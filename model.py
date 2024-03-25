@@ -132,23 +132,20 @@ class Transformer(nn.Module):
         self.max_batch_size = -1
         self.max_seq_length = -1
 
-    def setup_caches(self, max_batch_size, max_seq_length, use_kv_cache=True):
+    def setup_caches(self, max_batch_size, max_seq_length):
         if (
             self.max_seq_length >= max_seq_length
             and self.max_batch_size >= max_batch_size
         ):
             return
-
+        head_dim = self.config.dim // self.config.n_head
+        max_seq_length = find_multiple(max_seq_length, 8)
         self.max_seq_length = max_seq_length
         self.max_batch_size = max_batch_size
-
-        if use_kv_cache:
-            head_dim = self.config.dim // self.config.n_head
-            max_seq_length = find_multiple(max_seq_length, 8)
-            for b in self.layers:
-                b.attention.kv_cache = KVCache(
-                    max_batch_size, max_seq_length, self.config.n_local_heads, head_dim
-                )
+        for b in self.layers:
+            b.attention.kv_cache = KVCache(
+                max_batch_size, max_seq_length, self.config.n_local_heads, head_dim
+            )
 
         freqs_cis = precompute_freqs_cis(
             self.config.block_size,

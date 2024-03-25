@@ -27,12 +27,12 @@ def device_sync(device):
 
 
 class model_wrapper(nn.Module):
-    def __init__(self, model, device, use_kv_cache=False):
+    def __init__(self, model, device):
         super().__init__()
 
         max_seq_length = 350
         with torch.device(device):
-            model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length, use_kv_cache=use_kv_cache)
+            model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
 
         self.model = model
         # init model here if necessary
@@ -44,7 +44,7 @@ class model_wrapper(nn.Module):
         return logits  # sample(logits, **sampling_kwargs)
 
 
-def export_model(model: nn.Module, device, sopath, use_dynamic_shapes=False):
+def export_model(model: nn.Module, device):
 
     export_model = model_wrapper(model, device=device)
     print(export_model)
@@ -56,25 +56,14 @@ def export_model(model: nn.Module, device, sopath, use_dynamic_shapes=False):
 
     print(f"len(input)={len(input)}")
 
-    if use_dynamic_shapes:
-        batch = Dim("batch")
-        seqlen = Dim("seqlen")
-        # Specify that the first dimension of each input is that batch size
-        dynamic_shapes = {"idx": {0: batch, 1: seqlen}, "input_pos": {0: batch}}
-    else:
-        dynamic_shapes = None
+    batch = Dim("batch")
+    # Specify that the first dimension of each input is that batch size
+    dynamic_shapes = {"idx": {0: batch}, "input_pos": {0: batch}}
 
-    so = torch._export.aot_compile(
-        export_model,
-        args=input,
-        dynamic_shapes=dynamic_shapes,
-        options={"aot_inductor.output_path": sopath},
-    )
-
+    so = torch._export.aot_compile(export_model, args=input)
     print(f"so location: {so}")
-    return so
 
-    ###############################################################
+    return so
 
     exported_program: torch.export.ExportedProgram = export(
         export_model, args=input
@@ -91,7 +80,7 @@ def export_model(model: nn.Module, device, sopath, use_dynamic_shapes=False):
     assert so is not None
 
 
-def main(checkpoint_path, device, sopath):
+def main(checkpoint_path, device):
     assert checkpoint_path.is_file(), checkpoint_path
 
     print(f"Using device={device}")
@@ -105,7 +94,7 @@ def main(checkpoint_path, device, sopath):
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
     with torch.no_grad():
-        export_model(model, device, sopath)
+        export_model(model, device)
 
 
 def cli():
@@ -156,17 +145,9 @@ def cli():
     parser.add_argument(
         "--device", type=str, default=default_device, help="Device to use"
     )
-    parser.add_argument(
-        "--sopath", type=str, default="model.so", help="the output filepath"
-    )
-    parser.add_argument(
-        "--dynamic-shapes",
-        action="store_true",
-        help="enable aot compilation with dynamic shapes",
-    )
-    args = parser.parse_args()
 
-    main(args.checkpoint_path, args.device, args.sopath)
+    args = parser.parse_args()
+    main(args.checkpoint_path, args.device)
 
 if __name__ == "__main__":
     cli()
