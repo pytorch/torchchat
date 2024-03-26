@@ -26,6 +26,18 @@ Follow the [`gpt-fast` installation instructions](https://github.com/pytorch-lab
 
 If you are planning on using mobile backends, you should also install ExecuTorch and any hardware-specific libraries and IDEs.
 
+# A note on tokenizers
+
+There are two different formats for tokenizers, and both are used in this repo.
+1 - for generat.py and Python bindings, we use the Google sentencepiece Python operator. This operator consumes a tokenization model in the 'tokenizer.model' format.
+2 - for C/C++ inference, we use @Andrej Karpathy's C tokenizer function.  This tokenizer consumes a tokenization model in the 'tokenizer.bin' format.
+
+You can convert tokenizer.model into tokenizer.bin using Andrej's tokenizer.py utility to convert the tokenizer.model to tokenizer.bin format:
+```
+python tokenizer.py --tokenizer-model=/path/to/tokenizer/tokenizer.model
+./run codellama2_7b.bin -z /tokenizer/tokenizer.bin
+```
+
 # Generate Text
 
 ## Eager Execution
@@ -117,9 +129,9 @@ cmake -Bbuild -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cm
 cmake --build build
 ```
 
-To run, use the following command:
+To run, use the following command (assuming you already generated the tokenizer.bin tokenizer model):
 ```
-LD_LIBRARY_PATH=$CONDA_PREFIX/lib ./build/run ../${MODEL_REPO}.so
+LD_LIBRARY_PATH=$CONDA_PREFIX/lib ./build/run ../${MODEL_REPO}.so -z ../${MODEL_REPO}.bin
 ```
 
 ## Mobile and Edge Execution
@@ -133,8 +145,8 @@ cmake -Bbuild -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cm
 cmake --build build
 ```
 
-To run your pte model, use the following command:
+To run your pte model, use the following command (assuming you already generated the tokenizer.bin tokenizer model):
 ```
-./build/run ../${MODEL_REPO}{,_int8,_8da4w}.pte
+./build/run ../${MODEL_REPO}{,_int8,_8da4w}.pte -z ../${MODEL_REPO}.bin
 ```
 
