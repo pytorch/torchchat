@@ -135,6 +135,6 @@ cmake --build build
 
 To run your pte model, use the following command:
 ```
-./build/run ../${MODEL_REPO}.pte
+./build/run ../${MODEL_REPO}{,_int8,_8da4w}.pte
 ```
 
