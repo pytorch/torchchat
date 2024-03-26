@@ -8,9 +8,13 @@
 #include <math.h>
 #include <string.h>
 
-// FIXME: ET types inclusion
-#include <torch/csrc/inductor/aoti_runner/model_container_runner_cpu.h>
+#include <executorch/extension/runner_util/managed_tensor.h>
+#include <executorch/runtime/core/exec_aten/exec_aten.h>
+#include <executorch/runtime/core/exec_aten/util/scalar_type_util.h>
+
+#ifdef USE_ATEN_LIB
 #include <torch/torch.h>
+#endif
 
 // ----------------------------------------------------------------------------
 // Transformer model
@@ -28,8 +32,7 @@ typedef struct {
 typedef struct {
     Config config; // the hyperparameters of the architecture (the blueprint)
     RunState state; // buffers for the "wave" of activations in the forward pass
-  // FIXME: ET binding
-    torch::inductor::AOTIModelContainerRunnerCpu *runner;
+    unique_ptr<Module> runner;
 } Transformer;
 
 void malloc_run_state(RunState* s, Config* p) {
@@ -65,10 +68,9 @@ void build_transformer(Transformer *t, char* checkpoint_path, int vocab_size, in
     t->config.seq_len = seq_len;
     malloc_run_state(&t->state, &t->config);
 
-    // FIXME: load model here
-    t->runner = new torch::inductor::AOTIModelContainerRunnerCpu(
+    t->runner = std::make_unique<Module>(
         checkpoint_path,
-        1
+          Module::MlockConfig::UseMlockIgnoreErrors
     );
 }
 
