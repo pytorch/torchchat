@@ -46,12 +46,16 @@ When you have exported the model,
 Note to self: sopath is missing in the current version. Copy the reported path to ./${MODEL_REPO}.so
 
 ```
-python generate.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --dso ./${MODEL_REPO}.so
+python generate.py --device {cuda,cpu} --dso ./${MODEL_REPO}.so --prompt "Hello my name is"
 ```
 
 Note to self: --dso does not currently take an argument, and always loads stories15M.so.
 
 ## ExecuTorch mobile compilation
+
+### The basics
+
+Use a small model like stories15M.pt to test the instructions in the following section.
 
 ```
 python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 {-xnnpack|-coreml|--mps} --out-path ./${MODEL_REPO}.pte
@@ -59,9 +63,43 @@ python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 
 
 How do run is problematic -- I would love to run it with 
 ```
-python generate.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --dso ./${MODEL_REPO}.so
+python generate.py --pte ./${MODEL_REPO}.pte --prompt "Hello my name is"
 ```
 but *that requires xnnpack to work in python!* 
+
+### Making your models fit and execute fast!
+
+Next, we'll show you how to optimize your model for mobile execution. The basic model build for mobile surfaces two issues:
+Models quickly run out of memory and execution can be slow. In this section, we show you how to fit your models in the limited 
+memory of a mobile device, and optimize execution speed -- both using quantization. This is the `llama-fast` repo after all!
+
+#### 8 bit integer quantization
+The simplest way to quantize is with int8 quantization, where each value is represented by an 8 bit integer, and a 
+floating point scale:  
+```
+python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant int8 {-xnnpack|-coreml|--mps} --out-path ./${MODEL_REPO}_int8.pte
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py --ptr ./${MODEL_REPO}_int8.pte --prompt "Hello my name is"
+```
+
+#### 4 bit integer quantization (8da4w)
+To compress your model even more, 4 bit integer quantization may be used.  To achieve good accuracy, we recommend the use 
+of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8 bit, giving 
+this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights).
+```
+python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant 8da4w {-xnnpack|-coreml|--mps} --out-path ./${MODEL_REPO}_8da4w.pte
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py --ptr ./${MODEL_REPO}_8da4w.pte --prompt "Hello my name is"
+```
+
+#### Quantization with GPTQ (8da4w-gptq)
+TBD.
 
 
 # Standalone Execution 
