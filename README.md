@@ -4,6 +4,12 @@ A repo for building and using llama on servers, desktops and mobile
 The llama-fast repo enables model inference of llama models (and other LLMs) on servers, desktop and mobile devices.
 For a list of devices, see below, under *DEVICES*
 
+A goal of this repo, and the design of the PT2 components was to offer seamless integration and consistent workflows.  
+Both mobile and server/desktop paths start with torch.export() recieving the same model description.  Similarly,
+integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-posix
+and runner-mobile, respectively) offer very consistent experiences across backends.
+
+
 # Simple and efficient pytorch-native transformer text generation.
 
 Featuring:
