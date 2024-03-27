@@ -150,3 +150,22 @@ To run your pte model, use the following command (assuming you already generated
 ./build/run ../${MODEL_REPO}{,_int8,_8da4w}.pte -z ../${MODEL_REPO}.bin
 ```
 
+# Acknowledgements
+
+A big thank you to
+
+* Georgi Gerganov and his [GGML](https://github.com/ggerganov/ggml) project that helped shine a spotlight 
+on community-based neablement, and inspired so many other projects.
+
+* Andrej Karpathy and his [llama2.c](https://github.com/karpathy/llama2.c) project.  So many great (and simple!) ideas in llama2.c that we 
+have directly adopted (both ideas and code) from his repo.  You can never go wrong by following Andrej's work!
+
+* my colleague and friend Bert Maher and [llama2.so](https://github.com/bertmaher/llama2.so) who build on Andrej's llama2.c and closed the 
+loop on llama models.  I aspire to 
+
+* my colleagues and friends Christian Puhrsch, Horace He, Joe Isaacson, and many more for their many contributions in Accelerating GenAI models in 
+the *"Anything, Fast!"* blog series, and in particular Horace He for [GPT, Fast!](https://github.com/pytorch-labs/gpt-fast) that we have 
+directly adopted (both ideas and code) from his repo. 
+
+* my colleagues and friends Bert Maher, Scott Wolchok, Bin Bao, Chen Yang, Huamin Li and Mu-Chu Li for a great collaboration
+in building AOT Inductor for CPU, internal use cases and an experimental AOTI-compiled inference version of [nanoGPT](https://github.com/karpathy/nanoGPT).  
