@@ -5,7 +5,7 @@ The llama-fast repo enables model inference of llama models (and other LLMs) on 
 For a list of devices, see below, under *DEVICES*
 
 A goal of this repo, and the design of the PT2 components was to offer seamless integration and consistent workflows.  
-Both mobile and server/desktop paths start with torch.export() recieving the same model description.  Similarly,
+Both mobile and server/desktop paths start with torch.export() receiving the same model description.  Similarly,
 integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-posix
 and runner-mobile, respectively) offer very consistent experiences across backends and offer developers consistent interfaces 
 and user experience whether they target server, desktop or mobile & edge use cases, and/or all of them.
@@ -205,7 +205,7 @@ List dependencies for these backends
 A big thank you to
 
 * Georgi Gerganov and his [GGML](https://github.com/ggerganov/ggml) project that helped shine a spotlight 
-on community-based neablement, and inspired so many other projects.
+on community-based enablement, and inspired so many other projects.
 
 * Andrej Karpathy and his [llama2.c](https://github.com/karpathy/llama2.c) project.  So many great (and simple!) ideas in llama2.c that we 
 have directly adopted (both ideas and code) from his repo.  You can never go wrong by following Andrej's work!
