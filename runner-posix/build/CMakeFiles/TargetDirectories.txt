@@ -1,3 +1,0 @@
-/Users/mikekg/pytorch/llama-fast/run/build/CMakeFiles/run.dir
-/Users/mikekg/pytorch/llama-fast/run/build/CMakeFiles/edit_cache.dir
-/Users/mikekg/pytorch/llama-fast/run/build/CMakeFiles/rebuild_cache.dir
