@@ -168,7 +168,7 @@ on community-based neablement, and inspired so many other projects.
 have directly adopted (both ideas and code) from his repo.  You can never go wrong by following Andrej's work!
 
 * my colleague and friend Bert Maher and [llama2.so](https://github.com/bertmaher/llama2.so) who build on Andrej's llama2.c and closed the 
-loop on llama models.  I aspire to 
+loop on llama models.  The llama2.c integration with AOT Inductor comes from Bert's repo.
 
 * my colleagues and friends Christian Puhrsch, Horace He, Joe Isaacson, and many more for their many contributions in Accelerating GenAI models in 
 the *"Anything, Fast!"* blog series, and in particular Horace He for [GPT, Fast!](https://github.com/pytorch-labs/gpt-fast) that we have 
