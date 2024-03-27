@@ -4,6 +4,13 @@ A repo for building and using llama on servers, desktops and mobile
 The llama-fast repo enables model inference of llama models (and other LLMs) on servers, desktop and mobile devices.
 For a list of devices, see below, under *DEVICES*
 
+A goal of this repo, and the design of the PT2 components was to offer seamless integration and consistent workflows.  
+Both mobile and server/desktop paths start with torch.export() recieving the same model description.  Similarly,
+integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-posix
+and runner-mobile, respectively) offer very consistent experiences across backends and offer developers consistent interfaces 
+and user experience whether they target server, desktop or mobile & edge use cases, and/or all of them.
+
+
 # Simple and efficient pytorch-native transformer text generation.
 
 Featuring:
@@ -25,6 +32,18 @@ See [`gpt-fast` Supported Models](https://github.com/pytorch-labs/gpt-fast?tab=r
 Follow the [`gpt-fast` installation instructions](https://github.com/pytorch-labs/gpt-fast?tab=readme-ov-file#installation).
 
 If you are planning on using mobile backends, you should also install ExecuTorch and any hardware-specific libraries and IDEs.
+
+# A note on tokenizers
+
+There are two different formats for tokenizers, and both are used in this repo.
+1 - for generat.py and Python bindings, we use the Google sentencepiece Python operator. This operator consumes a tokenization model in the 'tokenizer.model' format.
+2 - for C/C++ inference, we use @Andrej Karpathy's C tokenizer function.  This tokenizer consumes a tokenization model in the 'tokenizer.bin' format.
+
+You can convert tokenizer.model into tokenizer.bin using Andrej's tokenizer.py utility to convert the tokenizer.model to tokenizer.bin format:
+```
+python tokenizer.py --tokenizer-model=/path/to/tokenizer/tokenizer.model
+./run codellama2_7b.bin -z /tokenizer/tokenizer.bin
+```
 
 # Generate Text
 
@@ -117,9 +136,9 @@ cmake -Bbuild -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cm
 cmake --build build
 ```
 
-To run, use the following command:
+To run, use the following command (assuming you already generated the tokenizer.bin tokenizer model):
 ```
-LD_LIBRARY_PATH=$CONDA_PREFIX/lib ./build/run ../${MODEL_REPO}.so
+LD_LIBRARY_PATH=$CONDA_PREFIX/lib ./build/run ../${MODEL_REPO}.so -z ../${MODEL_REPO}.bin
 ```
 
 ## Mobile and Edge Execution
@@ -133,8 +152,27 @@ cmake -Bbuild -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cm
 cmake --build build
 ```
 
-To run your pte model, use the following command:
+To run your pte model, use the following command (assuming you already generated the tokenizer.bin tokenizer model):
 ```
-./build/run ../${MODEL_REPO}{,_int8,_8da4w}.pte
+./build/run ../${MODEL_REPO}{,_int8,_8da4w}.pte -z ../${MODEL_REPO}.bin
 ```
 
+# Acknowledgements
+
+A big thank you to
+
+* Georgi Gerganov and his [GGML](https://github.com/ggerganov/ggml) project that helped shine a spotlight 
+on community-based neablement, and inspired so many other projects.
+
+* Andrej Karpathy and his [llama2.c](https://github.com/karpathy/llama2.c) project.  So many great (and simple!) ideas in llama2.c that we 
+have directly adopted (both ideas and code) from his repo.  You can never go wrong by following Andrej's work!
+
+* my colleague and friend Bert Maher and [llama2.so](https://github.com/bertmaher/llama2.so) who build on Andrej's llama2.c and closed the 
+loop on llama models.  The llama2.c integration with AOT Inductor comes from Bert's repo.
+
+* my colleagues and friends Christian Puhrsch, Horace He, Joe Isaacson, and many more for their many contributions in Accelerating GenAI models in 
+the *"Anything, Fast!"* blog series, and in particular Horace He for [GPT, Fast!](https://github.com/pytorch-labs/gpt-fast) that we have 
+directly adopted (both ideas and code) from his repo. 
+
+* my colleagues and friends Bert Maher, Scott Wolchok, Bin Bao, Chen Yang, Huamin Li and Mu-Chu Li for a great collaboration
+in building AOT Inductor for CPU, internal use cases and an experimental AOTI-compiled inference version of [nanoGPT](https://github.com/karpathy/nanoGPT).  
