@@ -7,7 +7,8 @@ For a list of devices, see below, under *DEVICES*
 A goal of this repo, and the design of the PT2 components was to offer seamless integration and consistent workflows.  
 Both mobile and server/desktop paths start with torch.export() recieving the same model description.  Similarly,
 integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-posix
-and runner-mobile, respectively) offer very consistent experiences across backends.
+and runner-mobile, respectively) offer very consistent experiences across backends and offer developers consistent interfaces 
+and user experience whether they target server, desktop or mobile & edge use cases, and/or all of them.
 
 
 # Simple and efficient pytorch-native transformer text generation.
