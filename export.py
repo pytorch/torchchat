@@ -44,7 +44,7 @@ class model_wrapper(nn.Module):
         return logits  # sample(logits, **sampling_kwargs)
 
 
-def export_model(model: nn.Module, device):
+def export_model(model: nn.Module, device, output_path):
 
     export_model = model_wrapper(model, device=device)
     print(export_model)
@@ -60,11 +60,18 @@ def export_model(model: nn.Module, device):
     # Specify that the first dimension of each input is that batch size
     dynamic_shapes = {"idx": {0: batch}, "input_pos": {0: batch}}
 
-    so = torch._export.aot_compile(export_model, args=input)
-    print(f"so location: {so}")
-
+    so = torch._export.aot_compile(
+        export_model,
+        args=input,
+        options={"aot_inductor.output_path": output_path},
+    )
+    print(f"The generated DSO model can be found at: {so}")
     return so
 
+    #################################################################
+    ### FIXME.... used for separate export & compile
+    #################################################################
+    
     exported_program: torch.export.ExportedProgram = export(
         export_model, args=input
     )  # , dynamic_shapes=dynamic_shapes)
@@ -80,7 +87,7 @@ def export_model(model: nn.Module, device):
     assert so is not None
 
 
-def main(checkpoint_path, device):
+def main(checkpoint_path, device, output_path):
     assert checkpoint_path.is_file(), checkpoint_path
 
     print(f"Using device={device}")
@@ -94,7 +101,7 @@ def main(checkpoint_path, device):
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
     with torch.no_grad():
-        export_model(model, device)
+        export_model(model, device, output_path)
 
 
 def cli():
@@ -145,9 +152,12 @@ def cli():
     parser.add_argument(
         "--device", type=str, default=default_device, help="Device to use"
     )
+    parser.add_argument(
+        "--out-path", type=str, default="model.so", help="Filename"
+    )
 
     args = parser.parse_args()
-    main(args.checkpoint_path, args.device)
+    main(args.checkpoint_path, args.device, args.out_path)
 
 if __name__ == "__main__":
     cli()

@@ -1,3 +1,4 @@
+# Export using Executorch, the PyTorch 2 mobile solution coming soon
 # (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
 
 import itertools
@@ -13,6 +14,8 @@ from torch.export import Dim, export
 from generate import _load_model, decode_one_token
 
 from model import Transformer
+
+from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -73,62 +76,9 @@ class model_wrapper(nn.Module):
 def canonical_path(path):
     return path
 
-
-def preprocess(args) -> Tuple:
-    """
-    returns a list of quantizers, and the dtype to use
-    """
-
-    # load model from checkpoint and params.json
-    checkpoint_path = canonical_path(args.checkpoint)
-    params_path = canonical_path(args.params)
-
-    if args.quantization_mode in ["8da4w", "8da4w-gptq"]:
-        dtype_override = torch.float16
-    else:
-        dtype_override = torch.float32
-        
-    # source transforms
-    transforms = []
-    if args.quantization_mode:
-        transforms.append(
-            partial(
-                quantize,
-                qmode=args.quantization_mode,
-                activation_dtype=dtype_override,
-                checkpoint_path=(
-                    Path(path) if (path := args.checkpoint) is not None else None
-                ),
-                tokenizer_path=(
-                    Path(path) if (path := args.tokenizer_path) is not None else None
-                ),
-                group_size=args.group_size,
-                calibration_tasks=args.calibration_tasks,
-                calibration_limit=args.calibration_limit,
-                calibration_seq_length=args.calibration_seq_length,
-            )
-        )
-
-    if args.embedding_quantize:
-        bitwidth, group_size = args.embedding_quantize.split(",")
-        if group_size == "none" or group_size == "None" or group_size == "0":
-            group_size = None
-        else:
-            group_size = int(group_size)
-        bitwidth = int(bitwidth)
-        transforms.append(
-            lambda model: EmbeddingOnlyInt8QuantHandler(
-                model, bitwidth=bitwidth, group_size=group_size
-            ).quantized_model()
-        )
-
-    if args.expand_rope_table:
-        transforms.append(materialze_broadcast_of_rope_freq_cis)
-
-    return transforms, dtype_override
-
-
-def export_model(model: nn.Module, device, output_path):
+## align AOTI and ET export
+# def export_model(model: nn.Module, device, output_path):
+def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
 
     export_model = model_wrapper(model, device=device)
     print(export_model)
@@ -138,200 +88,90 @@ def export_model(model: nn.Module, device, output_path):
         torch.tensor([0], dtype=torch.long, device=device),
     )
 
-    print(f"len(input)={len(input)}")
+    state_dict = model.state_dict()
+    state_dict_dtype = state_dict[next(iter(state_dict))].dtype
 
-    batch = Dim("batch")
-    # Specify that the first dimension of each input is that batch size
-    dynamic_shapes = {"idx": {0: batch}, "input_pos": {0: batch}}
-
-    quantizers, dtype_override = preprocess_quantizers(args)
-    dtype_override = preprocess_dtype(args)
-
-    # so = torch._export.aot_compile(
-    #     export_model,
-    #     args=input,
-    #     options={"aot_inductor.output_path": output_path},
-    # )
-    # print(f"The generated DSO model can be found at: {so}")
-    # return so
-
-    # process model here 
-    _prepare_for_llama_export(
-        args
-    ).export_to_edge()
-    checkpoint=checkpoint_path,
-
-    # we always use kv cache.  Let's discuss sdpa_w_kv
-    # maybe always on???? ... discuss pros and cons @kimish
-    use_kv_cache=args.use_kv_cache,
-    use_sdpa_with_kv_cache=args.use_sdpa_with_kv_cache,
-
-    # this doesn't use params - just hard code the models we support
-    see what gpt-fast does (and yes, params is better, but dict
-                            is simpler. This shows ET is SIMPLE!)
-
-    # I think we set that to a semi fixed value, check aoti export
-    max_seq_len=args.max_seq_length,
-
-    # maybe inline calling transforms here... 
-    .source_transform(transforms)
-    # FIXME: we should get rid of the separate "quantize" step for AOTI
-    # as well and do it the same way
-
-    # this 
-    .to_dtype(dtype_override)
+    # need to use kv sdpa?
+    edge_config = EdgeCompileConfig(
+        _check_ir_validity=False,
+        _skip_type_promotion=bool(args.dtype_override == "fp16"),
     )
 
-    # to_backend
+    dynamic_shapes = None
 
-    #### We don't do this one?
-    partitioner = None
-    if pt2e_quant_params is not None and pt2e_quant_params.quantize_linear is not None:
-        partitioner = XnnpackDynamicallyQuantizedPartitioner()
-        modelname = f"xnnpack_dq_{modelname}"
+    if args.quantization_mode:
+        modelname = f"{modelname}_q"
+        model = quantize(model, args.quantization_mode)
+
+        if args.verbose:
+            print(f"{modelname}:")
+            print(f"{model}")
+
+    if args.embedding_quantize:
+        modelname = f"{modelname}_e"
+        model = EmbeddingOnlyInt8QuantHandler(model).convert_for_runtime()
+
+    if args.dtype_override is not None:
+        if (
+            args.dtype_override == "fp16" and state_dict_dtype != torch.float16
+        ) or args.quantization_mode == "int4":
+            print("model.to torch.float16")
+            model = model.to(dtype=torch.float16)
+            state_dict_dtype = torch.float16
+        elif args.dtype_override == "fp32" and state_dict_dtype != torch.float:
+            print("model.to torch.float32")
+            model = model.to(dtype=torch.float32)
+        else:
+            raise ValueError(f"Unsupported dtype override: {args.dtype_override}")
+
+    if args.verbose:
+        print(f"{modelname}:")
+        print(f"{model}")
+
+    quantization_options = _get_quantization_options(args)
+    with torch.nn.attention.sdpa_kernel([SDPBackend.MATH]), torch.no_grad():
+        m = capture_pre_autograd_graph(
+            export_model,
+            input,
+            dynamic_shapes=dynamic_shapes
+        )
+
+        edge_manager = export_to_edge(
+            m,
+            input,
+            dynamic_shapes=dynamic_shapes,
+            edge_compile_config=edge_config,
+        )
+
+    if args.xnnpack_dynamic:
+        edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
 
     if args.xnnpack:
-        # Following changes due to.
-        # 1. We need dynamically quantized partitioner for both pt2e_quantize options
-        #    as well as "qmode 8da4w" which is also dynamic quantizes linear layers.
-        # 2. XNNPACK partitioner seems to result in seg fault for non dqlinear ops.
-        partitioner = XnnpackDynamicallyQuantizedPartitioner()
-        # partitioner = XnnpackPartitioner()
+        edge_manager = edge_manager.to_backend(XnnpackPartitioner())
 
-    if args.vulkan:
-        assert (
-            args.dtype_override == "fp32" or args.dtype_override is None
-        ), "Vulkan backend does not support non fp32 dtypes at the moment"
-        assert (
-            args.quantization_mode is None
-        ), "Vulkan backend does not support quantization at the moment"
-
-        partitioner = VulkanPartitioner()
-
-    if args.mps:
-        assert (
-            args.use_kv_cache is True
-        ), "MPS backend currently only supports static shape and use_kv_cache=True is the only way to support it at the moment"
-        try:
-            # pyre-ignore Undefined import [21]: Could not find a module corresponding to import `executorch.backends.apple.mps.partition.mps_partitioner`.
-            from executorch.backends.apple.mps.partition.mps_partitioner import (
-                MPSPartitioner,
-            )
-        except ImportError:
-            raise ImportError(
-                "Please install the MPS backend follwing https://pytorch.org/executorch/main/build-run-mps.html"
-            )
-
-        compile_specs = [CompileSpec("use_fp16", bytes([True]))]
-        # pyre-ignore: Undefined attribute [16]: Module `executorch.backends` has no attribute `apple`.
-        partitioner = MPSPartitioner(compile_specs)
-
-    if args.coreml:
-        assert (
-            args.use_kv_cache is True
-        ), "CoreML backend currently only supports static shape and use_kv_cache=True is the only way to support it at the moment"
-        try:
-            # pyre-ignore: Undefined import [21]: Could not find a module corresponding to import `executorch.backends.apple.coreml.partition.coreml_partitioner`.
-            import coremltools as ct
-
-            # pyre-ignore: Undefined import [21]: Could not find a module corresponding to import `executorch.backends.apple.coreml.compiler`
-            from executorch.backends.apple.coreml.compiler import CoreMLBackend
-
-            # pyre-ignore: Undefined import [21]: Could not find a module corresponding to import `executorch.backends.apple.coreml.partition.coreml_partitioner`
-            from executorch.backends.apple.coreml.partition.coreml_partitioner import (
-                CoreMLPartitioner,
-            )
-        except ImportError:
-            raise ImportError(
-                "Please install the CoreML backend follwing https://pytorch.org/executorch/main/build-run-coreml.html"
-            )
-
-        # pyre-ignore: Undefined attribute [16]: Module `executorch.backends` has no attribute `apple`.
-        compile_specs = CoreMLBackend.generate_compile_specs(
-            compute_precision=ct.precision(ct.precision.FLOAT16.value),
-            compute_unit=ct.ComputeUnit[ct.ComputeUnit.ALL.name.upper()],
-            # pyre-ignore: Undefined attribute [16]: Module `executorch.backends` has no attribute `apple`
-            model_type=CoreMLBackend.MODEL_TYPE.MODEL,
-        )
-        # pyre-ignore: Undefined attribute [16]: Module `executorch.backends` has no attribute `apple`
-        partitioner = CoreMLPartitioner(
-            skip_ops_for_coreml_delegation=None, compile_specs=compile_specs
+    # TODO: remove this after xnnpack delegation is ready
+    if args.quantization_mode == "int4":
+        raise Exception(
+            "some quantized ops should be lowered to xnnpack, but xnnpack delegate is not ready yet"
         )
 
-    #### QNN requires pt2e quantization.
-    #### Don't use.  This subverts the simplicity message.
-    #### Future update when we align quantization
-    
-    if args.qnn:
-        assert (
-            args.use_kv_cache is True
-        ), "Qualcomm backend currently only supports static shape and use_kv_cache=True is the only way to support it at the moment"
-        try:
-            # pyre-ignore: Undefined import [21]: Could not find a module corresponding to import `executorch.backends.qualcomm.partition.qnn_partitioner`
-            from executorch.backends.qualcomm.partition.qnn_partitioner import (
-                QnnPartitioner,
-            )
-
-            # pyre-ignore: Undefined import [21]: Could not find a module corresponding to import `executorch.backends.qualcomm.serialization.qnn_compile_spec_schema`
-            from executorch.backends.qualcomm.serialization.qnn_compile_spec_schema import (
-                QcomChipset,
-            )
-
-            # pyre-ignore: Undefined import [21]: Could not find a module corresponding to import `executorch.backends.qualcomm.utils.utils`
-            from executorch.backends.qualcomm.utils.utils import (
-                _transform,
-                generate_htp_compiler_spec,
-                generate_qnn_executorch_compiler_spec,
-            )
-        except ImportError:
-            raise ImportError(
-                "Please install the Qualcomm backend follwing https://pytorch.org/executorch/main/build-run-qualcomm.html"
-            )
-
-        # pyre-ignore: Undefined attribute [16]: Module `executorch.backends` has no attribute `qualcomm`
-        backend_options = generate_htp_compiler_spec(use_fp16=False)
-        # pyre-ignore: Undefined attribute [16]: Module `executorch.backends` has no attribute `qualcomm`
-        partitioner = QnnPartitioner(
-            # pyre-ignore: Undefined attribute [16]: Module `executorch.backends` has no attribute `qualcomm`
-            generate_qnn_executorch_compiler_spec(
-                # pyre-ignore: Undefined attribute [16]: Module `executorch.backends` has no attribute `qualcomm`.
-                soc_model=QcomChipset.SM8650,  # default to SM8650
-                backend_options=backend_options,
-                debug=False,
-                saver=False,
-            ),
-            skip_node_id_set={},
-            skip_node_op_set={},
+    export_program = edge_manager.to_executorch(
+        ExecutorchBackendConfig(
+            extract_constant_segment=True,
+            extract_delegate_segments=True,
+            passes=[
+                QuantFusionPass(),
+            ],
+            sym_shape_eval_pass=ConstraintBasedSymShapeEvalPass(),
         )
-        # pyre-ignore: Undefined attribute [16]: Module `executorch.backends` has no attribute `qualcomm`
-        _transform(builder_exported_to_edge.export_program())
+    )
 
-    #### no builder?
-    output_path = args.output_path
-    builder.save_to_pte(output_path)
+    save_pte_program(export_program.buffer, "llama-fast", output_path)
 
     return output_path
 
-    #################################################################
-    ### FIXME.... used for separate export & compile
-    #################################################################
-    
-    exported_program: torch.export.ExportedProgram = export(
-        export_model, args=input
-    )  # , dynamic_shapes=dynamic_shapes)
 
-    torch.export.save(exported_program, "exported_gpt-fast.pt2")
-
-    print(exported_program)
-
-    return
-
-    so = torch._export.aot_compile(exported_program, args=input)
-    print(f"{so=}")
-    assert so is not None
-
-
-def main(checkpoint_path, device, output_path):
+def main(checkpoint_path, device, output_path, args = None):
     assert checkpoint_path.is_file(), checkpoint_path
 
     print(f"Using device={device}")
@@ -339,13 +179,15 @@ def main(checkpoint_path, device, output_path):
 
     print("Loading model ...")
     t0 = time.time()
-    model = _load_model(checkpoint_path, device, precision, False)
+    model = _load_model(
+        checkpoint_path, device="cpu", precision=precision, use_tp=False)
 
     device_sync(device=device)  # MKG
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
     with torch.no_grad():
-        export_model(model, device, output_path)
+        # diverges from AOTI
+        export_model(model, device, output_path, args)
 
 
 def cli():
@@ -372,7 +214,7 @@ def cli():
     parser.add_argument(
         "--checkpoint_path",
         type=Path,
-        default=Path("checkpoints/meta-Transformer/Transformer-2-7b-chat-hf/model.pth"),
+        default="not_specified",
         help="Model checkpoint path.",
     )
     parser.add_argument(
@@ -400,8 +242,30 @@ def cli():
         "--out-path", type=str, default="model.so", help="Filename"
     )
 
+    ### ET EXPORT OPTIONS
+    parser.add_argument("-E", "--embedding-quantize", default=None, action="store_true")
+    parser.add_argument(
+        "-qmode",
+        "--quantization_mode",
+        type=str,
+        default=None,
+        choices=["int8", "int4"],
+        help="type of quantization",
+    )
+    parser.add_argument(
+        "-d",
+        "--dtype-override",
+        default=None,
+        help="Override the dtype of the model (default is the checkpoint dtype). Options: fp16, fp32",
+    )
+    parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("-X", "--xnnpack", action="store_true")
+    parser.add_argument("-x", "--xnnpack_dynamic", action="store_true")
+    parser.add_argument("-G", "--groupsize", default=None, help="specify the groupsize")
+
+
     args = parser.parse_args()
-    main(args.checkpoint_path, args.device, args.out_path)
+    main(args.checkpoint_path, "cpu", args.out_path, args)
 
 if __name__ == "__main__":
     cli()
