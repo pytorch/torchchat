@@ -153,7 +153,7 @@ def cli():
         "--device", type=str, default=default_device, help="Device to use"
     )
     parser.add_argument(
-        "--out-path", type=str, default="model.so", help="Filename"
+        "--out-path", type=str, default="stories15M.so", help="Filename"
     )
 
     args = parser.parse_args()
