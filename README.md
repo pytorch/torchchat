@@ -63,7 +63,7 @@ To squeeze out a little bit more performance, you can also compile the prefill w
 
 ## AOT Inductor compilation and execution
 ```
-python export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --out-path ./${MODEL_REPO}.so
+python aoti_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --out-path ./${MODEL_REPO}.so
 ```
 
 When you have exported the model, 
