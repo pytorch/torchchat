@@ -1,4 +1,3 @@
-# Export using Executorch, the PyTorch 2 mobile solution coming soon
 # (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
 
 import itertools
