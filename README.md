@@ -4,10 +4,10 @@ A repo for building and using llama on servers, desktops and mobile
 The llama-fast repo enables model inference of llama models (and other LLMs) on servers, desktop and mobile devices.
 For a list of devices, see below, under *SUPPORTED SYSTEMS*
 
-A goal of this repo, and the design of the PT2 components was to offer seamless integration and consistent workflows.  
+A goal of this repo, and the design of the PT2 components was to offer seamless integration and consistent workflows.
 Both mobile and server/desktop paths start with torch.export() receiving the same model description.  Similarly,
-integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-aoti
-and runner-et, respectively) offer a consistent experience across backends and offer developers consistent interfaces 
+integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-posix
+and runner-mobile, respectively) offer very consistent experiences across backends and offer developers consistent interfaces
 and user experience whether they target server, desktop or mobile & edge use cases, and/or all of them.
 
 
@@ -21,10 +21,10 @@ Featuring:
 * int8/int4 quantization
 * Supports Nvidia and AMD GPUs, MPS, CPU (Linux/x86 and MacOS/ARM), xnnpack, and backend-specific mobile runtimes ("delegates").
 
-This is NOT intended to be a "framework" or "library" - it is intended to show off what kind of performance you can get with native PyTorch :) 
+This is NOT intended to be a "framework" or "library" - it is intended to show off what kind of performance you can get with native PyTorch :)
 Please copy-paste and fork as you desire.
 
-# Supported Models 
+# Supported Models
 The model definition (and much more!) is adopted from gpt-fast, so we support the same models.
 See [`gpt-fast` Supported Models](https://github.com/pytorch-labs/gpt-fast?tab=readme-ov-file#supported-models) for a full list.
 
@@ -66,7 +66,7 @@ To squeeze out a little bit more performance, you can also compile the prefill w
 python aoti_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --out-path ./${MODEL_REPO}.so
 ```
 
-When you have exported the model, 
+When you have exported the model,
 Note to self: sopath is missing in the current version. Copy the reported path to ./${MODEL_REPO}.so
 
 ```
@@ -79,27 +79,30 @@ Note to self: --dso does not currently take an argument, and always loads storie
 
 ### The basics
 
-Use a small model like stories15M.pt to test the instructions in the following section.
+Use a small model like stories15M.pt to test the instructions in the following section.  You must first have ExecuTorch installed before running this command, see the installation instructions in the sections [here](#installation-instructions).
+
+The environment variable MODEL_REPO should point to a directory with the `model.pth` file and `tokenizer.model` file.
+The command below will add the file "llama-fast.pte" to your MODEL_REPO directory.
 
 ```
-python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 {-xnnpack|-coreml|--mps} --out-path ./${MODEL_REPO}.pte
+python et_export.py --checkpoint_path $MODEL_REPO/model.pth -d fp32 --xnnpack --out-path ${MODEL_REPO}
 ```
 
-We can now run this model with 
+How do run is problematic -- I would love to run it with
 ```
 python generate.py --pte ./${MODEL_REPO}.pte --prompt "Hello my name is" --device cpu
 ```
-but *that requires xnnpack to work in python!* 
+but *that requires xnnpack to work in python!*
 
 ### Making your models fit and execute fast!
 
 Next, we'll show you how to optimize your model for mobile execution. The basic model build for mobile surfaces two issues:
-Models quickly run out of memory and execution can be slow. In this section, we show you how to fit your models in the limited 
+Models quickly run out of memory and execution can be slow. In this section, we show you how to fit your models in the limited
 memory of a mobile device, and optimize execution speed -- both using quantization. This is the `llama-fast` repo after all!
 
 #### 8 bit integer quantization
-The simplest way to quantize is with int8 quantization, where each value is represented by an 8 bit integer, and a 
-floating point scale:  
+The simplest way to quantize is with int8 quantization, where each value is represented by an 8 bit integer, and a
+floating point scale:
 ```
 python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant int8 {-xnnpack|-coreml|--mps} --out-path ./${MODEL_REPO}_int8.pte
 ```
@@ -110,8 +113,8 @@ python generate.py --ptr ./${MODEL_REPO}_int8.pte --prompt "Hello my name is"
 ```
 
 #### 4 bit integer quantization (8da4w)
-To compress your model even more, 4 bit integer quantization may be used.  To achieve good accuracy, we recommend the use 
-of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8 bit, giving 
+To compress your model even more, 4 bit integer quantization may be used.  To achieve good accuracy, we recommend the use
+of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8 bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights).
 ```
 python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant 8da4w {-xnnpack|-coreml|--mps} --out-path ./${MODEL_REPO}_8da4w.pte
@@ -126,7 +129,7 @@ python generate.py --ptr ./${MODEL_REPO}_8da4w.pte --prompt "Hello my name is"
 TBD.
 
 
-# Standalone Execution 
+# Standalone Execution
 
 ## Desktop and Server Execution
 This has been tested with Linux and x86 (using CPU ~and GPU~), and MacOS and ARM/Apple Silicon.
@@ -147,7 +150,7 @@ LD_LIBRARY_PATH=$CONDA_PREFIX/lib ./build/run ../${MODEL_REPO}.so -z ../${MODEL_
 ```
 
 ## Mobile and Edge Execution
-This has been shown to run on x86. with the proper IDE environment, you can compile for your specific target. 
+This has been shown to run on x86. with the proper IDE environment, you can compile for your specific target.
 For a GUI integration in iOS and Android, please refer to...
 
 Build the runner like this
@@ -169,18 +172,18 @@ PyTorch and the mobile Executorch backend support a broad range fo devices for r
 
 | Hardware | OS | eager | eager + compile | AOT compile | ET Runtime |
 |-----|------|-----|-----|-----|-----|
-| x86 | Linux | ❎ |  ❎ |  ❎ |  ❎ | 
-| x86 | macOS | ? | ? | ? | ? | 
-| aarch64 | Linux | ? | ? | ? | ? | 
-| aarch64 | macOS | ❎ |  ❎ |  ❎ |  ❎ | 
-| AMD GPU | Linux |  ❎ |  ❎ |  ❎ |  ?| 
-| Nvidia GPU | Linux | ❎ |  ❎ |  ❎ |  ? | 
-| MPS | macOS | ❎ |  ? |  ? |  <chen lai> | 
-| MPS | iOS | ❌|❌|❌| ❎ | 
-| aarch64 | Android | ❌|❌|❌| ❎ | 
-| Mobile GPU (Vulkan) | Android |  ❌|❌|❌| ❎ | 
-| CoreML | iOS |  ❌|❌|❌| ❎ | 
-| Hexagon DSP | Android | ❌|❌|❌| ❎ | 
+| x86 | Linux | ❎ |  ❎ |  ❎ |  ❎ |
+| x86 | macOS | ? | ? | ? | ? |
+| aarch64 | Linux | ? | ? | ? | ? |
+| aarch64 | macOS | ❎ |  ❎ |  ❎ |  ❎ |
+| AMD GPU | Linux |  ❎ |  ❎ |  ❎ |  ?|
+| Nvidia GPU | Linux | ❎ |  ❎ |  ❎ |  ? |
+| MPS | macOS | ❎ |  ? |  ? |  <chen lai> |
+| MPS | iOS | ❌|❌|❌| ❎ |
+| aarch64 | Android | ❌|❌|❌| ❎ |
+| Mobile GPU (Vulkan) | Android |  ❌|❌|❌| ❎ |
+| CoreML | iOS |  ❌|❌|❌| ❎ |
+| Hexagon DSP | Android | ❌|❌|❌| ❎ |
 | Raspberry Pi 4/5 | Raspbian | ? | ? | ? | ? |
 | Raspberry Pi 4/5 | Android | ? | ? | ? | ? |
 | ARM 32b (up to v7) | any | ❌|❌|❌|❌|
@@ -209,16 +212,16 @@ PyTorch and the mobile Executorch backend support a broad range fo devices for r
 
 ## Installation Instructions
 
-Some systems require additional installation steps. 
+Some systems require additional installation steps.
 
 Note: External libraries have not been tested for correctness, reliability and safety. Please contact your system vendor if you have system-specific questions.
 
 ### macOS (aarch64, x86)
 
 To use torch.compile, you should install OpenMP and a compiler with suitable OpenMP support. You can install OpenMP using conda by following the PyTorch installation instructions
-at https://github.com/pytorch/pytorch?tab=readme-ov-file#install-dependencies. 
+at https://github.com/pytorch/pytorch?tab=readme-ov-file#install-dependencies.
 
-Alternatively, you can also find libraries here: https://mac.r-project.org/openmp/ and from other locations. Alternatively, you may install 
+Alternatively, you can also find libraries here: https://mac.r-project.org/openmp/ and from other locations. Alternatively, you may install
 
 macOS running on x86 is reaching end-of-life. To use PyTorch on x86 running macOS, you can download prebuilt binaries up to PyTorch 2.2.  You can download recent PyTorch releases and
 install them from source.
@@ -227,24 +230,27 @@ install them from source.
 
 List dependencies for these backends
 
+### ExecuTorch
+Set up executorch by following the instructions [here](https://pytorch.org/executorch/stable/getting-started-setup.html#setting-up-executorch).
+
 
 
 # Acknowledgements
 
 A big thank you to
 
-* Georgi Gerganov and his [GGML](https://github.com/ggerganov/ggml) project that helped shine a spotlight 
+* Georgi Gerganov and his [GGML](https://github.com/ggerganov/ggml) project that helped shine a spotlight
 on community-based enablement, and inspired so many other projects.
 
-* Andrej Karpathy and his [llama2.c](https://github.com/karpathy/llama2.c) project.  So many great (and simple!) ideas in llama2.c that we 
+* Andrej Karpathy and his [llama2.c](https://github.com/karpathy/llama2.c) project.  So many great (and simple!) ideas in llama2.c that we
 have directly adopted (both ideas and code) from his repo.  You can never go wrong by following Andrej's work!
 
-* my colleague and friend Bert Maher and [llama2.so](https://github.com/bertmaher/llama2.so) who build on Andrej's llama2.c and closed the 
+* my colleague and friend Bert Maher and [llama2.so](https://github.com/bertmaher/llama2.so) who build on Andrej's llama2.c and closed the
 loop on llama models.  The llama2.c integration with AOT Inductor comes from Bert's repo.
 
-* my colleagues and friends Christian Puhrsch, Horace He, Joe Isaacson, and many more for their many contributions in Accelerating GenAI models in 
-the *"Anything, Fast!"* blog series, and in particular Horace He for [GPT, Fast!](https://github.com/pytorch-labs/gpt-fast) that we have 
-directly adopted (both ideas and code) from his repo. 
+* my colleagues and friends Christian Puhrsch, Horace He, Joe Isaacson, and many more for their many contributions in Accelerating GenAI models in
+the *"Anything, Fast!"* blog series, and in particular Horace He for [GPT, Fast!](https://github.com/pytorch-labs/gpt-fast) that we have
+directly adopted (both ideas and code) from his repo.
 
 * my colleagues and friends Bert Maher, Scott Wolchok, Bin Bao, Chen Yang, Huamin Li and Mu-Chu Li for a great collaboration
-in building AOT Inductor for CPU, internal use cases and an experimental AOTI-compiled inference version of [nanoGPT](https://github.com/karpathy/nanoGPT).  
+in building AOT Inductor for CPU, internal use cases and an experimental AOTI-compiled inference version of [nanoGPT](https://github.com/karpathy/nanoGPT).
