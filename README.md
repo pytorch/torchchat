@@ -2,12 +2,12 @@
 A repo for building and using llama on servers, desktops and mobile
 
 The llama-fast repo enables model inference of llama models (and other LLMs) on servers, desktop and mobile devices.
-For a list of devices, see below, under *DEVICES*
+For a list of devices, see below, under *SUPPORTED SYSTEMS*
 
 A goal of this repo, and the design of the PT2 components was to offer seamless integration and consistent workflows.  
 Both mobile and server/desktop paths start with torch.export() receiving the same model description.  Similarly,
-integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-posix
-and runner-mobile, respectively) offer very consistent experiences across backends and offer developers consistent interfaces 
+integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-aoti
+and runner-et, respectively) offer a consistent experience across backends and offer developers consistent interfaces 
 and user experience whether they target server, desktop or mobile & edge use cases, and/or all of them.
 
 
@@ -136,7 +136,7 @@ In addition to running with the generate.py driver in Python, you can also run P
 
 Build the runner like this
 ```
-cd ./runner-posix
+cd ./runner-aoti
 cmake -Bbuild -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'`
 cmake --build build
 ```
@@ -152,7 +152,7 @@ For a GUI integration in iOS and Android, please refer to...
 
 Build the runner like this
 ```
-cd ./runner-mobile
+cd ./runner-et
 cmake -Bbuild -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'`
 cmake --build build
 ```
