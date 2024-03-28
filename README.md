@@ -41,8 +41,8 @@ There are two different formats for tokenizers, and both are used in this repo.
 
 You can convert tokenizer.model into tokenizer.bin using Andrej's tokenizer.py utility to convert the tokenizer.model to tokenizer.bin format:
 ```
-python tokenizer.py --tokenizer-model=/path/to/tokenizer/tokenizer.model
-./run codellama2_7b.bin -z /tokenizer/tokenizer.bin
+python utils/tokenizer.py --tokenizer-model=/path/to/tokenizer/tokenizer.model
+./run ./model.{so,pte} -z path/to/tokenizer/tokenizer.bin
 ```
 
 # Generate Text
