@@ -15,6 +15,13 @@ from generate import _load_model, decode_one_token
 from model import Transformer
 
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
+from torch._export import capture_pre_autograd_graph
+from executorch.examples.portable.utils import export_to_edge, save_pte_program
+from executorch.exir.passes.quant_fusion_pass import QuantFusionPass
+from executorch.exir.passes.sym_shape_eval_pass import ConstraintBasedSymShapeEvalPass
+from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
+    XnnpackPartitioner,
+)
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -127,8 +134,8 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
         print(f"{modelname}:")
         print(f"{model}")
 
-    quantization_options = _get_quantization_options(args)
-    with torch.nn.attention.sdpa_kernel([SDPBackend.MATH]), torch.no_grad():
+    #quantization_options = _get_quantization_options(args)
+    with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]), torch.no_grad():
         m = capture_pre_autograd_graph(
             export_model,
             input,
@@ -165,7 +172,7 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
         )
     )
 
-    save_pte_program(export_program.buffer, "llama-fast", output_path)
+    save_pte_program(export_program, "llama-fast", output_path)
 
     return output_path
 
