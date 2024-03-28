@@ -189,7 +189,10 @@ Note: External libraries have not been tested for correctness, reliability and s
 
 ### macOS (aarch64, x86)
 
-To use torch.compile, you should install OpenMP and a compiler with suitable OpenMP support. You can find libraries here https://mac.r-project.org/openmp/ and from other locations.
+To use torch.compile, you should install OpenMP and a compiler with suitable OpenMP support. You can install OpenMP using conda by following the PyTorch installation instructions
+at https://github.com/pytorch/pytorch?tab=readme-ov-file#install-dependencies. 
+
+Alternatively, you can also find libraries here: https://mac.r-project.org/openmp/ and from other locations. Alternatively, you may install 
 
 macOS running on x86 is reaching end-of-life. To use PyTorch on x86 running macOS, you can download prebuilt binaries up to PyTorch 2.2.  You can download recent PyTorch releases and
 install them from source.
