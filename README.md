@@ -39,6 +39,11 @@ There are two different formats for tokenizers, and both are used in this repo.
 1 - for generat.py and Python bindings, we use the Google sentencepiece Python operator. This operator consumes a tokenization model in the 'tokenizer.model' format.
 2 - for C/C++ inference, we use @Andrej Karpathy's C tokenizer function.  This tokenizer consumes a tokenization model in the 'tokenizer.bin' format.
 
+If you are using coda, you can install setencepiece using the following command:
+```
+conda install sentencepiece
+```
+
 You can convert tokenizer.model into tokenizer.bin using Andrej's tokenizer.py utility to convert the tokenizer.model to tokenizer.bin format:
 ```
 python utils/tokenizer.py --tokenizer-model=/path/to/tokenizer/tokenizer.model
