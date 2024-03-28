@@ -157,6 +157,29 @@ To run your pte model, use the following command (assuming you already generated
 ./build/run ../${MODEL_REPO}{,_int8,_8da4w}.pte -z ../${MODEL_REPO}.bin
 ```
 
+# Supported Systems
+
+PyTorch and the mobile Executorch backend support a broad range fo devices for running PyTorch with Python (using either eager or eager + torch.compile) or using a Python-free environment with AOT Inductor , as well as runtimes for executing exported models.
+
+|-----|------|-----|-----|-----|-----|
+| Hardware | OS | eager | eager + compile | AOT compile | ET Runtime |
+|-----|------|-----|-----|-----|-----|
+| x86 | Linux | ❎ |  ❎ |  ❎ |  ❎ | 
+| x86 | macOS | ? | ? | ? | ? | 
+| aarch64 | Linux | ? | ? | ? | ? | 
+| aarch64 | macOS | ❎ |  ❎ |  ❎ |  ❎ | 
+| AMD GPU |  ❎ |  ❎ |  ❎ |  ?| 
+| Nvidia GPU | Linux | ❎ |  ❎ |  ❎ |  ? | 
+| MPS | macOS | ❎ |  ? |  ? |  <chen lai> | 
+| MPS | iOS | ❌|❌|❌| ❎ | 
+| aarch | Android | ❌|❌|❌| ❎ | 
+| Mobile GPU (Vulkan) | Android |  ❌|❌|❌| ❎ | 
+| CoreML | iOS |  ❌|❌|❌| ❎ | 
+| Raspberry Pi 4/5 | Raspbian | ? | ? | ? | ? |
+| Raspberry Pi 4/5 | Android | ? | ? | ? | ? |
+| ARM 32b (up to v7) | any | ❌|❌|❌|❌|
+|-----|------|-----|-----|-----|-----|
+
 # Acknowledgements
 
 A big thank you to
