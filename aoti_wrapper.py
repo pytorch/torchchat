@@ -17,7 +17,7 @@ src = """
 #include <torch/csrc/inductor/aoti_runner/model_container_runner_cpu.h>
 #include <torch/torch.h>
 
-#define MODELPATH "./stories15M.so"
+#define MODELPATH "***my_model.so***"
 
 torch::inductor::AOTIModelContainerRunnerCpu *transformer_dso =
 new torch::inductor::AOTIModelContainerRunnerCpu(MODELPATH, 1);
@@ -38,13 +38,14 @@ extern "C" void kernel(long *tokens, long *pos, float *logits)
 
 
 class DSOModel(nn.Module):
-    def __init__(self, config) -> None:
+    def __init__(self, config, dso_path) -> None:
         super().__init__()
         self.config = config
 
         # build transformer model
         global src, dso_src
         
+        src = src.replace('***my_model.so***', str(dso_path))
         async_compile = AsyncCompile()
         self.transformer_model = async_compile.cpp_pybinding(
             ["long *", "long *", "float *"], dso_src + src
