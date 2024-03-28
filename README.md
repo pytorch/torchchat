@@ -80,9 +80,9 @@ Use a small model like stories15M.pt to test the instructions in the following s
 python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 {-xnnpack|-coreml|--mps} --out-path ./${MODEL_REPO}.pte
 ```
 
-How do run is problematic -- I would love to run it with 
+We can now run this model with 
 ```
-python generate.py --pte ./${MODEL_REPO}.pte --prompt "Hello my name is"
+python generate.py --pte ./${MODEL_REPO}.pte --prompt "Hello my name is" --device cpu
 ```
 but *that requires xnnpack to work in python!* 
 
