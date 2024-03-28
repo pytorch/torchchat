@@ -13,8 +13,6 @@ from torch._inductor.wrapper_benchmark import compiled_module_main
 
 dso_src =""
 
-async_compile = AsyncCompile()
-
 src = """
 #include <torch/csrc/inductor/aoti_runner/model_container_runner_cpu.h>
 #include <torch/torch.h>
@@ -37,12 +35,6 @@ extern "C" void kernel(long *tokens, long *pos, float *logits)
 
 """
 
-transformer_model = async_compile.cpp_pybinding(
-    ["long *", "long *", "float *"], dso_src + src
-)
-
-async_compile.wait(globals())
-del async_compile
 
 
 class DSOModel(nn.Module):
@@ -50,13 +42,24 @@ class DSOModel(nn.Module):
         super().__init__()
         self.config = config
 
+        # build transformer model
+        global src, dso_src
+        
+        async_compile = AsyncCompile()
+        self.transformer_model = async_compile.cpp_pybinding(
+            ["long *", "long *", "float *"], dso_src + src
+        )
+        async_compile.wait(globals())
+        del async_compile
+
+
     def forward(self, x, input_pos):
         vocab_size = self.config.vocab_size # 32000
         assert x.dim() == 2 and x.size(0) == 1 and x.size(1) == 1
         logits = torch.empty(1, 1, vocab_size)
         x = x.to(torch.long)
         input_pos = input_pos.to(torch.long)
-        transformer_model(x, input_pos, logits)
+        self.transformer_model(x, input_pos, logits)
         return logits
 
     def setup_caches(self, max_batch_size, max_seq_length):
