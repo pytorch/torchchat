@@ -161,24 +161,44 @@ To run your pte model, use the following command (assuming you already generated
 
 PyTorch and the mobile Executorch backend support a broad range fo devices for running PyTorch with Python (using either eager or eager + torch.compile) or using a Python-free environment with AOT Inductor , as well as runtimes for executing exported models.
 
-|-----|------|-----|-----|-----|-----|
+
 | Hardware | OS | eager | eager + compile | AOT compile | ET Runtime |
 |-----|------|-----|-----|-----|-----|
 | x86 | Linux | ❎ |  ❎ |  ❎ |  ❎ | 
 | x86 | macOS | ? | ? | ? | ? | 
 | aarch64 | Linux | ? | ? | ? | ? | 
 | aarch64 | macOS | ❎ |  ❎ |  ❎ |  ❎ | 
-| AMD GPU |  ❎ |  ❎ |  ❎ |  ?| 
+| AMD GPU | Linux |  ❎ |  ❎ |  ❎ |  ?| 
 | Nvidia GPU | Linux | ❎ |  ❎ |  ❎ |  ? | 
 | MPS | macOS | ❎ |  ? |  ? |  <chen lai> | 
 | MPS | iOS | ❌|❌|❌| ❎ | 
-| aarch | Android | ❌|❌|❌| ❎ | 
+| aarch64 | Android | ❌|❌|❌| ❎ | 
 | Mobile GPU (Vulkan) | Android |  ❌|❌|❌| ❎ | 
 | CoreML | iOS |  ❌|❌|❌| ❎ | 
+| Hexagon DSP | Android | ❌|❌|❌| ❎ | 
 | Raspberry Pi 4/5 | Raspbian | ? | ? | ? | ? |
 | Raspberry Pi 4/5 | Android | ? | ? | ? | ? |
 | ARM 32b (up to v7) | any | ❌|❌|❌|❌|
-|-----|------|-----|-----|-----|-----|
+
+
+## Installation Instructions
+
+Some systems require additional installation steps. 
+
+Note: External libraries have not been tested for correctness, reliability and safety. Please contact your system vendor if you have system-specific questions.
+
+### macOS (aarch64, x86)
+
+To use torch.compile, you should install OpenMP and a compiler with suitable OpenMP support. You can find libraries here https://mac.r-project.org/openmp/ and from other locations.
+
+macOS running on x86 is reaching end-of-life. To use PyTorch on x86 running macOS, you can download prebuilt binaries up to PyTorch 2.2.  You can download recent PyTorch releases and
+install them from source.
+
+### iOS CoreML and MPS
+
+List dependencies for these backends
+
+
 
 # Acknowledgements
 
