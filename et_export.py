@@ -51,7 +51,7 @@ def materialze_broadcast_of_rope_freq_cis(
     ), f"sin and cos freq table sizes must match. Mismatch found at dim 1: {dim1} vs {module.freqs_sin.size(1)}"
     module.freqs_sin = module.freqs_sin.view(dim0, 1, dim1)
     module.freqs_sin = module.freqs_sin.expand(dim0, num_heads, dim1).contiguous()
-    return module        
+    return module
 
 
 class model_wrapper(nn.Module):
@@ -111,15 +111,15 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
         model = EmbeddingOnlyInt8QuantHandler(model).convert_for_runtime()
 
     if args.dtype_override is not None:
-        if (
-            args.dtype_override == "fp16" and state_dict_dtype != torch.float16
-        ) or args.quantization_mode == "int4":
-            print("model.to torch.float16")
-            model = model.to(dtype=torch.float16)
-            state_dict_dtype = torch.float16
-        elif args.dtype_override == "fp32" and state_dict_dtype != torch.float:
-            print("model.to torch.float32")
-            model = model.to(dtype=torch.float32)
+        if args.dtype_override == "fp16" or args.quantization_mode == "int4":
+            if state_dict_dtype != torch.float16:
+                print("model.to torch.float16")
+                model = model.to(dtype=torch.float16)
+                state_dict_dtype = torch.float16
+        elif args.dtype_override == "fp32":
+            if state_dict_dtype != torch.float32:
+                print("model.to torch.float32")
+                model = model.to(dtype=torch.float32)
         else:
             raise ValueError(f"Unsupported dtype override: {args.dtype_override}")
 
