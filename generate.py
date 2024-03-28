@@ -333,6 +333,7 @@ def main(
     speculate_k: int = 5,
     device="cuda",
     use_dso=None,
+    use_pte=None,
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
     assert checkpoint_path.is_file(), checkpoint_path
@@ -560,7 +561,13 @@ def cli():
         "--dso",
         type=Path,
         default=None,
-        help="Use the specified DSO model."
+        help="Use the specified AOTI DSO model."
+    )
+    parser.add_argument(
+        "--pte",
+        type=Path,
+        default=None,
+        help="Use the specified Executorch PTE model."
     )
 
 
@@ -579,7 +586,8 @@ def cli():
         args.draft_checkpoint_path,
         args.speculate_k,
         args.device,
-        args.dso
+        args.dso,
+        args.pte,
     )
 
 if __name__ == "__main__":
