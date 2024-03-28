@@ -2,12 +2,12 @@
 A repo for building and using llama on servers, desktops and mobile
 
 The llama-fast repo enables model inference of llama models (and other LLMs) on servers, desktop and mobile devices.
-For a list of devices, see below, under *DEVICES*
+For a list of devices, see below, under *SUPPORTED SYSTEMS*
 
 A goal of this repo, and the design of the PT2 components was to offer seamless integration and consistent workflows.  
 Both mobile and server/desktop paths start with torch.export() receiving the same model description.  Similarly,
-integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-posix
-and runner-mobile, respectively) offer very consistent experiences across backends and offer developers consistent interfaces 
+integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-aoti
+and runner-et, respectively) offer a consistent experience across backends and offer developers consistent interfaces 
 and user experience whether they target server, desktop or mobile & edge use cases, and/or all of them.
 
 
@@ -36,8 +36,13 @@ If you are planning on using mobile backends, you should also install ExecuTorch
 # A note on tokenizers
 
 There are two different formats for tokenizers, and both are used in this repo.
-1 - for generat.py and Python bindings, we use the Google sentencepiece Python operator. This operator consumes a tokenization model in the 'tokenizer.model' format.
+1 - for generate.py and Python bindings, we use the Google sentencepiece Python operator. This operator consumes a tokenization model in the 'tokenizer.model' format.
 2 - for C/C++ inference, we use @Andrej Karpathy's C tokenizer function.  This tokenizer consumes a tokenization model in the 'tokenizer.bin' format.
+
+If you are using coda, you can install setencepiece using the following command:
+```
+conda install sentencepiece
+```
 
 You can convert tokenizer.model into tokenizer.bin using Andrej's tokenizer.py utility to convert the tokenizer.model to tokenizer.bin format:
 ```
@@ -58,7 +63,7 @@ To squeeze out a little bit more performance, you can also compile the prefill w
 
 ## AOT Inductor compilation and execution
 ```
-python export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --out-path ./${MODEL_REPO}.so
+python aoti_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --out-path ./${MODEL_REPO}.so
 ```
 
 When you have exported the model, 
@@ -80,9 +85,9 @@ Use a small model like stories15M.pt to test the instructions in the following s
 python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 {-xnnpack|-coreml|--mps} --out-path ./${MODEL_REPO}.pte
 ```
 
-How do run is problematic -- I would love to run it with 
+We can now run this model with 
 ```
-python generate.py --pte ./${MODEL_REPO}.pte --prompt "Hello my name is"
+python generate.py --pte ./${MODEL_REPO}.pte --prompt "Hello my name is" --device cpu
 ```
 but *that requires xnnpack to work in python!* 
 
@@ -131,7 +136,7 @@ In addition to running with the generate.py driver in Python, you can also run P
 
 Build the runner like this
 ```
-cd ./runner-posix
+cd ./runner-aoti
 cmake -Bbuild -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'`
 cmake --build build
 ```
@@ -147,7 +152,7 @@ For a GUI integration in iOS and Android, please refer to...
 
 Build the runner like this
 ```
-cd ./runner-mobile
+cd ./runner-et
 cmake -Bbuild -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'`
 cmake --build build
 ```
@@ -181,6 +186,27 @@ PyTorch and the mobile Executorch backend support a broad range fo devices for r
 | ARM 32b (up to v7) | any | ❌|❌|❌|❌|
 
 
+## Runtime performance with Llama 7B, in tokens per second (4b quantization)
+
+| Hardware | OS | eager | eager + compile | AOT compile | ET Runtime |
+|-----|------|-----|-----|-----|-----|
+| x86 | Linux | ? | ? | ? | ? |  
+| x86 | macOS | ? | ? | ? | ? | 
+| aarch64 | Linux | ? | ? | ? | ? | 
+| aarch64 | macOS | ? | ? | ? | ? | 
+| AMD GPU | Linux | ? | ? | ? | ? | 
+| Nvidia GPU | Linux | ? | ? | ? | ? |  
+| MPS | macOS | ? | ? | ? | ? |  
+| MPS | iOS | ? | ? | ? | ? |  
+| aarch64 | Android | ? | ? | ? | ? |  
+| Mobile GPU (Vulkan) | Android | ? | ? | ? | ? |   
+| CoreML | iOS | | ? | ? | ? | ? | 
+| Hexagon DSP | Android | | ? | ? | ? | ? | 
+| Raspberry Pi 4/5 | Raspbian | ? | ? | ? | ? |
+| Raspberry Pi 4/5 | Android | ? | ? | ? | ? |
+| ARM 32b (up to v7) | any | | ? | ? | ? | ? | 
+
+
 ## Installation Instructions
 
 Some systems require additional installation steps. 
@@ -189,7 +215,10 @@ Note: External libraries have not been tested for correctness, reliability and s
 
 ### macOS (aarch64, x86)
 
-To use torch.compile, you should install OpenMP and a compiler with suitable OpenMP support. You can find libraries here https://mac.r-project.org/openmp/ and from other locations.
+To use torch.compile, you should install OpenMP and a compiler with suitable OpenMP support. You can install OpenMP using conda by following the PyTorch installation instructions
+at https://github.com/pytorch/pytorch?tab=readme-ov-file#install-dependencies. 
+
+Alternatively, you can also find libraries here: https://mac.r-project.org/openmp/ and from other locations. Alternatively, you may install 
 
 macOS running on x86 is reaching end-of-life. To use PyTorch on x86 running macOS, you can download prebuilt binaries up to PyTorch 2.2.  You can download recent PyTorch releases and
 install them from source.
