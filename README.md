@@ -186,6 +186,27 @@ PyTorch and the mobile Executorch backend support a broad range fo devices for r
 | ARM 32b (up to v7) | any | ❌|❌|❌|❌|
 
 
+## Runtime performance with Llama 7B, in tokens per second (4b quantization)
+
+| Hardware | OS | eager | eager + compile | AOT compile | ET Runtime |
+|-----|------|-----|-----|-----|-----|
+| x86 | Linux | ? | ? | ? | ? |  
+| x86 | macOS | ? | ? | ? | ? | 
+| aarch64 | Linux | ? | ? | ? | ? | 
+| aarch64 | macOS | ? | ? | ? | ? | 
+| AMD GPU | Linux | ? | ? | ? | ? | 
+| Nvidia GPU | Linux | ? | ? | ? | ? |  
+| MPS | macOS | ? | ? | ? | ? |  
+| MPS | iOS | ? | ? | ? | ? |  
+| aarch64 | Android | ? | ? | ? | ? |  
+| Mobile GPU (Vulkan) | Android | ? | ? | ? | ? |   
+| CoreML | iOS | | ? | ? | ? | ? | 
+| Hexagon DSP | Android | | ? | ? | ? | ? | 
+| Raspberry Pi 4/5 | Raspbian | ? | ? | ? | ? |
+| Raspberry Pi 4/5 | Android | ? | ? | ? | ? |
+| ARM 32b (up to v7) | any | | ? | ? | ? | ? | 
+
+
 ## Installation Instructions
 
 Some systems require additional installation steps. 
