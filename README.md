@@ -2,12 +2,12 @@
 A repo for building and using llama on servers, desktops and mobile
 
 The llama-fast repo enables model inference of llama models (and other LLMs) on servers, desktop and mobile devices.
-For a list of devices, see below, under *DEVICES*
+For a list of devices, see below, under *SUPPORTED SYSTEMS*
 
 A goal of this repo, and the design of the PT2 components was to offer seamless integration and consistent workflows.
 Both mobile and server/desktop paths start with torch.export() receiving the same model description.  Similarly,
-integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-posix
-and runner-mobile, respectively) offer very consistent experiences across backends and offer developers consistent interfaces
+integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-aoti
+and runner-et, respectively) offer a consistent experience across backends and offer developers consistent interfaces 
 and user experience whether they target server, desktop or mobile & edge use cases, and/or all of them.
 
 
@@ -36,8 +36,13 @@ If you are planning on using mobile backends, you should also install ExecuTorch
 # A note on tokenizers
 
 There are two different formats for tokenizers, and both are used in this repo.
-1 - for generat.py and Python bindings, we use the Google sentencepiece Python operator. This operator consumes a tokenization model in the 'tokenizer.model' format.
+1 - for generate.py and Python bindings, we use the Google sentencepiece Python operator. This operator consumes a tokenization model in the 'tokenizer.model' format.
 2 - for C/C++ inference, we use @Andrej Karpathy's C tokenizer function.  This tokenizer consumes a tokenization model in the 'tokenizer.bin' format.
+
+If you are using coda, you can install setencepiece using the following command:
+```
+conda install sentencepiece
+```
 
 You can convert tokenizer.model into tokenizer.bin using Andrej's tokenizer.py utility to convert the tokenizer.model to tokenizer.bin format:
 ```
@@ -58,7 +63,7 @@ To squeeze out a little bit more performance, you can also compile the prefill w
 
 ## AOT Inductor compilation and execution
 ```
-python export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --out-path ./${MODEL_REPO}.so
+python aoti_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --out-path ./${MODEL_REPO}.so
 ```
 
 When you have exported the model,
@@ -85,7 +90,7 @@ python et_export.py --checkpoint_path $MODEL_REPO/model.pth -d fp32 --xnnpack --
 
 How do run is problematic -- I would love to run it with
 ```
-python generate.py --pte ./${MODEL_REPO}.pte --prompt "Hello my name is"
+python generate.py --pte ./${MODEL_REPO}.pte --prompt "Hello my name is" --device cpu
 ```
 but *that requires xnnpack to work in python!*
 
@@ -134,7 +139,7 @@ In addition to running with the generate.py driver in Python, you can also run P
 
 Build the runner like this
 ```
-cd ./runner-posix
+cd ./runner-aoti
 cmake -Bbuild -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'`
 cmake --build build
 ```
@@ -150,7 +155,7 @@ For a GUI integration in iOS and Android, please refer to...
 
 Build the runner like this
 ```
-cd ./runner-mobile
+cd ./runner-et
 cmake -Bbuild -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'`
 cmake --build build
 ```
