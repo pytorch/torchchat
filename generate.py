@@ -332,7 +332,7 @@ def main(
     draft_checkpoint_path: Optional[Path] = None,
     speculate_k: int = 5,
     device="cuda",
-    use_dso=True,
+    use_dso=None,
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
     assert checkpoint_path.is_file(), checkpoint_path
@@ -359,11 +359,18 @@ def main(
     model_ = _load_model(checkpoint_path, device, precision, use_tp)
     if use_dso:
         try:
-            from thin_wrapper import DSOModel
-            model = DSOModel(model_.config)
+            from aoti_wrapper import DSOModel
+            model = DSOModel(model_.config, use_dso)
             model_ = None
         except:
             print("compiled model load not successful, running eager model")
+            assert 0==1
+    elif use_pte:
+        try:
+            from et_wrapper import PTEModel
+            model = PTEModel(model_.config, use_pte)
+        except:
+            print("executorch model load not successful, running eager model")
             assert 0==1
     else:
         model = model_
@@ -550,7 +557,10 @@ def cli():
     )
     parser.add_argument("--device", type=str, default="cuda", help="Device to use")
     parser.add_argument(
-        "--dso", action="store_true", help="Whether to use DSO model."
+        "--dso",
+        type=Path,
+        default=None,
+        help="Use the specified DSO model."
     )
 
 
