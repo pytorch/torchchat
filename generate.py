@@ -571,6 +571,12 @@ def cli():
         default=None,
         help="Use the specified Executorch PTE model."
     )
+    parser.add_argument(
+        "--quantize",
+        type=str,
+        default="{ }",
+        help="Quantization options."
+    )
 
 
     args = parser.parse_args()
@@ -590,6 +596,7 @@ def cli():
         args.device,
         args.dso_path,
         args.pte,
+        args.quantize,
     )
 
 if __name__ == "__main__":
