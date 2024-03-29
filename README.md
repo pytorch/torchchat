@@ -6,8 +6,8 @@ For a list of devices, see below, under *SUPPORTED SYSTEMS*
 
 A goal of this repo, and the design of the PT2 components was to offer seamless integration and consistent workflows.
 Both mobile and server/desktop paths start with torch.export() receiving the same model description.  Similarly,
-integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-posix
-and runner-mobile, respectively) offer very consistent experiences across backends and offer developers consistent interfaces
+integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-aoti
+and runner-et, respectively) offer a consistent experience across backends and offer developers consistent interfaces
 and user experience whether they target server, desktop or mobile & edge use cases, and/or all of them.
 
 
@@ -85,12 +85,14 @@ The environment variable MODEL_REPO should point to a directory with the `model.
 The command below will add the file "llama-fast.pte" to your MODEL_REPO directory.
 
 ```
-python et_export.py --checkpoint_path $MODEL_REPO/model.pth -d fp32 --xnnpack --out-path ${MODEL_REPO}
+python et_export.py --checkpoint_path $MODEL_REPO/model.pth -d fp32 --out-path ${MODEL_REPO}
 ```
 
-How do run is problematic -- I would love to run it with
+TODO(fix this): the export command works with "--xnnpack" flag, but the next generate.py command will not run it so we do not set it right now.
+
+To run the pte file, run this.  Note that this is very slow at the moment.
 ```
-python generate.py --pte ./${MODEL_REPO}.pte --prompt "Hello my name is" --device cpu
+python generate.py --checkpoint_path $MODEL_REPO/model.pth --pte $MODEL_REPO/llama-fast.pte --prompt "Hello my name is" --device cpu
 ```
 but *that requires xnnpack to work in python!*
 
@@ -232,6 +234,11 @@ List dependencies for these backends
 
 ### ExecuTorch
 Set up executorch by following the instructions [here](https://pytorch.org/executorch/stable/getting-started-setup.html#setting-up-executorch).
+
+Make sure when you run the installation script in the executorch repo, you enable pybind.
+```
+./install_requirements.sh --pybind
+```
 
 
 
