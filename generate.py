@@ -13,6 +13,8 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 
+from quantize import quantize_model
+
 
 def device_sync(device):
     if "cuda" in device:
@@ -334,6 +336,7 @@ def main(
     device="cuda",
     use_dso=None,
     use_pte=None,
+    quantize=None,
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
     assert checkpoint_path.is_file(), checkpoint_path
@@ -376,6 +379,10 @@ def main(
     else:
         model = model_
 
+        # Add new CLI arg
+        if quantize:
+            quantize_model(model, quantize)
+	    
     if is_speculative:
         draft_model = _load_model(draft_checkpoint_path, device, precision, use_tp)
     else:

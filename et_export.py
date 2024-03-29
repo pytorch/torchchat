@@ -11,6 +11,7 @@ import torch.nn as nn
 from torch.export import Dim, export
 
 from generate import _load_model, decode_one_token
+from quantize import quantize_model
 
 from model import Transformer
 
@@ -195,6 +196,8 @@ def main(checkpoint_path, device, output_path, args = None):
     device_sync(device=device)  # MKG
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
+    quantize_model(model, args.quantize)
+    
     with torch.no_grad():
         # diverges from AOTI
         export_model(model, device, output_path, args)
