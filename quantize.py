@@ -7,6 +7,7 @@
 from functools import reduce
 from math import gcd
 from typing import Dict, Optional, Tuple
+import json
 
 import torch
 import torch.nn as nn
@@ -47,7 +48,10 @@ def quantize_model(model: nn.Module, quantize_options):
         'precision':   {'dtype': torch.float16},
     }
     """
-    
+
+    if isinstance(quantize_options, str):
+        quantize_options = json.loads(quantize_options)
+        
     for quantizer, q_kwargs in quantize_options.items():
         if quantizer == "embedding":
 	    model = EmbeddingOnlyInt8QuantHandler(
