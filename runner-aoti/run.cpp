@@ -63,8 +63,8 @@ void build_transformer(Transformer *t, char* checkpoint_path, int vocab_size, in
     t->config.seq_len = seq_len;
     malloc_run_state(&t->state, &t->config);
     t->runner = new torch::inductor::AOTIModelContainerRunnerCpu(
-        checkpoint_path,
-        1
+	/* path to model DSO */ checkpoint_path,
+        /* thread pool size  */ 1
     );
 }
 
