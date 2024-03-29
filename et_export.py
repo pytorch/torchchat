@@ -15,6 +15,13 @@ from generate import _load_model, decode_one_token
 from model import Transformer
 
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
+from torch._export import capture_pre_autograd_graph
+from executorch.examples.portable.utils import export_to_edge, save_pte_program
+from executorch.exir.passes.quant_fusion_pass import QuantFusionPass
+from executorch.exir.passes.sym_shape_eval_pass import ConstraintBasedSymShapeEvalPass
+from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
+    XnnpackPartitioner,
+)
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -51,7 +58,7 @@ def materialze_broadcast_of_rope_freq_cis(
     ), f"sin and cos freq table sizes must match. Mismatch found at dim 1: {dim1} vs {module.freqs_sin.size(1)}"
     module.freqs_sin = module.freqs_sin.view(dim0, 1, dim1)
     module.freqs_sin = module.freqs_sin.expand(dim0, num_heads, dim1).contiguous()
-    return module        
+    return module
 
 
 class model_wrapper(nn.Module):
@@ -111,15 +118,15 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
         model = EmbeddingOnlyInt8QuantHandler(model).convert_for_runtime()
 
     if args.dtype_override is not None:
-        if (
-            args.dtype_override == "fp16" and state_dict_dtype != torch.float16
-        ) or args.quantization_mode == "int4":
-            print("model.to torch.float16")
-            model = model.to(dtype=torch.float16)
-            state_dict_dtype = torch.float16
-        elif args.dtype_override == "fp32" and state_dict_dtype != torch.float:
-            print("model.to torch.float32")
-            model = model.to(dtype=torch.float32)
+        if args.dtype_override == "fp16" or args.quantization_mode == "int4":
+            if state_dict_dtype != torch.float16:
+                print("model.to torch.float16")
+                model = model.to(dtype=torch.float16)
+                state_dict_dtype = torch.float16
+        elif args.dtype_override == "fp32":
+            if state_dict_dtype != torch.float32:
+                print("model.to torch.float32")
+                model = model.to(dtype=torch.float32)
         else:
             raise ValueError(f"Unsupported dtype override: {args.dtype_override}")
 
@@ -127,8 +134,8 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
         print(f"{modelname}:")
         print(f"{model}")
 
-    quantization_options = _get_quantization_options(args)
-    with torch.nn.attention.sdpa_kernel([SDPBackend.MATH]), torch.no_grad():
+    #quantization_options = _get_quantization_options(args)
+    with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]), torch.no_grad():
         m = capture_pre_autograd_graph(
             export_model,
             input,
@@ -165,7 +172,11 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
         )
     )
 
-    save_pte_program(export_program.buffer, "llama-fast", output_path)
+    print("The methods are: ", export_program.methods)
+    path = f"{output_path}/llama-fast.pte"
+    with open(path, "wb") as f:
+        export_program.write_to_file(f)
+    # save_pte_program(export_program, "llama-fast", output_path)
 
     return output_path
 
