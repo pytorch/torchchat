@@ -234,6 +234,12 @@ def cli():
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument("-x", "--xnnpack_dynamic", action="store_true")
     parser.add_argument("-G", "--groupsize", default=None, help="specify the groupsize")
+    parser.add_argument(
+        "--quantize",
+        type=str,
+        default="{ }",
+        help="Quantization options."
+    )
 
 
     args = parser.parse_args()
