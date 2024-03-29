@@ -279,25 +279,25 @@ def _load_model(checkpoint_path, device, precision, use_tp=False):
     with torch.device("meta"):
         model = Transformer.from_name(checkpoint_path.parent.name)
 
-    if "int8" in str(checkpoint_path):
-        print("Using int8 weight-only quantization!")
-        from quantize import WeightOnlyInt8QuantHandler
-
-        simple_quantizer = WeightOnlyInt8QuantHandler(model)
-        model = simple_quantizer.convert_for_runtime()
-
-    if "int4" in str(checkpoint_path):
-        print("Using int4 weight-only quantization!")
-        path_comps = checkpoint_path.name.split(".")
-        assert path_comps[-3].startswith("g")
-        assert (
-            path_comps[-2] in device
-        ), "weight packed format mismatch, please rerun quantize.py!"
-        groupsize = int(path_comps[-3][1:])
-        from quantize import WeightOnlyInt4QuantHandler
-
-        simple_quantizer = WeightOnlyInt4QuantHandler(model, groupsize)
-        model = simple_quantizer.convert_for_runtime(use_cuda)
+#    if "int8" in str(checkpoint_path):
+#        print("Using int8 weight-only quantization!")
+#        from quantize import WeightOnlyInt8QuantHandler
+#
+#        simple_quantizer = WeightOnlyInt8QuantHandler(model)
+#        model = simple_quantizer.convert_for_runtime()
+#
+#    if "int4" in str(checkpoint_path):
+#        print("Using int4 weight-only quantization!")
+#        path_comps = checkpoint_path.name.split(".")
+#        assert path_comps[-3].startswith("g")
+#        assert (
+#            path_comps[-2] in device
+#        ), "weight packed format mismatch, please rerun quantize.py!"
+#        groupsize = int(path_comps[-3][1:])
+#        from quantize import WeightOnlyInt4QuantHandler
+#
+#        simple_quantizer = WeightOnlyInt4QuantHandler(model, groupsize)
+#        model = simple_quantizer.convert_for_runtime(use_cuda)
 
     checkpoint = torch.load(str(checkpoint_path), mmap=True, weights_only=True)
     if "model" in checkpoint and "stories" in str(checkpoint_path):
