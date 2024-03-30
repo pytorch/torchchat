@@ -26,6 +26,38 @@ Please copy-paste and fork as you desire.
 
 # Supported Models
 The model definition (and much more!) is adopted from gpt-fast, so we support the same models.
+
+## Installation
+[Download PyTorch nightly](https://pytorch.org/get-started/locally/)
+Install sentencepiece and huggingface_hub
+```bash
+pip install sentencepiece huggingface_hub
+```
+
+To download llama models, go to https://huggingface.co/meta-llama/Llama-2-7b and go through steps to obtain access.
+Then login with `huggingface-cli login`
+
+## Downloading Weights
+Models tested/supported
+```text
+tinyllamas/stories{15,42,110}
+openlm-research/open_llama_7b
+meta-llama/Llama-2-7b-chat-hf
+meta-llama/Llama-2-13b-chat-hf
+meta-llama/Llama-2-70b-chat-hf
+codellama/CodeLlama-7b-Python-hf
+codellama/CodeLlama-34b-Python-hf
+mistralai/Mistral-7B-v0.1
+mistralai/Mistral-7B-Instruct-v0.1
+mistralai/Mistral-7B-Instruct-v0.2
+```
+
+For example, to convert Llama-2-7b-chat-hf
+```bash
+export MODEL_REPO=meta-llama/Llama-2-7b-chat-hf
+./scripts/prepare.sh $MODEL_REPO
+```
+
 See [`gpt-fast` Supported Models](https://github.com/pytorch-labs/gpt-fast?tab=readme-ov-file#supported-models) for a full list.
 
 # Installation
