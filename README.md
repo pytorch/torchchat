@@ -54,7 +54,7 @@ python utils/tokenizer.py --tokenizer-model=/path/to/tokenizer/tokenizer.model
 
 ## Eager Execution
 
-Model definition in model.py, generation code in generate.py.
+Model definition in model.py, generation code in generate.py. The model checkpoint extension may have either the extension pth or pt.
 
 ```
 python generate.py --compile --checkpoint_path checkpoints/$MODEL_REPO/model.pth --prompt "Hello, my name is" --device {cuda,cpu,mps}
@@ -66,8 +66,9 @@ To squeeze out a little bit more performance, you can also compile the prefill w
 python aoti_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --out-path ./${MODEL_REPO}.so
 ```
 
-When you have exported the model,
-Note to self: sopath is missing in the current version. Copy the reported path to ./${MODEL_REPO}.so
+When you have exported the model, you can test the model with the sequence generator by importing the compiled DSO model with the `-sopath ./{modelname}.so` option. 
+This gives users the ability to test their model, run any pre-existing model tests against the exported model with the same interface, 
+and support additional experiments to confirm model quality and speed.
 
 ```
 python generate.py --device {cuda,cpu} --dso ./${MODEL_REPO}.so --prompt "Hello my name is"
@@ -82,17 +83,20 @@ Note to self: --dso does not currently take an argument, and always loads storie
 Use a small model like stories15M.pt to test the instructions in the following section.  You must first have ExecuTorch installed before running this command, see the installation instructions in the sections [here](#installation-instructions).
 
 The environment variable MODEL_REPO should point to a directory with the `model.pth` file and `tokenizer.model` file.
-The command below will add the file "llama-fast.pte" to your MODEL_REPO directory.
+The command below will add the file "${MODEL_REPO}.pte" to your current directory.
 
 ```
-python et_export.py --checkpoint_path $MODEL_REPO/model.pth -d fp32 --out-path ${MODEL_REPO}
+python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --out-path ${MODEL_REPO}.pte
 ```
 
 TODO(fix this): the export command works with "--xnnpack" flag, but the next generate.py command will not run it so we do not set it right now.
+When you have exported the model, you can test the model with the sequence generator by importing the compiled DSO model with the `---ptepath ./{modelname}.pte` option. 
+This gives users the ability to test their model, run any pre-existing model tests against the exported model with the same interface, 
+and support additional experiments to confirm model quality and speed.
 
-To run the pte file, run this.  Note that this is very slow at the moment.
+To run the pte file in s.  Note that this is very slow at the moment.
 ```
-python generate.py --checkpoint_path $MODEL_REPO/model.pth --pte $MODEL_REPO/llama-fast.pte --prompt "Hello my name is" --device cpu
+python generate.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --pte ${MODEL_REPO}.pte --prompt "Hello my name is" --device cpu
 ```
 but *that requires xnnpack to work in python!*
 
@@ -106,12 +110,12 @@ memory of a mobile device, and optimize execution speed -- both using quantizati
 The simplest way to quantize is with int8 quantization, where each value is represented by an 8 bit integer, and a
 floating point scale:
 ```
-python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant int8 {-xnnpack|-coreml|--mps} --out-path ./${MODEL_REPO}_int8.pte
+python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant int8 {-xnnpack|-coreml|--mps} --out-path ${MODEL_REPO}_int8.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --ptr ./${MODEL_REPO}_int8.pte --prompt "Hello my name is"
+python generate.py --pte ${MODEL_REPO}_int8.pte --prompt "Hello my name is"
 ```
 
 #### 4 bit integer quantization (8da4w)
@@ -134,10 +138,9 @@ TBD.
 # Standalone Execution
 
 ## Desktop and Server Execution
-This has been tested with Linux and x86 (using CPU ~and GPU~), and MacOS and ARM/Apple Silicon.
+This has been tested with Linux and x86 (using CPU ~and GPU~), and MacOS and ARM/Apple Silicon.  
 
-In addition to running with the generate.py driver in Python, you can also run PyTorch models without the Python runtime, based on Andrej's magnificent llama2.c code.
-(Installation instructions courtesy of @Bert Maher's llama2.so)
+The runner-* directories show how to integrate AOTI- and ET-exported models in a C/C++ application when no Python environment is available.  Integrate it with your own applications and adapt it to your own application and model needs!
 
 Build the runner like this
 ```
@@ -151,7 +154,7 @@ To run, use the following command (assuming you already generated the tokenizer.
 LD_LIBRARY_PATH=$CONDA_PREFIX/lib ./build/run ../${MODEL_REPO}.so -z ../${MODEL_REPO}.bin
 ```
 
-## Mobile and Edge Execution
+## Mobile and Edge Execution Test (x86)
 This has been shown to run on x86. with the proper IDE environment, you can compile for your specific target.
 For a GUI integration in iOS and Android, please refer to...
 
@@ -166,6 +169,24 @@ To run your pte model, use the following command (assuming you already generated
 ```
 ./build/run ../${MODEL_REPO}{,_int8,_8da4w}.pte -z ../${MODEL_REPO}.bin
 ```
+
+## Running on a mobile/edge system
+
+### Android
+
+Check out the [tutorial on how to build an Android app running your PyTorch models with Executorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html), and give your llama-fast models a spin.
+
+![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png "Android app running Llama model")
+
+### iOS
+
+Open the ios Llama Xcode project at https://github.com/pytorch/executorch/tree/main/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj in Xcode and click Run.
+You will need to provide a provisioning profile (similar to what's expected for any iOS dev).
+
+Once you can run the app on you device,
+1 - connect the device to you Mac, 
+2 - copy the model and tokenizer.bin to the iOS Llama app
+3 - select the tokenizer and model with the `(...)` control (bottom left of screen, to the left of the text entrybox) 
 
 # Supported Systems
 
