@@ -172,6 +172,16 @@ To run your pte model, use the following command (assuming you already generated
 
 ## Running on a mobile/edge system
 
+### Android
+
+Check out the [tutorial on how to build an Android app running your PyTorch models with Executorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html), and give your llama-fast models a spin.
+
+![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png "Android app running Llama model")
+
+### iOS
+
+TBD.
+
 # Supported Systems
 
 PyTorch and the mobile Executorch backend support a broad range fo devices for running PyTorch with Python (using either eager or eager + torch.compile) or using a Python-free environment with AOT Inductor , as well as runtimes for executing exported models.
