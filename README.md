@@ -36,7 +36,7 @@ pip install sentencepiece huggingface_hub
 ```
 
 To download llama models, go to https://huggingface.co/meta-llama/Llama-2-7b and go through steps to obtain access.
-Then login with `huggingface-cli login`
+Then, login with `huggingface-cli login`
 
 ## Downloading Weights
 Models tested/supported
