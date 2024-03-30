@@ -1,4 +1,10 @@
-# llama-fast
+# Preamble.
+
+*The statements contained in this README are our northstar, and we will be reality-testing the statemen, and remove any 
+items that are not factual.  If you find an item, that is incorrect, please tag as an issue, so we can triage and determine whether to fix,
+or drop from our initial release.*
+
+# llama-fast *NORTHSTAR*
 A repo for building and using llama on servers, desktops and mobile
 
 The llama-fast repo enables model inference of llama models (and other LLMs) on servers, desktop and mobile devices.
@@ -19,7 +25,8 @@ Featuring:
 * <1000 lines of python
 * No dependencies other than PyTorch and sentencepiece for server, and Executorch for mobile (plus, your mobile IDE, of course)
 * int8/int4 quantization
-* Supports Nvidia and AMD GPUs, MPS, CPU (Linux/x86 and MacOS/ARM), xnnpack, and backend-specific mobile runtimes ("delegates").
+* Supports Nvidia and AMD GPUs, Apple GPUs with MPS, CPU (Linux/x86 and MacOS/ARM), and xnnpack, Vulkan and MPS for mobile GPUs,
+  and backend-specific mobile runtimes ("delegates", such as CoreML and Hexagon).
 
 This is NOT intended to be a "framework" or "library" - it is intended to show off what kind of performance you can get with native PyTorch :)
 Please copy-paste and fork as you desire.
@@ -35,27 +42,33 @@ pip install sentencepiece huggingface_hub
 ```
 
 To download llama models, go to https://huggingface.co/meta-llama/Llama-2-7b and go through steps to obtain access.
-Then login with `huggingface-cli login`
+Then, login with `huggingface-cli login`
 
 ## Downloading Weights
 Models tested/supported
-```text
-tinyllamas/stories{15,42,110}
-openlm-research/open_llama_7b
-meta-llama/Llama-2-7b-chat-hf
-meta-llama/Llama-2-13b-chat-hf
-meta-llama/Llama-2-70b-chat-hf
-codellama/CodeLlama-7b-Python-hf
-codellama/CodeLlama-34b-Python-hf
-mistralai/Mistral-7B-v0.1
-mistralai/Mistral-7B-Instruct-v0.1
-mistralai/Mistral-7B-Instruct-v0.2
-```
+
+| Model | eager | torch.compile | AOT Inductor | ET Runtime | Fits on Mobile |
+|-----|------|-----|-----|-----|-----|
+tinyllamas/stories15M | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
+tinyllamas/stories42M  | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
+tinyllamas/stories110M   | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
+openlm-research/open_llama_7b  | ❎ |  ❎ |  ❎ |  ❎ | ❹ | 
+meta-llama/Llama-2-7b-chat-hf | ❎ |  ❎ |  ❎ |  ❎ | ❹| 
+meta-llama/Llama-2-13b-chat-hf | ❎ |  ❎ |  ❎ |  ❎ | 📵 | 
+meta-llama/Llama-2-70b-chat-hf | ❎ |  ❎ |  ❎ |  ❎ | ❌|
+codellama/CodeLlama-7b-Python-hf | ❎ |  ❎ |  ❎ |  ❎ | ❹| 
+codellama/CodeLlama-34b-Python-hf | ❎ |  ❎ |  ❎ |  ❎ | 📵 | 
+mistralai/Mistral-7B-v0.1 | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
+mistralai/Mistral-7B-Instruct-v0.1 | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
+mistralai/Mistral-7B-Instruct-v0.2 | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
+
+*Key:* ❎ works correctly; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile phone (may fit some high-end devices such as tablets);
+
 
 For example, to convert Llama-2-7b-chat-hf
 ```bash
-export MODEL_REPO=meta-llama/Llama-2-7b-chat-hf
-./scripts/prepare.sh $MODEL_REPO
+export MODEL_DOWNLOAD=meta-llama/Llama-2-7b-chat-hf
+./scripts/prepare.sh $MODEL_DOWNLOAD
 ```
 
 See [`gpt-fast` Supported Models](https://github.com/pytorch-labs/gpt-fast?tab=readme-ov-file#supported-models) for a full list.
@@ -138,11 +151,23 @@ Next, we'll show you how to optimize your model for mobile execution. The basic 
 Models quickly run out of memory and execution can be slow. In this section, we show you how to fit your models in the limited
 memory of a mobile device, and optimize execution speed -- both using quantization. This is the `llama-fast` repo after all!
 
-#### 8 bit integer quantization
+#### Embedding quantization (8 bit integer, groupwise)
+The simplest way to quantize embedding tables is with int8 groupwise quantization, where each value is represented by an 8 bit integer, and a
+floating point scale per group:
+```
+python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" {-xnnpack|-coreml|--mps} --out-path ${MODEL_REPO}_emb8b-gw256.pte
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py --pte ${MODEL_REPO}_emb8b-gw256.pte --prompt "Hello my name is"
+```
+
+#### Linear 8 bit integer quantization
 The simplest way to quantize is with int8 quantization, where each value is represented by an 8 bit integer, and a
 floating point scale:
 ```
-python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant int8 {-xnnpack|-coreml|--mps} --out-path ${MODEL_REPO}_int8.pte
+python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'linear:int8': {} }" {-xnnpack|-coreml|--mps} --out-path ${MODEL_REPO}_int8.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -153,9 +178,9 @@ python generate.py --pte ${MODEL_REPO}_int8.pte --prompt "Hello my name is"
 #### 4 bit integer quantization (8da4w)
 To compress your model even more, 4 bit integer quantization may be used.  To achieve good accuracy, we recommend the use
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8 bit, giving
-this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights).
+this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
-python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant 8da4w {-xnnpack|-coreml|--mps} --out-path ./${MODEL_REPO}_8da4w.pte
+python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }"  8da4w {-xnnpack|-coreml|--mps} --out-path ./${MODEL_REPO}_8da4w.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -166,6 +191,8 @@ python generate.py --ptr ./${MODEL_REPO}_8da4w.pte --prompt "Hello my name is"
 #### Quantization with GPTQ (8da4w-gptq)
 TBD.
 
+#### Adding additional quantization schemes
+We invite contributors to submit established quantization schemes, with accuracy and performance results demonstrating soundness.
 
 # Standalone Execution
 
