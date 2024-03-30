@@ -19,7 +19,8 @@ Featuring:
 * <1000 lines of python
 * No dependencies other than PyTorch and sentencepiece for server, and Executorch for mobile (plus, your mobile IDE, of course)
 * int8/int4 quantization
-* Supports Nvidia and AMD GPUs, MPS, CPU (Linux/x86 and MacOS/ARM), xnnpack, and backend-specific mobile runtimes ("delegates").
+* Supports Nvidia and AMD GPUs, Apple GPUs with MPS, CPU (Linux/x86 and MacOS/ARM), and xnnpack, Vulkan and MPS for mobile GPUs,
+  and backend-specific mobile runtimes ("delegates", such as CoreML and Hexagon).
 
 This is NOT intended to be a "framework" or "library" - it is intended to show off what kind of performance you can get with native PyTorch :)
 Please copy-paste and fork as you desire.
