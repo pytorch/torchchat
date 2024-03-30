@@ -40,7 +40,7 @@ Then login with `huggingface-cli login`
 ## Downloading Weights
 Models tested/supported
 
-| Model | eager | eager + compile | AOT compile | ET Runtime | Fits on Mobile |
+| Model | eager | torch.compile | AOT Inductor | ET Runtime | Fits on Mobile |
 |-----|------|-----|-----|-----|-----|
 tinyllamas/stories15M | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
 tinyllamas/stories42M  | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
