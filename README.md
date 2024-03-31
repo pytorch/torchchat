@@ -56,7 +56,8 @@ mistralai/Mistral-7B-v0.1 | ❎ |  ❎ |  ❎ |  ❎ | ❎ |
 mistralai/Mistral-7B-Instruct-v0.1 | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
 mistralai/Mistral-7B-Instruct-v0.2 | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
 
-*Key:* ❎ works correctly; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile phone (may fit some high-tablets);
+*Key:* ❎ works correctly; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile phone (may fit some high-end devices such as tablets);
+
 
 For example, to convert Llama-2-7b-chat-hf
 ```bash
