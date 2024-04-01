@@ -26,44 +26,27 @@ def device_sync(device):
         print(f"device={device} is not yet suppported")
 
 
-class model_wrapper(nn.Module):
-    def __init__(self, model, device):
-        super().__init__()
-
-        max_seq_length = 350
-        with torch.device(device):
-            model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
-
-        self.model = model
-        # init model here if necessary
-
-    def forward(self, x, input_pos):
-        # input_pos: [B, 1]
-        assert input_pos.shape[-1] == 1
-        logits = self.model(x, input_pos)
-        return logits  # sample(logits, **sampling_kwargs)
-
-
 def export_model(model: nn.Module, device, output_path):
-
-    export_model = model_wrapper(model, device=device)
-    print(export_model)
+    max_seq_length = 350
+    with torch.device(device):
+        model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
 
     input = (
-        torch.tensor([[1]], dtype=torch.long, device=device),
-        torch.tensor([0], dtype=torch.long, device=device),
+        torch.tensor([[1, 9038, 2501,  263,  931]], dtype=torch.int, device=device),
+        torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
     )
 
     print(f"len(input)={len(input)}")
 
-    batch = Dim("batch")
+    seq = Dim("seq", min=1, max=max_seq_length)
     # Specify that the first dimension of each input is that batch size
-    dynamic_shapes = {"idx": {0: batch}, "input_pos": {0: batch}}
+    dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
 
     so = torch._export.aot_compile(
-        export_model,
+        model,
         args=input,
         options={"aot_inductor.output_path": output_path},
+        dynamic_shapes=dynamic_shapes,
     )
     print(f"The generated DSO model can be found at: {so}")
     return so
@@ -71,7 +54,7 @@ def export_model(model: nn.Module, device, output_path):
     #################################################################
     ### FIXME.... used for separate export & compile
     #################################################################
-    
+
     exported_program: torch.export.ExportedProgram = export(
         export_model, args=input
     )  # , dynamic_shapes=dynamic_shapes)
@@ -89,6 +72,8 @@ def export_model(model: nn.Module, device, output_path):
 
 def main(checkpoint_path, device, output_path):
     assert checkpoint_path.is_file(), checkpoint_path
+
+    torch.manual_seed(1234)
 
     print(f"Using device={device}")
     precision = torch.float  # bfloat16
@@ -153,11 +138,11 @@ def cli():
         "--device", type=str, default=default_device, help="Device to use"
     )
     parser.add_argument(
-        "--out-path", type=str, default="stories15M.so", help="Filename"
+        "--output_path", type=str, default="stories15M.so", help="Filename"
     )
 
     args = parser.parse_args()
-    main(args.checkpoint_path, args.device, args.out_path)
+    main(args.checkpoint_path, args.device, args.output_path)
 
 if __name__ == "__main__":
     cli()
