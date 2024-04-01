@@ -376,6 +376,7 @@ def main(
         try:
             from et_wrapper import PTEModel
             model = PTEModel(model_.config, use_pte)
+            model_ = None
         except:
             print("executorch model load not successful, running eager model")
             assert 0==1
