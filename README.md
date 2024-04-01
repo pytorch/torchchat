@@ -1,3 +1,9 @@
+# Preamble.
+
+*The staments contained in this README are our northstar, and we will be reality-testing the statemen, and remove any 
+items that are not factual.  If you find an item, that is incorrect, please tag so we can triage and determine whether to fix,
+or drop from our initial release.*
+
 # llama-fast
 A repo for building and using llama on servers, desktops and mobile
 
