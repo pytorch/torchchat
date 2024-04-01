@@ -333,7 +333,7 @@ def main(
     speculate_k: int = 5,
     device="cuda",
     dso_path=None,
-    use_pte=None,
+    pte_path=None,
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
     assert checkpoint_path.is_file(), checkpoint_path
@@ -372,13 +372,13 @@ def main(
             model.forward = torch._export.aot_load(str(dso_path), device)
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {dso_path}")
-    elif use_pte:
+    elif pte_path:
         try:
             from et_wrapper import PTEModel
-            model = PTEModel(model_.config, use_pte)
+            model = PTEModel(model_.config, pte_path)
+            model_ = None
         except:
-            print("executorch model load not successful, running eager model")
-            assert 0==1
+            raise RuntimeError(f"Failed to load AOTI compiled {pte_path}")
     else:
         model = model_
 
