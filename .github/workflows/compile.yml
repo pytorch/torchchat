@@ -25,7 +25,7 @@ jobs:
           sysctl machdep.cpu.core_count
       - name: Install requirements
         run: |
-	  pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+	  pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
       - name: Download checkpoints
         run: |
