@@ -1,27 +1,23 @@
 # (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
 
-import itertools
-import sys
 import time
 from pathlib import Path
-from typing import Optional, Tuple
 
 import torch
 import torch.nn as nn
-from torch.export import Dim, export
-
-from generate import _load_model, decode_one_token
-
-from model import Transformer
+from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
+    XnnpackDynamicallyQuantizedPartitioner,
+)
+from executorch.examples.portable.utils import export_to_edge
 
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
-from torch._export import capture_pre_autograd_graph
-from executorch.examples.portable.utils import export_to_edge, save_pte_program
 from executorch.exir.passes.quant_fusion_pass import QuantFusionPass
 from executorch.exir.passes.sym_shape_eval_pass import ConstraintBasedSymShapeEvalPass
-from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
-    XnnpackPartitioner,
-)
+
+from generate import _load_model
+
+from model import Transformer
+from torch._export import capture_pre_autograd_graph
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -152,9 +148,6 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     if args.xnnpack_dynamic:
         edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
 
-    if args.xnnpack:
-        edge_manager = edge_manager.to_backend(XnnpackPartitioner())
-
     # TODO: remove this after xnnpack delegation is ready
     if args.quantization_mode == "int4":
         raise Exception(
@@ -204,23 +197,6 @@ def cli():
     import argparse
 
     parser = argparse.ArgumentParser(description="Your CLI description.")
-
-    parser.add_argument(
-        "--prompt", type=str, default="Hello, my name is", help="Input prompt."
-    )
-    parser.add_argument(
-        "--interactive",
-        action="store_true",
-        help="Whether to launch in interactive mode",
-    )
-    parser.add_argument("--num_samples", type=int, default=5, help="Number of samples.")
-    parser.add_argument(
-        "--max_new_tokens", type=int, default=200, help="Maximum number of new tokens."
-    )
-    parser.add_argument("--top_k", type=int, default=200, help="Top-k for sampling.")
-    parser.add_argument(
-        "--temperature", type=float, default=0.8, help="Temperature for sampling."
-    )
     parser.add_argument(
         "--checkpoint_path",
         type=Path,
@@ -234,19 +210,6 @@ def cli():
         "--compile_prefill",
         action="store_true",
         help="Whether to compile the prefill (improves prefill perf, but higher compile times)",
-    )
-    parser.add_argument("--profile", type=Path, default=None, help="Profile path.")
-    parser.add_argument(
-        "--speculate_k", type=int, default=5, help="Speculative execution depth."
-    )
-    parser.add_argument(
-        "--draft_checkpoint_path",
-        type=Path,
-        default=None,
-        help="Draft checkpoint path.",
-    )
-    parser.add_argument(
-        "--device", type=str, default=default_device, help="Device to use"
     )
     parser.add_argument(
         "--out-path", type=str, default="stories15M.pte", help="Filename"
@@ -269,7 +232,6 @@ def cli():
         help="Override the dtype of the model (default is the checkpoint dtype). Options: fp16, fp32",
     )
     parser.add_argument("-v", "--verbose", action="store_true")
-    parser.add_argument("-X", "--xnnpack", action="store_true")
     parser.add_argument("-x", "--xnnpack_dynamic", action="store_true")
     parser.add_argument("-G", "--groupsize", default=None, help="specify the groupsize")
 
