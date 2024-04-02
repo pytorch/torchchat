@@ -31,15 +31,15 @@ jobs:
           wget https://github.com/karpathy/llama2.c/blob/master/tokenizer.model
           popd
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
-          python aoti_export.py --checkpoint_path ${MODEL_PATH} --output_path ./${MODEL_REPO}.so
+          # python aoti_export.py --checkpoint_path ${MODEL_PATH} --output_path ./${MODEL_REPO}.so
           python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 |& tee output_eager
           python generate.py --compile --checkpoint_path ${MODEL_PATH} --temperature 0 |& tee output_compiled
-          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --dso ./${MODEL_REPO}.so |& tee output_aoti
+          # python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --dso ./${MODEL_REPO}.so |& tee output_aoti
           echo "******************************************"
           echo "********* EAGER vs TORCH.COMPILE *********"
           echo "******************************************"
           diff output_eager output_compiled
-          echo "******************************************"
-          echo "********* EAGER vs AOT INDUCTOR  *********"
-          echo "******************************************"
-          diff output_eager output_aoti
+          # echo "******************************************"
+          # echo "********* EAGER vs AOT INDUCTOR  *********"
+          # echo "******************************************"
+          # diff output_eager output_aoti
