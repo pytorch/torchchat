@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  do_compile:
+  run-tinystories:
     runs-on: macos-12
     # runs-on: self-hosted
     steps:
@@ -18,18 +18,23 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Compile and run
-        # shell: arch -arch arm64 zsh {0}
+      - name: Print machine info
         run: |
           uname -a
           sysctl machdep.cpu.brand_string
           sysctl machdep.cpu.core_count
+      - name: Install requirements
+        run: |
           pip install -r requirements.txt
+      - name: Download checkpoints
+        run: |
           mkdir -p checkpoints/stories15M
           pushd checkpoints/stories15M
           wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
-          wget https://github.com/karpathy/llama2.c/blob/master/tokenizer.model
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
           popd
+      - name: Run inference
+        run: |          
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
           # python aoti_export.py --checkpoint_path ${MODEL_PATH} --output_path ./${MODEL_REPO}.so
           python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --device cpu | tee output_eager
