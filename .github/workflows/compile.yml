@@ -25,6 +25,7 @@ jobs:
           sysctl machdep.cpu.core_count
       - name: Install requirements
         run: |
+	  pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
       - name: Download checkpoints
         run: |
@@ -39,7 +40,7 @@ jobs:
           # python aoti_export.py --checkpoint_path ${MODEL_PATH} --output_path ./${MODEL_REPO}.so
           python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --device cpu | tee output_eager
           python generate.py --compile --checkpoint_path ${MODEL_PATH} --temperature 0 --device cpu | tee output_compiled
-          # python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --dso ./${MODEL_REPO}.so | tee output_aoti
+          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --dso ./${MODEL_REPO}.so | tee output_aoti
           # echo "******************************************"
           # echo "********* EAGER vs TORCH.COMPILE *********"
           # echo "******************************************"
