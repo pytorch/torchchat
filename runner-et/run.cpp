@@ -7,14 +7,26 @@
 #include <time.h>
 #include <math.h>
 #include <string.h>
+#include <iostream>
+#include <cassert>
 
 #include <executorch/extension/runner_util/managed_tensor.h>
 #include <executorch/runtime/core/exec_aten/exec_aten.h>
 #include <executorch/runtime/core/exec_aten/util/scalar_type_util.h>
+#include <executorch/runtime/core/evalue.h>
+#include <executorch/extension/module/module.h>
+#include <executorch/extension/runner_util/managed_tensor.h>
 
 #ifdef USE_ATEN_LIB
 #include <torch/torch.h>
 #endif
+
+
+using torch::executor::Module;
+using torch::executor::ManagedTensor;
+using torch::executor::EValue;
+using exec_aten::ScalarType;
+using torch::executor::Result;
 
 // ----------------------------------------------------------------------------
 // Transformer model
@@ -32,7 +44,7 @@ typedef struct {
 typedef struct {
     Config config; // the hyperparameters of the architecture (the blueprint)
     RunState state; // buffers for the "wave" of activations in the forward pass
-    unique_ptr<Module> runner;
+    Module* runner;
 } Transformer;
 
 void malloc_run_state(RunState* s, Config* p) {
@@ -68,7 +80,7 @@ void build_transformer(Transformer *t, char* checkpoint_path, int vocab_size, in
     t->config.seq_len = seq_len;
     malloc_run_state(&t->state, &t->config);
 
-    t->runner = std::make_unique<Module>(
+    t->runner = new Module(
         checkpoint_path,
           Module::MlockConfig::UseMlockIgnoreErrors
     );
@@ -122,12 +134,16 @@ float* forward(Transformer* transformer, int token, int pos) {
         token_buffer, sizeof(int64_t), {1, 1}, ScalarType::Long);
 #endif
 
-    std::vector<ManagedTensor> inputs{tokens_managed, pos_managed};
+    std::vector<EValue> inputs;
+    auto tmp1 = EValue(tokens_managed.get_aliasing_tensor());
+    auto tmp2 = EValue(pos_managed.get_aliasing_tensor());
+    inputs.push_back(tmp1);
+    inputs.push_back(tmp2);
     Result<std::vector<EValue>> outputs_res = transformer->runner->forward(inputs);
     assert (outputs_res.ok());
 
     std::vector<EValue> result = outputs_res.get();
-    memcpy(s->logits, result[0].data_ptr(), p->vocab_size * sizeof(float));
+    memcpy(s->logits, result[0].toTensor().const_data_ptr(), p->vocab_size * sizeof(float));
     return s->logits;
 }
 
@@ -666,6 +682,7 @@ void chat(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler,
 #ifndef TESTING
 
 void error_usage() {
+    fprintf(stderr, "Unexpected arg.\n");
     fprintf(stderr, "Usage:   run <checkpoint> [options]\n");
     fprintf(stderr, "Example: run model.bin -n 256 -i \"Once upon a time\"\n");
     fprintf(stderr, "Options:\n");
@@ -695,8 +712,9 @@ int main(int argc, char *argv[]) {
     char *system_prompt = NULL; // the (optional) system prompt to use in chat mode
 
     // poor man's C argparse so we can override the defaults above from the command line
-    if (argc >= 2) { checkpoint_path = argv[1]; } else { error_usage(); }
-    for (int i = 2; i < argc; i+=2) {
+    if (argc < 3) { error_usage(); }
+    checkpoint_path = argv[2];
+    for (int i = 3; i < argc; i+=2) {
         // do some basic validation
         if (i + 1 >= argc) { error_usage(); } // must have arg after flag
         if (argv[i][0] != '-') { error_usage(); } // must start with dash
