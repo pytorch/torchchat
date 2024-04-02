@@ -7,8 +7,8 @@
 #include <time.h>
 #include <math.h>
 #include <string.h>
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 #include <executorch/extension/runner_util/managed_tensor.h>
 #include <executorch/runtime/core/exec_aten/exec_aten.h>
@@ -127,8 +127,7 @@ float* forward(Transformer* transformer, int token, int pos) {
 
 #ifndef __KV_CACHE__
       // @lint-ignore CLANGTIDY facebook-hte-LocalUncheckedArrayBounds
-    ManagedTensor tokens_managed(
-        s->toks, sizeof(int64_t)*(pos+1), {1, pos+1}, ScalarType::Long);
+    ManagedTensor tokens_managed(&(s->toks[pos]), /*ignored*/sizeof(int64_t)*(pos+1), {1, 1}, ScalarType::Long);
 #else
     ManagedTensor tokens_managed(
         token_buffer, sizeof(int64_t), {1, 1}, ScalarType::Long);
@@ -137,6 +136,7 @@ float* forward(Transformer* transformer, int token, int pos) {
     std::vector<EValue> inputs;
     auto tmp1 = EValue(tokens_managed.get_aliasing_tensor());
     auto tmp2 = EValue(pos_managed.get_aliasing_tensor());
+
     inputs.push_back(tmp1);
     inputs.push_back(tmp2);
     Result<std::vector<EValue>> outputs_res = transformer->runner->forward(inputs);
