@@ -23,8 +23,7 @@ jobs:
           pip install -r requirements.txt
           mkdir -p checkpoints/stories15M
           pushd checkpoints/stories15M
-          wget https://huggingface.co/karpathy/tinyllamas/raw/main/stories15M.pt
-          wget https://huggingface.co/karpathy/tinyllamas/raw/main/stories15M.bin
+          wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
           wget https://github.com/karpathy/llama2.c/blob/master/tokenizer.model
           popd
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
