@@ -258,10 +258,11 @@ PyTorch and the mobile Executorch backend support a broad range fo devices for r
 | x86 | macOS | ? | ? | ? | ? |
 | aarch64 | Linux | ? | ? | ? | ? |
 | aarch64 | macOS | ❎ |  ❎ |  ❎ |  ❎ |
-| AMD GPU | Linux |  ❎ |  ❎ |  ❎ |  ?|
-| Nvidia GPU | Linux | ❎ |  ❎ |  ❎ |  ? |
-| MPS | macOS | ❎ |  ? |  ? |  <chen lai> |
+| AMD GPU | Linux |  ❎ |  ❎ |  ❎ | ❌|
+| Nvidia GPU | Linux | ❎ |  ❎ |  ❎ | ❌|
+| MPS | macOS | ❎ |  ❌|  ❌|  ? |
 | MPS | iOS | ❌|❌|❌| ❎ |
+| aarch64 | iOS | ❌|❌|❌| ❎ |
 | aarch64 | Android | ❌|❌|❌| ❎ |
 | Mobile GPU (Vulkan) | Android |  ❌|❌|❌| ❎ |
 | CoreML | iOS |  ❌|❌|❌| ❎ |
