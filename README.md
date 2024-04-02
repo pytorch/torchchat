@@ -49,18 +49,18 @@ Models tested/supported
 
 | Model | eager | torch.compile | AOT Inductor | ET Runtime | Fits on Mobile |
 |-----|------|-----|-----|-----|-----|
-tinyllamas/stories15M | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
-tinyllamas/stories42M  | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
-tinyllamas/stories110M   | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
-openlm-research/open_llama_7b  | ❎ |  ❎ |  ❎ |  ❎ | ❹ | 
-meta-llama/Llama-2-7b-chat-hf | ❎ |  ❎ |  ❎ |  ❎ | ❹| 
-meta-llama/Llama-2-13b-chat-hf | ❎ |  ❎ |  ❎ |  ❎ | 📵 | 
+tinyllamas/stories15M | ❎ |  ❎ |  ❎ |  ❎ | ❎ |
+tinyllamas/stories42M  | ❎ |  ❎ |  ❎ |  ❎ | ❎ |
+tinyllamas/stories110M   | ❎ |  ❎ |  ❎ |  ❎ | ❎ |
+openlm-research/open_llama_7b  | ❎ |  ❎ |  ❎ |  ❎ | ❹ |
+meta-llama/Llama-2-7b-chat-hf | ❎ |  ❎ |  ❎ |  ❎ | ❹|
+meta-llama/Llama-2-13b-chat-hf | ❎ |  ❎ |  ❎ |  ❎ | 📵 |
 meta-llama/Llama-2-70b-chat-hf | ❎ |  ❎ |  ❎ |  ❎ | ❌|
-codellama/CodeLlama-7b-Python-hf | ❎ |  ❎ |  ❎ |  ❎ | ❹| 
-codellama/CodeLlama-34b-Python-hf | ❎ |  ❎ |  ❎ |  ❎ | 📵 | 
-mistralai/Mistral-7B-v0.1 | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
-mistralai/Mistral-7B-Instruct-v0.1 | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
-mistralai/Mistral-7B-Instruct-v0.2 | ❎ |  ❎ |  ❎ |  ❎ | ❎ | 
+codellama/CodeLlama-7b-Python-hf | ❎ |  ❎ |  ❎ |  ❎ | ❹|
+codellama/CodeLlama-34b-Python-hf | ❎ |  ❎ |  ❎ |  ❎ | 📵 |
+mistralai/Mistral-7B-v0.1 | ❎ |  ❎ |  ❎ |  ❎ | ❎ |
+mistralai/Mistral-7B-Instruct-v0.1 | ❎ |  ❎ |  ❎ |  ❎ | ❎ |
+mistralai/Mistral-7B-Instruct-v0.2 | ❎ |  ❎ |  ❎ |  ❎ | ❎ |
 
 *Key:* ❎ works correctly; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile phone (may fit some high-end devices such as tablets);
 
@@ -111,8 +111,8 @@ To squeeze out a little bit more performance, you can also compile the prefill w
 python aoti_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --out-path ./${MODEL_REPO}.so
 ```
 
-When you have exported the model, you can test the model with the sequence generator by importing the compiled DSO model with the `-sopath ./{modelname}.so` option. 
-This gives users the ability to test their model, run any pre-existing model tests against the exported model with the same interface, 
+When you have exported the model, you can test the model with the sequence generator by importing the compiled DSO model with the `-sopath ./{modelname}.so` option.
+This gives users the ability to test their model, run any pre-existing model tests against the exported model with the same interface,
 and support additional experiments to confirm model quality and speed.
 
 ```
@@ -135,15 +135,14 @@ python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 
 ```
 
 TODO(fix this): the export command works with "--xnnpack" flag, but the next generate.py command will not run it so we do not set it right now.
-When you have exported the model, you can test the model with the sequence generator by importing the compiled DSO model with the `---ptepath ./{modelname}.pte` option. 
-This gives users the ability to test their model, run any pre-existing model tests against the exported model with the same interface, 
+When you have exported the model, you can test the model with the sequence generator by importing the compiled DSO model with the `---pte ./{modelname}.pte` option.
+This gives users the ability to test their model, run any pre-existing model tests against the exported model with the same interface,
 and support additional experiments to confirm model quality and speed.
 
 To run the pte file in s.  Note that this is very slow at the moment.
 ```
 python generate.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --pte ${MODEL_REPO}.pte --prompt "Hello my name is" --device cpu
 ```
-but *that requires xnnpack to work in python!*
 
 ### Making your models fit and execute fast!
 
@@ -163,16 +162,16 @@ Now you can run your model with the same command as before:
 python generate.py --pte ${MODEL_REPO}_emb8b-gw256.pte --prompt "Hello my name is"
 ```
 
-#### Linear 8 bit integer quantization
+#### Linear 8 bit integer quantization (tested)
 The simplest way to quantize is with int8 quantization, where each value is represented by an 8 bit integer, and a
 floating point scale:
 ```
-python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'linear:int8': {} }" {-xnnpack|-coreml|--mps} --out-path ${MODEL_REPO}_int8.pte
+python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --xnnpack_dynamic --out-path ${MODEL_REPO}
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte ${MODEL_REPO}_int8.pte --prompt "Hello my name is"
+python generate.py --pte ${MODEL_REPO}/llama-fast.pte --prompt "Once upon a time" --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device cpu
 ```
 
 #### 4 bit integer quantization (8da4w)
@@ -197,7 +196,7 @@ We invite contributors to submit established quantization schemes, with accuracy
 # Standalone Execution
 
 ## Desktop and Server Execution
-This has been tested with Linux and x86 (using CPU ~and GPU~), and MacOS and ARM/Apple Silicon.  
+This has been tested with Linux and x86 (using CPU ~and GPU~), and MacOS and ARM/Apple Silicon.
 
 The runner-* directories show how to integrate AOTI- and ET-exported models in a C/C++ application when no Python environment is available.  Integrate it with your own applications and adapt it to your own application and model needs!
 
@@ -243,9 +242,9 @@ Open the ios Llama Xcode project at https://github.com/pytorch/executorch/tree/m
 You will need to provide a provisioning profile (similar to what's expected for any iOS dev).
 
 Once you can run the app on you device,
-1 - connect the device to you Mac, 
+1 - connect the device to you Mac,
 2 - copy the model and tokenizer.bin to the iOS Llama app
-3 - select the tokenizer and model with the `(...)` control (bottom left of screen, to the left of the text entrybox) 
+3 - select the tokenizer and model with the `(...)` control (bottom left of screen, to the left of the text entrybox)
 
 # Supported Systems
 
@@ -276,21 +275,21 @@ PyTorch and the mobile Executorch backend support a broad range fo devices for r
 
 | Hardware | OS | eager | eager + compile | AOT compile | ET Runtime |
 |-----|------|-----|-----|-----|-----|
-| x86 | Linux | ? | ? | ? | ? |  
-| x86 | macOS | ? | ? | ? | ? | 
-| aarch64 | Linux | ? | ? | ? | ? | 
-| aarch64 | macOS | ? | ? | ? | ? | 
-| AMD GPU | Linux | ? | ? | ? | ? | 
-| Nvidia GPU | Linux | ? | ? | ? | ? |  
-| MPS | macOS | ? | ? | ? | ? |  
-| MPS | iOS | ? | ? | ? | ? |  
-| aarch64 | Android | ? | ? | ? | ? |  
-| Mobile GPU (Vulkan) | Android | ? | ? | ? | ? |   
-| CoreML | iOS | | ? | ? | ? | ? | 
-| Hexagon DSP | Android | | ? | ? | ? | ? | 
+| x86 | Linux | ? | ? | ? | ? |
+| x86 | macOS | ? | ? | ? | ? |
+| aarch64 | Linux | ? | ? | ? | ? |
+| aarch64 | macOS | ? | ? | ? | ? |
+| AMD GPU | Linux | ? | ? | ? | ? |
+| Nvidia GPU | Linux | ? | ? | ? | ? |
+| MPS | macOS | ? | ? | ? | ? |
+| MPS | iOS | ? | ? | ? | ? |
+| aarch64 | Android | ? | ? | ? | ? |
+| Mobile GPU (Vulkan) | Android | ? | ? | ? | ? |
+| CoreML | iOS | | ? | ? | ? | ? |
+| Hexagon DSP | Android | | ? | ? | ? | ? |
 | Raspberry Pi 4/5 | Raspbian | ? | ? | ? | ? |
 | Raspberry Pi 4/5 | Android | ? | ? | ? | ? |
-| ARM 32b (up to v7) | any | | ? | ? | ? | ? | 
+| ARM 32b (up to v7) | any | | ? | ? | ? | ? |
 
 
 ## Installation Instructions
