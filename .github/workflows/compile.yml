@@ -32,8 +32,8 @@ jobs:
           popd
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
           # python aoti_export.py --checkpoint_path ${MODEL_PATH} --output_path ./${MODEL_REPO}.so
-          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 | tee output_eager
-          python generate.py --compile --checkpoint_path ${MODEL_PATH} --temperature 0 | tee output_compiled
+          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --device cpu | tee output_eager
+          python generate.py --compile --checkpoint_path ${MODEL_PATH} --temperature 0 --device cpu | tee output_compiled
           # python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --dso ./${MODEL_REPO}.so |& tee output_aoti
           echo "******************************************"
           echo "********* EAGER vs TORCH.COMPILE *********"
