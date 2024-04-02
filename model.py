@@ -59,6 +59,8 @@ class ModelArgs:
             assert len(config[0]) != len(
                 config[1]
             ), name  # make sure only one 'best' match
+        elif len(config) == 0:
+            raise ValueError(f"Unknown model directory name {name}. Must be one of {list(transformer_configs.keys())}.")
 
         return cls(**transformer_configs[config[0]])
 
