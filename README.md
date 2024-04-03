@@ -93,7 +93,7 @@ delegates such as CoreML, MPS, HTP in addition to Xnnpack.)
 
 # Introduction
 
-We use two variables in this example, which may be set as a preparatory step:
+We use three variables in this example, which may be set as a preparatory step:
 
 * `MODEL_NAME` describes the name of the model.  This name is *not* free-form, as it is used to index into a table
    of supported models and their configuration properties that are needed to load the model. This variable should correspond to the
@@ -109,10 +109,15 @@ We use two variables in this example, which may be set as a preparatory step:
   The generate.py  sequence generator will load the tokenizer from the directory specified by the MODEL_PATH variable,
   by replacing the modelname with the name of the tokenizer model which is expected to be named `tokenizer.model`
 
+* `MODEL_DIR` is a location for outputs from export for server/desktop and/or mobile/edge execution.  We store exported
+  artifacts here, with extensions .pte for Executorch models, .so for AOT Inductor generated models, and .bin for tokenizers
+  prepared for use with the C++ tokenizers user by `runner-aoti` and `runner-et`. 
+
 You can set these variables as follows for the exemplary model15M model from Andrej Karpathy's tinyllamas model family:
 ```
 MODEL_NAME=stories15M
 MODEL_PATH=checkpoints/${MODEL_NAME}/stories15M.pt
+MODEL_DIR=~/llama-fast-exports
 ```
 
 When we export models with AOT Inductor for servers and desktops, and Executorch for mobile and edge devices,
