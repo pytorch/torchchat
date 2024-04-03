@@ -89,7 +89,10 @@ If you are using coda, you can install setencepiece using the following command:
 conda install sentencepiece
 ```
 
-You can convert tokenizer.model into tokenizer.bin using Andrej's tokenizer.py utility to convert the tokenizer.model to tokenizer.bin format:
+You can convert tokenizer.model into tokenizer.bin using Andrej's
+tokenizer.py utility to convert the tokenizer.model to tokenizer.bin
+format:
+
 ```
 python utils/tokenizer.py --tokenizer-model=/path/to/tokenizer/tokenizer.model
 ./run ./model.{so,pte} -z path/to/tokenizer/tokenizer.bin
@@ -99,62 +102,106 @@ python utils/tokenizer.py --tokenizer-model=/path/to/tokenizer/tokenizer.model
 
 ## Eager Execution
 
-Model definition in model.py, generation code in generate.py. The model checkpoint extension may have either the extension pth or pt.
+Model definition in model.py, generation code in generate.py. The
+model checkpoint extension may have either the extension pth or pt.
 
 ```
 python generate.py --compile --checkpoint_path checkpoints/$MODEL_REPO/model.pth --prompt "Hello, my name is" --device {cuda,cpu,mps}
 ```
-To squeeze out a little bit more performance, you can also compile the prefill with --compile_prefill. This will increase compilation times though.
+
+To squeeze out a little bit more performance, you can also compile the
+prefill with --compile_prefill. This will increase compilation times
+though.
 
 ## AOT Inductor compilation and execution
 ```
-python aoti_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --output-path ./${MODEL_REPO}.so
+python export_aoti.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --output-path ./${MODEL_REPO}.so
 ```
 
-When you have exported the model, you can test the model with the sequence generator by importing the compiled DSO model with the `-sopath ./{modelname}.so` option.
-This gives users the ability to test their model, run any pre-existing model tests against the exported model with the same interface,
-and support additional experiments to confirm model quality and speed.
+When you have exported the model, you can test the model with the
+sequence generator by importing the compiled DSO model with the
+`-sopath ./{modelname}.so` option.  This gives users the ability to
+test their model, run any pre-existing model tests against the
+exported model with the same interface, and support additional
+experiments to confirm model quality and speed.
 
 ```
 python generate.py --device {cuda,cpu} --dso ./${MODEL_REPO}.so --prompt "Hello my name is"
 ```
 
-Note to self: --dso does not currently take an argument, and always loads stories15M.so.
+While we have shown the export and execution of a small model on CPU
+or an accelerator such as GPU, most models need to be compressed to
+reduce their memory bandwidth requirements and avoid stalling the
+execution engines while they are waiting for data.  We use
+quantization to achieve this.
+
 
 ## ExecuTorch mobile compilation
 
 ### The basics
 
-Use a small model like stories15M.pt to test the instructions in the following section.  You must first have ExecuTorch installed before running this command, see the installation instructions in the sections [here](#installation-instructions).
+Use a small model like stories15M.pt to test the instructions in the
+following section.  You must first have ExecuTorch installed before
+running this command, see the installation instructions in the
+sections [here](#installation-instructions).
 
-The environment variable MODEL_REPO should point to a directory with the `model.pth` file and `tokenizer.model` file.
-The command below will add the file "${MODEL_REPO}.pte" to your current directory.
+The environment variable MODEL_REPO should point to a a subdirectory
+of the checkpoints directory with the `model.pth` file (you may need
+adapt the checkpoint name) and `tokenizer.model` file.  The
+`MODEL_REPO` name is used to index into a list of supported models and
+their characteristics, so you *must* follow the naming convetions
+described herein.
+
+The command below will add the file "${MODEL_REPO}.pte" to your
+current directory.
 
 ```
-python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --output-path ${MODEL_REPO}.pte
+python export_et.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --output-path ./${MODEL_REPO}.pte
 ```
 
-TODO(fix this): the export command works with "--xnnpack" flag, but the next generate.py command will not run it so we do not set it right now.
-When you have exported the model, you can test the model with the sequence generator by importing the compiled DSO model with the `---pte ./{modelname}.pte` option.
-This gives users the ability to test their model, run any pre-existing model tests against the exported model with the same interface,
-and support additional experiments to confirm model quality and speed.
+At present, when exporting a model, the export command always uses the
+xnnpack delegate to export.  (Future versions will support additional
+delegates such as CoreML, MPS, HTP in addition to Xnnpack.  *fixme:
+@scott currently not true.  Making this work is the next priority*
 
-To run the pte file in s.  Note that this is very slow at the moment.
+When you have exported the model, you can test the model with the
+sequence generator by importing the compiled DSO model with the
+`---pte ./${MODEL_REPO}.pte` option.  This gives users the ability to
+test their model, run any pre-existing model tests against the
+exported model with the same interface, and support additional
+experiments to confirm model quality and speed.
+
 ```
 python generate.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --pte ${MODEL_REPO}.pte --prompt "Hello my name is" --device cpu
 ```
 
-### Making your models fit and execute fast!
+While we have shown the export and execution of a small model to a mobile/edge
+device supported by Executorch, most models need to be compressed to
+fit in the target device's memory. We use quantization to achieve this.
 
-Next, we'll show you how to optimize your model for mobile execution. The basic model build for mobile surfaces two issues:
-Models quickly run out of memory and execution can be slow. In this section, we show you how to fit your models in the limited
-memory of a mobile device, and optimize execution speed -- both using quantization. This is the `llama-fast` repo after all!
+
+# Optimizing your model for server, desktop and mobile devices
+
+## Making your models fit and execute fast!
+
+Next, we'll show you how to optimize your model for mobile execution
+(for ET) or get the most from your server or desktop hardware (with
+AOTI). The basic model build for mobile surfaces two issues: Models
+quickly run out of memory and execution can be slow. In this section,
+we show you how to fit your models in the limited memory of a mobile
+device, and optimize execution speed -- both using quantization. This
+is the `llama-fast` repo after all!
+
+For high-performance devices such as GPUs, quantization provides a way
+to reduce the memory bandwidth required to and take advantage of the
+massive compute capabilities provided by today's server-based
+accelerators such as GPUs. The 
 
 #### Embedding quantization (8 bit integer, groupwise)
 The simplest way to quantize embedding tables is with int8 groupwise quantization, where each value is represented by an 8 bit integer, and a
 floating point scale per group:
 ```
-python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" {-xnnpack|-coreml|--mps} --output-path ${MODEL_REPO}_emb8b-gw256.pte
+python export_et.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" --output-path ${MODEL_REPO}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -166,7 +213,7 @@ python generate.py --pte ${MODEL_REPO}_emb8b-gw256.pte --prompt "Hello my name i
 The simplest way to quantize is with int8 quantization, where each value is represented by an 8 bit integer, and a
 floating point scale:
 ```
-python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --xnnpack_dynamic --output-path ${MODEL_REPO}
+python export_et.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --xnnpack_dynamic --output-path ${MODEL_REPO}
 ```
 
 Now you can run your model with the same command as before:
@@ -179,7 +226,7 @@ To compress your model even more, 4 bit integer quantization may be used.  To ac
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8 bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
-python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }"  8da4w {-xnnpack|-coreml|--mps} --output-path ./${MODEL_REPO}_8da4w.pte
+python export_et.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }"  8da4w {-xnnpack|-coreml|--mps} --output-path ./${MODEL_REPO}_8da4w.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -192,6 +239,7 @@ TBD.
 
 #### Adding additional quantization schemes
 We invite contributors to submit established quantization schemes, with accuracy and performance results demonstrating soundness.
+
 
 # Standalone Execution
 
