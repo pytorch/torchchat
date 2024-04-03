@@ -6,12 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(ET_DIR "./executorch" CACHE STRING "Path to executorch.  Default value is ./executorch.")
 
-# Before calling this, executorch must be built with cmake.  Calling the ./install_requirements.sh in
-# the executorch repo is not enough.
-# To build executorch with cmake, cd to $ET_DIR and do the following steps:
-# 1. mkdir cmake-out
-# 2. cmake -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out; cmake --build cmake-out
-
 include(CMakePrintHelpers)
 cmake_print_variables(ET_DIR)
 
