@@ -108,7 +108,7 @@ To squeeze out a little bit more performance, you can also compile the prefill w
 
 ## AOT Inductor compilation and execution
 ```
-python aoti_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --out-path ./${MODEL_REPO}.so
+python aoti_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --output-path ./${MODEL_REPO}.so
 ```
 
 When you have exported the model, you can test the model with the sequence generator by importing the compiled DSO model with the `-sopath ./{modelname}.so` option.
@@ -131,7 +131,7 @@ The environment variable MODEL_REPO should point to a directory with the `model.
 The command below will add the file "${MODEL_REPO}.pte" to your current directory.
 
 ```
-python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --out-path ${MODEL_REPO}.pte
+python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --output-path ${MODEL_REPO}.pte
 ```
 
 TODO(fix this): the export command works with "--xnnpack" flag, but the next generate.py command will not run it so we do not set it right now.
@@ -154,7 +154,7 @@ memory of a mobile device, and optimize execution speed -- both using quantizati
 The simplest way to quantize embedding tables is with int8 groupwise quantization, where each value is represented by an 8 bit integer, and a
 floating point scale per group:
 ```
-python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" {-xnnpack|-coreml|--mps} --out-path ${MODEL_REPO}_emb8b-gw256.pte
+python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" {-xnnpack|-coreml|--mps} --output-path ${MODEL_REPO}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -166,7 +166,7 @@ python generate.py --pte ${MODEL_REPO}_emb8b-gw256.pte --prompt "Hello my name i
 The simplest way to quantize is with int8 quantization, where each value is represented by an 8 bit integer, and a
 floating point scale:
 ```
-python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --xnnpack_dynamic --out-path ${MODEL_REPO}
+python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --xnnpack_dynamic --output-path ${MODEL_REPO}
 ```
 
 Now you can run your model with the same command as before:
@@ -179,7 +179,7 @@ To compress your model even more, 4 bit integer quantization may be used.  To ac
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8 bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
-python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }"  8da4w {-xnnpack|-coreml|--mps} --out-path ./${MODEL_REPO}_8da4w.pte
+python et_export.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }"  8da4w {-xnnpack|-coreml|--mps} --output-path ./${MODEL_REPO}_8da4w.pte
 ```
 
 Now you can run your model with the same command as before:
