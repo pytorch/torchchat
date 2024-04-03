@@ -9,20 +9,24 @@ on:
 
 jobs:
   run-tinystories:
-    runs-on: macos-12
-    # runs-on: self-hosted
+    strategy:
+      matrix:
+        runner: [macos-12, ubuntu-latest]
+    runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.11
       - name: Print machine info
         run: |
           uname -a
-          sysctl machdep.cpu.brand_string
-          sysctl machdep.cpu.core_count
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
       - name: Install requirements
         run: |
           pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
