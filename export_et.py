@@ -225,9 +225,12 @@ def cli():
         help="Model checkpoint path.",
     )
     parser.add_argument(
-        "--output-path", type=str, default="stories15M.pte", help="Filename"
+        "-o",
+        "--output-path",
+        type=str,
+        default="stories15M.pte",
+        help="Filename"
     )
-
     parser.add_argument(
         "-d",
         "--dtype",
