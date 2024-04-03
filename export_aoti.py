@@ -11,6 +11,7 @@ import torch.nn as nn
 from torch.export import Dim, export
 
 from generate import _load_model, decode_one_token
+from quantize import quantize_model
 
 from model import Transformer
 
@@ -51,23 +52,6 @@ def export_model(model: nn.Module, device, output_path):
     print(f"The generated DSO model can be found at: {so}")
     return so
 
-    #################################################################
-    ### FIXME.... used for separate export & compile
-    #################################################################
-
-    exported_program: torch.export.ExportedProgram = export(
-        export_model, args=input
-    )  # , dynamic_shapes=dynamic_shapes)
-
-    torch.export.save(exported_program, "exported_gpt-fast.pt2")
-
-    print(exported_program)
-
-    return
-
-    so = torch._export.aot_compile(exported_program, args=input)
-    print(f"{so=}")
-    assert so is not None
 
 
 def main(checkpoint_path, device, output_path, quantize = "{ }"):
@@ -86,7 +70,7 @@ def main(checkpoint_path, device, output_path, quantize = "{ }"):
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
     quantize_model(model, quantize)
-
+    
     with torch.no_grad():
         export_model(model, device, output_path)
 
@@ -96,6 +80,9 @@ def cli():
 
     parser = argparse.ArgumentParser(description="Your CLI description.")
 
+    ######################################################################
+    ### We accept these options so we can ignore them w/o error
+    
     parser.add_argument(
         "--prompt", type=str, default="Hello, my name is", help="Input prompt."
     )
@@ -111,12 +98,6 @@ def cli():
     parser.add_argument("--top_k", type=int, default=200, help="Top-k for sampling.")
     parser.add_argument(
         "--temperature", type=float, default=0.8, help="Temperature for sampling."
-    )
-    parser.add_argument(
-        "--checkpoint_path",
-        type=Path,
-        default=Path("checkpoints/meta-Transformer/Transformer-2-7b-chat-hf/model.pth"),
-        help="Model checkpoint path.",
     )
     parser.add_argument(
         "--compile", action="store_true", help="Whether to compile the model."
@@ -136,12 +117,24 @@ def cli():
         default=None,
         help="Draft checkpoint path.",
     )
+    #####################################################################
+    
+    parser.add_argument(
+        "--checkpoint_path",
+        type=Path,
+        default=Path("checkpoints/meta-Transformer/Transformer-2-7b-chat-hf/model.pth"),
+        help="Model checkpoint path.",
+    )
     parser.add_argument(
         "--device", type=str, default=default_device, help="Device to use"
     )
     parser.add_argument(
-        "--output_path", type=str, default="stories15M.so", help="Filename"
+        "-d",
+        "--dtype",
+        default=None,
+        help="Override the dtype of the model (default is the checkpoint dtype). Options: fp16, fp32",
     )
+    parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument(
         "--quantize",
         type=str,
@@ -150,7 +143,7 @@ def cli():
     )
 
     args = parser.parse_args()
-    main(args.checkpoint_path, args.device, args.out_path, args.quantize)
+    main(args.checkpoint_path, args.device, args.output_path, args.quantize)
 
 if __name__ == "__main__":
     cli()
