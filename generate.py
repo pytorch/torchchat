@@ -364,7 +364,6 @@ def main(
     t0 = time.time()
     model_ = _load_model(checkpoint_path, device, precision, use_tp)
     if dso_path:
-        print("dso_path", dso_path)
         try:
             model = model_
             # Replace model forward with the AOT-compiled forward
@@ -377,12 +376,10 @@ def main(
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {dso_path}")
     elif pte_path:
-        print("pte_path", pte_path)
         try:
             from model_et import PTEModel
             model = PTEModel(model_.config, pte_path)
         except Exception as e:
-            print(e)
             raise RuntimeError(f"Failed to load ET compiled {pte_path}")
     else:
         model = model_
