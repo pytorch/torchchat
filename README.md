@@ -161,8 +161,8 @@ python export_et.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 
 
 At present, when exporting a model, the export command always uses the
 xnnpack delegate to export.  (Future versions will support additional
-delegates such as CoreML, MPS, HTP in addition to Xnnpack.  *fixme:
-@scott currently not true.  Making this work is the next priority*
+delegates such as CoreML, MPS, HTP in addition to Xnnpack.  ***fixme:
+@scott currently not true.  Making this work is the next priority***
 
 When you have exported the model, you can test the model with the
 sequence generator by importing the compiled DSO model with the
@@ -195,7 +195,10 @@ is the `llama-fast` repo after all!
 For high-performance devices such as GPUs, quantization provides a way
 to reduce the memory bandwidth required to and take advantage of the
 massive compute capabilities provided by today's server-based
-accelerators such as GPUs. The 
+accelerators such as GPUs. In addition to reducing the memory bandwidth required 
+to compute a result faster by avoiding stalls, quantization allows 
+accelerators (which usually have a limited amount of memory) to store and 
+process larger models than they would otherwise be able to.
 
 #### Embedding quantization (8 bit integer, groupwise)
 The simplest way to quantize embedding tables is with int8 groupwise quantization, where each value is represented by an 8 bit integer, and a
@@ -226,7 +229,7 @@ To compress your model even more, 4 bit integer quantization may be used.  To ac
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8 bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
-python export_et.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }"  8da4w {-xnnpack|-coreml|--mps} --output-path ./${MODEL_REPO}_8da4w.pte
+python export_et.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }"  8da4w --output-path ./${MODEL_REPO}_8da4w.pte
 ```
 
 Now you can run your model with the same command as before:
