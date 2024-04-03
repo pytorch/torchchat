@@ -42,10 +42,13 @@ jobs:
         run: |          
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
-          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 | tee output_eager
-          python generate.py --compile --checkpoint_path ${MODEL_PATH} --temperature 0 | tee output_compiled
+          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 > ./output_eager
+          cat ./output_eager
+          python generate.py --compile --checkpoint_path ${MODEL_PATH} --temperature 0 > ./output_compiled
+          cat ./output_compiled
           python export_aoti.py --checkpoint_path ${MODEL_PATH} --output-path ./${MODEL_NAME}.so
-          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --dso-path ./${MODEL_NAME}.so | tee output_aoti
+          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --dso-path ./${MODEL_NAME}.so  > ./output_aoti
+          cat ./output_aoti
           # echo "******************************************"
           # echo "********* EAGER vs TORCH.COMPILE *********"
           # echo "******************************************"
