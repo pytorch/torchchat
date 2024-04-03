@@ -209,7 +209,7 @@ python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --output-path ${MODE
 With the model exported, you can now generate text with the executorch runtime pybindings.  Feel free to play around with the prompt.
 
 ```
-python generate.py --checkpoint_path ${MODEL_DIR}/model.pth --pte ${MODEL_DIR}/model.pte --device cpu --prompt "Once upon a time"
+python generate.py --checkpoint_path ${MODEL_PATH} --pte ${MODEL_DIR}/model.pte --device cpu --prompt "Once upon a time"
 ```
 
 You can also run the model with the runner-et.  This requires you first build the runner.  See instructions [here](#setting-up-executorch-and-runner-et).
@@ -247,12 +247,12 @@ process larger models than they would otherwise be able to.
 The simplest way to quantize embedding tables is with int8 groupwise quantization, where each value is represented by an 8 bit integer, and a
 floating point scale per group:
 ```
-python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" --output-path ${MODEL_NAME}_emb8b-gw256.pte
+python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" --output-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
+python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
 ```
 
 #### Linear 8 bit integer quantization (tested)
@@ -264,7 +264,7 @@ python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --xnnpack_dynamic --
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ./${MODEL_NAME}.pte --prompt "Once upon a time" --checkpoint_path ${MODEL_PATH} --device cpu
+python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte --prompt "Once upon a time" --checkpoint_path ${MODEL_PATH} --device cpu
 ```
 
 #### 4 bit integer quantization (8da4w)
