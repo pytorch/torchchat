@@ -50,7 +50,7 @@ jobs:
           echo "llama-fast: building runner-et"
           cd ..
           echo "Inside: ${PWD}"
-          export ET_DIR="./executorch"
+          export ET_DIR="${PWD}/executorch"
           mkdir -p runner-et/cmake-out
           cmake -DET_DIR:STRING=$ET_DIR -DCMAKE_BUILD_TYPE=Release -S runner-et -B runner-et/cmake-out
           cmake --build runner-et/cmake-out
@@ -64,13 +64,13 @@ jobs:
           popd
       - name: Run inference
         run: |
-          export MODEL_PATH=checkpoints/stories15M/stories15M.pt
+          export MODEL_PATH=${PWD}/checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
-          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 > ./output_eager
-          cat ./output_eager
-          python export_et.py --checkpoint_path ${MODEL_PATH} --output-path ./${MODEL_NAME}.pte
-          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --pte-path ./${MODEL_NAME}.pte  > ./output_et
-          cat ./output_et
+          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 > ${PWD}/output_eager
+          cat ${PWD}/output_eager
+          python export_et.py --checkpoint_path ${MODEL_PATH} --output-path ${PWD}/${MODEL_NAME}.pte
+          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --pte-path ${PWD}/${MODEL_NAME}.pte  > ${PWD}/output_et
+          cat ${PWD}/output_et
 
           echo "******************************************"
           echo "********* EAGER vs ET *********"
