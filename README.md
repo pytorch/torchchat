@@ -1,6 +1,6 @@
 # Preamble.
 
-*The statements contained in this README are our northstar, and we will be reality-testing the statemen, and remove any 
+*The statements contained in this README are our northstar, and we will be reality-testing the statemen, and remove any
 items that are not factual.  If you find an item, that is incorrect, please tag as an issue, so we can triage and determine whether to fix,
 or drop from our initial release.*
 
@@ -70,9 +70,9 @@ See [`gpt-fast` Supported Models](https://github.com/pytorch-labs/gpt-fast?tab=r
 
 We use two variables in this example, which may be set as a preparatory step:
 
-* `MODEL_NAME` describes the name of the model.  This name is *not* free-form, as it is used to index into a table 
+* `MODEL_NAME` describes the name of the model.  This name is *not* free-form, as it is used to index into a table
    of supported models and their configuration properties that are needed to load the model. This variable should correspond to the
-   name of the directory holding the files for the corresponding model.  You *must* follow this convention to 
+   name of the directory holding the files for the corresponding model.  You *must* follow this convention to
    ensure correct operation.
 
 * `MODEL_PATH` describes the location of the model. Throughput the description
@@ -202,6 +202,33 @@ While we have shown the export and execution of a small model to a mobile/edge
 device supported by Executorch, most models need to be compressed to
 fit in the target device's memory. We use quantization to achieve this.
 
+### Setting up runner-et
+This is currently tested and works with no backend.
+
+Before using runner-et, you must build executorch with cmake.  Calling the install_requirements.sh script in the executorch repo is not enough.
+
+To build executorch with cmake, cd to the executorch repo and do the following steps.
+```
+rm -rf cmake-out; mkdir cmake-out
+```
+```
+cmake -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out; cmake --build cmake-out
+```
+
+This will build executorch and place the library and object files in cmake-out.
+
+After this is done, you can build runner-et in llama-fast.  Make sure to set DET_DIR to the executorch path on your machine.
+
+```
+rm -rf runner-et/cmake-out; mkdir -p runner-et/cmake-out; cmake -DET_DIR:STRING=/path/to/executorch -DCMAKE_BUILD_TYPE=Release -S runner-et -B runner-et/cmake-out; cmake --build runner-et/cmake-out
+```
+
+After this builds, the runner can be called with something like:
+
+
+```
+./runner-et/cmake-out/runner_et run llama-fast.pte -z stories15M/tokenizer.bin -i "Once upon a time"
+```
 
 # Optimizing your model for server, desktop and mobile devices
 
@@ -218,9 +245,9 @@ is the `llama-fast` repo after all!
 For high-performance devices such as GPUs, quantization provides a way
 to reduce the memory bandwidth required to and take advantage of the
 massive compute capabilities provided by today's server-based
-accelerators such as GPUs. In addition to reducing the memory bandwidth required 
-to compute a result faster by avoiding stalls, quantization allows 
-accelerators (which usually have a limited amount of memory) to store and 
+accelerators such as GPUs. In addition to reducing the memory bandwidth required
+to compute a result faster by avoiding stalls, quantization allows
+accelerators (which usually have a limited amount of memory) to store and
 process larger models than they would otherwise be able to.
 
 #### Embedding quantization (8 bit integer, groupwise)
