@@ -14,6 +14,9 @@ from model import Transformer
 # from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
 #    XnnpackDynamicallyQuantizedPartitioner,
 #)
+from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
+    XnnpackPartitioner,
+)
 from executorch.examples.portable.utils import export_to_edge
 
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
@@ -134,6 +137,9 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
             edge_compile_config=edge_config,
         )
 
+    if args.xnnpack:
+        edge_manager = edge_manager.to_backend(XnnpackPartitioner())
+
     export_program = edge_manager.to_executorch(
         ExecutorchBackendConfig(
             extract_constant_segment=True,
@@ -168,7 +174,7 @@ def main(checkpoint_path, device, output_path, args = None):
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
     quantize_model(model, args.quantize)
-    
+
     with torch.no_grad():
         # diverges from AOTI
         export_model(model, device, output_path, args)
@@ -181,7 +187,7 @@ def cli():
 
     ######################################################################
     ### We accept these options so we can ignore them w/o error
-    
+
     parser.add_argument(
         "--prompt", type=str, default="Hello, my name is", help="Input prompt."
     )
@@ -217,7 +223,7 @@ def cli():
         help="Draft checkpoint path.",
     )
     #####################################################################
-    
+
     parser.add_argument(
         "--checkpoint_path",
         type=Path,
@@ -238,6 +244,7 @@ def cli():
         help="Override the dtype of the model (default is the checkpoint dtype). Options: fp16, fp32",
     )
     parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("--xnnpack", action="store_true")
     parser.add_argument(
         "--quantize",
         type=str,
@@ -247,7 +254,7 @@ def cli():
 
 
     args = parser.parse_args()
-    main(args.checkpoint_path, "cpu", args.out_path, args)
+    main(args.checkpoint_path, "cpu", args.output_path, args)
 
 if __name__ == "__main__":
     cli()
