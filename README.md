@@ -249,6 +249,8 @@ We invite contributors to submit established quantization schemes, with accuracy
 ## Desktop and Server Execution
 This has been tested with Linux and x86 (using CPU ~and GPU~), and MacOS and ARM/Apple Silicon.
 
+**we must support GPUs, and test execution on them.**
+
 The runner-* directories show how to integrate AOTI- and ET-exported models in a C/C++ application when no Python environment is available.  Integrate it with your own applications and adapt it to your own application and model needs!
 
 Build the runner like this
