@@ -226,7 +226,7 @@ def generate(
     empty = torch.empty(T_new, dtype=dtype, device=device)
     empty[:T] = prompt
     seq = empty
-    input_pos = torch.arange(0, T, device=device)
+    input_pos = torch.arange(0, T, device=device, dtype=torch.int)
 
     next_token = prefill(model, prompt.view(1, -1), input_pos, **sampling_kwargs)
     if is_speculative:
@@ -334,12 +334,19 @@ def main(
     draft_checkpoint_path: Optional[Path] = None,
     speculate_k: int = 5,
     device="cuda",
+<<<<<<< HEAD
     use_dso=None,
     use_pte=None,
     quantize=None,
+=======
+    dso_path=None,
+    pte_path=None,
+>>>>>>> main
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
     assert checkpoint_path.is_file(), checkpoint_path
+
+    torch.manual_seed(1234)
 
     tokenizer_path = checkpoint_path.parent / "tokenizer.model"
     assert tokenizer_path.is_file(), tokenizer_path
@@ -361,21 +368,25 @@ def main(
     print("Loading model ...")
     t0 = time.time()
     model_ = _load_model(checkpoint_path, device, precision, use_tp)
-    if use_dso:
+    if dso_path:
         try:
-            from aoti_wrapper import DSOModel
-            model = DSOModel(model_.config, use_dso)
-            model_ = None
+            model = model_
+            # Replace model forward with the AOT-compiled forward
+            # This is a hacky way to quickly demo AOTI's capability.
+            # model is still a Python object, and any mutation to its
+            # attributes will NOT be seen on by AOTI-compiled forward
+            # function, e.g. calling model.setup_cache will NOT touch
+            # AOTI compiled and maintained model buffers such as kv_cache.
+            model.forward = torch._export.aot_load(str(dso_path), device)
         except:
-            print("compiled model load not successful, running eager model")
-            assert 0==1
-    elif use_pte:
+            raise RuntimeError(f"Failed to load AOTI compiled {dso_path}")
+    elif pte_path:
         try:
             from et_wrapper import PTEModel
-            model = PTEModel(model_.config, use_pte)
+            model = PTEModel(model_.config, pte_path)
+            model_ = None
         except:
-            print("executorch model load not successful, running eager model")
-            assert 0==1
+            raise RuntimeError(f"Failed to load AOTI compiled {pte_path}")
     else:
         model = model_
 
@@ -396,16 +407,12 @@ def main(
     print (encoded)
     prompt_length = encoded.size(0)
 
-    torch.manual_seed(1234)
-    if use_dso:
-        model_size = 0
-    else:
-        model_size = sum(
-            [
-                p.numel() * p.dtype.itemsize
-                for p in itertools.chain(model.parameters(), model.buffers())
-            ]
-        )
+    model_size = sum(
+        [
+            p.numel() * p.dtype.itemsize
+            for p in itertools.chain(model.parameters(), model.buffers())
+        ]
+    )
     if compile:
         if is_speculative and use_tp:  # and ("cuda" in device):
             torch._inductor.config.triton.cudagraph_trees = (
@@ -563,9 +570,9 @@ def cli():
         default=None,
         help="Draft checkpoint path.",
     )
-    parser.add_argument("--device", type=str, default="cuda", help="Device to use")
+    parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu", help="Device to use")
     parser.add_argument(
-        "--dso",
+        "--dso_path",
         type=Path,
         default=None,
         help="Use the specified AOTI DSO model."
@@ -599,7 +606,7 @@ def cli():
         args.draft_checkpoint_path,
         args.speculate_k,
         args.device,
-        args.dso,
+        args.dso_path,
         args.pte,
         args.quantize,
     )
