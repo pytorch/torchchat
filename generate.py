@@ -602,7 +602,7 @@ def cli():
         args.speculate_k,
         args.device,
         args.dso_path,
-        args.pte,
+        args.pte_path,
         args.quantize,
     )
 
