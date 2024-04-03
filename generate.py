@@ -379,16 +379,15 @@ def main(
         try:
             from model_et import PTEModel
             model = PTEModel(model_.config, pte_path)
-            model_ = None
-        except:
-            raise RuntimeError(f"Failed to load AOTI compiled {pte_path}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to load ET compiled {pte_path}")
     else:
         model = model_
 
         # Add new CLI arg
         if quantize:
             quantize_model(model, quantize)
-	    
+
     if is_speculative:
         draft_model = _load_model(draft_checkpoint_path, device, precision, use_tp)
     else:
