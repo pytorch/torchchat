@@ -9,7 +9,7 @@ on:
 
 jobs:
   run-tinystories:
-    runs-on: macos-13
+    runs-on: macos-14
     # runs-on: self-hosted
     steps:
       - name: Checkout repo
