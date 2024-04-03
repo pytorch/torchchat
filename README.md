@@ -156,7 +156,7 @@ exported model with the same interface, and support additional
 experiments to confirm model quality and speed.
 
 ```
-python generate.py --device {cuda,cpu} --dso ./${MODEL_NAME}.so --prompt "Hello my name is"
+python generate.py --device {cuda,cpu} --dso-path ./${MODEL_NAME}.so --prompt "Hello my name is"
 ```
 
 While we have shown the export and execution of a small model on CPU
@@ -189,13 +189,13 @@ delegates such as CoreML, MPS, HTP in addition to Xnnpack.  ***fixme:
 
 When you have exported the model, you can test the model with the
 sequence generator by importing the compiled DSO model with the
-`---pte ./${MODEL_NAME}.pte` option.  This gives users the ability to
+`--pte-path ./${MODEL_NAME}.pte` option.  This gives users the ability to
 test their model, run any pre-existing model tests against the
 exported model with the same interface, and support additional
 experiments to confirm model quality and speed.
 
 ```
-python generate.py --checkpoint_path ${MODEL_PATH} --pte ${MODEL_NAME}.pte --prompt "Hello my name is" --device cpu
+python generate.py --checkpoint_path ${MODEL_PATH} --pte-path ${MODEL_NAME}.pte --prompt "Hello my name is" --device cpu
 ```
 
 While we have shown the export and execution of a small model to a mobile/edge
@@ -232,19 +232,19 @@ python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'embedding
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte ${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
+python generate.py --pte-path ${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
 ```
 
 #### Linear 8 bit integer quantization (tested)
 The simplest way to quantize is with int8 quantization, where each value is represented by an 8 bit integer, and a
 floating point scale:
 ```
-python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --xnnpack_dynamic --output-path ${MODEL_NAME}
+python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --xnnpack_dynamic --output-path ${MODEL_NAME}.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte ${MODEL_NAME}/llama-fast.pte --prompt "Once upon a time" --checkpoint_path ${MODEL_PATH} --device cpu
+python generate.py --pte-path ./${MODEL_NAME}.pte --prompt "Once upon a time" --checkpoint_path ${MODEL_PATH} --device cpu
 ```
 
 #### 4 bit integer quantization (8da4w)
