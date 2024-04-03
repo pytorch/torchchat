@@ -39,7 +39,7 @@ jobs:
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
           export MODEL_REPO=stories15M
           python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --device cpu > ./output_eager
-          cat./output_eager 
+          cat ./output_eager 
           python generate.py --compile --checkpoint_path ${MODEL_PATH} --temperature 0 --device cpu > ./output_compiled
           cat ./output_compiled
           python aoti_export.py --checkpoint_path ${MODEL_PATH} --output_path ./${MODEL_REPO}.so
