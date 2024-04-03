@@ -9,15 +9,17 @@ on:
 
 jobs:
   run-tinystories:
-    runs-on: macos-12
-    # runs-on: self-hosted
+    strategy:
+      matrix:
+        runner: [macos-12, macos-14, ubuntu-latest]
+    runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.11
       - name: Print machine info
         run: |
           uname -a
