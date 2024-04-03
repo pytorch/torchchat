@@ -66,9 +66,34 @@ export MODEL_DOWNLOAD=meta-llama/Llama-2-7b-chat-hf
 
 See [`gpt-fast` Supported Models](https://github.com/pytorch-labs/gpt-fast?tab=readme-ov-file#supported-models) for a full list.
 
+### More downloading
+
+
+First cd into llama-fast.  We first create a directory for stories15M and download the model and tokenizers.
+
+```
+# Create directory for model and generated artifacts
+export MODEL_DIR="./stories15M"
+mkdir $MODEL_DIR
+
+
+# Download stories model to stories15M
+curl -L -o ${MODEL_DIR}/model.pth "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt?download=true"
+
+# Download tokenizers
+curl -L -o ${MODEL_DIR}/tokenizer.model "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
+curl -L -o ${MODEL_DIR}/tokenizer.bin "https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin"
+```
+
+Next we export the model with the export_et.py script.  Running this script requires you first install executorch with pybindings, see [here](#setting-up-executorch-and-runner-et).
+At present, when exporting a model, the export command always uses the
+xnnpack delegate to export.  (Future versions will support additional
+delegates such as CoreML, MPS, HTP in addition to Xnnpack.)
+
+
 # Introduction
 
-We use two variables in this example, which may be set as a preparatory step:
+We use three variables in this example, which may be set as a preparatory step:
 
 * `MODEL_NAME` describes the name of the model.  This name is *not* free-form, as it is used to index into a table
    of supported models and their configuration properties that are needed to load the model. This variable should correspond to the
@@ -84,10 +109,15 @@ We use two variables in this example, which may be set as a preparatory step:
   The generate.py  sequence generator will load the tokenizer from the directory specified by the MODEL_PATH variable,
   by replacing the modelname with the name of the tokenizer model which is expected to be named `tokenizer.model`
 
+* `MODEL_DIR` is a location for outputs from export for server/desktop and/or mobile/edge execution.  We store exported
+  artifacts here, with extensions .pte for Executorch models, .so for AOT Inductor generated models, and .bin for tokenizers
+  prepared for use with the C++ tokenizers user by `runner-aoti` and `runner-et`. 
+
 You can set these variables as follows for the exemplary model15M model from Andrej Karpathy's tinyllamas model family:
 ```
 MODEL_NAME=stories15M
 MODEL_PATH=checkpoints/${MODEL_NAME}/stories15M.pt
+MODEL_DIR=~/llama-fast-exports
 ```
 
 When we export models with AOT Inductor for servers and desktops, and Executorch for mobile and edge devices,
@@ -174,30 +204,9 @@ quantization to achieve this.
 #### Downloading and exporting the model
 Let's start by exporting and running a small model like stories15M.
 
-First cd into llama-fast.  We first create a directory for stories15M and download the model and tokenizers.
 
 ```
-# Create directory for model and generated artifacts
-export MODEL_DIR="./stories15M"
-mkdir $MODEL_DIR
-
-
-# Download stories model to stories15M
-curl -L -o ${MODEL_DIR}/model.pth "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt?download=true"
-
-# Download tokenizers
-curl -L -o ${MODEL_DIR}/tokenizer.model "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
-curl -L -o ${MODEL_DIR}/tokenizer.bin "https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin"
-```
-
-Next we export the model with the export_et.py script.  Running this script requires you first install executorch with pybindings, see [here](#setting-up-executorch-and-runner-et).
-At present, when exporting a model, the export command always uses the
-xnnpack delegate to export.  (Future versions will support additional
-delegates such as CoreML, MPS, HTP in addition to Xnnpack.)
-
-
-```
-python export_et.py --checkpoint_path ${MODEL_DIR}/model.pth -d fp32 --output-path ${MODEL_DIR}/model.pte
+python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --output-path ${MODEL_DIR}/model.pte
 ```
 
 #### Running the model
@@ -205,7 +214,7 @@ python export_et.py --checkpoint_path ${MODEL_DIR}/model.pth -d fp32 --output-pa
 With the model exported, you can now generate text with the executorch runtime pybindings.  Feel free to play around with the prompt.
 
 ```
-python generate.py --checkpoint_path ${MODEL_DIR}/model.pth --pte ${MODEL_DIR}/model.pte --device cpu --prompt "Once upon a time"
+python generate.py --checkpoint_path ${MODEL_PATH} --pte ${MODEL_DIR}/model.pte --device cpu --prompt "Once upon a time"
 ```
 
 You can also run the model with the runner-et.  This requires you first build the runner.  See instructions [here](#setting-up-executorch-and-runner-et).
@@ -243,12 +252,12 @@ process larger models than they would otherwise be able to.
 The simplest way to quantize embedding tables is with int8 groupwise quantization, where each value is represented by an 8 bit integer, and a
 floating point scale per group:
 ```
-python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" --output-path ${MODEL_NAME}_emb8b-gw256.pte
+python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" --output-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
+python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
 ```
 
 #### Linear 8 bit integer quantization (tested)
@@ -260,7 +269,7 @@ python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --xnnpack_dynamic --
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ./${MODEL_NAME}.pte --prompt "Once upon a time" --checkpoint_path ${MODEL_PATH} --device cpu
+python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte --prompt "Once upon a time" --checkpoint_path ${MODEL_PATH} --device cpu
 ```
 
 #### 4 bit integer quantization (8da4w)
@@ -268,12 +277,12 @@ To compress your model even more, 4 bit integer quantization may be used.  To ac
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8 bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
-python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }"  8da4w --output-path ./${MODEL_NAME}_8da4w.pte
+python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }" --output-path ./${MODEL_NAME}_8da4w.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --ptr ./${MODEL_NAME}_8da4w.pte --prompt "Hello my name is"
+python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_8da4w.pte --prompt "Hello my name is"
 ```
 
 #### Quantization with GPTQ (8da4w-gptq)
@@ -317,7 +326,7 @@ cmake --build build
 
 To run your pte model, use the following command (assuming you already generated the tokenizer.bin tokenizer model):
 ```
-./build/run ../${MODEL_NAME}{,_int8,_8da4w}.pte -z ../${MODEL_NAME}.bin
+./build/run ${MODEL_DIR}/${MODEL_NAME}{,_int8,_8da4w}.pte -z ${MODEL_DIR}/${MODEL_NAME}.bin
 ```
 
 ## Running on a mobile/edge system
