@@ -573,7 +573,7 @@ def cli():
         help="Use the specified AOTI DSO model."
     )
     parser.add_argument(
-        "--pte",
+        "--pte_path",
         type=Path,
         default=None,
         help="Use the specified Executorch PTE model."
