@@ -57,7 +57,7 @@ meta-llama/Llama-2-7b-chat-hf | ✅ |  ✅ |  ✅ |  ✅ | ❹|
 meta-llama/Llama-2-13b-chat-hf | ✅ |  ✅ |  ✅ |  ✅ | 📵 |
 meta-llama/Llama-2-70b-chat-hf | ✅ |  ✅ |  ✅ |  ✅ | ❌|
 codellama/CodeLlama-7b-Python-hf | ✅ |  ✅ |  ✅ |  ✅ | ❹|
-codellama/CodeLlama-34b-Python-hf | ✅ |  ✅ |  ✅ |  ✅ | 📵 |
+codellama/CodeLlama-34b-Python-hf | ✅ |  ✅ |  ✅ |  ✅ | ❌ |
 mistralai/Mistral-7B-v0.1 | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
 mistralai/Mistral-7B-Instruct-v0.1 | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
 mistralai/Mistral-7B-Instruct-v0.2 | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
