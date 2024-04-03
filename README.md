@@ -58,9 +58,9 @@ meta-llama/Llama-2-13b-chat-hf | ✅ |  ✅ |  ✅ |  ✅ | 📵 |
 meta-llama/Llama-2-70b-chat-hf | ✅ |  ✅ |  ✅ |  ✅ | ❌|
 codellama/CodeLlama-7b-Python-hf | ✅ |  ✅ |  ✅ |  ✅ | ❹|
 codellama/CodeLlama-34b-Python-hf | ✅ |  ✅ |  ✅ |  ✅ | ❌ |
-mistralai/Mistral-7B-v0.1 | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
-mistralai/Mistral-7B-Instruct-v0.1 | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
-mistralai/Mistral-7B-Instruct-v0.2 | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
+mistralai/Mistral-7B-v0.1 | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
+mistralai/Mistral-7B-Instruct-v0.1 | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
+mistralai/Mistral-7B-Instruct-v0.2 | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 
 *Key:* ✅ works correctly; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile phone (may fit some high-end devices such as tablets);
 
