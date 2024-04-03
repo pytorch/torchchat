@@ -377,7 +377,7 @@ def main(
             raise RuntimeError(f"Failed to load AOTI compiled {dso_path}")
     elif pte_path:
         try:
-            from et_wrapper import PTEModel
+            from model_et import PTEModel
             model = PTEModel(model_.config, pte_path)
             model_ = None
         except:
