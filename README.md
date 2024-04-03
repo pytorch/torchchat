@@ -170,65 +170,54 @@ quantization to achieve this.
 
 ### The basics
 
-Use a small model like stories15M.pt to test the instructions in the
-following section.  You must first have ExecuTorch installed before
-running this command, see the installation instructions in the
-sections [here](#installation-instructions).
 
-The command below will add the file "${MODEL_NAME}.pte" to your
-current directory.
+#### Downloading and exporting the model
+Let's start by exporting and running a small model like stories15M.
+
+First cd into llama-fast.  We first create a directory for stories15M and download the model and tokenizers.
 
 ```
-python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --output-path ./${MODEL_NAME}.pte
+# Create directory for model and generated artifacts
+export MODEL_DIR="./stories15M"
+mkdir $MODEL_DIR
+
+
+# Download stories model to stories15M
+curl -L -o ${MODEL_DIR}/model.pth "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt?download=true"
+
+# Download tokenizers
+curl -L -o ${MODEL_DIR}/tokenizer.model "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
+curl -L -o ${MODEL_DIR}/tokenizer.bin "https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin"
 ```
 
+Next we export the model with the export_et.py script.  Running this script requires you first install executorch with pybindings, see [here](#setting-up-executorch-and-runner-et).
 At present, when exporting a model, the export command always uses the
 xnnpack delegate to export.  (Future versions will support additional
-delegates such as CoreML, MPS, HTP in addition to Xnnpack.  ***fixme:
-@scott currently not true.  Making this work is the next priority***
+delegates such as CoreML, MPS, HTP in addition to Xnnpack.)
 
-When you have exported the model, you can test the model with the
-sequence generator by importing the compiled DSO model with the
-`--pte-path ./${MODEL_NAME}.pte` option.  This gives users the ability to
-test their model, run any pre-existing model tests against the
-exported model with the same interface, and support additional
-experiments to confirm model quality and speed.
 
 ```
-python generate.py --checkpoint_path ${MODEL_PATH} --pte-path ${MODEL_NAME}.pte --prompt "Hello my name is" --device cpu
+python export_et.py --checkpoint_path ${MODEL_DIR}/model.pth -d fp32 --output-path ${MODEL_DIR}/model.pte
+```
+
+#### Running the model
+
+With the model exported, you can now generate text with the executorch runtime pybindings.  Feel free to play around with the prompt.
+
+```
+python generate.py --checkpoint_path ${MODEL_DIR}/model.pth --pte ${MODEL_DIR}/model.pte --device cpu --prompt "Once upon a time"
+```
+
+You can also run the model with the runner-et.  This requires you first build the runner.  See instructions [here](#setting-up-executorch-and-runner-et).
+
+```
+./runner-et/cmake-out/runner_et run ${MODEL_DIR}/model.pte -z ${MODEL_DIR}/tokenizer.bin -i "Once upon a time"
 ```
 
 While we have shown the export and execution of a small model to a mobile/edge
 device supported by Executorch, most models need to be compressed to
 fit in the target device's memory. We use quantization to achieve this.
 
-### Setting up runner-et
-This is currently tested and works with no backend.
-
-Before using runner-et, you must build executorch with cmake.  Calling the install_requirements.sh script in the executorch repo is not enough.
-
-To build executorch with cmake, cd to the executorch repo and do the following steps.
-```
-rm -rf cmake-out; mkdir cmake-out
-```
-```
-cmake -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out; cmake --build cmake-out
-```
-
-This will build executorch and place the library and object files in cmake-out.
-
-After this is done, you can build runner-et in llama-fast.  Make sure to set DET_DIR to the executorch path on your machine.
-
-```
-rm -rf runner-et/cmake-out; mkdir -p runner-et/cmake-out; cmake -DET_DIR:STRING=/path/to/executorch -DCMAKE_BUILD_TYPE=Release -S runner-et -B runner-et/cmake-out; cmake --build runner-et/cmake-out
-```
-
-After this builds, the runner can be called with something like:
-
-
-```
-./runner-et/cmake-out/runner_et run llama-fast.pte -z stories15M/tokenizer.bin -i "Once upon a time"
-```
 
 # Optimizing your model for server, desktop and mobile devices
 
@@ -415,14 +404,40 @@ install them from source.
 
 List dependencies for these backends
 
-### ExecuTorch
-Set up executorch by following the instructions [here](https://pytorch.org/executorch/stable/getting-started-setup.html#setting-up-executorch).
+### Setting up ExecuTorch and runner-et
+Set up executorch by following the instructions [here](https://pytorch.org/executorch/stable/getting-started-setup.html#setting-up-executorch).  For clarity, the relevant commands are provided below.
 
-Make sure when you run the installation script in the executorch repo, you enable pybind.
 ```
-./install_requirements.sh --pybind
+git clone https://github.com/pytorch/executorch.git
+cd executorch
+git submodule sync
+git submodule update --init
+
+conda create -yn cllamafast python=3.10.0
+conda activate cllamafast
+conda install cmake
+./install_requirements.sh --pybind xnnpack
 ```
 
+Following the above commands will let you export ET models and run them using generate.py.
+If you also want to use runner-et, you must build executorch with cmake.
+To build executorch with cmake, cd to the executorch repo and run the following steps from the executorch directory.
+
+```
+rm -rf cmake-out
+mkdir cmake-out
+cmake -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out; cmake --build cmake-out
+```
+
+After executorch is built, you can build runner-et.  The following commands must be run from the llama-fast directory, and you must set ET_DIR to the executorch repo path on your machine.
+
+```
+export ET_DIR="/path/to/executorch"
+
+rm -rf runner-et/cmake-out
+mkdir -p runner-et/cmake-out
+cmake -DET_DIR:STRING=$ET_DIR -DCMAKE_BUILD_TYPE=Release -S runner-et -B runner-et/cmake-out; cmake --build runner-et/cmake-out
+```
 
 
 # Acknowledgements

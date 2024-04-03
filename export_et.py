@@ -137,9 +137,7 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
             edge_compile_config=edge_config,
         )
 
-    if args.xnnpack:
-        edge_manager = edge_manager.to_backend(XnnpackPartitioner())
-
+    edge_manager = edge_manager.to_backend(XnnpackPartitioner())
     export_program = edge_manager.to_executorch(
         ExecutorchBackendConfig(
             extract_constant_segment=True,
@@ -244,7 +242,6 @@ def cli():
         help="Override the dtype of the model (default is the checkpoint dtype). Options: fp16, fp32",
     )
     parser.add_argument("-v", "--verbose", action="store_true")
-    parser.add_argument("--xnnpack", action="store_true")
     parser.add_argument(
         "--quantize",
         type=str,
