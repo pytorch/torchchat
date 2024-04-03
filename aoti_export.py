@@ -11,6 +11,7 @@ import torch.nn as nn
 from torch.export import Dim, export
 
 from generate import _load_model, decode_one_token
+from quantize import quantize_model
 
 from model import Transformer
 
@@ -70,7 +71,7 @@ def export_model(model: nn.Module, device, output_path):
     assert so is not None
 
 
-def main(checkpoint_path, device, output_path):
+def main(checkpoint_path, device, output_path, quantize = "{ }"):
     assert checkpoint_path.is_file(), checkpoint_path
 
     torch.manual_seed(1234)
@@ -85,6 +86,8 @@ def main(checkpoint_path, device, output_path):
     device_sync(device=device)  # MKG
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
+    quantize_model(model, quantize)
+    
     with torch.no_grad():
         export_model(model, device, output_path)
 
@@ -140,9 +143,15 @@ def cli():
     parser.add_argument(
         "--output_path", type=str, default="stories15M.so", help="Filename"
     )
+    parser.add_argument(
+        "--quantize",
+        type=str,
+        default="{ }",
+        help="Quantization options."
+    )
 
     args = parser.parse_args()
-    main(args.checkpoint_path, args.device, args.output_path)
+    main(args.checkpoint_path, args.device, args.output_path, args.quantize)
 
 if __name__ == "__main__":
     cli()

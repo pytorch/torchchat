@@ -5,10 +5,19 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
+<<<<<<< HEAD
+from torch.export import Dim, export
+
+from generate import _load_model, decode_one_token
+from quantize import quantize_model
+
+from model import Transformer
+=======
 from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
     XnnpackDynamicallyQuantizedPartitioner,
 )
 from executorch.examples.portable.utils import export_to_edge
+>>>>>>> main
 
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
 from executorch.exir.passes.quant_fusion_pass import QuantFusionPass
@@ -188,6 +197,8 @@ def main(checkpoint_path, device, output_path, args = None):
     device_sync(device=device)  # MKG
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
+    quantize_model(model, args.quantize)
+    
     with torch.no_grad():
         # diverges from AOTI
         export_model(model, device, output_path, args)
@@ -234,6 +245,12 @@ def cli():
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument("-x", "--xnnpack_dynamic", action="store_true")
     parser.add_argument("-G", "--groupsize", default=None, help="specify the groupsize")
+    parser.add_argument(
+        "--quantize",
+        type=str,
+        default="{ }",
+        help="Quantization options."
+    )
 
 
     args = parser.parse_args()
