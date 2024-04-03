@@ -129,6 +129,13 @@ def cli():
         "--device", type=str, default=default_device, help="Device to use"
     )
     parser.add_argument(
+        "-o",
+        "--output-path",
+        type=str,
+        default="stories15M.pte",
+        help="Filename"
+    )
+    parser.add_argument(
         "-d",
         "--dtype",
         default=None,
