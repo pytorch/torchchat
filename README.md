@@ -66,6 +66,31 @@ export MODEL_DOWNLOAD=meta-llama/Llama-2-7b-chat-hf
 
 See [`gpt-fast` Supported Models](https://github.com/pytorch-labs/gpt-fast?tab=readme-ov-file#supported-models) for a full list.
 
+### More downloading
+
+
+First cd into llama-fast.  We first create a directory for stories15M and download the model and tokenizers.
+
+```
+# Create directory for model and generated artifacts
+export MODEL_DIR="./stories15M"
+mkdir $MODEL_DIR
+
+
+# Download stories model to stories15M
+curl -L -o ${MODEL_DIR}/model.pth "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt?download=true"
+
+# Download tokenizers
+curl -L -o ${MODEL_DIR}/tokenizer.model "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
+curl -L -o ${MODEL_DIR}/tokenizer.bin "https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin"
+```
+
+Next we export the model with the export_et.py script.  Running this script requires you first install executorch with pybindings, see [here](#setting-up-executorch-and-runner-et).
+At present, when exporting a model, the export command always uses the
+xnnpack delegate to export.  (Future versions will support additional
+delegates such as CoreML, MPS, HTP in addition to Xnnpack.)
+
+
 # Introduction
 
 We use two variables in this example, which may be set as a preparatory step:
@@ -174,30 +199,9 @@ quantization to achieve this.
 #### Downloading and exporting the model
 Let's start by exporting and running a small model like stories15M.
 
-First cd into llama-fast.  We first create a directory for stories15M and download the model and tokenizers.
 
 ```
-# Create directory for model and generated artifacts
-export MODEL_DIR="./stories15M"
-mkdir $MODEL_DIR
-
-
-# Download stories model to stories15M
-curl -L -o ${MODEL_DIR}/model.pth "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt?download=true"
-
-# Download tokenizers
-curl -L -o ${MODEL_DIR}/tokenizer.model "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
-curl -L -o ${MODEL_DIR}/tokenizer.bin "https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin"
-```
-
-Next we export the model with the export_et.py script.  Running this script requires you first install executorch with pybindings, see [here](#setting-up-executorch-and-runner-et).
-At present, when exporting a model, the export command always uses the
-xnnpack delegate to export.  (Future versions will support additional
-delegates such as CoreML, MPS, HTP in addition to Xnnpack.)
-
-
-```
-python export_et.py --checkpoint_path ${MODEL_DIR}/model.pth -d fp32 --output-path ${MODEL_DIR}/model.pte
+python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --output-path ${MODEL_DIR}/model.pte
 ```
 
 #### Running the model
