@@ -272,12 +272,12 @@ To compress your model even more, 4 bit integer quantization may be used.  To ac
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8 bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
-python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }"  8da4w --output-path ./${MODEL_NAME}_8da4w.pte
+python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }" --output-path ./${MODEL_NAME}_8da4w.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --ptr ./${MODEL_NAME}_8da4w.pte --prompt "Hello my name is"
+python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_8da4w.pte --prompt "Hello my name is"
 ```
 
 #### Quantization with GPTQ (8da4w-gptq)
@@ -321,7 +321,7 @@ cmake --build build
 
 To run your pte model, use the following command (assuming you already generated the tokenizer.bin tokenizer model):
 ```
-./build/run ../${MODEL_NAME}{,_int8,_8da4w}.pte -z ../${MODEL_NAME}.bin
+./build/run ${MODEL_DIR}/${MODEL_NAME}{,_int8,_8da4w}.pte -z ${MODEL_DIR}/${MODEL_NAME}.bin
 ```
 
 ## Running on a mobile/edge system
