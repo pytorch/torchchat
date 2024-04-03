@@ -54,30 +54,30 @@ def quantize_model(model: nn.Module, quantize_options):
         
     for quantizer, q_kwargs in quantize_options.items():
         if quantizer == "embedding":
-	    model = EmbeddingOnlyInt8QuantHandler(
+            model = EmbeddingOnlyInt8QuantHandler(
                 model,
                 **q_kwargs
-	    ).quantized_model()
+            ).quantized_model()
         elif linears_quantized:
             assert 0==1, "can only specify one linear quantizer"
         elif quantizer == "linear:int8":
             linears_quantized = True
-	    model = WeightOnlyInt8QuantHandler(
+            model = WeightOnlyInt8QuantHandler(
                 model,
                 **q_kwargs
-	    ).quantized_model()
+            ).quantized_model()
         elif quantizer == "linear:int4":
             linears_quantized = True
-	    model = Int8DynActInt4WeightQuantHandler(
+            model = Int8DynActInt4WeightQuantHandler(
                 model,
                 **q_kwargs
-	    ).quantized_model()
+            ).quantized_model()
         elif quantizer == "linear:gptq":
             linears_quantized = True
-	    model = Int8DynActInt4WeightQuantHandler(
+            model = Int8DynActInt4WeightQuantHandler(
                 model,
                 **q_kwargs
-	    ).quantized_model()
+            ).quantized_model()
         elif quantizer == "precision":
             model.to(**q_kwargs)
         else:
