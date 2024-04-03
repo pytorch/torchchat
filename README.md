@@ -49,20 +49,20 @@ Models tested/supported
 
 | Model | eager | torch.compile | AOT Inductor | ET Runtime | Fits on Mobile |
 |-----|------|-----|-----|-----|-----|
-tinyllamas/stories15M | ❎ |  ❎ |  ❎ |  ❎ | ❎ |
-tinyllamas/stories42M  | ❎ |  ❎ |  ❎ |  ❎ | ❎ |
-tinyllamas/stories110M   | ❎ |  ❎ |  ❎ |  ❎ | ❎ |
-openlm-research/open_llama_7b  | ❎ |  ❎ |  ❎ |  ❎ | ❹ |
-meta-llama/Llama-2-7b-chat-hf | ❎ |  ❎ |  ❎ |  ❎ | ❹|
-meta-llama/Llama-2-13b-chat-hf | ❎ |  ❎ |  ❎ |  ❎ | 📵 |
-meta-llama/Llama-2-70b-chat-hf | ❎ |  ❎ |  ❎ |  ❎ | ❌|
-codellama/CodeLlama-7b-Python-hf | ❎ |  ❎ |  ❎ |  ❎ | ❹|
-codellama/CodeLlama-34b-Python-hf | ❎ |  ❎ |  ❎ |  ❎ | 📵 |
-mistralai/Mistral-7B-v0.1 | ❎ |  ❎ |  ❎ |  ❎ | ❎ |
-mistralai/Mistral-7B-Instruct-v0.1 | ❎ |  ❎ |  ❎ |  ❎ | ❎ |
-mistralai/Mistral-7B-Instruct-v0.2 | ❎ |  ❎ |  ❎ |  ❎ | ❎ |
+tinyllamas/stories15M | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
+tinyllamas/stories42M  | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
+tinyllamas/stories110M   | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
+openlm-research/open_llama_7b  | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
+meta-llama/Llama-2-7b-chat-hf | ✅ |  ✅ |  ✅ |  ✅ | ❹|
+meta-llama/Llama-2-13b-chat-hf | ✅ |  ✅ |  ✅ |  ✅ | 📵 |
+meta-llama/Llama-2-70b-chat-hf | ✅ |  ✅ |  ✅ |  ✅ | ❌|
+codellama/CodeLlama-7b-Python-hf | ✅ |  ✅ |  ✅ |  ✅ | ❹|
+codellama/CodeLlama-34b-Python-hf | ✅ |  ✅ |  ✅ |  ✅ | 📵 |
+mistralai/Mistral-7B-v0.1 | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
+mistralai/Mistral-7B-Instruct-v0.1 | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
+mistralai/Mistral-7B-Instruct-v0.2 | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
 
-*Key:* ❎ works correctly; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile phone (may fit some high-end devices such as tablets);
+*Key:* ✅ works correctly; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile phone (may fit some high-end devices such as tablets);
 
 
 For example, to convert Llama-2-7b-chat-hf
@@ -253,19 +253,19 @@ PyTorch and the mobile Executorch backend support a broad range fo devices for r
 
 | Hardware | OS | eager | eager + compile | AOT compile | ET Runtime |
 |-----|------|-----|-----|-----|-----|
-| x86 | Linux | ❎ |  ❎ |  ❎ |  ❎ |
+| x86 | Linux | ✅ |  ✅ |  ✅ |  ✅ |
 | x86 | macOS | ? | ? | ? | ? |
 | aarch64 | Linux | ? | ? | ? | ? |
-| aarch64 | macOS | ❎ |  ❎ |  ❎ |  ❎ |
-| AMD GPU | Linux |  ❎ |  ❎ |  ❎ | ❌|
-| Nvidia GPU | Linux | ❎ |  ❎ |  ❎ | ❌|
-| MPS | macOS | ❎ |  ❌|  ❌|  ? |
-| MPS | iOS | ❌|❌|❌| ❎ |
-| aarch64 | iOS | ❌|❌|❌| ❎ |
-| aarch64 | Android | ❌|❌|❌| ❎ |
-| Mobile GPU (Vulkan) | Android |  ❌|❌|❌| ❎ |
-| CoreML | iOS |  ❌|❌|❌| ❎ |
-| Hexagon DSP | Android | ❌|❌|❌| ❎ |
+| aarch64 | macOS | ✅ |  ✅ |  ✅ |  ✅ |
+| AMD GPU | Linux |  ✅ |  ✅ |  ✅ | ❌|
+| Nvidia GPU | Linux | ✅ |  ✅ |  ✅ | ❌|
+| MPS | macOS | ✅ |  ❌|  ❌|  ? |
+| MPS | iOS | ❌|❌|❌| ✅ |
+| aarch64 | iOS | ❌|❌|❌| ✅ |
+| aarch64 | Android | ❌|❌|❌| ✅ |
+| Mobile GPU (Vulkan) | Android |  ❌|❌|❌| ✅ |
+| CoreML | iOS |  ❌|❌|❌| ✅ |
+| Hexagon DSP | Android | ❌|❌|❌| ✅ |
 | Raspberry Pi 4/5 | Raspbian | ? | ? | ? | ? |
 | Raspberry Pi 4/5 | Android | ? | ? | ? | ? |
 | ARM 32b (up to v7) | any | ❌|❌|❌|❌|
