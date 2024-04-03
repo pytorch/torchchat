@@ -566,13 +566,13 @@ def cli():
     )
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu", help="Device to use")
     parser.add_argument(
-        "--dso_path",
+        "--dso-path",
         type=Path,
         default=None,
         help="Use the specified AOTI DSO model."
     )
     parser.add_argument(
-        "--pte_path",
+        "--pte-path",
         type=Path,
         default=None,
         help="Use the specified Executorch PTE model."
