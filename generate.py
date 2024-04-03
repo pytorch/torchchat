@@ -334,14 +334,9 @@ def main(
     draft_checkpoint_path: Optional[Path] = None,
     speculate_k: int = 5,
     device="cuda",
-<<<<<<< HEAD
-    use_dso=None,
-    use_pte=None,
-    quantize=None,
-=======
     dso_path=None,
     pte_path=None,
->>>>>>> main
+    quantize=None,
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
     assert checkpoint_path.is_file(), checkpoint_path
