@@ -5,9 +5,15 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
-from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
-    XnnpackDynamicallyQuantizedPartitioner,
-)
+from torch.export import Dim, export
+
+from generate import _load_model, decode_one_token
+from quantize import quantize_model
+
+from model import Transformer
+# from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
+#    XnnpackDynamicallyQuantizedPartitioner,
+#)
 from executorch.examples.portable.utils import export_to_edge
 
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
@@ -96,41 +102,24 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     # need to use kv sdpa?
     edge_config = EdgeCompileConfig(
         _check_ir_validity=False,
-        _skip_type_promotion=bool(args.dtype_override == "fp16"),
+        _skip_type_promotion=bool(args.dtype == "fp16"),
     )
 
     dynamic_shapes = None
 
-    if args.quantization_mode:
-        modelname = f"{modelname}_q"
-        model = quantize(model, args.quantization_mode)
-
-        if args.verbose:
-            print(f"{modelname}:")
-            print(f"{model}")
-
-    if args.embedding_quantize:
-        modelname = f"{modelname}_e"
-        model = EmbeddingOnlyInt8QuantHandler(model).convert_for_runtime()
-
-    if args.dtype_override is not None:
-        if args.dtype_override == "fp16" or args.quantization_mode == "int4":
+    if args.dtype is not None:
+        if args.dtype == "fp16": # or args.quantization_mode == "int4":
             if state_dict_dtype != torch.float16:
                 print("model.to torch.float16")
                 model = model.to(dtype=torch.float16)
                 state_dict_dtype = torch.float16
-        elif args.dtype_override == "fp32":
+        elif args.dtype == "fp32":
             if state_dict_dtype != torch.float32:
                 print("model.to torch.float32")
                 model = model.to(dtype=torch.float32)
         else:
-            raise ValueError(f"Unsupported dtype override: {args.dtype_override}")
+            raise ValueError(f"Unsupported dtype: {args.dtype}")
 
-    if args.verbose:
-        print(f"{modelname}:")
-        print(f"{model}")
-
-    #quantization_options = _get_quantization_options(args)
     with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]), torch.no_grad():
         m = capture_pre_autograd_graph(
             export_model,
@@ -145,15 +134,6 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
             edge_compile_config=edge_config,
         )
 
-    if args.xnnpack_dynamic:
-        edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
-
-    # TODO: remove this after xnnpack delegation is ready
-    if args.quantization_mode == "int4":
-        raise Exception(
-            "some quantized ops should be lowered to xnnpack, but xnnpack delegate is not ready yet"
-        )
-
     export_program = edge_manager.to_executorch(
         ExecutorchBackendConfig(
             extract_constant_segment=True,
@@ -166,10 +146,9 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     )
 
     print("The methods are: ", export_program.methods)
-    path = f"{output_path}/llama-fast.pte"
-    with open(path, "wb") as f:
+    with open(output_path, "wb") as f:
         export_program.write_to_file(f)
-    # save_pte_program(export_program, "llama-fast", output_path)
+    # save_pte_program(export_program, output_path)
 
     return output_path
 
@@ -188,6 +167,8 @@ def main(checkpoint_path, device, output_path, args = None):
     device_sync(device=device)  # MKG
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
+    quantize_model(model, args.quantize)
+    
     with torch.no_grad():
         # diverges from AOTI
         export_model(model, device, output_path, args)
@@ -197,11 +178,25 @@ def cli():
     import argparse
 
     parser = argparse.ArgumentParser(description="Your CLI description.")
+
+    ######################################################################
+    ### We accept these options so we can ignore them w/o error
+    
     parser.add_argument(
-        "--checkpoint_path",
-        type=Path,
-        default="not_specified",
-        help="Model checkpoint path.",
+        "--prompt", type=str, default="Hello, my name is", help="Input prompt."
+    )
+    parser.add_argument(
+        "--interactive",
+        action="store_true",
+        help="Whether to launch in interactive mode",
+    )
+    parser.add_argument("--num_samples", type=int, default=5, help="Number of samples.")
+    parser.add_argument(
+        "--max_new_tokens", type=int, default=200, help="Maximum number of new tokens."
+    )
+    parser.add_argument("--top_k", type=int, default=200, help="Top-k for sampling.")
+    parser.add_argument(
+        "--temperature", type=float, default=0.8, help="Temperature for sampling."
     )
     parser.add_argument(
         "--compile", action="store_true", help="Whether to compile the model."
@@ -211,29 +206,35 @@ def cli():
         action="store_true",
         help="Whether to compile the prefill (improves prefill perf, but higher compile times)",
     )
+    parser.add_argument("--profile", type=Path, default=None, help="Profile path.")
     parser.add_argument(
-        "--out-path", type=str, default="stories15M.pte", help="Filename"
+        "--speculate_k", type=int, default=5, help="Speculative execution depth."
+    )
+    parser.add_argument(
+        "--draft_checkpoint_path",
+        type=Path,
+        default=None,
+        help="Draft checkpoint path.",
+    )
+    #####################################################################
+    
+    parser.add_argument(
+        "--checkpoint_path",
+        type=Path,
+        default="not_specified",
+        help="Model checkpoint path.",
+    )
+    parser.add_argument(
+        "--output-path", type=str, default="stories15M.pte", help="Filename"
     )
 
-    ### ET EXPORT OPTIONS
-    parser.add_argument("-E", "--embedding-quantize", default=None, action="store_true")
-    parser.add_argument(
-        "-qmode",
-        "--quantization_mode",
-        type=str,
-        default=None,
-        choices=["int8", "int4"],
-        help="type of quantization",
-    )
     parser.add_argument(
         "-d",
-        "--dtype-override",
+        "--dtype",
         default=None,
         help="Override the dtype of the model (default is the checkpoint dtype). Options: fp16, fp32",
     )
     parser.add_argument("-v", "--verbose", action="store_true")
-    parser.add_argument("-x", "--xnnpack_dynamic", action="store_true")
-    parser.add_argument("-G", "--groupsize", default=None, help="specify the groupsize")
     parser.add_argument(
         "--quantize",
         type=str,
