@@ -34,13 +34,6 @@ Please copy-paste and fork as you desire.
 # Supported Models
 The model definition (and much more!) is adopted from gpt-fast, so we support the same models.
 
-## Installation
-[Download PyTorch nightly](https://pytorch.org/get-started/locally/)
-Install sentencepiece and huggingface_hub
-```bash
-pip install sentencepiece huggingface_hub
-```
-
 To download llama models, go to https://huggingface.co/meta-llama/Llama-2-7b and go through steps to obtain access.
 Then, login with `huggingface-cli login`
 
@@ -73,18 +66,55 @@ export MODEL_DOWNLOAD=meta-llama/Llama-2-7b-chat-hf
 
 See [`gpt-fast` Supported Models](https://github.com/pytorch-labs/gpt-fast?tab=readme-ov-file#supported-models) for a full list.
 
-# Installation
+# Introduction
+
+We use two variables in this example, which may be set as a preparatory step:
+
+* `MODEL_NAME` describes the name of the model.  This name is *not* free-form, as it is used to index into a table 
+   of supported models and their configuration properties that are needed to load the model. This variable should correspond to the
+   name of the directory holding the files for the corresponding model.  You *must* follow this convention to 
+   ensure correct operation.
+
+* `MODEL_PATH` describes the location of the model. Throughput the description
+  herein, we will assume that MODEL_PATH starts with a subdirectory of the llama-fast repo
+  named checkpoints, and that it will contain the actual model. The modelname will thus
+  be of the form checpoints/${MODEL_NAME}/model.{pt,pth}.  (Both the extensions `pt` and `pth`
+  are used to describe checkpoints. In addition, model may be replaced with the name of the model)
+
+  The generate.py  sequence generator will load the tokenizer from the directory specified by the MODEL_PATH variable,
+  by replacing the modelname with the name of the tokenizer model which is expected to be named `tokenizer.model`
+
+You can set these variables as follows for the exemplary model15M model from Andrej Karpathy's tinyllamas model family:
+```
+MODEL_NAME=stories15M
+MODEL_PATH=checkpoints/${MODEL_NAME}/stories15M.pt
+```
+
+When we export models with AOT Inductor for servers and desktops, and Executorch for mobile and edge devices,
+we will save them in the current working directory under the names ${MODEL_NAME}.so (for AOTI-generated dynamic libraries),
+or ${MODEL_NAME}.pte (for Executorch-generated mobile/edge models).
+
+
+
+## Installation
+
 Follow the [`gpt-fast` installation instructions](https://github.com/pytorch-labs/gpt-fast?tab=readme-ov-file#installation).
+
+[Download PyTorch nightly](https://pytorch.org/get-started/locally/)
+Install sentencepiece and huggingface_hub
+```bash
+pip install sentencepiece huggingface_hub
+```
 
 If you are planning on using mobile backends, you should also install ExecuTorch and any hardware-specific libraries and IDEs.
 
-# A note on tokenizers
+## A note on tokenizers
 
 There are two different formats for tokenizers, and both are used in this repo.
-1 - for generate.py and Python bindings, we use the Google sentencepiece Python operator. This operator consumes a tokenization model in the 'tokenizer.model' format.
+1 - for generate.py and Python bindings, we use the Google sentencepiece Python operator. This operator consumes a tokenization model in the `tokenizer.model` format.
 2 - for C/C++ inference, we use @Andrej Karpathy's C tokenizer function.  This tokenizer consumes a tokenization model in the 'tokenizer.bin' format.
 
-If you are using coda, you can install setencepiece using the following command:
+If you are using coda, you can install sentencepiece using the following command:
 ```
 conda install sentencepiece
 ```
@@ -106,7 +136,7 @@ Model definition in model.py, generation code in generate.py. The
 model checkpoint extension may have either the extension pth or pt.
 
 ```
-python generate.py --compile --checkpoint_path checkpoints/$MODEL_REPO/model.pth --prompt "Hello, my name is" --device {cuda,cpu,mps}
+python generate.py --compile --checkpoint_path ${MODEL_PATH} --prompt "Hello, my name is" --device {cuda,cpu,mps}
 ```
 
 To squeeze out a little bit more performance, you can also compile the
@@ -115,7 +145,7 @@ though.
 
 ## AOT Inductor compilation and execution
 ```
-python export_aoti.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device {cuda,cpu} --output-path ./${MODEL_REPO}.so
+python export_aoti.py --checkpoint_path ${MODEL_PATH} --device {cuda,cpu} --output-path ./${MODEL_NAME}.so
 ```
 
 When you have exported the model, you can test the model with the
@@ -126,7 +156,7 @@ exported model with the same interface, and support additional
 experiments to confirm model quality and speed.
 
 ```
-python generate.py --device {cuda,cpu} --dso ./${MODEL_REPO}.so --prompt "Hello my name is"
+python generate.py --device {cuda,cpu} --dso ./${MODEL_NAME}.so --prompt "Hello my name is"
 ```
 
 While we have shown the export and execution of a small model on CPU
@@ -145,18 +175,11 @@ following section.  You must first have ExecuTorch installed before
 running this command, see the installation instructions in the
 sections [here](#installation-instructions).
 
-The environment variable MODEL_REPO should point to a a subdirectory
-of the checkpoints directory with the `model.pth` file (you may need
-adapt the checkpoint name) and `tokenizer.model` file.  The
-`MODEL_REPO` name is used to index into a list of supported models and
-their characteristics, so you *must* follow the naming convetions
-described herein.
-
-The command below will add the file "${MODEL_REPO}.pte" to your
+The command below will add the file "${MODEL_NAME}.pte" to your
 current directory.
 
 ```
-python export_et.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --output-path ./${MODEL_REPO}.pte
+python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --output-path ./${MODEL_NAME}.pte
 ```
 
 At present, when exporting a model, the export command always uses the
@@ -166,13 +189,13 @@ delegates such as CoreML, MPS, HTP in addition to Xnnpack.  ***fixme:
 
 When you have exported the model, you can test the model with the
 sequence generator by importing the compiled DSO model with the
-`---pte ./${MODEL_REPO}.pte` option.  This gives users the ability to
+`---pte ./${MODEL_NAME}.pte` option.  This gives users the ability to
 test their model, run any pre-existing model tests against the
 exported model with the same interface, and support additional
 experiments to confirm model quality and speed.
 
 ```
-python generate.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth --pte ${MODEL_REPO}.pte --prompt "Hello my name is" --device cpu
+python generate.py --checkpoint_path ${MODEL_PATH} --pte ${MODEL_NAME}.pte --prompt "Hello my name is" --device cpu
 ```
 
 While we have shown the export and execution of a small model to a mobile/edge
@@ -204,24 +227,24 @@ process larger models than they would otherwise be able to.
 The simplest way to quantize embedding tables is with int8 groupwise quantization, where each value is represented by an 8 bit integer, and a
 floating point scale per group:
 ```
-python export_et.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" --output-path ${MODEL_REPO}_emb8b-gw256.pte
+python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" --output-path ${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte ${MODEL_REPO}_emb8b-gw256.pte --prompt "Hello my name is"
+python generate.py --pte ${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
 ```
 
 #### Linear 8 bit integer quantization (tested)
 The simplest way to quantize is with int8 quantization, where each value is represented by an 8 bit integer, and a
 floating point scale:
 ```
-python export_et.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --xnnpack_dynamic --output-path ${MODEL_REPO}
+python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --xnnpack_dynamic --output-path ${MODEL_NAME}
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte ${MODEL_REPO}/llama-fast.pte --prompt "Once upon a time" --checkpoint_path checkpoints/$MODEL_REPO/model.pth --device cpu
+python generate.py --pte ${MODEL_NAME}/llama-fast.pte --prompt "Once upon a time" --checkpoint_path ${MODEL_PATH} --device cpu
 ```
 
 #### 4 bit integer quantization (8da4w)
@@ -229,12 +252,12 @@ To compress your model even more, 4 bit integer quantization may be used.  To ac
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8 bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
-python export_et.py --checkpoint_path checkpoints/$MODEL_REPO/model.pth -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }"  8da4w --output-path ./${MODEL_REPO}_8da4w.pte
+python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }"  8da4w --output-path ./${MODEL_NAME}_8da4w.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --ptr ./${MODEL_REPO}_8da4w.pte --prompt "Hello my name is"
+python generate.py --ptr ./${MODEL_NAME}_8da4w.pte --prompt "Hello my name is"
 ```
 
 #### Quantization with GPTQ (8da4w-gptq)
@@ -262,7 +285,7 @@ cmake --build build
 
 To run, use the following command (assuming you already generated the tokenizer.bin tokenizer model):
 ```
-LD_LIBRARY_PATH=$CONDA_PREFIX/lib ./build/run ../${MODEL_REPO}.so -z ../${MODEL_REPO}.bin
+LD_LIBRARY_PATH=$CONDA_PREFIX/lib ./build/run ../${MODEL_NAME}.so -z ../${MODEL_NAME}.bin
 ```
 
 ## Mobile and Edge Execution Test (x86)
@@ -278,7 +301,7 @@ cmake --build build
 
 To run your pte model, use the following command (assuming you already generated the tokenizer.bin tokenizer model):
 ```
-./build/run ../${MODEL_REPO}{,_int8,_8da4w}.pte -z ../${MODEL_REPO}.bin
+./build/run ../${MODEL_NAME}{,_int8,_8da4w}.pte -z ../${MODEL_NAME}.bin
 ```
 
 ## Running on a mobile/edge system
