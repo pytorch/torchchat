@@ -40,12 +40,13 @@ jobs:
 
           echo "Executorch: installing python interface"
           pip install cmake
+          pip install ninja
           ./install_requirements.sh --pybind xnnpack
 
           echo "Executorch: building C++ components"
           mkdir cmake-out
-          cmake -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out
-          cmake --build cmake-out
+          cmake -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_OPTIMIZED=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out -G Ninja
+          cmake --build cmake-out -j 10
 
           echo "llama-fast: building runner-et"
           cd ..
