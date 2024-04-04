@@ -7,7 +7,12 @@ import torch
 import torch.nn as nn
 from torch.export import Dim, export
 
-from export_et import export_model as export_model_et
+try:
+    executorch_export_available = True
+    from export_et import export_model as export_model_et
+except:
+    executorch_export_available = False
+    
 from export_aoti import export_model as export_model_aoti
 
 from model import Transformer
@@ -48,9 +53,11 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
     
     with torch.no_grad():
         if output_pte_path:
-            # diverges from AOTI
-            print(f"Exporting model using Executorch to {output_pte_path}")
-            export_model_et(model, device, args.output_pte_path, args)
+            if executorch_export_available:
+                print(f"Exporting model using Executorch to {output_pte_path}")
+                export_model_et(model, device, args.output_pte_path, args)
+            else:
+                print(f"Export with executorch requested but Executorch could not be loaded")
         if output_dso_path:
             # diverges from AOTI
             print(f"Exporting model using AOT Inductor to {output_pte_path}")
