@@ -328,9 +328,15 @@ class WeightOnlyInt8Linear(torch.nn.Module):
         weight = self.weight
         scales = scales.view(scales.shape[0], -1)
         no_groups = scales.shape[1]
-        #
-        return F.linear(input, (weight.to(dtype=input.dtype).view(weight.shape[0], no_groups, -1) * scales.view(weight.shape[0], no_groups, -1)).view(weight.shape[0], -1))
-        # return F.linear(input, self.weight.to(dtype=input.dtype)) * se...
+
+        # need a formulation / custom op for good performance on both eager, CUDA compiled, CPU compiled and ET exported
+        # maybe use IR-based rewriting?
+
+        # for now, we special-case channel-wise, because we know how to make that fast (but does not work for groupwise)
+        if scales.shape[1] == 1:
+            return F.linear(input, weight.to(dtype=input.dtype)) * self.scales
+        else:
+            return F.linear(input, (weight.to(dtype=input.dtype).view(weight.shape[0], no_groups, -1) * scales.view(weight.shape[0], no_groups, -1)).view(weight.shape[0], -1))
 
 
 ##### embedding table quantization ######
