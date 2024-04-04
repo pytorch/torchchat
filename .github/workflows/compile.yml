@@ -95,6 +95,8 @@ jobs:
           python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
           cat ./output_aoti
 
+	  echo "tests complete"
+	  
           # echo "******************************************"
           # echo "********* EAGER vs TORCH.COMPILE *********"
           # echo "******************************************"
