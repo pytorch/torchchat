@@ -51,9 +51,9 @@ jobs:
           python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
           cat ./output_aoti
 
-          # echo "******************************************"
-          # echo "******* Emb: channel-wise quantized ******"
-          # echo "******************************************"
+          echo "******************************************"
+          echo "******* Emb: channel-wise quantized ******"
+          echo "******************************************"
           python generate.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
           cat ./output_eager
           python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
@@ -62,20 +62,20 @@ jobs:
           python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
           cat ./output_aoti
 
-          # echo "******************************************"
-          # echo "******** Emb: group-wise quantized *******"
-          # echo "******************************************"
+          echo "******************************************"
+          echo "******** Emb: group-wise quantized *******"
+          echo "******************************************"
           python generate.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
           cat ./output_eager
           python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
           cat ./output_compiled
-          python export.py --quant "embedding" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+          python export.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
           python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
           cat ./output_aoti
 
-          # echo "******************************************"
-          # echo "******* INT8 channel-wise quantized ******"
-          # echo "******************************************"
+          echo "******************************************"
+          echo "******* INT8 channel-wise quantized ******"
+          echo "******************************************"
           python generate.py --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
           cat ./output_eager
           python generate.py --compile --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
@@ -84,9 +84,9 @@ jobs:
           python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
           cat ./output_aoti
 
-          # echo "******************************************"
-          # echo "******** INT8 group-wise quantized *******"
-          # echo "******************************************"
+          echo "******************************************"
+          echo "******** INT8 group-wise quantized *******"
+          echo "******************************************"
           python generate.py --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
           cat ./output_eager
           python generate.py --compile --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
@@ -95,7 +95,8 @@ jobs:
           python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
           cat ./output_aoti
 
-          # echo "******************************************"
+          echo "tests complete"
+          echo "******************************************"
           # echo "********* EAGER vs TORCH.COMPILE *********"
           # echo "******************************************"
           # diff output_eager output_compiled
