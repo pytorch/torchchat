@@ -73,11 +73,11 @@ def cli():
         action="store_true",
         help="Whether to launch in interactive mode",
     )
-    parser.add_argument("--num_samples", type=int, default=5, help="Number of samples.")
+    parser.add_argument("--num-samples", type=int, default=5, help="Number of samples.")
     parser.add_argument(
-        "--max_new_tokens", type=int, default=200, help="Maximum number of new tokens."
+        "--max-new-tokens", type=int, default=200, help="Maximum number of new tokens."
     )
-    parser.add_argument("--top_k", type=int, default=200, help="Top-k for sampling.")
+    parser.add_argument("--top-k", type=int, default=200, help="Top-k for sampling.")
     parser.add_argument(
         "--temperature", type=float, default=0.8, help="Temperature for sampling."
     )
@@ -85,16 +85,17 @@ def cli():
         "--compile", action="store_true", help="Whether to compile the model."
     )
     parser.add_argument(
-        "--compile_prefill",
+        "--compile-prefill",
         action="store_true",
         help="Whether to compile the prefill (improves prefill perf, but higher compile times)",
     )
-    parser.add_argument("--profile", type=Path, default=None, help="Profile path.")
     parser.add_argument(
-        "--speculate_k", type=int, default=5, help="Speculative execution depth."
+        "--profile", type=Path, default=None, help="Profile path.")
+    parser.add_argument(
+        "--speculate-k", type=int, default=5, help="Speculative execution depth."
     )
     parser.add_argument(
-        "--draft_checkpoint_path",
+        "--draft-checkpoint-path",
         type=Path,
         default=None,
         help="Draft checkpoint path.",
