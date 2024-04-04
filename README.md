@@ -166,7 +166,7 @@ Model definition in model.py, generation code in generate.py. The
 model checkpoint extension may have either the extension pth or pt.
 
 ```
-python generate.py --compile --checkpoint_path ${MODEL_PATH} --prompt "Hello, my name is" --device {cuda,cpu,mps}
+python generate.py --compile --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --device {cuda,cpu,mps}
 ```
 
 To squeeze out a little bit more performance, you can also compile the
@@ -214,7 +214,7 @@ python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --output-pte-path ${MOD
 With the model exported, you can now generate text with the executorch runtime pybindings.  Feel free to play around with the prompt.
 
 ```
-python generate.py --checkpoint_path ${MODEL_PATH} --pte ${MODEL_DIR}/model.pte --device cpu --prompt "Once upon a time"
+python generate.py --checkpoint-path ${MODEL_PATH} --pte ${MODEL_DIR}/model.pte --device cpu --prompt "Once upon a time"
 ```
 
 You can also run the model with the runner-et.  This requires you first build the runner.  See instructions [here](#setting-up-executorch-and-runner-et).
@@ -252,7 +252,7 @@ process larger models than they would otherwise be able to.
 The simplest way to quantize embedding tables is with int8 groupwise quantization, where each value is represented by an 8 bit integer, and a
 floating point scale per group:
 ```
-python export.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -265,7 +265,7 @@ The simplest way to quantize is with int8 quantization, where each value is repr
 floating point scale:
 ```
 # FIXME: --xnnpack-dynamic currently not supported
-python export.py --checkpoint_path ${MODEL_PATH} -d fp32 --xnnpack-dynamic --output-pte-path ${MODEL_NAME}.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --xnnpack-dynamic --output-pte-path ${MODEL_NAME}.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -278,7 +278,7 @@ To compress your model even more, 4 bit integer quantization may be used.  To ac
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8 bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
-python export.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_8da4w.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_8da4w.pte
 ```
 
 Now you can run your model with the same command as before:
