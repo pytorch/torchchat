@@ -461,11 +461,25 @@ class QuantizedGroupEmbedding(torch.nn.Module):
                 self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
             )
 
-        result_weights = self.weight.index_select(0, indices.view(-1))
-        result_scales = self.scales.index_select(0, indices.view(-1))
+        
+        # result_weights = self.weight.index_select(0, indices.view(-1))
+        # result_scales = self.scales.index_select(0, indices.view(-1))
 
-        r = result_weights.to(dtype=result_scales.dtype) * result_scales
+        weight = self.weight
+        scales = self.scales.view(weight.shape[0], -1)
+        
+        result_weights = F.embedding(indices, weight)
+        result_scales = F.embedding(indices, scales)
+
+        rw_view = result_weights.to(dtype=result_scales.dtype).view(tuple(result_weights.shape[:-1] + (scales.shape[1], -1, )))
+        rs_view = result_scales.view(tuple(result_scales.shape[:-1]) + (scales.shape[1], 1, ))
+        # print(f"rw_view {rw_view.shape}")
+        # print(f"rs_view {rs_view.shape}")
+
+        r = rw_view * rs_view
         return r.view(indices.size() + (-1,))
+        
+        # r = result_weights.to(dtype=result_scales.dtype).view(list(result_weights.shape[:-1] + (scales.shape[1], -1, )) * result_scales.view(scales.shape[-1] + (scales.shape[1], 1, ))
 
 ##################################################################
 ##### weight only int4 per channel groupwise quantized code ######
