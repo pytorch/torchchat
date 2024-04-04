@@ -78,6 +78,8 @@ mkdir $MODEL_DIR
 
 
 # Download stories model to stories15M
+*FIXME*: @Scott dont' rename a pt to a pth.  It's a different file type, even if it won't error out, it's bad hygiene
+That's why we have a separate MODEL_PATH so we can abstract away the difference. 
 curl -L -o ${MODEL_DIR}/model.pth "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt?download=true"
 
 # Download tokenizers
