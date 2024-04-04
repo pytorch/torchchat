@@ -57,7 +57,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
                 print(f"Exporting model using Executorch to {output_pte_path}")
                 export_model_et(model, device, args.output_pte_path, args)
             else:
-                print(f"Export with executorch requested but Executorch could not be loaded"
+                print(f"Export with executorch requested but Executorch could not be loaded")
         if output_dso_path:
             # diverges from AOTI
             print(f"Exporting model using AOT Inductor to {output_pte_path}")
