@@ -346,6 +346,11 @@ Now you can run your model with the same command as before:
 python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.pte --prompt "Hello my name is"
 ```
 
+Please note that group-wise quantization works functionally, but has
+not been optimized for CUDA and CPU targets where the best
+performnance requires a group-wise quantized mixed dtype linear
+operator.
+
 
 #### 4 bit integer quantization (8da4w)
 To compress your model even more, 4 bit integer quantization may be used.  To achieve good accuracy, we recommend the use
