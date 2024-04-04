@@ -256,18 +256,41 @@ quantization options.
 
 #### Embedding quantization (8 bit integer, channelwise & groupwise)
 
+*Channelwise quantization*:
+
 The simplest way to quantize embedding tables is with int8 groupwise
 quantization, where each value is represented by an 8 bit integer, and
-a floating point scale per group.  We can do this in eager, we use the
-`linear:int8` quantizer with group_size set to 0 which uses
-channelwise quantization:
+a floating point scale per group.
+
+We can do this in eager mode (optionally with torch.compile), we use the `embedding` quantizer with
+group_size set to 0 which uses channelwise quantization:
 
 ```
 python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --device cpu
+```
 
 Then, export as follows:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 0} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_int8.pte --prompt "Hello my name is"
+```
+
+
+*Groupwise quantization*:
+
+We can do this in eager mode (optionally with torch.compile), we use the `embedding` quantizer by specifying the group size:
+
+```
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --device cpu
+```
+
+Then, export as follows:
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 0} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -275,18 +298,54 @@ Now you can run your model with the same command as before:
 python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
 ```
 
-#### Linear 8 bit integer quantization (tested)
-The simplest way to quantize is with int8 quantization, where each value is represented by an 8 bit integer, and a
+
+
+#### Linear 8 bit integer quantization (channel-wise and groupwise)
+The simplest way to quantize linear operators is with int8 quantization, where each value is represented by an 8 bit integer, and a
 floating point scale:
+
+*Channelwise quantization*:
+
+The simplest way to quantize embedding tables is with int8 groupwise
+quantization, where each value is represented by an 8 bit integer, and
+a floating point scale per group.
+
+We can do this in eager mode (optionally with torch.compile), we use the `linear:int8` quantizer with
+group_size set to 0 which uses channelwise quantization:
+
 ```
-# FIXME: --xnnpack-dynamic currently not supported
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --xnnpack-dynamic --output-pte-path ${MODEL_NAME}.pte
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --device cpu
+```
+
+Then, export as follows:
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int8': {'bitwidth': 8, 'group_size': 0} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte --prompt "Once upon a time" --checkpoint-path ${MODEL_PATH} --device cpu
+python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_int8.pte --prompt "Hello my name is"
 ```
+
+
+*Groupwise quantization*:
+
+We can do this in eager mode (optionally with torch.compile), we use the `linear:int8` quantizer by specifying the group size:
+
+```
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --device cpu
+```
+
+Then, export as follows:
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int8': {'bitwidth': 8, 'group_size': 0} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.pte
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.pte --prompt "Hello my name is"
+```
+
 
 #### 4 bit integer quantization (8da4w)
 To compress your model even more, 4 bit integer quantization may be used.  To achieve good accuracy, we recommend the use
