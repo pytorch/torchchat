@@ -85,7 +85,7 @@ curl -L -o ${MODEL_DIR}/tokenizer.model "https://github.com/karpathy/llama2.c/ra
 curl -L -o ${MODEL_DIR}/tokenizer.bin "https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin"
 ```
 
-Next we export the model with the export_et.py script.  Running this script requires you first install executorch with pybindings, see [here](#setting-up-executorch-and-runner-et).
+Next we export the model with the export.py script.  Running this script requires you first install executorch with pybindings, see [here](#setting-up-executorch-and-runner-et).
 At present, when exporting a model, the export command always uses the
 xnnpack delegate to export.  (Future versions will support additional
 delegates such as CoreML, MPS, HTP in addition to Xnnpack.)
@@ -155,7 +155,7 @@ format:
 
 ```
 python utils/tokenizer.py --tokenizer-model=/path/to/tokenizer/tokenizer.model
-./run ./model.{so,pte} -z path/to/tokenizer/tokenizer.bin
+./run ${MODEL_DIR}//model.{so,pte} -z path/to/tokenizer/tokenizer.bin
 ```
 
 # Generate Text
@@ -166,7 +166,7 @@ Model definition in model.py, generation code in generate.py. The
 model checkpoint extension may have either the extension pth or pt.
 
 ```
-python generate.py --compile --checkpoint_path ${MODEL_PATH} --prompt "Hello, my name is" --device {cuda,cpu,mps}
+python generate.py --compile --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --device {cuda,cpu,mps}
 ```
 
 To squeeze out a little bit more performance, you can also compile the
@@ -175,7 +175,7 @@ though.
 
 ## AOT Inductor compilation and execution
 ```
-python export_aoti.py --checkpoint_path ${MODEL_PATH} --device {cuda,cpu} --output-path ./${MODEL_NAME}.so
+python export.py --checkpoint-path ${MODEL_PATH} --device {cuda,cpu} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
 ```
 
 When you have exported the model, you can test the model with the
@@ -186,7 +186,7 @@ exported model with the same interface, and support additional
 experiments to confirm model quality and speed.
 
 ```
-python generate.py --device {cuda,cpu} --dso-path ./${MODEL_NAME}.so --prompt "Hello my name is"
+python generate.py --device {cuda,cpu} --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --prompt "Hello my name is"
 ```
 
 While we have shown the export and execution of a small model on CPU
@@ -206,7 +206,7 @@ Let's start by exporting and running a small model like stories15M.
 
 
 ```
-python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --output-path ${MODEL_DIR}/model.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --output-pte-path ${MODEL_DIR}/model.pte
 ```
 
 #### Running the model
@@ -214,7 +214,7 @@ python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --output-path ${MODE
 With the model exported, you can now generate text with the executorch runtime pybindings.  Feel free to play around with the prompt.
 
 ```
-python generate.py --checkpoint_path ${MODEL_PATH} --pte ${MODEL_DIR}/model.pte --device cpu --prompt "Once upon a time"
+python generate.py --checkpoint-path ${MODEL_PATH} --pte ${MODEL_DIR}/model.pte --device cpu --prompt "Once upon a time"
 ```
 
 You can also run the model with the runner-et.  This requires you first build the runner.  See instructions [here](#setting-up-executorch-and-runner-et).
@@ -252,7 +252,7 @@ process larger models than they would otherwise be able to.
 The simplest way to quantize embedding tables is with int8 groupwise quantization, where each value is represented by an 8 bit integer, and a
 floating point scale per group:
 ```
-python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" --output-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -264,12 +264,13 @@ python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte --promp
 The simplest way to quantize is with int8 quantization, where each value is represented by an 8 bit integer, and a
 floating point scale:
 ```
-python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --xnnpack_dynamic --output-path ${MODEL_NAME}.pte
+# FIXME: --xnnpack-dynamic currently not supported
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --xnnpack-dynamic --output-pte-path ${MODEL_NAME}.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte --prompt "Once upon a time" --checkpoint_path ${MODEL_PATH} --device cpu
+python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte --prompt "Once upon a time" --checkpoint-path ${MODEL_PATH} --device cpu
 ```
 
 #### 4 bit integer quantization (8da4w)
@@ -277,7 +278,7 @@ To compress your model even more, 4 bit integer quantization may be used.  To ac
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8 bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
-python export_et.py --checkpoint_path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }" --output-path ./${MODEL_NAME}_8da4w.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_8da4w.pte
 ```
 
 Now you can run your model with the same command as before:
