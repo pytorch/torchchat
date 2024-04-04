@@ -50,6 +50,7 @@ def quantize_model(model: nn.Module, quantize_options):
     }
     """
 
+    linears_quantized = False
     if isinstance(quantize_options, str):
         quantize_options = json.loads(quantize_options)
         
@@ -193,7 +194,10 @@ class QuantHandler:
 ##### Weight-only int8 per-channel quantized code ######
 
 
-def replace_linear_weight_only_int8_per_channel(module, node_type):
+def replace_linear_weight_only_int8_per_channel(module, node_type, group_size=None):
+    if group_size is not None and group_size != 0:
+        pass # group_size = 2 ** group_size
+        
     for name, child in module.named_children():
         # print(f"name: {name}")
         if isinstance(child, nn.Linear):
@@ -208,10 +212,10 @@ def replace_linear_weight_only_int8_per_channel(module, node_type):
                 setattr(
                     module,
                     name,
-                    WeightOnlyInt8Linear(child.in_features, child.out_features),
+                    WeightOnlyInt8Linear(child.in_features, child.out_features, group_size),
                 )
         else:
-            replace_linear_weight_only_int8_per_channel(child, node_type)
+            replace_linear_weight_only_int8_per_channel(child, node_type, group_size)
 
 
 class WeightOnlyInt8QuantHandler:
@@ -280,7 +284,7 @@ class WeightOnlyInt8QuantHandler:
         return cur_state_dict
 
     def convert_for_runtime(self) -> nn.Module:
-        replace_linear_weight_only_int8_per_channel(self.mod, self.node_type)
+        replace_linear_weight_only_int8_per_channel(self.mod, self.node_type, self.group_size)
         return self.mod
 
     def quantized_model(self) -> nn.Module:
@@ -300,17 +304,24 @@ class WeightOnlyInt8Linear(torch.nn.Module):
         self,
         in_features: int,
         out_features: int,
+        group_size: Optional[int] = None,
         bias: bool = True,
         device=None,
         dtype=None,
     ) -> None:
         super().__init__()
+        print(f"group size: {group_size}")
+        
         self.in_features = in_features
         self.out_features = out_features
         self.register_buffer(
             "weight", torch.empty((out_features, in_features), dtype=torch.int8)
         )
-        self.register_buffer("scales", torch.ones(out_features, dtype=torch.bfloat16))
+        if group_size is None or (group_size == 0):
+            self.register_buffer("scales", torch.ones(out_features, dtype=torch.bfloat16))
+        else:
+            groups = (in_features + group_size - 1) // group_size
+            self.register_buffer("scales", torch.ones(out_features, groups, dtype=torch.bfloat16))
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         return F.linear(input, self.weight.to(dtype=input.dtype)) * self.scales
