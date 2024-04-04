@@ -437,7 +437,7 @@ class QuantizedGroupEmbedding(torch.nn.Module):
         dtype=torch.half,
     ) -> None:
         super().__init__()
-        if group_size is None:
+        if group_size is None or group_size == 0:
             group_size = embedding_dim
         self.group_size = group_size
         self.dtype = dtype
