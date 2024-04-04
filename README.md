@@ -250,9 +250,22 @@ to compute a result faster by avoiding stalls, quantization allows
 accelerators (which usually have a limited amount of memory) to store and
 process larger models than they would otherwise be able to.
 
-#### Embedding quantization (8 bit integer, groupwise)
-The simplest way to quantize embedding tables is with int8 groupwise quantization, where each value is represented by an 8 bit integer, and a
-floating point scale per group:
+We can specify quantization parameters with the --quantize option. The
+quantize option takes a JSON/dictionary with quantizers and
+quantization options.
+
+#### Embedding quantization (8 bit integer, channelwise & groupwise)
+
+The simplest way to quantize embedding tables is with int8 groupwise
+quantization, where each value is represented by an 8 bit integer, and
+a floating point scale per group.  We can do this in eager, we use the
+`linear:int8` quantizer with group_size set to 0 which uses
+channelwise quantization:
+
+```
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --device cpu
+
+Then, export as follows:
 ```
 python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 8} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
 ```
