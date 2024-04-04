@@ -456,16 +456,18 @@ class QuantizedGroupEmbedding(torch.nn.Module):
 
     @torch.no_grad()
     def forward(self, indices: torch.Tensor) -> torch.Tensor:
-        return torch.ops.llama_quantized.embedding_byte.dtype(
-            self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
-        )
+        if False:   # Used for Executorch
+            return torch.ops.llama_quantized.embedding_byte.dtype(
+                self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
+            )
 
+        result_weights = self.weight.index_select(0, indices.view(-1))
+        result_scales = self.scales.index_select(0, indices.view(-1))
 
-#        result_weights = self.weight.index_select(0, indices.view(-1))
-#        result_scales = self.scales.index_select(0, indices.view(-1))
-#
-#        r = result_weights.to(dtype=result_scales.dtype) * result_scales
-#        return r.view(indices.size() + (-1,))
+        r = result_weights.to(dtype=result_scales.dtype) * result_scales
+        return r.view(indices.size() + (-1,))
+
+##################################################################
 ##### weight only int4 per channel groupwise quantized code ######
 
 
