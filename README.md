@@ -317,16 +317,25 @@ group_size set to 0 which uses channelwise quantization:
 python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --device cpu
 ```
 
-Then, export as follows:
+Then, export as follows using Executorch for mobile backends:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int8': {'bitwidth': 8, 'group_size': 0} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int8': {'bitwidth': 8, 'group_size': 0} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_int8.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_int8.pte --prompt "Hello my name is"
+python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_int8.pte --checkpoint-path ${MODEL_PATH}  --prompt "Hello my name is"
 ```
 
+Or, export as follows for server/desktop deployments:
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int8': {'bitwidth': 8, 'group_size': 0} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_int8.so
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py --dso-path ${MODEL_DIR}/${MODEL_NAME}_int8.so --checkpoint-path ${MODEL_PATH}  --prompt "Hello my name is"
+```
 
 *Groupwise quantization*:
 
@@ -336,15 +345,24 @@ We can do this in eager mode (optionally with torch.compile), we use the `linear
 python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --device cpu
 ```
 
-Then, export as follows:
+Then, export as follows using Executorch:
 ```
 python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int8': {'bitwidth': 8, 'group_size': 0} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.pte --prompt "Hello my name is"
+python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.pte --checkpoint-path ${MODEL_PATH} --prompt "Hello my name is"
 ```
+
+Or, export as follows for :
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int8': {'bitwidth': 8, 'group_size': 0} }" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.so
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.so --checkpoint-path ${MODEL_PATH} -d fp32 --prompt "Hello my name is"
 
 Please note that group-wise quantization works functionally, but has
 not been optimized for CUDA and CPU targets where the best
