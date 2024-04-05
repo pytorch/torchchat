@@ -21,11 +21,12 @@ import torch.nn as nn
 
 from gguf import GGUFValueType, ReaderTensor
 
-wd = Path(__file__).parent.parent.resolve()
+wd = Path(__file__).parent.resolve()
 sys.path.append(str(wd))
-from model import ModelArgs, Transformer
 
+from model import ModelArgs, Transformer
 from typing import Set
+from ggml_quantization_type import Q4_0
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -98,6 +99,25 @@ def _convert_gguf_tensor_name_to_llama_nn(gguf_name: str) -> str:
     return result
 
 
+def _build_model_args(metadata: dict[str, Any]) -> GGUFModelArgs:
+    return GGUFModelArgs(
+        arch=arch,
+        embedding_length=metadata[f"{arch}.embedding_length"],
+        block_count=metadata[f"{arch}.block_count"],
+        feed_forward_length=metadata[f"{arch}.feed_forward_length"],
+        vocab_size=len(metadata["tokenizer.ggml.tokens"]),
+        attention=AttentionArgs(
+            head_count=metadata[f"{arch}.attention.head_count"],
+            head_count_kv=metadata[f"{arch}.attention.head_count_kv"],
+            layer_norm_rms_epsilon=metadata[f"{arch}.attention.layer_norm_rms_epsilon"],
+        ),
+        rope=RopeArgs(
+            freq_base=metadata.get(f"{arch}.rope.freq_base", None),
+            dimension_count=metadata.get(f"{arch}.rope.dimension_count", None),
+        ),
+    )
+
+
 def _fqn_lookup(fqn: str, module: torch.nn.Module) -> Any:
     if fqn == "":
         return module
@@ -126,23 +146,51 @@ def _fqn_last(fqn: str) -> str:
     return atoms[-1]
 
 
+def _load_by_state_dict(pt_model: torch.nn.Module, state_dict: Dict[str, Any], fqn: str, gguf_tensor: ReaderTensor) -> bool:
+    assert fqn in state_dict
+    if gguf.tensor_type in (GGMLQuantizationType.F32, GGMLQuantizationType.F16):
+        reversed_shape = tensor.shape[::-1]
+        new_tensor = tensor.data.reshape(reversed_shape)
+        state_dict[fqn] = torch.from_numpy(new_tensor)
+        return True
+    elif tensor.tensor_type == GGMLQuantizationType.Q4_0 and tensor.name == "token_embd.weight":
+        unpacked = Q4_0.to_float(torch.from_numpy(tensor.data.reshape(-1, 18)))
+        state_dict[fqn] = unpacked.reshape(
+            pt_model.params.vocab_size, pt_model.params.dim
+        )
+        return True
+    return False
+
+
+def _load_by_parameter(pt_model: torch.nn.Module, fqn: str, gguf_tensor: ReaderTensor) -> bool:
+    assert isinstance(_fqn_lookup(fqn, pt_model), torch.nn.Parameter)
+    parent: torch.nn.Module = _fqn_lookup(_fqn_up(fqn), pt_model)
+
+    if tensor.tensor_type == GGMLQuantizationType.Q4_0 and isinstance(parent, torch.nn.Linear) and _fqn_last(fqn) == "weight":
+        print(fqn, tensor.shape, tensor.data.shape, parent.weight.shape)
+        packed = torch.from_numpy(tensor.data).reshape(-1, 18)
+        scale = torch.tensor(Q4_0._unpack_two_uint8(packed[:, :2]), dtype=torch.float16)
+        parent.weight = torch.nn.Parameter(
+            Q4_0.GGMLInt4LinearWeight(packed, scale, parent.weight.shape)
+        )
+        return True
+
+    return False
+
+
 def _load_weights(pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor]) -> None:
+    loaded_by_state_dict: Set[str] = {}
+    loaded_by_parameter: Set[str] = {}
+
     # state_dict pass
     state_dict = {}
     for fqn, _ model.state_dict():
         if fqn not in weight_map:
             continue
         tensor = weight_map[fqn]
-
-        if tensor.tensor_type in (GGMLQuantizationType.F32, GGMLQuantizationType.F16):
-            reversed_shape = tensor.shape[::-1]
-            new_tensor = tensor.data.reshape(reversed_shape)
-            state_dict[fqn] = torch.from_numpy(new_tensor)
-        elif tensor.tensor_type == GGMLQuantizationType.Q4_0 and tensor.name == "token_embd.weight":
-            unpacked = to_float(torch.from_numpy(tensor.data.reshape(-1, 18)))
-            state_dict[fqn] = unpacked.reshape(
-                pt_model.params.vocab_size, pt_model.params.dim
-            )
+        loaded = _load_by_state_dict(pt_model, state_dict, fqn, tensor)
+        if loaded:
+            loaded_by_state_dict.add(fqn)
 
     # allow partial loading
     pt_model.load_state_dict(state_dict, strict=False)
@@ -152,19 +200,19 @@ def _load_weights(pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor]
         if fqn not in weight_map:
             continue
         tensor = weight_map[fqn]
+        loaded = _load_by_parameter(pt_model, fqn, tensor)
+        if loaded:
+            loaded_by_parameter.add(fqn)
 
-        if tensor.tensor_type == GGMLQuantizationType.Q4_0:
-            parent = _fqn_lookup(_fqn_up(fqn), pt_model)
-            if isinstance(parent, torch.nn.Linear) and _fqn_last(fqn) == "weight":
-                print(fqn, tensor.shape, tensor.data.shape, parent.weight.shape)
-                packed = torch.from_numpy(tensor.data).reshape(-1, 18)
-                scale = torch.tensor(_unpack_two_uint8(packed[:, :2]), dtype=torch.float16)
-                parent.weight = torch.nn.Parameter(
-                    GGMLInt4LinearWeight(packed, scale, parent.weight.shape)
-                )
+    # Sanity checks
+    for fqn in loaded_by_state_dict:
+        assert fqn not in loaded_by_parameter, f"{fqn} was loaded by both state_dict and parameter"
 
-    # TODO: add some check that every weight was loaded
-    # TODO: do we need to add special layers.{id}.attention.mask logic
+    for fqn in weight_map:
+        assert fqn in (loaded_by_state_dict | loaded_by_parameter), f"{fqn} in weight_map was not loaded"
+
+    for fqn, _ model.state_dict():
+        assert fqn in (loaded_by_state_dict | loaded_by_parameter), f"{fqn} in model.state_dict() was not loaded"
 
 
 def _get_metadata(reader: gguf.GGUFReader) -> dict[str, Any]:
@@ -189,62 +237,22 @@ def _get_metadata(reader: gguf.GGUFReader) -> dict[str, Any]:
 
     return metadata
 
-
-def _build_model_args(metadata: dict[str, Any]) -> GGUFModelArgs:
-    arch = metadata["general.architecture"]
-    assert arch == "llama", "Only LLaMa models are supported by this converter."
-
-    gguf_ft = metadata["general.file_type"]
-    # ALL_F32 or MOSTLY_F16
-    assert (
-        gguf_ft == 0 or gguf_ft == 1
-    ), "Only fp32 or fp16 are supported by this converter."
-
-    return GGUFModelArgs(
-        arch=arch,
-        embedding_length=metadata[f"{arch}.embedding_length"],
-        block_count=metadata[f"{arch}.block_count"],
-        feed_forward_length=metadata[f"{arch}.feed_forward_length"],
-        vocab_size=len(metadata["tokenizer.ggml.tokens"]),
-        attention=AttentionArgs(
-            head_count=metadata[f"{arch}.attention.head_count"],
-            head_count_kv=metadata[f"{arch}.attention.head_count_kv"],
-            layer_norm_rms_epsilon=metadata[f"{arch}.attention.layer_norm_rms_epsilon"],
-        ),
-        rope=RopeArgs(
-            freq_base=metadata.get(f"{arch}.rope.freq_base", None),
-            dimension_count=metadata.get(f"{arch}.rope.dimension_count", None),
-        ),
-    )
-
-
-def load_gguf_file(gguf_file: str) -> (GGUFModelArgs, GGUFWeights):
+def load_llama_from_gguf_file(gguf_file: str) -> torch.nn.Module:
     """
-    Load a GGUF file and return the model arguments and weights.
+    Load a LLaMa model from a GGUF file and return a PT nn.Module.
     """
     if not Path(gguf_file).is_file():
         raise ValueError(f"Could not find file {gguf_file}")
 
     reader = gguf.GGUFReader(gguf_file, "r")
 
-    # Step 1: Build GGUFModelArgs
     metadata = _get_metadata(reader)
     model_args = _build_model_args(metadata)
-
-    # Step 2: Build GGUFWeights
-    gguf_weights = GGUFWeights(tensors=reader.tensors)
-
-    return (model_args, gguf_weights)
-
-
-def convert_from_gguf(gguf_file: str) -> torch.nn.Module:
-
-    gguf_model_args, gguf_weights = load_gguf_file(gguf_file)
     assert (
         gguf_model_args.arch == "llama"
     ), "Only LLaMa models are supported by this converter."
 
-
+    gguf_weights = GGUFWeights(tensors=reader.tensors)
     pt_model = _create_pt_model(gguf_model_args)
 
     # map from fqn in pt_model to gguf tensor
