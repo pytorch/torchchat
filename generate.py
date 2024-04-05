@@ -349,6 +349,7 @@ def main(
         print("Warning: checkpoint path ignored because an exported DSO or PTE path specified")
               
     if not tokenizer_path:
+        assert checkpoint_path, "either a tokenizer or a checkpoint path must be specified"
         tokenizer_path = checkpoint_path.parent / "tokenizer.model"
     assert tokenizer_path.is_file(), tokenizer_path
 
