@@ -363,6 +363,7 @@ python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int8'
 Now you can run your model with the same command as before:
 ```
 python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.so --checkpoint-path ${MODEL_PATH} -d fp32 --prompt "Hello my name is"
+```
 
 Please note that group-wise quantization works functionally, but has
 not been optimized for CUDA and CPU targets where the best
