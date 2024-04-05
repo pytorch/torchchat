@@ -393,7 +393,11 @@ def main(
 
         # Add new CLI arg
         if quantize:
+            device_sync(device=device)
+            t0q = time.time()
             quantize_model(model, quantize)
+            device_sync(device=device)  # MKG
+            print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
 
     if is_speculative:
         draft_model = _load_model(draft_checkpoint_path, device, precision, use_tp)
