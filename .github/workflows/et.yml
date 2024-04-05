@@ -29,6 +29,11 @@ jobs:
           fi
       - name: Install requirements
         run: |
+          echo "Install pip requirements"
+          pip install wheel
+          pip install cmake
+          pip install ninja
+
           echo "Executorch: cloning"
           git clone https://github.com/pytorch/executorch.git
           cd executorch
@@ -39,8 +44,6 @@ jobs:
           git submodule update --init
 
           echo "Executorch: installing python interface"
-          pip install cmake
-          pip install ninja
           ./install_requirements.sh --pybind xnnpack
 
           echo "Executorch: building C++ components"
