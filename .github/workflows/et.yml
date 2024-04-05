@@ -1,0 +1,79 @@
+name: Compile main
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  run-tinystories:
+    strategy:
+      matrix:
+        runner: [32-core-ubuntu]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Install requirements
+        run: |
+          echo "Executorch: cloning"
+          git clone https://github.com/pytorch/executorch.git
+          cd executorch
+          echo "Inside: ${PWD}"
+
+          echo "Executorch: submodule update"
+          git submodule sync
+          git submodule update --init
+
+          echo "Executorch: installing python interface"
+          pip install cmake
+          pip install ninja
+          ./install_requirements.sh --pybind xnnpack
+
+          echo "Executorch: building C++ components"
+          mkdir cmake-out
+          cmake -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_OPTIMIZED=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out -G Ninja
+          cmake --build cmake-out -j 10
+
+          echo "llama-fast: building runner-et"
+          cd ..
+          echo "Inside: ${PWD}"
+          export ET_DIR="${PWD}/executorch"
+          mkdir -p runner-et/cmake-out
+          cmake -DET_DIR:STRING=$ET_DIR -DCMAKE_BUILD_TYPE=Release -S runner-et -B runner-et/cmake-out
+          cmake --build runner-et/cmake-out
+      - name: Download checkpoints
+        run: |
+          mkdir -p checkpoints/stories15M
+          pushd checkpoints/stories15M
+          wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+          popd
+      - name: Run inference
+        run: |
+          export MODEL_PATH=${PWD}/checkpoints/stories15M/stories15M.pt
+          export MODEL_NAME=stories15M
+          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 > ${PWD}/output_eager
+          cat ${PWD}/output_eager
+          python export_et.py --checkpoint_path ${MODEL_PATH} --output-path ${PWD}/${MODEL_NAME}.pte
+          python generate.py --checkpoint_path ${MODEL_PATH} --temperature 0 --pte-path ${PWD}/${MODEL_NAME}.pte  > ${PWD}/output_et
+          cat ${PWD}/output_et
+
+          echo "******************************************"
+          echo "********* EAGER vs ET *********"
+          echo "******************************************"
+          diff output_eager output_et
