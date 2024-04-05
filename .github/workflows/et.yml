@@ -11,7 +11,7 @@ jobs:
   run-tinystories:
     strategy:
       matrix:
-        runner: [macos-latest-large, 32-core-ubuntu]
+        runner: [32-core-ubuntu]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -46,19 +46,6 @@ jobs:
 
           echo "Executorch: installing python interface"
           ./install_requirements.sh --pybind xnnpack
-
-          echo "Executorch: building C++ components"
-          mkdir cmake-out
-          cmake -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out -G Ninja
-          cmake --build cmake-out
-
-          echo "llama-fast: building runner-et"
-          cd ..
-          echo "Inside: ${PWD}"
-          export ET_DIR="${PWD}/executorch"
-          mkdir -p runner-et/cmake-out
-          cmake -DET_DIR:STRING=$ET_DIR -DCMAKE_BUILD_TYPE=Release -S runner-et -B runner-et/cmake-out
-          cmake --build runner-et/cmake-out
       - name: Download checkpoints
         run: |
           mkdir -p checkpoints/stories15M
