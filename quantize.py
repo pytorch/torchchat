@@ -234,7 +234,7 @@ class WeightOnlyInt8QuantHandler:
 
         for fqn, mod in self.mod.named_modules():
             # print(f"maybe? quantize {fqn}...{type(mod)}")
-            if isinstance(mod, torch.nn.Linear) or isinstance(mod, fsLinear):
+            if isinstance(mod, torch.nn.Linear):
                 # print(f"candidate {fqn}, nodetype {self.node_type}")
                 if (
                     (self.node_type == "*")
@@ -371,8 +371,6 @@ class EmbeddingOnlyInt8QuantHandler:
         for fqn, mod in self.mod.named_modules():
             if (
                 isinstance(mod, nn.Embedding)
-                or isinstance(mod, fsEmbedding)
-                or isinstance(mod, fsStandardEmbedding)
             ):
                 # print("****")
                 # print(f"Embedding identified: {fqn, mod}")
