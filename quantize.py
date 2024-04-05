@@ -23,22 +23,6 @@ import torch.nn.functional as F
 # )
 
 
-try:
-    # pyre-ignore[21]: Undefined import.
-    from fairseq2.nn.embedding import (
-        Embedding as fsEmbedding,
-        StandardEmbedding as fsStandardEmbedding,
-    )
-
-    # pyre-ignore[21]: Undefined import.
-    from fairseq2.nn.projection import Linear as fsLinear
-except:
-    print("Could not import fairseq2 modules.")
-    fsEmbedding = nn.Embedding
-    fsStandardEmbedding = nn.Embedding
-    fsLinear = nn.Linear
-
-
 def quantize_model(model: nn.Module, quantize_options):
     """
     Quantize the specified model using the quantizers described by
