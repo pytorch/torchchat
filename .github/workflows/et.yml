@@ -11,11 +11,7 @@ jobs:
   run-tinystories:
     strategy:
       matrix:
-<<<<<<< HEAD
         runner: [macos-latest-large, 32-core-ubuntu]
-=======
-        runner: [macos-14]
->>>>>>> 2d140cf (m1 mac)
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
