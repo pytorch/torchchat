@@ -37,6 +37,8 @@ jobs:
           pip install -r requirements.txt
 
           echo "Executorch: cloning"
+          mkdir etorch
+          cd etorch
           git clone https://github.com/pytorch/executorch.git
           cd executorch
           echo "Inside: ${PWD}"
@@ -47,6 +49,9 @@ jobs:
 
           echo "Executorch: installing python interface"
           ./install_requirements.sh --pybind xnnpack
+
+          cd ../..
+          echo "Inside: ${PWD}"
       - name: Download checkpoints
         run: |
           mkdir -p checkpoints/stories15M
