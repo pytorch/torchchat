@@ -23,22 +23,6 @@ import torch.nn.functional as F
 # )
 
 
-try:
-    # pyre-ignore[21]: Undefined import.
-    from fairseq2.nn.embedding import (
-        Embedding as fsEmbedding,
-        StandardEmbedding as fsStandardEmbedding,
-    )
-
-    # pyre-ignore[21]: Undefined import.
-    from fairseq2.nn.projection import Linear as fsLinear
-except:
-    print("Could not import fairseq2 modules.")
-    fsEmbedding = nn.Embedding
-    fsStandardEmbedding = nn.Embedding
-    fsLinear = nn.Linear
-
-
 def quantize_model(model: nn.Module, quantize_options):
     """
     Quantize the specified model using the quantizers described by
@@ -250,7 +234,7 @@ class WeightOnlyInt8QuantHandler:
 
         for fqn, mod in self.mod.named_modules():
             # print(f"maybe? quantize {fqn}...{type(mod)}")
-            if isinstance(mod, torch.nn.Linear) or isinstance(mod, fsLinear):
+            if isinstance(mod, torch.nn.Linear):
                 # print(f"candidate {fqn}, nodetype {self.node_type}")
                 if (
                     (self.node_type == "*")
@@ -387,8 +371,6 @@ class EmbeddingOnlyInt8QuantHandler:
         for fqn, mod in self.mod.named_modules():
             if (
                 isinstance(mod, nn.Embedding)
-                or isinstance(mod, fsEmbedding)
-                or isinstance(mod, fsStandardEmbedding)
             ):
                 # print("****")
                 # print(f"Embedding identified: {fqn, mod}")
