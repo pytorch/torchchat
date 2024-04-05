@@ -271,7 +271,7 @@ python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, 
 
 Then, export as follows:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 0} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -290,7 +290,7 @@ python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, 
 
 Then, export as follows:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'embedding': {'bitwidth': 8, 'group_size': 0} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -319,7 +319,7 @@ python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, 
 
 Then, export as follows using Executorch for mobile backends:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int8': {'bitwidth': 8, 'group_size': 0} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_int8.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_int8.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -329,7 +329,7 @@ python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_int8.pte --checkpoint-p
 
 Or, export as follows for server/desktop deployments:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int8': {'bitwidth': 8, 'group_size': 0} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_int8.so
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_int8.so
 ```
 
 Now you can run your model with the same command as before:
@@ -347,7 +347,7 @@ python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, 
 
 Then, export as follows using Executorch:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int8': {'bitwidth': 8, 'group_size': 0} }" --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -357,7 +357,7 @@ python generate.py --pte-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.pte --checkp
 
 Or, export as follows for :
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int8': {'bitwidth': 8, 'group_size': 0} }" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.so
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "group_size": 0} }' --output-dso-path ${MODEL_DIR}/${MODEL_NAME}_int8-gw256.so
 ```
 
 Now you can run your model with the same command as before:
