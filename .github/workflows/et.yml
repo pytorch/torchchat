@@ -29,7 +29,11 @@ jobs:
           fi
       - name: Install requirements
         run: |
+<<<<<<< HEAD
           echo "Install pip requirements"
+=======
+          echo "Intalling pip packages"
+>>>>>>> 62c0163 (add wheel)
           pip install wheel
           pip install cmake
           pip install ninja
