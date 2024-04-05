@@ -33,6 +33,7 @@ jobs:
           pip install wheel
           pip install cmake
           pip install ninja
+          pip install zstd
 
           echo "Executorch: cloning"
           git clone https://github.com/pytorch/executorch.git
