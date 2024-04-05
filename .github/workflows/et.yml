@@ -11,7 +11,7 @@ jobs:
   run-tinystories:
     strategy:
       matrix:
-        runner: [macos-14]
+        runner: [macos-14, 32-core-ubuntu]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -45,7 +45,7 @@ jobs:
 
           echo "Executorch: building C++ components"
           mkdir cmake-out
-          cmake -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_OPTIMIZED=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out -G Ninja
+          cmake -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out -G Ninja
           cmake --build cmake-out -j 10
 
           echo "llama-fast: building runner-et"
