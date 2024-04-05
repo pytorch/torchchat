@@ -14,9 +14,10 @@ from torch.export import Dim, export
 try:
     executorch_export_available = True
     from export_et import export_model as export_model_et
-except:
+except Exception as e:
+    print("ET EXPORT EXCEPTION: ", e) # TODO: remove
     executorch_export_available = False
-    
+
 from export_aoti import export_model as export_model_aoti
 
 from model import Transformer
@@ -54,7 +55,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
 
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
-    
+
     with torch.no_grad():
         if output_pte_path:
             if executorch_export_available:
