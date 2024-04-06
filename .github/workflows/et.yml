@@ -50,8 +50,21 @@ jobs:
           echo "Executorch: installing python interface"
           ./install_requirements.sh --pybind xnnpack
 
+          echo "Executorch: install C++ libraries"
+          mkdir cmake-out
+          cmake -DCMAKE_BUILD_TYPE=Release -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out -G Ninja
+          cmake --build cmake-out
+
+          export ET_DIR=${PWD}
+          echo "executorch directory: ${ET_DIR}"
+
           cd ../..
           echo "Inside: ${PWD}"
+          echo "Building runner-et"
+          mkdir -p runner-et/cmake-out
+          cmake -DET_DIR:STRING=$ET_DIR -DCMAKE_BUILD_TYPE=Release -S runner-et -B runner-et/cmake-out
+          cmake --build runner-et/cmake-out
+
       - name: Download checkpoints
         run: |
           mkdir -p checkpoints/stories15M
@@ -62,14 +75,25 @@ jobs:
           popd
       - name: Run inference
         run: |
-          export MODEL_PATH=${PWD}/checkpoints/stories15M/stories15M.pt
+          export CHECKPOINT_PATH=${PWD}/checkpoints/stories15M
           export MODEL_NAME=stories15M
 
-          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 > ${PWD}/output_eager
+          python generate.py --checkpoint-path ${CHECKPOINT_PATH}/stories15M.pt --temperature 0 --prompt "Once upon a time" > ${PWD}/output_eager
           cat ${PWD}/output_eager
 
-          python export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
-          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${PWD}/${MODEL_NAME}.pte  > ${PWD}/output_et
+          python export.py --checkpoint-path ${CHECKPOINT_PATH}/stories15M.pt --output-pte-path ${PWD}/stories15M.pte
+          python generate.py --checkpoint-path ${CHECKPOINT_PATH}/stories15M.pt --temperature 0 --prompt "Once upon a time" --pte-path ${PWD}/stories15M.pte  > ${PWD}/output_et
           cat ${PWD}/output_et
+
+          ./runner-et/cmake-out/runner_et run ${PWD}/stories15M.pte -z ${CHECKPOINT_PATH}/tokenizer.bin -i "Once upon a time" > ${PWD}/output_runner_et
+
+          echo "eager out:"
+          cat ${PWD}/output_eager
+
+          echo "et out:"
+          cat ${PWD}/output_et
+
+          echo "runner-et out:"
+          cat ${PWD}/output_runner_et
 
           echo "Tests complete."
