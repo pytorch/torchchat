@@ -43,6 +43,8 @@ jobs:
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
+	  printenv
+	  which nvidia-smi
           python generate.py --device cuda --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
           cat ./output_eager
           python generate.py --device cuda --compile --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
