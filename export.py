@@ -57,6 +57,7 @@ class model_wrapper(nn.Module):
 def main(checkpoint_path, device, quantize = "{ }", args = None):
     assert checkpoint_path.is_file(), checkpoint_path
 
+    precision = torch.float
     if args.dtype is not None:
         if args.dtype == "fp16": # or args.quantization_mode == "int4":
             precision = torch.float16
