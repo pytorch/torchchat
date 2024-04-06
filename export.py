@@ -81,8 +81,10 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
 
     quantize_model(model, args.quantize)
 
-    export_model = model_wrapper(model, device=device, max_seq_length=max_seq_length)
-    print(export_model)
+    export_model = model_wrapper(
+        model, device=device, max_seq_length=max_seq_length
+    )
+    # print(export_model)
 
     input = (
         torch.tensor([[1]], dtype=torch.long, device=device),
@@ -125,7 +127,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
                     input=input,
                     dynamic_shapes=dynamic_shapes,
                     output_path=output_pte_path,
-                    max_seq_length=,
+                    max_seq_length=max_seq_length,
                     args=args
                 )
                 print(f"exported model to: {pte_path}")
