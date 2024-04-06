@@ -12,8 +12,9 @@ git submodule update --init
 echo "Applying fixes"
 export SCRIPT_DIR=$(dirname $(realpath $0))
 echo "Script dir: ${SCRIPT_DIR}"
-cp ${SCRIPT_DIR}/fixes_et/module.h ./extension/module
-cp ${SCRIPT_DIR}/fixes_et/module.cpp ./extension/module
+echo "Current dir: ${PWD}"
+cp ${SCRIPT_DIR}/fixes_et/module.h ${PWD}/extension/module/module.h
+cp ${SCRIPT_DIR}/fixes_et/module.cpp ${PWD}/extension/module/module.cpp
 
 echo "Install executorch: running pip install"
 sh ./install_requirements.sh --pybind xnnpack
