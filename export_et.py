@@ -21,7 +21,7 @@ from model import Transformer
 from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
     XnnpackPartitioner,
 )
-from executorch.examples.portable.utils import export_to_edge
+from executorch_portable_utils import export_to_edge # TODO: change back to executorch.examples.portable.utils when executorch installs correctly
 
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
 from executorch.exir.passes.quant_fusion_pass import QuantFusionPass
@@ -159,4 +159,3 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     # save_pte_program(export_program, output_path)
 
     return output_path
-
