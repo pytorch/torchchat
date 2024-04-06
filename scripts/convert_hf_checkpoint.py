@@ -98,8 +98,8 @@ def convert_hf_checkpoint(
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Convert HuggingFace checkpoint.')
-    parser.add_argument('--checkpoint_dir', type=Path, default=Path("checkpoints/meta-llama/llama-2-7b-chat-hf"))
-    parser.add_argument('--model_name', type=str, default=None)
+    parser.add_argument('--checkpoint-dir', type=Path, default=Path("checkpoints/meta-llama/llama-2-7b-chat-hf"))
+    parser.add_argument('--model-name', type=str, default=None)
 
     args = parser.parse_args()
     convert_hf_checkpoint(
