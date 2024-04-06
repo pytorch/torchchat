@@ -33,9 +33,11 @@ def device_sync(device):
 
 def export_model(
         export_model: nn.Module,
+        *,
         input,
         dynamic_shapes=None,
         output_path=None,
+        max_seq_length=1024,
         args=None):
 
     ########################################################################

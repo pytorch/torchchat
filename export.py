@@ -37,10 +37,9 @@ def device_sync(device):
         print(f"device={device} is not yet suppported")
 
 class model_wrapper(nn.Module):
-    def __init__(self, model, device):
+    def __init__(self, model, device, max_seq_length=1024):
         super().__init__()
 
-        max_seq_length = 350
         with torch.device(device):
             model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
 
@@ -70,6 +69,8 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
 
     print(f"Using device={device}, precision={precision}")    
 
+    max_seq_length = 350
+
     print("Loading model ...")
     t0 = time.time()
     model = _load_model(
@@ -80,7 +81,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
 
     quantize_model(model, args.quantize)
 
-    export_model = model_wrapper(model, device=device)
+    export_model = model_wrapper(model, device=device, max_seq_length=max_seq_length)
     print(export_model)
 
     input = (
@@ -117,16 +118,31 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
     with torch.no_grad():
         if output_pte_path:
             output_pte_path = str(os.path.abspath(output_pte_path))
-            print(f">{output_pte_path}<")
             if executorch_export_available:
                 print(f"Exporting model using Executorch to {output_pte_path}")
-                export_model_et(export_model, input, dynamic_shapes, args.output_pte_path, args)
+                pte_path = export_model_et(
+                    export_model,
+                    input=input,
+                    dynamic_shapes=dynamic_shapes,
+                    output_path=output_pte_path,
+                    max_seq_length=,
+                    args=args
+                )
+                print(f"exported model to: {pte_path}")
             else:
                 print(f"Export with executorch requested but Executorch could not be loaded")
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
             print(f"Exporting model using AOT Inductor to {output_pte_path}")
-            export_model_aoti(export_model, input, dynamic_shapes, output_dso_path, args)
+            dso_path = export_model_aoti(
+                export_model,
+                input=input,
+                dynamic_shapes=dynamic_shapes,
+                output_path=output_dso_path,
+                max_seq_length=max_seq_length,
+                args=args
+            )
+            print(f"exported model to: {dso_path}")
 
 
 def cli():
