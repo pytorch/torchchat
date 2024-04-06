@@ -4,8 +4,6 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-rando_change = True
-
 import time
 import os
 from pathlib import Path
@@ -49,7 +47,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
     print("Loading model ...")
     t0 = time.time()
     model = _load_model(
-        checkpoint_path, device="cpu", precision=precision, use_tp=False)
+        checkpoint_path, device=device, precision=precision, use_tp=False)
 
     device_sync(device=device)  # MKG
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
