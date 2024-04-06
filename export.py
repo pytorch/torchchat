@@ -46,10 +46,10 @@ class model_wrapper(nn.Module):
         self.model = model
         # init model here if necessary
 
-    def forward(self, x, input_pos):
+    def forward(self, idx, input_pos):
         # input_pos: [B, 1]
         assert input_pos.shape[-1] == 1
-        logits = self.model(x, input_pos)
+        logits = self.model(idx, input_pos)
         return logits  # sample(logits, **sampling_kwargs)
 
     
