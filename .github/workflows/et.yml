@@ -61,6 +61,7 @@ jobs:
 
           export ET_DIR="${PWD}/build/executorch"
           echo "executorch directory: ${ET_DIR}"
+          cd ../..
           echo "current directory: ${PWD}"
           echo "Building runner-et"
           mkdir -p runner-et/cmake-out
