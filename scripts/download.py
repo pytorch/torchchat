@@ -23,8 +23,8 @@ def hf_download(repo_id: Optional[str] = None, hf_token: Optional[str] = None) -
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Download data from HuggingFace Hub.')
-    parser.add_argument('--repo_id', type=str, default="checkpoints/meta-llama/llama-2-7b-chat-hf", help='Repository ID to download from.')
-    parser.add_argument('--hf_token', type=str, default=None, help='HuggingFace API token.')
+    parser.add_argument('--repo-id', type=str, default="checkpoints/meta-llama/llama-2-7b-chat-hf", help='Repository ID to download from.')
+    parser.add_argument('--hf-token', type=str, default=None, help='HuggingFace API token.')
 
     args = parser.parse_args()
     hf_download(args.repo_id, args.hf_token)
