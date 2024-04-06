@@ -36,12 +36,38 @@ def device_sync(device):
     else:
         print(f"device={device} is not yet suppported")
 
+class model_wrapper(nn.Module):
+    def __init__(self, model, device):
+        super().__init__()
 
+        max_seq_length = 350
+        with torch.device(device):
+            model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+
+        self.model = model
+        # init model here if necessary
+
+    def forward(self, x, input_pos):
+        # input_pos: [B, 1]
+        assert input_pos.shape[-1] == 1
+        logits = self.model(x, input_pos)
+        return logits  # sample(logits, **sampling_kwargs)
+
+    
 def main(checkpoint_path, device, quantize = "{ }", args = None):
     assert checkpoint_path.is_file(), checkpoint_path
 
-    print(f"Using device={device}")
-    precision = torch.float  # bfloat16
+    if args.dtype is not None:
+        if args.dtype == "fp16": # or args.quantization_mode == "int4":
+            precision = torch.float16
+        elif args.dtype == "bf16": 
+            precision = torch.bfloat16
+        elif args.dtype == "fp32":
+            precision = torch.float32)
+        else:
+            raise ValueError(f"Unsupported dtype: {args.dtype}")
+
+    print(f"Using device={device}, precision={precision}")    
 
     print("Loading model ...")
     t0 = time.time()
@@ -53,6 +79,37 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
 
     quantize_model(model, args.quantize)
 
+    export_model = model_wrapper(model, device=device)
+    print(export_model)
+
+    input = (
+        torch.tensor([[1]], dtype=torch.long, device=device),
+        torch.tensor([0], dtype=torch.long, device=device),
+    )
+
+    state_dict = model.state_dict()
+    state_dict_dtype = state_dict[next(iter(state_dict))].dtype
+
+    if args.dtype is not None:
+        if args.dtype == "fp16": # or args.quantization_mode == "int4":
+            if state_dict_dtype != torch.float16:
+                print("model.to torch.float16")
+                model = model.to(dtype=torch.float16)
+                state_dict_dtype = torch.float16
+        elif args.dtype == "bf16": 
+            if state_dict_dtype != torch.bfloat16:
+                print("model.to torch.bfloat16")
+                model = model.to(dtype=torch.bfloat16)
+                state_dict_dtype = torch.bfloat16
+        elif args.dtype == "fp32":
+            if state_dict_dtype != torch.float32:
+                print("model.to torch.float32")
+                model = model.to(dtype=torch.float32)
+        else:
+            raise ValueError(f"Unsupported dtype: {args.dtype}")
+
+    dynamic_shapes = None
+            
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
     
@@ -62,13 +119,13 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
             print(f">{output_pte_path}<")
             if executorch_export_available:
                 print(f"Exporting model using Executorch to {output_pte_path}")
-                export_model_et(model, device, args.output_pte_path, args)
+                export_model_et(export_model, input, dynamic_shapes, args.output_pte_path, args)
             else:
                 print(f"Export with executorch requested but Executorch could not be loaded")
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
             print(f"Exporting model using AOT Inductor to {output_pte_path}")
-            export_model_aoti(model, device, output_dso_path, args)
+            export_model_aoti(export_model, input, dynamic_shapes, output_dso_path, args)
 
 
 def cli():
@@ -138,7 +195,7 @@ def cli():
         "-d",
         "--dtype",
         default=None,
-        help="Override the dtype of the model (default is the checkpoint dtype). Options: fp16, fp32",
+        help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument(

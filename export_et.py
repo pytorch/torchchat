@@ -70,62 +70,23 @@ def materialze_broadcast_of_rope_freq_cis(
     return module
 
 
-class model_wrapper(nn.Module):
-    def __init__(self, model, device):
-        super().__init__()
-
-        max_seq_length = 350
-        with torch.device(device):
-            model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
-
-        self.model = model
-        # init model here if necessary
-
-    def forward(self, x, input_pos):
-        # input_pos: [B, 1]
-        assert input_pos.shape[-1] == 1
-        logits = self.model(x, input_pos)
-        return logits  # sample(logits, **sampling_kwargs)
-
-
 def canonical_path(path):
     return path
 
-## align AOTI and ET export
-# def export_model(model: nn.Module, device, output_path):
-def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
 
-    export_model = model_wrapper(model, device=device)
-    print(export_model)
-
-    input = (
-        torch.tensor([[1]], dtype=torch.long, device=device),
-        torch.tensor([0], dtype=torch.long, device=device),
-    )
-
-    state_dict = model.state_dict()
-    state_dict_dtype = state_dict[next(iter(state_dict))].dtype
+def export_model(
+        export_model: nn.Module,
+        input,
+        dynamic_shapes = None,
+        output_path = None,
+        args=None
+) -> str:  # noqa: C901
 
     # need to use kv sdpa?
     edge_config = EdgeCompileConfig(
         _check_ir_validity=False,
         _skip_type_promotion=bool(args.dtype == "fp16"),
     )
-
-    dynamic_shapes = None
-
-    if args.dtype is not None:
-        if args.dtype == "fp16": # or args.quantization_mode == "int4":
-            if state_dict_dtype != torch.float16:
-                print("model.to torch.float16")
-                model = model.to(dtype=torch.float16)
-                state_dict_dtype = torch.float16
-        elif args.dtype == "fp32":
-            if state_dict_dtype != torch.float32:
-                print("model.to torch.float32")
-                model = model.to(dtype=torch.float32)
-        else:
-            raise ValueError(f"Unsupported dtype: {args.dtype}")
 
     with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]), torch.no_grad():
         m = capture_pre_autograd_graph(

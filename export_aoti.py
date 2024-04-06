@@ -31,24 +31,23 @@ def device_sync(device):
         print(f"device={device} is not yet suppported")
 
 
-def export_model(model: nn.Module, device, output_path, args=None):
-    max_seq_length = 350
-    with torch.device(device):
-        model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+def export_model(
+        export_model: nn.Module,
+        input,
+        dynamic_shapes=None,
+        output_path=None,
+        args=None):
 
-    input = (
-        torch.tensor([[1, 9038, 2501,  263,  931]], dtype=torch.int, device=device),
-        torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
-    )
-
-    print(f"len(input)={len(input)}")
-
+    ########################################################################
+    ### presently ignoring input_shapes from call, define our own
+    ########################################################################
+    
     seq = Dim("seq", min=1, max=max_seq_length)
     # Specify that the first dimension of each input is that batch size
     dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
 
     so = torch._export.aot_compile(
-        model,
+        export_model,
         args=input,
         options={"aot_inductor.output_path": output_path},
         dynamic_shapes=dynamic_shapes,
