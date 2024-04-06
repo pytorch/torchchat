@@ -36,30 +36,10 @@ jobs:
           pip install zstd
           pip install -r requirements.txt
 
-          echo "Executorch: cloning"
-          mkdir etorch
-          cd etorch
-          git clone https://github.com/pytorch/executorch.git
-          cd executorch
-          echo "Inside: ${PWD}"
-
-          echo "Executorch: submodule update"
-          git submodule sync
-          git submodule update --init
-
-          echo "Executorch: installing python interface"
-          ./install_requirements.sh --pybind xnnpack
-
-          echo "Executorch: install C++ libraries"
-          mkdir cmake-out
-          cmake -DCMAKE_BUILD_TYPE=Release -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out
-          cmake --build cmake-out -j 20
-
-          export ET_DIR=${PWD}
+          sh ./scripts/install_et.sh
+          export ET_DIR="${PWD}/build/executorch"
           echo "executorch directory: ${ET_DIR}"
-
-          cd ../..
-          echo "Inside: ${PWD}"
+          echo "current directory: ${PWD}"
           echo "Building runner-et"
           mkdir -p runner-et/cmake-out
           cmake -DET_DIR:STRING=$ET_DIR -DCMAKE_BUILD_TYPE=Release -S runner-et -B runner-et/cmake-out
