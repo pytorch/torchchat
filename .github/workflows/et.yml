@@ -53,7 +53,7 @@ jobs:
           echo "Executorch: install C++ libraries"
           mkdir cmake-out
           cmake -DCMAKE_BUILD_TYPE=Release -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out
-          cmake --build cmake-out
+          cmake --build cmake-out -j 20
 
           export ET_DIR=${PWD}
           echo "executorch directory: ${ET_DIR}"
