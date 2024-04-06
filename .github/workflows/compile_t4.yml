@@ -11,7 +11,7 @@ jobs:
   run-tinystories:
     strategy:
       matrix:
-        runner: [4-core-ubuntu-gpu-t4
+        runner: [4-core-ubuntu-gpu-t4]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
