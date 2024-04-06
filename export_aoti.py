@@ -43,10 +43,24 @@ def export_model(
     ########################################################################
     ### presently ignoring input_shapes from call, define our own
     ########################################################################
-    
+    # with torch.device(device):
+    #     model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+
+    device=
+    input = (
+        torch.tensor([[1, 9038, 2501,  263,  931]], dtype=torch.int, device=device),
+        torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
+    )
+
+    print(f"len(input)={len(input)}")
+
     seq = Dim("seq", min=1, max=max_seq_length)
     # Specify that the first dimension of each input is that batch size
     dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
+    
+    # seq = Dim("seq", min=1, max=max_seq_length)
+    # Specify that the first dimension of each input is that batch size
+    # dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
 
     so = torch._export.aot_compile(
         export_model,
