@@ -57,6 +57,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
     
     with torch.no_grad():
         if output_pte_path:
+            print(f">{output_pte_path}<")
             if executorch_export_available:
                 print(f"Exporting model using Executorch to {output_pte_path}")
                 export_model_et(model, device, args.output_pte_path, args)
@@ -122,13 +123,13 @@ def cli():
     parser.add_argument(
         "--output-pte-path",
         type=str,
-        default="stories15M.pte",
+        default=None, 
         help="Filename"
     )
     parser.add_argument(
         "--output-dso-path",
         type=str,
-        default="stories15M.so",
+        default=None,
         help="Filename"
     )
     parser.add_argument(
