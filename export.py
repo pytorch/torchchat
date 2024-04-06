@@ -63,7 +63,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
         elif args.dtype == "bf16": 
             precision = torch.bfloat16
         elif args.dtype == "fp32":
-            precision = torch.float32)
+            precision = torch.float32
         else:
             raise ValueError(f"Unsupported dtype: {args.dtype}")
 
