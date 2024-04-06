@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import time
+import os
 from pathlib import Path
 
 import torch
@@ -57,6 +58,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
     
     with torch.no_grad():
         if output_pte_path:
+            output_pte_path = str(os.path.abspath(output_pte_path))
             print(f">{output_pte_path}<")
             if executorch_export_available:
                 print(f"Exporting model using Executorch to {output_pte_path}")
@@ -64,7 +66,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
             else:
                 print(f"Export with executorch requested but Executorch could not be loaded")
         if output_dso_path:
-            # diverges from AOTI
+            output_dso_path = str(os.path.abspath(output_dso_path))
             print(f"Exporting model using AOT Inductor to {output_pte_path}")
             export_model_aoti(model, device, output_dso_path, args)
 
