@@ -18,7 +18,7 @@ target_link_libraries(
     ${ET_DIR}/cmake-out/extension/data_loader/libextension_data_loader.a
     ${ET_DIR}/cmake-out/kernels/portable/libportable_kernels.a
     ${ET_DIR}/cmake-out/libexecutorch.a
-    ${ET_DIR}/cmake-out/extension/module/libextension_module.a
+    ${ET_DIR}/cmake-out/extension/module/libextension_module_static.a
 )
 
 # To register kernels + backends properly, we need to use whole-archive linking.  This requires cmake 3.24+.
