@@ -37,6 +37,26 @@ def device_sync(device):
     else:
         print(f"device={device} is not yet suppported")
 
+        
+class model_wrapper(nn.Module):
+    def __init__(self, model, device):
+        super().__init__()
+
+        max_seq_length = 350
+        with torch.device(device):
+            model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+
+        self.model = model
+        # init model here if necessary
+
+    def forward(self, idx, input_pos):
+        # input_pos: [B, 1]
+        # assert failed on symbolic shape during aot_compile?!
+        # but not for ET?
+        # assert input_pos.shape[-1] == 1
+        logits = self.model(idx, input_pos)
+        return logits  # sample(logits, **sampling_kwargs)
+
 
 def main(checkpoint_path, device, quantize = "{ }", args = None):
     assert checkpoint_path.is_file(), checkpoint_path
@@ -53,7 +73,8 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
     quantize_model(model, args.quantize)
-
+    model = model_wrapper(model, device=device)
+    
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
 
