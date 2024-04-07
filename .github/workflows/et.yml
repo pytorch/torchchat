@@ -29,10 +29,6 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          echo "Installing clang"
-          sudo apt install clang
-          sudo apt install llvm
-
           echo "Intalling pip packages"
           pip install wheel
           pip install cmake
@@ -40,18 +36,22 @@ jobs:
           pip install zstd
           pip install -r requirements.txt
 
-          export LLAMA_FAST_DIR=${PWD}
-          ./scripts/install_et.sh
-
-          export CC=clang
-          export CXX=clang++
-          echo "Installing runner-et"
-          cd ${LLAMA_FAST_DIR}
+          echo "Executorch: cloning"
+          mkdir etorch
+          cd etorch
+          git clone https://github.com/pytorch/executorch.git
+          cd executorch
           echo "Inside: ${PWD}"
-          mkdir -p build/cmake-out
-          cmake -DET_DIR:STRING=${LLAMA_FAST_DIR}/build -DCMAKE_BUILD_TYPE=Release -S runner-et -B build/cmake-out
-          cmake --build build/cmake-out
 
+          echo "Executorch: submodule update"
+          git submodule sync
+          git submodule update --init
+
+          echo "Executorch: installing python interface"
+          ./install_requirements.sh --pybind xnnpack
+
+          cd ../..
+          echo "Inside: ${PWD}"
       - name: Download checkpoints
         run: |
           mkdir -p checkpoints/stories15M
@@ -62,25 +62,14 @@ jobs:
           popd
       - name: Run inference
         run: |
-          export CHECKPOINT_PATH=${PWD}/checkpoints/stories15M
+          export MODEL_PATH=${PWD}/checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
 
-          python generate.py --checkpoint-path ${CHECKPOINT_PATH}/stories15M.pt --temperature 0 --prompt "Once upon a time" > ${PWD}/output_eager
+          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 > ${PWD}/output_eager
           cat ${PWD}/output_eager
 
-          python export.py --checkpoint-path ${CHECKPOINT_PATH}/stories15M.pt --output-pte-path ${PWD}/stories15M.pte
-          python generate.py --checkpoint-path ${CHECKPOINT_PATH}/stories15M.pt --temperature 0 --prompt "Once upon a time" --pte-path ${PWD}/stories15M.pte  > ${PWD}/output_et
+          python export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
+          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${PWD}/${MODEL_NAME}.pte  > ${PWD}/output_et
           cat ${PWD}/output_et
-
-          ./build/cmake-out/runner_et run ${PWD}/stories15M.pte -z ${CHECKPOINT_PATH}/tokenizer.bin -i "Once upon a time" > ${PWD}/output_runner_et
-
-          echo "eager out:"
-          cat ${PWD}/output_eager
-
-          echo "et out:"
-          cat ${PWD}/output_et
-
-          echo "runner-et out:"
-          cat ${PWD}/output_runner_et
 
           echo "Tests complete."
