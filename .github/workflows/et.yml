@@ -11,7 +11,7 @@ jobs:
   run-tinystories:
     strategy:
       matrix:
-        runner: [macos-14]
+        runner: [macos-16]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
