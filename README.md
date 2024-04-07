@@ -62,7 +62,10 @@ export MODEL_DOWNLOAD=meta-llama/Llama-2-7b-chat-hf
 ./scripts/prepare.sh $MODEL_DOWNLOAD
 ```
 
-### Models tested/supported
+### Supported Models
+
+While we strive to support a broad range of models, we can't test all models.  Consequently, we classify supported models as tested ✅,
+work in progress 🚧 and not tested.  We invite community contributions of both new models, as well as test reports.
 
 | Model | tested | eager | torch.compile | AOT Inductor | ET Runtime | Fits on Mobile |
 |-----|--------|-------|-----|-----|-----|-----|
