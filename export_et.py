@@ -70,24 +70,6 @@ def materialze_broadcast_of_rope_freq_cis(
     return module
 
 
-class model_wrapper(nn.Module):
-    def __init__(self, model, device):
-        super().__init__()
-
-        max_seq_length = 350
-        with torch.device(device):
-            model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
-
-        self.model = model
-        # init model here if necessary
-
-    def forward(self, x, input_pos):
-        # input_pos: [B, 1]
-        assert input_pos.shape[-1] == 1
-        logits = self.model(x, input_pos)
-        return logits  # sample(logits, **sampling_kwargs)
-
-
 def canonical_path(path):
     return path
 
