@@ -51,7 +51,9 @@ class model_wrapper(nn.Module):
 
     def forward(self, idx, input_pos):
         # input_pos: [B, 1]
-        assert input_pos.shape[-1] == 1
+        # assert failed on symbolic shape during aot_compile?!
+        # but not for ET?
+        # assert input_pos.shape[-1] == 1
         logits = self.model(idx, input_pos)
         return logits  # sample(logits, **sampling_kwargs)
 
