@@ -65,7 +65,7 @@ export MODEL_DOWNLOAD=meta-llama/Llama-2-7b-chat-hf
 ### Models tested/supported
 
 | Model | tested | eager | torch.compile | AOT Inductor | ET Runtime | Fits on Mobile |
-|-----|--------+-------|-----|-----|-----|-----|
+|-----|--------|-------|-----|-----|-----|-----|
 tinyllamas/stories15M | ✅ | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
 tinyllamas/stories42M  | - | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
 tinyllamas/stories110M   | ✅ | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
@@ -75,7 +75,7 @@ meta-llama/Llama-2-13b-chat-hf | - | ✅ |  ✅ |  ✅ |  ✅ | 📵 |
 meta-llama/Llama-2-70b-chat-hf | - | ✅ |  ✅ |  ✅ |  ✅ | ❌|
 codellama/CodeLlama-7b-Python-hf | -| ✅ |  ✅ |  ✅ |  ✅ | ❹|
 codellama/CodeLlama-34b-Python-hf | -| ✅ |  ✅ |  ✅ |  ✅ | ❌ |
-mistralai/Mistral-7B-v0.1 | WIP | 🚧  |  ✅ |  ✅ |  ✅ | ❹ |
+mistralai/Mistral-7B-v0.1 | 🚧  |  ✅  |  ✅ |  ✅ |  ✅ | ❹ |
 mistralai/Mistral-7B-Instruct-v0.1 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 mistralai/Mistral-7B-Instruct-v0.2 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 
