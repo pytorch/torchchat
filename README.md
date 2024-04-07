@@ -65,7 +65,7 @@ export MODEL_DOWNLOAD=meta-llama/Llama-2-7b-chat-hf
 ### Models tested/supported
 
 | Model | tested | eager | torch.compile | AOT Inductor | ET Runtime | Fits on Mobile |
-|-----|------|-----|-----|-----|-----|
+|-----|--------+-------|-----|-----|-----|-----|
 tinyllamas/stories15M | ✅ | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
 tinyllamas/stories42M  | - | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
 tinyllamas/stories110M   | ✅ | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
