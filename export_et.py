@@ -73,11 +73,12 @@ def materialze_broadcast_of_rope_freq_cis(
 def canonical_path(path):
     return path
 
-## align AOTI and ET export
-# def export_model(model: nn.Module, device, output_path):
+
 def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
 
-    export_model = model_wrapper(model, device=device)
+    # applied wrapper already in export.
+    # export_model = model_wrapper(model, device=device)
+    export_model = model
     print(export_model)
 
     input = (
