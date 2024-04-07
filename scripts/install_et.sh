@@ -25,10 +25,3 @@ echo "Inside: ${PWD}"
 mkdir cmake-out
 cmake -DCMAKE_BUILD_TYPE=Release -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out -G Ninja
 cmake --build cmake-out
-
-echo "Installing runner-et"
-cd ${LLAMA_FAST_DIR}
-echo "Inside: ${PWD}"
-mkdir -p build/cmake-out
-cmake -DET_DIR:STRING=$ET_DIR -DCMAKE_BUILD_TYPE=Release -S runner-et -B build/cmake-out
-cmake --build build/cmake-out

@@ -32,8 +32,6 @@ jobs:
           echo "Installing clang"
           sudo apt install clang
           sudo apt install llvm
-          export CC=clang
-          export CXX=clang++
 
           echo "Intalling pip packages"
           pip install wheel
@@ -44,6 +42,16 @@ jobs:
 
           export LLAMA_FAST_DIR=${PWD}
           ./scripts/install_et.sh
+
+          export CC=clang
+          export CXX=clang++
+          echo "Installing runner-et"
+          cd ${LLAMA_FAST_DIR}
+          echo "Inside: ${PWD}"
+          mkdir -p build/cmake-out
+          cmake -DET_DIR:STRING=$ET_DIR -DCMAKE_BUILD_TYPE=Release -S runner-et -B build/cmake-out
+          cmake --build build/cmake-out
+
       - name: Download checkpoints
         run: |
           mkdir -p checkpoints/stories15M
