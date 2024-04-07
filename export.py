@@ -93,7 +93,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
             print(f"Exporting model using AOT Inductor to {output_pte_path}")
-            export_model_aoti(model, input device, output_dso_path, args)
+            export_model_aoti(model, input, device, output_dso_path, args)
 
 
 def cli():
