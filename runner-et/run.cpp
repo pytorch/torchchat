@@ -127,7 +127,7 @@ float* forward(Transformer* transformer, int token, int pos) {
 
 #ifndef __KV_CACHE__
       // @lint-ignore CLANGTIDY facebook-hte-LocalUncheckedArrayBounds
-    ManagedTensor tokens_managed(&(s->toks[pos]), /*ignored*/sizeof(int64_t)*(pos+1), {1, 1}, ScalarType::Long);
+    ManagedTensor tokens_managed(&(s->toks[pos]), /*ignored*/sizeof(int64_t), {1, 1}, ScalarType::Long);
 #else
     ManagedTensor tokens_managed(
         token_buffer, sizeof(int64_t), {1, 1}, ScalarType::Long);
