@@ -123,8 +123,8 @@ MODEL_DIR=~/llama-fast-exports
 ```
 
 When we export models with AOT Inductor for servers and desktops, and Executorch for mobile and edge devices,
-we will save them in the current working directory under the names ${MODEL_NAME}.so (for AOTI-generated dynamic libraries),
-or ${MODEL_NAME}.pte (for Executorch-generated mobile/edge models).
+we will save them in the specified directory (`${MODEL_DIR}` in our example below) as a DSO under the name `${MODEL_NAME}.so` (for AOTI-generated dynamic libraries),
+or as Executorch model under the name `${MODEL_NAME}.pte` (for Executorch-generated mobile/edge models).
 
 
 
