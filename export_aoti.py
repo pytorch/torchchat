@@ -31,15 +31,11 @@ def device_sync(device):
         print(f"device={device} is not yet suppported")
 
 
-def export_model(model: nn.Module, device, output_path, args=None):
+def export_model(model: nn.Module, input, device, output_path, args=None):
     max_seq_length = 350
 #    with torch.device(device):
 #        model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
 
-    input = (
-        torch.tensor([[1, 9038, 2501,  263,  931]], dtype=torch.int, device=device),
-        torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
-    )
 
     print(f"len(input)={len(input)}")
 

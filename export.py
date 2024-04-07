@@ -16,7 +16,7 @@ try:
     executorch_export_available = True
     from export_et import export_model as export_model_et
 except Exception as e:
-    print("ET EXPORT EXCEPTION: ", e) # TODO: remove
+    # print("ET EXPORT EXCEPTION: ", e) # TODO: remove
     executorch_export_available = False
 
 from export_aoti import export_model as export_model_aoti
@@ -39,15 +39,13 @@ def device_sync(device):
 
         
 class model_wrapper(nn.Module):
-    def __init__(self, model, device):
+    def __init__(self, model, device, max_seq_length = 350):
         super().__init__()
 
-        max_seq_length = 350
         with torch.device(device):
             model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
-
         self.model = model
-        # init model here if necessary
+
 
     def forward(self, idx, input_pos):
         # input_pos: [B, 1]
@@ -74,7 +72,12 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
 
     quantize_model(model, args.quantize)
     model = model_wrapper(model, device=device)
-    
+
+    input = (
+        torch.tensor([[1, 9038, 2501,  263,  931]], dtype=torch.int, device=device),
+        torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
+    )
+
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
 
@@ -84,13 +87,13 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
             print(f">{output_pte_path}<")
             if executorch_export_available:
                 print(f"Exporting model using Executorch to {output_pte_path}")
-                export_model_et(model, device, args.output_pte_path, args)
+                export_model_et(model, input, device, args.output_pte_path, args)
             else:
                 print(f"Export with executorch requested but Executorch could not be loaded")
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
             print(f"Exporting model using AOT Inductor to {output_pte_path}")
-            export_model_aoti(model, device, output_dso_path, args)
+            export_model_aoti(model, input device, output_dso_path, args)
 
 
 def cli():

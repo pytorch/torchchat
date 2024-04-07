@@ -74,17 +74,17 @@ def canonical_path(path):
     return path
 
 
-def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
+def export_model(model, input, device, output_path, args=None) -> str:  # noqa: C901
 
     # applied wrapper already in export.
     # export_model = model_wrapper(model, device=device)
     export_model = model
     print(export_model)
 
-    input = (
-        torch.tensor([[1]], dtype=torch.long, device=device),
-        torch.tensor([0], dtype=torch.long, device=device),
-    )
+    #input = (
+    #    torch.tensor([[1]], dtype=torch.long, device=device),
+    #    torch.tensor([0], dtype=torch.long, device=device),
+    #)
 
     state_dict = model.state_dict()
     state_dict_dtype = state_dict[next(iter(state_dict))].dtype
