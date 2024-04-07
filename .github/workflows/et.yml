@@ -11,7 +11,7 @@ jobs:
   run-tinystories:
     strategy:
       matrix:
-        runner: [linux.2xlarge]
+        runner: [32-core-ubuntu]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -29,6 +29,12 @@ jobs:
           fi
       - name: Install requirements
         run: |
+          echo "Installing clang"
+          sudo apt install clang
+          sudo apt install llvm
+          export CC=clang
+          export CXX=clang++
+
           echo "Intalling pip packages"
           pip install wheel
           pip install cmake
