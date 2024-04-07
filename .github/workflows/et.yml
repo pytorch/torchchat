@@ -49,7 +49,7 @@ jobs:
           cd ${LLAMA_FAST_DIR}
           echo "Inside: ${PWD}"
           mkdir -p build/cmake-out
-          cmake -DET_DIR:STRING=$ET_DIR -DCMAKE_BUILD_TYPE=Release -S runner-et -B build/cmake-out
+          cmake -DET_DIR:STRING=${LLAMA_FAST_DIR}/build -DCMAKE_BUILD_TYPE=Release -S runner-et -B build/cmake-out
           cmake --build build/cmake-out
 
       - name: Download checkpoints
