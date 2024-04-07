@@ -11,7 +11,7 @@ class PTEModel(nn.Module):
         self.config = config
         self.model_ = exec_lib._load_for_executorch(str(path))
 
-    def forward(self, idxx, input_pos):
+    def forward(self, idx, input_pos):
         # model_.forward expects inputs to be wrapped in a tuple
         forward_inputs = (idx.to(torch.long), input_pos.to(torch.long))
         logits = self.model_.forward(forward_inputs)
