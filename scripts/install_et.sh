@@ -1,32 +1,26 @@
-echo "Install executorch: cloning"
-rm -rf ${LLAMA_FAST_DIR}/build
-mkdir ${LLAMA_FAST_DIR}/build
-cd ${LLAMA_FAST_DIR}/build
-echo "Inside: ${PWD}"
+cd ${LLAMA_FAST_ROOT}
+echo "Inside: $LLAMA_FAST_ROOT"
+
+echo "Cloning executorch to ${LLAMA_FAST_ROOT}/build/src"
+rm -rf ${LLAMA_FAST_ROOT}/build
+mkdir -p ${LLAMA_FAST_ROOT}/build/src
+cd ${LLAMA_FAST_ROOT}/build/src
 git clone https://github.com/pytorch/executorch.git
 cd executorch
 echo "Install executorch: submodule update"
 git submodule sync
 git submodule update --init
 
-export ET_DIR=${LLAMA_FAST_DIR}/build
-
 echo "Applying fixes"
-echo "Inside: ${PWD}"
-cp ${LLAMA_FAST_DIR}/scripts/fixes_et/module.cpp ${ET_DIR}/executorch/extension/module/module.cpp # ET uses non-standard C++ that does not compile in GCC
-cp ${LLAMA_FAST_DIR}/scripts/fixes_et/managed_tensor.h ${ET_DIR}/executorch/extension/runner_util/managed_tensor.h # ET is missing headers for vector/memory
+cp ${LLAMA_FAST_ROOT}/scripts/fixes_et/module.cpp ${LLAMA_FAST_ROOT}/build/src/executorch/extension/module/module.cpp # ET uses non-standard C++ that does not compile in GCC
+cp ${LLAMA_FAST_ROOT}/scripts/fixes_et/managed_tensor.h ${LLAMA_FAST_ROOT}/build/src/executorch/extension/runner_util/managed_tensor.h # ET is missing headers for vector/memory.  This causes downstream issues when building runner-et.
 
-echo "Install executorch: running pip install"
+echo "Building and installing python libraries"
 ./install_requirements.sh --pybind xnnpack
 
-echo "Install executorch: building C++ libraries"
+echo "Building and installing C++ libraries"
 echo "Inside: ${PWD}"
 mkdir cmake-out
-cmake -DCMAKE_BUILD_TYPE=Release -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out -G Ninja
+cmake -DCMAKE_BUILD_TYPE=Release -DEXECUTORCH_BUILD_OPTIMIZED=ON -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out -G Ninja
 cmake --build cmake-out
-
-cd ${LLAMA_FAST_DIR}
-echo "Inside: ${PWD}"
-mkdir -p build/cmake-out
-cmake -DET_DIR:STRING=${ET_DIR} -DCMAKE_BUILD_TYPE=Release -S runner-et -B build/cmake-out
-cmake --build build/cmake-out
+cmake --install cmake-out --prefix ${LLAMA_FAST_ROOT}/build/install
