@@ -1,33 +1,32 @@
 cmake_minimum_required(VERSION 3.24)
-
-project(llama_fast)
-
 set(CMAKE_CXX_STANDARD 17)
 
-set(ET_DIR "./build" CACHE STRING "Path to directory containing executorch.  Default value is ./build.")
+project(llama-fast)
 
 include(CMakePrintHelpers)
-cmake_print_variables(ET_DIR)
+set(LLAMA_FAST_ROOT $ENV{LLAMA_FAST_ROOT})
+cmake_print_variables(LLAMA_FAST_ROOT)
 
+find_package(executorch CONFIG REQUIRED PATHS ${LLAMA_FAST_ROOT}/build/install/lib/cmake/ExecuTorch)
+set(_common_include_directories ${LLAMA_FAST_ROOT}/build/src)
+cmake_print_variables(_common_include_directories)
+
+target_include_directories(executorch INTERFACE ${_common_include_directories}) # Ideally ET installation process would do this
 add_executable(runner_et run.cpp)
-target_include_directories(runner_et PRIVATE ${ET_DIR})
 
 # Link ET runtime + extensions
 target_link_libraries(
     runner_et PRIVATE
-    ${ET_DIR}/executorch/cmake-out/extension/data_loader/libextension_data_loader.a
-    ${ET_DIR}/executorch/cmake-out/kernels/portable/libportable_kernels.a
-    ${ET_DIR}/executorch/cmake-out/libexecutorch.a
-    ${ET_DIR}/executorch/cmake-out/extension/module/libextension_module_static.a
+        executorch
+        extension_module
+        ${LLAMA_FAST_ROOT}/build/src/executorch/cmake-out/extension/data_loader/libextension_data_loader.a # This one does not get installed by ET
+        optimized_kernels
+        portable_kernels
+        cpublas
+        eigen_blas
 )
-
-# To register kernels + backends properly, we need to use whole-archive linking.  This requires cmake 3.24+.
-
-# Link portable kernel library
-target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,${ET_DIR}/executorch/cmake-out/kernels/portable/libportable_ops_lib.a">)
-
-# Link XNNPACK
-target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,${ET_DIR}/executorch/cmake-out/backends/xnnpack/libxnnpack_backend.a>")
-target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,${ET_DIR}/executorch/cmake-out/backends/xnnpack/third-party/pthreadpool/libpthreadpool.a>")
-target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,${ET_DIR}/executorch/cmake-out/backends/xnnpack/third-party/cpuinfo/libcpuinfo.a>")
-target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,${ET_DIR}/executorch/cmake-out/backends/xnnpack/third-party/XNNPACK/libXNNPACK.a>")
+target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,optimized_native_cpu_ops_lib">)
+target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,xnnpack_backend">)
+target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,XNNPACK">)
+target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,pthreadpool">)
+target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,cpuinfo">)
