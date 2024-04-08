@@ -436,7 +436,7 @@ You can also run the model with the runner-et.  This requires you first build th
 After this is done, you can run runner-et with
 
 ```
-/build/cmake-out/runner_et ${MODEL_OUT}/model.pte -z ${MODEL_OUT}/tokenizer.bin -i "Once upon a time in a land far away"
+./build/cmake-out/runner_et ${MODEL_OUT}/model.pte -z ${MODEL_OUT}/tokenizer.bin -i "Once upon a time in a land far away"
 ```
 
 While we have shown the export and execution of a small model to a mobile/edge
