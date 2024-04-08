@@ -1,17 +1,17 @@
 # Preamble.
 
-*The statements contained in this README are our northstar, and we will be reality-testing the statemen, and remove any
-items that are not factual.  If you find an item, that is incorrect, please tag as an issue, so we can triage and determine whether to fix,
+*The statements contained in this README are our northstar, and we will be reality-testing the statement, and remove any
+items that are not factual.  If you find an item that is incorrect, please tag as an issue, so we can triage and determine whether to fix,
 or drop from our initial release.*
 
 # llama-fast *NORTHSTAR*
-A repo for building and using llama on servers, desktops and mobile
+A repo for building and using llama on servers, desktops and mobile.
 
 The llama-fast repo enables model inference of llama models (and other LLMs) on servers, desktop and mobile devices.
-For a list of devices, see below, under *SUPPORTED SYSTEMS*
+For a list of devices, see below, under *SUPPORTED SYSTEMS*.
 
 A goal of this repo, and the design of the PT2 components was to offer seamless integration and consistent workflows.
-Both mobile and server/desktop paths start with torch.export() receiving the same model description.  Similarly,
+Both mobile and server/desktop paths start with `torch.export()` receiving the same model description.  Similarly,
 integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-aoti
 and runner-et, respectively) offer a consistent experience across backends and offer developers consistent interfaces
 and user experience whether they target server, desktop or mobile & edge use cases, and/or all of them.
@@ -22,7 +22,7 @@ and user experience whether they target server, desktop or mobile & edge use cas
 Featuring:
 
 * Very low latency
-* <1000 lines of python
+* <1000 lines of Python
 * No dependencies other than PyTorch and sentencepiece for server, and Executorch for mobile (plus, your mobile IDE, of course)
 * int8/int4 quantization (for linear and embedding operators)
 * Supports Nvidia and AMD GPUs, Apple GPUs with MPS, CPU (Linux/x86 and MacOS/ARM), and xnnpack, Vulkan and MPS for mobile GPUs,
@@ -129,10 +129,10 @@ We use several variables in this example, which may be set as a preparatory step
   herein, we will assume that MODEL_PATH starts with a subdirectory of the llama-fast repo
   named checkpoints, and that it will contain the actual model. In this case, the MODEL_PATH will thus
   be of the form ${MODEL_OUT}/model.{pt,pth}.  (Both the extensions `pt` and `pth`
-  are used to describe checkpoints. In addition, model may be replaced with the name of the model)
+  are used to describe checkpoints. In addition, model may be replaced with the name of the model.)
 
-  The generate.py  sequence generator will load the tokenizer from the directory specified by the MODEL_PATH variable,
-  by replacing the modelname with the name of the tokenizer model which is expected to be named `tokenizer.model`
+  The generate.py sequence generator will load the tokenizer from the directory specified by the MODEL_PATH variable,
+  by replacing the modelname with the name of the tokenizer model which is expected to be named `tokenizer.model`.
 
 * `MODEL_OUT` is a location for outputs from export for server/desktop and/or mobile/edge execution.  We store exported
   artifacts here, with extensions .pte for Executorch models, .so for AOT Inductor generated models, and .bin for tokenizers
@@ -297,7 +297,7 @@ python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --prompt "Hell
 
 *Groupwise quantization*:
 
-We can do this in eager mode (optionally with torch.compile), we use the `embedding` quantizer by specifying the group size:
+We can do this in eager mode (optionally with `torch.compile`), we use the `embedding` quantizer by specifying the group size:
 
 ```
 python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --device cpu
@@ -316,7 +316,7 @@ python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte --promp
 
 
 #### Linear 8 bit integer quantization (channel-wise and groupwise)
-The simplest way to quantize linear operators is with int8 quantization, where each value is represented by an 8 bit integer, and a
+The simplest way to quantize linear operators is with int8 quantization, where each value is represented by an 8-bit integer, and a
 floating point scale:
 
 *Channelwise quantization*:
@@ -354,7 +354,7 @@ python generate.py --dso-path ${MODEL_OUT}/${MODEL_NAME}_int8.so --checkpoint-pa
 
 *Groupwise quantization*:
 
-We can do this in eager mode (optionally with torch.compile), we use the `linear:int8` quantizer by specifying the group size:
+We can do this in eager mode (optionally with `torch.compile`), we use the `linear:int8` quantizer by specifying the group size:
 
 ```
 python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --device cpu
@@ -386,9 +386,9 @@ performnance requires a group-wise quantized mixed dtype linear
 operator.
 
 
-#### 4 bit integer quantization (8da4w)
-To compress your model even more, 4 bit integer quantization may be used.  To achieve good accuracy, we recommend the use
-of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8 bit, giving
+#### 4-bit integer quantization (8da4w)
+To compress your model even more, 4-bit integer quantization may be used.  To achieve good accuracy, we recommend the use
+of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8-bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
 python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }" --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte
@@ -468,7 +468,7 @@ Check out the [tutorial on how to build an Android app running your PyTorch mode
 
 ### iOS
 
-Open the ios Llama Xcode project at https://github.com/pytorch/executorch/tree/main/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj in Xcode and click Run.
+Open the iOS Llama Xcode project at https://github.com/pytorch/executorch/tree/main/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj in Xcode and click Run.
 You will need to provide a provisioning profile (similar to what's expected for any iOS dev).
 
 Once you can run the app on you device,
@@ -478,7 +478,7 @@ Once you can run the app on you device,
 
 # Supported Systems
 
-PyTorch and the mobile Executorch backend support a broad range fo devices for running PyTorch with Python (using either eager or eager + torch.compile) or using a Python-free environment with AOT Inductor , as well as runtimes for executing exported models.
+PyTorch and the mobile Executorch backend support a broad range of devices for running PyTorch with Python (using either eager or eager + `torch.compile`) or using a Python-free environment with AOT Inductor, as well as runtimes for executing exported models.
 
 
 | Hardware | OS | eager | eager + compile | AOT compile | ET Runtime |
@@ -530,7 +530,7 @@ Note: External libraries have not been tested for correctness, reliability and s
 
 ### macOS (aarch64, x86)
 
-To use torch.compile, you should install OpenMP and a compiler with suitable OpenMP support. You can install OpenMP using conda by following the PyTorch installation instructions
+To use `torch.compile`, you should install OpenMP and a compiler with suitable OpenMP support. You can install OpenMP using conda by following the PyTorch installation instructions
 at https://github.com/pytorch/pytorch?tab=readme-ov-file#install-dependencies.
 
 Alternatively, you can also find libraries here: https://mac.r-project.org/openmp/ and from other locations. Alternatively, you may install
