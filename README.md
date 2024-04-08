@@ -29,9 +29,9 @@ Featuring:
   and backend-specific mobile runtimes ("delegates", such as CoreML and Hexagon).
 
 The model definition (and much more!) is adopted from gpt-fast, so we support the same models.  As new models are supported by gpt-fast,
-bringing them into llama-fast should be straight forward.  In addition, we invite community contributions 
+bringing them into llama-fast should be straight forward.  In addition, we invite community contributions
 
-# Getting started 
+# Getting started
 
 Follow the `gpt-fast` [installation instructions](https://github.com/pytorch-labs/gpt-fast?tab=readme-ov-file#installation).
 Because llama-fast was designed to showcase the latest and greatest PyTorch 2 features for Llama (and related llama-style) models, many of the features used in llama-fast are hot off the press. [Download PyTorch nightly](https://pytorch.org/get-started/locally/) with the latest steaming hot PyTorch 2 features.
@@ -91,8 +91,8 @@ mistralai/Mistral-7B-Instruct-v0.2 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 
 First cd into llama-fast.  We first create a directory for stories15M and download the model and tokenizers.
 We show how to download @Andrej Karpathy's stories15M tiny llama-style model that were used in llama2.c.  Advantageously,
-stories15M is both a great example and quick to download and run across a range of platforms, ideal for introductions like this 
-README and for [testing](https://github.com/pytorch-labs/llama-fast/blob/main/.github/workflows). We will be using it throughout 
+stories15M is both a great example and quick to download and run across a range of platforms, ideal for introductions like this
+README and for [testing](https://github.com/pytorch-labs/llama-fast/blob/main/.github/workflows). We will be using it throughout
 this introduction as our running example.
 
 ```
@@ -116,7 +116,7 @@ curl -L -o ${MODEL_DIR}/tokenizer.bin "https://github.com/karpathy/llama2.c/raw/
 ## Conventions
 
 We use several variables in this example, which may be set as a preparatory step:
-  
+
 * `MODEL_NAME` describes the name of the model.  This name is *not* free-form, as it is used to index into a table
    of supported models and their configuration properties that are needed to load the model. This variable should correspond to the
    name of the directory holding the files for the corresponding model.  You *must* follow this convention to
@@ -124,7 +124,7 @@ We use several variables in this example, which may be set as a preparatory step
 
 * `MODEL_OUT` is the location where we store model and tokenizer information for a particular model. We recommend `checkpoints/${MODEL_NAME}`
   or any other directory you already use to store model information.
-  
+
 * `MODEL_PATH` describes the location of the model. Throughput the description
   herein, we will assume that MODEL_PATH starts with a subdirectory of the llama-fast repo
   named checkpoints, and that it will contain the actual model. In this case, the MODEL_PATH will thus
@@ -136,7 +136,7 @@ We use several variables in this example, which may be set as a preparatory step
 
 * `MODEL_OUT` is a location for outputs from export for server/desktop and/or mobile/edge execution.  We store exported
   artifacts here, with extensions .pte for Executorch models, .so for AOT Inductor generated models, and .bin for tokenizers
-  prepared for use with the C++ tokenizers user by `runner-aoti` and `runner-et`. 
+  prepared for use with the C++ tokenizers user by `runner-aoti` and `runner-et`.
 
 You can set these variables as follows for the exemplary model15M model from Andrej Karpathy's tinyllamas model family:
 ```
@@ -238,7 +238,7 @@ With the model exported, you can now generate text with the executorch runtime p
 python generate.py --checkpoint-path ${MODEL_PATH} --pte ${MODEL_OUT}/model.pte --device cpu --prompt "Once upon a time"
 ```
 
-You can also run the model with the runner-et.  See below under "Standalone Execution". 
+You can also run the model with the runner-et.  See below under "Standalone Execution".
 
 While we have shown the export and execution of a small model to a mobile/edge
 device supported by Executorch, most models need to be compressed to
@@ -409,7 +409,7 @@ We invite contributors to submit established quantization schemes, with accuracy
 # Standalone Execution
 
 In addition to running the exported and compiled models for server, desktop/laptop and mobile/edge devices by loading them in a PyTorch environment under the Python interpreter,
-these models can also be executed directly 
+these models can also be executed directly
 
 ## Desktop and Server Execution
 This has been tested with Linux and x86 (using CPU ~and GPU~), and MacOS and ARM/Apple Silicon.
@@ -543,40 +543,26 @@ install them from source.
 List dependencies for these backends
 
 ### Setting up ExecuTorch and runner-et
-Set up executorch by following the instructions [here](https://pytorch.org/executorch/stable/getting-started-setup.html#setting-up-executorch).  For clarity, the relevant commands are provided below.
+Set up ExecuTorch by following the instructions [here](https://pytorch.org/executorch/stable/getting-started-setup.html#setting-up-executorch).
+For convenience, we provide a script that does this for you.
 
+From the llama-fast root directory, run the following
 ```
-git clone https://github.com/pytorch/executorch.git
-cd executorch
-git submodule sync
-git submodule update --init
-
-conda create -yn cllamafast python=3.10.0
-conda activate cllamafast
-conda install cmake
-./install_requirements.sh --pybind xnnpack
+export LLAMA_FAST_ROOT=${PWD}
+./scripts/install_et.sh
 ```
 
-Following the above commands will let you export ET models and run them using generate.py.
-If you also want to use runner-et, you must build executorch with cmake.
-To build executorch with cmake, cd to the executorch repo and run the following steps from the executorch directory.
+This will create a build directory, git clone ExecuTorch to ./build/src, applies some patches to the ExecuTorch source code, install the ExecuTorch python libraries with pip, and install the required ExecuTorch C++ libraries to ./build/install.  This will take a while to complete.
+
+After ExecuTorch is installed, you can build runner-et from the llama-fast root directory with the following
 
 ```
-rm -rf cmake-out
-mkdir cmake-out
-cmake -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out; cmake --build cmake-out
+export LLAMA_FAST_ROOT=${PWD}
+cmake -S ./runner-et -B build/cmake-out -G Ninja
+cmake --build ./build/cmake-out
 ```
 
-After executorch is built, you can build runner-et.  The following commands must be run from the llama-fast directory, and you must set ET_DIR to the executorch repo path on your machine.
-
-```
-export ET_DIR="/path/to/executorch"
-
-rm -rf runner-et/cmake-out
-mkdir -p runner-et/cmake-out
-cmake -DET_DIR:STRING=$ET_DIR -DCMAKE_BUILD_TYPE=Release -S runner-et -B runner-et/cmake-out; cmake --build runner-et/cmake-out
-```
-
+The built executable is located at ./build/cmake-out/runner-et.
 
 # Acknowledgements
 
