@@ -52,12 +52,12 @@ typedef struct {
     Config config; // the hyperparameters of the architecture (the blueprint)
     RunState state; // buffers for the "wave" of activations in the forward pass
 
-#ifdef __AOTI_MODEL__  
+#ifdef __AOTI_MODEL__
     torch::inductor::AOTIModelContainerRunnerCpu *runner;
 #else // __ET_MODEL__
     Module* runner;
 #endif
-  
+
 } Transformer;
 
 void malloc_run_state(RunState* s, Config* p) {
@@ -102,6 +102,7 @@ void build_transformer(Transformer *t, char* checkpoint_path, int vocab_size, in
     t->runner = new Module(
 	/* path to PTE model */ checkpoint_path,
 	/* PTE mmap settings */ Module::MlockConfig::UseMlockIgnoreErrors
+    );
 #endif
 
 }
@@ -153,7 +154,7 @@ float* forward(Transformer* transformer, int token, int pos) {
 
     torch::Tensor result = transformer->runner->run(inputs)[0];
     auto logits = result[0].data_ptr();
-    
+
 #else // __ET_MODEL__
     ManagedTensor pos_managed(
         pos_buffer, sizeof(int64_t), { 1 }, ScalarType::Long);
@@ -171,11 +172,14 @@ float* forward(Transformer* transformer, int token, int pos) {
     inputs.push_back(tmp1);
     inputs.push_back(tmp2);
     Result<std::vector<EValue>> outputs_res = transformer->runner->forward(inputs);
-    assert (outputs_res.ok());
+    if (!outputs_res.ok()) {
+        fprintf(stderr, "Executorch forward() failed.");
+        exit(EXIT_FAILURE);
+    }
     std::vector<EValue> result = outputs_res.get();
     auto logits = result[0].toTensor().const_data_ptr();
 #endif
-    
+
     memcpy(s->logits, logits, p->vocab_size * sizeof(float));
     return s->logits;
 }
@@ -547,9 +551,8 @@ long time_in_ms() {
 // generation loop
 
 void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, const char *prompt, int steps) {
-    const char *empty_prompt = "";
-    if (prompt == NULL) { prompt = empty_prompt; }
-    prompt = "Once upon a time";
+    const char *default_prompt = "Once upon a time";
+    if (prompt == NULL) { prompt = default_prompt; }
 
     // encode the (string) prompt into tokens sequence
     int num_prompt_tokens = 0;
@@ -560,10 +563,12 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
         exit(EXIT_FAILURE);
     }
 
+    #ifdef DEBUG
     std::cerr << "# " << num_prompt_tokens << "\n";
     for(int i = 0; i < num_prompt_tokens; i++)
       std::cerr << "[" << i << "] " << prompt_tokens[i];
     std::cerr << "\n";
+    #endif
 
     // start the main loop
     long start = 0;  // used to time our code, only initialized after first iteration
