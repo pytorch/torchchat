@@ -12,24 +12,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: CUDA 2.2.2
-            runs-on: 4-core-ubuntu-gpu-t4
-            torch-spec: 'torch==2.2.2'
-          - name: CUDA 2.3 RC
-            runs-on: 4-core-ubuntu-gpu-t4
-            torch-spec: 'torch==2.3.0 --index-url https://download.pytorch.org/whl/test/cu121'
           - name: CUDA Nightly
             runs-on: 4-core-ubuntu-gpu-t4
             torch-spec: '--pre torch --index-url https://download.pytorch.org/whl/nightly/cu121'
-          - name: CPU 2.2.2
-            runs-on: 32-core-ubuntu
-            torch-spec: 'torch==2.2.2 --index-url https://download.pytorch.org/whl/cpu'
-          - name: CPU 2.3 RC
-            runs-on: 32-core-ubuntu
-            torch-spec: 'torch==2.3.0 --index-url https://download.pytorch.org/whl/test/cpu'
-          - name: Nightly CPU
-            runs-on: 32-core-ubuntu
-            torch-spec: '--pre torch --index-url https://download.pytorch.org/whl/nightly/cpu'
     runs-on: ${{ matrix.runs-on }}
 
     steps:
