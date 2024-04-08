@@ -11,7 +11,9 @@ jobs:
   run-tinystories:
     strategy:
       matrix:
-        runner: [4-core-ubuntu-gpu-t4]
+        include:
+          - runner: 4-core-ubuntu-gpu-t4
+            torch-spec: '--pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121'
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -29,7 +31,8 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
+          python -m pip install --upgrade pip
+          pip install ${{ matrix.torch-spec }}
           pip install -r requirements.txt
       - name: Download checkpoints
         run: |
