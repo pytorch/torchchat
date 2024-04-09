@@ -327,7 +327,7 @@ def main(
 
     if (checkpoint_path and (dso_path or pte_path)):
         print("Warning: checkpoint path ignored because an exported DSO or PTE path specified")
-              
+
     if not tokenizer_path:
         assert checkpoint_path, "either a tokenizer or a checkpoint path must be specified"
         tokenizer_path = checkpoint_path.parent / "tokenizer.model"
@@ -359,7 +359,7 @@ def main(
             # attributes will NOT be seen on by AOTI-compiled forward
             # function, e.g. calling model.setup_cache will NOT touch
             # AOTI compiled and maintained model buffers such as kv_cache.
-            model.forward = torch._export.aot_load(str(dso_path), device)
+            model.forward = torch._export.aot_load(str(dso_path.absolute()), device)
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {dso_path}")
     elif pte_path:
@@ -596,7 +596,7 @@ def cli():
 
     if args.seed:
               torch.manual_seed(args.seed)
-              
+
     main(
         args.prompt,
         args.interactive,
