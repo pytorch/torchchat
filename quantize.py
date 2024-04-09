@@ -64,6 +64,12 @@ def quantize_model(model: nn.Module, quantize_options):
                 model,
                 **q_kwargs
             ).quantized_model()
+        elif quantizer == "linear:hqq":
+            linears_quantized = True
+            model = WeightOnlyInt4HqqQuantHandler,
+                model,
+                **q_kwargs
+            ).quantized_model()
         elif quantizer == "precision":
             model.to(**q_kwargs)
         else:
@@ -462,6 +468,124 @@ class QuantizedGroupEmbedding(torch.nn.Module):
         return r.view(indices.size() + (-1,))
         
         # r = result_weights.to(dtype=result_scales.dtype).view(list(result_weights.shape[:-1] + (scales.shape[1], -1, )) * result_scales.view(scales.shape[-1] + (scales.shape[1], 1, ))
+
+
+##################################################################
+### HQQ
+
+class WeightOnlyInt4HqqQuantHandler:
+    def __init__(self, mod, groupsize):
+        self.mod = mod
+        self.groupsize = groupsize
+
+    def _create_quantized_state_dict(self):
+        from hqq.core.quantize import Quantizer  # TODO maybe torchao
+
+        for m in self.mod.modules():
+            for name, child in m.named_children():
+                if isinstance(child, torch.nn.Linear):
+                    child.weight = torch.nn.Parameter(
+                        Quantizer.dequantize(
+                            *Quantizer.quantize(
+                                child.weight,
+                                nbits=4,
+                                group_size=self.groupsize,
+                                axis=1,
+                            )
+                        )
+                    )
+
+        return WeightOnlyInt4QuantHandler(self.mod, self.groupsize).create_quantized_state_dict()
+
+    def _convert_for_runtime(self):
+        return WeightOnlyInt4GPTQQuantHandler(self.mod, self.groupsize).convert_for_runtime(use_cuda=True)
+    
+
+    class WeightOnlyInt4HqqQuantHandler:
+    def __init__(self, mod, groupsize):
+        self.mod = mod
+        self.groupsize = groupsize
+
+    def _create_quantized_state_dict(self):
+        from hqq.core.quantize import Quantizer  # TODO maybe torchao
+
+        for m in self.mod.modules():
+            for name, child in m.named_children():
+                if isinstance(child, torch.nn.Linear):
+                    child.weight = torch.nn.Parameter(
+                        Quantizer.dequantize(
+                            *Quantizer.quantize(
+                                child.weight,
+                                nbits=4,
+                                group_size=self.groupsize,
+                                axis=1,
+                            )
+                        )
+                    )
+
+        return WeightOnlyInt4QuantHandler(self.mod, self.groupsize).create_quantized_state_dict()
+
+    def _convert_for_runtime(self):
+        return WeightOnlyInt4GPTQQuantHandler(self.mod, self.groupsize).convert_for_runtime(use_cuda=True)
+    class WeightOnlyInt4HqqQuantHandler:
+    def __init__(self, mod, groupsize):
+        self.mod = mod
+        self.groupsize = groupsize
+
+    def _create_quantized_state_dict(self):
+        from hqq.core.quantize import Quantizer  # TODO maybe torchao
+
+        for m in self.mod.modules():
+            for name, child in m.named_children():
+                if isinstance(child, torch.nn.Linear):
+                    child.weight = torch.nn.Parameter(
+                        Quantizer.dequantize(
+                            *Quantizer.quantize(
+                                child.weight,
+                                nbits=4,
+                                group_size=self.groupsize,
+                                axis=1,
+                            )
+                        )
+                    )
+
+        return WeightOnlyInt4QuantHandler(self.mod, self.groupsize).create_quantized_state_dict()
+
+    def _convert_for_runtime(self):
+        return WeightOnlyInt4GPTQQuantHandler(self.mod, self.groupsize).convert_for_runtime(use_cuda=True)
+    class WeightOnlyInt4HqqQuantHandler:
+    def __init__(self, mod, groupsize):
+        self.mod = mod
+        self.groupsize = groupsize
+
+    def _create_quantized_state_dict(self):
+        from hqq.core.quantize import Quantizer  # TODO maybe torchao
+
+        for m in self.mod.modules():
+            for name, child in m.named_children():
+                if isinstance(child, torch.nn.Linear):
+                    child.weight = torch.nn.Parameter(
+                        Quantizer.dequantize(
+                            *Quantizer.quantize(
+                                child.weight,
+                                nbits=4,
+                                group_size=self.groupsize,
+                                axis=1,
+                            )
+                        )
+                    )
+
+        return WeightOnlyInt4QuantHandler(self.mod, self.groupsize).create_quantized_state_dict()
+
+    def _convert_for_runtime(self):
+        return WeightOnlyInt4GPTQQuantHandler(self.mod, self.groupsize).convert_for_runtime(use_cuda=True)
+
+    def quantized_model(self) -> nn.Module:
+        model_updated_state_dict = self.create_quantized_state_dict()
+        self.convert_for_runtime()
+        self.mod.load_state_dict(model_updated_state_dict)
+        return self.mod
+
 
 ##################################################################
 ##### weight only int4 per channel groupwise quantized code ######
