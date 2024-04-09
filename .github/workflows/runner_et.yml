@@ -35,6 +35,7 @@ jobs:
           pip install ninja
           pip install zstd
           pip install -r requirements.txt
+          xcode-select --install
 
           export LLAMA_FAST_ROOT=${PWD}
           ./scripts/install_et.sh
