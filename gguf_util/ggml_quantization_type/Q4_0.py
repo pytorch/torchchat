@@ -90,8 +90,10 @@ def from_float(
     """
     group_size = 32
     zero_point = 8.5
-    # pyre-fixme[16]: Callable input has no attribute dtype.
-    assert input.dtype == torch.float16, f"Expecting float16 input, got {input.dtype}"
+    assert input.dtype in (
+        torch.float16,
+        torch.float32,
+    ), f"Expecting float16 or float32 input, got {input.dtype}"
     assert (
         input.numel() % group_size
         == 0
@@ -100,7 +102,7 @@ def from_float(
     input = input.reshape(-1, group_size)
     abs_max_id = torch.argmax(torch.abs(input), dim=1)
     scales = input[torch.arange(input.size(0)), abs_max_id] / -8
-    inv_scales = torch.div(1.0, scales.to(torch.float32))
+    inv_scales = torch.div(1.0, scales)
 
     clamped = torch.clamp(
         input=torch.floor(inv_scales.unsqueeze(1) * input + zero_point),
@@ -108,24 +110,32 @@ def from_float(
         max=15,
     ).to(torch.uint8)
     alternate = _interleave(clamped, group_size)
-    return torch.cat([_pack_to_two_uint8(scales), pack_uint4(alternate)], dim=1)
+    return torch.cat(
+        [_pack_to_two_uint8(scales.to(torch.float16)), pack_uint4(alternate)], dim=1
+    )
 
 
 def to_float(
     input: torch.Tensor,
+    dtype: torch.dtype = torch.float16,
 ) -> torch.Tensor:
     """
     Dequantize GGUF's Q4_0 tensor. Expecting input to be a uint8 tensor
     with a dimension of [num_group // 2, 18], the first 2 values of each
     row represents the scale of that group.
     """
+    assert dtype in (
+        torch.float32,
+        torch.float16,
+    ), f"Expecting float16, or float32 but got {dtype}"
+
     zero_point = 8
     data_unint8 = input[:, 2:]
     data = unpack_uint4(data_unint8)
     assert data.dtype == torch.uint8
     interleave = torch.cat([data[:, ::2], data[:, 1::2]], dim=1)
     scale = _unpack_two_uint8(input[:, :2])
-    a = interleave.to(torch.float16) - zero_point
+    a = interleave.to(dtype) - zero_point
     return a * scale.unsqueeze(1)
 
 
@@ -217,7 +227,7 @@ class GGMLInt4LinearWeight(QuantizedLinearWeightBase):
         assert isinstance(
             w_qtensor, GGMLInt4LinearWeight
         ), f"Expect {w_qtensor} to be an instance of GGMLInt4LinearWeight but got {type(w_qtensor)}"
-        fp_weight = to_float(w_qtensor.int_data).view(w_qtensor.shape)
+        fp_weight = to_float(w_qtensor.int_data, w_qtensor.dtype).view(w_qtensor.shape)
         return torch.nn.functional.linear(act_mat, fp_weight, bias)
 
     @classmethod
@@ -233,10 +243,10 @@ class GGMLInt4LinearWeight(QuantizedLinearWeightBase):
             )
         """
         packed = from_float(input_float)
-        scale = torch.tensor(_unpack_two_uint8(packed[:, :2]), dtype=torch.float16)
+        scale = torch.tensor(_unpack_two_uint8(packed[:, :2]), dtype=input_float.dtype)
         return cls(
             packed,
             scale,
             input_float.shape,
-            dtype=torch.float16,
+            dtype=input_float.dtype,
         )
