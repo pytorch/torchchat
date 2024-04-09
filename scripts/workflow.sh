@@ -1,0 +1,84 @@
+#!/bin/bash
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
+
+set -eu
+
+function download_tinyllamas() {
+    local MODEL_REPO="$1"
+    local FORCE_DOWNLOAD="${2:-false}"
+    local CHECKPOINT_DIR="checkpoints/$MODEL_REPO"
+    local MODEL_NAME="${MODEL_REPO##*/}"
+
+    if [ "$FORCE_DOWNLOAD" = true ] || [ ! -d "$CHECKPOINT_DIR" ] || [ -z "$(ls -A "$CHECKPOINT_DIR")" ]; then
+        echo "Download checkpoint for $MODEL_REPO"
+        rm -rf "$CHECKPOINT_DIR"
+
+        mkdir -p checkpoints/$MODEL_REPO
+        pushd checkpoints/$MODEL_REPO
+        wget "https://huggingface.co/karpathy/tinyllamas/resolve/main/${MODEL_NAME}.pt"
+        wget "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
+        wget "https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin"
+        popd
+    else
+        echo "Checkpoint directory for $MODEL_REPO is not empty. Skipping download."
+    fi
+}
+
+function download_checkpoint() {
+    local MODEL_REPO="$1"
+    local FORCE_DOWNLOAD="${2:-false}"
+    local CHECKPOINT_DIR="checkpoints/$MODEL_REPO"
+
+    if [ "$MODEL_REPO" = "tinyllamas/stories15M" ] || [ "$MODEL_REPO" = "tinyllamas/stories42M" ] || [ "$MODEL_REPO" = "tinyllamas/stories110M" ]; then
+        echo "Download checkpoint for $MODEL_REPO"
+        download_tinyllamas "$MODEL_REPO" "$FORCE_DOWNLOAD"
+        return 0
+    fi
+
+    if [ "$FORCE_DOWNLOAD" = true ] || [ ! -d "$CHECKPOINT_DIR" ] || [ -z "$(ls -A "$CHECKPOINT_DIR")" ]; then
+        echo "Download checkpoint for $MODEL_REPO"
+        rm -rf "$CHECKPOINT_DIR"
+        python scripts/download.py --repo-id "$MODEL_REPO"
+    else
+        echo "Checkpoint directory for $MODEL_REPO is not empty. Skipping download."
+    fi
+}
+
+
+# List of models to validate
+MODEL_REPOS=(
+    "tinyllamas/stories15M"
+    # "tinyllamas/stories42M"
+    "tinyllamas/stories110M"
+    # "mistralai/Mistral-7B-v0.1"
+    # "mistralai/Mistral-7B-Instruct-v0.1"
+    # "mistralai/Mistral-7B-Instruct-v0.2"
+    # "openlm-research/open_llama_7b"
+    # "codellama/CodeLlama-7b-Python-hf"
+    # "codellama/CodeLlama-34b-Python-hf"
+    # "meta-llama/Llama-2-7b-chat-hf"
+    # "meta-llama/Llama-2-13b-chat-hf"
+    # "meta-llama/Llama-2-70b-chat-hf"
+)
+
+PROMPT="Hello, my name is"
+DEVICE="${1:-cpu}"
+CHECKPOINT_FILENAME="model.pth"
+
+echo "###############################################################"
+echo "############## Start LLama-fast Model Validation ##############"
+echo "###############################################################"
+for MODEL_REPO in "${MODEL_REPOS[@]}"; do
+    echo "############### Validating ${MODEL_REPO##*/} ###############"
+    download_checkpoint "$MODEL_REPO"
+    bash .ci/scripts/convert_checkpoint.sh "$MODEL_REPO"
+
+    set +e
+    CHECKPOINT_PATH="checkpoints/$MODEL_REPO/$CHECKPOINT_FILENAME"
+    bash .ci/scripts/validate.sh "$CHECKPOINT_PATH" "$DEVICE"
+done
