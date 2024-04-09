@@ -35,9 +35,9 @@ jobs:
           pip install ninja
           pip install zstd
           pip install -r requirements.txt
-          softwareupdate --install xcode--select
 
           export LLAMA_FAST_ROOT=${PWD}
+          export ET_NO_PYBIND=1
           ./scripts/install_et.sh
           cmake -S ./runner-et -B build/cmake-out -G Ninja
           cmake --build ./build/cmake-out
