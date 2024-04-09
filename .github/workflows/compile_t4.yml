@@ -14,7 +14,7 @@ jobs:
         include:
           - name: CUDA Nightly
             runs-on: 4-core-ubuntu-gpu-t4
-	    cuda: "12.0"
+            cuda: "12.0"
             torch-spec: '--pre torch --index-url https://download.pytorch.org/whl/nightly/cu121'
     runs-on: ${{ matrix.runs-on }}
 
