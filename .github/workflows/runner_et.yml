@@ -53,12 +53,12 @@ jobs:
           export MODEL_DIR=${PWD}/checkpoints/stories15M
           export PROMPT="Once upon a time in a land far away"
 
-          python generate.py --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt ${PROMPT}  > ${PWD}/output_eager
+          python generate.py --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}"  > ${PWD}/output_eager
           cat ${PWD}/output_eager
 
           python export.py --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-pte-path ${PWD}/stories15M.pte
 
-          ./build/cmake-out/runner_et ${PWD}/stories15M.pte -z ${MODEL_DIR}/tokenizer.bin -i ${PROMPT} > ${PWD}/output_et
+          ./build/cmake-out/runner_et ${PWD}/stories15M.pte -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}" > ${PWD}/output_et
           cat ${PWD}/output_et
 
           echo "Tests complete."
