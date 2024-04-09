@@ -19,6 +19,11 @@ jobs:
     runs-on: ${{ matrix.runs-on }}
 
     steps:
+      - name: Install CUDA toolkit
+        uses: Jimver/cuda-toolkit@v0.2.14
+        id: cuda-toolkit
+        with:
+          cuda: '11.8.0'
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Setup Python
@@ -34,8 +39,8 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          wget https://developer.download.nvidia.com/compute/cuda/12.1.1/local_installers/cuda_12.1.1_530.30.02_linux.run
-          sh cuda_12.1.1_530.30.02_linux.run
+          # wget https://developer.download.nvidia.com/compute/cuda/12.1.1/local_installers/cuda_12.1.1_530.30.02_linux.run
+          # sh cuda_12.1.1_530.30.02_linux.run
           pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
           pip install -r requirements.txt
       - name: Download checkpoints
