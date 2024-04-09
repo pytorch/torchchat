@@ -474,9 +474,9 @@ class QuantizedGroupEmbedding(torch.nn.Module):
 ### HQQ
 
 class WeightOnlyInt4HqqQuantHandler:
-    def __init__(self, mod, groupsize):
+    def __init__(self, mod, group_size):
         self.mod = mod
-        self.groupsize = groupsize
+        self.groupsize = group_size
 
     def _create_quantized_state_dict(self):
         from hqq.core.quantize import Quantizer  # TODO maybe torchao
