@@ -37,7 +37,6 @@ jobs:
           pip install -r requirements.txt
 
           export LLAMA_FAST_ROOT=${PWD}
-          export ET_NO_PYBIND=1
           ./scripts/install_et.sh
           cmake -S ./runner-et -B build/cmake-out -G Ninja
           cmake --build ./build/cmake-out
