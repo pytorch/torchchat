@@ -16,12 +16,12 @@ cp ${LLAMA_FAST_ROOT}/scripts/fixes_et/module.cpp ${LLAMA_FAST_ROOT}/build/src/e
 cp ${LLAMA_FAST_ROOT}/scripts/fixes_et/managed_tensor.h ${LLAMA_FAST_ROOT}/build/src/executorch/extension/runner_util/managed_tensor.h # ET is missing headers for vector/memory.  This causes downstream issues when building runner-et.
 
 echo "Building and installing python libraries"
-if [ z "${ET_NO_PYBIND}" ]; then
-    echo "Installing pybind"
-    ./install_requirements.sh --pybind xnnpack
-else
+if [ -n "${ET_NO_PYBIND}" ]; then
     echo "Not installing pybind"
     ./install_requirements.sh
+else
+    echo "Installing pybind"
+    ./install_requirements.sh --pybind xnnpack
 fi
 
 echo "Building and installing C++ libraries"
