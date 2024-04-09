@@ -37,7 +37,7 @@ def device_sync(device):
     else:
         print(f"device={device} is not yet suppported")
 
-        
+
 class model_wrapper(nn.Module):
     def __init__(self, model, device):
         super().__init__()
@@ -74,7 +74,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
 
     quantize_model(model, args.quantize)
     model = model_wrapper(model, device=device)
-    
+
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
 
@@ -89,7 +89,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
                 print(f"Export with executorch requested but Executorch could not be loaded")
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
-            print(f"Exporting model using AOT Inductor to {output_pte_path}")
+            print(f"Exporting model using AOT Inductor to {output_dso_path}")
             export_model_aoti(model, device, output_dso_path, args)
 
 
@@ -147,7 +147,7 @@ def cli():
     parser.add_argument(
         "--output-pte-path",
         type=str,
-        default=None, 
+        default=None,
         help="Filename"
     )
     parser.add_argument(
