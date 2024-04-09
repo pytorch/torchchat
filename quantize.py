@@ -498,7 +498,7 @@ class WeightOnlyInt4HqqQuantHandler:
 
         # we use Int4 packaged in an int8 for now, packing to follow
         # return WeightOnlyInt4QuantHandler(self.mod, self.groupsize).create_quantized_state_dict()
-        return WeightOnlyInt8QuantHandler(self.mod, bitwidth=4, self.groupsize).create_quantized_state_dict()
+        return WeightOnlyInt8QuantHandler(self.mod, bitwidth=4, group_size=self.groupsize).create_quantized_state_dict()
 
     def _convert_for_runtime(self):
         # we use Int4 packaged in an int8 for now, packing to follow
