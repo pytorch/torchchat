@@ -66,7 +66,7 @@ def quantize_model(model: nn.Module, quantize_options):
             ).quantized_model()
         elif quantizer == "linear:hqq":
             linears_quantized = True
-            model = WeightOnlyInt4HqqQuantHandler,
+            model = WeightOnlyInt4HqqQuantHandler(
                 model,
                 **q_kwargs
             ).quantized_model()
