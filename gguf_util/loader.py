@@ -277,4 +277,4 @@ def load_llama_from_gguf_file(gguf_file: str) -> torch.nn.Module:
     logger.info("Loading GGUF weights into PT model.")
     _load_weights(pt_model, weight_map)
 
-    return pt_model, weight_map
+    return pt_model
