@@ -8,10 +8,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-tinystories:
+  run-hqq-tinystories:
     strategy:
       matrix:
-        runner: [ubuntu-latest, macos-12, macos-14]
+        runner: [ubuntu-latest]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -31,7 +31,7 @@ jobs:
         run: |
           pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
-	  pip install hqq
+          pip install hqq
       - name: Download checkpoints
         run: |
           mkdir -p checkpoints/stories15M
