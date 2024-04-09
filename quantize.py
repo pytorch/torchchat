@@ -478,7 +478,7 @@ class WeightOnlyInt4HqqQuantHandler:
         self.mod = mod
         self.groupsize = group_size
 
-    def _create_quantized_state_dict(self):
+    def create_quantized_state_dict(self):
         from hqq.core.quantize import Quantizer  # TODO maybe torchao
 
         for m in self.mod.modules():
