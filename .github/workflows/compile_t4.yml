@@ -14,15 +14,11 @@ jobs:
         include:
           - name: CUDA Nightly
             runs-on: 4-core-ubuntu-gpu-t4
+	    cuda: "12.0"
             torch-spec: '--pre torch --index-url https://download.pytorch.org/whl/nightly/cu121'
     runs-on: ${{ matrix.runs-on }}
 
     steps:
-      - name: Install CUDA toolkit
-        uses: Jimver/cuda-toolkit@v0.2.14
-        id: cuda-toolkit
-        with:
-          cuda: '12.3.2'
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Setup Python
