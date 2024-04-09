@@ -587,10 +587,9 @@ class Int8DynActInt4WeightQuantHandler:
             if isinstance(mod, torch.nn.Linear):
                 assert not mod.bias
                 in_features = mod.in_features
+                group_size = self.group_size
                 if group_size is None or group_size == 0:
                     group_size = in_features
-                else:
-                    group_size = self.group_size
                 # print("in features:", in_features, " out features:", out_features)
                 # assert out_features % 8 == 0, "require out_features % 8 == 0"
                 # print(f"linear: {fqn}, in={in_features}, out={out_features}")
