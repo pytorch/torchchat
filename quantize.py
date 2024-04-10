@@ -13,6 +13,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
+try:
+    from GPTQ import GenericGPTQRunner, InputRecorder
+    from eval import get_task_dict, evaluate, lm_eval
+except:
+    pass
+
 # from .ops.quantized_ops import *  # noqa
 #
 # from torchao.quantization.quant_primitives import (
@@ -22,6 +29,8 @@ import torch.nn.functional as F
 #     per_token_dynamic_quant,
 # )
 
+##########################################################################
+###                  process quantization dictionary                   ###
 
 def quantize_model(model: nn.Module, quantize_options):
     """
@@ -54,13 +63,19 @@ def quantize_model(model: nn.Module, quantize_options):
             ).quantized_model()
         elif quantizer == "linear:int4":
             linears_quantized = True
+            model = WeightOnlyInt4QuantHandler(
+                model,
+                **q_kwargs
+            ).quantized_model()
+        elif quantizer == "linear:a8w4dq":
+            linears_quantized = True
             model = Int8DynActInt4WeightQuantHandler(
                 model,
                 **q_kwargs
             ).quantized_model()
         elif quantizer == "linear:gptq":
             linears_quantized = True
-            model = Int8DynActInt4WeightQuantHandler(
+            model = WeightOnlyInt4GPTQQuantHandler(
                 model,
                 **q_kwargs
             ).quantized_model()
@@ -76,6 +91,9 @@ def quantize_model(model: nn.Module, quantize_options):
             assert 0 == 1, f"quantizer {quantizer} not supported"
             
     
+#########################################################################
+#####                     Quantization Primitives                  ######
+
 def dynamically_quantize_per_channel(
     x,
     quant_min,
@@ -170,6 +188,117 @@ def dynamically_quantize_per_channel(
     return quant, scales, zero_points
 
 
+
+def get_group_qparams(w, n_bit=4, groupsize=128, *, scales_dtype= torch.float):
+    # needed for GPTQ with padding
+    if groupsize > w.shape[-1]:
+        groupsize = w.shape[-1]
+    assert groupsize > 1
+    assert w.shape[-1] % groupsize == 0
+    assert w.dim() == 2
+
+    to_quant = w.reshape(-1, groupsize)
+    assert torch.isnan(to_quant).sum() == 0
+
+    max_val = to_quant.amax(dim=1, keepdim=True)
+    min_val = to_quant.amin(dim=1, keepdim=True)
+    max_int = 2**n_bit - 1
+    scales = (max_val - min_val).clamp(min=1e-6) / max_int
+    zeros = min_val + scales * (2 ** (n_bit - 1))
+    return scales.to(scales_dtype).reshape(w.shape[0], -1), zeros.to(
+        scales_dtype
+    ).reshape(w.shape[0], -1)
+
+
+def pack_scales_and_zeros(scales, zeros, *, scales_dtype=torch.float):
+    assert scales.shape == zeros.shape
+    assert scales.dtype == scales_dtype
+    assert zeros.dtype == scales_dtype
+    return (
+        torch.cat(
+            [
+                scales.reshape(scales.size(0), scales.size(1), 1),
+                zeros.reshape(zeros.size(0), zeros.size(1), 1),
+            ],
+            2,
+        )
+        .transpose(0, 1)
+        .contiguous()
+    )
+
+
+def unpack_scales_and_zeros(scales_and_zeros):
+    assert len(scales_and_zeros.shape) == 3 and scales_and_zeros.shape[2] == 2
+    assert scales_and_zeros.dtype == torch.float
+    return torch.split(scales_and_zeros.transpose(0, 1), 1, 2)
+
+
+def group_quantize_tensor_from_qparams(w, scales, zeros, n_bit=4, groupsize=128):
+    assert groupsize > 1
+    # needed for GPTQ single column quantize
+    if groupsize > w.shape[-1] and scales.shape[-1] == 1:
+        groupsize = w.shape[-1]
+
+    assert w.shape[-1] % groupsize == 0
+    assert w.dim() == 2
+
+    to_quant = w.reshape(-1, groupsize)
+    assert torch.isnan(to_quant).sum() == 0
+
+    scales = scales.reshape(-1, 1)
+    zeros = zeros.reshape(-1, 1)
+    min_val = zeros - scales * (2 ** (n_bit - 1))
+    max_int = 2**n_bit - 1
+    min_int = 0
+    w_int32 = (
+        to_quant.sub(min_val)
+        .div(scales)
+        .round()
+        .clamp_(min_int, max_int)
+        .to(torch.int32)
+        .reshape_as(w)
+    )
+
+    return w_int32
+
+
+def group_quantize_tensor(w, n_bit=4, groupsize=128):
+    scales, zeros = get_group_qparams(w, n_bit, groupsize)
+    w_int32 = group_quantize_tensor_from_qparams(w, scales, zeros, n_bit, groupsize)
+    scales_and_zeros = pack_scales_and_zeros(scales, zeros)
+    return w_int32, scales_and_zeros
+
+
+def group_dequantize_tensor_from_qparams(
+    w_int32, scales, zeros, n_bit=4, groupsize=128
+):
+    assert groupsize > 1
+    # needed for GPTQ single column dequantize
+    if groupsize > w_int32.shape[-1] and scales.shape[-1] == 1:
+        groupsize = w_int32.shape[-1]
+    assert w_int32.shape[-1] % groupsize == 0
+    assert w_int32.dim() == 2
+
+    w_int32_grouped = w_int32.reshape(-1, groupsize)
+    scales = scales.reshape(-1, 1)
+    zeros = zeros.reshape(-1, 1)
+
+    w_dq = (
+        w_int32_grouped.sub(2 ** (n_bit - 1)).mul(scales).add(zeros).reshape_as(w_int32)
+    )
+    return w_dq
+
+
+def group_dequantize_tensor(w_int32, scales_and_zeros, n_bit=4, groupsize=128):
+    scales, zeros = unpack_scales_and_zeros(scales_and_zeros)
+    return group_dequantize_tensor_from_qparams(
+        w_int32, scales, zeros, n_bit, groupsize
+    )
+
+#########################################################################
+###                QuantHandler API definition                        ###
+
+
 class QuantHandler:
     def __init__(self, mod):
         self.mod = mod
@@ -179,9 +308,16 @@ class QuantHandler:
 
     def convert_for_runtime(self) -> nn.Module:
         pass
+    
+    def quantized_model(self) -> nn.Module:
+        model_updated_state_dict = self.create_quantized_state_dict()
+        self.convert_for_runtime()
+        self.mod.load_state_dict(model_updated_state_dict)
+        return self.mod
 
 
-##### Weight-only int8 per-channel quantized code ######
+#########################################################################
+#####          Weight-only int8 per-channel quantized code         ######
 
 
 def replace_linear_weight_only_int8_per_channel(module, node_type, group_size=None):
@@ -208,7 +344,7 @@ def replace_linear_weight_only_int8_per_channel(module, node_type, group_size=No
             replace_linear_weight_only_int8_per_channel(child, node_type, group_size)
 
 
-class WeightOnlyInt8QuantHandler:
+class WeightOnlyInt8QuantHandler(QuantHandler):
     def __init__(
         self,
         mod,
@@ -329,7 +465,8 @@ class WeightOnlyInt8Linear(torch.nn.Module):
             return F.linear(input, (weight.to(dtype=input.dtype).view(weight.shape[0], no_groups, -1) * scales.view(weight.shape[0], no_groups, -1)).view(weight.shape[0], -1))
 
 
-##### embedding table quantization ######
+#########################################################################
+#####                   embedding table quantization               ######
 
 
 def replace_embedding_weight_only_grouped_int8_per_channel(
@@ -355,7 +492,7 @@ def replace_embedding_weight_only_grouped_int8_per_channel(
             )
 
 
-class EmbeddingOnlyInt8QuantHandler:
+class EmbeddingOnlyInt8QuantHandler(QuantHandler):
     def __init__(self, mod, *, bitwidth: int = 8, group_size: Optional[int] = None):
         self.mod = mod
         self.group_size = group_size
@@ -469,47 +606,95 @@ class QuantizedGroupEmbedding(torch.nn.Module):
         
         # r = result_weights.to(dtype=result_scales.dtype).view(list(result_weights.shape[:-1] + (scales.shape[1], -1, )) * result_scales.view(scales.shape[-1] + (scales.shape[1], 1, ))
 
+        
+#########################################################################
+#####     weight only int4 per channel groupwise quantized code    ######
 
-##################################################################
-### HQQ
+def _int4_prepare_int4_weight_and_scales_and_zeros(weight_bf16, groupsize, inner_k_tiles):
+    weight_int32, scales_and_zeros = group_quantize_tensor(
+        weight_bf16, n_bit=4, groupsize=groupsize
+    )
+    weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(weight_int32, inner_k_tiles)
+    return weight_int4pack, scales_and_zeros
 
-class WeightOnlyInt4HqqQuantHandler:
-    def __init__(self, mod, group_size):
+def _int4_calc_padded_size(k, groupsize=1, innner_k_tiles=1):
+    from model import find_multiple
+    return find_multiple(k, 1024)
+
+def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, groupsize):
+    origin_x_size = x.size()
+    x = x.reshape(-1, origin_x_size[-1])
+    c = torch.ops.aten._weight_int4pack_mm(
+        x.to(dtype=torch.bfloat16),
+        weight_int4pack,
+        groupsize,
+        scales_and_zeros.to(dtype=torch.bfloat16)
+    ).to(dtype=x.dtype)
+    new_shape = origin_x_size[:-1] + (out_features,)
+    c = c.reshape(new_shape)
+    return c
+
+
+def _int4_check_linear_int4_k(k, groupsize = 1, inner_k_tiles = 1):
+    return k % groupsize == 0 and k % (inner_k_tiles * 16) == 0
+
+def replace_linear_int4(module, groupsize, inner_k_tiles, padding_allowed, use_cuda=False):
+    for name, child in module.named_children():
+        if isinstance(child, nn.Linear):
+            if _int4_check_linear_int4_k(child.in_features, groupsize, inner_k_tiles) or padding_allowed:
+                setattr(module, name, WeightOnlyInt4Linear(
+                    child.in_features, child.out_features, bias=False,
+                    groupsize=groupsize, inner_k_tiles=inner_k_tiles, use_cuda=use_cuda
+                ))
+        else:
+            replace_linear_int4(child, groupsize, inner_k_tiles, padding_allowed, use_cuda)
+
+
+class WeightOnlyInt4QuantHandler(QuantHandler):
+    def __init__(self, mod, group_size=128, inner_k_tiles=8, padding_allowed=True):
         self.mod = mod
         self.groupsize = group_size
+        self.inner_k_tiles = inner_k_tiles
+        self.padding_allowed = padding_allowed
+        assert group_size in [32, 64, 128, 256]
+        assert inner_k_tiles in [2, 4, 8]
 
+    @torch.no_grad()
     def create_quantized_state_dict(self):
-        from hqq.core.quantize import Quantizer  # TODO maybe torchao
+        cur_state_dict = self.mod.state_dict()
+        for fqn, mod in self.mod.named_modules():
+            if isinstance(mod, torch.nn.Linear):
+                assert not mod.bias
+                out_features = mod.out_features
+                in_features = mod.in_features
+                assert out_features % 8 == 0, "require out_features % 8 == 0"
+                print(f"linear: {fqn}, in={in_features}, out={out_features}")
 
-        
-        for m in self.mod.modules():
-            for name, child in m.named_children():
-                if isinstance(child, torch.nn.Linear):
-                    child.weight = torch.nn.Parameter(
-                        Quantizer.dequantize(
-                            *Quantizer.quantize(
-                                child.weight,
-                                nbits=4,
-                                group_size=self.groupsize,
-                                axis=1,
-                            )
-                        )
-                    )
+                weight = mod.weight.data
+                if not _int4_check_linear_int4_k(in_features, self.groupsize, self.inner_k_tiles):
+                    if self.padding_allowed:
+                        from model import find_multiple
+                        import torch.nn.functional as F
+                        print(f"warning: {fqn} is padded to satisfy in_features % 1024 == 0")
+                        padded_in_features = find_multiple(in_features, 1024)
+                        weight = F.pad(weight, pad=(0, padded_in_features - in_features))
+                    else:
+                        print(f"warning: {fqn} is skipped, int4 requires that in_features is 32, 64, or is divisible by 1024, " +
+                            "and that groupsize and inner_k_tiles*16 evenly divide into it")
+                        continue
+                weight_int4pack, scales_and_zeros = _int4_prepare_int4_weight_and_scales_and_zeros(
+                    weight.to(torch.float), self.groupsize, self.inner_k_tiles
+                )
+                cur_state_dict[f"{fqn}.weight"] = weight_int4pack.to('cpu')
+                cur_state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros.to('cpu')
 
-        # we use Int4 packaged in an int8 for now, packing to follow
-        # return WeightOnlyInt4QuantHandler(self.mod, self.groupsize).create_quantized_state_dict()
-        return WeightOnlyInt8QuantHandler(
-            self.mod, bitwidth=4, group_size=self.groupsize
-        ).create_quantized_state_dict()
+        return cur_state_dict
 
-    def convert_for_runtime(self):
-        # we use Int4 packaged in an int8 for now, packing to follow
-        # ALSO: all code must work for CPU, CUDA, MPS
-        # return WeightOnlyInt4GPTQQuantHandler(self.mod, self.groupsize).convert_for_runtime(use_cuda=True)
-        return WeightOnlyInt4GPTQQuantHandler(
-            self.mod, bitwidth=4, group_size=self.groupsize
-        ).convert_for_runtime()
-    
+
+    def convert_for_runtime(self, use_cuda=False):
+        replace_linear_int4(self.mod, self.groupsize, self.inner_k_tiles, self.padding_allowed, use_cuda)
+        return self.mod
+
     def quantized_model(self) -> nn.Module:
         model_updated_state_dict = self.create_quantized_state_dict()
         self.convert_for_runtime()
@@ -517,9 +702,54 @@ class WeightOnlyInt4HqqQuantHandler:
         return self.mod
 
 
-##################################################################
-##### weight only int4 per channel groupwise quantized code ######
+class WeightOnlyInt4Linear(torch.nn.Module):
+    __constants__ = ['in_features', 'out_features']
+    in_features: int
+    out_features: int
+    weight: torch.Tensor
 
+    def __init__(
+            self, in_features: int, out_features: int,
+            bias=True, device=None, dtype=None, groupsize: int = 128, inner_k_tiles: int = 8, use_cuda=True,
+    ) -> None:
+        super().__init__()
+        self.padding = not _int4_check_linear_int4_k(in_features, groupsize, inner_k_tiles)
+        if self.padding:
+            from model import find_multiple
+            self.origin_in_features = in_features
+            in_features = find_multiple(in_features, 1024)
+
+        self.in_features = in_features
+        self.out_features = out_features
+        assert not bias, "require bias=False"
+        self.groupsize = groupsize
+        self.inner_k_tiles = inner_k_tiles
+
+        assert out_features % 8 == 0, "require out_features % 8 == 0"
+        assert in_features % (inner_k_tiles * 16) == 0, "require in_features % (innerKTiles * 16) == 0"
+        self.register_buffer(
+            "weight",
+            torch.empty((out_features // 8, in_features // (inner_k_tiles * 16), 32, inner_k_tiles // 2), dtype=torch.int32)
+        )
+        # MKG: torch.float
+        self.register_buffer(
+            "scales_and_zeros",
+            torch.empty((in_features // groupsize, out_features, 2), dtype=torch.float)
+        )
+
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        # MKG torch.float
+        input = input.to(torch.float)
+        if self.padding:
+            import torch.nn.functional as F
+            input = F.pad(input, pad=(0, self.in_features - self.origin_in_features))
+        return linear_forward_int4(
+            input,
+            self.weight, self.scales_and_zeros, self.out_features, self.groupsize
+        )
+
+#########################################################################
+#####           Int8 Dynamic Activations 4 Bit Weights              #####
 
 def prepare_int4_weight_and_scales_and_zeros(weight, group_size, precision):
     weight_int8, scales, zeros = group_quantize_tensor_symmetric(
@@ -577,7 +807,6 @@ def find_multiple(n: int, *args: Tuple[int]) -> int:
 def _check_linear_int4_k(k, group_size=1):
     return k % group_size == 0
 
-
 def _calc_padded_size_linear_int4(k, groupsize=1):
     return find_multiple(k, groupsize)
 
@@ -614,7 +843,7 @@ def replace_linear_8da4w(
             )
 
 
-class Int8DynActInt4WeightQuantHandler:
+class Int8DynActInt4WeightQuantHandler(QuantHandler):
     def __init__(
         self,
         mod,
@@ -778,171 +1007,190 @@ class Int8DynActInt4WeightLinear(torch.nn.Module):
         )
 
 
-#### GPTQ ########
+#########################################################################
+#####                           GPTQ                                #####
 
-# try:
-#     from GPTQ import (  # pyre-ignore[21]
-#         evaluate,
-#         GenericGPTQRunner,
-#         get_task_dict,
-#         InputRecorder,
-#         lm_eval,
-#         MultiInput,
-#     )
+class GPTQQuantHandler(QuantHandler):
+    """
+    This class implements a GPTQ QuantHandler that can be used to apply GPTQ to a model in concert with the GenericGPTQRunner class.
+    Unlike the base QuantHandler class, the user does not need to implement the create_quantized_state_dict, instead they have to reimplement
+    __init__ such that it defines the functions for the quantization mode. User is expected to reimplement convert_for_runtime.
 
-# except:
-#     pass
+    The following functions (which must be defined in __init__) are used to define the quantization mode for both GPTQ and
+    create_quantized_state_dict. Here is a description of each function.
 
+    get_qparams_func:
+        A function that calculates the quantization qparams for an input tensor.
+        Args:
+            weight: A 2d weight tensor with non-integer dtype.
+        Returns:
+            qparams: it can have any format but will need to be handled by the other defined functions below.
 
-# class GPTQQuantHandler(QuantHandler):
-#     """
-#     This class implements a GPTQ QuantHandler that can be used to apply GPTQ to a model in concert with the GenericGPTQRunner class.
-#     Unlike the base QuantHandler class, the user does not need to implement the create_quantized_state_dict, instead they have to reimplement
-#     __init__ such that it defines the functions for the quantization mode. User is expected to reimplement convert_for_runtime.
-
-#     The following functions (which must be defined in __init__) are used to define the quantization mode for both GPTQ and
-#     create_quantized_state_dict. Here is a description of each function.
-
-#     get_qparams_func:
-#         A function that calculates the quantization qparams for an input tensor.
-#         Args:
-#             weight: A 2d weight tensor with non-integer dtype.
-#         Returns:
-#             qparams: it can have any format but will need to be handled by the other defined functions below.
-
-#     quantize_func:
-#         A function that applies quantization to an input tensor. It should be noted
-#         that this function needs to be able to handle quantizing the entire weight tensor, a single group,
-#         or a single column.
-#         Args:
-#             weight: A 2d weight tensor with non-integer dtype.
-#             qparams: the output from get_qparams_func
-#         Returns:
-#             quantized_weight: A 2d quantized weight tensor (generally with an integer dtype)
+    quantize_func:
+        A function that applies quantization to an input tensor. It should be noted
+        that this function needs to be able to handle quantizing the entire weight tensor, a single group,
+        or a single column.
+        Args:
+            weight: A 2d weight tensor with non-integer dtype.
+            qparams: the output from get_qparams_func
+        Returns:
+            quantized_weight: A 2d quantized weight tensor (generally with an integer dtype)
 
 
-#     dequantize_func:
-#         A function that dequantizes an input quantized weight tensor. It should be noted
-#         that this function needs to be able to handle dequantizing the entire weight tensor, a single group,
-#         or a single column.
-#         Args:
-#             quantized_weight: A 2d quantized weight tensor (generally with an integer dtype)
-#             qparams: the output from get_qparams_func
-#         Returns:
-#             weight: A 2d weight tensor with non-integer dtype.
+    dequantize_func:
+        A function that dequantizes an input quantized weight tensor. It should be noted
+        that this function needs to be able to handle dequantizing the entire weight tensor, a single group,
+        or a single column.
+        Args:
+            quantized_weight: A 2d quantized weight tensor (generally with an integer dtype)
+            qparams: the output from get_qparams_func
+        Returns:
+            weight: A 2d weight tensor with non-integer dtype.
 
-#     combine_qparams_list_func:
-#         A function that combines several qparams into one qparam.
-#         Args:
-#             qparams_list: a list of qparams objects, each obtained by calling get_qparams_func
-#             on a single group from a weight tensor
-#         Returns:
-#             qparams: an object of the same format as the qparams above.
+    combine_qparams_list_func:
+        A function that combines several qparams into one qparam.
+        Args:
+            qparams_list: a list of qparams objects, each obtained by calling get_qparams_func
+            on a single group from a weight tensor
+        Returns:
+            qparams: an object of the same format as the qparams above.
 
-#     skip_layer_func:
-#         A function that determines which linear layers should be skipped during GPTQ
-#         Args:
-#             weight: A 2d weight tensor with non-integer dtype.
-#         Returns:
-#             skip: boolean indicating whether layer should be skipped
+    skip_layer_func:
+        A function that determines which linear layers should be skipped during GPTQ
+        Args:
+            weight: A 2d weight tensor with non-integer dtype.
+        Returns:
+            skip: boolean indicating whether layer should be skipped
 
-#     make_names_and_values_dict_func:
-#         A function that prepares the qparams and quantized_weight and creates a dictionary indicating how they
-#         should be inserted into the state_dict. Generally any packing of the weight and qparams should be done here.
-#         Args:
-#             quantized_weight: A 2d quantized weight tensor (generally with an integer dtype)
-#             qparams: the output from get_qparams_func
-#         Returns:
-#             names_and_values_dict: a dictionary mapping the name of the parameters of the quantized module to the
-#             corresponding quantized weights and qparams.
-#     """
+    make_names_and_values_dict_func:
+        A function that prepares the qparams and quantized_weight and creates a dictionary indicating how they
+        should be inserted into the state_dict. Generally any packing of the weight and qparams should be done here.
+        Args:
+            quantized_weight: A 2d quantized weight tensor (generally with an integer dtype)
+            qparams: the output from get_qparams_func
+        Returns:
+            names_and_values_dict: a dictionary mapping the name of the parameters of the quantized module to the
+            corresponding quantized weights and qparams.
+    """
+    def __init__(self):
+        assert self.mod is not None
+        assert self.get_qparams_func is not None
+        assert self.quantize_func is not None
+        assert self.dequantize_func is not None
+        assert self.combine_qparams_list_func is not None
+        assert self.make_names_and_values_dict_func is not None
 
-#     def __init__(self):
-#         assert self.get_qparams_func is not None
-#         assert self.quantize_func is not None
-#         assert self.dequantize_func is not None
-#         assert self.combine_qparams_list_func is not None
-#         assert self.make_names_and_values_dict_func is not None
+    @staticmethod
+    def get_inputs(model, tokenizer, calibration_tasks, calibration_limit, calibration_seq_length, pad_calibration_inputs) -> "MultiInput":
+        input_recorder = InputRecorder(
+            model,
+            tokenizer,
+            calibration_seq_length,
+            pad_calibration_inputs,
+        )
 
-#     @staticmethod
-#     def get_inputs(
-#         model,
-#         tokenizer,
-#         calibration_tasks,
-#         calibration_limit,
-#         calibration_seq_length,
-#         pad_calibration_inputs,
-#     ) -> "MultiInput":  # pyre-ignore[11]
-#         input_recorder = InputRecorder(
-#             model,
-#             tokenizer,
-#             calibration_seq_length,
-#             pad_calibration_inputs,
-#         )
+        try:
+            lm_eval.tasks.initialize_tasks()
+        except:
+            pass
+        task_dict = get_task_dict(calibration_tasks)
+        print("Obtaining GPTQ calibration inputs on: ", calibration_tasks)
 
-#         try:
-#             lm_eval.tasks.initialize_tasks()
-#         except:
-#             pass
-#         task_dict = get_task_dict(calibration_tasks)
-#         print("Obtaining GPTQ calibration inputs on: ", calibration_tasks)
+        evaluate(
+            input_recorder,
+            task_dict,
+            limit=calibration_limit,
+        )
+        inputs = input_recorder.get_recorded_inputs()
+        assert inputs is not None, (
+            f"No inputs were collected, use a task other than {calibration_tasks}, "+
+            f"use option pad_calibration_inputs, or decrease calibration_sequence_length (currently "+
+            f"{calibration_seq_length})"
+        )
+        print(f"Obtained {len(inputs[0].values)} calibration samples")
+        return inputs
 
-#         evaluate(
-#             input_recorder,
-#             task_dict,
-#             limit=calibration_limit,
-#         )
-#         inputs = input_recorder.get_recorded_inputs()
-#         assert inputs is not None, (
-#             f"No inputs were collected, use a task other than {calibration_tasks}, "
-#             + "use option pad_calibration_inputs, or decrease calibration_sequence_length (currently "
-#             + f"{calibration_seq_length})"
-#         )
-#         print(f"Obtained {len(inputs[0].values)} calibration samples")
-#         return inputs
+    @torch.no_grad()
+    def create_quantized_state_dict(
+        self,
+        tokenizer,
+        blocksize,
+        percdamp,
+        groupsize,
+        calibration_tasks,
+        calibration_limit,
+        calibration_seq_length,
+        pad_calibration_inputs,
+    ) -> "StateDict":
+        inputs = GPTQQuantHandler.get_inputs(self.mod, tokenizer, calibration_tasks, calibration_limit, calibration_seq_length, pad_calibration_inputs)
+        print("Tracing model for GPTQ")
+        GPTQ_runner = GenericGPTQRunner(
+            self.mod,
+            inputs,
+            blocksize,
+            percdamp,
+            groupsize,
+        ).configure_quantization_mode(
+            self.get_qparams_func,
+            self.quantize_func,
+            self.dequantize_func,
+            self.combine_qparams_list_func,
+            self.make_names_and_values_dict_func,
+            self.skip_layer_func
+        )
 
-#     @torch.no_grad()
-#     def create_quantized_state_dict(
-#         self,
-#         tokenizer,
-#         blocksize,
-#         percdamp,
-#         groupsize,
-#         calibration_tasks,
-#         calibration_limit,
-#         calibration_seq_length,
-#         pad_calibration_inputs,
-#     ) -> Dict:
-#         inputs = GPTQQuantHandler.get_inputs(
-#             self.mod,
-#             tokenizer,
-#             calibration_tasks,
-#             calibration_limit,
-#             calibration_seq_length,
-#             pad_calibration_inputs,
-#         )
-#         print("Tracing model for GPTQ")
-#         GPTQ_runner = GenericGPTQRunner(
-#             self.mod,
-#             inputs,
-#             blocksize,
-#             percdamp,
-#             groupsize,
-#         ).configure_quantization_mode(
-#             self.get_qparams_func,  # pyre-ignore[16]
-#             self.quantize_func,  # pyre-ignore[16]
-#             self.dequantize_func,  # pyre-ignore[16]
-#             self.combine_qparams_list_func,  # pyre-ignore[16]
-#             self.make_names_and_values_dict_func,  # pyre-ignore[16]
-#             self.skip_layer_func,  # pyre-ignore[16]
-#         )
+        print("Applying GPTQ to weights")
+        GPTQ_runner.run()
+        return GPTQ_runner.get_quantized_state_dict()
 
-#         print("Applying GPTQ to weights")
-#         GPTQ_runner.run()
-#         return GPTQ_runner.get_quantized_state_dict()
+    def convert_for_runtime(self) -> "nn.Module":
+        pass
 
-#     def convert_for_runtime(self) -> "nn.Module":
-#         pass
+
+class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
+    def __init__(self, mod, groupsize=128, inner_k_tiles=8, padding=True):
+        from model import find_multiple
+        self.mod = mod
+        self.groupsize = groupsize
+        self.inner_k_tiles = inner_k_tiles
+        self.padding = padding
+        self.get_qparams_func = lambda w: get_group_qparams(w, 4, groupsize)
+        self.quantize_func = lambda w, qparams: \
+            group_quantize_tensor_from_qparams(w, qparams[0], qparams[1], 4, groupsize)
+        self.dequantize_func = lambda q, qparams: \
+            group_dequantize_tensor_from_qparams(q, qparams[0], qparams[1], 4, groupsize).float()
+        self.combine_qparams_list_func = lambda qparams_list: \
+            [torch.cat(x, dim=1) for x in zip(*qparams_list)]
+        # skip unless padding=True or its correctly sized
+        self.skip_layer_func = lambda linear_weight: not (
+            _check_linear_int4_k(linear_weight.shape[-1], groupsize, inner_k_tiles) or padding
+        )
+        # we need to do the padding here, both for q and the qparams if necessary
+        def make_names_and_values_dict_func(q, qparams):
+            k = q.shape[1]
+            new_k = find_multiple(k, 1024)
+            # how much we need to pad the weight
+            delta_k = new_k - q.shape[1]
+            final_q = torch.ops.aten._convert_weight_to_int4pack(F.pad(q, pad=(0, delta_k)), inner_k_tiles)
+            scales_and_zeros = pack_scales_and_zeros(*qparams)
+            # how many new groups we need for padded weight
+            delta_groups = new_k // groupsize - scales_and_zeros.shape[0]
+            final_s_and_z = F.pad(scales_and_zeros, pad=(0,0,0,0,0, delta_groups), value=1)
+            return {"weight": final_q, "scales_and_zeros": final_s_and_z}
+        self.make_names_and_values_dict_func = make_names_and_values_dict_func
+        super().__init__()
+
+
+    def convert_for_runtime(self, use_cuda):
+        replace_linear_int4(self.mod, self.groupsize, self.inner_k_tiles, self.padding, use_cuda)
+        return self.mod
+
+    def quantized_model(self) -> nn.Module:
+        model_updated_state_dict = self.create_quantized_state_dict()
+        self.convert_for_runtime()
+        self.mod.load_state_dict(model_updated_state_dict)
+        return self.mod
+    
 
 
 # class Int8DynActInt4WeightGPTQQuantHandler(GPTQQuantHandler):
@@ -1064,3 +1312,4 @@ class WeightOnlyInt4HqqQuantHandler:
 
 
 ##################################################################
+

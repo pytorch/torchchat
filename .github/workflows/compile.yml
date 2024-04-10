@@ -11,7 +11,7 @@ jobs:
   run-tinystories:
     strategy:
       matrix:
-        runner: [ubuntu-latest, macos-12, macos-14]
+        runner: [ubuntu-latest, macos-14]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -92,6 +92,17 @@ jobs:
           python generate.py --compile --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
           cat ./output_compiled
           python export.py --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
+          cat ./output_aoti
+
+          echo "******************************************"
+          echo "******** INT4 group-wise quantized *******"
+          echo "******************************************"
+          python generate.py --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+          cat ./output_eager
+          python generate.py --compile --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
+          cat ./output_compiled
+          python export.py --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
           python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
           cat ./output_aoti
 
