@@ -81,6 +81,7 @@ codellama/CodeLlama-34b-Python-hf | -| ✅ |  ✅ |  ✅ |  ✅ | ❌ |
 mistralai/Mistral-7B-v0.1 | 🚧  |  ✅  |  ✅ |  ✅ |  ✅ | ❹ |
 mistralai/Mistral-7B-Instruct-v0.1 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 mistralai/Mistral-7B-Instruct-v0.2 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
+Llama3 | 🚧  | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 
 *Key:* ✅ works correctly; 🚧  work in progress; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile phone (may fit some high-end devices such as tablets);
 
@@ -179,6 +180,13 @@ environment:
 ./run ${MODEL_OUT}/model.{so,pte} -z ${MODEL_OUT}/tokenizer.bin
 ```
 
+### llama3 tokenizer
+
+Add option to load tiktoken
+```
+--tiktoken
+```
+
 # Generate Text
 
 ## Eager Execution
@@ -250,6 +258,18 @@ device supported by Executorch, most models need to be compressed to
 fit in the target device's memory. We use quantization to achieve this.
 
 
+# llama3 support
+
+How to obtain snapshot (to be filled in when published by Meta, we use internal snapshot]
+
+enable llama3 tokenizer with option `--tiktoken` (see also discussion under tokenizer)
+
+Enable all export options for llama3 as described below
+
+Identify and enable a runner/run.cpp with a binary tiktoken optimizer.  (May already be available in OSS)
+we cannot presently run runner/run.cpp with llama3, until we have a C/C++ tokenizer im[plementation
+(initial tiktoken is python) 
+
 # Optimizing your model for server, desktop and mobile devices
 
 ## Making your models fit and execute fast!
@@ -273,6 +293,9 @@ process larger models than they would otherwise be able to.
 We can specify quantization parameters with the --quantize option. The
 quantize option takes a JSON/dictionary with quantizers and
 quantization options.
+
+generate and export (for both ET and AOTI) can both accept quantization options.  We only show a subset of the combinations 
+to avoid combinatorial explosion.
 
 #### Embedding quantization (8 bit integer, channelwise & groupwise)
 
@@ -390,26 +413,57 @@ not been optimized for CUDA and CPU targets where the best
 performnance requires a group-wise quantized mixed dtype linear
 operator.
 
+#### 4-bit integer quantization (int4)
+To compress your model even more, 4-bit integer quantization may be used.  To achieve good accuracy, we recommend the use
+of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int4': {'group_size' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]  --prompt "Hello my name is"
+```
 
 #### 4-bit integer quantization (8da4w)
 To compress your model even more, 4-bit integer quantization may be used.  To achieve good accuracy, we recommend the use
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8-bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }" --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso... ]
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte --prompt "Hello my name is"
+python generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso...]  --prompt "Hello my name is"
 ```
 
-#### Quantization with GPTQ (8da4w-gptq)
-TBD.
+#### Quantization with GPTQ (gptq)
 
-#### Adding additional quantization schemes
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:gptq': {'group_size' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ] # may require additional options, check with AO team 
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso...]  --prompt "Hello my name is"
+```
+
+#### Adding additional quantization schemes (hqq)
 We invite contributors to submit established quantization schemes, with accuracy and performance results demonstrating soundness.
 
+
+# Loading GGUF models
+
+GGUF is a nascent industry standard format and will will read fp32, fp16 and some quantized formats (q4_0 and whatever is necessary to read llama2_78_q4_0.gguf)
+
+```
+--load_gguf <gguf_filename> # all other options as described elsewhere, works for generate and export, for all backends, but cannot be used with --quantize
+```
+
+```
+--dequantize_gguf <gguf_filename # all other options as described elsewhere, works for generate and export, for all backends, and be used with --quantize
+```
 
 # Standalone Execution
 
@@ -472,6 +526,9 @@ Check out the [tutorial on how to build an Android app running your PyTorch mode
 
 ![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png "Android app running Llama model")
 
+Detailed step by step in conjunction with ET Android build, to run on simulator for Android.
+
+
 ### iOS
 
 Open the iOS Llama Xcode project at https://github.com/pytorch/executorch/tree/main/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj in Xcode and click Run.
@@ -481,6 +538,9 @@ Once you can run the app on you device,
 1 - connect the device to you Mac,
 2 - copy the model and tokenizer.bin to the iOS Llama app
 3 - select the tokenizer and model with the `(...)` control (bottom left of screen, to the left of the text entrybox)
+
+
+Detailed step by step in conjunction with ET iOS build, to run on simulator for iOS.
 
 # Supported Systems
 
@@ -527,6 +587,25 @@ PyTorch and the mobile Executorch backend support a broad range of devices for r
 | Raspberry Pi 4/5 | Android | ? | ? | ? | ? |
 | ARM 32b (up to v7) | any | | ? | ? | ? | ? |
 
+## Runtime performance with Llama3, in tokens per second (4b quantization)
+
+| Hardware | OS | eager | eager + compile | AOT compile | ET Runtime |
+|-----|------|-----|-----|-----|-----|
+| x86 | Linux | ? | ? | ? | ? |
+| x86 | macOS | ? | ? | ? | ? |
+| aarch64 | Linux | ? | ? | ? | ? |
+| aarch64 | macOS | ? | ? | ? | ? |
+| AMD GPU | Linux | ? | ? | ? | ? |
+| Nvidia GPU | Linux | ? | ? | ? | ? |
+| MPS | macOS | ? | ? | ? | ? |
+| MPS | iOS | ? | ? | ? | ? |
+| aarch64 | Android | ? | ? | ? | ? |
+| Mobile GPU (Vulkan) | Android | ? | ? | ? | ? |
+| CoreML | iOS | | ? | ? | ? | ? |
+| Hexagon DSP | Android | | ? | ? | ? | ? |
+| Raspberry Pi 4/5 | Raspbian | ? | ? | ? | ? |
+| Raspberry Pi 4/5 | Android | ? | ? | ? | ? |
+| ARM 32b (up to v7) | any | | ? | ? | ? | ? |
 
 ## Installation Instructions
 
@@ -544,7 +623,7 @@ Alternatively, you can also find libraries here: https://mac.r-project.org/openm
 macOS running on x86 is reaching end-of-life. To use PyTorch on x86 running macOS, you can download prebuilt binaries up to PyTorch 2.2.  You can download recent PyTorch releases and
 install them from source.
 
-### iOS CoreML and MPS
+### iOS CoreML, Vulkan, MPS
 
 List dependencies for these backends
 
@@ -569,6 +648,15 @@ cmake --build ./build/cmake-out
 ```
 
 The built executable is located at ./build/cmake-out/runner-et.
+
+### Tiktoken instructions & instructions for running llama3 without a python environment
+
+for mobile and runner, if we can get a C/C++ tokenizer
+
+
+### Raspberry Pi 5 instructions
+
+Expanded version of digant's note.
 
 # Acknowledgements
 
