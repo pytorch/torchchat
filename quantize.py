@@ -54,7 +54,7 @@ def quantize_model(model: nn.Module, quantize_options):
             ).quantized_model()
         elif quantizer == "linear:int4":
             linears_quantized = True
-            model = Int8DynActInt4WeightQuantHandler(
+            model = WeightOnlyInt4QuantHandler(
                 model,
                 **q_kwargs
             ).quantized_model()
