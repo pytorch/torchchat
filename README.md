@@ -278,7 +278,7 @@ quantization options.
 
 *Channelwise quantization*:
 
-The simplest way to quantize embedding tables is with int8 groupwise
+The simplest way to quantize embedding tables is with int8 "channelwise"
 quantization, where each value is represented by an 8 bit integer, and
 a floating point scale per group.
 
