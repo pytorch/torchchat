@@ -8,11 +8,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-cuda:
+  test-mps:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
       runner: macos-m1-stable
       script: |
+        set -eou pipefail
+
         echo "::group::Print machine info"
         uname -a
         if [ $(uname -s) == Darwin ]; then
@@ -30,11 +32,13 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Download checkpoints"
-        mkdir -p checkpoints/stories15M
-        pushd checkpoints/stories15M
-        wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
-        wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
-        popd
+        (
+          mkdir -p checkpoints/stories15M
+          pushd checkpoints/stories15M
+          curl -fsSL -O https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+          curl -fsSL -O https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+          popd
+        )
         echo "::endgroup::"
 
         echo "::group::Run inference"
