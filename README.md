@@ -81,6 +81,7 @@ codellama/CodeLlama-34b-Python-hf | -| ✅ |  ✅ |  ✅ |  ✅ | ❌ |
 mistralai/Mistral-7B-v0.1 | 🚧  |  ✅  |  ✅ |  ✅ |  ✅ | ❹ |
 mistralai/Mistral-7B-Instruct-v0.1 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 mistralai/Mistral-7B-Instruct-v0.2 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
+Llama3 | 🚧  | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 
 *Key:* ✅ works correctly; 🚧  work in progress; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile phone (may fit some high-end devices such as tablets);
 
@@ -586,6 +587,25 @@ PyTorch and the mobile Executorch backend support a broad range of devices for r
 | Raspberry Pi 4/5 | Android | ? | ? | ? | ? |
 | ARM 32b (up to v7) | any | | ? | ? | ? | ? |
 
+## Runtime performance with Llama3, in tokens per second (4b quantization)
+
+| Hardware | OS | eager | eager + compile | AOT compile | ET Runtime |
+|-----|------|-----|-----|-----|-----|
+| x86 | Linux | ? | ? | ? | ? |
+| x86 | macOS | ? | ? | ? | ? |
+| aarch64 | Linux | ? | ? | ? | ? |
+| aarch64 | macOS | ? | ? | ? | ? |
+| AMD GPU | Linux | ? | ? | ? | ? |
+| Nvidia GPU | Linux | ? | ? | ? | ? |
+| MPS | macOS | ? | ? | ? | ? |
+| MPS | iOS | ? | ? | ? | ? |
+| aarch64 | Android | ? | ? | ? | ? |
+| Mobile GPU (Vulkan) | Android | ? | ? | ? | ? |
+| CoreML | iOS | | ? | ? | ? | ? |
+| Hexagon DSP | Android | | ? | ? | ? | ? |
+| Raspberry Pi 4/5 | Raspbian | ? | ? | ? | ? |
+| Raspberry Pi 4/5 | Android | ? | ? | ? | ? |
+| ARM 32b (up to v7) | any | | ? | ? | ? | ? |
 
 ## Installation Instructions
 
