@@ -1,0 +1,18 @@
+name: Run compile tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-cuda:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      script: |
+        pip install --extra-index-url https://download.pytorch.org/whl/nightly/cu121 -r requirements.txt
+        python generate.py --compile --cuda
