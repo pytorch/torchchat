@@ -353,8 +353,7 @@ def main(
     model_ = _load_model(checkpoint_path, device, precision, use_tp)
     if dso_path:
         assert not model_dtype, f"dtype setting not valid for a DSO model. Specify dtype during export."
-        assert quantize is None or quantize == "{ }",
-          f"quantize not valid for exported DSO model. Specify quantization during export."
+        assert quantize is None or quantize == "{ }", f"quantize not valid for exported DSO model. Specify quantization during export."
         try:
             model = model_
             # Replace model forward with the AOT-compiled forward
@@ -368,8 +367,7 @@ def main(
             raise RuntimeError(f"Failed to load AOTI compiled {dso_path}")
     elif pte_path:
         assert not model_dtype, f"dtype setting not valid for a PTE model. Specify dtype during export."
-        assert quantize is None or quantize == "{ }",
-          f"quantize not valid for exported PTE model. Specify quantization during export."
+        assert quantize is None or quantize == "{ }", f"quantize not valid for exported PTE model. Specify quantization during export."
         try:
             from model_et import PTEModel
             model = PTEModel(model_.config, pte_path)
