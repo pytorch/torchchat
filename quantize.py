@@ -20,14 +20,6 @@ try:
 except:
     pass
 
-# from .ops.quantized_ops import *  # noqa
-#
-# from torchao.quantization.quant_primitives import (
-#     get_group_qparams_symmetric,
-#     group_quantize_tensor_symmetric,
-#     pack_scales_and_zeros,
-#     per_token_dynamic_quant,
-# )
 
 ##########################################################################
 ###                  process quantization dictionary                   ###
