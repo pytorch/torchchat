@@ -168,12 +168,12 @@ def _load_by_parameter(pt_model: torch.nn.Module, fqn: str, gguf_tensor: ReaderT
     parent: torch.nn.Module = _fqn_lookup(_fqn_up(fqn), pt_model)
 
     if gguf_tensor.tensor_type == gguf.GGMLQuantizationType.Q4_0 and isinstance(parent, torch.nn.Linear) and _fqn_last(fqn) == "weight":
-        print(fqn, gguf_tensor.shape, gguf_tensor.data.shape, parent.weight.shape)
         packed = torch.from_numpy(gguf_tensor.data).reshape(-1, 18)
-        scale = torch.tensor(Q4_0._unpack_two_uint8(packed[:, :2]), dtype=torch.float16)
+        scale = Q4_0._unpack_two_uint8(packed[:, :2]).to(dtype=torch.float16)
         parent.weight = torch.nn.Parameter(
             Q4_0.GGMLInt4LinearWeight(packed, scale, parent.weight.shape)
         )
+        pt_model = pt_model.to(dtype=torch.float32)
         return True
 
     return False
@@ -209,20 +209,19 @@ def _load_weights(pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor]
 
     # Sanity checks
     for fqn in loaded_by_state_dict:
-        # assert fqn not in loaded_by_parameter, f"{fqn} was loaded by both state_dict and parameter"
         if not(fqn not in loaded_by_parameter):
-            print(f"{fqn} was loaded by both state_dict and parameter")
-
+            msg = f"{fqn} was loaded by both state_dict and parameter"
+            raise Exception(msg)
 
     for fqn in weight_map:
-        # assert fqn in (loaded_by_state_dict | loaded_by_parameter), f"{fqn} in weight_map was not loaded"
         if not (fqn in (loaded_by_state_dict | loaded_by_parameter)):
-            print(f"{fqn} in weight_map was not loaded")
+            msg = f"{fqn} in weight_map was not loaded"
+            raise Exception(msg)
 
     for fqn in pt_model.state_dict():
-        # assert fqn in (loaded_by_state_dict | loaded_by_parameter), f"{fqn} in model.state_dict() was not loaded"
         if not (fqn in (loaded_by_state_dict | loaded_by_parameter)):
-            print(f"{fqn} in model.state_dict() was not loaded")
+            msg = f"{fqn} in model.state_dict() was not loaded"
+            raise Exception(msg)
 
 
 def _get_metadata(reader: gguf.GGUFReader) -> dict[str, Any]:
@@ -278,4 +277,4 @@ def load_llama_from_gguf_file(gguf_file: str) -> torch.nn.Module:
     logger.info("Loading GGUF weights into PT model.")
     _load_weights(pt_model, weight_map)
 
-    return pt_model, weight_map
+    return pt_model
