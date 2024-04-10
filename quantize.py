@@ -13,6 +13,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
+try:
+    from GPTQ import GenericGPTQRunner, InputRecorder
+    from eval import get_task_dict, evaluate, lm_eval
+except:
+    pass
+
 # from .ops.quantized_ops import *  # noqa
 #
 # from torchao.quantization.quant_primitives import (
@@ -68,7 +75,7 @@ def quantize_model(model: nn.Module, quantize_options):
             ).quantized_model()
         elif quantizer == "linear:gptq":
             linears_quantized = True
-            model = Int8DynActInt4WeightQuantHandler(
+            model = WeightOnlyInt4GPTQQuantHandler(
                 model,
                 **q_kwargs
             ).quantized_model()
