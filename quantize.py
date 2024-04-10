@@ -20,6 +20,20 @@ try:
 except:
     pass
 
+##########################################################################
+###               dtype name to torch.dtype mapping                    ###
+
+def name_to_dtype(name):
+    if name in name_to_dtype_dict:
+        return name_to_dtype_dict[name]
+    else:
+        raise RuntimeError("unsupported dtype specified")
+    
+name_to_dtype_dict = {
+    "fp32" : torch.float,
+    "fp16" : torch.float16,
+    "bf16" : torch.bfloat
+}
 
 ##########################################################################
 ###                  process quantization dictionary                   ###
