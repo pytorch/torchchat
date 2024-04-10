@@ -613,7 +613,7 @@ def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, grou
 def _int4_check_linear_int4_k(k, groupsize = 1, inner_k_tiles = 1):
     return k % groupsize == 0 and k % (inner_k_tiles * 16) == 0
 
-def replace_linear_int4(module, groupsize, inner_k_tiles, padding_allowed, use_cuda):
+def replace_linear_int4(module, groupsize, inner_k_tiles, padding_allowed, use_cuda=False):
     for name, child in module.named_children():
         if isinstance(child, nn.Linear):
             if _int4_check_linear_int4_k(child.in_features, groupsize, inner_k_tiles) or padding_allowed:
@@ -665,7 +665,7 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
 
         return cur_state_dict
 
-    def convert_for_runtime(self, use_cuda):
+    def convert_for_runtime(self, use_cuda=False):
         replace_linear_int4(self.mod, self.groupsize, self.inner_k_tiles, self.padding_allowed, use_cuda)
         return self.mod
 
