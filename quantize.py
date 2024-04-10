@@ -513,7 +513,7 @@ class WeightOnlyInt4QuantHandler:
         self.groupsize = group_size
         self.inner_k_tiles = inner_k_tiles
         self.padding_allowed = padding_allowed
-        assert groupsize in [32, 64, 128, 256]
+        assert group_size in [32, 64, 128, 256]
         assert inner_k_tiles in [2, 4, 8]
 
     @torch.no_grad()
