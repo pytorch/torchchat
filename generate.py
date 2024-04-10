@@ -13,7 +13,7 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 
-from quantize import quantize_model
+from quantize import quantize_model, name_to_dtype
 
 
 def device_sync(device):
@@ -386,7 +386,7 @@ def main(
 
         # dtype:
         if model_dtype:
-            model.to(dtype=model_dtype)
+            model.to(dtype=name_to_dtype(model_dtype))
             
     if is_speculative:
         draft_model = _load_model(draft_checkpoint_path, device, precision, use_tp)

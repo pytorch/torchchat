@@ -76,7 +76,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
 
     # dtype:
     if args.dtype:
-        model.to(dtype=model_dtype)
+        model.to(dtype=name_to_dtype(args.dtype))
     
     model = model_wrapper(model, device=device)
 
