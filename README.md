@@ -272,6 +272,18 @@ we cannot presently run runner/run.cpp with llama3, until we have a C/C++ tokeni
 
 # Optimizing your model for server, desktop and mobile devices
 
+## Model precision (dtype precision setting)_
+
+You can generate models (for both export and generate, with eager, torch.compile, AOTI, ET, for all backends - mobile at present will primarily support fp32, with all options)
+specify the precision of the model with 
+```
+python generate.py --dtype [bf16 | fp16 | fp32] ...
+python export.py --dtype [bf16 | fp16 | fp32] ...
+```
+
+Unlike gpt-fast which uses bfloat16 as default, Torch@ uses float32 as the default. As a consequence you will have to set to `--dtype bf16` or `--dtype fp16` on server / desktop for best performance.
+
+
 ## Making your models fit and execute fast!
 
 Next, we'll show you how to optimize your model for mobile execution
