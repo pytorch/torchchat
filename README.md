@@ -179,6 +179,13 @@ environment:
 ./run ${MODEL_OUT}/model.{so,pte} -z ${MODEL_OUT}/tokenizer.bin
 ```
 
+### llama3 tokenizer
+
+Add option to load tiktoken
+```
+--tiktoken
+```
+
 # Generate Text
 
 ## Eager Execution
@@ -249,6 +256,18 @@ While we have shown the export and execution of a small model to a mobile/edge
 device supported by Executorch, most models need to be compressed to
 fit in the target device's memory. We use quantization to achieve this.
 
+
+# llama3 support
+
+How to obtain snapshot (to be filled in when published by Meta, we use internal snapshot]
+
+enable llama3 tokenizer with option `--tiktoken` (see also discussion under tokenizer)
+
+Enable all export options for llama3 as described below
+
+Identify and enable a runner/run.cpp with a binary tiktoken optimizer.  (May already be available in OSS)
+we cannot presently run runner/run.cpp with llama3, until we have a C/C++ tokenizer im[plementation
+(initial tiktoken is python) 
 
 # Optimizing your model for server, desktop and mobile devices
 
