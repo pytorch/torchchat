@@ -174,7 +174,7 @@ def dynamically_quantize_per_channel(
 
 
 
-def get_group_qparams(w, n_bit=4, groupsize=128, *, scales_dtype torch.float):
+def get_group_qparams(w, n_bit=4, groupsize=128, *, scales_dtype= torch.float):
     # needed for GPTQ with padding
     if groupsize > w.shape[-1]:
         groupsize = w.shape[-1]
