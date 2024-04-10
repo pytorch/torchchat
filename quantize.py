@@ -502,7 +502,7 @@ class WeightOnlyInt4HqqQuantHandler:
             self.mod, bitwidth=4, group_size=self.groupsize
         ).create_quantized_state_dict()
 
-    def _convert_for_runtime(self):
+    def convert_for_runtime(self):
         # we use Int4 packaged in an int8 for now, packing to follow
         # ALSO: all code must work for CPU, CUDA, MPS
         # return WeightOnlyInt4GPTQQuantHandler(self.mod, self.groupsize).convert_for_runtime(use_cuda=True)
