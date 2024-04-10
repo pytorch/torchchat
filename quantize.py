@@ -179,6 +179,12 @@ class QuantHandler:
 
     def convert_for_runtime(self) -> nn.Module:
         pass
+    
+    def quantized_model(self) -> nn.Module:
+        model_updated_state_dict = self.create_quantized_state_dict()
+        self.convert_for_runtime()
+        self.mod.load_state_dict(model_updated_state_dict)
+        return self.mod
 
 
 ##### Weight-only int8 per-channel quantized code ######
@@ -550,6 +556,51 @@ class WeightOnlyInt4QuantHandler:
     def convert_for_runtime(self, use_cuda):
         replace_linear_int4(self.mod, self.groupsize, self.inner_k_tiles, self.padding_allowed, use_cuda)
         return self.mod
+
+
+class WeightOnlyInt4Linear(torch.nn.Module):
+    __constants__ = ['in_features', 'out_features']
+    in_features: int
+    out_features: int
+    weight: torch.Tensor
+
+    def __init__(
+            self, in_features: int, out_features: int,
+            bias=True, device=None, dtype=None, groupsize: int = 128, inner_k_tiles: int = 8, use_cuda=True,
+    ) -> None:
+        super().__init__()
+        self.padding = not _int4_check_linear_int4_k(in_features, groupsize, inner_k_tiles)
+        if self.padding:
+            from model import find_multiple
+            self.origin_in_features = in_features
+            in_features = find_multiple(in_features, 1024)
+
+        self.in_features = in_features
+        self.out_features = out_features
+        assert not bias, "require bias=False"
+        self.groupsize = groupsize
+        self.inner_k_tiles = inner_k_tiles
+
+        assert out_features % 8 == 0, "require out_features % 8 == 0"
+        assert in_features % (inner_k_tiles * 16) == 0, "require in_features % (innerKTiles * 16) == 0"
+        self.register_buffer(
+            "weight",
+            torch.empty((out_features // 8, in_features // (inner_k_tiles * 16), 32, inner_k_tiles // 2), dtype=torch.int32)
+        )
+        self.register_buffer(
+            "scales_and_zeros",
+            torch.empty((in_features // groupsize, out_features, 2), dtype=torch.bfloat16)
+        )
+
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        input = input.to(torch.bfloat16)
+        if self.padding:
+            import torch.nn.functional as F
+            input = F.pad(input, pad=(0, self.in_features - self.origin_in_features))
+        return linear_forward_int4(
+            input,
+            self.weight, self.scales_and_zeros, self.out_features, self.groupsize
+        )
 
 ########################################################################
 ### Int8 Dynamic Activations 4 Bit Weights
