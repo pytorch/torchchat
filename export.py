@@ -73,6 +73,11 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
     quantize_model(model, args.quantize)
+
+    # dtype:
+    if args.dtype:
+        model.to(dtype=model_dtype)
+    
     model = model_wrapper(model, device=device)
 
     output_pte_path = args.output_pte_path
@@ -160,7 +165,7 @@ def cli():
         "-d",
         "--dtype",
         default=None,
-        help="Override the dtype of the model (default is the checkpoint dtype). Options: fp16, fp32",
+        help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument(

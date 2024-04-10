@@ -316,6 +316,7 @@ def main(
     dso_path=None,
     pte_path=None,
     quantize=None,
+    model_dtype=None,
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
     assert (
@@ -351,6 +352,8 @@ def main(
     t0 = time.time()
     model_ = _load_model(checkpoint_path, device, precision, use_tp)
     if dso_path:
+        assert not model_dtype, f"dtype setting not valid for a DSO model. Specify dtype during export."
+        assert quantize is None or quantize == "{ }", f"quantize not valid for exported DSO model. Specify quantization during export."
         try:
             model = model_
             # Replace model forward with the AOT-compiled forward
@@ -363,6 +366,8 @@ def main(
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {dso_path}")
     elif pte_path:
+        assert not model_dtype, f"dtype setting not valid for a PTE model. Specify dtype during export."
+        assert quantize is None or quantize == "{ }", f"quantize not valid for exported PTE model. Specify quantization during export."
         try:
             from model_et import PTEModel
             model = PTEModel(model_.config, pte_path)
@@ -379,6 +384,10 @@ def main(
             device_sync(device=device)  # MKG
             print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
 
+        # dtype:
+        if model_dtype:
+            model.to(dtype=model_dtype)
+            
     if is_speculative:
         draft_model = _load_model(draft_checkpoint_path, device, precision, use_tp)
     else:
@@ -590,6 +599,12 @@ def cli():
         default="{ }",
         help="Quantization options."
     )
+    parser.add_argument(
+        "-d",
+        "--dtype",
+        default=None,
+        help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
+    )
 
 
     args = parser.parse_args()
@@ -615,6 +630,7 @@ def cli():
         args.dso_path,
         args.pte_path,
         args.quantize,
+        args.dtype,
     )
 
 if __name__ == "__main__":
