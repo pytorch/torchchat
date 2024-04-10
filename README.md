@@ -123,7 +123,7 @@ We use several variables in this example, which may be set as a preparatory step
    name of the directory holding the files for the corresponding model.  You *must* follow this convention to
    ensure correct operation.
 
-* `MODEL_OUT` is the location where we store model and tokenizer information for a particular model. We recommend `checkpoints/${MODEL_NAME}`
+* `MODEL_DIR` is the location where we store model and tokenizer information for a particular model. We recommend `checkpoints/${MODEL_NAME}`
   or any other directory you already use to store model information.
 
 * `MODEL_PATH` describes the location of the model. Throughput the description
@@ -271,6 +271,18 @@ we cannot presently run runner/run.cpp with llama3, until we have a C/C++ tokeni
 (initial tiktoken is python) 
 
 # Optimizing your model for server, desktop and mobile devices
+
+## Model precision (dtype precision setting)_
+
+You can generate models (for both export and generate, with eager, torch.compile, AOTI, ET, for all backends - mobile at present will primarily support fp32, with all options)
+specify the precision of the model with 
+```
+python generate.py --dtype [bf16 | fp16 | fp32] ...
+python export.py --dtype [bf16 | fp16 | fp32] ...
+```
+
+Unlike gpt-fast which uses bfloat16 as default, Torch@ uses float32 as the default. As a consequence you will have to set to `--dtype bf16` or `--dtype fp16` on server / desktop for best performance.
+
 
 ## Making your models fit and execute fast!
 
@@ -526,7 +538,7 @@ Check out the [tutorial on how to build an Android app running your PyTorch mode
 
 ![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png "Android app running Llama model")
 
-Detailed step by step in conjunction with ET Android build, to run on simulator for Android.
+Detailed step by step in conjunction with ET Android build, to run on simulator for Android. `scripts/android_example.sh` for running a model on an Android simulator (on Mac)
 
 
 ### iOS
