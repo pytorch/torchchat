@@ -1,0 +1,43 @@
+name: Run compile tests on MPS
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-cuda:
+    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
+    with:
+      runner: macos-m1-stable
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        if [ $(uname -s) == Darwin ]; then
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+        fi
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoints"
+        # Install requirements
+        pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+        pip install -r requirements.txt
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoints"
+        mkdir -p checkpoints/stories15M
+        pushd checkpoints/stories15M
+        wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+        wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+        popd
+        echo "::endgroup::"
+
+        echo "::group::Run inference"
+        export MODEL_PATH=checkpoints/stories15M/stories15M.pt
+        export MODEL_NAME=stories15M
+        export MODEL_DIR=/tmp
+        python generate.py --device mps --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+        cat ./output_eager
