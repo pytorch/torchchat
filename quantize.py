@@ -572,17 +572,18 @@ class QuantizedGroupEmbedding(torch.nn.Module):
             group_size = embedding_dim
         self.group_size = group_size
         self.dtype = dtype
+        if device is None: device = "cpu"
         self.register_buffer(
-            "weight", torch.empty((vocab_size, embedding_dim), dtype=torch.int8)
+            "weight", torch.empty((vocab_size, embedding_dim), dtype=torch.int8, device=device)
         )
         groups_per_row = (embedding_dim + group_size - 1) // group_size
         if groups_per_row > 1:
             self.register_buffer(
-                "scales", torch.ones((vocab_size, groups_per_row), dtype=torch.float16)
+                "scales", torch.ones((vocab_size, groups_per_row), dtype=torch.float16, device=device)
             )
         else:
             self.register_buffer(
-                "scales", torch.ones((vocab_size,), dtype=torch.float16)
+                "scales", torch.ones((vocab_size,), dtype=torch.float16, device=device)
             )
 
     @torch.no_grad()
