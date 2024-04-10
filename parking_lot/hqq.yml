@@ -1,0 +1,60 @@
+name: Compile main
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  run-hqq-tinystories:
+    strategy:
+      matrix:
+        runner: [ubuntu-latest]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Install requirements
+        run: |
+          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt
+          pip install hqq
+      - name: Download checkpoints
+        run: |
+          mkdir -p checkpoints/stories15M
+          pushd checkpoints/stories15M
+          wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+          popd
+      - name: Run inference
+        run: |          
+          export MODEL_PATH=checkpoints/stories15M/stories15M.pt
+          export MODEL_NAME=stories15M
+          export MODEL_DIR=/tmp
+
+          echo "******************************************"
+          echo "******** HQQ: group-wise quantized *******"
+          echo "******************************************"
+          python generate.py --quant '{"linear:hqq" : {"group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+          cat ./output_eager
+          python generate.py --compile --quant '{"linear:hqq" : {"group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
+          cat ./output_compiled
+          python export.py --quant '{"embedding" : {"group_size": 8}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
+          cat ./output_aoti
+
+          echo "tests complete"
+          echo "******************************************"
