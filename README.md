@@ -525,6 +525,9 @@ Check out the [tutorial on how to build an Android app running your PyTorch mode
 
 ![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png "Android app running Llama model")
 
+Detailed step by step in conjunction with ET Android build, to run on simulator for Android.
+
+
 ### iOS
 
 Open the iOS Llama Xcode project at https://github.com/pytorch/executorch/tree/main/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj in Xcode and click Run.
@@ -534,6 +537,9 @@ Once you can run the app on you device,
 1 - connect the device to you Mac,
 2 - copy the model and tokenizer.bin to the iOS Llama app
 3 - select the tokenizer and model with the `(...)` control (bottom left of screen, to the left of the text entrybox)
+
+
+Detailed step by step in conjunction with ET iOS build, to run on simulator for iOS.
 
 # Supported Systems
 
@@ -597,7 +603,7 @@ Alternatively, you can also find libraries here: https://mac.r-project.org/openm
 macOS running on x86 is reaching end-of-life. To use PyTorch on x86 running macOS, you can download prebuilt binaries up to PyTorch 2.2.  You can download recent PyTorch releases and
 install them from source.
 
-### iOS CoreML and MPS
+### iOS CoreML, Vulkan, MPS
 
 List dependencies for these backends
 
@@ -622,6 +628,15 @@ cmake --build ./build/cmake-out
 ```
 
 The built executable is located at ./build/cmake-out/runner-et.
+
+### Tiktoken instructions & instructions for running llama3 without a python environment
+
+for mobile and runner, if we can get a C/C++ tokenizer
+
+
+### Raspberry Pi 5 instructions
+
+Expanded version of digant's note.
 
 # Acknowledgements
 
