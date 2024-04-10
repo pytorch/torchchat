@@ -214,7 +214,7 @@ def replace_linear_weight_only_int8_per_channel(module, node_type, group_size=No
             replace_linear_weight_only_int8_per_channel(child, node_type, group_size)
 
 
-class WeightOnlyInt8QuantHandler:
+class WeightOnlyInt8QuantHandler(QuantHandler):
     def __init__(
         self,
         mod,
@@ -361,7 +361,7 @@ def replace_embedding_weight_only_grouped_int8_per_channel(
             )
 
 
-class EmbeddingOnlyInt8QuantHandler:
+class EmbeddingOnlyInt8QuantHandler(QuantHandler):
     def __init__(self, mod, *, bitwidth: int = 8, group_size: Optional[int] = None):
         self.mod = mod
         self.group_size = group_size
@@ -513,7 +513,7 @@ def replace_linear_int4(module, groupsize, inner_k_tiles, padding_allowed, use_c
             replace_linear_int4(child, groupsize, inner_k_tiles, padding_allowed, use_cuda)
 
 
-class WeightOnlyInt4QuantHandler:
+class WeightOnlyInt4QuantHandler(QuantHandler):
     def __init__(self, mod, group_size=128, inner_k_tiles=8, padding_allowed=True):
         self.mod = mod
         self.groupsize = group_size
@@ -555,6 +555,12 @@ class WeightOnlyInt4QuantHandler:
 
     def convert_for_runtime(self, use_cuda):
         replace_linear_int4(self.mod, self.groupsize, self.inner_k_tiles, self.padding_allowed, use_cuda)
+        return self.mod
+
+    def quantized_model(self) -> nn.Module:
+        model_updated_state_dict = self.create_quantized_state_dict()
+        self.convert_for_runtime()
+        self.mod.load_state_dict(model_updated_state_dict)
         return self.mod
 
 
@@ -697,7 +703,7 @@ def replace_linear_8da4w(
             )
 
 
-class Int8DynActInt4WeightQuantHandler:
+class Int8DynActInt4WeightQuantHandler(QuantHandler):
     def __init__(
         self,
         mod,
