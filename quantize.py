@@ -1015,3 +1015,52 @@ class Int8DynActInt4WeightLinear(torch.nn.Module):
 #             self.precision,
 #         )
 #         return model
+
+##################################################################
+###                           WIP: HQQ                         ###
+
+class WeightOnlyInt4HqqQuantHandler:
+    def __init__(self, mod, group_size):
+        self.mod = mod
+        self.groupsize = group_size
+
+    def create_quantized_state_dict(self):
+        from hqq.core.quantize import Quantizer  # TODO maybe torchao
+
+        
+        for m in self.mod.modules():
+            for name, child in m.named_children():
+                if isinstance(child, torch.nn.Linear):
+                    child.weight = torch.nn.Parameter(
+                        Quantizer.dequantize(
+                            *Quantizer.quantize(
+                                child.weight,
+                                nbits=4,
+                                group_size=self.groupsize,
+                                axis=1,
+                            )
+                        )
+                    )
+
+        # we use Int4 packaged in an int8 for now, packing to follow
+        # return WeightOnlyInt4QuantHandler(self.mod, self.groupsize).create_quantized_state_dict()
+        return WeightOnlyInt8QuantHandler(
+            self.mod, bitwidth=4, group_size=self.groupsize
+        ).create_quantized_state_dict()
+
+    def convert_for_runtime(self):
+        # we use Int4 packaged in an int8 for now, packing to follow
+        # ALSO: all code must work for CPU, CUDA, MPS
+        # return WeightOnlyInt4GPTQQuantHandler(self.mod, self.groupsize).convert_for_runtime(use_cuda=True)
+        return WeightOnlyInt4GPTQQuantHandler(
+            self.mod, bitwidth=4, group_size=self.groupsize
+        ).convert_for_runtime()
+    
+    def quantized_model(self) -> nn.Module:
+        model_updated_state_dict = self.create_quantized_state_dict()
+        self.convert_for_runtime()
+        self.mod.load_state_dict(model_updated_state_dict)
+        return self.mod
+
+
+##################################################################
