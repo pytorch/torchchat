@@ -21,9 +21,11 @@ jobs:
         fi
         echo "::endgroup::"
 
-        echo "::group::Download checkpoints"
+        echo "::group::Install requirements"
         # Install requirements
         pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+        ls -la
+        pwd
         pip install -r requirements.txt
         echo "::endgroup::"
 
