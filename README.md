@@ -274,6 +274,9 @@ We can specify quantization parameters with the --quantize option. The
 quantize option takes a JSON/dictionary with quantizers and
 quantization options.
 
+generate and export (for both ET and AOTI) can both accept quantization options.  We only show a subset of the combinations 
+to avoid combinatorial explosion.
+
 #### Embedding quantization (8 bit integer, channelwise & groupwise)
 
 *Channelwise quantization*:
@@ -390,26 +393,57 @@ not been optimized for CUDA and CPU targets where the best
 performnance requires a group-wise quantized mixed dtype linear
 operator.
 
+#### 4-bit integer quantization (int4)
+To compress your model even more, 4-bit integer quantization may be used.  To achieve good accuracy, we recommend the use
+of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int4': {'group_size' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]  --prompt "Hello my name is"
+```
 
 #### 4-bit integer quantization (8da4w)
 To compress your model even more, 4-bit integer quantization may be used.  To achieve good accuracy, we recommend the use
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8-bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }" --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso... ]
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte --prompt "Hello my name is"
+python generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso...]  --prompt "Hello my name is"
 ```
 
-#### Quantization with GPTQ (8da4w-gptq)
-TBD.
+#### Quantization with GPTQ (gptq)
 
-#### Adding additional quantization schemes
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:gptq': {'group_size' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ] # may require additional options, check with AO team 
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso...]  --prompt "Hello my name is"
+```
+
+#### Adding additional quantization schemes (hqq)
 We invite contributors to submit established quantization schemes, with accuracy and performance results demonstrating soundness.
 
+
+# Loading GGUF models
+
+GGUF is a nascent industry standard format and will will read fp32, fp16 and some quantized formats (q4_0 and whatever is necessary to read llama2_78_q4_0.gguf)
+
+```
+--load_gguf <gguf_filename> # all other options as described elsewhere, works for generate and export, for all backends, but cannot be used with --quantize
+```
+
+```
+--dequantize_gguf <gguf_filename # all other options as described elsewhere, works for generate and export, for all backends, and be used with --quantize
+```
 
 # Standalone Execution
 
