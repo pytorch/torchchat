@@ -13,6 +13,22 @@ from torch.nn import functional as F
 
 from quantize import get_precision
 
+def prepare_inputs_for_model(inps, max_new_tokens=1):
+    # this is because input from lm-eval is 2d
+    if inps.dim() != 2:
+        raise ValueError(f"Expected input to be of dim 2, but got {inps.dim()}")
+
+    inps = inps.squeeze(0)
+    # setup inputs in correct format
+    T = inps.size(0)
+    T_new = T + max_new_tokens
+    seq = torch.empty(T_new, dtype=inps.dtype, device=inps.device)
+    seq[:T] = inps
+    input_pos = torch.arange(0, T, device=inps.device)
+    x = seq.index_select(0, input_pos).view(1, -1)
+    return (x, input_pos)
+
+
 def find_multiple(n: int, k: int) -> int:
     if n % k == 0:
         return n
@@ -170,7 +186,7 @@ class Transformer(nn.Module):
         self.max_batch_size = -1
         self.max_seq_length = -1
 
-    def setup_caches(self, max_batch_size, max_seq_length):
+    def setup_caches(self, max_batch_size, max_seq_length, dtype=torch.float):
         if (
             self.max_seq_length >= max_seq_length
             and self.max_batch_size >= max_batch_size
@@ -182,7 +198,7 @@ class Transformer(nn.Module):
         self.max_batch_size = max_batch_size
         for b in self.layers:
             b.attention.kv_cache = KVCache(
-                max_batch_size, max_seq_length, self.config.n_local_heads, head_dim
+                max_batch_size, max_seq_length, self.config.n_local_heads, head_dim, dtype
             )
 
         freqs_cis = precompute_freqs_cis(
@@ -261,30 +277,14 @@ class Attention(nn.Module):
         self._register_load_state_dict_pre_hook(self.load_hook)
 
     def load_hook(self, state_dict, prefix, *args):
-        # if prefix + "wq.weight" in state_dict:
-        #     wq = state_dict.pop(prefix + "wq.weight")
-        #     wk = state_dict.pop(prefix + "wk.weight")
-        #     wv = state_dict.pop(prefix + "wv.weight")
-        #     state_dict[prefix + "wqkv.weight"] = torch.cat([wq, wk, wv])
-
-        def _unfuse_wqkv_state_dict(
-            state_dict: Dict[str, torch.Tensor],
-            dim: int,
-        ):
-            for key in list(state_dict):
-                if key.endswith("wqkv.weight"):
-                    tensor = state_dict[key]
-                    wq_key = key.replace("wqkv.weight", "wq.weight")
-                    state_dict[wq_key] = tensor[: dim]
-                    wk_key = key.replace("wqkv.weight", "wk.weight")
-                    wv_key = key.replace("wqkv.weight", "wv.weight")
-                    wk, wv = tensor[dim :].chunk(2, 0)
-                    state_dict[wk_key] = wk
-                    state_dict[wv_key] = wv
-                    state_dict.pop(key)
-                else:
-                    continue
-        _unfuse_wqkv_state_dict(state_dict, self.dim)
+        if prefix + "wqkv.weight" in state_dict:
+            wqkv = state_dict.pop(prefix + "wqkv.weight")
+            q_size = self.n_heads * self.head_dim
+            kv_size = self.n_local_heads * self.head_dim
+            wq, wk, wv = torch.split(wqkv, (q_size, kv_size, kv_size), dim=0)
+            state_dict[prefix + "wq.weight"] = wq
+            state_dict[prefix + "wk.weight"] = wk
+            state_dict[prefix + "wv.weight"] = wv
 
     def forward(
         self,

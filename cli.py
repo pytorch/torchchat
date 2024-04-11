@@ -78,12 +78,12 @@ def cli_args():
         "--chat",
         action="store_true",
         help="Use torchat to for an interactive chat session.",
-    )    
+    )
     parser.add_argument(
         "--gui",
         action="store_true",
         help="Use torchat to for an interactive gui-chat session.",
-    )    
+    )
     parser.add_argument(
         "--num-samples",
         type=int,
@@ -157,7 +157,7 @@ def cli_args():
         type=Path,
         default=None,
         help="Model checkpoint path.",
-    )    
+    )
     parser.add_argument(
         "--output-pte-path",
         type=str,
@@ -181,7 +181,7 @@ def cli_args():
         type=Path,
         default=None,
         help="Use the specified Executorch PTE model."
-    )    
+    )
     parser.add_argument(
         "-d",
         "--dtype",
@@ -224,7 +224,7 @@ def cli_args():
         type=int,
         default=None,
         help='maximum length sequence to evaluate')
-    
+
     args = parser.parse_args()
 
     if (Path(args.quantize).is_file()):
@@ -232,6 +232,6 @@ def cli_args():
             args.quantize = json.loads(f.read())
 
     if args.seed:
-              torch.manual_seed(args.seed)
+        torch.manual_seed(args.seed)
 
     return args

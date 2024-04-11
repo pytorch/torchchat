@@ -198,6 +198,7 @@ def generate(
     draft_model: Transformer,
     speculate_k: Optional[int] = 8,
     callback=lambda x: x,
+    precision=torch.float,
     **sampling_kwargs,
 ) -> torch.Tensor:
     """
@@ -214,13 +215,14 @@ def generate(
         max_seq_length = min(T_new, model.config.block_size)
 
     device, dtype = prompt.device, prompt.dtype
+    model = model.to(device)
     max_seq_length = (
         max_seq_length + speculate_k + 1 if is_speculative else max_seq_length
     )
     with torch.device(device):
-        model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+        model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length, dtype=precision)
         if is_speculative and draft_model is not model:
-            draft_model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+            draft_model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length, dtype=precision)
 
     # create an empty tensor of the expected final shape and fill in the current tokens
     empty = torch.empty(T_new, dtype=dtype, device=device)
@@ -288,7 +290,7 @@ def _load_model(
         if params_path:
             model = Transformer.from_params(params_path)
         elif params_table:
-            model = Transformer.from_table(params_path)            
+            model = Transformer.from_table(params_path)
         else:
             model = Transformer.from_name(checkpoint_path.parent.name)
 
@@ -307,7 +309,7 @@ def _load_model(
                     mmap=True,
                 )
             )
-            
+
         checkpoint = {}
         for key in cps[0].keys():
             if not torch.allclose(cps[0][key], cps[1][key]):
@@ -345,10 +347,10 @@ def _load_inference_model(
         params_table,
         dso_path,
         pte_path,
-        quantize,
         device,
         precision,
-        use_tp=False
+        use_tp=False,
+        args=None,
 ):
     assert (
         (checkpoint_path and checkpoint_path.is_file()) or
@@ -360,8 +362,9 @@ def _load_inference_model(
     if (checkpoint_path and (dso_path or pte_path)):
         print("Warning: checkpoint path ignored because an exported DSO or PTE path specified")
 
+    quantize = args.quantize if args is not None else None
     print("Loading model ...")
-    t0 = time.time()    
+    t0 = time.time()
     model_ = _load_model(
         checkpoint_path,
         checkpoint_dir,
@@ -402,8 +405,12 @@ def _load_inference_model(
         model = model_
 
         if quantize:
+            with torch.device(device):
+                # TODO: fix max_seq_length
+                model.setup_caches(max_batch_size=1, max_seq_length=2048, dtype=precision)
+            device_sync(device=device)
             t0q = time.time()
-            quantize_model(model, quantize)
+            quantize_model(model, args)
             device_sync(device=device)  # MKG
             print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
 
@@ -432,11 +439,20 @@ def _main(
     device="cuda",
     dso_path=None,
     pte_path=None,
-    quantize=None,
     model_dtype=None,
     use_tiktoken=False,
+    args=None,
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
+    assert (
+        (checkpoint_path and checkpoint_path.is_file()) or
+        (dso_path and Path(dso_path).is_file()) or
+        (pte_path and Path(pte_path).is_file())
+    ), "need to specified a valid checkpoint path, DSO path, or PTE path"
+    assert not (dso_path and pte_path), f"specify either DSO path or PTE path, but not both: {dso_path} {pte_path}"
+
+    if (checkpoint_path and (dso_path or pte_path)):
+        print("Warning: checkpoint path ignored because an exported DSO or PTE path specified")
 
     if not tokenizer_path:
         assert checkpoint_path, "either a tokenizer or a checkpoint path must be specified"
@@ -465,10 +481,10 @@ def _main(
         params_table,
         dso_path,
         pte_path,
-        quantize,
         device,
         precision,
-        use_tp
+        use_tp,
+        args,
     )
 
     # will add a version of _load_inference_model in future
@@ -569,6 +585,7 @@ def _main(
                 callback=callback,
                 temperature=temperature,
                 top_k=top_k,
+                precision=name_to_dtype(model_dtype),
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
         if i == -1:
@@ -628,15 +645,14 @@ def main(args):
         args.device,
         args.dso_path,
         args.pte_path,
-        args.quantize,
         args.dtype,
-        args.tiktoken
+        args.tiktoken,
+        args,
     )
 
 def cli():
     args = cli_args()
     main(args)
-
 
 if __name__ == "__main__":
         cli()

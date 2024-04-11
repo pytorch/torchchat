@@ -22,5 +22,5 @@ class PTEModel(nn.Module):
         logits = logits[0]
         return logits
 
-    def setup_caches(self, max_batch_size, max_seq_length):
+    def setup_caches(self, max_batch_size, max_seq_length, dtype=torch.float):
         pass

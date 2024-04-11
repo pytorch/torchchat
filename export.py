@@ -71,7 +71,7 @@ def main(args):
     print(f"Using device={device}")
     precision = name_to_dtype(args.dtype)  # torch.float  # bfloat16
     set_precision(precision)
-    
+
     print("Loading model ...")
     t0 = time.time()
     model = _load_model(
@@ -87,7 +87,7 @@ def main(args):
     device_sync(device=device)  # MKG
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
-    quantize_model(model, args.quantize)
+    quantize_model(model, args)
 
     # dtype:
     if args.dtype:

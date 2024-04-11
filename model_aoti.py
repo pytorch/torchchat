@@ -44,7 +44,7 @@ class DSOModel(nn.Module):
 
         # build transformer model
         global src, dso_src
-        
+
         src = src.replace('***my_model.so***', str(dso_path))
         async_compile = AsyncCompile()
         self.transformer_model = async_compile.cpp_pybinding(
@@ -63,5 +63,5 @@ class DSOModel(nn.Module):
         self.transformer_model(x, input_pos, logits)
         return logits
 
-    def setup_caches(self, max_batch_size, max_seq_length):
+    def setup_caches(self, max_batch_size, max_seq_length, dtype=torch.float):
         pass
