@@ -74,7 +74,13 @@ def main(args):
     print("Loading model ...")
     t0 = time.time()
     model = _load_model(
-        checkpoint_path, device=device, precision=precision, use_tp=False)
+        checkpoint_path,
+        args.checkpoint_dir,
+        args.params_path,
+        device=device,
+        precision=precision,
+        use_tp=False
+    )
 
     device_sync(device=device)  # MKG
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
@@ -157,6 +163,18 @@ def cli():
         help="Model checkpoint path.",
     )
     parser.add_argument(
+        "--checkpoint-dir",
+        type=Path,
+        default=None,
+        help="Model checkpoint directory.",
+    )
+    parser.add_argument(
+        "--params-path",
+        type=Path,
+        default=None,
+        help="Parameter file path.",
+    )
+    parser.add_argument(
         "--output-pte-path",
         type=str,
         default=None,
@@ -171,7 +189,7 @@ def cli():
     parser.add_argument(
         "-d",
         "--dtype",
-        default="fp32",
+        default="float32",
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
     parser.add_argument("-v", "--verbose", action="store_true")

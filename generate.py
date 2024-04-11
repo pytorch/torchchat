@@ -274,12 +274,50 @@ def encode_tokens(tokenizer, string, bos=True, device="cuda"):
     return torch.tensor(tokens, dtype=torch.int, device=device)
 
 
-def _load_model(checkpoint_path, device, precision, use_tp=False):
+def _load_model(
+        checkpoint_path,
+        checkpoint_dir,
+        params_path,
+        device,
+        precision,
+        use_tp=False
+):
     use_cuda = "cuda" in device
     with torch.device("meta"):
-        model = Transformer.from_name(checkpoint_path.parent.name)
+        if params_path:
+            model = Transformer.from_params(params_path)
+        else:
+            model = Transformer.from_name(checkpoint_path.parent.name)
 
-    checkpoint = torch.load(str(checkpoint_path), mmap=True, weights_only=True)
+    # checkpoint = torch.load(str(checkpoint_path), mmap=True, weights_only=True)
+    cps = []
+    if checkpoint_dir is not None:
+        # Load multiple checkpoint; ignore the single path.
+        checkpoint_path = None
+        for i in range(4):
+            cp_name = f"consolidated.{i}.pth"
+            print(f"Loading {cp_name}")
+            cps.append(
+                torch.load(
+                    os.path.join(checkpoint_dir, cp_name),
+                    map_location=device,
+                    mmap=True,
+                )
+            )
+            
+        checkpoint = {}
+        for key in cps[0].keys():
+            if not torch.allclose(cps[0][key], cps[1][key]):
+                values = (cps[0][key], cps[1][key], cps[2][key], cps[3][key])
+                if key.endswith("wo.weight") or key.endswith("w2.weight"):
+                    checkpoint[key] = torch.cat(values, dim=1)
+                else:
+                    checkpoint[key] = torch.cat(values, dim=0)
+            else:
+                checkpoint[key] = cps[0][key]
+    else:
+        checkpoint = torch.load(checkpoint_path, map_location=device, mmap=True, weights_only=True)
+
     if "model" in checkpoint and "stories" in str(checkpoint_path):
         checkpoint = checkpoint["model"]
 
@@ -306,6 +344,8 @@ def _main(
     top_k: int = 200,
     temperature: float = 0.8,
     checkpoint_path: Optional[Path] = None,
+    checkpoint_dir: Optional[Path] = None,
+    params_path: Optional[Path] = None,
     tokenizer_path: Optional[Path] = None,
     compile: bool = True,
     compile_prefill: bool = False,
@@ -352,7 +392,14 @@ def _main(
 
     print("Loading model ...")
     t0 = time.time()
-    model_ = _load_model(checkpoint_path, device, precision, use_tp)
+    model_ = _load_model(
+        checkpoint_path,
+        checkpoint_dir,
+        params_path,
+        device,
+        precision,
+        use_tp
+    )
     if dso_path:
         assert not model_dtype, f"dtype setting not valid for a DSO model. Specify dtype during export."
         assert quantize is None or quantize == "{ }", f"quantize not valid for exported DSO model. Specify quantization during export."
@@ -391,7 +438,14 @@ def _main(
             model.to(dtype=name_to_dtype(model_dtype))
             
     if is_speculative:
-        draft_model = _load_model(draft_checkpoint_path, device, precision, use_tp)
+        draft_model = _load_model(
+            draft_checkpoint_path,
+            None,
+            None,
+            device,
+            precision,
+            use_tp
+        )
     else:
         draft_model = None
 
@@ -577,6 +631,18 @@ def cli():
         help="Model checkpoint path.",
     )
     parser.add_argument(
+        "--checkpoint-dir",
+        type=Path,
+        default=None,
+        help="Model checkpoint directory.",
+    )
+    parser.add_argument(
+        "--params-path",
+        type=Path,
+        default=None,
+        help="Parameter file path.",
+    )
+    parser.add_argument(
         "--tokenizer-path",
         type=Path,
         default=None,
@@ -626,7 +692,7 @@ def cli():
     parser.add_argument(
         "-d",
         "--dtype",
-        default="fp32",
+        default="float32",
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
     parser.add_argument(
@@ -642,6 +708,7 @@ def cli():
               torch.manual_seed(args.seed)
 
     main(args)
+
 
 if __name__ == "__main__":
         cli()
