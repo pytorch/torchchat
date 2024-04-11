@@ -49,7 +49,8 @@ def embedding_int8(
     result_weights = F.embedding(indices, weight)
     result_scales = F.embedding(indices, scales)
 
-    rw_view = result_weights.to(dtype=result_scales.dtype).view(tuple(result_weights.shape[:-1]) + (scales.shape[1], -1, ))
+    rw_dtype = result_weights.to(dtype=scales.dtype)
+    rw_view = rw_dtype.view(tuple(result_weights.shape[:-1]) + (scales.shape[1], -1, ))
     rs_view = result_scales.view(tuple(result_scales.shape[:-1]) + (scales.shape[1], 1, ))
     # print(f"rw_view {rw_view.shape}")
     # print(f"rs_view {rs_view.shape}")
