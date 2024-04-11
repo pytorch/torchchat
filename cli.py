@@ -83,6 +83,18 @@ def cli_args():
         help="Model checkpoint path.",
     )
     parser.add_argument(
+        "--checkpoint-dir",
+        type=Path,
+        default=None,
+        help="Model checkpoint directory.",
+    )
+    parser.add_argument(
+        "--params-path",
+        type=Path,
+        default=None,
+        help="Parameter file path.",
+    )
+    parser.add_argument(
         "--output-pte-path",
         type=str,
         default=None,
