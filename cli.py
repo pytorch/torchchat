@@ -95,6 +95,12 @@ def cli_args():
         help="Parameter file path.",
     )
     parser.add_argument(
+        "--tokenizer-path",
+        type=Path,
+        default=None,
+        help="Model checkpoint path.",
+    )    
+    parser.add_argument(
         "--output-pte-path",
         type=str,
         default=None,
