@@ -13,6 +13,7 @@ from torch.export import Dim, export
 
 from generate import _load_model, decode_one_token
 from quantize import quantize_model
+from quantize import quantize_model, name_to_dtype, set_precision, get_precision
 
 from model import Transformer
 # from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
@@ -92,23 +93,23 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     # need to use kv sdpa?
     edge_config = EdgeCompileConfig(
         _check_ir_validity=False,
-        _skip_type_promotion=bool(args.dtype == "fp16"),
+        _skip_type_promotion=bool(target_precision == torch.float16),
     )
 
     dynamic_shapes = None
 
-    if args.dtype is not None:
-        if args.dtype == "fp16": # or args.quantization_mode == "int4":
-            if state_dict_dtype != torch.float16:
-                print("model.to torch.float16")
-                model = model.to(dtype=torch.float16)
-                state_dict_dtype = torch.float16
-        elif args.dtype == "fp32":
-            if state_dict_dtype != torch.float32:
-                print("model.to torch.float32")
-                model = model.to(dtype=torch.float32)
-        else:
-            raise ValueError(f"Unsupported dtype: {args.dtype}")
+    target_precision = get_precision()
+    if target_precision == torch.float16: # or args.quantization_mode=="int4":
+        if state_dict_dtype != torch.float16:
+            print("model.to torch.float16")
+            model = model.to(dtype=torch.float16)
+            state_dict_dtype = torch.float16
+    elif target_precision = torch.float32:
+        if state_dict_dtype != torch.float32:
+            print("model.to torch.float32")
+            model = model.to(dtype=torch.float32)
+    else:
+        raise ValueError(f"Unsupported dtype for ET export: {target_precision}")
 
     with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]), torch.no_grad():
         m = capture_pre_autograd_graph(
