@@ -42,11 +42,11 @@ class ModelArgs:
             # If hidden_dim is not explicitly set in the ModelArgs,
             # then calculate implicitly based on dim and
             # also multiple of `args.multiple_of`
-            multiple_of = args.multiple_of
+            multiple_of = self.multiple_of
             hidden_dim = 4 * dim
             hidden_dim = int(2 * hidden_dim / 3)
-            if args.ffn_dim_multiplier is not None:
-                hidden_dim = int(args.ffn_dim_multiplier * hidden_dim)
+            if self.ffn_dim_multiplier is not None:
+                hidden_dim = int(self.ffn_dim_multiplier * hidden_dim)
             args.hidden_dim = multiple_of * ((hidden_dim + multiple_of - 1) // multiple_of)
         self.head_dim = self.dim // self.n_heads
 
