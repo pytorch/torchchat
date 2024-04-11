@@ -91,31 +91,27 @@ jobs:
           echo "******************************************"
           echo "******** INT8 group-wise quantized *******"
           echo "******************************************"
-          # python generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-          # cat ./output_eager
-          # python generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
-          # cat ./output_compiled
-          # python export.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
-          # python generate.py --dtype ${DTYPE} --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
-          # cat ./output_aoti
+	  if [ ${DTYPE} == float16 ]; then
+            DTYPE=bfloat16
+          fi
+
+          python generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+          cat ./output_eager
+          python generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
+          cat ./output_compiled
+          python export.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+          python generate.py --dtype ${DTYPE} --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
+          cat ./output_aoti
 
           echo "******************************************"
           echo "******** INT4 group-wise quantized *******"
           echo "******************************************"
-          # python generate.py --dtype ${DTYPE} --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-          # cat ./output_eager
-          # python generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
-          # cat ./output_compiled
-          # python export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
-          # python generate.py --dtype ${DTYPE} --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
-          # cat ./output_aoti
+          python generate.py --dtype ${DTYPE} --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+          cat ./output_eager
+          python generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
+          cat ./output_compiled
+          python export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+          python generate.py --dtype ${DTYPE} --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
+          cat ./output_aoti
 
           echo "tests complete"
-          echo "******************************************"
-          # echo "********* EAGER vs TORCH.COMPILE *********"
-          # echo "******************************************"
-          # diff output_eager output_compiled
-          # echo "******************************************"
-          # echo "********* EAGER vs AOT INDUCTOR  *********"
-          # echo "******************************************"
-          # diff output_eager output_aoti
