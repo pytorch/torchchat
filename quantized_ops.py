@@ -28,7 +28,7 @@ def embedding_int8(
     indices = input
     # embedding_byte_weight_checks(weight, weight_scales, weight_zero_points)
     group_size = weight.size(1) // (
-        weight_scales.size(1) if weight_scales.dim() == 2 else 1
+        scales.size(1) if scales.dim() == 2 else 1
     )
     # ET definition
     if False:
