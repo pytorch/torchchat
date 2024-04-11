@@ -401,7 +401,8 @@ def _main(
         use_tp
     )
     if dso_path:
-        assert not model_dtype, f"dtype setting not valid for a DSO model. Specify dtype during export."
+        # make sure user did not try to set dtype
+        assert model_dtype == "float32", f"dtype setting not valid for a DSO model. Specify dtype during export."
         assert quantize is None or quantize == "{ }", f"quantize not valid for exported DSO model. Specify quantization during export."
         try:
             model = model_
@@ -415,7 +416,8 @@ def _main(
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {dso_path}")
     elif pte_path:
-        assert not model_dtype, f"dtype setting not valid for a PTE model. Specify dtype during export."
+        # make sure user did not try to set dtype
+        assert model_dtype == "float32", f"dtype setting not valid for a DSO model. Specify dtype during export."
         assert quantize is None or quantize == "{ }", f"quantize not valid for exported PTE model. Specify quantization during export."
         try:
             from model_et import PTEModel
@@ -583,6 +585,8 @@ def main(args):
         args.top_k,
         args.temperature,
         args.checkpoint_path,
+        args.checkpoint_dir,
+        args.params_path,
         args.tokenizer_path,
         args.compile,
         args.compile_prefill,
