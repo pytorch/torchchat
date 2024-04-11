@@ -31,6 +31,27 @@ Featuring:
 The model definition (and much more!) is adopted from gpt-fast, so we support the same models.  As new models are supported by gpt-fast,
 bringing them into torchat should be straight forward.  In addition, we invite community contributions
 
+# Torchat usage
+
+torchat tools are either accessible through a common interface torchat, supporting chat, prompted text generation, model export, 
+model test, and a standalone C/C++ runtime for server.
+
+| function | torchat call | direct command | tested |
+|---|----|----|-----|
+chat          | `torch --chat`   | n/a | 🚧 |
+generate text | `torchat --generate` |`generate` | ✅ |
+export model  | `torchat --export` | `export` | ✅ |
+exported model test | `torchat --chat` | n/a  | 🚧 |
+exported model test | `torchat --generate` |`generate` | ✅ |
+server C++ runtime | n/a | run.cpp model.so | ✅ |
+server C++ runtime | n/a | run.cpp model.pte | ✅ |
+mobile C++ runtime | n/a | app model.pte | ✅ |
+mobile C++ runtime | n/a | app + AOTI | 🚧 |
+
+Advantageously, exported models can be laoded back into torchat for chat or text generation, thus enabling experimentation with the exported model
+as well as model quality validation, retaining the prior Python interface to simplify reuse of tests and test harnesses developed in Python during
+model development and qualification.
+
 # Getting started
 
 Follow the `gpt-fast` [installation instructions](https://github.com/pytorch-labs/gpt-fast?tab=readme-ov-file#installation).
