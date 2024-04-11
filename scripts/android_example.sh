@@ -55,13 +55,12 @@ export PATH="$(realpath sdk/cmdline-tools/latest/bin):$PATH"
 
 export ANDROID_HOME="$(realpath ./sdk)"
 export ANDROID_SDK_ROOT="$ANDROID_HOME"
-yes | sdkmanager --sdk_root="${ANDROID_HOME}" --licenses
-sdkmanager --sdk_root="${ANDROID_HOME}" --install "platforms;android-34"
-sdkmanager --sdk_root="${ANDROID_HOME}" --install "ndk;25.0.8775105"
-sdkmanager --sdk_root="${ANDROID_HOME}" --install "platform-tools"
+sdkmanager "platforms;android-34"
+sdkmanager "ndk;25.0.8775105"
+sdkmanager "platform-tools"
 export ANDROID_NDK="$ANDROID_HOME/ndk/25.0.8775105"
-sdkmanager --sdk_root="${ANDROID_HOME}" --install "emulator"
-sdkmanager --sdk_root="${ANDROID_HOME}" --install "system-images;android-34;google_apis;${ANDROID_ABI}"
+sdkmanager "emulator"
+sdkmanager "system-images;android-34;google_apis;${ANDROID_ABI}"
 
 popd
 
@@ -76,5 +75,5 @@ sdk/emulator/emulator @llama-fast &
 adb wait-for-device
 adb shell mkdir /data/local/tmp/llama
 adb push stories15M.pte /data/local/tmp/llama
-adb push tokenizer.bin /data/local/tmp/llama
+adb push checkpoints/stories15M/tokenizer.bin /data/local/tmp/llama
 adb install -t build/src/executorch/examples/demo-apps/android/LlamaDemo/app/build/outputs/apk/debug/app-debug.apk
