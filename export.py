@@ -12,6 +12,8 @@ import torch
 import torch.nn as nn
 from torch.export import Dim, export
 
+from quantize import quantize_model, name_to_dtype, set_precision, get_precision
+
 try:
     executorch_export_available = True
     from export_et import export_model as export_model_et
@@ -62,8 +64,9 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
     assert checkpoint_path.is_file(), checkpoint_path
 
     print(f"Using device={device}")
-    precision = torch.float  # bfloat16
-
+    precision = name_to_dtype(args.dtype)  # torch.float  # bfloat16
+    set_precision(precision)
+    
     print("Loading model ...")
     t0 = time.time()
     model = _load_model(
