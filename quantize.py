@@ -760,11 +760,11 @@ class WeightOnlyInt4Linear(torch.nn.Module):
             self.weight,
             self.scales_and_zeros,
             None,
-            self.groupsize,
-            self.origin_in_features,
-            self.int_features,
-            self.out_features,
-            self.padding
+            groupsize=self.groupsize,
+            origin_in_features=self.origin_in_features,
+            in_features=self.in_features,
+            out_features=self.out_features,
+            padding=self.padding
         )
 
 #########################################################################

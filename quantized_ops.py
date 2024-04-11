@@ -90,7 +90,7 @@ def linear_int8(
 
 torchat_lib.define(
     "linear_int4(Tensor input, Tensor weight, Tensor scales_and_zeros, "
-    "Tensor bias = None, int groupsize, int origin_in_features, "
+    "Tensor bias=None, *, int groupsize, int origin_in_features, "
     "int int_features, int out_features, bool padding = True) -> Tensor",
 )
 
@@ -99,7 +99,7 @@ def linear_int4(
         input: torch.Tensor,
         weight: torch.Tensor,
         scales_and_zeros: torch.Tensor,
-        bias: torch.Tensor = None,
+        bias: torch.Tensor,
         *,
         groupsize: int,
         origin_in_features: int,
