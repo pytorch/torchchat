@@ -755,12 +755,16 @@ class WeightOnlyInt4Linear(torch.nn.Module):
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         # MKG torch.float
         input = input.to(torch.float)
-        if self.padding:
-            import torch.nn.functional as F
-            input = F.pad(input, pad=(0, self.in_features - self.origin_in_features))
-        return linear_forward_int4(
+        return torch.ops.torchat.linear_int4(
             input,
-            self.weight, self.scales_and_zeros, self.out_features, self.groupsize
+            self.weight,
+            self.scales_and_zeros,
+            None,
+            self.groupsize,
+            self.origin_in_features,
+            self.int_features,
+            self.out_features,
+            self.padding
         )
 
 #########################################################################
