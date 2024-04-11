@@ -28,11 +28,6 @@ def cli_args():
         "--prompt", type=str, default="Hello, my name is", help="Input prompt."
     )
     parser.add_argument(
-        "--interactive",
-        action="store_true",
-        help="Whether to launch in interactive mode",
-    )
-    parser.add_argument(
         "--tiktoken",
         action="store_true",
         help="Whether to use tiktoken tokenizer.",
