@@ -37,7 +37,7 @@ def name_to_dtype(name):
     if name in name_to_dtype_dict:
         return name_to_dtype_dict[name]
     else:
-        raise RuntimeError("unsupported dtype specified")
+        raise RuntimeError("unsupported dtype {name} specified")
     
 name_to_dtype_dict = {
     "fp32" : torch.float,
