@@ -113,6 +113,18 @@ def cli_args():
         help="Filename"
     )
     parser.add_argument(
+        "--dso-path",
+        type=Path,
+        default=None,
+        help="Use the specified AOTI DSO model."
+    )
+    parser.add_argument(
+        "--pte-path",
+        type=Path,
+        default=None,
+        help="Use the specified Executorch PTE model."
+    )    
+    parser.add_argument(
         "-d",
         "--dtype",
         default=None,
