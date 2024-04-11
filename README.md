@@ -38,7 +38,7 @@ model test, and a standalone C/C++ runtime for server.
 
 | function | torchat call | direct command | tested |
 |---|----|----|-----|
-chat          | `torch --chat`   | n/a | 🚧 |
+chat          | `torchat --chat`   | n/a | 🚧 |
 generate text | `torchat --generate` |`generate` | ✅ |
 export model  | `torchat --export` | `export` | ✅ |
 exported model test (dso,pte) | `torchat --chat` | n/a  | 🚧 |
