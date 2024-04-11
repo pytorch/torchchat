@@ -277,13 +277,17 @@ def encode_tokens(tokenizer, string, bos=True, device="cuda"):
 def _load_model(
         checkpoint_path,
         checkpoint_dir,
+        params_path,
         device,
         precision,
         use_tp=False
 ):
     use_cuda = "cuda" in device
     with torch.device("meta"):
-        model = Transformer.from_name(checkpoint_path.parent.name)
+        if params_path:
+            model = Transformer.from_params(params_path)
+        else:
+            model = Transformer.from_name(checkpoint_path.parent.name)
 
     # checkpoint = torch.load(str(checkpoint_path), mmap=True, weights_only=True)
     cps = []
@@ -341,6 +345,7 @@ def main(
     temperature: float = 0.8,
     checkpoint_path: Optional[Path] = None,
     checkpoint_dir: Optional[Path] = None,
+    params_path: Optional[Path] = None,
     tokenizer_path: Optional[Path] = None,
     compile: bool = True,
     compile_prefill: bool = False,
@@ -385,7 +390,14 @@ def main(
 
     print("Loading model ...")
     t0 = time.time()
-    model_ = _load_model(checkpoint_path, checkpoint_dir, device, precision, use_tp)
+    model_ = _load_model(
+        checkpoint_path,
+        checkpoint_dir,
+        params_path,
+        device,
+        precision,
+        use_tp
+    )
     if dso_path:
         assert not model_dtype, f"dtype setting not valid for a DSO model. Specify dtype during export."
         assert quantize is None or quantize == "{ }", f"quantize not valid for exported DSO model. Specify quantization during export."
@@ -424,7 +436,14 @@ def main(
             model.to(dtype=name_to_dtype(model_dtype))
             
     if is_speculative:
-        draft_model = _load_model(draft_checkpoint_path, None, device, precision, use_tp)
+        draft_model = _load_model(
+            draft_checkpoint_path,
+            None,
+            None,
+            device,
+            precision,
+            use_tp
+        )
     else:
         draft_model = None
 
@@ -594,6 +613,12 @@ def cli():
         help="Model checkpoint directory.",
     )
     parser.add_argument(
+        "--params-path",
+        type=Path,
+        default=None,
+        help="Parameter file path.",
+    )
+    parser.add_argument(
         "--tokenizer-path",
         type=Path,
         default=None,
@@ -662,6 +687,7 @@ def cli():
         args.temperature,
         args.checkpoint_path,
         args.checkpoint_dir,
+        args.params_path,
         args.tokenizer_path,
         args.compile,
         args.compile_prefill,

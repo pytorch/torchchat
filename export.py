@@ -67,7 +67,13 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
     print("Loading model ...")
     t0 = time.time()
     model = _load_model(
-        checkpoint_path, args.checkpoint_dir, device=device, precision=precision, use_tp=False)
+        checkpoint_path,
+        args.checkpoint_dir,
+        args.params_path,
+        device=device,
+        precision=precision,
+        use_tp=False
+    )
 
     device_sync(device=device)  # MKG
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
@@ -154,6 +160,12 @@ def cli():
         type=Path,
         default=None,
         help="Model checkpoint directory.",
+    )
+    parser.add_argument(
+        "--params-path",
+        type=Path,
+        default=None,
+        help="Parameter file path.",
     )
     parser.add_argument(
         "--output-pte-path",
