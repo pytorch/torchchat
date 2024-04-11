@@ -1,4 +1,4 @@
-name: Compile main
+name: Compile-dtype main
 
 on:
   push:
