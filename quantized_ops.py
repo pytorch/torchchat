@@ -137,7 +137,7 @@ torchat_lib.define(
 )
 
 @impl(torchat_lib, "linear_a8w4dq", "CompositeExplicitAutograd")
-def linear_a8w4dq((
+def linear_a8w4dq(
     input, weight, scales, zeros, out_features, group_size, precision
 ):
     x = per_token_dynamic_quant(input)
