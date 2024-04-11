@@ -7,6 +7,7 @@
 from typing import Optional
 
 import torch
+import torch.nn.functional as F
 from torch.library import impl, impl_abstract
 
 torchat_lib = torch.library.Library(
@@ -110,7 +111,6 @@ def linear_int4(
     assert bias is None, "bias != None not implemented"
 
     if padding:
-        import torch.nn.functional as F
         input = F.pad(input, pad=(0, in_features - origin_in_features))
 
     # the weight is in int4pack format
