@@ -48,7 +48,7 @@ class ModelArgs:
             hidden_dim = int(2 * hidden_dim / 3)
             if self.ffn_dim_multiplier is not None:
                 hidden_dim = int(self.ffn_dim_multiplier * hidden_dim)
-            self.hidden_dim = multiple_of * ((hidden_dim + multiple_of - 1) // multiple_of)
+            self.hidden_dim = find_multiple(hidden_dim, multiple_of)
         self.head_dim = self.dim // self.n_heads
 
     @classmethod
