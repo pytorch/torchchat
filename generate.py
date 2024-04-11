@@ -365,8 +365,7 @@ def _main(
         (dso_path and Path(dso_path).is_file()) or
         (pte_path and Path(pte_path).is_file())
     ), "need to specified a valid checkpoint path, DSO path, or PTE path"
-    print(f"dso_path {dso_path} pte_path {pte_path}")
-    assert not (dso_path and pte_path), "specify either DSO path or PTE path, but not both"
+    assert not (dso_path and pte_path), f"dso_path {dso_path} pte_path {pte_path}" # "specify either DSO path or PTE path, but not both"
 
     if (checkpoint_path and (dso_path or pte_path)):
         print("Warning: checkpoint path ignored because an exported DSO or PTE path specified")
