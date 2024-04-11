@@ -194,7 +194,7 @@ def generate(
     prompt: torch.Tensor,
     max_new_tokens: int,
     *,
-    interactive: bool,
+    chat_mode: bool,
     draft_model: Transformer,
     speculate_k: Optional[int] = 8,
     callback=lambda x: x,
@@ -208,7 +208,7 @@ def generate(
     # create an empty tensor of the expected final shape and fill in the current tokens
     T = prompt.size(0)
     T_new = T + max_new_tokens
-    if interactive:
+    if chat_mode:
         max_seq_length = 350
     else:
         max_seq_length = min(T_new, model.config.block_size)
@@ -338,7 +338,7 @@ B_INST, E_INST = "[INST]", "[/INST]"
 
 def _main(
     prompt: str = "Hello, my name is",
-    interactive: bool = False,
+    chat_mode: bool = False,
     num_samples: int = 5,
     max_new_tokens: int = 100,
     top_k: int = 200,
@@ -494,13 +494,13 @@ def _main(
 
     for i in range(start, num_samples):
         device_sync(device=device)  # MKG
-        if i >= 0 and interactive:
+        if i >= 0 and chat_mode:
             prompt = input("What is your prompt? ")
             if is_chat:
                 prompt = f"{B_INST} {prompt.strip()} {E_INST}"
             encoded = encode_tokens(tokenizer, prompt, bos=True, device=device)
 
-        if interactive and i >= 0:
+        if chat_mode and i >= 0:
             buffer = []
             period_id = tokenizer.encode(".")[0]
             done_generating = False
@@ -534,7 +534,7 @@ def _main(
                 max_new_tokens,
                 draft_model=draft_model,
                 speculate_k=speculate_k,
-                interactive=interactive,
+                chat_mode=chat_mode,
                 callback=callback,
                 temperature=temperature,
                 top_k=top_k,
@@ -551,7 +551,7 @@ def _main(
         device_sync(device=device)  # MKG
         t = time.perf_counter() - t0
 
-        if not interactive:
+        if not chat_mode:
             print(tokenizer.decode(y.tolist()))
         else:
             print()
@@ -579,7 +579,7 @@ def _main(
 def main(args):
     _main(
         args.prompt,
-        args.interactive,
+        args.chat,
         args.num_samples,
         args.max_new_tokens,
         args.top_k,
