@@ -19,6 +19,12 @@ def cli_args():
     parser = argparse.ArgumentParser(description="Your CLI description.")
 
     parser.add_argument(
+        "--seed",
+        type=int,
+        default=1234, # set None for release
+        help="Initialize torch seed"
+    )
+    parser.add_argument(
         "--prompt", type=str, default="Hello, my name is", help="Input prompt."
     )
     parser.add_argument(
@@ -105,4 +111,9 @@ def cli_args():
         "--device", type=str, default=default_device, help="Device to use"
     )
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    if args.seed:
+              torch.manual_seed(args.seed)
+
+    return args

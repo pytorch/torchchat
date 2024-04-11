@@ -19,12 +19,8 @@ from cli import cli_args
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def cli():
-
     args = cli_args()
     
-    if args.seed:
-              torch.manual_seed(args.seed)
-
     if args.generate:
         generate_main(args)
     elif args.export:

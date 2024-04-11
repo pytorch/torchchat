@@ -602,12 +602,7 @@ def main(args):
     )
 
 def cli():
-
     args = cli_args()
-
-    if args.seed:
-              torch.manual_seed(args.seed)
-
     main(args)
 
 
