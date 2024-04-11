@@ -41,8 +41,8 @@ model test, and a standalone C/C++ runtime for server.
 chat          | `torch --chat`   | n/a | 🚧 |
 generate text | `torchat --generate` |`generate` | ✅ |
 export model  | `torchat --export` | `export` | ✅ |
-exported model test | `torchat --chat` | n/a  | 🚧 |
-exported model test | `torchat --generate` |`generate` | ✅ |
+exported model test (dso,pte) | `torchat --chat` | n/a  | 🚧 |
+exported model test (dso,pte) | `torchat --generate` |`generate` | ✅ |
 server C++ runtime | n/a | run.cpp model.so | ✅ |
 server C++ runtime | n/a | run.cpp model.pte | ✅ |
 mobile C++ runtime | n/a | app model.pte | ✅ |
