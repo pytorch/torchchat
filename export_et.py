@@ -103,7 +103,7 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
             print("model.to torch.float16")
             model = model.to(dtype=torch.float16)
             state_dict_dtype = torch.float16
-    elif target_precision = torch.float32:
+    elif target_precision == torch.float32:
         if state_dict_dtype != torch.float32:
             print("model.to torch.float32")
             model = model.to(dtype=torch.float32)
