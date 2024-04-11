@@ -78,7 +78,7 @@ def linear_int8(
     # for now, we special-case channel-wise, because we know how to
     # make that fast with Triton 
     if scales.shape[1] == 1:
-        return F.linear(input, weight.to(dtype=input.dtype)) * self.scales
+        return F.linear(input, weight.to(dtype=input.dtype)) * scales
     else:
         return F.linear(
             input,
