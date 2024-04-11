@@ -68,7 +68,7 @@ def linear_int8(
         weight: torch.Tensor,
         scales: torch.Tensor,
         bias: Optional[torch.Tensor] = None,
-) -> Tensor:
+) -> torch.Tensor:
     assert bias is None, "bias != None not implemented"
     
     scales = scales.view(scales.shape[0], -1)
@@ -106,7 +106,7 @@ def linear_int4(
         in_features: int,
         out_features: int,
         padding: bool = True,
-) -> Tensor:
+) -> torch.Tensor:
     assert bias is None, "bias != None not implemented"
 
     if padding:
