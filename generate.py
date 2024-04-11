@@ -336,7 +336,7 @@ def _load_model(
 B_INST, E_INST = "[INST]", "[/INST]"
 
 
-def main(
+def _main(
     prompt: str = "Hello, my name is",
     interactive: bool = False,
     num_samples: int = 5,
@@ -357,6 +357,7 @@ def main(
     pte_path=None,
     quantize=None,
     model_dtype=None,
+    use_tiktoken=False,
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
     assert (
@@ -573,6 +574,28 @@ def main(
     )
     print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
+def main(args):
+    _main(
+        args.prompt,
+        args.interactive,
+        args.num_samples,
+        args.max_new_tokens,
+        args.top_k,
+        args.temperature,
+        args.checkpoint_path,
+        args.tokenizer_path,
+        args.compile,
+        args.compile_prefill,
+        args.profile,
+        args.draft_checkpoint_path,
+        args.speculate_k,
+        args.device,
+        args.dso_path,
+        args.pte_path,
+        args.quantize,
+        args.dtype,
+        args.tiktoken
+    )
 
 def cli():
     import argparse
@@ -672,6 +695,11 @@ def cli():
         default="float32",
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
+    parser.add_argument(
+        "--tiktoken",
+        action="store_true",
+        help="Whether to use tiktoken tokenizer.",
+    )
 
 
     args = parser.parse_args()
@@ -679,28 +707,8 @@ def cli():
     if args.seed:
               torch.manual_seed(args.seed)
 
-    main(
-        args.prompt,
-        args.interactive,
-        args.num_samples,
-        args.max_new_tokens,
-        args.top_k,
-        args.temperature,
-        args.checkpoint_path,
-        args.checkpoint_dir,
-        args.params_path,
-        args.tokenizer_path,
-        args.compile,
-        args.compile_prefill,
-        args.profile,
-        args.draft_checkpoint_path,
-        args.speculate_k,
-        args.device,
-        args.dso_path,
-        args.pte_path,
-        args.quantize,
-        args.dtype,
-    )
+    main(args)
+
 
 if __name__ == "__main__":
         cli()

@@ -60,7 +60,11 @@ class model_wrapper(nn.Module):
         return logits  # sample(logits, **sampling_kwargs)
 
 
-def main(checkpoint_path, device, quantize = "{ }", args = None):
+def main(args):
+    checkpoint_path = args.checkpoint_path
+    device = args.device
+    quantize = args.quantize
+
     assert checkpoint_path.is_file(), checkpoint_path
 
     print(f"Using device={device}")
@@ -201,7 +205,7 @@ def cli():
 
 
     args = parser.parse_args()
-    main(args.checkpoint_path, args.device, args.quantize, args)
+    main(args)
 
 if __name__ == "__main__":
     cli()
