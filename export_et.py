@@ -89,6 +89,8 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
 
     state_dict = model.state_dict()
     state_dict_dtype = state_dict[next(iter(state_dict))].dtype
+    target_precision = get_precision()
+    dynamic_shapes = None
 
     # need to use kv sdpa?
     edge_config = EdgeCompileConfig(
@@ -96,9 +98,6 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
         _skip_type_promotion=bool(target_precision == torch.float16),
     )
 
-    dynamic_shapes = None
-
-    target_precision = get_precision()
     if target_precision == torch.float16: # or args.quantization_mode=="int4":
         if state_dict_dtype != torch.float16:
             print("model.to torch.float16")
