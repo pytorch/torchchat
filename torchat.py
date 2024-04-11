@@ -17,7 +17,7 @@ from generate import main as generate_main
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
-def cli():
+def cli_args():
     import argparse
 
     parser = argparse.ArgumentParser(description="Your CLI description.")
@@ -109,8 +109,11 @@ def cli():
         "--device", type=str, default=default_device, help="Device to use"
     )
 
+    return parser.parse_args()
+    
+def cli():
 
-    args = parser.parse_args()
+    args = cli_args()
     
     if args.seed:
               torch.manual_seed(args.seed)
