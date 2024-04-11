@@ -49,7 +49,7 @@ def embedding_int8(
     result_weights = F.embedding(indices, weight)
     result_scales = F.embedding(indices, scales)
 
-    rw_view = result_weights.to(dtype=result_scales.dtype).view(tuple(result_weights.shape[:-1] + (scales.shape[1], -1, )))
+    rw_view = result_weights.to(dtype=result_scales.dtype).view(tuple(result_weights.shape[:-1]) + (scales.shape[1], -1, ))
     rs_view = result_scales.view(tuple(result_scales.shape[:-1]) + (scales.shape[1], 1, ))
     # print(f"rw_view {rw_view.shape}")
     # print(f"rs_view {rs_view.shape}")
@@ -129,3 +129,44 @@ def linear_int4(
     c = c.reshape(new_shape)
     return c
 
+
+torchat_lib.define(
+    "linear_a8w4dq(Tensor input, Tensor weight, Tensor scales, "
+    "Tensor zeros, int out_features, int group_size, "
+    "dtype precision) -> Tensor",
+)
+
+@impl(torchat_lib, "linear_a8w4dq", "CompositeExplicitAutograd")
+def linear_a8w4dq((
+    input, weight, scales, zeros, out_features, group_size, precision
+):
+    x = per_token_dynamic_quant(input)
+    weight_int8 = weight
+    # TODO: verify and remove following reshape code
+    # origin_x_size = x.size()
+    # x = x.reshape(-1, origin_x_size[-1])
+
+    # TODO: better API
+    # weight_int8 = torch.ops.quantized_decomposed.unpack_int4_to_int8(weight_int4packed)
+    n_bit = 4
+    quant_min = -(2 ** (n_bit - 1))
+    quant_max = 2 ** (n_bit - 1) - 1
+    w_dq = torch.ops.quantized_decomposed.dequantize_per_channel_group(
+        weight_int8,
+        scales,
+        zeros,
+        quant_min,
+        quant_max,
+        torch.int8,
+        group_size,
+        precision,
+    )
+
+    # x = x.to(torch.float16)
+    # w_dq = w_dq.to(torch.float16)
+    c = torch.nn.functional.linear(x, w_dq)
+
+    # new_shape = origin_x_size[:-1] + (out_features,)
+    # c = c.reshape(new_shape)
+
+    return c

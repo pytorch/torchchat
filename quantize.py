@@ -763,40 +763,6 @@ def prepare_int4_weight_and_scales_and_zeros(weight, group_size, precision):
     return weight_int8, scales, zeros
 
 
-def linear_forward_8da4w(
-    x, weight_int8, scales, zeros, out_features, group_size, precision
-):
-    x = per_token_dynamic_quant(x)
-    # TODO: verify and remove following reshape code
-    # origin_x_size = x.size()
-    # x = x.reshape(-1, origin_x_size[-1])
-
-    # TODO: better API
-    # weight_int8 = torch.ops.quantized_decomposed.unpack_int4_to_int8(weight_int4packed)
-    n_bit = 4
-    quant_min = -(2 ** (n_bit - 1))
-    quant_max = 2 ** (n_bit - 1) - 1
-    w_dq = torch.ops.quantized_decomposed.dequantize_per_channel_group(
-        weight_int8,
-        scales,
-        zeros,
-        quant_min,
-        quant_max,
-        torch.int8,
-        group_size,
-        precision,
-    )
-
-    # x = x.to(torch.float16)
-    # w_dq = w_dq.to(torch.float16)
-    c = torch.nn.functional.linear(x, w_dq)
-
-    # new_shape = origin_x_size[:-1] + (out_features,)
-    # c = c.reshape(new_shape)
-
-    return c
-
-
 def find_multiple(n: int, *args: Tuple[int]) -> int:
     k: int = reduce(lambda x, y: x * y // gcd(x, y), args + (1,))  # type: ignore[9]
     if n % k == 0:
@@ -996,7 +962,7 @@ class Int8DynActInt4WeightLinear(torch.nn.Module):
         input = input.to(self.precision)
         # padding is removed for perf
         # input = F.pad(input, pad=(0, self.in_features - self.origin_in_features))
-        return linear_forward_8da4w(
+        return torch.ops.torchat.linear_a8w4dq(
             input,
             self.weight,
             self.scales,
