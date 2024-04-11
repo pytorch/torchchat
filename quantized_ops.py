@@ -14,11 +14,11 @@ torchat_lib = torch.library.Library(
 )
 
 torchat_lib.define(
-    "embedding_int8(Tensor weight, Tensor weight_scales, Tensor? weight_zero_points, "
-    "int weight_quant_min, int weight_quant_max, Tensor indices) -> Tensor",
+    "embedding_int8(Tensor input, Tensor weight, "
+    "Tensor scales) -> Tensor",
 )
 
-@impl(torchat_lib, "embedding_int", "CompositeExplicitAutograd")
+@impl(torchat_lib, "embedding_int8", "CompositeExplicitAutograd")
 def embedding_int8(
     input: torch.Tensor,
     weight: torch.Tensor,
@@ -89,7 +89,7 @@ def linear_int8(
 
 
 torchat_lib.define(
-    "linear_int4(Tensor input, Tensor weight, Tensor scales, "
+    "linear_int4(Tensor input, Tensor weight, Tensor scales_and_zeros, "
     "Tensor bias = None, int groupsize, int origin_in_features, "
     "int int_features, int out_features, bool padding = True) -> Tensor",
 )
@@ -111,7 +111,7 @@ def linear_int4(
 
     if padding:
         import torch.nn.functional as F
-        input = F.pad(input, pad=(0, in_features - origin_in_features)
+        input = F.pad(input, pad=(0, in_features - origin_in_features))
 
     # the weight is in int4pack format
     # rename to remind ourselves of that
