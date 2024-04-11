@@ -330,7 +330,9 @@ class RMSNorm(nn.Module):
         return output * self.weight
 
 # transpsoed first two arguments to align with model in ET
-def precompute_freqs_cis(n_elem: int, seq_len: int, base: int = 10000) -> Tensor:
+def precompute_freqs_cis(n_elem: int, seq_len: int, base: int = 10000, dtype=None) -> Tensor:
+    if not dtype:
+        dtype = get_precision()
     freqs = 1.0 / (
         base ** (torch.arange(0, n_elem, 2)[: (n_elem // 2)].float() / n_elem)
     )
@@ -338,7 +340,7 @@ def precompute_freqs_cis(n_elem: int, seq_len: int, base: int = 10000) -> Tensor
     freqs = torch.outer(t, freqs)
     freqs_cis = torch.polar(torch.ones_like(freqs), freqs)
     cache = torch.stack([freqs_cis.real, freqs_cis.imag], dim=-1)
-    return cache.to(dtype=torch.float) # bfloat16)
+    return cache.to(dtype=dtype) # bfloat16)
 
 
 def apply_rotary_emb(x: Tensor, freqs_cis: Tensor) -> Tensor:
