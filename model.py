@@ -92,6 +92,22 @@ transformer_configs = {
         intermediate_size=14336,
         vocab_size=32000,
     ),
+    "Mistral-7B-Instruct-v0.1": dict(
+        n_layer=32,
+        n_head=32,
+        n_local_heads=8,
+        dim=4096,
+        intermediate_size=14336,
+        vocab_size=32000,
+    ),
+    "Mistral-7B-Instruct-v0.2": dict(
+        n_layer=32,
+        n_head=32,
+        n_local_heads=8,
+        dim=4096,
+        intermediate_size=14336,
+        vocab_size=32000,
+    ),
     "stories15M": dict(n_layer=6, n_head=6, dim=288),
     "stories110M": dict(n_layer=12, n_head=12, dim=768),
 }
