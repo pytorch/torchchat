@@ -14,7 +14,7 @@ import torch._dynamo.config
 import torch._inductor.config
 
 from quantize import quantize_model, name_to_dtype, set_precision, get_precision
-from torchat import cli_args
+from cli import cli_args
 
 def device_sync(device):
     if "cuda" in device:

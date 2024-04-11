@@ -13,7 +13,7 @@ import torch.nn as nn
 from torch.export import Dim, export
 
 from quantize import quantize_model, name_to_dtype, set_precision, get_precision
-from torchat import cli_args
+from cli import cli_args
 
 try:
     executorch_export_available = True
