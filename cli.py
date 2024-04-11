@@ -28,11 +28,6 @@ def cli_args():
         "--prompt", type=str, default="Hello, my name is", help="Input prompt."
     )
     parser.add_argument(
-        "--interactive",
-        action="store_true",
-        help="Whether to launch in interactive mode",
-    )
-    parser.add_argument(
         "--tiktoken",
         action="store_true",
         help="Whether to use tiktoken tokenizer.",
@@ -47,6 +42,12 @@ def cli_args():
         action="store_true",
         help="Use torchat to generate a sequence using a model.",
     )
+    
+    parser.add_argument(
+        "--chat",
+        action="store_true",
+        help="Use torchat to for an interactive chat session.",
+    )    
     parser.add_argument(
         "--num-samples",
         type=int,
