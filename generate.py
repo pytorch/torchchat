@@ -14,7 +14,7 @@ import torch._dynamo.config
 import torch._inductor.config
 
 from quantize import quantize_model, name_to_dtype, set_precision, get_precision
-
+from cli import cli_args
 
 def device_sync(device):
     if "cuda" in device:
@@ -602,115 +602,7 @@ def main(args):
     )
 
 def cli():
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Your CLI description.")
-
-    parser.add_argument(
-        "--prompt", type=str, default="Hello, my name is", help="Input prompt."
-    )
-    parser.add_argument(
-        "--interactive",
-        action="store_true",
-        help="Whether to launch in interactive mode",
-    )
-    parser.add_argument("--num_samples", type=int, default=5, help="Number of samples.")
-    parser.add_argument(
-        "--max-new-tokens", type=int, default=200, help="Maximum number of new tokens."
-    )
-    parser.add_argument("--top-k", type=int, default=200, help="Top-k for sampling.")
-    parser.add_argument(
-        "--temperature", type=float, default=0.8, help="Temperature for sampling."
-    )
-    parser.add_argument(
-        "--seed",
-        type=int,
-        default=1234, # set None for release
-        help="Initialize torch seed"
-    )
-    parser.add_argument(
-        "--checkpoint-path",
-        type=Path,
-        default=None,
-        help="Model checkpoint path.",
-    )
-    parser.add_argument(
-        "--checkpoint-dir",
-        type=Path,
-        default=None,
-        help="Model checkpoint directory.",
-    )
-    parser.add_argument(
-        "--params-path",
-        type=Path,
-        default=None,
-        help="Parameter file path.",
-    )
-    parser.add_argument(
-        "--tokenizer-path",
-        type=Path,
-        default=None,
-        help="Model checkpoint path.",
-    )
-    parser.add_argument(
-        "--compile", action="store_true", help="Whether to compile the model."
-    )
-    parser.add_argument(
-        "--compile-prefill",
-        action="store_true",
-        help="Whether to compile the prefill (improves prefill perf, but higher compile times)",
-    )
-    parser.add_argument("--profile", type=Path, default=None, help="Profile path.")
-    parser.add_argument(
-        "--speculate-k", type=int, default=5, help="Speculative execution depth."
-    )
-    parser.add_argument(
-        "--draft-checkpoint-path",
-        type=Path,
-        default=None,
-        help="Draft checkpoint path.",
-    )
-    parser.add_argument(
-        "--device",
-        type=str,
-        default="cuda" if torch.cuda.is_available() else "cpu",
-        help="Device to use")
-    parser.add_argument(
-        "--dso-path",
-        type=Path,
-        default=None,
-        help="Use the specified AOTI DSO model."
-    )
-    parser.add_argument(
-        "--pte-path",
-        type=Path,
-        default=None,
-        help="Use the specified Executorch PTE model."
-    )
-    parser.add_argument(
-        "--quantize",
-        type=str,
-        default="{ }",
-        help="Quantization options."
-    )
-    parser.add_argument(
-        "-d",
-        "--dtype",
-        default="float32",
-        help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
-    )
-    parser.add_argument(
-        "--tiktoken",
-        action="store_true",
-        help="Whether to use tiktoken tokenizer.",
-    )
-
-
-    args = parser.parse_args()
-
-    if args.seed:
-              torch.manual_seed(args.seed)
-
+    args = cli_args()
     main(args)
 
 
