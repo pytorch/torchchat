@@ -584,7 +584,7 @@ def main(args):
         args.temperature,
         args.checkpoint_path,
         args.checkpoint_dir,
-        args.parms_path,
+        args.params_path,
         args.tokenizer_path,
         args.compile,
         args.compile_prefill,
