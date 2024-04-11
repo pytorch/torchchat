@@ -23,16 +23,31 @@ except:
 ##########################################################################
 ###               dtype name to torch.dtype mapping                    ###
 
+precision = torch.float
+
+def set_precision(dtype):
+    global precision
+    precision = dtype
+
+def get_precision():
+    global precision
+    return precision
+
 def name_to_dtype(name):
     if name in name_to_dtype_dict:
         return name_to_dtype_dict[name]
     else:
-        raise RuntimeError("unsupported dtype specified")
+        raise RuntimeError(f"unsupported dtype name {name} specified")
     
 name_to_dtype_dict = {
     "fp32" : torch.float,
     "fp16" : torch.float16,
     "bf16" : torch.bfloat16,
+    "float" : torch.float,
+    "half" : torch.float16,
+    "float32" : torch.float,
+    "float16" : torch.float16,
+    "bfloat16" : torch.bfloat16,
 }
 
 ##########################################################################

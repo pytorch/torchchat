@@ -4,10 +4,10 @@
 items that are not factual.  If you find an item that is incorrect, please tag as an issue, so we can triage and determine whether to fix,
 or drop from our initial release.*
 
-# TorchAt *NORTHSTAR*
+# torchat *NORTHSTAR*
 A repo for building and using llama on servers, desktops and mobile.
 
-The TorchAt repo enables model inference of llama models (and other LLMs) on servers, desktop and mobile devices.
+The torchat repo enables model inference of llama models (and other LLMs) on servers, desktop and mobile devices.
 For a list of devices, see below, under *SUPPORTED SYSTEMS*.
 
 A goal of this repo, and the design of the PT2 components was to offer seamless integration and consistent workflows.
@@ -29,12 +29,12 @@ Featuring:
   and backend-specific mobile runtimes ("delegates", such as CoreML and Hexagon).
 
 The model definition (and much more!) is adopted from gpt-fast, so we support the same models.  As new models are supported by gpt-fast,
-bringing them into TorchAt should be straight forward.  In addition, we invite community contributions
+bringing them into torchat should be straight forward.  In addition, we invite community contributions
 
 # Getting started
 
 Follow the `gpt-fast` [installation instructions](https://github.com/pytorch-labs/gpt-fast?tab=readme-ov-file#installation).
-Because TorchAt was designed to showcase the latest and greatest PyTorch 2 features for Llama (and related llama-style) models, many of the features used in TorchAt are hot off the press. [Download PyTorch nightly](https://pytorch.org/get-started/locally/) with the latest steaming hot PyTorch 2 features.
+Because torchat was designed to showcase the latest and greatest PyTorch 2 features for Llama (and related llama-style) models, many of the features used in torchat are hot off the press. [Download PyTorch nightly](https://pytorch.org/get-started/locally/) with the latest steaming hot PyTorch 2 features.
 
 
 Install sentencepiece and huggingface_hub
@@ -67,6 +67,10 @@ export MODEL_DOWNLOAD=meta-llama/Llama-2-7b-chat-hf
 While we strive to support a broad range of models, we can't test all models.  Consequently, we classify supported models as tested ✅,
 work in progress 🚧 and not tested.  We invite community contributions of both new models, as well as test reports.
 
+Some common models are recognized by torchat based on their filename (`Transformer.from_name()`).  For models not recognized based 
+on the filename, you can construct a model by initializing the `ModelArgs` dataclass that controls model construction from a parameter json
+specified using the `params-path ${PARAMS_PATH}` containing the appropriate model parameters.
+
 | Model | tested | eager | torch.compile | AOT Inductor | ET Runtime | Fits on Mobile |
 |-----|--------|-------|-----|-----|-----|-----|
 tinyllamas/stories15M | ✅ | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
@@ -90,10 +94,10 @@ Llama3 | 🚧  | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 ### More downloading
 
 
-First cd into TorchAt.  We first create a directory for stories15M and download the model and tokenizers.
+First cd into torchat.  We first create a directory for stories15M and download the model and tokenizers.
 We show how to download @Andrej Karpathy's stories15M tiny llama-style model that were used in llama2.c.  Advantageously,
 stories15M is both a great example and quick to download and run across a range of platforms, ideal for introductions like this
-README and for [testing](https://github.com/pytorch-labs/TorchAt/blob/main/.github/workflows). We will be using it throughout
+README and for [testing](https://github.com/pytorch-labs/torchat/blob/main/.github/workflows). We will be using it throughout
 this introduction as our running example.
 
 ```
@@ -123,11 +127,11 @@ We use several variables in this example, which may be set as a preparatory step
    name of the directory holding the files for the corresponding model.  You *must* follow this convention to
    ensure correct operation.
 
-* `MODEL_OUT` is the location where we store model and tokenizer information for a particular model. We recommend `checkpoints/${MODEL_NAME}`
+* `MODEL_DIR` is the location where we store model and tokenizer information for a particular model. We recommend `checkpoints/${MODEL_NAME}`
   or any other directory you already use to store model information.
 
 * `MODEL_PATH` describes the location of the model. Throughput the description
-  herein, we will assume that MODEL_PATH starts with a subdirectory of the TorchAt repo
+  herein, we will assume that MODEL_PATH starts with a subdirectory of the torchat repo
   named checkpoints, and that it will contain the actual model. In this case, the MODEL_PATH will thus
   be of the form ${MODEL_OUT}/model.{pt,pth}.  (Both the extensions `pt` and `pth`
   are used to describe checkpoints. In addition, model may be replaced with the name of the model.)
@@ -144,7 +148,7 @@ You can set these variables as follows for the exemplary model15M model from And
 MODEL_NAME=stories15M
 MODEL_DIR=checkpoints/${MODEL_NAME}
 MODEL_PATH=${MODEL_OUT}/stories15M.pt
-MODEL_OUT=~/TorchAt-exports
+MODEL_OUT=~/torchat-exports
 ```
 
 When we export models with AOT Inductor for servers and desktops, and Executorch for mobile and edge devices,
@@ -193,7 +197,7 @@ Add option to load tiktoken
 
 Model definition in model.py, generation code in generate.py. The
 model checkpoint may have extensions `pth` (checkpoint and model definition) or `pt` (model checkpoint).
-At present, we always use the TorchAt model for export and import the checkpoint into this model definition
+At present, we always use the torchat model for export and import the checkpoint into this model definition
 because we have tested that model with the export descriptions described herein.
 
 ```
@@ -231,7 +235,7 @@ quantization to achieve this, as described below.
 
 We export the model with the export.py script.  Running this script requires you first install executorch with pybindings, see [here](#setting-up-executorch-and-runner-et).
 At present, when exporting a model, the export command always uses the
-xnnpack delegate to export.  (Future versions of TorchAt will support additional
+xnnpack delegate to export.  (Future versions of torchat will support additional
 delegates such as Vulkan, CoreML, MPS, HTP in addition to Xnnpack as they are released for Executorch.)
 
 
@@ -292,7 +296,7 @@ AOTI). The basic model build for mobile surfaces two issues: Models
 quickly run out of memory and execution can be slow. In this section,
 we show you how to fit your models in the limited memory of a mobile
 device, and optimize execution speed -- both using quantization. This
-is the `TorchAt` repo after all!
+is the `torchat` repo after all!
 
 For high-performance devices such as GPUs, quantization provides a way
 to reduce the memory bandwidth required to and take advantage of the
@@ -534,7 +538,7 @@ To run your pte model, use the following command (assuming you already generated
 
 ### Android
 
-Check out the [tutorial on how to build an Android app running your PyTorch models with Executorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html), and give your TorchAt models a spin.
+Check out the [tutorial on how to build an Android app running your PyTorch models with Executorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html), and give your torchat models a spin.
 
 ![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png "Android app running Llama model")
 
@@ -643,7 +647,7 @@ List dependencies for these backends
 Set up ExecuTorch by following the instructions [here](https://pytorch.org/executorch/stable/getting-started-setup.html#setting-up-executorch).
 For convenience, we provide a script that does this for you.
 
-From the TorchAt root directory, run the following
+From the torchat root directory, run the following
 ```
 export LLAMA_FAST_ROOT=${PWD}
 ./scripts/install_et.sh
@@ -651,7 +655,7 @@ export LLAMA_FAST_ROOT=${PWD}
 
 This will create a build directory, git clone ExecuTorch to ./build/src, applies some patches to the ExecuTorch source code, install the ExecuTorch python libraries with pip, and install the required ExecuTorch C++ libraries to ./build/install.  This will take a while to complete.
 
-After ExecuTorch is installed, you can build runner-et from the TorchAt root directory with the following
+After ExecuTorch is installed, you can build runner-et from the torchat root directory with the following
 
 ```
 export LLAMA_FAST_ROOT=${PWD}

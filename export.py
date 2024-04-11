@@ -12,6 +12,8 @@ import torch
 import torch.nn as nn
 from torch.export import Dim, export
 
+from quantize import quantize_model, name_to_dtype, set_precision, get_precision
+
 try:
     executorch_export_available = True
     from export_et import export_model as export_model_et
@@ -23,7 +25,7 @@ from export_aoti import export_model as export_model_aoti
 
 from model import Transformer
 from generate import _load_model, decode_one_token
-from quantize import quantize_model
+from quantize import quantize_model, name_to_dtype
 from torch._export import capture_pre_autograd_graph
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -62,8 +64,9 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
     assert checkpoint_path.is_file(), checkpoint_path
 
     print(f"Using device={device}")
-    precision = torch.float  # bfloat16
-
+    precision = name_to_dtype(args.dtype)  # torch.float  # bfloat16
+    set_precision(precision)
+    
     print("Loading model ...")
     t0 = time.time()
     model = _load_model(
@@ -83,7 +86,7 @@ def main(checkpoint_path, device, quantize = "{ }", args = None):
     # dtype:
     if args.dtype:
         model.to(dtype=name_to_dtype(args.dtype))
-    
+
     model = model_wrapper(model, device=device)
 
     output_pte_path = args.output_pte_path
@@ -182,7 +185,7 @@ def cli():
     parser.add_argument(
         "-d",
         "--dtype",
-        default=None,
+        default="float32",
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
     parser.add_argument("-v", "--verbose", action="store_true")

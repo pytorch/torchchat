@@ -11,6 +11,7 @@ import torch.nn as nn
 from torch import Tensor
 from torch.nn import functional as F
 
+from quantize import get_precision
 
 def find_multiple(n: int, k: int) -> int:
     if n % k == 0:
@@ -108,6 +109,22 @@ transformer_configs = {
         hidden_dim=14336,
         vocab_size=32000,
     ),
+    "Mistral-7B-Instruct-v0.1": dict(
+        n_layer=32,
+        n_heads=32,
+        n_local_heads=8,
+        dim=4096,
+        hidden_dim=14336,
+        vocab_size=32000,
+    ),
+    "Mistral-7B-Instruct-v0.2": dict(
+        n_layer=32,
+        n_heads=32,
+        n_local_heads=8,
+        dim=4096,
+        hidden_dim=14336,
+        vocab_size=32000,
+    ),
     "stories15M": dict(n_layer=6, n_heads=6, dim=288),
     "stories110M": dict(n_layer=12, n_heads=12, dim=768),
 }
@@ -115,8 +132,11 @@ transformer_configs = {
 
 class KVCache(nn.Module):
     def __init__(
-        self, max_batch_size, max_seq_length, n_heads, head_dim, dtype=torch.float): # bfloat16    ):
+        self, max_batch_size, max_seq_length, n_heads, head_dim, dtype=None):
+        # torch.float): # bfloat16    ):
         super().__init__()
+        if not dtype:
+            dtype=get_precision()
         cache_shape = (max_batch_size, n_heads, max_seq_length, head_dim)
         self.register_buffer("k_cache", torch.zeros(cache_shape, dtype=dtype))
         self.register_buffer("v_cache", torch.zeros(cache_shape, dtype=dtype))

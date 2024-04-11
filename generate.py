@@ -13,7 +13,7 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 
-from quantize import quantize_model, name_to_dtype
+from quantize import quantize_model, name_to_dtype, set_precision, get_precision
 
 
 def device_sync(device):
@@ -384,7 +384,8 @@ def main(
     #            print = lambda *args, **kwargs: None
 
     print(f"Using device={device}")
-    precision = torch.float  # bfloat16
+    precision = name_to_dtype(model_dtype)
+    set_precision(precision)
     is_speculative = draft_checkpoint_path is not None
     is_chat = "chat" in str(checkpoint_path)
 
@@ -668,7 +669,7 @@ def cli():
     parser.add_argument(
         "-d",
         "--dtype",
-        default=None,
+        default="float32",
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
 
