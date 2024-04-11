@@ -123,7 +123,7 @@ We use several variables in this example, which may be set as a preparatory step
    name of the directory holding the files for the corresponding model.  You *must* follow this convention to
    ensure correct operation.
 
-* `MODEL_OUT` is the location where we store model and tokenizer information for a particular model. We recommend `checkpoints/${MODEL_NAME}`
+* `MODEL_DIR` is the location where we store model and tokenizer information for a particular model. We recommend `checkpoints/${MODEL_NAME}`
   or any other directory you already use to store model information.
 
 * `MODEL_PATH` describes the location of the model. Throughput the description
