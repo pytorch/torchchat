@@ -15,7 +15,7 @@ from torch.export import Dim, export
 from export import main as export_main
 from generate import main as generate_main
 
-
+default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def cli():
     import argparse
