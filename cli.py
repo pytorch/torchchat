@@ -47,6 +47,12 @@ def cli_args():
         action="store_true",
         help="Use torchat to generate a sequence using a model.",
     )
+    
+    parser.add_argument(
+        "--chat",
+        action="store_true",
+        help="Use torchat to for an interactive chat session.",
+    )    
     parser.add_argument(
         "--num-samples",
         type=int,
