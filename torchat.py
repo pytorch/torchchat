@@ -21,7 +21,7 @@ default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 def cli():
     args = cli_args()
     
-    if args.generate:
+    if args.generate or args.chat:
         generate_main(args)
     elif args.export:
         export_main(args)
