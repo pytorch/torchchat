@@ -47,16 +47,32 @@ def cli_args():
         action="store_true",
         help="Use torchat to generate a sequence using a model.",
     )
-    parser.add_argument("--num-samples", type=int, default=5, help="Number of samples.")
     parser.add_argument(
-        "--max-new-tokens", type=int, default=200, help="Maximum number of new tokens."
+        "--num-samples",
+        type=int,
+        default=5,
+        help="Number of samples.")
+    parser.add_argument(
+        "--max-new-tokens",
+        type=int,
+        default=200,
+        help="Maximum number of new tokens."
     )
-    parser.add_argument("--top-k", type=int, default=200, help="Top-k for sampling.")
     parser.add_argument(
-        "--temperature", type=float, default=0.8, help="Temperature for sampling."
+        "--top-k",
+        type=int,
+        default=200,
+        help="Top-k for sampling.")
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=0.8,
+        help="Temperature for sampling."
     )
     parser.add_argument(
-        "--compile", action="store_true", help="Whether to compile the model."
+        "--compile",
+        action="store_true",
+        help="Whether to compile the model."
     )
     parser.add_argument(
         "--compile-prefill",
@@ -64,9 +80,16 @@ def cli_args():
         help="Whether to compile the prefill (improves prefill perf, but higher compile times)",
     )
     parser.add_argument(
-        "--profile", type=Path, default=None, help="Profile path.")
+        "--profile",
+        type=Path,
+        default=None,
+        help="Profile path."
+    )
     parser.add_argument(
-        "--speculate-k", type=int, default=5, help="Speculative execution depth."
+        "--speculate-k",
+        type=int,
+        default=5,
+        help="Speculative execution depth."
     )
     parser.add_argument(
         "--draft-checkpoint-path",
@@ -74,8 +97,6 @@ def cli_args():
         default=None,
         help="Draft checkpoint path.",
     )
-    #####################################################################
-
     parser.add_argument(
         "--checkpoint-path",
         type=Path,
@@ -127,7 +148,7 @@ def cli_args():
     parser.add_argument(
         "-d",
         "--dtype",
-        default=None,
+        default="float32",
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
     parser.add_argument("-v", "--verbose", action="store_true")
@@ -138,7 +159,10 @@ def cli_args():
         help="Quantization options."
     )
     parser.add_argument(
-        "--device", type=str, default=default_device, help="Device to use"
+        "--device",
+        type=str,
+        default=default_device,
+        help="Device to use"
     )
 
     args = parser.parse_args()
