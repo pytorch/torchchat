@@ -603,7 +603,7 @@ def cli():
     parser.add_argument(
         "-d",
         "--dtype",
-        default=None,
+        default="float32",
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
 
