@@ -52,6 +52,11 @@ Advantageously, exported models can be laoded back into torchat for chat or text
 as well as model quality validation, retaining the prior Python interface to simplify reuse of tests and test harnesses developed in Python during
 model development and qualification.
 
+In addition, torchat comes with server C++ runtimes for both AOT Inductor-compiled models and Executorch-compiled models for servers. Mobile C++ runtimes
+enable the deployment of Executorch-compiled PTE mobile/edge models on iOS, Android and Raspberry Pi 5.  In addition, an experimental mobile C++ runtime 
+for AOT Inductor compiled models exists as prototype (as of 4/10).
+
+
 # Getting started
 
 Follow the `gpt-fast` [installation instructions](https://github.com/pytorch-labs/gpt-fast?tab=readme-ov-file#installation).
