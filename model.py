@@ -11,6 +11,7 @@ import torch.nn as nn
 from torch import Tensor
 from torch.nn import functional as F
 
+from quantize import get_precision
 
 def find_multiple(n: int, k: int) -> int:
     if n % k == 0:
@@ -99,8 +100,11 @@ transformer_configs = {
 
 class KVCache(nn.Module):
     def __init__(
-        self, max_batch_size, max_seq_length, n_heads, head_dim, dtype=torch.float): # bfloat16    ):
+        self, max_batch_size, max_seq_length, n_heads, head_dim, dtype=None):
+        # torch.float): # bfloat16    ):
         super().__init__()
+        if not dtype:
+            dtype=get_precision()
         cache_shape = (max_batch_size, n_heads, max_seq_length, head_dim)
         self.register_buffer("k_cache", torch.zeros(cache_shape, dtype=dtype))
         self.register_buffer("v_cache", torch.zeros(cache_shape, dtype=dtype))
