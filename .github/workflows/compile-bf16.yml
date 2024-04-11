@@ -43,10 +43,10 @@ jobs:
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
-	  export DTYPE=bfloat16
+          export DTYPE=bfloat16
           if [ $(uname -s) == Darwin ]; then
             export DTYPE=float16
-          fi	  
+          fi  
           python generate.py --dtype ${DTYPE} --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
           cat ./output_eager
           python generate.py --dtype ${DTYPE} --compile --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
