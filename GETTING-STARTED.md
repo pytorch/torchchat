@@ -6,7 +6,7 @@ with text interspersed as Google Colab and link it here at the top.)
 python3 -m pip install --user virtualenv
 python3 -m virtualenv .llama-fast
 source .llama-fast/bin/activate
-git clone https://github.com/pytorch-labs/llama-fast.git
+git clone https://github.com/pytorch/torchat.git
 cd llama-fast
 git submodule sync
 git submodule update --init
