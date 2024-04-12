@@ -278,6 +278,7 @@ def _load_model(
         checkpoint_path,
         checkpoint_dir,
         params_path,
+        params_table,
         device,
         precision,
         use_tp=False
@@ -346,6 +347,7 @@ def _main(
     checkpoint_path: Optional[Path] = None,
     checkpoint_dir: Optional[Path] = None,
     params_path: Optional[Path] = None,
+    params_table: Optional[str] = None,
     tokenizer_path: Optional[Path] = None,
     compile: bool = True,
     compile_prefill: bool = False,
@@ -396,6 +398,7 @@ def _main(
         checkpoint_path,
         checkpoint_dir,
         params_path,
+        params_table,
         device,
         precision,
         use_tp
