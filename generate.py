@@ -362,7 +362,8 @@ def main(
             # attributes will NOT be seen on by AOTI-compiled forward
             # function, e.g. calling model.setup_cache will NOT touch
             # AOTI compiled and maintained model buffers such as kv_cache.
-            model.forward = torch._export.aot_load(str(dso_path.absolute()), device)
+            from _package_aoti import aoti_load
+            model.forward = aoti_load(str(dso_path.absolute()), device)
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {dso_path}")
     elif pte_path:
@@ -387,7 +388,7 @@ def main(
         # dtype:
         if model_dtype:
             model.to(dtype=model_dtype)
-            
+
     if is_speculative:
         draft_model = _load_model(draft_checkpoint_path, device, precision, use_tp)
     else:

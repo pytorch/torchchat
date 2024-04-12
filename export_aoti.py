@@ -19,6 +19,8 @@ from quantize import quantize_model
 
 from model import Transformer
 
+from _package_aoti import aoti_compile
+
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
@@ -47,11 +49,11 @@ def export_model(model: nn.Module, device, output_path, args=None):
     # Specify that the first dimension of each input is that batch size
     dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
 
-    so = torch._export.aot_compile(
-        model,
-        args=input,
-        options={"aot_inductor.output_path": output_path},
-        dynamic_shapes=dynamic_shapes,
+    ep = torch.export.export(
+        model, args=input, dynamic_shapes=dynamic_shapes,
     )
-    print(f"The generated DSO model can be found at: {so}")
-    return so
+    package_path = aoti_compile(
+        ep, input, options={"aot_inductor.output_path": output_path}
+    )
+    print(f"The generated PT2 model can be found at: {package_path}")
+    return package_path
