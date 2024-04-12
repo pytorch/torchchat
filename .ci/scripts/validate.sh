@@ -15,7 +15,7 @@ function generate_eager_model_output() {
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
     echo "Run inference with eager model for $MODEL_NAME"
-    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --prompt "$PROMPT" --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager"
+    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --prompt "$PROMPT" --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
     cat "$MODEL_DIR/output_eager"
 }
 
@@ -25,7 +25,7 @@ function generate_compiled_model_output() {
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
     echo ""############### Run inference with torch.compile for $MODEL_NAME "###############"
-    python -W ignore generate.py --compile --checkpoint-path "$CHECKPOINT_PATH" --prompt "$PROMPT" --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled"
+    python -W ignore generate.py --compile --checkpoint-path "$CHECKPOINT_PATH" --prompt "$PROMPT" --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
     cat "$MODEL_DIR/output_compiled"
 }
 
@@ -36,7 +36,7 @@ function generate_aoti_model_output() {
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
     echo ""############### Run inference with AOTInductor for $MODEL_NAME "###############"
     python -W ignore export.py --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path "${MODEL_DIR}/${MODEL_NAME}.so" --device "$TARGET_DEVICE"
-    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --dso-path "$MODEL_DIR/${MODEL_NAME}.so" --prompt "$PROMPT" --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti"
+    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --dso-path "$MODEL_DIR/${MODEL_NAME}.so" --prompt "$PROMPT" --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
     cat "$MODEL_DIR/output_aoti"
 }
 
@@ -46,24 +46,24 @@ function generate_executorch_model_output() {
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
     echo ""############### Run inference with ExecuTorch using XNNPACK for $MODEL_NAME "###############"
-    python -W ignore export.py --checkpoint-path "$CHECKPOINT_PATH" --output-pte-path "$MODEL_DIR/${MODEL_NAME}.pte" -d "fp32"
-    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --prompt "$PROMPT" --device "$TARGET_DEVICE" --pte-path "$MODEL_DIR/${MODEL_NAME}.pte" > "$MODEL_DIR/output_et"
+    python -W ignore export.py --checkpoint-path "$CHECKPOINT_PATH" --output-pte-path "$MODEL_DIR/${MODEL_NAME}.pte" -d "fp32" || exit 1
+    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --prompt "$PROMPT" --device "$TARGET_DEVICE" --pte-path "$MODEL_DIR/${MODEL_NAME}.pte" > "$MODEL_DIR/output_et" || exit 1
     cat "$MODEL_DIR/output_et"
 }
 
 function run_compile() {
-    generate_compiled_model_output "$CHECKPOINT_PATH" "$TARGET_DEVICE"
+    generate_compiled_model_output "$CHECKPOINT_PATH" "$TARGET_DEVICE" || exit 1
 }
 
 function run_aoti() {
-    generate_aoti_model_output "$CHECKPOINT_PATH" "$TARGET_DEVICE"
+    generate_aoti_model_output "$CHECKPOINT_PATH" "$TARGET_DEVICE" || exit 1
 }
 
 function run_executorch() {
     if [ "$TARGET_DEVICE" = "cpu" ]; then
-        generate_executorch_model_output "$CHECKPOINT_PATH" "$TARGET_DEVICE"
+        generate_executorch_model_output "$CHECKPOINT_PATH" "$TARGET_DEVICE" || exit 1
     else
-        echo "Error: Executorch doesn't run on ${TARGET_DEVICE}"
+        echo "Skipped: Executorch doesn't run on ${TARGET_DEVICE}"
     fi
 }
 
@@ -78,16 +78,17 @@ if [ "$#" -gt 2 ]; then
     for arg in "${@:3}"; do
         case "$arg" in
             "compile")
-                run_compile
+                run_compile || exit 1
                 ;;
             "aoti")
-                run_aoti
+                run_aoti || exit 1
                 ;;
             "executorch")
-                run_executorch
+                run_executorch || exit 1
                 ;;
             *)
                 echo "Unknown argument: $arg" >&2
+                exit 1
                 ;;
         esac
     done
