@@ -356,7 +356,7 @@ def _load_inference_model(
         checkpoint_path,
         checkpoint_dir,
         params_path,
-        paramas_table,
+        params_table,
         device,
         precision,
         use_tp
