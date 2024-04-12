@@ -592,6 +592,7 @@ def main(args):
         args.checkpoint_path,
         args.checkpoint_dir,
         args.params_path,
+        args.params_table,
         args.tokenizer_path,
         args.compile,
         args.compile_prefill,
