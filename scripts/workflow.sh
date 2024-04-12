@@ -49,6 +49,23 @@ function download_checkpoint() {
     fi
 }
 
+function run_validation_e2e() {
+    local MODEL_REPO="$1"
+
+    echo ""
+    echo "############### Validating ${MODEL_REPO##*/} ###############"
+    download_checkpoint "$MODEL_REPO"
+    bash .ci/scripts/convert_checkpoint.sh "$MODEL_REPO"
+
+    set +e
+    CHECKPOINT_PATH="checkpoints/$MODEL_REPO/$CHECKPOINT_FILENAME"
+    if [ -z "$ADDITIONAL_ARG" ]; then
+        bash .ci/scripts/validate.sh "$CHECKPOINT_PATH" "$DEVICE"
+    else
+        bash .ci/scripts/validate.sh "$CHECKPOINT_PATH" "$DEVICE" "$ADDITIONAL_ARG"
+    fi
+}
+
 
 # List of models to validate
 MODEL_REPOS=(
@@ -59,8 +76,8 @@ MODEL_REPOS=(
     "mistralai/Mistral-7B-Instruct-v0.1"
     "mistralai/Mistral-7B-Instruct-v0.2"
     # "openlm-research/open_llama_7b"
-    # "codellama/CodeLlama-7b-Python-hf"
-    # "codellama/CodeLlama-34b-Python-hf"
+    "codellama/CodeLlama-7b-Python-hf"
+    "codellama/CodeLlama-34b-Python-hf"
     # "meta-llama/Llama-2-7b-chat-hf"
     # "meta-llama/Llama-2-13b-chat-hf"
     # "meta-llama/Llama-2-70b-chat-hf"
@@ -68,17 +85,17 @@ MODEL_REPOS=(
 
 PROMPT="Hello, my name is"
 DEVICE="${1:-cpu}"
+INPUT_MODEL_REPO="${2:-}"
+ADDITIONAL_ARG="${3:-}"
 CHECKPOINT_FILENAME="model.pth"
 
 echo "###############################################################"
 echo "############## Start LLama-fast Model Validation ##############"
 echo "###############################################################"
-for MODEL_REPO in "${MODEL_REPOS[@]}"; do
-    echo "############### Validating ${MODEL_REPO##*/} ###############"
-    download_checkpoint "$MODEL_REPO"
-    bash .ci/scripts/convert_checkpoint.sh "$MODEL_REPO"
-
-    set +e
-    CHECKPOINT_PATH="checkpoints/$MODEL_REPO/$CHECKPOINT_FILENAME"
-    bash .ci/scripts/validate.sh "$CHECKPOINT_PATH" "$DEVICE"
-done
+if [ -z "$INPUT_MODEL_REPO" ]; then
+    for MODEL_REPO in "${MODEL_REPOS[@]}"; do
+        run_validation_e2e "$MODEL_REPO" "$DEVICE"
+    done
+else
+    run_validation_e2e "$INPUT_MODEL_REPO" "$DEVICE" "$ADDITIONAL_ARG"
+fi

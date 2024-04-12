@@ -11,11 +11,9 @@ MODEL_REPO="$1"
 RESOURCES_STRING="$2"
 CHECKPOINT_NAME="${MODEL_REPO##*/}"
 
-pushd "${LLAMA_FAST_ROOT}" || exit
-
 # Create the directory for the checkpoint
 mkdir -p "checkpoints/${MODEL_REPO}"
-cd "checkpoints/${MODEL_REPO}" || exit
+pushd "checkpoints/${MODEL_REPO}" || exit
 
 # Download all resources
 IFS=',' # Set the field separator to comma
