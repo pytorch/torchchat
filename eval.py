@@ -224,7 +224,7 @@ def main(
 
     print("Loading model ...")
     t0 = time.time()
-    model = _load_model(checkpoint_path, device, precision, False)
+    model = _load_model(checkpoint_path, None, None, None, device, precision, False)
 
     torch.cuda.synchronize()
     print(f"Time to load model: {time.time() - t0:.02f} seconds.")
