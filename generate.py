@@ -278,6 +278,7 @@ def _load_model(
         checkpoint_path,
         checkpoint_dir,
         params_path,
+        params_table,
         device,
         precision,
         use_tp=False
@@ -286,6 +287,8 @@ def _load_model(
     with torch.device("meta"):
         if params_path:
             model = Transformer.from_params(params_path)
+        elif params_table:
+            model = Transformer.from_table(params_path)            
         else:
             model = Transformer.from_name(checkpoint_path.parent.name)
 
@@ -346,6 +349,7 @@ def _main(
     checkpoint_path: Optional[Path] = None,
     checkpoint_dir: Optional[Path] = None,
     params_path: Optional[Path] = None,
+    params_table: Optional[str] = None,
     tokenizer_path: Optional[Path] = None,
     compile: bool = True,
     compile_prefill: bool = False,
@@ -396,6 +400,7 @@ def _main(
         checkpoint_path,
         checkpoint_dir,
         params_path,
+        params_table,
         device,
         precision,
         use_tp
@@ -587,6 +592,7 @@ def main(args):
         args.checkpoint_path,
         args.checkpoint_dir,
         args.params_path,
+        args.params_table,
         args.tokenizer_path,
         args.compile,
         args.compile_prefill,
