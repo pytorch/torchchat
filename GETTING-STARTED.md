@@ -12,7 +12,7 @@ git submodule sync
 git submodule update --init
 
 # If we need PyTorch nightlies
-pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
 # Otherwise
 # pip install torch torchvision
 
