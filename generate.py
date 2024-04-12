@@ -362,7 +362,7 @@ def _load_inference_model(
         use_tp
     )
     device_sync(device=device)  # MKG
-    print(f"Time to load model: {time.time() - t0q:.02f} seconds")
+    print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
     if dso_path:
         # make sure user did not try to set dtype
