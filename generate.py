@@ -457,7 +457,7 @@ def _main(
     is_speculative = draft_checkpoint_path is not None
     is_chat = "chat" in str(checkpoint_path)
 
-    model_ = _load_inference_model(
+    model = _load_inference_model(
         checkpoint_path,
         checkpoint_dir,
         params_path,
