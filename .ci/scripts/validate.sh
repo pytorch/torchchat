@@ -1,3 +1,4 @@
+
 #!/bin/bash
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
@@ -35,7 +36,7 @@ function generate_aoti_model_output() {
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
     echo ""############### Run inference with AOTInductor for $MODEL_NAME "###############"
     python -W ignore export.py --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path "${MODEL_DIR}/${MODEL_NAME}.so" --device "$TARGET_DEVICE"
-    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --dso-path "$MODEL_DIR/${MODEL_NAME}.so" --prompt "$PROMPT" > "$MODEL_DIR/output_aoti"
+    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --dso-path "$MODEL_DIR/${MODEL_NAME}.so" --prompt "$PROMPT" --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti"
     cat "$MODEL_DIR/output_aoti"
 }
 
@@ -50,11 +51,49 @@ function generate_executorch_model_output() {
     cat "$MODEL_DIR/output_et"
 }
 
+function run_compile() {
+    generate_compiled_model_output "$CHECKPOINT_PATH" "$TARGET_DEVICE"
+}
+
+function run_aoti() {
+    generate_aoti_model_output "$CHECKPOINT_PATH" "$TARGET_DEVICE"
+}
+
+function run_executorch() {
+    if [ "$TARGET_DEVICE" = "cpu" ]; then
+        generate_executorch_model_output "$CHECKPOINT_PATH" "$TARGET_DEVICE"
+    else
+        echo "Error: Executorch doesn't run on ${TARGET_DEVICE}"
+    fi
+}
+
 
 CHECKPOINT_PATH="$1"
 TARGET_DEVICE="${2:-cpu}"
 PROMPT="Hello, my name is"
 
-generate_compiled_model_output $CHECKPOINT_PATH $TARGET_DEVICE
-generate_aoti_model_output $CHECKPOINT_PATH $TARGET_DEVICE
-generate_executorch_model_output $CHECKPOINT_PATH $TARGET_DEVICE
+
+if [ "$#" -gt 2 ]; then
+    # Additional arguments provided
+    for arg in "${@:3}"; do
+        case "$arg" in
+            "compile")
+                run_compile
+                ;;
+            "aoti")
+                run_aoti
+                ;;
+            "executorch")
+                run_executorch
+                ;;
+            *)
+                echo "Unknown argument: $arg" >&2
+                ;;
+        esac
+    done
+else
+    # No additional arguments provided, run all functions
+    run_compile
+    run_aoti
+    run_executorch
+fi
