@@ -4,7 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 from dataclasses import dataclass
-from typing import Optional
+from typing import Dict, Optional
 
 import torch
 import torch.nn as nn
@@ -35,7 +35,7 @@ class ModelArgs:
     norm_eps: float = 1e-5
     multiple_of = 256
     ffn_dim_multiplier = None
-    
+
     def __post_init__(self):
         if self.n_local_heads == -1:
             self.n_local_heads = self.n_heads
@@ -56,7 +56,7 @@ class ModelArgs:
         with open(params_path, "r") as f:
             params = json.loads(f.read())
         return cls(**params)
-    
+
     @classmethod
     def from_name(cls, name: str):
         print(f"name {name}")
@@ -221,7 +221,7 @@ class Transformer(nn.Module):
     @classmethod
     def from_params(cls, params_path: str):
         return cls(ModelArgs.from_params(params_path))
-        
+
 
 class TransformerBlock(nn.Module):
     def __init__(self, config: ModelArgs) -> None:
@@ -258,14 +258,33 @@ class Attention(nn.Module):
         self.head_dim = config.head_dim
         self.n_local_heads = config.n_local_heads
         self.dim = config.dim
-        # self._register_load_state_dict_pre_hook(self.load_hook)
+        self._register_load_state_dict_pre_hook(self.load_hook)
 
-    # def load_hook(self, state_dict, prefix, *args):
-    #     if prefix + "wq.weight" in state_dict:
-    #         wq = state_dict.pop(prefix + "wq.weight")
-    #         wk = state_dict.pop(prefix + "wk.weight")
-    #         wv = state_dict.pop(prefix + "wv.weight")
-    #         state_dict[prefix + "wqkv.weight"] = torch.cat([wq, wk, wv])
+    def load_hook(self, state_dict, prefix, *args):
+        # if prefix + "wq.weight" in state_dict:
+        #     wq = state_dict.pop(prefix + "wq.weight")
+        #     wk = state_dict.pop(prefix + "wk.weight")
+        #     wv = state_dict.pop(prefix + "wv.weight")
+        #     state_dict[prefix + "wqkv.weight"] = torch.cat([wq, wk, wv])
+
+        def _unfuse_wqkv_state_dict(
+            state_dict: Dict[str, torch.Tensor],
+            dim: int,
+        ):
+            for key in list(state_dict):
+                if key.endswith("wqkv.weight"):
+                    tensor = state_dict[key]
+                    wq_key = key.replace("wqkv.weight", "wq.weight")
+                    state_dict[wq_key] = tensor[: dim]
+                    wk_key = key.replace("wqkv.weight", "wk.weight")
+                    wv_key = key.replace("wqkv.weight", "wv.weight")
+                    wk, wv = tensor[dim :].chunk(2, 0)
+                    state_dict[wk_key] = wk
+                    state_dict[wv_key] = wv
+                    state_dict.pop(key)
+                else:
+                    continue
+        _unfuse_wqkv_state_dict(state_dict, self.dim)
 
     def forward(
         self,
