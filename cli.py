@@ -18,9 +18,6 @@ strict = False
 def check_args(args, command_name: str):
     global strict
 
-    if not strict:
-        return
-
     # chat and generate support the same options
     if command_name in  ["generate", "chat", "gui"]::
         # examples, can add more. Note that attributes convert dash to _
@@ -36,7 +33,11 @@ def check_args(args, command_name: str):
     
     for disallowed in disallowed_args:
         if args.hasattr(disallow):
-            raise RuntimeError("command {command_name} does not support option {disallowed.replace('_', '-')}")
+            text = f"command {command_name} does not support option {disallowed.replace('_', '-')}"
+            if strict:
+                raise RuntimeError(text)
+            else:
+                print(f"Warning: {text}")
 
     
 def cli_args():
