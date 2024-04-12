@@ -29,7 +29,7 @@ def unpack_q40(gguf_tensor: gguf.gguf_reader.ReaderTensor, dtype: torch.dtype = 
     QK4_0 = 32 # groupsize
 
     # Parse block_q4_0
-    block_q4_0_size = 2 + QK4_0 / 2
+    block_q4_0_size = int(2 + QK4_0 / 2)
     packed = torch.from_numpy(gguf_tensor.data.reshape(-1, block_q4_0_size))
     assert packed.dtype == torch.uint8
     ng = packed.shape[0] # number of groups/blocks
@@ -40,7 +40,7 @@ def unpack_q40(gguf_tensor: gguf.gguf_reader.ReaderTensor, dtype: torch.dtype = 
     d = torch.tensor(d.untyped_storage(), dtype=torch.float16).reshape(ng, 1)
     curr += size
 
-    size = QK4_0 / 2
+    size = int(QK4_0 / 2)
     qs = packed[:,curr:(curr+size)].contiguous()
     curr += size
 
@@ -100,6 +100,8 @@ def unpack_q6k(gguf_tensor: gguf.gguf_reader.ReaderTensor):
     ng = packed.shape[0] # number of groups/blocks
 
     curr = 0
+    curr += 2 # TODO: look into missing bytes
+
     size = int(QK_K/2)
     ql = packed[:,curr:(curr+size)].contiguous()
     assert ql.shape == (ng, 32)
@@ -121,8 +123,8 @@ def unpack_q6k(gguf_tensor: gguf.gguf_reader.ReaderTensor):
     curr += size
 
     # Check we finished parsing
-    curr += 2 # TODO: look into missing bytes
     assert curr == block_q6_K_size
+
     # Unpack quantized values.  Unlike the code in ggml-quants.c, we do not subtract the
     # zero-points
     q1 = ((ql[:,0:16] & 0xF) | (((qh[:,0:16] >> 0) & 3) << 4))
@@ -134,7 +136,7 @@ def unpack_q6k(gguf_tensor: gguf.gguf_reader.ReaderTensor):
     assert int32_data.min().item() == 0
     assert int32_data.max().item() == 2**6-1
 
-    scales = d * scales
+    # scales = d * scales
     zeros = 32 * torch.ones(scales.shape)
 
-    return int32_data, scales, zeros
+    return int32_data, d, scales, zeros
