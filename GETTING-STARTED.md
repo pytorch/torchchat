@@ -14,7 +14,7 @@ git submodule update --init
 # If we need PyTorch nightlies
 pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
 # Otherwise
-# pip install torch torchvision
+# pip3 install torch
 
 pip install sentencepiece huggingface_hub
 # Eventually should be (when Dave has the PyPI packages)
