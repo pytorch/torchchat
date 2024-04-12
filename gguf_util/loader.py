@@ -26,7 +26,6 @@ sys.path.append(str(wd))
 
 from model import ModelArgs, Transformer
 from typing import Set
-from ggml_quantization_type import Q4_0
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -66,11 +65,11 @@ def _create_pt_model(
     llama_model_args = ModelArgs(
         dim=gguf_model_args.embedding_length,
         n_layer=gguf_model_args.block_count,
-        n_head=gguf_model_args.attention.head_count,
+        n_heads=gguf_model_args.attention.head_count,
         n_local_heads=gguf_model_args.attention.head_count_kv,
         vocab_size=gguf_model_args.vocab_size,
         norm_eps=gguf_model_args.attention.layer_norm_rms_epsilon,
-        intermediate_size=gguf_model_args.feed_forward_length,
+        hidden_dim=gguf_model_args.feed_forward_length,
     )
     pt_model = Transformer(llama_model_args)
     pt_model.eval()
@@ -148,80 +147,80 @@ def _fqn_last(fqn: str) -> str:
     return atoms[-1]
 
 
-def _load_by_state_dict(pt_model: torch.nn.Module, state_dict: Dict[str, Any], fqn: str, gguf_tensor: ReaderTensor) -> bool:
-    if gguf_tensor.tensor_type in (gguf.GGMLQuantizationType.F32, gguf.GGMLQuantizationType.F16):
-        reversed_shape = gguf_tensor.shape[::-1]
-        new_tensor = gguf_tensor.data.reshape(reversed_shape)
-        state_dict[fqn] = torch.from_numpy(new_tensor)
-        return True
-    elif gguf_tensor.tensor_type == gguf.GGMLQuantizationType.Q4_0 and gguf_tensor.name == "token_embd.weight":
-        unpacked = Q4_0.to_float(torch.from_numpy(gguf_tensor.data.reshape(-1, 18)))
-        state_dict[fqn] = unpacked.reshape(
-            pt_model.config.vocab_size, pt_model.config.dim
-        )
-        return True
-    return False
+# def _load_by_state_dict(pt_model: torch.nn.Module, state_dict: Dict[str, Any], fqn: str, gguf_tensor: ReaderTensor) -> bool:
+#     if gguf_tensor.tensor_type in (gguf.GGMLQuantizationType.F32, gguf.GGMLQuantizationType.F16):
+#         reversed_shape = gguf_tensor.shape[::-1]
+#         new_tensor = gguf_tensor.data.reshape(reversed_shape)
+#         state_dict[fqn] = torch.from_numpy(new_tensor)
+#         return True
+#     elif gguf_tensor.tensor_type == gguf.GGMLQuantizationType.Q4_0 and gguf_tensor.name == "token_embd.weight":
+#         unpacked = Q4_0.to_float(torch.from_numpy(gguf_tensor.data.reshape(-1, 18)))
+#         state_dict[fqn] = unpacked.reshape(
+#             pt_model.config.vocab_size, pt_model.config.dim
+#         )
+#         return True
+#     return False
 
 
-def _load_by_parameter(pt_model: torch.nn.Module, fqn: str, gguf_tensor: ReaderTensor) -> bool:
-    assert isinstance(_fqn_lookup(fqn, pt_model), torch.nn.Parameter)
-    parent: torch.nn.Module = _fqn_lookup(_fqn_up(fqn), pt_model)
+# def _load_by_parameter(pt_model: torch.nn.Module, fqn: str, gguf_tensor: ReaderTensor) -> bool:
+#     assert isinstance(_fqn_lookup(fqn, pt_model), torch.nn.Parameter)
+#     parent: torch.nn.Module = _fqn_lookup(_fqn_up(fqn), pt_model)
 
-    if gguf_tensor.tensor_type == gguf.GGMLQuantizationType.Q4_0 and isinstance(parent, torch.nn.Linear) and _fqn_last(fqn) == "weight":
-        packed = torch.from_numpy(gguf_tensor.data).reshape(-1, 18)
-        scale = Q4_0._unpack_two_uint8(packed[:, :2]).to(dtype=torch.float16)
-        parent.weight = torch.nn.Parameter(
-            Q4_0.GGMLInt4LinearWeight(packed, scale, parent.weight.shape)
-        )
-        pt_model = pt_model.to(dtype=torch.float32)
-        return True
+#     if gguf_tensor.tensor_type == gguf.GGMLQuantizationType.Q4_0 and isinstance(parent, torch.nn.Linear) and _fqn_last(fqn) == "weight":
+#         packed = torch.from_numpy(gguf_tensor.data).reshape(-1, 18)
+#         scale = Q4_0._unpack_two_uint8(packed[:, :2]).to(dtype=torch.float16)
+#         parent.weight = torch.nn.Parameter(
+#             Q4_0.GGMLInt4LinearWeight(packed, scale, parent.weight.shape)
+#         )
+#         pt_model = pt_model.to(dtype=torch.float32)
+#         return True
 
-    return False
+#     return False
 
 
-def _load_weights(pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor]) -> None:
-    loaded_by_state_dict: Set[str] = set()
-    loaded_by_parameter: Set[str] = set()
+# def _load_weights(pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor]) -> None:
+#     loaded_by_state_dict: Set[str] = set()
+#     loaded_by_parameter: Set[str] = set()
 
-    # state_dict pass
-    logger.info("Loading weights by state_dict.")
-    state_dict = {}
-    for fqn in pt_model.state_dict():
-        if fqn not in weight_map:
-            continue
-        tensor = weight_map[fqn]
-        loaded = _load_by_state_dict(pt_model, state_dict, fqn, tensor)
-        if loaded:
-            loaded_by_state_dict.add(fqn)
+#     # state_dict pass
+#     logger.info("Loading weights by state_dict.")
+#     state_dict = {}
+#     for fqn in pt_model.state_dict():
+#         if fqn not in weight_map:
+#             continue
+#         tensor = weight_map[fqn]
+#         loaded = _load_by_state_dict(pt_model, state_dict, fqn, tensor)
+#         if loaded:
+#             loaded_by_state_dict.add(fqn)
 
-    # allow partial loading
-    pt_model.load_state_dict(state_dict, strict=False)
+#     # allow partial loading
+#     pt_model.load_state_dict(state_dict, strict=False)
 
-    # parameter pass
-    logger.info("Loading weights by parameter.")
-    for fqn, param in pt_model.named_parameters():
-        if fqn not in weight_map:
-            continue
-        tensor = weight_map[fqn]
-        loaded = _load_by_parameter(pt_model, fqn, tensor)
-        if loaded:
-            loaded_by_parameter.add(fqn)
+#     # parameter pass
+#     logger.info("Loading weights by parameter.")
+#     for fqn, param in pt_model.named_parameters():
+#         if fqn not in weight_map:
+#             continue
+#         tensor = weight_map[fqn]
+#         loaded = _load_by_parameter(pt_model, fqn, tensor)
+#         if loaded:
+#             loaded_by_parameter.add(fqn)
 
-    # Sanity checks
-    for fqn in loaded_by_state_dict:
-        if not(fqn not in loaded_by_parameter):
-            msg = f"{fqn} was loaded by both state_dict and parameter"
-            raise Exception(msg)
+#     # Sanity checks
+#     for fqn in loaded_by_state_dict:
+#         if not(fqn not in loaded_by_parameter):
+#             msg = f"{fqn} was loaded by both state_dict and parameter"
+#             raise Exception(msg)
 
-    for fqn in weight_map:
-        if not (fqn in (loaded_by_state_dict | loaded_by_parameter)):
-            msg = f"{fqn} in weight_map was not loaded"
-            raise Exception(msg)
+#     for fqn in weight_map:
+#         if not (fqn in (loaded_by_state_dict | loaded_by_parameter)):
+#             msg = f"{fqn} in weight_map was not loaded"
+#             raise Exception(msg)
 
-    for fqn in pt_model.state_dict():
-        if not (fqn in (loaded_by_state_dict | loaded_by_parameter)):
-            msg = f"{fqn} in model.state_dict() was not loaded"
-            raise Exception(msg)
+#     for fqn in pt_model.state_dict():
+#         if not (fqn in (loaded_by_state_dict | loaded_by_parameter)):
+#             msg = f"{fqn} in model.state_dict() was not loaded"
+#             raise Exception(msg)
 
 
 def _get_metadata(reader: gguf.GGUFReader) -> dict[str, Any]:
@@ -246,6 +245,7 @@ def _get_metadata(reader: gguf.GGUFReader) -> dict[str, Any]:
 
     return metadata
 
+# TODO: finish weight loading
 def load_llama_from_gguf_file(gguf_file: str) -> torch.nn.Module:
     """
     Load a LLaMa model from a GGUF file and return a PT nn.Module.
@@ -274,7 +274,7 @@ def load_llama_from_gguf_file(gguf_file: str) -> torch.nn.Module:
         _convert_gguf_tensor_name_to_llama_nn(tensor.name): tensor
         for tensor in gguf_weights.tensors
     }
-    logger.info("Loading GGUF weights into PT model.")
-    _load_weights(pt_model, weight_map)
+    # logger.info("Loading GGUF weights into PT model.")
+    # _load_weights(pt_model, weight_map)
 
-    return pt_model
+    return pt_model, weight_map

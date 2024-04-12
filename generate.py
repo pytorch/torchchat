@@ -22,7 +22,7 @@ def device_sync(device):
     elif ("cpu" in device) or ("mps" in device):
         pass
     else:
-        print(f"device={device} is not yet suppported")
+        print(f"device={ device } is not yet suppported")
 
 
 torch._inductor.config.coordinate_descent_tuning = True
@@ -278,6 +278,7 @@ def _load_model(
         checkpoint_path,
         checkpoint_dir,
         params_path,
+        params_table,
         device,
         precision,
         use_tp=False
@@ -286,6 +287,8 @@ def _load_model(
     with torch.device("meta"):
         if params_path:
             model = Transformer.from_params(params_path)
+        elif params_table:
+            model = Transformer.from_table(params_path)            
         else:
             model = Transformer.from_name(checkpoint_path.parent.name)
 
@@ -334,10 +337,12 @@ def _load_model(
 
 
 B_INST, E_INST = "[INST]", "[/INST]"
+
 def _load_inference_model(
         checkpoint_path,
         checkpoint_dir,
         params_path,
+        params_table,
         dso_path,
         pte_path,
         quantize,
@@ -406,6 +411,7 @@ def _main(
     checkpoint_path: Optional[Path] = None,
     checkpoint_dir: Optional[Path] = None,
     params_path: Optional[Path] = None,
+    params_table: Optional[str] = None,
     tokenizer_path: Optional[Path] = None,
     compile: bool = True,
     compile_prefill: bool = False,
@@ -454,6 +460,7 @@ def _main(
         checkpoint_path,
         checkpoint_dir,
         params_path,
+        params_table,
         dso_path,
         pte_path,
         quantize,
@@ -609,6 +616,7 @@ def main(args):
         args.checkpoint_path,
         args.checkpoint_dir,
         args.params_path,
+        args.params_table,
         args.tokenizer_path,
         args.compile,
         args.compile_prefill,
