@@ -11,11 +11,15 @@ jobs:
   run-tinystories:
     strategy:
       matrix:
-        runner: [linux.g5.4xlarge.nvidia.gpu]
+        runner: [macos-14-xlarge]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
       - name: Print machine info
         run: |
           uname -a
