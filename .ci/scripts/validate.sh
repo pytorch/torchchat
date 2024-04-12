@@ -35,7 +35,7 @@ function generate_aoti_model_output() {
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
     echo ""############### Run inference with AOTInductor for $MODEL_NAME "###############"
     python -W ignore export.py --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path "${MODEL_DIR}/${MODEL_NAME}.so" --device "$TARGET_DEVICE"
-    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --dso-path "$MODEL_DIR/${MODEL_NAME}.so" --prompt "$PROMPT" > "$MODEL_DIR/output_aoti"
+    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --dso-path "$MODEL_DIR/${MODEL_NAME}.so" --prompt "$PROMPT" --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti"
     cat "$MODEL_DIR/output_aoti"
 }
 
@@ -57,4 +57,7 @@ PROMPT="Hello, my name is"
 
 generate_compiled_model_output $CHECKPOINT_PATH $TARGET_DEVICE
 generate_aoti_model_output $CHECKPOINT_PATH $TARGET_DEVICE
-generate_executorch_model_output $CHECKPOINT_PATH $TARGET_DEVICE
+
+if [ $TARGET_DEVICE = "cpu" ]; then
+    generate_executorch_model_output $CHECKPOINT_PATH $TARGET_DEVICE
+fi

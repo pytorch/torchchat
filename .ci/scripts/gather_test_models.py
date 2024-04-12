@@ -27,6 +27,22 @@ JOB_RUNNERS = {
 }
 
 
+def parse_args() -> Any:
+    from argparse import ArgumentParser
+
+    parser = ArgumentParser("Gather all models to test on CI for the target OS")
+    parser.add_argument(
+        "-e",
+        "--event",
+        type=str,
+        choices=["pull_request", "push", "periodic"],
+        required=True,
+        help="GitHub CI Event. See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on",
+    )
+
+    return parser.parse_args()
+
+
 def set_output(name: str, val: Any) -> None:
     """
     Set the GitHb output so that it can be accessed by other jobs
@@ -40,10 +56,27 @@ def set_output(name: str, val: Any) -> None:
         print(f"::set-output name={name}::{val}")
 
 
+def model_should_run_on_event(model: str, event: str) -> bool:
+    """
+    A helper function to decide whether a model should be tested on an event (pull_request/push)
+    We put higher priority and fast models to pull request and rest to push.
+    """
+    if event == "pull_request":
+        return model in ["tinyllamas/stories15M", "tinyllamas/stories110M"]
+    elif event == "push":
+        return model in []
+    elif event == "periodic":
+        return model in ["mistralai/Mistral-7B-v0.1", "mistralai/Mistral-7B-Instruct-v0.1", "mistralai/Mistral-7B-Instruct-v0.2"]
+    else:
+        return False
+
+
 def export_models_for_ci() -> dict[str, dict]:
     """
     This gathers all the models that we want to test on GitHub OSS CI
     """
+    args = parse_args()
+    event = args.event
 
     # This is the JSON syntax for configuration matrix used by GitHub
     # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
@@ -53,6 +86,9 @@ def export_models_for_ci() -> dict[str, dict]:
         MODEL_REPOS.keys(),
         JOB_RUNNERS.keys(),
     ):
+        if not model_should_run_on_event(repo_name, event):
+            continue
+
         record = {
             "repo_name": repo_name,
             "resources": MODEL_REPOS[repo_name],
