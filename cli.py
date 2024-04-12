@@ -36,7 +36,7 @@ def check_args(args, command_name: str):
     
     for disallowed in disallowed_args:
         if args.hasattr(disallow):
-        raise RuntimeError("command {command_name} does not support option {disallowed.replace('_', '-')}")
+            raise RuntimeError("command {command_name} does not support option {disallowed.replace('_', '-')}")
 
     
 def cli_args():
