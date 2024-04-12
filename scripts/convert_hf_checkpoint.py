@@ -55,12 +55,12 @@ def convert_hf_checkpoint(
     }
     bin_files = {checkpoint_dir / bin for bin in bin_index["weight_map"].values()}
 
-    def permute(w, n_head):
+    def permute(w, n_heads):
         dim = config.dim
         return (
-            w.view(n_head, 2, config.head_dim // 2, dim)
+            w.view(n_heads, 2, config.head_dim // 2, dim)
             .transpose(1, 2)
-            .reshape(config.head_dim * n_head, dim)
+            .reshape(config.head_dim * n_heads, dim)
         )
 
     merged_result = {}
@@ -86,7 +86,7 @@ def convert_hf_checkpoint(
             q = final_result[key]
             k = final_result[key.replace("wq", "wk")]
             v = final_result[key.replace("wq", "wv")]
-            q = permute(q, config.n_head)
+            q = permute(q, config.n_heads)
             k = permute(k, config.n_local_heads)
             final_result[key.replace("wq", "wqkv")] = torch.cat([q, k, v])
             del final_result[key]
