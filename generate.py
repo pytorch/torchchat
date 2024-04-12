@@ -287,6 +287,8 @@ def _load_model(
     with torch.device("meta"):
         if params_path:
             model = Transformer.from_params(params_path)
+        elif params_table:
+            model = Transformer.from_table(params_path)            
         else:
             model = Transformer.from_name(checkpoint_path.parent.name)
 
