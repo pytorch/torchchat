@@ -26,7 +26,6 @@ sys.path.append(str(wd))
 
 from model import ModelArgs, Transformer
 from typing import Set
-from ggml_quantization_type import Q4_0
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -66,11 +65,11 @@ def _create_pt_model(
     llama_model_args = ModelArgs(
         dim=gguf_model_args.embedding_length,
         n_layer=gguf_model_args.block_count,
-        n_head=gguf_model_args.attention.head_count,
+        n_heads=gguf_model_args.attention.head_count,
         n_local_heads=gguf_model_args.attention.head_count_kv,
         vocab_size=gguf_model_args.vocab_size,
         norm_eps=gguf_model_args.attention.layer_norm_rms_epsilon,
-        intermediate_size=gguf_model_args.feed_forward_length,
+        hidden_dim=gguf_model_args.feed_forward_length,
     )
     pt_model = Transformer(llama_model_args)
     pt_model.eval()
@@ -278,4 +277,4 @@ def load_llama_from_gguf_file(gguf_file: str) -> torch.nn.Module:
     # logger.info("Loading GGUF weights into PT model.")
     # _load_weights(pt_model, weight_map)
 
-    return pt_model
+    return pt_model, weight_map
