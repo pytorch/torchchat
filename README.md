@@ -40,9 +40,11 @@ model test, and a standalone C/C++ runtime for server.
 |---|----|----|-----|
 chat          | `torchat --chat`   | n/a | 🚧 |
 generate text | `torchat --generate` |`generate` | ✅ |
+evaluate model | `torchat --eval` | `eval` | 🚧 |
 export model  | `torchat --export` | `export` | ✅ |
 exported model test (dso,pte) | `torchat --chat` | n/a  | 🚧 |
 exported model test (dso,pte) | `torchat --generate` |`generate` | ✅ |
+evaluate exported model (dso,pte) | `torchat --eval` | `eval` | 🚧 |
 server C++ runtime | n/a | run.cpp model.so | ✅ |
 server C++ runtime | n/a | run.cpp model.pte | ✅ |
 mobile C++ runtime | n/a | app model.pte | ✅ |
@@ -56,6 +58,7 @@ In addition, torchat comes with server C++ runtimes for both AOT Inductor-compil
 enable the deployment of Executorch-compiled PTE mobile/edge models on iOS, Android and Raspberry Pi 5.  In addition, an experimental mobile C++ runtime 
 for AOT Inductor compiled models exists as prototype (as of 4/10).
 
+`torchat --eval` (`eval` as direct command) give access to Eleuthera eval suite for eager models with/without torch.compile (optionally with user-defined quantization), DSO models and PTE models. 
 
 # Getting started
 
