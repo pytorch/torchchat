@@ -102,7 +102,7 @@ jobs:
             echo "******************************************"
             echo "******** INT4 group-wise quantized *******"
             echo "******************************************"
-  	    if [ ${DTYPE} == float16 ]; then
+              if [ ${DTYPE} == float16 ]; then
               DTYPE=bfloat16
             fi
   
@@ -115,6 +115,6 @@ jobs:
             cat ./output_aoti
   
             echo "tests complete for ${DTYPE}"
-  	  done
-	  
-	  echo "tests complete for all dtypes!"
+            done
+          
+          echo "tests complete for all dtypes!"
