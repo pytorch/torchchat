@@ -1,0 +1,47 @@
+name: Compile main
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  gguf-load-test:
+    strategy:
+      matrix:
+        runner: [32-core-ubuntu]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Install requirements
+        run: |
+          echo "Intalling pip packages"
+          pip install gguf
+          pip install -r requirements.txt
+
+      - name: Download GGUF files
+        run: |
+          mkdir gguf_files
+          pushd gguf_files
+          wget https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_0.gguf?download=true
+          popd
+      - name: Load files
+        run: |
+          from gguf_loader import load_llama_from_gguf_file
+          pt = load_llama_from_gguf_file("gguf_files/llama-2-7b.Q4_0.gguf")
+
+          echo "Tests complete."

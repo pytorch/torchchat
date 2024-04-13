@@ -14,8 +14,9 @@ class F16:
         Unpacks GGUF F16 tensor.
         """
         assert gguf_tensor.tensor_type == gguf.GGMLQuantizationType.F16
-        shape = tuple(gguf_tensor.shape)
-        return torch.from_numpy(gguf_tensor.data).to(torch.float16).reshape(shape)
+        reversed_shape = gguf_tensor.shape[::-1] # TODO: GGUF tensors are reversed
+        new_tensor = gguf_tensor.data.reshape(reversed_shape)
+        return torch.from_numpy(new_tensor).to(torch.float16)
 
 class F32:
     @staticmethod
@@ -24,8 +25,9 @@ class F32:
         Unpacks GGUF F32 tensor.
         """
         assert gguf_tensor.tensor_type == gguf.GGMLQuantizationType.F32
-        shape = tuple(gguf_tensor.shape)
-        return torch.from_numpy(gguf_tensor.data).to(torch.float32).reshape(shape)
+        reversed_shape = gguf_tensor.shape[::-1] # TODO: GGUF tensors are reversed
+        new_tensor = gguf_tensor.data.reshape(reversed_shape)
+        return torch.from_numpy(new_tensor).to(torch.float32)
 
 class Q4_0:
     group_size = 32
@@ -36,12 +38,12 @@ class Q4_0:
         """
         Unpacks GGUF Q4_0 matrix of size (nr, nc) to q, s, and z that can be dequantized by:
 
-        x = s(q - 8) + z,
+        x = s(q - 8) + z (roughly, reshape is needed),
 
         where
         * q is an int4-valued tensor of shape (nr, nc) and type torch.int32
-        * s is a torch.float32 tensor of shape (nr, 1)
-        * z is a torch.float32 tensor of shape (nr, 1).
+        * s is a torch.float32 tensor of shape (nr, -1) with one scale per group
+        * z is a torch.float32 tensor of shape (nr, -1) with one zero per group
 
         Note that z is always zero because Q4_0 is a scale-only scheme.
 
@@ -59,7 +61,8 @@ class Q4_0:
 
         assert gguf_tensor.tensor_type == gguf.GGMLQuantizationType.Q4_0
         assert len(gguf_tensor.shape) == 2
-        nr, nc = gguf_tensor.shape
+        nc, nr = gguf_tensor.shape # TODO: CHECK THIS.  GGUF TENSOR REVERSED?
+
         QK4_0 = 32 # groupsize
 
         # Parse block_q4_0
@@ -107,12 +110,12 @@ class Q6_K:
         """
         Unpacks GGUF Q6_k matrix of size (nr, nc) to q, s, and z that can be dequantized by:
 
-        x = s(q - 32) + z,
+        x = s(q - 32) + z (roughly, reshape is needed),
 
         where
         * q is an int6-valued tensor of shape (nr, nc) and type torch.int32
-        * s is a torch.float32 tensor of shape (nr, -1)
-        * z is a torch.float32 tensor of shape (nr, -1)
+        * s is a torch.float32 tensor of shape (nr, -1) with one scale per group
+        * z is a torch.float32 tensor of shape (nr, -1) with one zero per group
 
         There is one element of s/z per group of 32 elements of 4.
 
@@ -139,7 +142,7 @@ class Q6_K:
         """
         assert gguf_tensor.tensor_type == gguf.GGMLQuantizationType.Q6_K
         assert len(gguf_tensor.shape) == 2
-        nr, nc = gguf_tensor.shape
+        nc, nr = gguf_tensor.shape # TODO: CHECK THIS.  GGUF TENSOR REVERSED?
         QK_K = 256
 
         # Parse block_q6_K
