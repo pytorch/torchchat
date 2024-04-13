@@ -212,8 +212,8 @@ def main(args) -> None:
     checkpoint_dir = args.checkpoint_dir
     params_path = args.params_path
     params_table = args.params_table
+    gguf_path = args.gguf_path
     tokenizer_path = args.tokenizer_path
-    params_path = args.params_path
     dso_path = args.dso_path
     pte_path = args.pte_path
     quantize = args.quantize
@@ -238,6 +238,7 @@ def main(args) -> None:
         checkpoint_dir,
         params_path,
         params_table,
+        gguf_path,
         dso_path,
         pte_path,
         quantize,

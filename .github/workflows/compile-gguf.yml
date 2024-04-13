@@ -1,0 +1,76 @@
+name: Compile main using GGUF
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  run-tinystories:
+    strategy:
+      matrix:
+        runner: [ubuntu-latest, macos-14]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Install requirements
+        run: |
+          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt
+      - name: Download GGUF
+        run: |
+          mkdir gguf_files
+          wget -O gguf_files/llama-2-7b.Q4_0.gguf "https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_0.gguf?download=true"
+          wget -O gguf_files/tokenizer.model https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+      - name: Run inference
+        run: |          
+          export GGUF_PATH=gguf_files/llama-2-7b.Q4_0.gguf
+          export MODEL_NAME=llama-2-7b.Q4_0.gguf
+          export MODEL_DIR=/tmp
+          python generate.py --gguf-path ${GGUF_PATH} --temperature 0 > ./output_eager
+          cat ./output_eager
+          python generate.py --compile --gguf-path ${GGUF_PATH} --temperature 0 > ./output_compiled
+          cat ./output_compiled
+          python export.py --gguf-path ${GGUF_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+          python generate.py --gguf-path ${GGUF_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
+          cat ./output_aoti
+
+          echo "******************************************"
+          echo "******* Emb: channel-wise quantized ******"
+          echo "******************************************"
+          python generate.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --gguf-path ${GGUF_PATH} --temperature 0 > ./output_eager
+          cat ./output_eager
+          python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --gguf-path ${GGUF_PATH} --temperature 0 > ./output_compiled
+          cat ./output_compiled
+          python export.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --gguf-path ${GGUF_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+          python generate.py --gguf-path ${GGUF_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
+          cat ./output_aoti
+
+          echo "******************************************"
+          echo "******** Emb: group-wise quantized *******"
+          echo "******************************************"
+          python generate.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --gguf-path ${GGUF_PATH} --temperature 0 > ./output_eager
+          cat ./output_eager
+          python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --gguf-path ${GGUF_PATH} --temperature 0 > ./output_compiled
+          cat ./output_compiled
+          python export.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --gguf-path ${GGUF_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+          python generate.py --gguf-path ${GGUF_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
+          cat ./output_aoti
+
+          echo "tests complete"
+          echo "******************************************"
+
