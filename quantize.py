@@ -467,7 +467,7 @@ class WeightOnlyInt8Linear(torch.nn.Module):
         )
         dtype=get_precision()
         if group_size is None or (group_size == 0):
-            self.register_buffer("scales", torch.ones(out_features, dtype=torch.bfloat16))
+            self.register_buffer("scales", torch.ones(out_features, dtype=dtype))
         else:
             groups = (in_features + group_size - 1) // group_size
             self.register_buffer("scales", torch.ones(out_features, groups, dtype=dtype))
