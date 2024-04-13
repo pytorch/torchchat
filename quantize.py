@@ -515,7 +515,9 @@ def replace_embedding_weight_only_grouped_int8_per_channel(
 
 
 class EmbeddingOnlyInt8QuantHandler(QuantHandler):
-    def __init__(self, mod, *, bitwidth: int = 8, group_size: Optional[int] = None, packed: bool = False):
+    def __init__(self, mod, *, bitwidth: int = 8, group_size: Optional[int] = None, packed = False):
+        if isinstance(packed, str):
+            packed = (packed == "True")
         self.mod = mod
         self.group_size = group_size
         self.bitwidth = bitwidth
