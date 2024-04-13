@@ -58,6 +58,14 @@ class ModelArgs:
         return cls(**params)
 
     @classmethod
+    def from_table(cls, name: str):
+        print(f"name {name}")
+        if name in transformer_configs:
+            return cls(**transformer_configs[name])
+        else:
+            raise RuntimeError(f"unknown table index {name} for transformer_configs")
+
+    @classmethod
     def from_name(cls, name: str):
         print(f"name {name}")
         if name in transformer_configs:
@@ -217,6 +225,10 @@ class Transformer(nn.Module):
     @classmethod
     def from_name(cls, name: str):
         return cls(ModelArgs.from_name(name))
+
+    @classmethod
+    def from_table(cls, name: str):
+        return cls(ModelArgs.from_table(name))
 
     @classmethod
     def from_params(cls, params_path: str):
