@@ -13,6 +13,33 @@ import torch.nn as nn
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
+strict = False
+
+def check_args(args, command_name: str):
+    global strict
+
+    # chat and generate support the same options
+    if command_name in  ["generate", "chat", "gui"]:
+        # examples, can add more. Note that attributes convert dash to _
+        disallowed_args = ['output_pte_path', 'output_dso_path' ]
+    elif command_name == "export":
+        # examples, can add more. Note that attributes convert dash to _
+        disallowed_args = ['pte_path', 'dso_path' ]
+    elif command_name == "eval":
+        # TBD
+        disallowed_args = []
+    else:
+        raise RuntimeError(f"{command_name} is not a valid command")
+    
+    for disallowed in disallowed_args:
+        if args.hasattr(disallow):
+            text = f"command {command_name} does not support option {disallowed.replace('_', '-')}"
+            if strict:
+                raise RuntimeError(text)
+            else:
+                print(f"Warning: {text}")
+
+    
 def cli_args():
     import argparse
 
