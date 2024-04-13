@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir gguf_files
           export GGUF_PATH=gguf_files/llama-2-7b.Q4_0.gguf
-	  export TOKENIZER_PATH=gguf_files/tokenizer.model
+          export TOKENIZER_PATH=gguf_files/tokenizer.model
           wget -O ${GGUF_PATH} "https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_0.gguf?download=true"
           wget -O ${TOKENIZER_PATH} https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
       - name: Run inference
