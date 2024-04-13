@@ -1,4 +1,4 @@
-name: Run compile tests on MPS
+name: Run eager tests on MPS
 
 on:
   pull_request:

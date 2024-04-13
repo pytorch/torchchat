@@ -1,4 +1,4 @@
-name: Run compile tests on MPS with dtypes
+name: Run eager tests on MPS with dtypes
 
 on:
   pull_request:
