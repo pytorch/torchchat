@@ -120,11 +120,11 @@ def linear_int4(
     origin_input_size = input.size()
     input = input.reshape(-1, origin_input_size[-1])
     c = torch.ops.aten._weight_int4pack_mm(
-        input.to(dtype=torch.bfloat16),
+        input,
         weight_int4pack,
         groupsize,
-        scales_and_zeros.to(dtype=torch.bfloat16)
-    ).to(dtype=input.dtype)
+        scales_and_zeros,
+    )
     new_shape = origin_input_size[:-1] + (out_features,)
     c = c.reshape(new_shape)
     return c

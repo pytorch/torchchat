@@ -465,11 +465,12 @@ class WeightOnlyInt8Linear(torch.nn.Module):
         self.register_buffer(
             "weight", torch.empty((out_features, in_features), dtype=torch.int8)
         )
+        dtype=get_precision()
         if group_size is None or (group_size == 0):
             self.register_buffer("scales", torch.ones(out_features, dtype=torch.bfloat16))
         else:
             groups = (in_features + group_size - 1) // group_size
-            self.register_buffer("scales", torch.ones(out_features, groups, dtype=torch.bfloat16))
+            self.register_buffer("scales", torch.ones(out_features, groups, dtype=dtype)
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         scales = self.scales
@@ -647,11 +648,11 @@ def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, grou
     origin_x_size = x.size()
     x = x.reshape(-1, origin_x_size[-1])
     c = torch.ops.aten._weight_int4pack_mm(
-        x.to(dtype=torch.bfloat16),
+        x,
         weight_int4pack,
         groupsize,
-        scales_and_zeros.to(dtype=torch.bfloat16)
-    ).to(dtype=x.dtype)
+        scales_and_zeros,
+    )
     new_shape = origin_x_size[:-1] + (out_features,)
     c = c.reshape(new_shape)
     return c
