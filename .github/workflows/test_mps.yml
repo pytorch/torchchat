@@ -25,7 +25,7 @@ jobs:
 
         echo "::group::Install requirements"
         # Install requirements
-        pip install --pre torch torchvision torchaudio --index-url https://download.py --device mpstorch.org/whl/nightly/cpu
+        pip install --pre torch torchvision torchaudio --index-url https://download.py torch.org/whl/nightly/cpu
         ls -la
         pwd
         pip install -r requirements.txt
