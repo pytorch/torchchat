@@ -107,10 +107,6 @@ specified using the `params-path ${PARAMS_PATH}` containing the appropriate mode
 
 The parameter file will should be in JSON format specifying thee parameters.  You can find the Model Args data class in [`model.py`](https://github.com/pytorch/torchat/blob/main/model.py#L22).
 
-The final way to initialize a torchat model from a GGUF format, a new file format for storing models.  You load a GGUF model with the option --load_gguf ${MODELNAME}.gguf`. Presently, the F16, F32, Q4_0, and Q6_K formats are supported and converted into native torch-chat models.  Please refer to section *Loading GGUF* for details.
-
-You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsoul;y quantized and thend equantized model.) 
-
 | Model | tested | eager | torch.compile | AOT Inductor | ET Runtime | Fits on Mobile |
 |-----|--------|-------|-----|-----|-----|-----|
 tinyllamas/stories15M | ✅ | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
@@ -129,9 +125,19 @@ Llama3 | 🚧  | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 
 *Key:* ✅ works correctly; 🚧  work in progress; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile phone (may fit some high-end devices such as tablets);
 
+## Supported GGUF models
 
-### More downloading
+The final way to initialize a torchat model from a GGUF format, a new file format for storing models.  You load a GGUF model with the option --load_gguf ${MODELNAME}.gguf`. Presently, the F16, F32, Q4_0, and Q6_K formats are supported and converted into native torch-chat models.  Please refer to section *Loading GGUF* for details.
 
+You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsouly quantized and thend equantized model.) 
+
+| GGUF Model | tested | eager | torch.compile | AOT Inductor | ET Runtime | Fits on Mobile |
+|-----|--------|-------|-----|-----|-----|-----|
+| llama-2-7b.Q4_0.gguf |  🚧 | 🚧 | 🚧 | 🚧 | 🚧 |
+
+
+## Downloading
+### Downloading LLM checkpoints
 
 First cd into torchat.  We first create a directory for stories15M and download the model and tokenizers.
 We show how to download @Andrej Karpathy's stories15M tiny llama-style model that were used in llama2.c.  Advantageously,
@@ -155,6 +161,10 @@ curl -L -o ${MODEL_DIR}/stories15M.pt "https://huggingface.co/karpathy/tinyllama
 curl -L -o ${MODEL_DIR}/tokenizer.model "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
 curl -L -o ${MODEL_DIR}/tokenizer.bin "https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin"
 ```
+
+### Downloading GGUF models
+
+...
 
 
 ## Conventions
