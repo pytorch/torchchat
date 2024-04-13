@@ -19,7 +19,7 @@ def check_args(args, command_name: str):
     global strict
 
     # chat and generate support the same options
-    if command_name in  ["generate", "chat", "gui"]::
+    if command_name in  ["generate", "chat", "gui"]:
         # examples, can add more. Note that attributes convert dash to _
         disallowed_args = ['output_pte_path', 'output_dso_path' ]
     elif command_name == "export":

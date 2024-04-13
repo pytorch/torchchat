@@ -22,8 +22,10 @@ def cli():
     args = cli_args()
     
     if args.generate or args.chat:
+        check_args(args, "generate")
         generate_main(args)
     elif args.export:
+        check_args(args, "export")
         export_main(args)
     else:
         raise RuntimeError("must specify either --generate or --export")
