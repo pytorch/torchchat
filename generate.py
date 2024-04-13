@@ -350,6 +350,16 @@ def _load_inference_model(
         precision,
         use_tp=False
 ):
+    assert (
+        (checkpoint_path and checkpoint_path.is_file()) or
+        (dso_path and Path(dso_path).is_file()) or
+        (pte_path and Path(pte_path).is_file())
+    ), "need to specified a valid checkpoint path, DSO path, or PTE path"
+    assert not (dso_path and pte_path), "specify either DSO path or PTE path, but not both"
+
+    if (checkpoint_path and (dso_path or pte_path)):
+        print("Warning: checkpoint path ignored because an exported DSO or PTE path specified")
+
     print("Loading model ...")
     t0 = time.time()    
     model_ = _load_model(
@@ -427,15 +437,6 @@ def _main(
     use_tiktoken=False,
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
-    assert (
-        (checkpoint_path and checkpoint_path.is_file()) or
-        (dso_path and Path(dso_path).is_file()) or
-        (pte_path and Path(pte_path).is_file())
-    ), "need to specified a valid checkpoint path, DSO path, or PTE path"
-    assert not (dso_path and pte_path), "specify either DSO path or PTE path, but not both"
-
-    if (checkpoint_path and (dso_path or pte_path)):
-        print("Warning: checkpoint path ignored because an exported DSO or PTE path specified")
 
     if not tokenizer_path:
         assert checkpoint_path, "either a tokenizer or a checkpoint path must be specified"
