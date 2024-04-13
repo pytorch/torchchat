@@ -525,7 +525,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 
         
     @torch.no_grad()
-    def create_quantized_state_dict(self) -> Dict:
+    def create_quantized_state_dict(self, packed=False) -> Dict:
         cur_state_dict = self.mod.state_dict()
 
         if self.bitwidth == 4:
@@ -558,7 +558,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
                     scales_dtype=mod.weight.dtype,
                 )
                 
-                if pack:
+                if packed:
                     if weight.shape[-1] %2 != 0:
                         raise RUntimeError("automatic padding not implemented yet")
 
@@ -586,7 +586,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
         return self.mod
 
     def quantized_model(self) -> nn.Module:
-        model_updated_state_dict = self.create_quantized_state_dict()
+        model_updated_state_dict = self.create_quantized_state_dict(self.packed)
         self.convert_for_runtime()
         self.mod.load_state_dict(model_updated_state_dict)
         return self.mod
