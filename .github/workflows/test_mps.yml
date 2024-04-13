@@ -25,7 +25,7 @@ jobs:
 
         echo "::group::Install requirements"
         # Install requirements
-        pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+        pip install --pre torch torchvision torchaudio --index-url https://download.py --device mpstorch.org/whl/nightly/cpu
         ls -la
         pwd
         pip install -r requirements.txt
@@ -45,19 +45,17 @@ jobs:
         export MODEL_PATH=checkpoints/stories15M/stories15M.pt
         export MODEL_NAME=stories15M
         export MODEL_DIR=/tmp
+
         python generate.py --device mps --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
         cat ./output_eager
-
-        python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+        python generate.py --device mps --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
         cat ./output_eager
-        python generate.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+        python generate.py --device mps --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
         cat ./output_eager
-        python generate.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+        python generate.py --device mps --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
         cat ./output_eager
-        python generate.py --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+        python generate.py --device mps --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
         cat ./output_eager
-        python generate.py --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-        cat ./output_eager
-        python generate.py --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+        python generate.py --device mps --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
         cat ./output_eager
           
