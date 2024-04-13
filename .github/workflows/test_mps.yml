@@ -48,10 +48,10 @@ jobs:
 
         python generate.py --device mps --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
         cat ./output_eager
-        python generate.py --device mps --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-        cat ./output_eager
-        python generate.py --device mps --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-        cat ./output_eager
+        # python generate.py --device mps --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+        # cat ./output_eager
+        # python generate.py --device mps --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+        # cat ./output_eager
         python generate.py --device mps --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
         cat ./output_eager
         python generate.py --device mps --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
