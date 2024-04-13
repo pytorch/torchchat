@@ -36,12 +36,13 @@ jobs:
       - name: Download GGUF files
         run: |
           mkdir gguf_files
-          pushd gguf_files
-          wget https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_0.gguf?download=true
-          popd
+          wget -O gguf_files/llama-2-7b.Q4_0.gguf "https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_0.gguf?download=true"
       - name: Load files
         run: |
-          from gguf_loader import load_llama_from_gguf_file
-          pt = load_llama_from_gguf_file("gguf_files/llama-2-7b.Q4_0.gguf")
+          touch test.py
+          echo "from gguf_loader import load_llama_from_gguf_file" >> test.py
+          echo "pt = load_llama_from_gguf_file(\"gguf_files/llama-2-7b.Q4_0.gguf\")" >> test.py
+          cat test.py
+          python test.py
 
           echo "Tests complete."
