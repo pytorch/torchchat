@@ -5,7 +5,7 @@ items that are not factual.  If you find an item that is incorrect, please tag a
 or drop from our initial release.*
 
 # torchat *NORTHSTAR*
-A repo for building and using llama on servers, desktops and mobile.
+A repo for building and using llama on servers, desktops and mobile with torchat (pronounced torch-chat).
 
 The torchat repo enables model inference of llama models (and other LLMs) on servers, desktop and mobile devices.
 For a list of devices, see below, under *SUPPORTED SYSTEMS*.
@@ -91,14 +91,25 @@ export MODEL_DOWNLOAD=meta-llama/Llama-2-7b-chat-hf
 ./scripts/prepare.sh $MODEL_DOWNLOAD
 ```
 
-### Supported Models
+## Supported Models
 
 While we strive to support a broad range of models, we can't test all models.  Consequently, we classify supported models as tested ✅,
 work in progress 🚧 and not tested.  We invite community contributions of both new models, as well as test reports.
 
-Some common models are recognized by torchat based on their filename (`Transformer.from_name()`).  For models not recognized based 
-on the filename, you can construct a model by initializing the `ModelArgs` dataclass that controls model construction from a parameter json
-specified using the `params-path ${PARAMS_PATH}` containing the appropriate model parameters.
+Some common models are recognized by torchat based on their filename (we use the model constructor `Transformer.from_name()`).  We derive this name from the last component of the pathname specified
+for the model, i.e., the name of the directory in which the model weights are specified and we perform a fuzzy match against a table of known model architectures.
+Alternatively, you can specify the index into that table with the option `--params-table ${INDEX}` where the index is the dictionary key in the `transformer_configs`   
+dictionary specified [here](https://github.com/pytorch/torchat/blob/main/model.py#L85).  For our running example with the stories15M model, this would be expressed as
+`--params-table stories15M`. (We use the model constructor `Transformer.from_table()`)
+
+For models not specified not in the list of "known configurations", you can construct the model by initializing the `ModelArgs` dataclass that controls model construction from a parameter json
+specified using the `params-path ${PARAMS_PATH}` containing the appropriate model parameters to initialize the ModelArgs for the model. (We use the model constructor `Transformer.from_params()`)
+
+The parameter file will should be in JSON format specifying thee parameters.  You can find the Model Args data class in [`model.py`](https://github.com/pytorch/torchat/blob/main/model.py#L22).
+
+The final way to initialize a torchat model from a GGUF format, a new file format for storing models.  You load a GGUF model with the option --load_gguf ${MODELNAME}.gguf`. Presently, the F16, F32, Q4_0, and Q6_K formats are supported and converted into native torch-chat models.  Please refer to section *Loading GGUF* for details.
+
+You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsoul;y quantized and thend equantized model.) 
 
 | Model | tested | eager | torch.compile | AOT Inductor | ET Runtime | Fits on Mobile |
 |-----|--------|-------|-----|-----|-----|-----|
@@ -117,7 +128,6 @@ mistralai/Mistral-7B-Instruct-v0.2 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 Llama3 | 🚧  | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 
 *Key:* ✅ works correctly; 🚧  work in progress; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile phone (may fit some high-end devices such as tablets);
-
 
 
 ### More downloading
@@ -500,14 +510,24 @@ We invite contributors to submit established quantization schemes, with accuracy
 
 # Loading GGUF models
 
-GGUF is a nascent industry standard format and will will read fp32, fp16 and some quantized formats (q4_0 and whatever is necessary to read llama2_78_q4_0.gguf)
+GGUF is a nascent industry standard format and presently torchat can read  the F16, F32, Q4_0, and Q6_K formats natively and convert them into native torch-chat models by using the load-gguf option:
 
 ```
 --load_gguf <gguf_filename> # all other options as described elsewhere, works for generate and export, for all backends, but cannot be used with --quantize
 ```
 
+Ypu may then apply the standard quantization options, e.g., to add embedding table quantization as described under quantization. (You cannot directly requantize already quantized formats.  However, you may dequantize them using GGUF tools, and then laod the model into torchat to quantize wqith torchat's quantization workflow.)
+
+## Loading unsupported GGUF formats in torchat
+
+GGUF formats not presently supported natively in torchat may be converted to one of the supported formats with GGUF's `${GGUF}/quantize` utility to be loaded in torchat. If you convert to the FP16 or FP32 formats with GGUF's `quantize` utility, you may then requantize these models with torchat's quantization workflow. 
+
+Note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previously quantized and then dequantized model. This, while you can convert your q4_1 model to FP16 or FP32 GGUF formats and then requantize, you might get better results if you start with the original FP16 or FP32 GGUF format. 
+
+To use the quantize tool, install the GGML tools at ${GGUF} . Then, you can, for example, convert a quantized model to f16 format:
+
 ```
---dequantize_gguf <gguf_filename # all other options as described elsewhere, works for generate and export, for all backends, and be used with --quantize
+${GGUF}/quantize --allow-requantize your_quantized_model.gguf fake_unquantized_model.gguf f16
 ```
 
 # Standalone Execution
