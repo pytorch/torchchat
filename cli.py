@@ -25,7 +25,7 @@ def check_args(args, command_name: str):
     elif command_name == "export":
         # examples, can add more. Note that attributes convert dash to _
         disallowed_args = ['pte_path', 'dso_path' ]
-    elif command_name = "eval":
+    elif command_name == "eval":
         # TBD
         disallowed_args = []
     else:
