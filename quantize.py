@@ -492,7 +492,7 @@ class WeightOnlyInt8Linear(torch.nn.Module):
 
 
 def replace_embedding_weight_only_grouped_int8_per_channel(
-    module, bitwidth: int = 8, group_size: Optional[int] = None
+        module, bitwidth: int = 8, group_size: Optional[int] = None, pack = False
 ):
     for name, child in module.named_children():
         # print(f"name: {name}")
@@ -510,16 +510,20 @@ def replace_embedding_weight_only_grouped_int8_per_channel(
             )
         else:
             replace_embedding_weight_only_grouped_int8_per_channel(
-                child, bitwidth, group_size
+                child, bitwidth, group_size, pack
             )
 
 
 class EmbeddingOnlyInt8QuantHandler(QuantHandler):
-    def __init__(self, mod, *, bitwidth: int = 8, group_size: Optional[int] = None):
+    def __init__(self, mod, *, bitwidth: int = 8, group_size: Optional[int] = None, packed: bool = False):
         self.mod = mod
         self.group_size = group_size
         self.bitwidth = bitwidth
+        self.packed = packed
+        if (bitwidth != 4) and packed:
+            raise RUntimeError("pack only works with bitsize 4")
 
+        
     @torch.no_grad()
     def create_quantized_state_dict(self) -> Dict:
         cur_state_dict = self.mod.state_dict()
@@ -553,7 +557,21 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
                     self.group_size,
                     scales_dtype=mod.weight.dtype,
                 )
+                
+                if pack:
+                    if weight.shape[-1] %2 != 0:
+                        raise RUntimeError("automatic padding not implemented yet")
 
+                    weight_view = weight.view(
+                        weight.shape[0],
+                        weight.shape[1] //2,
+                        2
+                        )
+                    weight_even = weight_view[:,:,0] * 16 # left shift 4
+                    weight_odd = weight_view[:,:,1]
+                    weight_packed = weight_even + weight_odd
+                    weight = weight_packed
+                    
                 # Update state dict
                 cur_state_dict[f"{fqn}.weight"] = weight
                 # squeeze makes groupsize=rowsize unidimensional
@@ -582,15 +600,22 @@ class QuantizedGroupEmbedding(torch.nn.Module):
         group_size: Optional[int] = None,
         device=None,
         dtype=torch.half,
+        packed=False,
     ) -> None:
         super().__init__()
         if group_size is None or group_size == 0:
             group_size = embedding_dim
         self.group_size = group_size
         self.dtype = dtype
-        self.register_buffer(
-            "weight", torch.empty((vocab_size, embedding_dim), dtype=torch.int8)
-        )
+        self.packed = packed
+        if not packed:
+            self.register_buffer(
+                "weight", torch.empty((vocab_size, embedding_dim), dtype=torch.int8)
+            )
+        else: # packed
+            self.register_buffer(
+                "weight", torch.empty((vocab_size, embedding_dim//2), dtype=torch.int8)
+            )            
         groups_per_row = (embedding_dim + group_size - 1) // group_size
         if groups_per_row > 1:
             self.register_buffer(
@@ -612,7 +637,14 @@ class QuantizedGroupEmbedding(torch.nn.Module):
         # result_weights = self.weight.index_select(0, indices.view(-1))
         # result_scales = self.scales.index_select(0, indices.view(-1))
 
-        weight = self.weight
+        if self.packed:
+            weight_even = self.weight.div(16)
+            weight_even = self.weight.remainder(16)
+            weight_unpacked = torch.stack(weight_even, weight_odd)
+            weight = weight_unpacked.view(weight.shape[0], -1)
+        else:    
+            weight = self.weight
+
         scales = self.scales.view(weight.shape[0], -1)
         
         result_weights = F.embedding(indices, weight)
