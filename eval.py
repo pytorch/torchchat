@@ -196,13 +196,7 @@ def eval(
     return eval_results
 
 
-def main(
-    checkpoint_path: Path = Path("checkpoints/meta-llama/Llama-2-7b-chat-hf/lit_model.pth"),
-    compile: bool = False,
-    tasks: list = ["hellaswag"],
-    limit: Optional[int] = None,
-    max_seq_length: Optional[int] = None,
-) -> None:
+def main(args) -> None:
     """Evaluates model on a task from the `lm-evaluation-harness` library.
 
     Args:
@@ -214,28 +208,48 @@ def main(
 
     """
 
-    assert checkpoint_path.is_file(), checkpoint_path
-
-    tokenizer_path = checkpoint_path.parent / "tokenizer.model"
+    checkpoint_path = args.checkpoint_path
+    checkpoint_dir = args.checkpoint_dir
+    params_path = args.params_path
+    params_table = args.params_table
+    tokenizer_path = args.tokenizer_path
+    params_path = args.params_path
+    dso_path = args.dso_path
+    pte_path = args.pte_path
+    quantize = args.quantize
+    device = args.device
+    model_dtype = args.dtype    
+    tasks = args.tasks
+    limit = args.limit
+    max_seq_length = args.max_seq_length
+    use_tiktoken = args.tiktoken
+    
+    if not tokenizer_path:
+        assert checkpoint_path, "either a tokenizer or a checkpoint path must be specified"
+        tokenizer_path = checkpoint_path.parent / "tokenizer.model"
     assert tokenizer_path.is_file(), tokenizer_path
 
-    device = 'cuda'
-    precision = torch.bfloat16
-
-    print("Loading model ...")
-    t0 = time.time()
-    model = _load_model(checkpoint_path, None, None, None, device, precision, False)
-
-    torch.cuda.synchronize()
-    print(f"Time to load model: {time.time() - t0:.02f} seconds.")
-
-    model.eval()
+    print(f"Using device={device}")
+    precision = name_to_dtype(model_dtype)
+    set_precision(precision)
+    
+    model = _load_inference_model(
+        checkpoint_path,
+        checkpoint_dir,
+        params_path,
+        params_table,
+        dso_path,
+        pte_path,
+        quantize,
+        device,
+        precision,
+        use_tp=False
+    )
 
     tokenizer = SentencePieceProcessor(model_file=str(tokenizer_path))
 
-    torch.manual_seed(1234)
-
     if compile:
+        assert not (dso_path or pte_path), "cannot compile exported model"
         global model_forward
         model_forward = torch.compile(model_forward,  mode="reduce-overhead", dynamic=True, fullgraph=True)
         torch._inductor.config.coordinate_descent_tuning = True
@@ -249,22 +263,25 @@ def main(
         max_seq_length,
     )
     print(f"Time to run eval: {time.time() - t1:.02f} seconds.")
-    print(f"For model {checkpoint_path}")
+    if dso_path:
+        print(f"For model {dso_path}")
+    elif pte_path:
+        print(f"For model {pte_path}")
+    elif checkpoint_path:
+        print(f"For model {checkpoint_path}")
+    elif checkpoint_dir:
+        print(f"For model {checkpoint_dir}")
+    else:
+        raise RuntimeError("Well That's Fine. How did we get here")
+
     for task, res in result["results"].items():
         print(f"{task}: {res}")
 
-
 if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser(description='Your CLI description.')
+def cli():
+    args = cli_args()
+    main(args)
 
-    parser.add_argument('--checkpoint_path', type=Path, default=Path("checkpoints/meta-llama/Llama-2-7b-chat-hf/lit_model.pth"), help='Model checkpoint path.')
-    parser.add_argument('--compile', action='store_true', help='Whether to compile the model.')
-    parser.add_argument('--tasks', nargs='+', type=str, default=["hellaswag"], help='list of lm-eluther tasks to evaluate usage: --tasks task1 task2')
-    parser.add_argument('--limit', type=int, default=None, help='number of samples to evalulate')
-    parser.add_argument('--max_seq_length', type=int, default=None, help='maximum length sequence to evaluate')
 
-    args = parser.parse_args()
-    main(
-        Path(args.checkpoint_path), args.compile, args.tasks, args.limit, args.max_seq_length,
-    )
+if __name__ == "__main__":
+        cli()
