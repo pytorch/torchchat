@@ -38,15 +38,24 @@ def cli_args():
         help="Use torchat to export a model.",
     )
     parser.add_argument(
+        "--eval",
+        action="store_true",
+        help="Use torchat to eval a model.",
+    )
+    parser.add_argument(
         "--generate",
         action="store_true",
         help="Use torchat to generate a sequence using a model.",
     )
-    
     parser.add_argument(
         "--chat",
         action="store_true",
         help="Use torchat to for an interactive chat session.",
+    )    
+    parser.add_argument(
+        "--gui",
+        action="store_true",
+        help="Use torchat to for an interactive gui-chat session.",
     )    
     parser.add_argument(
         "--num-samples",
@@ -171,6 +180,23 @@ def cli_args():
         default=None,
         help="Device to use"
     )
+    parser.add_argument(
+        '--tasks',
+        nargs='+',
+        type=str,
+        default=["hellaswag"],
+        help='list of lm-eluther tasks to evaluate usage: --tasks task1 task2'
+    )
+    parser.add_argument(
+        '--limit', type=int,
+        default=None,
+        help='number of samples to evaluate'
+    )
+    parser.add_argument(
+        '--max-seq-length',
+        type=int,
+        default=None,
+        help='maximum length sequence to evaluate')
     
     args = parser.parse_args()
 
