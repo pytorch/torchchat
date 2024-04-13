@@ -11,7 +11,7 @@ jobs:
   gguf-load-test:
     strategy:
       matrix:
-        runner: [32-core-ubuntu]
+        runner: [macos-14]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
