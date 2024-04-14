@@ -31,19 +31,19 @@ work in progress 🚧 or some restrictions ❹.  As always, we invite community 
 
 | Model | Tested | Eager | torch.compile | AOT Inductor | ExecuTorch | Fits on Mobile |
 |-----|--------|-------|-----|-----|-----|-----|
+meta-llama/Llama-3-7b | 🚧  | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
+meta-llama/Llama-2-7b-chat-hf | 🚧  | ✅ |  ✅ |  ✅ |  ✅ | ❹|
+meta-llama/Llama-2-13b-chat-hf | - | ✅ |  ✅ |  ✅ |  ✅ | 📵 |
+meta-llama/Llama-2-70b-chat-hf | - | ✅ |  ✅ |  ✅ |  ✅ | ❌|
 tinyllamas/stories15M | ✅ | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
 tinyllamas/stories42M  | - | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
 tinyllamas/stories110M   | ✅ | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
 openlm-research/open_llama_7b  | 🚧 | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
-meta-llama/Llama-2-7b-chat-hf | 🚧  | ✅ |  ✅ |  ✅ |  ✅ | ❹|
-meta-llama/Llama-2-13b-chat-hf | - | ✅ |  ✅ |  ✅ |  ✅ | 📵 |
-meta-llama/Llama-2-70b-chat-hf | - | ✅ |  ✅ |  ✅ |  ✅ | ❌|
 codellama/CodeLlama-7b-Python-hf | -| ✅ |  ✅ |  ✅ |  ✅ | ❹|
 codellama/CodeLlama-34b-Python-hf | -| ✅ |  ✅ |  ✅ |  ✅ | ❌ |
 mistralai/Mistral-7B-v0.1 | 🚧  |  ✅  |  ✅ |  ✅ |  ✅ | ❹ |
 mistralai/Mistral-7B-Instruct-v0.1 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 mistralai/Mistral-7B-Instruct-v0.2 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
-Llama3 | 🚧  | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 
 *Key:* ✅ works correctly; 🚧  work in progress; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile (may fit some high-end devices such as tablets);
 
@@ -135,7 +135,13 @@ For models not specified not in the list of known configurations, you can constr
 
 The parameter file will should be in JSON format specifying thee parameters.  You can find the Model Args data class in [`model.py`](https://github.com/pytorch/torchat/blob/main/model.py#L22).
 
-The final way to initialize a torchat model is from GGUF.  You load a GGUF model with the option `--gguf-path ${MODELNAME}.gguf`. Presently, the F16, F32, Q4_0, and Q6_K formats are supported and converted into native torchat models.  Please refer to section *Loading GGUF* for details.
+The final way to initialize a torchat model is from GGUF. You load a GGUF model with the option `--load-gguf ${MODELNAME}.gguf`. Presently, the F16, F32, Q4_0, and Q6_K formats are supported and converted into native torchat models.
+
+You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsouly quantized and thend equantized model.) 
+
+| GGUF Model | Tested | Eager | torch.compile | AOT Inductor | ExecuTorch | Fits on Mobile |
+|-----|--------|-------|-----|-----|-----|-----|
+| llama-2-7b.Q4_0.gguf |  🚧 | 🚧 | 🚧 | 🚧 | 🚧 |
 
 You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsoul;y quantized and thend equantized model.) 
 
