@@ -61,7 +61,7 @@ class TokenizerArgs:
     is_TikToken: bool = False
 
     @classmethod
-    def from_args(cls, args) -> TokenizerArgs
+    def from_args(cls, args) -> TokenizerArgs:
         is Sentencepiece = True
         is_TikToken = False
         
