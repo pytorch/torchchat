@@ -114,6 +114,7 @@ torch._inductor.config.fx_graph_cache = True  # Experimental feature to reduce c
 wd = Path(__file__).parent.parent.resolve()
 sys.path.append(str(wd))
 
+
 def _load_model(
         checkpoint_path,
         checkpoint_dir,
