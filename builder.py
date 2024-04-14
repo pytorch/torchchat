@@ -18,6 +18,10 @@ from cli import cli_args
 from dataclasses import dataclass
 from typing import Union, Optional
 
+from sentencepiece import SentencePieceProcessor
+from model import Transformer
+
+
 @dataclass
 class BuilderArgs:
     checkpoint_path: Optional[Union[Path, str]] = None
@@ -107,10 +111,6 @@ torch._inductor.config.fx_graph_cache = True  # Experimental feature to reduce c
 # support running without installing as a package
 wd = Path(__file__).parent.parent.resolve()
 sys.path.append(str(wd))
-
-from sentencepiece import SentencePieceProcessor
-
-from model import Transformer
 
 def _load_model(
         checkpoint_path,
