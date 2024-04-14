@@ -676,7 +676,7 @@ For convenience, we provide a script that does this for you.
 
 From the torchat root directory, run the following
 ```
-export LLAMA_FAST_ROOT=${PWD}
+export TORCHAT_ROOT=${PWD}
 ./scripts/install_et.sh
 ```
 
@@ -685,7 +685,7 @@ This will create a build directory, git clone ExecuTorch to ./build/src, applies
 After ExecuTorch is installed, you can build runner-et from the torchat root directory with the following
 
 ```
-export LLAMA_FAST_ROOT=${PWD}
+export TORCHAT_ROOT=${PWD}
 cmake -S ./runner-et -B build/cmake-out -G Ninja
 cmake --build ./build/cmake-out
 ```

@@ -30,7 +30,7 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.runner }}
     env:
-      LLAMA_FAST_ROOT: ${{ github.workspace }}
+      TORCHAT_ROOT: ${{ github.workspace }}
       REPO_NAME: ${{ matrix.repo_name }}
       ENABKE_ET_PYBIND: ${{ matrix.runner == 'macos-14' && 'false' || 'true' }}
     steps:
@@ -45,13 +45,13 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          bash ${LLAMA_FAST_ROOT}/scripts/install_et.sh $ENABKE_ET_PYBIND
+          bash ${TORCHAT_ROOT}/scripts/install_et.sh $ENABKE_ET_PYBIND
       - name: Download checkpoints
         run: |
-          bash ${LLAMA_FAST_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
+          bash ${TORCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
       - name: Run validation
         run: |
-          pushd ${LLAMA_FAST_ROOT}
-          export CHECKPOINT_PATH=${LLAMA_FAST_ROOT}/checkpoints/${REPO_NAME}/model.pth
-          bash ${LLAMA_FAST_ROOT}/.ci/scripts/convert_checkpoint.sh ${REPO_NAME}
-          bash ${LLAMA_FAST_ROOT}/.ci/scripts/validate.sh ${CHECKPOINT_PATH}
+          pushd ${TORCHAT_ROOT}
+          export CHECKPOINT_PATH=${TORCHAT_ROOT}/checkpoints/${REPO_NAME}/model.pth
+          bash ${TORCHAT_ROOT}/.ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+          bash ${TORCHAT_ROOT}/.ci/scripts/validate.sh ${CHECKPOINT_PATH}

@@ -1,4 +1,4 @@
-# Contributing to gpt-fast
+# Contributing to torchat
 We want to make contributing to this project as easy and transparent as
 possible.
 
@@ -28,5 +28,5 @@ disclosure of security bugs. In those cases, please go through the process
 outlined on that page and do not file a public issue.
 
 ## License
-By contributing to `gpt-fast`, you agree that your contributions will be licensed
+By contributing to `torchat`, you agree that your contributions will be licensed
 under the LICENSE file in the root directory of this source tree.
