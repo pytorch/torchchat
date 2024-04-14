@@ -18,6 +18,9 @@ torch._inductor.config.epilogue_fusion = False
 torch._inductor.config.triton.cudagraphs = True
 torch._dynamo.config.cache_size_limit = 100000
 
+from cli import cli_args
+from quantize import name_to_dtype, set_precision
+
 from sentencepiece import SentencePieceProcessor
 
 from model import Transformer
@@ -196,7 +199,7 @@ def eval(
     return eval_results
 
 
-def main(args) -> None:
+def eval_main(args) -> None:
     """Evaluates model on a task from the `lm-evaluation-harness` library.
 
     Args:
@@ -278,9 +281,9 @@ def main(args) -> None:
         print(f"{task}: {res}")
 
 if __name__ == '__main__':
-def cli():
-    args = cli_args()
-    main(args)
+    def cli():
+        args = cli_args()
+        eval_main(args)
 
 
 if __name__ == "__main__":

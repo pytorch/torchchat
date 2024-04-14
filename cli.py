@@ -32,7 +32,7 @@ def check_args(args, command_name: str):
         raise RuntimeError(f"{command_name} is not a valid command")
     
     for disallowed in disallowed_args:
-        if args.hasattr(disallow):
+        if hasattr(args, disallowed):
             text = f"command {command_name} does not support option {disallowed.replace('_', '-')}"
             if strict:
                 raise RuntimeError(text)
