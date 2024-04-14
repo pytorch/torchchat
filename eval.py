@@ -31,7 +31,8 @@ try:
 except:
     lm_eval_available = False
 
-from generate import _initialize_model, encode_tokens, model_forward
+from builder import _initialize_model
+from generate import encode_tokens, model_forward
 
 if lm_eval_available:
     try: # lm_eval version 0.4
