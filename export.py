@@ -25,7 +25,7 @@ except Exception as e:
 from export_aoti import export_model as export_model_aoti
 
 from model import Transformer
-from generate import _load_model, decode_one_token
+from generate import _load_model, decode_one_token, _initialize_model
 from quantize import quantize_model, name_to_dtype
 from torch._export import capture_pre_autograd_graph
 
@@ -41,25 +41,6 @@ def device_sync(device):
         print(f"device={device} is not yet suppported")
 
 
-class model_wrapper(nn.Module):
-    def __init__(self, model, device):
-        super().__init__()
-
-        max_seq_length = 350
-        with torch.device(device):
-            model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
-
-        self.model = model
-        # init model here if necessary
-
-    def forward(self, idx, input_pos):
-        # input_pos: [B, 1]
-        # assert failed on symbolic shape during aot_compile?!
-        # but not for ET?
-        # assert input_pos.shape[-1] == 1
-        logits = self.model(idx, input_pos)
-        return logits  # sample(logits, **sampling_kwargs)
-
 
 def main(args):
     checkpoint_path = args.checkpoint_path
@@ -72,29 +53,24 @@ def main(args):
     precision = name_to_dtype(args.dtype)  # torch.float  # bfloat16
     set_precision(precision)
     
-    print("Loading model ...")
-    t0 = time.time()
-    model = _load_model(
-        checkpoint_path,
+    model = _initialize_model(
+        args.checkpoint_path,
         args.checkpoint_dir,
         args.params_path,
         args.params_table,
         args.gguf_path,
-        device=device,
-        precision=precision,
+        None,  # dso_path - cannot re-export exported model
+        None,  # pte_path - cannot re-export exported model
+        quantize,
+        device,
+        precision,
+        setup_caches=True,
         use_tp=False
     )
 
-    device_sync(device=device)  # MKG
-    print(f"Time to load model: {time.time() - t0:.02f} seconds")
-
-    quantize_model(model, args.quantize)
-
     # dtype:
-    if args.dtype:
-        model.to(dtype=name_to_dtype(args.dtype))
-
-    model = model_wrapper(model, device=device)
+    # if args.dtype:
+    #    model.to(dtype=name_to_dtype(args.dtype))
 
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
