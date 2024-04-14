@@ -487,7 +487,8 @@ def _main(
         quantize,
         device,
         precision,
-        use_tp
+        False, # setup_caches
+        False, # use_tp
     )
 
     # will add a version of _load_inference_model in future
