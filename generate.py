@@ -352,6 +352,7 @@ def _load_inference_model(
         quantize,
         device,
         precision,
+        setup_caches,
         use_tp # =False
 ):
     assert (
@@ -417,6 +418,11 @@ def _load_inference_model(
             quantize_model(model, quantize)
             device_sync(device=device)  # MKG
             print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
+
+        if setup_caches:
+            max_seq_length = 350
+            with torch.device(device):
+                model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
 
         model.to(dtype=precision)
 

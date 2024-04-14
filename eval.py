@@ -247,6 +247,7 @@ def eval_main(args) -> None:
         quantize,
         device,
         precision,
+        setup_caches=False,
         use_tp=False
     )
 
