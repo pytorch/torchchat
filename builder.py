@@ -78,7 +78,7 @@ class TokenizerArgs:
                 raise RuntimeError(f"did not find tokenizer at {tokenizer_path}")
 
         if args.toktoken:
-            is Sentencepiece = False
+            is_Sentencepiece = False
             is_TikToken = True
 
         return cls(
