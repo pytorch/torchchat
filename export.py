@@ -25,7 +25,7 @@ except Exception as e:
 from export_aoti import export_model as export_model_aoti
 
 from model import Transformer
-from generate import _load_model, decode_one_token
+from generate import _load_model, decode_one_token, _load_inference_model
 from quantize import quantize_model, name_to_dtype
 from torch._export import capture_pre_autograd_graph
 
