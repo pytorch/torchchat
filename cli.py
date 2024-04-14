@@ -153,6 +153,12 @@ def cli_args():
         help="Parameter file path.",
     )
     parser.add_argument(
+        "--gguf-path",
+        type=Path,
+        default=None,
+        help="GGUF file path.",
+    )
+    parser.add_argument(
         "--tokenizer-path",
         type=Path,
         default=None,
