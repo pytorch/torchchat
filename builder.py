@@ -13,7 +13,9 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 
-from quantize import quantize_model, name_to_dtype, set_precision, get_precision
+from quantize import (
+    quantize_model, name_to_dtype, set_precision, get_precision
+)
 from cli import cli_args
 from dataclasses import dataclass
 from typing import Union, Optional
