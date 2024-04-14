@@ -107,7 +107,7 @@ specified using the `params-path ${PARAMS_PATH}` containing the appropriate mode
 
 The parameter file will should be in JSON format specifying thee parameters.  You can find the Model Args data class in [`model.py`](https://github.com/pytorch/torchat/blob/main/model.py#L22).
 
-The final way to initialize a torchat model from a GGUF format, a new file format for storing models.  You load a GGUF model with the option --load_gguf ${MODELNAME}.gguf`. Presently, the F16, F32, Q4_0, and Q6_K formats are supported and converted into native torch-chat models.  Please refer to section *Loading GGUF* for details.
+The final way to initialize a torchat model from a GGUF format, a new file format for storing models.  You load a GGUF model with the option --gguf-path ${MODELNAME}.gguf`. Presently, the F16, F32, Q4_0, and Q6_K formats are supported and converted into native torch-chat models.  Please refer to section *Loading GGUF* for details.
 
 You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsoul;y quantized and thend equantized model.) 
 
@@ -513,7 +513,7 @@ We invite contributors to submit established quantization schemes, with accuracy
 GGUF is a nascent industry standard format and presently torchat can read  the F16, F32, Q4_0, and Q6_K formats natively and convert them into native torch-chat models by using the load-gguf option:
 
 ```
---load_gguf <gguf_filename> # all other options as described elsewhere, works for generate and export, for all backends, but cannot be used with --quantize
+--gguf-path <gguf_filename> # all other options as described elsewhere, works for generate and export, for all backends, but cannot be used with --quantize
 ```
 
 Ypu may then apply the standard quantization options, e.g., to add embedding table quantization as described under quantization. (You cannot directly requantize already quantized formats.  However, you may dequantize them using GGUF tools, and then laod the model into torchat to quantize wqith torchat's quantization workflow.)
