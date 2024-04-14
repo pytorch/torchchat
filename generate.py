@@ -279,16 +279,19 @@ def _load_model(
         checkpoint_dir,
         params_path,
         params_table,
+        gguf_path,
         device,
         precision,
-        use_tp=False
+        use_tp # =False
 ):
     use_cuda = "cuda" in device
     with torch.device("meta"):
         if params_path:
             model = Transformer.from_params(params_path)
         elif params_table:
-            model = Transformer.from_table(params_path)            
+            model = Transformer.from_table(params_path)
+        elif gguf_path:
+            model = Transformer.from_gguf(gguf_path)            
         else:
             model = Transformer.from_name(checkpoint_path.parent.name)
 
@@ -343,22 +346,29 @@ def _load_inference_model(
         checkpoint_dir,
         params_path,
         params_table,
+        gguf_path,
         dso_path,
         pte_path,
         quantize,
         device,
         precision,
-        use_tp=False
+        use_tp # =False
 ):
     assert (
         (checkpoint_path and checkpoint_path.is_file()) or
+        (checkpoint_dir and checkpoint_path.is_dir()) or
+        (gguf_path and gguf_path.is_file()) or
         (dso_path and Path(dso_path).is_file()) or
         (pte_path and Path(pte_path).is_file())
-    ), "need to specified a valid checkpoint path, DSO path, or PTE path"
+    ), "need to specified a valid checkpoint path, checkpoint dir, gguf path, DSO path, or PTE path"
     assert not (dso_path and pte_path), "specify either DSO path or PTE path, but not both"
 
     if (checkpoint_path and (dso_path or pte_path)):
         print("Warning: checkpoint path ignored because an exported DSO or PTE path specified")
+    if (checkpoint_dir and (dso_path or pte_path)):
+        print("Warning: checkpoint dir ignored because an exported DSO or PTE path specified")
+    if (gguf_path and (dso_path or pte_path)):
+        print("Warning: GGUF path ignored because an exported DSO or PTE path specified")
 
     print("Loading model ...")
     t0 = time.time()    
@@ -367,6 +377,7 @@ def _load_inference_model(
         checkpoint_dir,
         params_path,
         params_table,
+        gguf_path,
         device,
         precision,
         use_tp
@@ -423,6 +434,7 @@ def _main(
     checkpoint_dir: Optional[Path] = None,
     params_path: Optional[Path] = None,
     params_table: Optional[str] = None,
+    gguf_path: Optional[Path] = None,
     tokenizer_path: Optional[Path] = None,
     compile: bool = True,
     compile_prefill: bool = False,
@@ -463,6 +475,7 @@ def _main(
         checkpoint_dir,
         params_path,
         params_table,
+        gguf_path,
         dso_path,
         pte_path,
         quantize,
@@ -476,8 +489,10 @@ def _main(
     if is_speculative:
         draft_model = _load_model(
             draft_checkpoint_path,
-            None,
-            None,
+            None, # checkpoint_dir
+            None, # params_path,
+            None, # params_table
+            None, # gguf_path
             device,
             precision,
             use_tp
@@ -619,6 +634,7 @@ def main(args):
         args.checkpoint_dir,
         args.params_path,
         args.params_table,
+        args.gguf_path,
         args.tokenizer_path,
         args.compile,
         args.compile_prefill,

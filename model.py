@@ -234,6 +234,12 @@ class Transformer(nn.Module):
     def from_params(cls, params_path: str):
         return cls(ModelArgs.from_params(params_path))
 
+    @classmethod
+    def from_gguf(cls, gguf_path: str):
+        from gguf_loader import load_llama_from_gguf_file
+        model = load_llama_from_gguf_file(gguf_path)
+        return model
+    
 
 class TransformerBlock(nn.Module):
     def __init__(self, config: ModelArgs) -> None:
