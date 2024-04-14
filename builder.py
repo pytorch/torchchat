@@ -34,7 +34,7 @@ class BuilderArgs:
     dso_path: Optional[Union[Path, str]] = None
     pte_path: Optional[Union[Path, str]] = None
     device: str = "cpu"
-    precision: dtype = torch.float32
+    precision: torch.dtype = torch.float32
     setup_caches: bool = False
     use_tp: bool = False
 
