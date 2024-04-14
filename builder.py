@@ -15,6 +15,80 @@ import torch._inductor.config
 
 from quantize import quantize_model, name_to_dtype, set_precision, get_precision
 from cli import cli_args
+from dataclasses import dataclass
+from typing import Union, Optional
+
+@dataclass
+class BuilderArgs:
+    checkpoint_path: Optional[Union[Path, str]] = None
+    checkpoint_dir: Optional[Union[Path, str]] = None
+    params_path: Optional[Union[Path, str]] = None
+    params_table: Optional[str] = None
+    gguf_path: Optional[Union[Path, str]] = None
+    dso_path: Optional[Union[Path, str]] = None
+    pte_path: Optional[Union[Path, str]] = None
+    device: str = "cpu"
+    precision: dtype = torch.float32
+    setup_caches: bool = False
+    use_tp: bool = False
+
+    @classmethod
+    def from_args(cls, args) -> BuilderArgs
+        return cls(
+            checkpoint_path = args.checkpoint_path,
+            checkpoint_dir = args.checkpoint_dir,
+            params_path = args.params_path,
+            params_table = args.params_table,
+            gguf_path = args.gguf_path,
+            dso_path = args.dso_path,
+            pte_path = args.pte_path,
+            device = args.device,
+            precision = name_to_dtype(args.precision),
+            setup_caches = (args.output_dso_path or args.output_pte_path),
+            use_tp = False,
+        )
+    
+@dataclass
+class TokenizerArgs:
+    tokenizer_path: Optional[Union[Path, str]] = None
+    is_SentencePiece: bool = True
+    is_TikToken: bool = False
+
+    @classmethod
+    def from_args(cls, args) -> TokenizerArgs
+        is Sentencepiece = True
+        is_TikToken = False
+        
+        if args.tokenizer_path:
+            tokenizer_path = args.tokenizer_path
+        elif argscheckpoint_path:
+            tokenizer_path = args.checkpoint_path.parent / "tokenizer.model"
+        elif checkpoint_dir:
+            tokenizer_path = args.checkpoint_dir / "tokenizer.model"
+        else:
+            raise RuntimeError(f"cannot find tokenizer model")
+            
+        if not tokenizer_path.is_file():
+                raise RuntimeError(f"did not find tokenizer at {tokenizer_path}")
+
+        if args.toktoken:
+            is Sentencepiece = False
+            is_TikToken = True
+
+        return cls(
+            tokenizer_path=tokenizer_path,
+            is_SentencePiece=is_SentencePiece,
+            is_TikToken=is_TikToken
+        )
+
+def _initialize_tokenizer(config: TokenizerArgs):
+    if is_SentencePiece:
+        return SentencePieceProcessor(model_file=str(tokenizer_path))
+    elif is_TikToken:
+        raise RUntimeError("TikToken not implemented yet!")
+    else:
+        raise RUntimeError("must specify a valid tokenizer in TokenizerArgs")
+        
 
 def device_sync(device):
     if "cuda" in device:
