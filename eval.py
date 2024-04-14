@@ -31,7 +31,7 @@ try:
 except:
     lm_eval_available = False
 
-from generate import _load_inference_model, encode_tokens, model_forward
+from generate import _initialize_model, encode_tokens, model_forward
 
 if lm_eval_available:
     try: # lm_eval version 0.4
@@ -236,7 +236,7 @@ def eval_main(args) -> None:
     precision = name_to_dtype(model_dtype)
     set_precision(precision)
     
-    model = _load_inference_model(
+    model = _initialize_model(
         checkpoint_path,
         checkpoint_dir,
         params_path,
@@ -247,6 +247,7 @@ def eval_main(args) -> None:
         quantize,
         device,
         precision,
+        setup_caches=False,
         use_tp=False
     )
 

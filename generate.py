@@ -341,7 +341,7 @@ def _load_model(
 
 B_INST, E_INST = "[INST]", "[/INST]"
 
-def _load_inference_model(
+def _initialize_model(
         checkpoint_path,
         checkpoint_dir,
         params_path,
@@ -352,6 +352,7 @@ def _load_inference_model(
         quantize,
         device,
         precision,
+        setup_caches,
         use_tp # =False
 ):
     assert (
@@ -418,6 +419,11 @@ def _load_inference_model(
             device_sync(device=device)  # MKG
             print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
 
+        if setup_caches:
+            max_seq_length = 350
+            with torch.device(device):
+                model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+
         model.to(dtype=precision)
 
     return model
@@ -470,7 +476,7 @@ def _main(
     is_speculative = draft_checkpoint_path is not None
     is_chat = "chat" in str(checkpoint_path)
 
-    model = _load_inference_model(
+    model = _initialize_model(
         checkpoint_path,
         checkpoint_dir,
         params_path,
@@ -481,10 +487,11 @@ def _main(
         quantize,
         device,
         precision,
-        use_tp
+        False, # setup_caches
+        False, # use_tp
     )
 
-    # will add a version of _load_inference_model in future
+    # will add a version of _initialize_model in future
     # (need additional args)
     if is_speculative:
         draft_model = _load_model(
