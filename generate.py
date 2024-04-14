@@ -341,7 +341,7 @@ def _load_model(
 
 B_INST, E_INST = "[INST]", "[/INST]"
 
-def _load_inference_model(
+def _initialize_model(
         checkpoint_path,
         checkpoint_dir,
         params_path,
@@ -476,7 +476,7 @@ def _main(
     is_speculative = draft_checkpoint_path is not None
     is_chat = "chat" in str(checkpoint_path)
 
-    model = _load_inference_model(
+    model = _initialize_model(
         checkpoint_path,
         checkpoint_dir,
         params_path,
@@ -491,7 +491,7 @@ def _main(
         False, # use_tp
     )
 
-    # will add a version of _load_inference_model in future
+    # will add a version of _initialize_model in future
     # (need additional args)
     if is_speculative:
         draft_model = _load_model(

@@ -25,7 +25,7 @@ except Exception as e:
 from export_aoti import export_model as export_model_aoti
 
 from model import Transformer
-from generate import _load_model, decode_one_token, _load_inference_model
+from generate import _load_model, decode_one_token, _initialize_model
 from quantize import quantize_model, name_to_dtype
 from torch._export import capture_pre_autograd_graph
 
@@ -53,7 +53,7 @@ def main(args):
     precision = name_to_dtype(args.dtype)  # torch.float  # bfloat16
     set_precision(precision)
     
-    model = _load_inference_model(
+    model = _initialize_model(
         args.checkpoint_path,
         args.checkpoint_dir,
         args.params_path,
