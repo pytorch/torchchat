@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 from torch.export import Dim, export
 
-from generate import _load_model, decode_one_token
+from generate import decode_one_token
 from quantize import quantize_model
 from quantize import quantize_model, name_to_dtype, set_precision, get_precision
 
@@ -27,8 +27,6 @@ from executorch_portable_utils import export_to_edge # TODO: change back to exec
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
 from executorch.exir.passes.quant_fusion_pass import QuantFusionPass
 from executorch.exir.passes.sym_shape_eval_pass import ConstraintBasedSymShapeEvalPass
-
-from generate import _load_model
 
 from model import Transformer
 from torch._export import capture_pre_autograd_graph

@@ -14,7 +14,7 @@ import torch
 import torch.nn as nn
 from torch.export import Dim, export
 
-from generate import _load_model, decode_one_token
+from generate import decode_one_token
 from quantize import quantize_model
 
 from model import Transformer
