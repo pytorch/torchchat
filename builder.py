@@ -62,7 +62,7 @@ class TokenizerArgs:
 
     @classmethod
     def from_args(cls, args) -> TokenizerArgs:
-        is Sentencepiece = True
+        is_Sentencepiece = True
         is_TikToken = False
         
         if args.tokenizer_path:
