@@ -37,7 +37,7 @@ class BuilderArgs:
     use_tp: bool = False
 
     @classmethod
-    def from_args(cls, args) -> BuilderArgs
+    def from_args(cls, args) -> BuilderArgs:
         return cls(
             checkpoint_path = args.checkpoint_path,
             checkpoint_dir = args.checkpoint_dir,
