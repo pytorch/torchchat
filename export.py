@@ -79,6 +79,7 @@ def main(args):
         args.checkpoint_dir,
         args.params_path,
         args.params_table,
+        args.gguf_path,
         device=device,
         precision=precision,
         use_tp=False
