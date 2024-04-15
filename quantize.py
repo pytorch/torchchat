@@ -349,7 +349,7 @@ class QuantHandler:
 #####          Weight-only int8 per-channel quantized code         ######
 
 
-def replace_linear_weight_only_int8_per_channel(module, node_type, groupsize=None):
+def replace_linear_weight_only_int8_per_channel(module, device, node_type, groupsize=None):
     if groupsize is not None and groupsize != 0:
         pass # groupsize = 2 ** groupsize
 
@@ -367,10 +367,10 @@ def replace_linear_weight_only_int8_per_channel(module, node_type, groupsize=Non
                 setattr(
                     module,
                     name,
-                    WeightOnlyInt8Linear(child.in_features, child.out_features, groupsize),
+                    WeightOnlyInt8Linear(device, child.in_features, child.out_features, groupsize),
                 )
         else:
-            replace_linear_weight_only_int8_per_channel(child, node_type, groupsize)
+            replace_linear_weight_only_int8_per_channel(child, device, node_type, groupsize)
 
 
 class WeightOnlyInt8QuantHandler(QuantHandler):
@@ -384,7 +384,7 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
         groupsize: Optional[int] = None,
     ):
         self.mod = mod
-        self.device = device,
+        self.device = device
         self.groupsize = groupsize
         self.node_type = node_type
         if bitwidth is None:
@@ -434,6 +434,8 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
                         scales_dtype=mod.weight.dtype,
                     )
 
+                    weight = weight.to(device=self.device)
+                    scales = scales.to(device=self.device)
                     cur_state_dict[f"{fqn}.weight"] = weight
                     # squeeze makes groupsize=rowsize unidimensional
                     cur_state_dict[f"{fqn}.scales"] = scales.squeeze(dim=-1)
@@ -441,7 +443,7 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
         return cur_state_dict
 
     def convert_for_runtime(self) -> nn.Module:
-        replace_linear_weight_only_int8_per_channel(self.mod, self.node_type, self.groupsize)
+        replace_linear_weight_only_int8_per_channel(self.mod, self.device, self.node_type, self.groupsize)
         return self.mod
 
     def quantized_model(self) -> nn.Module:
@@ -459,11 +461,11 @@ class WeightOnlyInt8Linear(torch.nn.Module):
 
     def __init__(
         self,
+        device,
         in_features: int,
         out_features: int,
         groupsize: Optional[int] = None,
         bias: bool = True,
-        device=None,
         dtype=None,
     ) -> None:
         super().__init__()
@@ -472,14 +474,14 @@ class WeightOnlyInt8Linear(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
         self.register_buffer(
-            "weight", torch.empty((out_features, in_features), dtype=torch.int8)
+            "weight", torch.empty((out_features, in_features), dtype=torch.int8, device=device)
         )
         dtype=get_precision()
         if groupsize is None or (groupsize == 0):
-            self.register_buffer("scales", torch.ones(out_features, dtype=dtype))
+            self.register_buffer("scales", torch.ones(out_features, dtype=dtype, device=device))
         else:
             groups = (in_features + groupsize - 1) // groupsize
-            self.register_buffer("scales", torch.ones(out_features, groups, dtype=dtype))
+            self.register_buffer("scales", torch.ones(out_features, groups, dtype=dtype, device=device))
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         scales = self.scales
