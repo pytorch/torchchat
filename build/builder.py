@@ -250,7 +250,7 @@ def _initialize_model(
         # assert model_dtype == "float32", f"dtype setting not valid for a DSO model. Specify dtype during export."
         assert quantize is None or quantize == "{ }", f"quantize not valid for exported PTE model. Specify quantization during export."
         try:
-            from model_et import PTEModel
+            from build.model_et import PTEModel
             model = PTEModel(model_.config, builder_args.pte_path)
         except Exception as e:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
