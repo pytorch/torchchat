@@ -271,7 +271,7 @@ def main(args) -> None:
 if __name__ == '__main__':
     def cli():
         args = cli_args()
-        eval_main(args)
+        main(args)
 
 
 if __name__ == "__main__":
