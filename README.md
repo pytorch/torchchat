@@ -298,6 +298,21 @@ we cannot presently run runner/run.cpp with llama3, until we have a C/C++ tokeni
 
 ## Optimizing your model for server, desktop and mobile devices
 
+To compress models, torchat offers a variety of strategies:
+* Configurable floating-point precision, depending on backend capabilities (for activations and weights): float32, float16, bfloat16
+* weight-quantization: embedding quantization and linear operator quantization
+* dynamic activation quantization with weight quantization: a8w4dq
+
+In addition, we support GPTQ for improving the quality of 4b weight-only quantization.  Support for HQQ is a work in progress.
+
+| compression | FP precision |  weight quantization | dynamic activation quantization |
+|--|--|--|--|
+embedding table (symmetric) | fp32, fp16, bf16 | 8b (group/channel), 4b (group/channel) | n/a |
+linear operator (symmetric) | fp32, fp16, bf16 | 8b (group/channel) | n/a |
+linear operator (asymmetric) | n/a | 4b (group), a6w4dq | a8w4dq (group) |
+linear operator (asymmetric) with GPTQ | n/a | 4b (group) | n/a |
+linear operator (asymmetric) with HQQ | n/a |  work in progress | n/a |
+
 ## Model precision (dtype precision setting)
 
 You can generate models (for both export and generate, with eager, torch.compile, AOTI, ET, for all backends - mobile at present will primarily support fp32, with all options)
@@ -336,17 +351,18 @@ to avoid combinatorial explosion.
 
 #### Embedding quantization (8 bit integer, channelwise & groupwise)
 
-*Channelwise quantization*:
-
 The simplest way to quantize embedding tables is with int8 "channelwise"
-quantization, where each value is represented by an 8 bit integer, and
-a floating point scale per group.
+(symmetric) quantization, where each value is represented by an 8 bit integer, and
+a floating point scale per embedding (channelwise quantization) or one scale for each group of values
+in an embedding (groupwise quantization).
+
+*Channelwise quantization*:
 
 We can do this in eager mode (optionally with torch.compile), we use the `embedding` quantizer with
 groupsize set to 0 which uses channelwise quantization:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
 ```
 
 Then, export as follows:
@@ -364,12 +380,56 @@ python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --prompt "Hell
 We can do this in eager mode (optionally with `torch.compile`), we use the `embedding` quantizer by specifying the group size:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
 ```
 
 Then, export as follows:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "groupsize": 8} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
+```
+
+#### Embedding quantization (4 bit integer, channelwise & groupwise)
+
+Quantizing embedding tables  with int4 provides even higher compression of embedding tables, potentially at
+the cost of embedding quality and model outcome quality. In 4-bit embedding table quantization, each value is represented by a 4 bit integer with two values are packed into each byte
+to provide greater compression efficiency (potentially at the cost of model quality) over int8 embedding quantization.
+
+
+*Channelwise quantization*:
+
+We can do this in eager mode (optionally with torch.compile), we use the `embedding` quantizer with
+groupsize set to 0 which uses channelwise quantization:
+
+```
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 4, "groupsize": 0}}' --device cpu
+```
+
+Then, export as follows:
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 4, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --prompt "Hello my name is"
+```
+
+*Groupwise quantization*:
+
+We can do this in eager mode (optionally with `torch.compile`), we use the `embedding` quantizer by specifying the group size:
+
+```
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8}}' --device cpu
+```
+
+Then, export as follows:
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 4, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
