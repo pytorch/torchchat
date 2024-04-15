@@ -466,10 +466,10 @@ class WeightOnlyInt8Linear(torch.nn.Module):
             "weight", torch.empty((out_features, in_features), dtype=torch.int8)
         )
         dtype=get_precision()
-        if group_size is None or (group_size == 0):
+        if groupsize is None or (groupsize == 0):
             self.register_buffer("scales", torch.ones(out_features, dtype=dtype))
         else:
-            groups = (in_features + group_size - 1) // group_size
+            groups = (in_features + groupsize - 1) // groupsize
             self.register_buffer("scales", torch.ones(out_features, groups, dtype=dtype))
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
