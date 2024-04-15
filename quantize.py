@@ -13,6 +13,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import quantized_ops
+from build.model import find_multiple
 
 
 try:
@@ -678,7 +679,6 @@ def _int4_prepare_int4_weight_and_scales_and_zeros(weight_bf16, groupsize, inner
     return weight_int4pack, scales_and_zeros
 
 def _int4_calc_padded_size(k, groupsize=1, innner_k_tiles=1):
-    from model import find_multiple
     return find_multiple(k, 1024)
 
 def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, groupsize):
