@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 import itertools
 import sys
+import os
 import time
 from pathlib import Path
 from typing import Optional, Tuple
@@ -333,9 +334,9 @@ def _main(
     set_precision(builder_args.precision)
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
-    is_chat = "chat" in str(builder_args.checkpoint_path)
+    is_chat = "chat" in str(os.path.basename(builder_args.checkpoint_path))
     if is_chat:
-            raise RuntimeError("need to stop filename based kludgery, at a minimum need to look at all pathnames. yuck!")
+            raise RuntimeError("need to stop filename based kludgery, at a minimum need to look at all pathnames. in particular, this now fails because chat is part of the pathname, yuck!")
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
 
