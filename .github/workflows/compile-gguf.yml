@@ -56,22 +56,22 @@ jobs:
           echo "******************************************"
           echo "******* Emb: channel-wise quantized ******"
           echo "******************************************"
-          python generate.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_eager
+          python generate.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_eager
           cat ./output_eager
-          python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_compiled
+          python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_compiled
           cat ./output_compiled
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --gguf-path ${GGUF_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
           python generate.py --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
           cat ./output_aoti
 
           echo "******************************************"
           echo "******** Emb: group-wise quantized *******"
           echo "******************************************"
-          python generate.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_eager
+          python generate.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_eager
           cat ./output_eager
-          python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_compiled
+          python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_compiled
           cat ./output_compiled
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --gguf-path ${GGUF_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
           python generate.py --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
           cat ./output_aoti
 

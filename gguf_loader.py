@@ -179,7 +179,7 @@ def load_weights(pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor],
                 WeightOnlyInt4Linear(
                     in_features, out_features,
                     bias=False,
-                    groupsize=Q4_0.group_size,
+                    groupsize=Q4_0.groupsize,
                     inner_k_tiles=inner_k_tiles,
                     use_cuda=False
                 )
@@ -187,9 +187,9 @@ def load_weights(pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor],
         else:
             # All other weights are dequantized to float
             if t.tensor_type == gguf.GGMLQuantizationType.Q4_0:
-                as_float =  group_dequantize_tensor_from_qparams(*Q4_0.unpack(t), Q4_0.n_bit, Q4_0.group_size)
+                as_float =  group_dequantize_tensor_from_qparams(*Q4_0.unpack(t), Q4_0.n_bit, Q4_0.groupsize)
             elif t.tensor_type == gguf.GGMLQuantizationType.Q6_K:
-                as_float = group_dequantize_tensor_from_qparams(*Q6_K.unpack(t), Q6_K.n_bit, Q6_K.group_size)
+                as_float = group_dequantize_tensor_from_qparams(*Q6_K.unpack(t), Q6_K.n_bit, Q6_K.groupsize)
             elif t.tensor_type == gguf.GGMLQuantizationType.F16:
                 as_float = F16.unpack(t)
             elif t.tensor_type == gguf.GGMLQuantizationType.F32:
