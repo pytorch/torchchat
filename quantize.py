@@ -384,7 +384,7 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
         groupsize: Optional[int] = None,
     ):
         self.mod = mod
-        self.device = device,
+        self.device = device
         self.groupsize = groupsize
         self.node_type = node_type
         if bitwidth is None:
