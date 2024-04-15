@@ -31,7 +31,7 @@ try:
 except:
     lm_eval_available = False
 
-from builder import _initialize_model
+from builder import _initialize_model, _initialize_tokenizer, BuilderArgs, TokenizerArgs
 from generate import encode_tokens, model_forward
 
 if lm_eval_available:
