@@ -32,7 +32,7 @@ class GeneratorArgs:
     speculate_k: int = 5,
 
     @classmethod
-    def from_args(cls, args): # -> BuilderArgs:
+    def from_args(cls, args): # -> GeneratorArgs:
         return cls(
             prompt = args.prompt,
             chat = args.chat,
@@ -307,6 +307,7 @@ def encode_tokens(tokenizer, string, bos=True, device="cuda"):
 
 def _main(
     builder_args: BuilderArgs,
+    speculative_builder_args: BuilderArgs,
     tokenizer_args: TokenizerArgs,    
     prompt: str = "Hello, my name is",
     chat_mode: bool = False,
@@ -317,7 +318,6 @@ def _main(
     compile: bool = True,
     compile_prefill: bool = False,
     profile: Optional[Path] = None,
-    draft_checkpoint_path: Optional[Path] = None,
     speculate_k: int = 5,
     quantize=None,
 ) -> None:
@@ -334,7 +334,7 @@ def _main(
 
     print(f"Using device={builder_args.device}")
     set_precision(builder_args.precision)
-    is_speculative = draft_checkpoint_path is not None
+    is_speculative = speculative_builder_args.checkpoint_path is not None
     
     is_chat = "chat" in str(builder_args.checkpoint_path)
     if is_chat:
@@ -352,15 +352,10 @@ def _main(
     # (need additional args)
     if is_speculative:
         from builder import _load_model
+        speculative_builder_args = builder_args
+        
         draft_model = _load_model(
-            draft_checkpoint_path,
-            None, # checkpoint_dir
-            None, # params_path,
-            None, # params_table
-            None, # gguf_path
-            builder_args.device,
-            builder_args.precision,
-            builder_args.use_tp
+            speculative_builder_args,
         )
     else:
         draft_model = None
@@ -489,11 +484,13 @@ def _main(
             
 def main(args):
     builder_args = BuilderArgs.from_args(args)
+    speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
     generator_args = GeneratorArgs.from_args(args)
             
     _main(
         builder_args,
+        speculative_builder_args,
         tokenizer_args,
         args.prompt,
         args.chat,
@@ -504,7 +501,6 @@ def main(args):
         args.compile,
         args.compile_prefill,
         args.profile,
-        args.draft_checkpoint_path,
         args.speculate_k,
         args.quantize,
     )

@@ -74,6 +74,18 @@ class BuilderArgs:
             setup_caches = (args.output_dso_path or args.output_pte_path),
             use_tp = False,
         )
+
+    @classmethod
+    def from_speculative_args(cls, args): # -> BuilderArgs:
+        speculative_builder_args = BuilderArgs.from_args(args)
+        # let's limit multi-checkpoint to checker
+        speculative_builder_args.checkpoint_dir = None 
+        speculative_builder_args.checkpoint_path = args.draft_checkpoint_path
+        speculative_builder_args.gguf_path = None
+        speculative_builder_args.dso_path = None
+        speculative_builder_args.pte_path = None
+        return speculative_builder_args
+
     
 @dataclass
 class TokenizerArgs:
@@ -136,38 +148,31 @@ wd = Path(__file__).parent.parent.resolve()
 sys.path.append(str(wd))
 
 def _load_model(
-        checkpoint_path,
-        checkpoint_dir,
-        params_path,
-        params_table,
-        gguf_path,
-        device,
-        precision,
-        use_tp # =False
+        builder_args
 ):
-    use_cuda = "cuda" in device
+    use_cuda = "cuda" in builder_args.device
     with torch.device("meta"):
-        if params_path:
-            model = Transformer.from_params(params_path)
-        elif params_table:
-            model = Transformer.from_table(params_path)
-        elif gguf_path:
-            model = Transformer.from_gguf(gguf_path)            
+        if builder_args.params_path:
+            model = Transformer.from_params(builder_args.params_path)
+        elif builder_args.params_table:
+            model = Transformer.from_table(builder_args.params_path)
+        elif builder_args.gguf_path:
+            model = Transformer.from_gguf(builder_args.gguf_path)            
         else:
-            model = Transformer.from_name(checkpoint_path.parent.name)
+            model = Transformer.from_name(builder_args.checkpoint_path.parent.name)
 
-    # checkpoint = torch.load(str(checkpoint_path), mmap=True, weights_only=True)
+    # checkpoint = torch.load(str(builder_args.checkpoint_path), mmap=True, weights_only=True)
     cps = []
-    if checkpoint_dir is not None:
+    if builder_args.checkpoint_dir is not None:
         # Load multiple checkpoint; ignore the single path.
-        checkpoint_path = None
+        builder_args.checkpoint_path = None
         for i in range(4):
             cp_name = f"consolidated.{i}.pth"
             print(f"Loading {cp_name}")
             cps.append(
                 torch.load(
-                    os.path.join(checkpoint_dir, cp_name),
-                    map_location=device,
+                    os.path.join(builder_args.checkpoint_dir, cp_name),
+                    map_location=builder_args.device,
                     mmap=True,
                 )
             )
@@ -183,20 +188,20 @@ def _load_model(
             else:
                 checkpoint[key] = cps[0][key]
     else:
-        checkpoint = torch.load(checkpoint_path, map_location=device, mmap=True, weights_only=True)
+        checkpoint = torch.load(builder_args.checkpoint_path, map_location=builder_args.device, mmap=True, weights_only=True)
 
-    if "model" in checkpoint and "stories" in str(checkpoint_path):
+    if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
         checkpoint = checkpoint["model"]
 
     model.load_state_dict(checkpoint, assign=True)
 
-    if use_tp:
+    if builder_args.use_tp:
         from tp import apply_tp
 
         print("Applying tensor parallel to model ...")
         apply_tp(model)
 
-    model = model.to(device=device, dtype=precision)
+    model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
 
 
@@ -207,14 +212,7 @@ def _initialize_model(
     print("Loading model ...")
     t0 = time.time()    
     model_ = _load_model(
-        builder_args.checkpoint_path,
-        builder_args.checkpoint_dir,
-        builder_args.params_path,
-        builder_args.params_table,
-        builder_args.gguf_path,
-        builder_args.device,
-        builder_args.precision,
-        builder_args.use_tp
+        builder_args
     )
     device_sync(device=builder_args.device)
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
