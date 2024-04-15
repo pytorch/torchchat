@@ -65,7 +65,7 @@ def _create_pt_model(
 ) -> nn.Module:
     llama_model_args = ModelArgs(
         dim=gguf_model_args.embedding_length,
-        n_layer=gguf_model_args.block_count,
+        n_layers=gguf_model_args.block_count,
         n_heads=gguf_model_args.attention.head_count,
         n_local_heads=gguf_model_args.attention.head_count_kv,
         vocab_size=gguf_model_args.vocab_size,
