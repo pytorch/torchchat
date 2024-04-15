@@ -44,9 +44,9 @@ jobs:
           export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
           for DTYPE in bfloat16 float16 float32; do
-            if [ $(uname -s) == Darwin ]; then
-              export DTYPE=float16
-            fi  
+            # if [ $(uname -s) == Darwin ]; then
+            #   export DTYPE=float16
+            # fi  
             python generate.py --dtype ${DTYPE} --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
             cat ./output_eager
             python generate.py --dtype ${DTYPE} --compile --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
