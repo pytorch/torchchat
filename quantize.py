@@ -434,8 +434,8 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
                         scales_dtype=mod.weight.dtype,
                     )
 
-                    weight = weight.to(device=device)
-                    scales = scales.to(device=device)
+                    weight = weight.to(device=self.device)
+                    scales = scales.to(device=self.device)
                     cur_state_dict[f"{fqn}.weight"] = weight
                     # squeeze makes groupsize=rowsize unidimensional
                     cur_state_dict[f"{fqn}.scales"] = scales.squeeze(dim=-1)
