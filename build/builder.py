@@ -259,7 +259,7 @@ def _initialize_model(
 
         if quantize:
             t0q = time.time()
-            quantize_model(model, quantize)
+            quantize_model(model, builder_args.device, quantize)
             device_sync(device=builder_args.device)
             print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
 
