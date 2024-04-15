@@ -492,7 +492,7 @@ class WeightOnlyInt8Linear(torch.nn.Module):
 
 
 def replace_embedding_weight_only_grouped_int8_per_channel(
-        module, bitwidth: int = 8, group_size: Optional[int] = None, pack = False
+        module, bitwidth: int = 8, group_size: Optional[int] = None, packed = False
 ):
     for name, child in module.named_children():
         # print(f"name: {name}")
@@ -506,11 +506,12 @@ def replace_embedding_weight_only_grouped_int8_per_channel(
                     vocab_size=child.weight.shape[0],
                     embedding_dim=child.weight.shape[1],
                     group_size=group_size,
+                    packed
                 ),
             )
         else:
             replace_embedding_weight_only_grouped_int8_per_channel(
-                child, bitwidth, group_size, pack
+                child, bitwidth, group_size, packed
             )
 
 
@@ -523,7 +524,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
         self.bitwidth = bitwidth
         self.packed = packed
         if (bitwidth != 4) and packed:
-            raise RUntimeError("pack only works with bitsize 4")
+            raise RuntimeError("pack only works with bitsize 4")
 
         
     @torch.no_grad()
@@ -564,7 +565,8 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
                     if weight.shape[-1] %2 != 0:
                         raise RUntimeError("automatic padding not implemented yet")
 
-                    weight_view = weight.view(
+                    weight_range_shifted = weight.add(8).view(torch.uint8)
+                    weight_view = weight_range_shifted.view(
                         weight.shape[0],
                         weight.shape[1] //2,
                         2
@@ -583,7 +585,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 
     def convert_for_runtime(self) -> nn.Module:
         replace_embedding_weight_only_grouped_int8_per_channel(
-            self.mod, self.bitwidth, self.group_size
+            self.mod, self.bitwidth, self.group_size, self.packed
         )
         return self.mod
 
@@ -616,7 +618,7 @@ class QuantizedGroupEmbedding(torch.nn.Module):
             )
         else: # packed
             self.register_buffer(
-                "weight", torch.empty((vocab_size, embedding_dim//2), dtype=torch.int8)
+                "weight", torch.empty((vocab_size, embedding_dim//2), dtype=torch.uint8)
             )            
         groups_per_row = (embedding_dim + group_size - 1) // group_size
         if groups_per_row > 1:
