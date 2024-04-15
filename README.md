@@ -94,6 +94,7 @@ Torchat lets you access LLMs through an interactive interface, prompted single-u
 |---|----|----|-----|
 Download model | `torchat --download` | n/a | 🚧 |
 Interactive chat | `torchat --chat`   | n/a | 🚧 |
+GUI-based chat | `torchat --gui`   | n/a | ⚠️ |
 Generate text | `torchat --generate` |`generate` | ✅ |
 Evaluate model | `torchat --eval` | `eval` | 🚧 |
 Export model  | `torchat --export` | `export` | ✅ |
