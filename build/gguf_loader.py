@@ -13,8 +13,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping, Dict
 import logging
-from quantize import WeightOnlyInt4Linear, pack_scales_and_zeros, group_dequantize_tensor_from_qparams
-from gguf_util import F16, F32, Q4_0, Q6_K
+from quantize import (
+    WeightOnlyInt4Linear, pack_scales_and_zeros, group_dequantize_tensor_from_qparams
+)
+from build.gguf_util import F16, F32, Q4_0, Q6_K
 import gguf
 
 import torch

@@ -15,6 +15,7 @@ import torch.nn.functional as F
 import quantized_ops
 
 
+
 try:
     from GPTQ import GenericGPTQRunner, InputRecorder
     from eval import get_task_dict, evaluate, lm_eval
@@ -466,10 +467,10 @@ class WeightOnlyInt8Linear(torch.nn.Module):
             "weight", torch.empty((out_features, in_features), dtype=torch.int8)
         )
         dtype=get_precision()
-        if group_size is None or (group_size == 0):
+        if groupsize is None or (groupsize == 0):
             self.register_buffer("scales", torch.ones(out_features, dtype=dtype))
         else:
-            groups = (in_features + group_size - 1) // group_size
+            groups = (in_features + groupsize - 1) // groupsize
             self.register_buffer("scales", torch.ones(out_features, groups, dtype=dtype))
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
@@ -678,7 +679,7 @@ def _int4_prepare_int4_weight_and_scales_and_zeros(weight_bf16, groupsize, inner
     return weight_int4pack, scales_and_zeros
 
 def _int4_calc_padded_size(k, groupsize=1, innner_k_tiles=1):
-    from model import find_multiple
+    from build.model import find_multiple
     return find_multiple(k, 1024)
 
 def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, groupsize):
@@ -742,7 +743,7 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
                 weight = mod.weight.data
                 if not _int4_check_linear_int4_k(in_features, self.groupsize, self.inner_k_tiles):
                     if self.padding_allowed:
-                        from model import find_multiple
+                        from build.model import find_multiple
                         import torch.nn.functional as F
                         print(f"warning: {fqn} is padded to satisfy in_features % 1024 == 0")
                         padded_in_features = find_multiple(in_features, 1024)
@@ -784,7 +785,7 @@ class WeightOnlyInt4Linear(torch.nn.Module):
         super().__init__()
         self.padding = not _int4_check_linear_int4_k(in_features, groupsize, inner_k_tiles)
         if self.padding:
-            from model import find_multiple
+            from build.model import find_multiple
             self.origin_in_features = in_features
             in_features = find_multiple(in_features, 1024)
 
@@ -1218,7 +1219,7 @@ class GPTQQuantHandler(QuantHandler):
 
 class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
     def __init__(self, mod, groupsize=128, inner_k_tiles=8, padding=True):
-        from model import find_multiple
+        from build.model import find_multiple
         self.mod = mod
         self.groupsize = groupsize
         self.inner_k_tiles = inner_k_tiles
