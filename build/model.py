@@ -285,6 +285,18 @@ class Attention(nn.Module):
         #     wv = state_dict.pop(prefix + "wv.weight")
         #     state_dict[prefix + "wqkv.weight"] = torch.cat([wq, wk, wv])
 
+        if prefix + "wqkv.weight" in state_dict:
+            wqkv = state_dict.pop(prefix + "wqkv.weight")
+            q_size = self.n_heads * self.head_dim
+            kv_size = self.n_local_heads * self.head_dim
+            wq, wk, wv = torch.split(wqkv, (q_size, kv_size, kv_size), dim=0)
+            state_dict[prefix + "wq.weight"] = wq
+            state_dict[prefix + "wk.weight"] = wk
+            state_dict[prefix + "wv.weight"] = wv
+
+        return
+
+    
         def _unfuse_wqkv_state_dict(
             state_dict: Dict[str, torch.Tensor],
             dim: int,
