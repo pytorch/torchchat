@@ -47,7 +47,7 @@ class BuilderArgs:
             (self.pte_path and Path(self.pte_path).is_file())
         ):
             raise RuntimeError("need to specified a valid checkpoint path, checkpoint dir, gguf path, DSO path, or PTE path")
-    
+
         if (self.dso_path and self.pte_path):
             raise RuntimeError("specify either DSO path or PTE path, but not both")
 
@@ -58,7 +58,7 @@ class BuilderArgs:
         if (self.gguf_path and (self.dso_path or self.pte_path)):
             print("Warning: GGUF path ignored because an exported DSO or PTE path specified")
 
-            
+
     @classmethod
     def from_args(cls, args): # -> BuilderArgs:
         return cls(
@@ -79,14 +79,14 @@ class BuilderArgs:
     def from_speculative_args(cls, args): # -> BuilderArgs:
         speculative_builder_args = BuilderArgs.from_args(args)
         # let's limit multi-checkpoint to checker
-        speculative_builder_args.checkpoint_dir = None 
+        speculative_builder_args.checkpoint_dir = None
         speculative_builder_args.checkpoint_path = args.draft_checkpoint_path
         speculative_builder_args.gguf_path = None
         speculative_builder_args.dso_path = None
         speculative_builder_args.pte_path = None
         return speculative_builder_args
 
-    
+
 @dataclass
 class TokenizerArgs:
     tokenizer_path: Optional[Union[Path, str]] = None
@@ -97,7 +97,7 @@ class TokenizerArgs:
     def from_args(cls, args): # -> TokenizerArgs:
         is_SentencePiece = True
         is_TikToken = False
-        
+
         if args.tokenizer_path:
             tokenizer_path = args.tokenizer_path
         elif args.checkpoint_path:
@@ -106,7 +106,7 @@ class TokenizerArgs:
             tokenizer_path = args.checkpoint_dir / "tokenizer.model"
         else:
             raise RuntimeError(f"cannot find tokenizer model")
-            
+
         if not tokenizer_path.is_file():
                 raise RuntimeError(f"did not find tokenizer at {tokenizer_path}")
 
@@ -127,7 +127,7 @@ def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
         raise RuntimeError("TikToken not implemented yet!")
     else:
         raise RuntimeError("must specify a valid tokenizer in TokenizerArgs")
-        
+
 
 def device_sync(device):
     if "cuda" in device:
@@ -147,17 +147,27 @@ torch._inductor.config.fx_graph_cache = True  # Experimental feature to reduce c
 wd = Path(__file__).parent.parent.resolve()
 sys.path.append(str(wd))
 
-def _load_model(
+def _load_model(builder_args):
+    if builder_args.gguf_path:
+        model = Transformer.from_gguf(builder_args.gguf_path)
+
+        # TODO: do not send GGUF to float in builder if quantized.  Must be converted to bfloat in int4 operator
+        model = model.to(device=builder_args.device, dtype=builder_args.precision)
+        return model.eval()
+    else:
+        return _load_model_not_gguf(builder_args)
+
+def _load_model_not_gguf(
         builder_args
 ):
+    assert not builder_args.gguf_path
+
     use_cuda = "cuda" in builder_args.device
     with torch.device("meta"):
         if builder_args.params_path:
             model = Transformer.from_params(builder_args.params_path)
         elif builder_args.params_table:
             model = Transformer.from_table(builder_args.params_path)
-        elif builder_args.gguf_path:
-            model = Transformer.from_gguf(builder_args.gguf_path)            
         else:
             model = Transformer.from_name(builder_args.checkpoint_path.parent.name)
 
@@ -176,7 +186,7 @@ def _load_model(
                     mmap=True,
                 )
             )
-            
+
         checkpoint = {}
         for key in cps[0].keys():
             if not torch.allclose(cps[0][key], cps[1][key]):
@@ -210,7 +220,7 @@ def _initialize_model(
         quantize,
 ):
     print("Loading model ...")
-    t0 = time.time()    
+    t0 = time.time()
     model_ = _load_model(
         builder_args
     )
@@ -261,5 +271,3 @@ def _initialize_model(
         model.to(dtype=builder_args.precision)
 
     return model
-
-
