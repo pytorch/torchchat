@@ -73,6 +73,28 @@ jobs:
           python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
           cat ./output_aoti
 
+          echo "***********************************************"
+          echo "******* Emb: 4bit channel-wise quantized ******"
+          echo "***********************************************"
+          python generate.py --quant '{"embedding" : {"bitwidth": 4, "group_size": 0, "packed": "True"}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+          cat ./output_eager
+          python generate.py --compile --quant '{"embedding" : {"bitwidth": 4, "group_size": 0, "packed": "True"}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
+          cat ./output_compiled
+          python export.py --quant '{"embedding" : {"bitwidth": 4, "group_size": 0, "packed": "True"}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
+          cat ./output_aoti
+
+          echo "***********************************************"
+          echo "******** Emb: 4bit group-wise quantized *******"
+          echo "***********************************************"
+          python generate.py --quant '{"embedding" : {"bitwidth": 4, "group_size": 8, "packed": "True"}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+          cat ./output_eager
+          python generate.py --compile --quant '{"embedding" : {"bitwidth": 4, "group_size": 8, "packed": "True"}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
+          cat ./output_compiled
+          python export.py --quant '{"embedding" : {"bitwidth": 4, "group_size": 8, "packed": "True"}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
+          cat ./output_aoti
+
           echo "******************************************"
           echo "******* INT8 channel-wise quantized ******"
           echo "******************************************"
