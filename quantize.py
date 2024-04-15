@@ -55,7 +55,7 @@ name_to_dtype_dict = {
 ##########################################################################
 ###                  process quantization dictionary                   ###
 
-def quantize_model(model: nn.Module, quantize_options):
+def quantize_model(model: nn.Module, device, quantize_options):
     """
     Quantize the specified model using the quantizers described by
     a quantization dict of the form:
@@ -74,6 +74,7 @@ def quantize_model(model: nn.Module, quantize_options):
         if quantizer == "embedding":
             model = EmbeddingOnlyInt8QuantHandler(
                 model,
+                device,
                 **q_kwargs
             ).quantized_model()
         elif linears_quantized:
@@ -82,30 +83,35 @@ def quantize_model(model: nn.Module, quantize_options):
             linears_quantized = True
             model = WeightOnlyInt8QuantHandler(
                 model,
+                device,
                 **q_kwargs
             ).quantized_model()
         elif quantizer == "linear:int4":
             linears_quantized = True
             model = WeightOnlyInt4QuantHandler(
                 model,
+                device,
                 **q_kwargs
             ).quantized_model()
         elif quantizer == "linear:a8w4dq":
             linears_quantized = True
             model = Int8DynActInt4WeightQuantHandler(
                 model,
+                device,
                 **q_kwargs
             ).quantized_model()
         elif quantizer == "linear:gptq":
             linears_quantized = True
             model = WeightOnlyInt4GPTQQuantHandler(
                 model,
+                device,
                 **q_kwargs
             ).quantized_model()
         elif quantizer == "linear:hqq":
             linears_quantized = True
             model = WeightOnlyInt4HqqQuantHandler(
                 model,
+                device,
                 **q_kwargs
             ).quantized_model()
         elif quantizer == "precision":
@@ -371,12 +377,14 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
     def __init__(
         self,
         mod,
+        device,
         *,
         node_type: str = "*",
         bitwidth: Optional[int] = None,
         groupsize: Optional[int] = None,
     ):
         self.mod = mod
+        self.device = device,
         self.groupsize = groupsize
         self.node_type = node_type
         if bitwidth is None:
@@ -494,7 +502,7 @@ class WeightOnlyInt8Linear(torch.nn.Module):
 
 
 def replace_embedding_weight_only_grouped_int8_per_channel(
-        module, bitwidth: int = 8, groupsize: Optional[int] = None, packed = False
+        module, device, bitwidth: int = 8, groupsize: Optional[int] = None, packed = False
 ):
     for name, child in module.named_children():
         # print(f"name: {name}")
@@ -505,6 +513,7 @@ def replace_embedding_weight_only_grouped_int8_per_channel(
                 module,
                 name,
                 QuantizedGroupEmbedding(
+                    device=device,
                     vocab_size=child.weight.shape[0],
                     embedding_dim=child.weight.shape[1],
                     groupsize=groupsize,
@@ -518,10 +527,11 @@ def replace_embedding_weight_only_grouped_int8_per_channel(
 
 
 class EmbeddingOnlyInt8QuantHandler(QuantHandler):
-    def __init__(self, mod, *, bitwidth: int = 8, groupsize: Optional[int] = None, packed = False):
+    def __init__(self, mod, device, *, bitwidth: int = 8, groupsize: Optional[int] = None, packed = False):
         if isinstance(packed, str):
             packed = (packed == "True")
         self.mod = mod
+        self.device = device
         self.groupsize = groupsize
         self.bitwidth = bitwidth
         self.packed = packed
@@ -565,7 +575,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 
                 if packed:
                     if weight.shape[-1] %2 != 0:
-                        raise RUntimeError("automatic padding not implemented yet")
+                        raise RuntimeError("automatic padding not implemented yet")
 
                     weight_range_shifted = weight.add(8).view(torch.uint8)
                     weight_view = weight_range_shifted.view(
@@ -578,6 +588,8 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
                     weight_packed = weight_even + weight_odd
                     weight = weight_packed
 
+                weight = weight.to(device=self.device)
+                scales = scales.to(device=self.device)
                 # Update state dict
                 cur_state_dict[f"{fqn}.weight"] = weight
                 # squeeze makes groupsize=rowsize unidimensional
@@ -587,7 +599,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 
     def convert_for_runtime(self) -> nn.Module:
         replace_embedding_weight_only_grouped_int8_per_channel(
-            self.mod, self.bitwidth, self.groupsize, self.packed
+            self.mod, self.device, self.bitwidth, self.groupsize, self.packed
         )
         return self.mod
 
@@ -601,6 +613,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 class QuantizedGroupEmbedding(torch.nn.Module):
     def __init__(
         self,
+        device,
         vocab_size: int,
         embedding_dim: int,
         groupsize: Optional[int] = None,
@@ -616,20 +629,20 @@ class QuantizedGroupEmbedding(torch.nn.Module):
         self.packed = packed
         if not packed:
             self.register_buffer(
-                "weight", torch.empty((vocab_size, embedding_dim), dtype=torch.int8)
+                "weight", torch.empty((vocab_size, embedding_dim), dtype=torch.int8, device=device)
             )
         else: # packed
             self.register_buffer(
-                "weight", torch.empty((vocab_size, embedding_dim//2), dtype=torch.uint8)
+                "weight", torch.empty((vocab_size, embedding_dim//2), dtype=torch.uint8, device=device)
             )
         groups_per_row = (embedding_dim + groupsize - 1) // groupsize
         if groups_per_row > 1:
             self.register_buffer(
-                "scales", torch.ones((vocab_size, groups_per_row), dtype=torch.float16)
+                "scales", torch.ones((vocab_size, groups_per_row), dtype=torch.float16, device=device)
             )
         else:
             self.register_buffer(
-                "scales", torch.ones((vocab_size,), dtype=torch.float16)
+                "scales", torch.ones((vocab_size,), dtype=torch.float16, device=device)
             )
 
     @torch.no_grad()
@@ -712,8 +725,9 @@ def replace_linear_int4(module, groupsize, inner_k_tiles, padding_allowed, use_c
 
 
 class WeightOnlyInt4QuantHandler(QuantHandler):
-    def __init__(self, mod, groupsize=128, inner_k_tiles=8, padding_allowed=True):
+    def __init__(self, mod, device, *, groupsize=128, inner_k_tiles=8, padding_allowed=True):
         self.mod = mod
+        self.device = device,
         self.groupsize = groupsize
         self.inner_k_tiles = inner_k_tiles
         self.padding_allowed = padding_allowed
@@ -908,12 +922,15 @@ class Int8DynActInt4WeightQuantHandler(QuantHandler):
     def __init__(
         self,
         mod,
+        device,
+        * ,
         groupsize=256,
         padding_allowed=False,
         precision=torch.float32,
         scales_precision=torch.float32,
     ):
         self.mod = mod
+        self.device = device
         self.groupsize = groupsize
         self.padding_allowed = padding_allowed
         self.precision = precision
@@ -1209,9 +1226,10 @@ class GPTQQuantHandler(QuantHandler):
 
 
 class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
-    def __init__(self, mod, groupsize=128, inner_k_tiles=8, padding=True):
+    def __init__(self, mod, device, *, groupsize=128, inner_k_tiles=8, padding=True):
         from build.model import find_multiple
         self.mod = mod
+        self.device = device
         self.groupsize = groupsize
         self.inner_k_tiles = inner_k_tiles
         self.padding = padding
@@ -1329,7 +1347,7 @@ class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
 ###                           WIP: HQQ                         ###
 
 class WeightOnlyInt4HqqQuantHandler:
-    def __init__(self, mod, groupsize):
+    def __init__(self, mod, device, *, groupsize):
         self.mod = mod
         self.groupsize = groupsize
 
