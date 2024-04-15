@@ -201,12 +201,13 @@ def _load_model_not_gguf(
             else:
                 checkpoint[key] = cps[0][key]
     else:
-        checkpoint = torch.load(builder_args.checkpoint_path, map_location=builder_args.device, mmap=True, weights_only=True)
+        # Convert if pathlib object to string
+        checkpoint = torch.load(str(builder_args.checkpoint_path), map_location=builder_args.device, mmap=True, weights_only=True)
 
     if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
         checkpoint = checkpoint["model"]
 
-    model.load_state_dict(checkpoint, assign=True)
+    model.load_state_dict(checkpoint, assign=True, strict=False)
 
     if builder_args.use_tp:
         from tp import apply_tp
