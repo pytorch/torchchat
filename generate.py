@@ -8,7 +8,8 @@ import sys
 import time
 from pathlib import Path
 from typing import Optional, Tuple
-from builder import _load_model, _initialize_model
+from builder import _load_model, _initialize_model, _initialize_tokenizer, BuilderArgs, TokenizerArgs
+from dataclasses import dataclass
 
 import torch
 import torch._dynamo.config
@@ -17,6 +18,35 @@ import torch._inductor.config
 from quantize import quantize_model, name_to_dtype, set_precision, get_precision
 from cli import cli_args
 
+@dataclass
+class GeneratorArgs:
+    prompt: str = "torchat is pronounced torch-chat and is so cool because"
+    chat: bool = False,
+    gui: bool = False,
+    num_samples: int =1,
+    max_new_tokens: int = 200,
+    top_k: int = 200,
+    temperature: int = 0, # deterministic argmax
+    compile: bool = False,
+    compile_prefill: bool = False,
+    speculate_k: int = 5,
+
+    @classmethod
+    def from_args(cls, args): # -> BuilderArgs:
+        return cls(
+            prompt = args.prompt,
+            chat = args.chat,
+            gui = args.gui,
+            num_samples = args.num_samples,
+            max_new_tokens = args.max_new_tokens,
+            top_k = args.top_k,
+            temperature = args.temperature,
+            compile = args.compile,
+            compile_prefill = args.compile_prefill,
+            speculate_k = args.speculate_k,
+        )
+
+    
 def device_sync(device):
     if "cuda" in device:
         torch.cuda.synchronize(device)
@@ -276,36 +306,22 @@ def encode_tokens(tokenizer, string, bos=True, device="cuda"):
 
 
 def _main(
+    builder_args: BuilderArgs,
+    tokenizer_args: TokenizerArgs,    
     prompt: str = "Hello, my name is",
     chat_mode: bool = False,
     num_samples: int = 5,
     max_new_tokens: int = 100,
     top_k: int = 200,
     temperature: float = 0.8,
-    checkpoint_path: Optional[Path] = None,
-    checkpoint_dir: Optional[Path] = None,
-    params_path: Optional[Path] = None,
-    params_table: Optional[str] = None,
-    gguf_path: Optional[Path] = None,
-    tokenizer_path: Optional[Path] = None,
     compile: bool = True,
     compile_prefill: bool = False,
     profile: Optional[Path] = None,
     draft_checkpoint_path: Optional[Path] = None,
     speculate_k: int = 5,
-    device="cuda",
-    dso_path=None,
-    pte_path=None,
     quantize=None,
-    model_dtype=None,
-    use_tiktoken=False,
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
-
-    if not tokenizer_path:
-        assert checkpoint_path, "either a tokenizer or a checkpoint path must be specified"
-        tokenizer_path = checkpoint_path.parent / "tokenizer.model"
-    assert tokenizer_path.is_file(), tokenizer_path
 
     # global print
     #    from tp import maybe_init_dist
@@ -316,27 +332,22 @@ def _main(
     #            # only print on rank 0
     #            print = lambda *args, **kwargs: None
 
-    print(f"Using device={device}")
-    precision = name_to_dtype(model_dtype)
-    set_precision(precision)
+    print(f"Using device={builder_args.device}")
+    set_precision(builder_args.precision)
     is_speculative = draft_checkpoint_path is not None
-    is_chat = "chat" in str(checkpoint_path)
-
+    
+    is_chat = "chat" in str(builder_args.checkpoint_path)
+    if is_chat:
+            raise RuntimeError("need to stop filename based kludgery, at a minimum need to look at all pathnames. yuck!")
+            
+    tokenizer = _initialize_tokenizer(tokenizer_args)
+            
+    builder_args.setup_caches = False
     model = _initialize_model(
-        checkpoint_path,
-        checkpoint_dir,
-        params_path,
-        params_table,
-        gguf_path,
-        dso_path,
-        pte_path,
-        quantize,
-        device,
-        precision,
-        False, # setup_caches
-        False, # use_tp
+        builder_args,
+        quantize
     )
-
+            
     # will add a version of _initialize_model in future
     # (need additional args)
     if is_speculative:
@@ -347,15 +358,14 @@ def _main(
             None, # params_path,
             None, # params_table
             None, # gguf_path
-            device,
-            precision,
-            use_tp
+            builder_args.device,
+            builder_args.precision,
+            builder_args.use_tp
         )
     else:
         draft_model = None
 
-    tokenizer = SentencePieceProcessor(model_file=str(tokenizer_path))
-    encoded = encode_tokens(tokenizer, prompt, bos=True, device=device)
+    encoded = encode_tokens(tokenizer, prompt, bos=True, device=builder_args.device)
     print (encoded)
     prompt_length = encoded.size(0)
 
@@ -366,7 +376,7 @@ def _main(
         ]
     )
     if compile:
-        if is_speculative and use_tp:  # and ("cuda" in device):
+        if is_speculative and builder_args.use_tp:  # and ("cuda" in builder_args.device):
             torch._inductor.config.triton.cudagraph_trees = (
                 False  # Bug with cudagraph trees in this case
             )
@@ -393,12 +403,12 @@ def _main(
     start = -1 if compile else 0
 
     for i in range(start, num_samples):
-        device_sync(device=device)  # MKG
+        device_sync(device=builder_args.device)
         if i >= 0 and chat_mode:
             prompt = input("What is your prompt? ")
             if is_chat:
                 prompt = f"{B_INST} {prompt.strip()} {E_INST}"
-            encoded = encode_tokens(tokenizer, prompt, bos=True, device=device)
+            encoded = encode_tokens(tokenizer, prompt, bos=True, device=builder_args.device)
 
         if chat_mode and i >= 0:
             buffer = []
@@ -448,7 +458,7 @@ def _main(
                 prof.export_chrome_trace(f"{profile}_rank_{rank}.json")
             else:
                 prof.export_chrome_trace(f"{profile}.json")
-        device_sync(device=device)  # MKG
+        device_sync(device=builder_args.device)
         t = time.perf_counter() - t0
 
         if not chat_mode:
@@ -476,31 +486,27 @@ def _main(
     )
     print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
+            
 def main(args):
+    builder_args = BuilderArgs.from_args(args)
+    tokenizer_args = TokenizerArgs.from_args(args)
+    generator_args = GeneratorArgs.from_args(args)
+            
     _main(
+        builder_args,
+        tokenizer_args,
         args.prompt,
         args.chat,
         args.num_samples,
         args.max_new_tokens,
         args.top_k,
         args.temperature,
-        args.checkpoint_path,
-        args.checkpoint_dir,
-        args.params_path,
-        args.params_table,
-        args.gguf_path,
-        args.tokenizer_path,
         args.compile,
         args.compile_prefill,
         args.profile,
         args.draft_checkpoint_path,
         args.speculate_k,
-        args.device,
-        args.dso_path,
-        args.pte_path,
         args.quantize,
-        args.dtype,
-        args.tiktoken
     )
 
 def cli():
