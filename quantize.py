@@ -506,7 +506,7 @@ def replace_embedding_weight_only_grouped_int8_per_channel(
                     vocab_size=child.weight.shape[0],
                     embedding_dim=child.weight.shape[1],
                     group_size=group_size,
-                    packed
+                    packed=packed,
                 ),
             )
         else:
