@@ -47,7 +47,7 @@ class GeneratorArgs:
             speculate_k = args.speculate_k,
         )
 
-    
+
 def device_sync(device):
     if "cuda" in device:
         torch.cuda.synchronize(device)
@@ -305,7 +305,7 @@ def encode_tokens(tokenizer, string, bos=True, device="cuda"):
 def _main(
     builder_args: BuilderArgs,
     speculative_builder_args: BuilderArgs,
-    tokenizer_args: TokenizerArgs,    
+    tokenizer_args: TokenizerArgs,
     prompt: str = "Hello, my name is",
     chat_mode: bool = False,
     num_samples: int = 5,
@@ -332,25 +332,25 @@ def _main(
     print(f"Using device={builder_args.device}")
     set_precision(builder_args.precision)
     is_speculative = speculative_builder_args.checkpoint_path is not None
-    
+
     is_chat = "chat" in str(builder_args.checkpoint_path)
     if is_chat:
             raise RuntimeError("need to stop filename based kludgery, at a minimum need to look at all pathnames. yuck!")
-            
+
     tokenizer = _initialize_tokenizer(tokenizer_args)
-            
+
     builder_args.setup_caches = False
     model = _initialize_model(
         builder_args,
         quantize
     )
-            
+
     # will add a version of _initialize_model in future
     # (need additional args)
     if is_speculative:
         from builder import _load_model
         speculative_builder_args = builder_args
-        
+
         draft_model = _load_model(
             speculative_builder_args,
         )
@@ -478,13 +478,13 @@ def _main(
     )
     print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
-            
+
 def main(args):
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
     generator_args = GeneratorArgs.from_args(args)
-            
+
     _main(
         builder_args,
         speculative_builder_args,
