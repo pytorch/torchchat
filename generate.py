@@ -305,17 +305,9 @@ def encode_tokens(tokenizer, string, bos=True, device="cuda"):
 def _main(
     builder_args: BuilderArgs,
     speculative_builder_args: BuilderArgs,
-    tokenizer_args: TokenizerArgs,    
-    prompt: str = "Hello, my name is",
-    chat_mode: bool = False,
-    num_samples: int = 5,
-    max_new_tokens: int = 100,
-    top_k: int = 200,
-    temperature: float = 0.8,
-    compile: bool = True,
-    compile_prefill: bool = False,
+    tokenizer_args: TokenizerArgs,
+    generator_args: GeneratorArgs,
     profile: Optional[Path] = None,
-    speculate_k: int = 5,
     quantize=None,
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
@@ -357,7 +349,12 @@ def _main(
     else:
         draft_model = None
 
-    encoded = encode_tokens(tokenizer, prompt, bos=True, device=builder_args.device)
+    encoded = encode_tokens(
+        tokenizer,
+        generator_args.prompt,
+        bos=True,
+        device=builder_args.device
+    )
     print (encoded)
     prompt_length = encoded.size(0)
 
@@ -385,7 +382,7 @@ def _main(
         )
 
         # Uncomment to squeeze more perf out of prefill
-        if compile_prefill:
+        if generator_args.compile_prefill:
             prefill = torch.compile(prefill, fullgraph=True, dynamic=True)
 
     aggregate_metrics = {
@@ -394,15 +391,15 @@ def _main(
     }
     start = -1 if compile else 0
 
-    for i in range(start, num_samples):
+    for i in range(start, generator_args.num_samples):
         device_sync(device=builder_args.device)
-        if i >= 0 and chat_mode:
+        if i >= 0 and generator_args.chat:
             prompt = input("What is your prompt? ")
             if is_chat:
                 prompt = f"{B_INST} {prompt.strip()} {E_INST}"
-            encoded = encode_tokens(tokenizer, prompt, bos=True, device=builder_args.device)
+            encoded = encode_tokens(tokenizer, generator_args.prompt, bos=True, device=builder_args.device)
 
-        if chat_mode and i >= 0:
+        if generator_args.chat and i >= 0:
             buffer = []
             period_id = tokenizer.encode(".")[0]
             done_generating = False
@@ -424,7 +421,8 @@ def _main(
         t0 = time.perf_counter()
         import contextlib
 
-        if (i != num_samples - 1 or not profile) or (use_tp and rank != 0):
+        if ((i != generator_args.num_samples - 1 or not profile) or
+            (use_tp and rank != 0)):
             prof = contextlib.nullcontext()
         else:
             torch.profiler._utils._init_for_cuda_graphs()
@@ -433,13 +431,13 @@ def _main(
             y, metrics = generate(
                 model,
                 encoded,
-                max_new_tokens,
+                generator_args.max_new_tokens,
                 draft_model=draft_model,
-                speculate_k=speculate_k,
-                chat_mode=chat_mode,
+                speculate_k=generator_args.speculate_k,
+                chat_mode=generator_args.chat,
                 callback=callback,
-                temperature=temperature,
-                top_k=top_k,
+                temperature=generator_args.temperature,
+                top_k=generator_args.top_k,
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
         if i == -1:
@@ -453,7 +451,7 @@ def _main(
         device_sync(device=builder_args.device)
         t = time.perf_counter() - t0
 
-        if not chat_mode:
+        if not generator_args.chat:
             print(tokenizer.decode(y.tolist()))
         else:
             print()
@@ -489,16 +487,8 @@ def main(args):
         builder_args,
         speculative_builder_args,
         tokenizer_args,
-        args.prompt,
-        args.chat,
-        args.num_samples,
-        args.max_new_tokens,
-        args.top_k,
-        args.temperature,
-        args.compile,
-        args.compile_prefill,
+        generator_args,
         args.profile,
-        args.speculate_k,
         args.quantize,
     )
 
