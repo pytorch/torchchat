@@ -31,7 +31,7 @@ try:
 except:
     lm_eval_available = False
 
-from builder import _initialize_model
+from builder import _initialize_model, _initialize_tokenizer, BuilderArgs, TokenizerArgs
 from generate import encode_tokens, model_forward
 
 if lm_eval_available:
@@ -212,6 +212,9 @@ def eval_main(args) -> None:
 
     """
 
+    builder_args = BuilderArgs.from_args(args)
+    tokenizer_args = TokenizerArgs.from_args(args)
+    
     checkpoint_path = args.checkpoint_path
     checkpoint_dir = args.checkpoint_dir
     params_path = args.params_path
@@ -228,34 +231,18 @@ def eval_main(args) -> None:
     max_seq_length = args.max_seq_length
     use_tiktoken = args.tiktoken
     
-    if not tokenizer_path:
-        assert checkpoint_path, "either a tokenizer or a checkpoint path must be specified"
-        tokenizer_path = checkpoint_path.parent / "tokenizer.model"
-    assert tokenizer_path.is_file(), tokenizer_path
-
     print(f"Using device={device}")
-    precision = name_to_dtype(model_dtype)
-    set_precision(precision)
-    
-    model = _initialize_model(
-        checkpoint_path,
-        checkpoint_dir,
-        params_path,
-        params_table,
-        gguf_path,
-        dso_path,
-        pte_path,
-        quantize,
-        device,
-        precision,
-        setup_caches=False,
-        use_tp=False
-    )
+    set_precision(buildeer_args.precision)
 
     tokenizer = SentencePieceProcessor(model_file=str(tokenizer_path))
+    builder_args.setup_caches = False
+    model = _initialize_model(
+        buildeer_args,
+        quantize,
+    )
 
     if compile:
-        assert not (dso_path or pte_path), "cannot compile exported model"
+        assert not (builder_args.dso_path or builder_args.pte_path), "cannot compile exported model"
         global model_forward
         model_forward = torch.compile(model_forward,  mode="reduce-overhead", dynamic=True, fullgraph=True)
         torch._inductor.config.coordinate_descent_tuning = True
@@ -270,13 +257,13 @@ def eval_main(args) -> None:
     )
     print(f"Time to run eval: {time.time() - t1:.02f} seconds.")
     if dso_path:
-        print(f"For model {dso_path}")
+        print(f"For model {builder_args.dso_path}")
     elif pte_path:
-        print(f"For model {pte_path}")
+        print(f"For model {builder_args.pte_path}")
     elif checkpoint_path:
-        print(f"For model {checkpoint_path}")
+        print(f"For model {builder_args.checkpoint_path}")
     elif checkpoint_dir:
-        print(f"For model {checkpoint_dir}")
+        print(f"For model {builder_args.checkpoint_dir}")
     else:
         raise RuntimeError("Well That's Fine. How did we get here")
 

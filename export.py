@@ -19,13 +19,13 @@ try:
     executorch_export_available = True
     from export_et import export_model as export_model_et
 except Exception as e:
-    print("ET EXPORT EXCEPTION: ", e) # TODO: remove
+    executorch_exception = f"ET EXPORT EXCEPTION: {e}"
     executorch_export_available = False
 
 from export_aoti import export_model as export_model_aoti
 
 from model import Transformer
-from builder import _initialize_model
+from builder import _initialize_model, BuilderArgs, TokenizerArgs
 from generate import decode_one_token
 from quantize import quantize_model, name_to_dtype
 from torch._export import capture_pre_autograd_graph
@@ -44,34 +44,20 @@ def device_sync(device):
 
 
 def main(args):
-    checkpoint_path = args.checkpoint_path
-    device = args.device
+    builder_args = BuilderArgs.from_args(args)
+    tokenizer_args = TokenizerArgs.from_args(args)
     quantize = args.quantize
 
-    assert checkpoint_path.is_file(), checkpoint_path
+    print(f"Using device={builder_args.device}")
+    set_precision(builder_args.precision)
 
-    print(f"Using device={device}")
-    precision = name_to_dtype(args.dtype)  # torch.float  # bfloat16
-    set_precision(precision)
-    
+    builder_args.dso_path = None
+    builder_args.pte_path = None
+    builder_args.setup_caches = True
     model = _initialize_model(
-        args.checkpoint_path,
-        args.checkpoint_dir,
-        args.params_path,
-        args.params_table,
-        args.gguf_path,
-        None,  # dso_path - cannot re-export exported model
-        None,  # pte_path - cannot re-export exported model
+        builder_args,
         quantize,
-        device,
-        precision,
-        setup_caches=True,
-        use_tp=False
     )
-
-    # dtype:
-    # if args.dtype:
-    #    model.to(dtype=name_to_dtype(args.dtype))
 
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
@@ -82,13 +68,14 @@ def main(args):
             print(f">{output_pte_path}<")
             if executorch_export_available:
                 print(f"Exporting model using Executorch to {output_pte_path}")
-                export_model_et(model, device, args.output_pte_path, args)
+                export_model_et(model, builder_args.device, args.output_pte_path, args)
             else:
                 print(f"Export with executorch requested but Executorch could not be loaded")
+                print(executorch_exception)
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
             print(f"Exporting model using AOT Inductor to {output_dso_path}")
-            export_model_aoti(model, device, output_dso_path, args)
+            export_model_aoti(model, builder_args.device, output_dso_path, args)
 
 
 def cli():
