@@ -15,7 +15,7 @@ import torch._dynamo.config
 import torch._inductor.config
 
 from build.builder import _load_model, _initialize_model, _initialize_tokenizer, BuilderArgs, TokenizerArgs
-from builder.model import Transformer
+from build.model import Transformer
 from quantize import quantize_model, name_to_dtype, set_precision, get_precision
 from cli import cli_args
 
