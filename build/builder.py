@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from typing import Union, Optional
 
 from sentencepiece import SentencePieceProcessor
-from model import Transformer
+from build.model import Transformer
 
 
 @dataclass
