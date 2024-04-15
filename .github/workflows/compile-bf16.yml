@@ -58,44 +58,44 @@ jobs:
             echo "******************************************"
             echo "******* Emb: channel-wise quantized ******"
             echo "******************************************"
-            python generate.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+            python generate.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
             cat ./output_eager
-            python generate.py --dtype ${DTYPE} --compile --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
+            python generate.py --dtype ${DTYPE} --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
             cat ./output_compiled
-            python export.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+            python export.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
             python generate.py --dtype ${DTYPE} --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
             cat ./output_aoti
   
             echo "******************************************"
             echo "******** Emb: group-wise quantized *******"
             echo "******************************************"
-            python generate.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+            python generate.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
             cat ./output_eager
-            python generate.py --dtype ${DTYPE} --compile --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
+            python generate.py --dtype ${DTYPE} --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
             cat ./output_compiled
-            python export.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+            python export.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
             python generate.py --dtype ${DTYPE} --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
             cat ./output_aoti
   
             echo "******************************************"
             echo "******* INT8 channel-wise quantized ******"
             echo "******************************************"
-            python generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+            python generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
             cat ./output_eager
-            python generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
+            python generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
             cat ./output_compiled
-            python export.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+            python export.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
             python generate.py --dtype ${DTYPE} --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
             cat ./output_aoti
   
             echo "******************************************"
             echo "******** INT8 group-wise quantized *******"
             echo "******************************************"
-            python generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+            python generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
             cat ./output_eager
-            python generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
+            python generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
             cat ./output_compiled
-            python export.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+            python export.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
             python generate.py --dtype ${DTYPE} --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
             cat ./output_aoti
   
@@ -106,11 +106,11 @@ jobs:
               DTYPE=bfloat16
             fi
   
-            python generate.py --dtype ${DTYPE} --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+            python generate.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
             cat ./output_eager
-            python generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
+            python generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
             cat ./output_compiled
-            python export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+            python export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
             python generate.py --dtype ${DTYPE} --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
             cat ./output_aoti
   
