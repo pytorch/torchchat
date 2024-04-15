@@ -617,7 +617,6 @@ class QuantizedGroupEmbedding(torch.nn.Module):
         vocab_size: int,
         embedding_dim: int,
         groupsize: Optional[int] = None,
-        device=None,
         dtype=torch.half,
         packed=False,
     ) -> None:
