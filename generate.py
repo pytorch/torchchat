@@ -8,14 +8,46 @@ import sys
 import time
 from pathlib import Path
 from typing import Optional, Tuple
+from dataclasses import dataclass
 
 import torch
 import torch._dynamo.config
 import torch._inductor.config
 
+from build.builder import _load_model, _initialize_model, _initialize_tokenizer, BuilderArgs, TokenizerArgs
+from build.model import Transformer
 from quantize import quantize_model, name_to_dtype, set_precision, get_precision
 from cli import cli_args
 
+@dataclass
+class GeneratorArgs:
+    prompt: str = "torchat is pronounced torch-chat and is so cool because"
+    chat: bool = False,
+    gui: bool = False,
+    num_samples: int =1,
+    max_new_tokens: int = 200,
+    top_k: int = 200,
+    temperature: int = 0, # deterministic argmax
+    compile: bool = False,
+    compile_prefill: bool = False,
+    speculate_k: int = 5,
+
+    @classmethod
+    def from_args(cls, args): # -> GeneratorArgs:
+        return cls(
+            prompt = args.prompt,
+            chat = args.chat,
+            gui = args.gui,
+            num_samples = args.num_samples,
+            max_new_tokens = args.max_new_tokens,
+            top_k = args.top_k,
+            temperature = args.temperature,
+            compile = args.compile,
+            compile_prefill = args.compile_prefill,
+            speculate_k = args.speculate_k,
+        )
+
+    
 def device_sync(device):
     if "cuda" in device:
         torch.cuda.synchronize(device)
@@ -33,10 +65,6 @@ torch._inductor.config.fx_graph_cache = True  # Experimental feature to reduce c
 # support running without installing as a package
 wd = Path(__file__).parent.parent.resolve()
 sys.path.append(str(wd))
-
-from sentencepiece import SentencePieceProcessor
-
-from model import Transformer
 
 
 def multinomial_sample_one_no_sync(
@@ -274,174 +302,23 @@ def encode_tokens(tokenizer, string, bos=True, device="cuda"):
     return torch.tensor(tokens, dtype=torch.int, device=device)
 
 
-def _load_model(
-        checkpoint_path,
-        checkpoint_dir,
-        params_path,
-        params_table,
-        device,
-        precision,
-        use_tp=False
-):
-    use_cuda = "cuda" in device
-    with torch.device("meta"):
-        if params_path:
-            model = Transformer.from_params(params_path)
-        elif params_table:
-            model = Transformer.from_table(params_path)            
-        else:
-            model = Transformer.from_name(checkpoint_path.parent.name)
-
-    # checkpoint = torch.load(str(checkpoint_path), mmap=True, weights_only=True)
-    cps = []
-    if checkpoint_dir is not None:
-        # Load multiple checkpoint; ignore the single path.
-        checkpoint_path = None
-        for i in range(4):
-            cp_name = f"consolidated.{i}.pth"
-            print(f"Loading {cp_name}")
-            cps.append(
-                torch.load(
-                    os.path.join(checkpoint_dir, cp_name),
-                    map_location=device,
-                    mmap=True,
-                )
-            )
-            
-        checkpoint = {}
-        for key in cps[0].keys():
-            if not torch.allclose(cps[0][key], cps[1][key]):
-                values = (cps[0][key], cps[1][key], cps[2][key], cps[3][key])
-                if key.endswith("wo.weight") or key.endswith("w2.weight"):
-                    checkpoint[key] = torch.cat(values, dim=1)
-                else:
-                    checkpoint[key] = torch.cat(values, dim=0)
-            else:
-                checkpoint[key] = cps[0][key]
-    else:
-        checkpoint = torch.load(checkpoint_path, map_location=device, mmap=True, weights_only=True)
-
-    if "model" in checkpoint and "stories" in str(checkpoint_path):
-        checkpoint = checkpoint["model"]
-
-    model.load_state_dict(checkpoint, assign=True)
-
-    if use_tp:
-        from tp import apply_tp
-
-        print("Applying tensor parallel to model ...")
-        apply_tp(model)
-
-    model = model.to(device=device, dtype=precision)
-    return model.eval()
-
-
-B_INST, E_INST = "[INST]", "[/INST]"
-
-def _load_inference_model(
-        checkpoint_path,
-        checkpoint_dir,
-        params_path,
-        params_table,
-        dso_path,
-        pte_path,
-        quantize,
-        device,
-        precision,
-        use_tp=False
-):
-    assert (
-        (checkpoint_path and checkpoint_path.is_file()) or
-        (dso_path and Path(dso_path).is_file()) or
-        (pte_path and Path(pte_path).is_file())
-    ), "need to specified a valid checkpoint path, DSO path, or PTE path"
-    assert not (dso_path and pte_path), "specify either DSO path or PTE path, but not both"
-
-    if (checkpoint_path and (dso_path or pte_path)):
-        print("Warning: checkpoint path ignored because an exported DSO or PTE path specified")
-
-    print("Loading model ...")
-    t0 = time.time()    
-    model_ = _load_model(
-        checkpoint_path,
-        checkpoint_dir,
-        params_path,
-        params_table,
-        device,
-        precision,
-        use_tp
-    )
-    device_sync(device=device)  # MKG
-    print(f"Time to load model: {time.time() - t0:.02f} seconds")
-
-    if dso_path:
-        # make sure user did not try to set dtype
-        # assert model_dtype == "float32", f"dtype setting not valid for a DSO model. Specify dtype during export."
-        assert quantize is None or quantize == "{ }", f"quantize not valid for exported DSO model. Specify quantization during export."
-        try:
-            model = model_
-            # Replace model forward with the AOT-compiled forward
-            # This is a hacky way to quickly demo AOTI's capability.
-            # model is still a Python object, and any mutation to its
-            # attributes will NOT be seen on by AOTI-compiled forward
-            # function, e.g. calling model.setup_cache will NOT touch
-            # AOTI compiled and maintained model buffers such as kv_cache.
-            model.forward = torch._export.aot_load(str(dso_path.absolute()), device)
-        except:
-            raise RuntimeError(f"Failed to load AOTI compiled {dso_path}")
-    elif pte_path:
-        # make sure user did not try to set dtype
-        # assert model_dtype == "float32", f"dtype setting not valid for a DSO model. Specify dtype during export."
-        assert quantize is None or quantize == "{ }", f"quantize not valid for exported PTE model. Specify quantization during export."
-        try:
-            from model_et import PTEModel
-            model = PTEModel(model_.config, pte_path)
-        except Exception as e:
-            raise RuntimeError(f"Failed to load ET compiled {pte_path}")
-    else:
-        model = model_
-
-        if quantize:
-            t0q = time.time()
-            quantize_model(model, quantize)
-            device_sync(device=device)  # MKG
-            print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
-
-        model.to(dtype=precision)
-
-    return model
-
-
 def _main(
+    builder_args: BuilderArgs,
+    speculative_builder_args: BuilderArgs,
+    tokenizer_args: TokenizerArgs,    
     prompt: str = "Hello, my name is",
     chat_mode: bool = False,
     num_samples: int = 5,
     max_new_tokens: int = 100,
     top_k: int = 200,
     temperature: float = 0.8,
-    checkpoint_path: Optional[Path] = None,
-    checkpoint_dir: Optional[Path] = None,
-    params_path: Optional[Path] = None,
-    params_table: Optional[str] = None,
-    tokenizer_path: Optional[Path] = None,
     compile: bool = True,
     compile_prefill: bool = False,
     profile: Optional[Path] = None,
-    draft_checkpoint_path: Optional[Path] = None,
     speculate_k: int = 5,
-    device="cuda",
-    dso_path=None,
-    pte_path=None,
     quantize=None,
-    model_dtype=None,
-    use_tiktoken=False,
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
-
-    if not tokenizer_path:
-        assert checkpoint_path, "either a tokenizer or a checkpoint path must be specified"
-        tokenizer_path = checkpoint_path.parent / "tokenizer.model"
-    assert tokenizer_path.is_file(), tokenizer_path
 
     # global print
     #    from tp import maybe_init_dist
@@ -452,41 +329,35 @@ def _main(
     #            # only print on rank 0
     #            print = lambda *args, **kwargs: None
 
-    print(f"Using device={device}")
-    precision = name_to_dtype(model_dtype)
-    set_precision(precision)
-    is_speculative = draft_checkpoint_path is not None
-    is_chat = "chat" in str(checkpoint_path)
-
-    model = _load_inference_model(
-        checkpoint_path,
-        checkpoint_dir,
-        params_path,
-        params_table,
-        dso_path,
-        pte_path,
-        quantize,
-        device,
-        precision,
-        use_tp
+    print(f"Using device={builder_args.device}")
+    set_precision(builder_args.precision)
+    is_speculative = speculative_builder_args.checkpoint_path is not None
+    
+    is_chat = "chat" in str(builder_args.checkpoint_path)
+    if is_chat:
+            raise RuntimeError("need to stop filename based kludgery, at a minimum need to look at all pathnames. yuck!")
+            
+    tokenizer = _initialize_tokenizer(tokenizer_args)
+            
+    builder_args.setup_caches = False
+    model = _initialize_model(
+        builder_args,
+        quantize
     )
-
-    # will add a version of _load_inference_model in future
+            
+    # will add a version of _initialize_model in future
     # (need additional args)
     if is_speculative:
+        from builder import _load_model
+        speculative_builder_args = builder_args
+        
         draft_model = _load_model(
-            draft_checkpoint_path,
-            None,
-            None,
-            device,
-            precision,
-            use_tp
+            speculative_builder_args,
         )
     else:
         draft_model = None
 
-    tokenizer = SentencePieceProcessor(model_file=str(tokenizer_path))
-    encoded = encode_tokens(tokenizer, prompt, bos=True, device=device)
+    encoded = encode_tokens(tokenizer, prompt, bos=True, device=builder_args.device)
     print (encoded)
     prompt_length = encoded.size(0)
 
@@ -497,7 +368,7 @@ def _main(
         ]
     )
     if compile:
-        if is_speculative and use_tp:  # and ("cuda" in device):
+        if is_speculative and builder_args.use_tp:  # and ("cuda" in builder_args.device):
             torch._inductor.config.triton.cudagraph_trees = (
                 False  # Bug with cudagraph trees in this case
             )
@@ -524,12 +395,12 @@ def _main(
     start = -1 if compile else 0
 
     for i in range(start, num_samples):
-        device_sync(device=device)  # MKG
+        device_sync(device=builder_args.device)
         if i >= 0 and chat_mode:
             prompt = input("What is your prompt? ")
             if is_chat:
                 prompt = f"{B_INST} {prompt.strip()} {E_INST}"
-            encoded = encode_tokens(tokenizer, prompt, bos=True, device=device)
+            encoded = encode_tokens(tokenizer, prompt, bos=True, device=builder_args.device)
 
         if chat_mode and i >= 0:
             buffer = []
@@ -579,7 +450,7 @@ def _main(
                 prof.export_chrome_trace(f"{profile}_rank_{rank}.json")
             else:
                 prof.export_chrome_trace(f"{profile}.json")
-        device_sync(device=device)  # MKG
+        device_sync(device=builder_args.device)
         t = time.perf_counter() - t0
 
         if not chat_mode:
@@ -607,30 +478,28 @@ def _main(
     )
     print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
+            
 def main(args):
+    builder_args = BuilderArgs.from_args(args)
+    speculative_builder_args = BuilderArgs.from_speculative_args(args)
+    tokenizer_args = TokenizerArgs.from_args(args)
+    generator_args = GeneratorArgs.from_args(args)
+            
     _main(
+        builder_args,
+        speculative_builder_args,
+        tokenizer_args,
         args.prompt,
         args.chat,
         args.num_samples,
         args.max_new_tokens,
         args.top_k,
         args.temperature,
-        args.checkpoint_path,
-        args.checkpoint_dir,
-        args.params_path,
-        args.params_table,
-        args.tokenizer_path,
         args.compile,
         args.compile_prefill,
         args.profile,
-        args.draft_checkpoint_path,
         args.speculate_k,
-        args.device,
-        args.dso_path,
-        args.pte_path,
         args.quantize,
-        args.dtype,
-        args.tiktoken
     )
 
 def cli():

@@ -36,7 +36,7 @@ jobs:
           pip install zstd
           pip install -r requirements.txt
 
-          export LLAMA_FAST_ROOT=${PWD}
+          export TORCHAT_ROOT=${PWD}
           export ENABLE_ET_PYBIND=false
           ./scripts/install_et.sh $ENABLE_ET_PYBIND
           cmake -S ./runner-et -B build/cmake-out -G Ninja

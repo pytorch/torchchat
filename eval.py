@@ -18,9 +18,10 @@ torch._inductor.config.epilogue_fusion = False
 torch._inductor.config.triton.cudagraphs = True
 torch._dynamo.config.cache_size_limit = 100000
 
-from sentencepiece import SentencePieceProcessor
+from cli import cli_args
+from quantize import name_to_dtype, set_precision
 
-from model import Transformer
+from build.model import Transformer
 
 try:
     import lm_eval
@@ -28,7 +29,8 @@ try:
 except:
     lm_eval_available = False
 
-from generate import _load_model, encode_tokens, model_forward
+from build.builder import _initialize_model, _initialize_tokenizer, BuilderArgs, TokenizerArgs
+from generate import encode_tokens, model_forward
 
 if lm_eval_available:
     try: # lm_eval version 0.4
@@ -208,12 +210,15 @@ def main(args) -> None:
 
     """
 
+    builder_args = BuilderArgs.from_args(args)
+    tokenizer_args = TokenizerArgs.from_args(args)
+    
     checkpoint_path = args.checkpoint_path
     checkpoint_dir = args.checkpoint_dir
     params_path = args.params_path
     params_table = args.params_table
+    gguf_path = args.gguf_path
     tokenizer_path = args.tokenizer_path
-    params_path = args.params_path
     dso_path = args.dso_path
     pte_path = args.pte_path
     quantize = args.quantize
@@ -224,32 +229,18 @@ def main(args) -> None:
     max_seq_length = args.max_seq_length
     use_tiktoken = args.tiktoken
     
-    if not tokenizer_path:
-        assert checkpoint_path, "either a tokenizer or a checkpoint path must be specified"
-        tokenizer_path = checkpoint_path.parent / "tokenizer.model"
-    assert tokenizer_path.is_file(), tokenizer_path
-
     print(f"Using device={device}")
-    precision = name_to_dtype(model_dtype)
-    set_precision(precision)
-    
-    model = _load_inference_model(
-        checkpoint_path,
-        checkpoint_dir,
-        params_path,
-        params_table,
-        dso_path,
-        pte_path,
+    set_precision(buildeer_args.precision)
+
+    tokenizer = _initialize_tokenizer(tokenizer_args)
+    builder_args.setup_caches = False
+    model = _initialize_model(
+        buildeer_args,
         quantize,
-        device,
-        precision,
-        use_tp=False
     )
 
-    tokenizer = SentencePieceProcessor(model_file=str(tokenizer_path))
-
     if compile:
-        assert not (dso_path or pte_path), "cannot compile exported model"
+        assert not (builder_args.dso_path or builder_args.pte_path), "cannot compile exported model"
         global model_forward
         model_forward = torch.compile(model_forward,  mode="reduce-overhead", dynamic=True, fullgraph=True)
         torch._inductor.config.coordinate_descent_tuning = True
@@ -264,13 +255,13 @@ def main(args) -> None:
     )
     print(f"Time to run eval: {time.time() - t1:.02f} seconds.")
     if dso_path:
-        print(f"For model {dso_path}")
+        print(f"For model {builder_args.dso_path}")
     elif pte_path:
-        print(f"For model {pte_path}")
+        print(f"For model {builder_args.pte_path}")
     elif checkpoint_path:
-        print(f"For model {checkpoint_path}")
+        print(f"For model {builder_args.checkpoint_path}")
     elif checkpoint_dir:
-        print(f"For model {checkpoint_dir}")
+        print(f"For model {builder_args.checkpoint_dir}")
     else:
         raise RuntimeError("Well That's Fine. How did we get here")
 
@@ -278,9 +269,9 @@ def main(args) -> None:
         print(f"{task}: {res}")
 
 if __name__ == '__main__':
-def cli():
-    args = cli_args()
-    main(args)
+    def cli():
+        args = cli_args()
+        eval_main(args)
 
 
 if __name__ == "__main__":

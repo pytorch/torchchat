@@ -1,17 +1,17 @@
 cmake_minimum_required(VERSION 3.24)
 set(CMAKE_CXX_STANDARD 17)
 
-project(llama-fast)
+project(Torchat)
 
 include(CMakePrintHelpers)
-set(LLAMA_FAST_ROOT $ENV{LLAMA_FAST_ROOT})
-cmake_print_variables(LLAMA_FAST_ROOT)
+set(TORCHAT_ROOT $ENV{TORCHAT_ROOT})
+cmake_print_variables(TORCHAT_ROOT)
 
-find_package(executorch CONFIG REQUIRED PATHS ${LLAMA_FAST_ROOT}/build/install/lib/cmake/ExecuTorch)
-set(_common_include_directories ${LLAMA_FAST_ROOT}/build/src)
+find_package(executorch CONFIG REQUIRED PATHS ${TORCHAT_ROOT}/build/install/lib/cmake/ExecuTorch)
+set(_common_include_directories ${TORCHAT_ROOT}/build/src)
 cmake_print_variables(_common_include_directories)
 
-target_include_directories(executorch INTERFACE ${_common_include_directories}) # Ideally ET installation process would do this
+target_include_directories(executorch INTERFACE ${_common_include_directories}) # Ideally ExecuTorch installation process would do this
 add_executable(runner_et run.cpp)
 
 # Link ET runtime + extensions
@@ -19,7 +19,7 @@ target_link_libraries(
     runner_et PRIVATE
         executorch
         extension_module
-        ${LLAMA_FAST_ROOT}/build/src/executorch/cmake-out/extension/data_loader/libextension_data_loader.a # This one does not get installed by ET
+        ${TORCHAT_ROOT}/build/src/executorch/cmake-out/extension/data_loader/libextension_data_loader.a # This one does not get installed by ExecuTorch
         optimized_kernels
         portable_kernels
         cpublas

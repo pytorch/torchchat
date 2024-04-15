@@ -236,7 +236,7 @@ class Transformer(nn.Module):
 
     @classmethod
     def from_gguf(cls, gguf_path: str):
-        from gguf_loader import load_llama_from_gguf_file
+        from build.gguf_loader import load_llama_from_gguf_file
         model = load_llama_from_gguf_file(gguf_path)
         return model
     

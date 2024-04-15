@@ -1,150 +1,153 @@
-# Preamble.
-
-*The statements contained in this README are our northstar, and we will be reality-testing the statement, and remove any
-items that are not factual.  If you find an item that is incorrect, please tag as an issue, so we can triage and determine whether to fix,
-or drop from our initial release.*
-
-# torchat *NORTHSTAR*
-A repo for building and using llama on servers, desktops and mobile.
-
-The torchat repo enables model inference of llama models (and other LLMs) on servers, desktop and mobile devices.
-For a list of devices, see below, under *SUPPORTED SYSTEMS*.
-
-A goal of this repo, and the design of the PT2 components was to offer seamless integration and consistent workflows.
-Both mobile and server/desktop paths start with `torch.export()` receiving the same model description.  Similarly,
-integration into runners for Python (for initial testing) and Python-free environments (for deployment, in runner-aoti
-and runner-et, respectively) offer a consistent experience across backends and offer developers consistent interfaces
-and user experience whether they target server, desktop or mobile & edge use cases, and/or all of them.
+# Torchat is still in pre-release!
 
 
-# Simple and efficient pytorch-native transformer text generation.
-
-Featuring:
-
-* Very low latency
-* <1000 lines of Python
-* No dependencies other than PyTorch and sentencepiece for server, and Executorch for mobile (plus, your mobile IDE, of course)
-* int8/int4 quantization (for linear and embedding operators)
-* Supports Nvidia and AMD GPUs, Apple GPUs with MPS, CPU (Linux/x86 and MacOS/ARM), and xnnpack, Vulkan and MPS for mobile GPUs,
-  and backend-specific mobile runtimes ("delegates", such as CoreML and Hexagon).
-
-The model definition (and much more!) is adopted from gpt-fast, so we support the same models.  As new models are supported by gpt-fast,
-bringing them into torchat should be straight forward.  In addition, we invite community contributions
-
-# Torchat usage
-
-torchat tools are either accessible through a common interface torchat, supporting chat, prompted text generation, model export, 
-model test, and a standalone C/C++ runtime for server.
-
-| function | torchat call | direct command | tested |
-|---|----|----|-----|
-chat          | `torchat --chat`   | n/a | 🚧 |
-generate text | `torchat --generate` |`generate` | ✅ |
-export model  | `torchat --export` | `export` | ✅ |
-exported model test (dso,pte) | `torchat --chat` | n/a  | 🚧 |
-exported model test (dso,pte) | `torchat --generate` |`generate` | ✅ |
-server C++ runtime | n/a | run.cpp model.so | ✅ |
-server C++ runtime | n/a | run.cpp model.pte | ✅ |
-mobile C++ runtime | n/a | app model.pte | ✅ |
-mobile C++ runtime | n/a | app + AOTI | 🚧 |
-
-Advantageously, exported models can be laoded back into torchat for chat or text generation, thus enabling experimentation with the exported model
-as well as model quality validation, retaining the prior Python interface to simplify reuse of tests and test harnesses developed in Python during
-model development and qualification.
-
-In addition, torchat comes with server C++ runtimes for both AOT Inductor-compiled models and Executorch-compiled models for servers. Mobile C++ runtimes
-enable the deployment of Executorch-compiled PTE mobile/edge models on iOS, Android and Raspberry Pi 5.  In addition, an experimental mobile C++ runtime 
-for AOT Inductor compiled models exists as prototype (as of 4/10).
+Torchat is currently in a pre-release state and under extensive development.
 
 
-# Getting started
+# Torchat
 
-Follow the `gpt-fast` [installation instructions](https://github.com/pytorch-labs/gpt-fast?tab=readme-ov-file#installation).
-Because torchat was designed to showcase the latest and greatest PyTorch 2 features for Llama (and related llama-style) models, many of the features used in torchat are hot off the press. [Download PyTorch nightly](https://pytorch.org/get-started/locally/) with the latest steaming hot PyTorch 2 features.
+[**Introduction**](#introduction) | [**Installation**](#installation) | [**Get Started**](#get-started) | [**Download**](#download) | [**Chat**](#chat) | [**Generate**](#generate) | [**Eval**](#eval) | [**Export**](#export) | [**Supported Systems**](#supported-systems) | [**Contributing**](#contributing) | [**License**](#license)
 
+&nbsp;
 
-Install sentencepiece and huggingface_hub
-```bash
-pip install sentencepiece huggingface_hub
-```
+## Introduction
 
-If you are planning on using mobile backends, you will also [install ExecuTorch](https://pytorch.org/executorch/stable/getting-started-setup.html) and any hardware-specific libraries and IDEs.
+Torchat (pronounced “torch chat” and also a play on torch @ [laptop, desktop, mobile]) is a tool and library to easily run LLMs on laptops, desktops, and mobile devices using pure [PyTorch](https://github.com/pytorch/pytorch) and [ExecuTorch](https://github.com/pytorch/executorch). See below for a [full list of supported devices](#supported-systems).
 
-To download llama models, go to https://huggingface.co/meta-llama/Llama-2-7b and go through steps to obtain access.
-Then, login with `huggingface-cli login`
+The library provides:
 
-## Downloading Weights
+- Command line interaction with popular LLMs through PyTorch eager and torch.compile
+- Export to laptop and desktop through AOT Inductor
+- Export to Android and iOS through [ExecuTorch](https://github.com/pytorch/executorch)
+- Very low latency through quantization and optimized kernels
+- Hackable PyTorch models and integration to [torchtune](https://github.com/pytorch/torchtune) for model fine-tuning
+- Import of GGUF models
+- <1000 lines of python
+- Quantization to int8 and int4 for linear and embedding operators
+- Support for Nvidia and AMD GPUs, Apple GPUs with MPS, CPU (Linux/x86, MacOS/ARM),  Mobile CPU with XNNPACK, Mobile GPU with Vulkan and CoreML. Hardware-specific delegates through CoreML and HTP.
 
-To download Llama 2 models, go to [https://huggingface.co/meta-llama/Llama-2-7b] and go through steps to obtain access.
-Once approved, login with
-```
-huggingface-cli login
-```
-You will be asked for a token from [https://huggingface.co/settings/tokens].
+While we strive to support a broad range of models, we can't test them all. We classify supported models as tested ✅,
+work in progress 🚧 or some restrictions ❹.  As always, we invite community contributions of new model suport and test results!
 
-For example, to convert meta-llama/Llama-2-7b-chat-hf
-```bash
-export MODEL_DOWNLOAD=meta-llama/Llama-2-7b-chat-hf
-./scripts/prepare.sh $MODEL_DOWNLOAD
-```
-
-### Supported Models
-
-While we strive to support a broad range of models, we can't test all models.  Consequently, we classify supported models as tested ✅,
-work in progress 🚧 and not tested.  We invite community contributions of both new models, as well as test reports.
-
-Some common models are recognized by torchat based on their filename (`Transformer.from_name()`).  For models not recognized based 
-on the filename, you can construct a model by initializing the `ModelArgs` dataclass that controls model construction from a parameter json
-specified using the `params-path ${PARAMS_PATH}` containing the appropriate model parameters.
-
-| Model | tested | eager | torch.compile | AOT Inductor | ET Runtime | Fits on Mobile |
+| Model | Tested | Eager | torch.compile | AOT Inductor | ExecuTorch | Fits on Mobile |
 |-----|--------|-------|-----|-----|-----|-----|
+meta-llama/Llama-3-7b | 🚧  | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
+meta-llama/Llama-2-7b-chat-hf | 🚧  | ✅ |  ✅ |  ✅ |  ✅ | ❹|
+meta-llama/Llama-2-13b-chat-hf | - | ✅ |  ✅ |  ✅ |  ✅ | 📵 |
+meta-llama/Llama-2-70b-chat-hf | - | ✅ |  ✅ |  ✅ |  ✅ | ❌|
 tinyllamas/stories15M | ✅ | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
 tinyllamas/stories42M  | - | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
 tinyllamas/stories110M   | ✅ | ✅ |  ✅ |  ✅ |  ✅ | ✅ |
 openlm-research/open_llama_7b  | 🚧 | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
-meta-llama/Llama-2-7b-chat-hf | 🚧  | ✅ |  ✅ |  ✅ |  ✅ | ❹|
-meta-llama/Llama-2-13b-chat-hf | - | ✅ |  ✅ |  ✅ |  ✅ | 📵 |
-meta-llama/Llama-2-70b-chat-hf | - | ✅ |  ✅ |  ✅ |  ✅ | ❌|
 codellama/CodeLlama-7b-Python-hf | -| ✅ |  ✅ |  ✅ |  ✅ | ❹|
 codellama/CodeLlama-34b-Python-hf | -| ✅ |  ✅ |  ✅ |  ✅ | ❌ |
 mistralai/Mistral-7B-v0.1 | 🚧  |  ✅  |  ✅ |  ✅ |  ✅ | ❹ |
 mistralai/Mistral-7B-Instruct-v0.1 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 mistralai/Mistral-7B-Instruct-v0.2 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
-Llama3 | 🚧  | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 
-*Key:* ✅ works correctly; 🚧  work in progress; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile phone (may fit some high-end devices such as tablets);
+*Key:* ✅ works correctly; 🚧  work in progress; ❌ not supported; ❹ requires 4bit groupwise quantization; 📵 not on mobile (may fit some high-end devices such as tablets);
 
+&nbsp;
 
+---
 
-### More downloading
+## Installation
 
-
-First cd into torchat.  We first create a directory for stories15M and download the model and tokenizers.
-We show how to download @Andrej Karpathy's stories15M tiny llama-style model that were used in llama2.c.  Advantageously,
-stories15M is both a great example and quick to download and run across a range of platforms, ideal for introductions like this
-README and for [testing](https://github.com/pytorch-labs/torchat/blob/main/.github/workflows). We will be using it throughout
-this introduction as our running example.
+Currently `torchat` must be built via cloning the repository and installing as follows:
 
 ```
-# Create directory for model and generated artifacts
-export MODEL_NAME=stories15M
-export MODEL_DIR=checkpoints/${MODEL_NAME}
-mkdir -p ${MODEL_DIR}
-# Output directory for exported models and tokenizers - same as checkpoints
-# or can use a separate directory
-export MODEL_OUT=${MODEL_DIR}
-
-# Download stories model to stories15M
-curl -L -o ${MODEL_DIR}/stories15M.pt "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt?download=true"
-
-# Download tokenizers
-curl -L -o ${MODEL_DIR}/tokenizer.model "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
-curl -L -o ${MODEL_DIR}/tokenizer.bin "https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin"
+git clone https://github.com/pytorch/torchat.git
+cd torchat
+pip install -r requirements.txt
 ```
 
+To confirm that the package is installed correctly, you can run the following command:
 
-## Conventions
+```
+torchat --help
+```
+
+And should see the following output:
+
+```
+usage: torchat [-h] {chat,generate,eval,export} ...
+
+Welcome to the torchat CLI!
+
+options:
+  -h, --help            show this help message and exit
+
+...
+```
+
+If you are planning on use mobile backends, [install ExecuTorch](https://pytorch.org/executorch/stable/getting-started-setup.html) and any hardware-specific libraries and IDEs.
+
+&nbsp;
+
+---
+
+## Get Started
+
+Torchat lets you access LLMs through an interactive interface, prompted single-use generation, model export (for use by AOT Inductor and ExecuTorch), and standalone C++ runtimes.
+
+| Function | Torchat Command | Direct Command | Tested |
+|---|----|----|-----|
+Download model | `torchat --download` | n/a | 🚧 |
+Interactive chat | `torchat --chat`   | n/a | 🚧 |
+GUI-based chat | `torchat --gui`   | n/a | ⚠️ |
+Generate text | `torchat --generate` |`generate` | ✅ |
+Evaluate model | `torchat --eval` | `eval` | 🚧 |
+Export model  | `torchat --export` | `export` | ✅ |
+Exported model test (dso,pte) | `torchat --chat` | n/a  | 🚧 |
+exported model test (dso,pte) | `torchat --generate` |`generate` | ✅ |
+Evaluate exported model (dso,pte) | `torchat --eval` | `eval` | 🚧 |
+Server C++ runtime | n/a | run.cpp model.so | ✅ |
+Server C++ runtime | n/a | run.cpp model.pte | ✅ |
+Mobile C++ runtime | n/a | app model.pte | ✅ |
+Mobile C++ runtime | n/a | app + AOTI | 🚧 |
+
+Exported models can be loaded back into torchat for chat or text generation, letting you experiment with the exported model and valid model quality. The python interface is the same in all cases and is used for testing nad test harnesses too.
+
+Torchat comes with server C++ runtimes to execute AOT Inductor and ExecuTorch models. Mobile C++ runtimes allow you to deploy ExecuTorch-compiled .pte files on iOS, Android and Raspberry Pi 5.
+
+## Download
+
+For Llama 2 and 3, follow the instructions on the official [`meta-llama`](https://huggingface.co/meta-llama/Llama-2-7b) repository to ensure you have access to the Llama 2 model weights. Once you have confirmed access, you can run the following command to download the weights to your local machine. This will also download the tokenizer model and a responsible use guide.
+
+```
+huggingface-cli login
+torchat --download meta-llama/Llama-2-7b-hf --output-dir /tmp/Llama-2-7b-hf
+```
+
+Note: While the ``torchat download`` command allows you to download *any* model from the hub, there's no guarantee that the model can be run with torchat. Currently supported models can be found [here](#introduction)
+
+For stories15M, which we use in this quick start guide, run the following:
+
+```
+huggingface-cli login
+torchat --download tinyllamas/stories15M --output-dir /tmp/stories15M
+```
+
+Some common models are recognized by torchat based on their filename through `Transformer.from_name()` to perform a fuzzy match against a table of known model architectures. Alternatively, you can specify the index into that table with the option `--params-table ${INDEX}` where the index is the dictionary key in the `transformer_configs`   
+dictionary specified [here](https://github.com/pytorch/torchat/blob/main/model.py#L85).  For our example, with the stories15M model, this would be expressed as
+`--params-table stories15M`. (We use the model constructor `Transformer.from_table()`)
+
+For models not specified not in the list of known configurations, you can construct the model by initializing the `ModelArgs` dataclass that controls model construction from a parameter json using the `params-path ${PARAMS_PATH}` containing the appropriate model parameters to initialize the ModelArgs for the model. (We use the model constructor `Transformer.from_params()`).
+
+The parameter file will should be in JSON format specifying thee parameters.  You can find the Model Args data class in [`model.py`](https://github.com/pytorch/torchat/blob/main/model.py#L22).
+
+The final way to initialize a torchat model is from GGUF. You load a GGUF model with the option `--load-gguf ${MODELNAME}.gguf`. Presently, the F16, F32, Q4_0, and Q6_K formats are supported and converted into native torchat models.
+
+You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsouly quantized and thend equantized model.) 
+
+| GGUF Model | Tested | Eager | torch.compile | AOT Inductor | ExecuTorch | Fits on Mobile |
+|-----|--------|-------|-----|-----|-----|-----|
+| llama-2-7b.Q4_0.gguf |  🚧 | 🚧 | 🚧 | 🚧 | 🚧 |
+
+You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsoul;y quantized and thend equantized model.) 
+
+
+## Chat
 
 We use several variables in this example, which may be set as a preparatory step:
 
@@ -184,17 +187,11 @@ or as Executorch model under the name `${MODEL_NAME}.pte` (for Executorch-genera
 We use `[ optional input ]` to indicate optional inputs, and `[ choice 1 | choice 2 | ... ]` to indicate a choice
 
 
-
-## A note on tokenizers
+### A note on tokenizers
 
 There are two different formats for tokenizers, and both are used in this repo.
 1 - for generate.py and Python bindings, we use the Google sentencepiece Python operator. This operator consumes a tokenization model in the `tokenizer.model` format.
 2 - for C/C++ inference, we use @Andrej Karpathy's C tokenizer function.  This tokenizer consumes a tokenization model in the 'tokenizer.bin' format.
-
-If you are using conda, you can install sentencepiece using the following command:
-```
-conda install sentencepiece
-```
 
 You can convert tokenizer.model into tokenizer.bin using Andrej's
 tokenizer.py utility to convert the tokenizer.model to tokenizer.bin
@@ -210,16 +207,14 @@ environment:
 ./run ${MODEL_OUT}/model.{so,pte} -z ${MODEL_OUT}/tokenizer.bin
 ```
 
-### llama3 tokenizer
+### Llama 3 tokenizer
 
-Add option to load tiktoken
+Add option to load tiktoken tokenizer
 ```
 --tiktoken
 ```
 
-# Generate Text
-
-## Eager Execution
+## Generate
 
 Model definition in model.py, generation code in generate.py. The
 model checkpoint may have extensions `pth` (checkpoint and model definition) or `pt` (model checkpoint).
@@ -234,7 +229,17 @@ To squeeze out a little bit more performance, you can also compile the
 prefill with --compile_prefill. This will increase compilation times
 though.
 
-## AOT Inductor compilation and execution
+## Eval
+
+## Export
+
+Let's start by exporting and running a small model like stories15M.
+
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --output-pte-path ${MODEL_OUT}/model.pte
+```
+
+### AOT Inductor compilation and execution
 ```
 python export.py --checkpoint-path ${MODEL_PATH} --device {cuda,cpu} --output-dso-path ${MODEL_OUT}/${MODEL_NAME}.so
 ```
@@ -257,21 +262,12 @@ execution engines while they are waiting for data.  We use
 quantization to achieve this, as described below.
 
 
-## ExecuTorch mobile compilation
+### ExecuTorch mobile compilation
 
 We export the model with the export.py script.  Running this script requires you first install executorch with pybindings, see [here](#setting-up-executorch-and-runner-et).
 At present, when exporting a model, the export command always uses the
 xnnpack delegate to export.  (Future versions of torchat will support additional
 delegates such as Vulkan, CoreML, MPS, HTP in addition to Xnnpack as they are released for Executorch.)
-
-
-### Exporting the model
-Let's start by exporting and running a small model like stories15M.
-
-
-```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --output-pte-path ${MODEL_OUT}/model.pte
-```
 
 ### Running the model
 
@@ -288,7 +284,7 @@ device supported by Executorch, most models need to be compressed to
 fit in the target device's memory. We use quantization to achieve this.
 
 
-# llama3 support
+## Llama 3 support
 
 How to obtain snapshot (to be filled in when published by Meta, we use internal snapshot]
 
@@ -300,9 +296,24 @@ Identify and enable a runner/run.cpp with a binary tiktoken optimizer.  (May alr
 we cannot presently run runner/run.cpp with llama3, until we have a C/C++ tokenizer im[plementation
 (initial tiktoken is python) 
 
-# Optimizing your model for server, desktop and mobile devices
+## Optimizing your model for server, desktop and mobile devices
 
-## Model precision (dtype precision setting)_
+To compress models, torchat offers a variety of strategies:
+* Configurable floating-point precision, depending on backend capabilities (for activations and weights): float32, float16, bfloat16
+* weight-quantization: embedding quantization and linear operator quantization
+* dynamic activation quantization with weight quantization: a8w4dq
+
+In addition, we support GPTQ for improving the quality of 4b weight-only quantization.  Support for HQQ is a work in progress.
+
+| compression | FP precision |  weight quantization | dynamic activation quantization |
+|--|--|--|--|
+embedding table (symmetric) | fp32, fp16, bf16 | 8b (group/channel), 4b (group/channel) | n/a |
+linear operator (symmetric) | fp32, fp16, bf16 | 8b (group/channel) | n/a |
+linear operator (asymmetric) | n/a | 4b (group), a6w4dq | a8w4dq (group) |
+linear operator (asymmetric) with GPTQ | n/a | 4b (group) | n/a |
+linear operator (asymmetric) with HQQ | n/a |  work in progress | n/a |
+
+## Model precision (dtype precision setting)
 
 You can generate models (for both export and generate, with eager, torch.compile, AOTI, ET, for all backends - mobile at present will primarily support fp32, with all options)
 specify the precision of the model with 
@@ -312,7 +323,6 @@ python export.py --dtype [bf16 | fp16 | fp32] ...
 ```
 
 Unlike gpt-fast which uses bfloat16 as default, Torch@ uses float32 as the default. As a consequence you will have to set to `--dtype bf16` or `--dtype fp16` on server / desktop for best performance.
-
 
 ## Making your models fit and execute fast!
 
@@ -341,22 +351,23 @@ to avoid combinatorial explosion.
 
 #### Embedding quantization (8 bit integer, channelwise & groupwise)
 
+The simplest way to quantize embedding tables is with int8 "channelwise"
+(symmetric) quantization, where each value is represented by an 8 bit integer, and
+a floating point scale per embedding (channelwise quantization) or one scale for each group of values
+in an embedding (groupwise quantization).
+
 *Channelwise quantization*:
 
-The simplest way to quantize embedding tables is with int8 "channelwise"
-quantization, where each value is represented by an 8 bit integer, and
-a floating point scale per group.
-
 We can do this in eager mode (optionally with torch.compile), we use the `embedding` quantizer with
-group_size set to 0 which uses channelwise quantization:
+groupsize set to 0 which uses channelwise quantization:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --device cpu
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
 ```
 
 Then, export as follows:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -364,18 +375,17 @@ Now you can run your model with the same command as before:
 python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --prompt "Hello my name is"
 ```
 
-
 *Groupwise quantization*:
 
 We can do this in eager mode (optionally with `torch.compile`), we use the `embedding` quantizer by specifying the group size:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --device cpu
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
 ```
 
 Then, export as follows:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "groupsize": 8} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -383,7 +393,49 @@ Now you can run your model with the same command as before:
 python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
 ```
 
+#### Embedding quantization (4 bit integer, channelwise & groupwise)
 
+Quantizing embedding tables  with int4 provides even higher compression of embedding tables, potentially at
+the cost of embedding quality and model outcome quality. In 4-bit embedding table quantization, each value is represented by a 4 bit integer with two values are packed into each byte
+to provide greater compression efficiency (potentially at the cost of model quality) over int8 embedding quantization.
+
+
+*Channelwise quantization*:
+
+We can do this in eager mode (optionally with torch.compile), we use the `embedding` quantizer with
+groupsize set to 0 which uses channelwise quantization:
+
+```
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 4, "groupsize": 0}}' --device cpu
+```
+
+Then, export as follows:
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 4, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --prompt "Hello my name is"
+```
+
+*Groupwise quantization*:
+
+We can do this in eager mode (optionally with `torch.compile`), we use the `embedding` quantizer by specifying the group size:
+
+```
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8}}' --device cpu
+```
+
+Then, export as follows:
+```
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 4, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
+```
+
+Now you can run your model with the same command as before:
+```
+python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
+```
 
 #### Linear 8 bit integer quantization (channel-wise and groupwise)
 The simplest way to quantize linear operators is with int8 quantization, where each value is represented by an 8-bit integer, and a
@@ -396,15 +448,15 @@ quantization, where each value is represented by an 8 bit integer, and
 a floating point scale per group.
 
 We can do this in eager mode (optionally with torch.compile), we use the `linear:int8` quantizer with
-group_size set to 0 which uses channelwise quantization:
+groupsize set to 0 which uses channelwise quantization:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --device cpu
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
 ```
 
 Then, export as follows using Executorch for mobile backends:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -414,7 +466,7 @@ python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --checkpoint-p
 
 Or, export as follows for server/desktop deployments:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.so
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.so
 ```
 
 Now you can run your model with the same command as before:
@@ -427,12 +479,12 @@ python generate.py --dso-path ${MODEL_OUT}/${MODEL_NAME}_int8.so --checkpoint-pa
 We can do this in eager mode (optionally with `torch.compile`), we use the `linear:int8` quantizer by specifying the group size:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --device cpu
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
 ```
 
 Then, export as follows using Executorch:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -442,7 +494,7 @@ python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte --checkp
 
 Or, export as follows for :
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "group_size": 0} }' --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.so
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.so
 ```
 
 Now you can run your model with the same command as before:
@@ -459,7 +511,7 @@ operator.
 To compress your model even more, 4-bit integer quantization may be used.  To achieve good accuracy, we recommend the use
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int4': {'group_size' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int4': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]
 ```
 
 Now you can run your model with the same command as before:
@@ -472,7 +524,7 @@ To compress your model even more, 4-bit integer quantization may be used.  To ac
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8-bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso... ]
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'groupsize' : 7} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso... ]
 ```
 
 Now you can run your model with the same command as before:
@@ -483,7 +535,7 @@ python generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso...
 #### Quantization with GPTQ (gptq)
 
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:gptq': {'group_size' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ] # may require additional options, check with AO team 
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:gptq': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ] # may require additional options, check with AO team 
 ```
 
 Now you can run your model with the same command as before:
@@ -497,14 +549,24 @@ We invite contributors to submit established quantization schemes, with accuracy
 
 # Loading GGUF models
 
-GGUF is a nascent industry standard format and will will read fp32, fp16 and some quantized formats (q4_0 and whatever is necessary to read llama2_78_q4_0.gguf)
+GGUF is a nascent industry standard format and presently torchat can read  the F16, F32, Q4_0, and Q6_K formats natively and convert them into native torchat models by using the load-gguf option:
 
 ```
---load_gguf <gguf_filename> # all other options as described elsewhere, works for generate and export, for all backends, but cannot be used with --quantize
+--gguf-path <gguf_filename> # all other options as described elsewhere, works for generate and export, for all backends, but cannot be used with --quantize
 ```
 
+Ypu may then apply the standard quantization options, e.g., to add embedding table quantization as described under quantization. (You cannot directly requantize already quantized formats.  However, you may dequantize them using GGUF tools, and then laod the model into torchat to quantize wqith torchat's quantization workflow.)
+
+## Loading unsupported GGUF formats in torchat
+
+GGUF formats not presently supported natively in torchat may be converted to one of the supported formats with GGUF's `${GGUF}/quantize` utility to be loaded in torchat. If you convert to the FP16 or FP32 formats with GGUF's `quantize` utility, you may then requantize these models with torchat's quantization workflow. 
+
+Note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previously quantized and then dequantized model. This, while you can convert your q4_1 model to FP16 or FP32 GGUF formats and then requantize, you might get better results if you start with the original FP16 or FP32 GGUF format. 
+
+To use the quantize tool, install the GGML tools at ${GGUF} . Then, you can, for example, convert a quantized model to f16 format:
+
 ```
---dequantize_gguf <gguf_filename # all other options as described elsewhere, works for generate and export, for all backends, and be used with --quantize
+${GGUF}/quantize --allow-requantize your_quantized_model.gguf fake_unquantized_model.gguf f16
 ```
 
 # Standalone Execution
@@ -586,10 +648,10 @@ Detailed step by step in conjunction with ET iOS build, to run on simulator for 
 
 # Supported Systems
 
-PyTorch and the mobile Executorch backend support a broad range of devices for running PyTorch with Python (using either eager or eager + `torch.compile`) or using a Python-free environment with AOT Inductor, as well as runtimes for executing exported models.
+PyTorch and ExecuTorch support a broad range of devices for running PyTorch with python (using either eager or eager + `torch.compile`) or in a python-free environment with AOT Inductor and ExecuTorch.
 
 
-| Hardware | OS | eager | eager + compile | AOT compile | ET Runtime |
+| Hardware | OS | Eager | Eager + Compile | AOT Compile | ET Runtime |
 |-----|------|-----|-----|-----|-----|
 | x86 | Linux | ✅ |  ✅ |  ✅ |  ✅ |
 | x86 | macOS | ? | ? | ? | ? |
@@ -675,7 +737,7 @@ For convenience, we provide a script that does this for you.
 
 From the torchat root directory, run the following
 ```
-export LLAMA_FAST_ROOT=${PWD}
+export TORCHAT_ROOT=${PWD}
 ./scripts/install_et.sh
 ```
 
@@ -684,7 +746,7 @@ This will create a build directory, git clone ExecuTorch to ./build/src, applies
 After ExecuTorch is installed, you can build runner-et from the torchat root directory with the following
 
 ```
-export LLAMA_FAST_ROOT=${PWD}
+export TORCHAT_ROOT=${PWD}
 cmake -S ./runner-et -B build/cmake-out -G Ninja
 cmake --build ./build/cmake-out
 ```
@@ -695,27 +757,33 @@ The built executable is located at ./build/cmake-out/runner-et.
 
 for mobile and runner, if we can get a C/C++ tokenizer
 
+&nbsp;
 
-### Raspberry Pi 5 instructions
+---
 
-Expanded version of digant's note.
+&nbsp;
 
-# Acknowledgements
+## Acknowledgements
 
-A big thank you to
-
-* Georgi Gerganov and his [GGML](https://github.com/ggerganov/ggml) project that helped shine a spotlight
-on community-based enablement, and inspired so many other projects.
-
-* Andrej Karpathy and his [llama2.c](https://github.com/karpathy/llama2.c) project.  So many great (and simple!) ideas in llama2.c that we
-have directly adopted (both ideas and code) from his repo.  You can never go wrong by following Andrej's work!
-
-* my colleague and friend Bert Maher and [llama2.so](https://github.com/bertmaher/llama2.so) who build on Andrej's llama2.c and closed the
-loop on llama models.  The llama2.c integration with AOT Inductor comes from Bert's repo.
-
-* my colleagues and friends Christian Puhrsch, Horace He, Joe Isaacson, and many more for their many contributions in Accelerating GenAI models in
-the *"Anything, Fast!"* blog series, and in particular Horace He for [GPT, Fast!](https://github.com/pytorch-labs/gpt-fast) that we have
+* Georgi Gerganov and his [GGML](https://github.com/ggerganov/ggml) project shining a spotlight on community-based enablement and inspiring so many other projects.
+* Andrej Karpathy and his [llama2.c](https://github.com/karpathy/llama2.c) project.  So many great (and simple!) ideas in llama2.c that we have directly adopted (both ideas and code) from his repo.  You can never go wrong by following Andrej's work.
+* Bert Maher and his [llama2.so](https://github.com/bertmaher/llama2.so), which built on Andrej's llama2.c and closed the
+loop on Llama models with AOTInductor.
+* Christian Puhrsch, Horace He, Joe Isaacson and many more for their many contributions in Accelerating GenAI models in
+the *"Anything, Fast!"* pytorch.org blogs, and, in particular, Horace He for [GPT, Fast!](https://github.com/pytorch-labs/gpt-fast), which we have
 directly adopted (both ideas and code) from his repo.
+* Bert Maher, Scott Wolchok, Bin Bao, Chen Yang, Huamin Li and Mu-Chu Li for great collaborations
+in building AOTInductor for CPU including for [nanoGPT](https://github.com/karpathy/nanoGPT).
 
-* my colleagues and friends Bert Maher, Scott Wolchok, Bin Bao, Chen Yang, Huamin Li and Mu-Chu Li for a great collaboration
-in building AOT Inductor for CPU, internal use cases and an experimental AOTI-compiled inference version of [nanoGPT](https://github.com/karpathy/nanoGPT).
+&nbsp;
+
+## Contributing
+
+We welcome any feature requests, bug reports, or pull requests from the community. See the [CONTRIBUTING](CONTRIBUTING.md) file for how to help out.
+
+&nbsp;
+
+## License
+
+Torchat is released under the [BSD 3 license](./LICENSE). However you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models.
+

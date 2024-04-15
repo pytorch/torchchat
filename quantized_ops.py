@@ -27,7 +27,7 @@ def embedding_int8(
 ) -> torch.Tensor:
     indices = input
     # embedding_byte_weight_checks(weight, weight_scales, weight_zero_points)
-    group_size = weight.size(1) // (
+    groupsize = weight.size(1) // (
         scales.size(1) if scales.dim() == 2 else 1
     )
     # ET definition
@@ -40,7 +40,7 @@ def embedding_int8(
             weight_quant_min,
             weight_quant_max,
             weight.dtype,
-            group_size,
+            groupsize,
             weight_scales.dtype,
         )
         return torch.ops.aten.embedding.default(weight, indices)
@@ -132,13 +132,13 @@ def linear_int4(
 
 torchat_lib.define(
     "linear_a8w4dq(Tensor input, Tensor weight, Tensor scales, "
-    "Tensor zeros, int out_features, int group_size, "
+    "Tensor zeros, int out_features, int groupsize, "
     "dtype precision) -> Tensor",
 )
 
 @impl(torchat_lib, "linear_a8w4dq", "CompositeExplicitAutograd")
 def linear_a8w4dq(
-    input, weight, scales, zeros, out_features, group_size, precision
+    input, weight, scales, zeros, out_features, groupsize, precision
 ):
     x = per_token_dynamic_quant(input)
     weight_int8 = weight
@@ -158,7 +158,7 @@ def linear_a8w4dq(
         quant_min,
         quant_max,
         torch.int8,
-        group_size,
+        groupsize,
         precision,
     )
 

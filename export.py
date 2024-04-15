@@ -19,13 +19,14 @@ try:
     executorch_export_available = True
     from export_et import export_model as export_model_et
 except Exception as e:
-    print("ET EXPORT EXCEPTION: ", e) # TODO: remove
+    executorch_exception = f"ET EXPORT EXCEPTION: {e}"
     executorch_export_available = False
 
 from export_aoti import export_model as export_model_aoti
 
-from model import Transformer
-from generate import _load_model, decode_one_token
+from build.model import Transformer
+from build.builder import _initialize_model, BuilderArgs, TokenizerArgs
+from generate import decode_one_token
 from quantize import quantize_model, name_to_dtype
 from torch._export import capture_pre_autograd_graph
 
@@ -41,59 +42,22 @@ def device_sync(device):
         print(f"device={device} is not yet suppported")
 
 
-class model_wrapper(nn.Module):
-    def __init__(self, model, device):
-        super().__init__()
-
-        max_seq_length = 350
-        with torch.device(device):
-            model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
-
-        self.model = model
-        # init model here if necessary
-
-    def forward(self, idx, input_pos):
-        # input_pos: [B, 1]
-        # assert failed on symbolic shape during aot_compile?!
-        # but not for ET?
-        # assert input_pos.shape[-1] == 1
-        logits = self.model(idx, input_pos)
-        return logits  # sample(logits, **sampling_kwargs)
-
 
 def main(args):
-    checkpoint_path = args.checkpoint_path
-    device = args.device
+    builder_args = BuilderArgs.from_args(args)
+    tokenizer_args = TokenizerArgs.from_args(args)
     quantize = args.quantize
 
-    assert checkpoint_path.is_file(), checkpoint_path
+    print(f"Using device={builder_args.device}")
+    set_precision(builder_args.precision)
 
-    print(f"Using device={device}")
-    precision = name_to_dtype(args.dtype)  # torch.float  # bfloat16
-    set_precision(precision)
-    
-    print("Loading model ...")
-    t0 = time.time()
-    model = _load_model(
-        checkpoint_path,
-        args.checkpoint_dir,
-        args.params_path,
-        args.params_table,
-        device=device,
-        precision=precision,
-        use_tp=False
+    builder_args.dso_path = None
+    builder_args.pte_path = None
+    builder_args.setup_caches = True
+    model = _initialize_model(
+        builder_args,
+        quantize,
     )
-
-    device_sync(device=device)  # MKG
-    print(f"Time to load model: {time.time() - t0:.02f} seconds")
-
-    quantize_model(model, args.quantize)
-
-    # dtype:
-    if args.dtype:
-        model.to(dtype=name_to_dtype(args.dtype))
-
-    model = model_wrapper(model, device=device)
 
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
@@ -104,13 +68,14 @@ def main(args):
             print(f">{output_pte_path}<")
             if executorch_export_available:
                 print(f"Exporting model using Executorch to {output_pte_path}")
-                export_model_et(model, device, args.output_pte_path, args)
+                export_model_et(model, builder_args.device, args.output_pte_path, args)
             else:
                 print(f"Export with executorch requested but Executorch could not be loaded")
+                print(executorch_exception)
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
             print(f"Exporting model using AOT Inductor to {output_dso_path}")
-            export_model_aoti(model, device, output_dso_path, args)
+            export_model_aoti(model, builder_args.device, output_dso_path, args)
 
 
 def cli():
