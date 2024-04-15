@@ -465,11 +465,12 @@ class WeightOnlyInt8Linear(torch.nn.Module):
         self.register_buffer(
             "weight", torch.empty((out_features, in_features), dtype=torch.int8)
         )
-        if groupsize is None or (groupsize == 0):
-            self.register_buffer("scales", torch.ones(out_features, dtype=torch.bfloat16))
+        dtype=get_precision()
+        if group_size is None or (group_size == 0):
+            self.register_buffer("scales", torch.ones(out_features, dtype=dtype))
         else:
-            groups = (in_features + groupsize - 1) // groupsize
-            self.register_buffer("scales", torch.ones(out_features, groups, dtype=torch.bfloat16))
+            groups = (in_features + group_size - 1) // group_size
+            self.register_buffer("scales", torch.ones(out_features, groups, dtype=dtype))
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         scales = self.scales
@@ -683,12 +684,21 @@ def _int4_calc_padded_size(k, groupsize=1, innner_k_tiles=1):
 def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, groupsize):
     origin_x_size = x.size()
     x = x.reshape(-1, origin_x_size[-1])
-    c = torch.ops.aten._weight_int4pack_mm(
-        x.to(dtype=torch.bfloat16),
-        weight_int4pack,
-        groupsize,
-        scales_and_zeros.to(dtype=torch.bfloat16)
-    ).to(dtype=x.dtype)
+    if x.dtype == torch.float:
+        # work around missing int4pack_mm for torch.float
+        c = torch.ops.aten._weight_int4pack_mm(
+            x.to(torch.float16),
+            weight_int4pack,
+            groupsize,
+            scales_and_zeros.to(torch.float16),
+        ).to(torch.float)
+    else:
+        c = torch.ops.aten._weight_int4pack_mm(
+            x,
+            weight_int4pack,
+            groupsize,
+            scales_and_zeros,
+        )
     new_shape = origin_x_size[:-1] + (out_features,)
     c = c.reshape(new_shape)
     return c
