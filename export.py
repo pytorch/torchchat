@@ -24,8 +24,8 @@ except Exception as e:
 
 from export_aoti import export_model as export_model_aoti
 
-from model import Transformer
-from builder import _initialize_model, BuilderArgs, TokenizerArgs
+from build.model import Transformer
+from build.builder import _initialize_model, BuilderArgs, TokenizerArgs
 from generate import decode_one_token
 from quantize import quantize_model, name_to_dtype
 from torch._export import capture_pre_autograd_graph

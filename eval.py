@@ -21,9 +21,7 @@ torch._dynamo.config.cache_size_limit = 100000
 from cli import cli_args
 from quantize import name_to_dtype, set_precision
 
-from sentencepiece import SentencePieceProcessor
-
-from model import Transformer
+from build.model import Transformer
 
 try:
     import lm_eval
@@ -31,7 +29,7 @@ try:
 except:
     lm_eval_available = False
 
-from builder import _initialize_model, _initialize_tokenizer, BuilderArgs, TokenizerArgs
+from build.builder import _initialize_model, _initialize_tokenizer, BuilderArgs, TokenizerArgs
 from generate import encode_tokens, model_forward
 
 if lm_eval_available:
@@ -200,7 +198,7 @@ def eval(
     return eval_results
 
 
-def eval_main(args) -> None:
+def main(args) -> None:
     """Evaluates model on a task from the `lm-evaluation-harness` library.
 
     Args:
@@ -234,7 +232,7 @@ def eval_main(args) -> None:
     print(f"Using device={device}")
     set_precision(buildeer_args.precision)
 
-    tokenizer = SentencePieceProcessor(model_file=str(tokenizer_path))
+    tokenizer = _initialize_tokenizer(tokenizer_args)
     builder_args.setup_caches = False
     model = _initialize_model(
         buildeer_args,
