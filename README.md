@@ -56,8 +56,8 @@ mistralai/Mistral-7B-Instruct-v0.2 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 Currently `torchat` must be built via cloning the repository and installing as follows:
 
 ```
-git clone https://github.com/pytorch/torchat.git
-cd torchat
+git clone https://github.com/pytorch/torchchat.git
+cd torchchat
 pip install -r requirements.txt
 ```
 
