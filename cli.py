@@ -87,7 +87,7 @@ def cli_args():
     parser.add_argument(
         "--num-samples",
         type=int,
-        default=5,
+        default=1,
         help="Number of samples.")
     parser.add_argument(
         "--max-new-tokens",

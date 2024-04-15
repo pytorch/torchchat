@@ -642,13 +642,14 @@ class QuantizedGroupEmbedding(torch.nn.Module):
         # result_scales = self.scales.index_select(0, indices.view(-1))
 
         if self.packed:
-            weight_even = self.weight.div(16)
+            weight_even = self.weight.div(16, rounding_mode='trunc')
             weight_odd = self.weight.remainder(16)
             weight_unpacked = torch.stack((weight_even, weight_odd), dim=-1)
             weight = weight_unpacked.view(self.weight.shape[0], -1)
+            weight = weight.view(torch.int8).add(-8)
         else:    
             weight = self.weight
-
+        
         scales = self.scales.view(weight.shape[0], -1)
         
         result_weights = F.embedding(indices, weight)
