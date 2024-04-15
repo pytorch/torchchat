@@ -466,7 +466,6 @@ class WeightOnlyInt8Linear(torch.nn.Module):
         out_features: int,
         groupsize: Optional[int] = None,
         bias: bool = True,
-        device=None,
         dtype=None,
     ) -> None:
         super().__init__()
