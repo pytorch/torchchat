@@ -40,7 +40,7 @@ def name_to_dtype(name):
         return name_to_dtype_dict[name]
     else:
         raise RuntimeError(f"unsupported dtype name {name} specified")
-    
+
 name_to_dtype_dict = {
     "fp32" : torch.float,
     "fp16" : torch.float16,
@@ -69,7 +69,7 @@ def quantize_model(model: nn.Module, quantize_options):
     linears_quantized = False
     if isinstance(quantize_options, str):
         quantize_options = json.loads(quantize_options)
-        
+
     for quantizer, q_kwargs in quantize_options.items():
         if quantizer == "embedding":
             model = EmbeddingOnlyInt8QuantHandler(
@@ -112,8 +112,8 @@ def quantize_model(model: nn.Module, quantize_options):
             model.to(**q_kwargs)
         else:
             assert 0 == 1, f"quantizer {quantizer} not supported"
-            
-    
+
+
 #########################################################################
 #####                     Quantization Primitives                  ######
 
@@ -331,7 +331,7 @@ class QuantHandler:
 
     def convert_for_runtime(self) -> nn.Module:
         pass
-    
+
     def quantized_model(self) -> nn.Module:
         model_updated_state_dict = self.create_quantized_state_dict()
         self.convert_for_runtime()
@@ -346,7 +346,7 @@ class QuantHandler:
 def replace_linear_weight_only_int8_per_channel(module, node_type, groupsize=None):
     if groupsize is not None and groupsize != 0:
         pass # groupsize = 2 ** groupsize
-        
+
     for name, child in module.named_children():
         # print(f"name: {name}")
         if isinstance(child, nn.Linear):
@@ -460,7 +460,7 @@ class WeightOnlyInt8Linear(torch.nn.Module):
     ) -> None:
         super().__init__()
         print(f"group size: {groupsize}")
-        
+
         self.in_features = in_features
         self.out_features = out_features
         self.register_buffer(
@@ -528,7 +528,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
         if (bitwidth != 4) and packed:
             raise RuntimeError("pack only works with bitsize 4")
 
-        
+
     @torch.no_grad()
     def create_quantized_state_dict(self, packed=False) -> Dict:
         cur_state_dict = self.mod.state_dict()
@@ -562,7 +562,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
                     self.groupsize,
                     scales_dtype=mod.weight.dtype,
                 )
-                
+
                 if packed:
                     if weight.shape[-1] %2 != 0:
                         raise RUntimeError("automatic padding not implemented yet")
@@ -577,7 +577,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
                     weight_odd = weight_view[:,:,1]
                     weight_packed = weight_even + weight_odd
                     weight = weight_packed
-                    
+
                 # Update state dict
                 cur_state_dict[f"{fqn}.weight"] = weight
                 # squeeze makes groupsize=rowsize unidimensional
@@ -621,7 +621,7 @@ class QuantizedGroupEmbedding(torch.nn.Module):
         else: # packed
             self.register_buffer(
                 "weight", torch.empty((vocab_size, embedding_dim//2), dtype=torch.uint8)
-            )            
+            )
         groups_per_row = (embedding_dim + groupsize - 1) // groupsize
         if groups_per_row > 1:
             self.register_buffer(
@@ -639,7 +639,7 @@ class QuantizedGroupEmbedding(torch.nn.Module):
                 self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
             )
 
-        
+
         # result_weights = self.weight.index_select(0, indices.view(-1))
         # result_scales = self.scales.index_select(0, indices.view(-1))
 
@@ -649,11 +649,11 @@ class QuantizedGroupEmbedding(torch.nn.Module):
             weight_unpacked = torch.stack((weight_even, weight_odd), dim=-1)
             weight = weight_unpacked.view(self.weight.shape[0], -1)
             weight = weight.view(torch.int8).add(-8)
-        else:    
+        else:
             weight = self.weight
-        
+
         scales = self.scales.view(weight.shape[0], -1)
-        
+
         result_weights = F.embedding(indices, weight)
         result_scales = F.embedding(indices, scales)
 
@@ -664,10 +664,10 @@ class QuantizedGroupEmbedding(torch.nn.Module):
 
         r = rw_view * rs_view
         return r.view(indices.size() + (-1,))
-        
+
         # r = result_weights.to(dtype=result_scales.dtype).view(list(result_weights.shape[:-1] + (scales.shape[1], -1, )) * result_scales.view(scales.shape[-1] + (scales.shape[1], 1, ))
 
-        
+
 #########################################################################
 #####     weight only int4 per channel groupwise quantized code    ######
 
@@ -685,21 +685,12 @@ def _int4_calc_padded_size(k, groupsize=1, innner_k_tiles=1):
 def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, groupsize):
     origin_x_size = x.size()
     x = x.reshape(-1, origin_x_size[-1])
-    if x.dtype == torch.float:
-        # work around missing int4pack_mm for torch.float
-        c = torch.ops.aten._weight_int4pack_mm(
-            x.to(torch.float16),
-            weight_int4pack,
-            groupsize,
-            scales_and_zeros.to(torch.float16),
-        ).to(torch.float)
-    else:
-        c = torch.ops.aten._weight_int4pack_mm(
-            x,
-            weight_int4pack,
-            groupsize,
-            scales_and_zeros,
-        )
+    c = torch.ops.aten._weight_int4pack_mm(
+        x.to(torch.bfloat16), # TODO: should probably make a warning if x is not already bfloat16
+        weight_int4pack,
+        groupsize,
+        scales_and_zeros.to(torch.bfloat16), # TODO: should probably make a warning if not already bfloat16
+    ).to(x.dtype) # cast back to x.dtype
     new_shape = origin_x_size[:-1] + (out_features,)
     c = c.reshape(new_shape)
     return c
@@ -1260,7 +1251,7 @@ class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
         self.convert_for_runtime()
         self.mod.load_state_dict(model_updated_state_dict)
         return self.mod
-    
+
 
 
 # class Int8DynActInt4WeightGPTQQuantHandler(GPTQQuantHandler):
@@ -1345,7 +1336,7 @@ class WeightOnlyInt4HqqQuantHandler:
     def create_quantized_state_dict(self):
         from hqq.core.quantize import Quantizer  # TODO maybe torchao
 
-        
+
         for m in self.mod.modules():
             for name, child in m.named_children():
                 if isinstance(child, torch.nn.Linear):
@@ -1373,7 +1364,7 @@ class WeightOnlyInt4HqqQuantHandler:
         return WeightOnlyInt4GPTQQuantHandler(
             self.mod, bitwidth=4, groupsize=self.groupsize
         ).convert_for_runtime()
-    
+
     def quantized_model(self) -> nn.Module:
         model_updated_state_dict = self.create_quantized_state_dict()
         self.convert_for_runtime()
@@ -1382,4 +1373,3 @@ class WeightOnlyInt4HqqQuantHandler:
 
 
 ##################################################################
-
