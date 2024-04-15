@@ -12,8 +12,9 @@ from typing import Optional
 import torch
 
 # support running without installing as a package
-wd = Path(__file__).parent.parent.resolve()
-sys.path.append(str(wd))
+wd = Path(__file__).parent.parent
+sys.path.append(str(wd.resolve()))
+sys.path.append(str((wd / "build").resolve()))
 
 from model import ModelArgs
 
