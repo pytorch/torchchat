@@ -3,6 +3,7 @@
 
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+import json
 from dataclasses import dataclass
 from typing import Dict, Optional
 
@@ -33,8 +34,8 @@ class ModelArgs:
     head_dim: int = 64
     rope_base: float = 10000
     norm_eps: float = 1e-5
-    multiple_of = 256
-    ffn_dim_multiplier = None
+    multiple_of: int = 256
+    ffn_dim_multiplier: Optional[int] = None
 
     def __post_init__(self):
         if self.n_local_heads == -1:
