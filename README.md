@@ -342,15 +342,15 @@ quantization, where each value is represented by an 8 bit integer, and
 a floating point scale per group.
 
 We can do this in eager mode (optionally with torch.compile), we use the `embedding` quantizer with
-group_size set to 0 which uses channelwise quantization:
+groupsize set to 0 which uses channelwise quantization:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --device cpu
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
 ```
 
 Then, export as follows:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -363,12 +363,12 @@ python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --prompt "Hell
 We can do this in eager mode (optionally with `torch.compile`), we use the `embedding` quantizer by specifying the group size:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --device cpu
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
 ```
 
 Then, export as follows:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -387,15 +387,15 @@ quantization, where each value is represented by an 8 bit integer, and
 a floating point scale per group.
 
 We can do this in eager mode (optionally with torch.compile), we use the `linear:int8` quantizer with
-group_size set to 0 which uses channelwise quantization:
+groupsize set to 0 which uses channelwise quantization:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --device cpu
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
 ```
 
 Then, export as follows using Executorch for mobile backends:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -405,7 +405,7 @@ python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --checkpoint-p
 
 Or, export as follows for server/desktop deployments:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.so
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.so
 ```
 
 Now you can run your model with the same command as before:
@@ -418,12 +418,12 @@ python generate.py --dso-path ${MODEL_OUT}/${MODEL_NAME}_int8.so --checkpoint-pa
 We can do this in eager mode (optionally with `torch.compile`), we use the `linear:int8` quantizer by specifying the group size:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --device cpu
+python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
 ```
 
 Then, export as follows using Executorch:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "group_size": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
@@ -433,7 +433,7 @@ python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte --checkp
 
 Or, export as follows for :
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "group_size": 0} }' --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.so
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.so
 ```
 
 Now you can run your model with the same command as before:
@@ -450,7 +450,7 @@ operator.
 To compress your model even more, 4-bit integer quantization may be used.  To achieve good accuracy, we recommend the use
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int4': {'group_size' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int4': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]
 ```
 
 Now you can run your model with the same command as before:
@@ -463,7 +463,7 @@ To compress your model even more, 4-bit integer quantization may be used.  To ac
 of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  We also quantize activations to 8-bit, giving
 this scheme its name (8da4w = 8b dynamically quantized activations with 4b weights), and boost performance.
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'group_size' : 7} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso... ]
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:8da4w': {'groupsize' : 7} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso... ]
 ```
 
 Now you can run your model with the same command as before:
@@ -474,7 +474,7 @@ python generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso...
 #### Quantization with GPTQ (gptq)
 
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:gptq': {'group_size' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ] # may require additional options, check with AO team 
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:gptq': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ] # may require additional options, check with AO team 
 ```
 
 Now you can run your model with the same command as before:

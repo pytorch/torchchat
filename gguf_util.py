@@ -30,7 +30,7 @@ class F32:
         return torch.from_numpy(new_tensor).to(torch.float32)
 
 class Q4_0:
-    group_size = 32
+    groupsize = 32
     n_bit = 4
 
     @staticmethod
@@ -102,7 +102,7 @@ class Q4_0:
 
 
 class Q6_K:
-    group_size = 16
+    groupsize = 16
     n_bit = 6
 
     @staticmethod
