@@ -254,13 +254,13 @@ def main(args) -> None:
         max_seq_length,
     )
     print(f"Time to run eval: {time.time() - t1:.02f} seconds.")
-    if dso_path:
+    if builder_args.dso_path:
         print(f"For model {builder_args.dso_path}")
-    elif pte_path:
+    elif builder_args.pte_path:
         print(f"For model {builder_args.pte_path}")
-    elif checkpoint_path:
+    elif builder_args.checkpoint_path:
         print(f"For model {builder_args.checkpoint_path}")
-    elif checkpoint_dir:
+    elif builder_args.checkpoint_dir:
         print(f"For model {builder_args.checkpoint_dir}")
     else:
         raise RuntimeError("Well That's Fine. How did we get here")
@@ -271,7 +271,7 @@ def main(args) -> None:
 if __name__ == '__main__':
     def cli():
         args = cli_args()
-        eval_main(args)
+        main(args)
 
 
 if __name__ == "__main__":

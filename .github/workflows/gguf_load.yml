@@ -41,7 +41,7 @@ jobs:
       - name: Load files
         run: |
           touch test.py
-          echo "from gguf_loader import load_llama_from_gguf_file" >> test.py
+          echo "from build.gguf_loader import load_llama_from_gguf_file" >> test.py
           echo "pt = load_llama_from_gguf_file(\"gguf_files/llama-2-7b.Q4_0.gguf\")" >> test.py
           cat test.py
           python test.py
