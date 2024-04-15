@@ -10,26 +10,29 @@ from pathlib import Path
 import torch
 import torch.nn as nn
 from torch.export import Dim, export
+from torch._export import capture_pre_autograd_graph
 
 from generate import decode_one_token
-from quantize import quantize_model
-from quantize import quantize_model, name_to_dtype, set_precision, get_precision
+from quantize import (
+    quantize_model, name_to_dtype, set_precision, get_precision,
+)
+from build.model import Transformer
+from build.model import Transformer
 
-from model import Transformer
-# from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
-#    XnnpackDynamicallyQuantizedPartitioner,
-#)
 from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
     XnnpackPartitioner,
 )
-from executorch_portable_utils import export_to_edge # TODO: change back to executorch.examples.portable.utils when executorch installs correctly
+# from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
+#    XnnpackDynamicallyQuantizedPartitioner,
+#)
+from executorch_portable_utils import export_to_edge
+# TODO: change back to executorch.examples.portable.utils
+# when executorch installs correctly
 
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
 from executorch.exir.passes.quant_fusion_pass import QuantFusionPass
 from executorch.exir.passes.sym_shape_eval_pass import ConstraintBasedSymShapeEvalPass
 
-from model import Transformer
-from torch._export import capture_pre_autograd_graph
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 

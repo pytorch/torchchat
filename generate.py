@@ -8,13 +8,14 @@ import sys
 import time
 from pathlib import Path
 from typing import Optional, Tuple
-from builder import _load_model, _initialize_model, _initialize_tokenizer, BuilderArgs, TokenizerArgs
 from dataclasses import dataclass
 
 import torch
 import torch._dynamo.config
 import torch._inductor.config
 
+from build.builder import _load_model, _initialize_model, _initialize_tokenizer, BuilderArgs, TokenizerArgs
+from builder.model import Transformer
 from quantize import quantize_model, name_to_dtype, set_precision, get_precision
 from cli import cli_args
 
@@ -64,10 +65,6 @@ torch._inductor.config.fx_graph_cache = True  # Experimental feature to reduce c
 # support running without installing as a package
 wd = Path(__file__).parent.parent.resolve()
 sys.path.append(str(wd))
-
-from sentencepiece import SentencePieceProcessor
-
-from model import Transformer
 
 
 def multinomial_sample_one_no_sync(

@@ -17,7 +17,7 @@ from torch.export import Dim, export
 from generate import decode_one_token
 from quantize import quantize_model
 
-from model import Transformer
+from build.model import Transformer
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
