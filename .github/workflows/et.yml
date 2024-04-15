@@ -86,35 +86,35 @@ jobs:
           echo "******************************************"
           echo "******* Emb: channel-wise quantized ******"
           echo "******************************************"
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
           cat ./output_et
 
           echo "******************************************"
           echo "******** Emb: group-wise quantized *******"
           echo "******************************************"
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
           cat ./output_et
 
           echo "******************************************"
           echo "******* INT8 channel-wise quantized ******"
           echo "******************************************"
-          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
           cat ./output_et
 
           echo "******************************************"
           echo "******** INT8 group-wise quantized *******"
           echo "******************************************"
-          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "group_size": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
           cat ./output_et
 
           echo "******************************************"
           echo "******** INT4 group-wise quantized *******"
           echo "******************************************"
-          python export.py --quant '{"linear:int4" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python export.py --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
           cat ./output_et
 
