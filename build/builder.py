@@ -216,7 +216,7 @@ def _load_model_not_gguf(builder_args):
     if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
         checkpoint = checkpoint["model"]
 
-    model.load_state_dict(checkpoint, assign=True)
+    model.load_state_dict(checkpoint, assign=True, strict=False)
 
     if builder_args.use_tp:
         from tp import apply_tp
