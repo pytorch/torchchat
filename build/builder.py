@@ -207,7 +207,7 @@ def _load_model_not_gguf(builder_args):
                 checkpoint[key] = cps[0][key]
     else:
         checkpoint = torch.load(
-            builder_args.checkpoint_path,
+            str(builder_args.checkpoint_path),
             map_location=builder_args.device,
             mmap=True,
             weights_only=True,
