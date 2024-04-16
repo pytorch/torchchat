@@ -4,12 +4,11 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-import os
-import time
+import json
 from pathlib import Path
 
 import torch
-import torch.nn as nn
+
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -41,11 +40,19 @@ def check_args(args, command_name: str):
                 print(f"Warning: {text}")
 
 
-def cli_args():
-    import argparse
+def add_arguments_for_generate(parser):
+    _add_arguments_common(parser)
 
-    parser = argparse.ArgumentParser(description="Your CLI description.")
 
+def add_arguments_for_eval(parser):
+    _add_arguments_common(parser)
+
+
+def add_arguments_for_export(parser):
+    _add_arguments_common(parser)
+
+
+def _add_arguments_common(parser):
     parser.add_argument(
         "--seed",
         type=int,
@@ -59,21 +66,6 @@ def cli_args():
         "--tiktoken",
         action="store_true",
         help="Whether to use tiktoken tokenizer.",
-    )
-    parser.add_argument(
-        "--export",
-        action="store_true",
-        help="Use torchchat to export a model.",
-    )
-    parser.add_argument(
-        "--eval",
-        action="store_true",
-        help="Use torchchat to eval a model.",
-    )
-    parser.add_argument(
-        "--generate",
-        action="store_true",
-        help="Use torchchat to generate a sequence using a model.",
     )
     parser.add_argument(
         "--chat",
@@ -162,10 +154,10 @@ def cli_args():
     parser.add_argument(
         "--quantize", type=str, default="{ }", help="Quantization options."
     )
+    parser.add_argument("--params-table", type=str, default=None, help="Device to use")
     parser.add_argument(
         "--device", type=str, default=default_device, help="Device to use"
     )
-    parser.add_argument("--params-table", type=str, default=None, help="Device to use")
     parser.add_argument(
         "--tasks",
         nargs="+",
@@ -183,7 +175,8 @@ def cli_args():
         help="maximum length sequence to evaluate",
     )
 
-    args = parser.parse_args()
+
+def arg_init(args):
 
     if Path(args.quantize).is_file():
         with open(args.quantize, "r") as f:
@@ -191,5 +184,4 @@ def cli_args():
 
     if args.seed:
         torch.manual_seed(args.seed)
-
     return args

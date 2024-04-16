@@ -3,14 +3,26 @@
 
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
-import sys
+import argparse
 import time
-from pathlib import Path
 from typing import Optional
 
 import torch
 import torch._dynamo.config
 import torch._inductor.config
+
+from build.builder import (
+    _initialize_model,
+    _initialize_tokenizer,
+    BuilderArgs,
+    TokenizerArgs,
+)
+
+from build.model import Transformer
+from cli import add_arguments_for_eval, arg_init
+from generate import encode_tokens, model_forward
+
+from quantize import set_precision
 
 torch._dynamo.config.automatic_dynamic_shapes = True
 torch._inductor.config.triton.unique_kernel_names = True
@@ -18,9 +30,6 @@ torch._inductor.config.epilogue_fusion = False
 torch._inductor.config.triton.cudagraphs = True
 torch._dynamo.config.cache_size_limit = 100000
 
-from build.model import Transformer
-from cli import cli_args
-from quantize import name_to_dtype, set_precision
 
 try:
     import lm_eval
@@ -29,13 +38,6 @@ try:
 except:
     lm_eval_available = False
 
-from build.builder import (
-    _initialize_model,
-    _initialize_tokenizer,
-    BuilderArgs,
-    TokenizerArgs,
-)
-from generate import encode_tokens, model_forward
 
 if lm_eval_available:
     try:  # lm_eval version 0.4
@@ -218,30 +220,19 @@ def main(args) -> None:
 
     builder_args = BuilderArgs.from_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
-
-    checkpoint_path = args.checkpoint_path
-    checkpoint_dir = args.checkpoint_dir
-    params_path = args.params_path
-    params_table = args.params_table
-    gguf_path = args.gguf_path
-    tokenizer_path = args.tokenizer_path
-    dso_path = args.dso_path
-    pte_path = args.pte_path
     quantize = args.quantize
     device = args.device
-    model_dtype = args.dtype
     tasks = args.tasks
     limit = args.limit
     max_seq_length = args.max_seq_length
-    use_tiktoken = args.tiktoken
 
     print(f"Using device={device}")
-    set_precision(buildeer_args.precision)
+    set_precision(builder_args.precision)
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
     builder_args.setup_caches = False
     model = _initialize_model(
-        buildeer_args,
+        builder_args,
         quantize,
     )
 
@@ -280,11 +271,8 @@ def main(args) -> None:
 
 
 if __name__ == "__main__":
-
-    def cli():
-        args = cli_args()
-        main(args)
-
-
-if __name__ == "__main__":
-    cli()
+    parser = argparse.ArgumentParser(description="Export specific CLI.")
+    add_arguments_for_eval(parser)
+    args = parser.parse_args()
+    args = arg_init(args)
+    main(args)

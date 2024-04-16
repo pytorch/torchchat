@@ -3,6 +3,7 @@
 
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+import argparse
 import itertools
 import os
 import sys
@@ -23,8 +24,8 @@ from build.builder import (
     TokenizerArgs,
 )
 from build.model import Transformer
-from cli import cli_args
-from quantize import get_precision, name_to_dtype, quantize_model, set_precision
+from cli import add_arguments_for_generate, arg_init, check_args
+from quantize import set_precision
 
 
 @dataclass
@@ -137,7 +138,7 @@ def decode_n_tokens(
     **sampling_kwargs,
 ):
     new_tokens, new_probs = [], []
-    for i in range(num_new_tokens):
+    for _ in range(num_new_tokens):
         with torch.backends.cuda.sdp_kernel(
             enable_flash=False, enable_mem_efficient=False, enable_math=True
         ):  # Actually better for Inductor to codegen attention here
@@ -356,8 +357,6 @@ def _main(
     # will add a version of _initialize_model in future
     # (need additional args)
     if is_speculative:
-        from builder import _load_model
-
         speculative_builder_args = builder_args
 
         draft_model = _load_model(
@@ -496,8 +495,6 @@ def main(args):
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
-    generator_args = GeneratorArgs.from_args(args)
-
     _main(
         builder_args,
         speculative_builder_args,
@@ -516,10 +513,10 @@ def main(args):
     )
 
 
-def cli():
-    args = cli_args()
-    main(args)
-
-
 if __name__ == "__main__":
-    cli()
+    parser = argparse.ArgumentParser(description="Generate specific CLI.")
+    add_arguments_for_generate(parser)
+    args = parser.parse_args()
+    check_args(args, "generate")
+    args = arg_init(args)
+    main(args)
