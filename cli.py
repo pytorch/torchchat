@@ -63,27 +63,27 @@ def cli_args():
     parser.add_argument(
         "--export",
         action="store_true",
-        help="Use torchat to export a model.",
+        help="Use torchchat to export a model.",
     )
     parser.add_argument(
         "--eval",
         action="store_true",
-        help="Use torchat to eval a model.",
+        help="Use torchchat to eval a model.",
     )
     parser.add_argument(
         "--generate",
         action="store_true",
-        help="Use torchat to generate a sequence using a model.",
+        help="Use torchchat to generate a sequence using a model.",
     )
     parser.add_argument(
         "--chat",
         action="store_true",
-        help="Use torchat to for an interactive chat session.",
+        help="Use torchchat to for an interactive chat session.",
     )
     parser.add_argument(
         "--gui",
         action="store_true",
-        help="Use torchat to for an interactive gui-chat session.",
+        help="Use torchchat to for an interactive gui-chat session.",
     )
     parser.add_argument("--num-samples", type=int, default=1, help="Number of samples.")
     parser.add_argument(

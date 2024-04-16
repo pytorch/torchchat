@@ -1,10 +1,10 @@
 # Torchat is still in pre-release!
 
 
-Torchat is currently in a pre-release state and under extensive development.
+Torchchat is currently in a pre-release state and under extensive development.
 
 
-# Torchat
+# Torchchat
 
 [**Introduction**](#introduction) | [**Installation**](#installation) | [**Get Started**](#get-started) | [**Download**](#download) | [**Chat**](#chat) | [**Generate**](#generate) | [**Eval**](#eval) | [**Export**](#export) | [**Supported Systems**](#supported-systems) | [**Contributing**](#contributing) | [**License**](#license)
 
@@ -12,7 +12,7 @@ Torchat is currently in a pre-release state and under extensive development.
 
 ## Introduction
 
-Torchat (pronounced “torch chat” and also a play on torch @ [laptop, desktop, mobile]) is a tool and library to easily run LLMs on laptops, desktops, and mobile devices using pure [PyTorch](https://github.com/pytorch/pytorch) and [ExecuTorch](https://github.com/pytorch/executorch). See below for a [full list of supported devices](#supported-systems).
+Torchchat (pronounced “torch chat” and also a play on torch @ [laptop, desktop, mobile]) is a tool and library to easily run LLMs on laptops, desktops, and mobile devices using pure [PyTorch](https://github.com/pytorch/pytorch) and [ExecuTorch](https://github.com/pytorch/executorch). See below for a [full list of supported devices](#supported-systems).
 
 The library provides:
 
@@ -53,26 +53,26 @@ mistralai/Mistral-7B-Instruct-v0.2 | - | ✅ |  ✅ |  ✅ |  ✅ | ❹ |
 
 ## Installation
 
-Currently `torchat` must be built via cloning the repository and installing as follows:
+Currently `torchchat` must be built via cloning the repository and installing as follows:
 
 ```
-git clone https://github.com/pytorch/torchat.git
-cd torchat
+git clone https://github.com/pytorch/torchchat.git
+cd torchchat
 pip install -r requirements.txt
 ```
 
 To confirm that the package is installed correctly, you can run the following command:
 
 ```
-torchat --help
+torchchat --help
 ```
 
 And should see the following output:
 
 ```
-usage: torchat [-h] {chat,generate,eval,export} ...
+usage: torchchat [-h] {chat,generate,eval,export} ...
 
-Welcome to the torchat CLI!
+Welcome to the torchchat CLI!
 
 options:
   -h, --help            show this help message and exit
@@ -88,27 +88,27 @@ If you are planning on use mobile backends, [install ExecuTorch](https://pytorch
 
 ## Get Started
 
-Torchat lets you access LLMs through an interactive interface, prompted single-use generation, model export (for use by AOT Inductor and ExecuTorch), and standalone C++ runtimes.
+Torchchat lets you access LLMs through an interactive interface, prompted single-use generation, model export (for use by AOT Inductor and ExecuTorch), and standalone C++ runtimes.
 
-| Function | Torchat Command | Direct Command | Tested |
+| Function | Torchchat Command | Direct Command | Tested |
 |---|----|----|-----|
-Download model | `torchat --download` | n/a | 🚧 |
-Interactive chat | `torchat --chat`   | n/a | 🚧 |
-GUI-based chat | `torchat --gui`   | n/a | ⚠️ |
-Generate text | `torchat --generate` |`generate` | ✅ |
-Evaluate model | `torchat --eval` | `eval` | 🚧 |
-Export model  | `torchat --export` | `export` | ✅ |
-Exported model test (dso,pte) | `torchat --chat` | n/a  | 🚧 |
-exported model test (dso,pte) | `torchat --generate` |`generate` | ✅ |
-Evaluate exported model (dso,pte) | `torchat --eval` | `eval` | 🚧 |
+Download model | `torchchat --download` | n/a | 🚧 |
+Interactive chat | `torchchat --chat`   | n/a | 🚧 |
+GUI-based chat | `torchchat --gui`   | n/a | ⚠️ |
+Generate text | `torchchat --generate` |`generate` | ✅ |
+Evaluate model | `torchchat --eval` | `eval` | 🚧 |
+Export model  | `torchchat --export` | `export` | ✅ |
+Exported model test (dso,pte) | `torchchat --chat` | n/a  | 🚧 |
+exported model test (dso,pte) | `torchchat --generate` |`generate` | ✅ |
+Evaluate exported model (dso,pte) | `torchchat --eval` | `eval` | 🚧 |
 Server C++ runtime | n/a | run.cpp model.so | ✅ |
 Server C++ runtime | n/a | run.cpp model.pte | ✅ |
 Mobile C++ runtime | n/a | app model.pte | ✅ |
 Mobile C++ runtime | n/a | app + AOTI | 🚧 |
 
-Exported models can be loaded back into torchat for chat or text generation, letting you experiment with the exported model and valid model quality. The python interface is the same in all cases and is used for testing nad test harnesses too.
+Exported models can be loaded back into torchchat for chat or text generation, letting you experiment with the exported model and valid model quality. The python interface is the same in all cases and is used for testing nad test harnesses too.
 
-Torchat comes with server C++ runtimes to execute AOT Inductor and ExecuTorch models. Mobile C++ runtimes allow you to deploy ExecuTorch-compiled .pte files on iOS, Android and Raspberry Pi 5.
+Torchchat comes with server C++ runtimes to execute AOT Inductor and ExecuTorch models. Mobile C++ runtimes allow you to deploy ExecuTorch-compiled .pte files on iOS, Android and Raspberry Pi 5.
 
 ## Download
 
@@ -116,35 +116,35 @@ For Llama 2 and 3, follow the instructions on the official [`meta-llama`](https:
 
 ```
 huggingface-cli login
-torchat --download meta-llama/Llama-2-7b-hf --output-dir /tmp/Llama-2-7b-hf
+torchchat --download meta-llama/Llama-2-7b-hf --output-dir /tmp/Llama-2-7b-hf
 ```
 
-Note: While the ``torchat download`` command allows you to download *any* model from the hub, there's no guarantee that the model can be run with torchat. Currently supported models can be found [here](#introduction)
+Note: While the ``torchchat download`` command allows you to download *any* model from the hub, there's no guarantee that the model can be run with torchchat. Currently supported models can be found [here](#introduction)
 
 For stories15M, which we use in this quick start guide, run the following:
 
 ```
 huggingface-cli login
-torchat --download tinyllamas/stories15M --output-dir /tmp/stories15M
+torchchat --download tinyllamas/stories15M --output-dir /tmp/stories15M
 ```
 
-Some common models are recognized by torchat based on their filename through `Transformer.from_name()` to perform a fuzzy match against a table of known model architectures. Alternatively, you can specify the index into that table with the option `--params-table ${INDEX}` where the index is the dictionary key in the `transformer_configs`
-dictionary specified [here](https://github.com/pytorch/torchat/blob/main/model.py#L85).  For our example, with the stories15M model, this would be expressed as
+Some common models are recognized by torchchat based on their filename through `Transformer.from_name()` to perform a fuzzy match against a table of known model architectures. Alternatively, you can specify the index into that table with the option `--params-table ${INDEX}` where the index is the dictionary key in the `transformer_configs`   
+dictionary specified [here](https://github.com/pytorch/torchchat/blob/main/model.py#L85).  For our example, with the stories15M model, this would be expressed as
 `--params-table stories15M`. (We use the model constructor `Transformer.from_table()`)
 
 For models not specified not in the list of known configurations, you can construct the model by initializing the `ModelArgs` dataclass that controls model construction from a parameter json using the `params-path ${PARAMS_PATH}` containing the appropriate model parameters to initialize the ModelArgs for the model. (We use the model constructor `Transformer.from_params()`).
 
-The parameter file will should be in JSON format specifying thee parameters.  You can find the Model Args data class in [`model.py`](https://github.com/pytorch/torchat/blob/main/model.py#L22).
+The parameter file will should be in JSON format specifying thee parameters.  You can find the Model Args data class in [`model.py`](https://github.com/pytorch/torchchat/blob/main/model.py#L22).
 
-The final way to initialize a torchat model is from GGUF. You load a GGUF model with the option `--load-gguf ${MODELNAME}.gguf`. Presently, the F16, F32, Q4_0, and Q6_K formats are supported and converted into native torchat models.
+The final way to initialize a torchchat model is from GGUF. You load a GGUF model with the option `--load-gguf ${MODELNAME}.gguf`. Presently, the F16, F32, Q4_0, and Q6_K formats are supported and converted into native torchchat models.
 
-You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsouly quantized and thend equantized model.)
+You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsouly quantized and thend equantized model.) 
 
 | GGUF Model | Tested | Eager | torch.compile | AOT Inductor | ExecuTorch | Fits on Mobile |
 |-----|--------|-------|-----|-----|-----|-----|
 | llama-2-7b.Q4_0.gguf |  🚧 | 🚧 | 🚧 | 🚧 | 🚧 |
 
-You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsoul;y quantized and thend equantized model.)
+You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsoul;y quantized and thend equantized model.) 
 
 
 ## Chat
@@ -160,7 +160,7 @@ We use several variables in this example, which may be set as a preparatory step
   or any other directory you already use to store model information.
 
 * `MODEL_PATH` describes the location of the model. Throughput the description
-  herein, we will assume that MODEL_PATH starts with a subdirectory of the torchat repo
+  herein, we will assume that MODEL_PATH starts with a subdirectory of the torchchat repo
   named checkpoints, and that it will contain the actual model. In this case, the MODEL_PATH will thus
   be of the form ${MODEL_OUT}/model.{pt,pth}.  (Both the extensions `pt` and `pth`
   are used to describe checkpoints. In addition, model may be replaced with the name of the model.)
@@ -177,7 +177,7 @@ You can set these variables as follows for the exemplary model15M model from And
 MODEL_NAME=stories15M
 MODEL_DIR=checkpoints/${MODEL_NAME}
 MODEL_PATH=${MODEL_OUT}/stories15M.pt
-MODEL_OUT=~/torchat-exports
+MODEL_OUT=~/torchchat-exports
 ```
 
 When we export models with AOT Inductor for servers and desktops, and Executorch for mobile and edge devices,
@@ -218,7 +218,7 @@ Add option to load tiktoken tokenizer
 
 Model definition in model.py, generation code in generate.py. The
 model checkpoint may have extensions `pth` (checkpoint and model definition) or `pt` (model checkpoint).
-At present, we always use the torchat model for export and import the checkpoint into this model definition
+At present, we always use the torchchat model for export and import the checkpoint into this model definition
 because we have tested that model with the export descriptions described herein.
 
 ```
@@ -266,7 +266,7 @@ quantization to achieve this, as described below.
 
 We export the model with the export.py script.  Running this script requires you first install executorch with pybindings, see [here](#setting-up-executorch-and-runner-et).
 At present, when exporting a model, the export command always uses the
-xnnpack delegate to export.  (Future versions of torchat will support additional
+xnnpack delegate to export.  (Future versions of torchchat will support additional
 delegates such as Vulkan, CoreML, MPS, HTP in addition to Xnnpack as they are released for Executorch.)
 
 ### Running the model
@@ -298,7 +298,7 @@ we cannot presently run runner/run.cpp with llama3, until we have a C/C++ tokeni
 
 ## Optimizing your model for server, desktop and mobile devices
 
-To compress models, torchat offers a variety of strategies:
+To compress models, torchchat offers a variety of strategies:
 * Configurable floating-point precision, depending on backend capabilities (for activations and weights): float32, float16, bfloat16
 * weight-quantization: embedding quantization and linear operator quantization
 * dynamic activation quantization with weight quantization: a8w4dq
@@ -332,7 +332,7 @@ AOTI). The basic model build for mobile surfaces two issues: Models
 quickly run out of memory and execution can be slow. In this section,
 we show you how to fit your models in the limited memory of a mobile
 device, and optimize execution speed -- both using quantization. This
-is the `torchat` repo after all!
+is the `torchchat` repo after all!
 
 For high-performance devices such as GPUs, quantization provides a way
 to reduce the memory bandwidth required to and take advantage of the
@@ -549,17 +549,17 @@ We invite contributors to submit established quantization schemes, with accuracy
 
 # Loading GGUF models
 
-GGUF is a nascent industry standard format and presently torchat can read  the F16, F32, Q4_0, and Q6_K formats natively and convert them into native torchat models by using the load-gguf option:
+GGUF is a nascent industry standard format and presently torchchat can read  the F16, F32, Q4_0, and Q6_K formats natively and convert them into native torchchat models by using the load-gguf option:
 
 ```
 --gguf-path <gguf_filename> # all other options as described elsewhere, works for generate and export, for all backends, but cannot be used with --quantize
 ```
 
-Ypu may then apply the standard quantization options, e.g., to add embedding table quantization as described under quantization. (You cannot directly requantize already quantized formats.  However, you may dequantize them using GGUF tools, and then laod the model into torchat to quantize wqith torchat's quantization workflow.)
+Ypu may then apply the standard quantization options, e.g., to add embedding table quantization as described under quantization. (You cannot directly requantize already quantized formats.  However, you may dequantize them using GGUF tools, and then laod the model into torchchat to quantize wqith torchchat's quantization workflow.)
 
-## Loading unsupported GGUF formats in torchat
+## Loading unsupported GGUF formats in torchchat
 
-GGUF formats not presently supported natively in torchat may be converted to one of the supported formats with GGUF's `${GGUF}/quantize` utility to be loaded in torchat. If you convert to the FP16 or FP32 formats with GGUF's `quantize` utility, you may then requantize these models with torchat's quantization workflow.
+GGUF formats not presently supported natively in torchchat may be converted to one of the supported formats with GGUF's `${GGUF}/quantize` utility to be loaded in torchchat. If you convert to the FP16 or FP32 formats with GGUF's `quantize` utility, you may then requantize these models with torchchat's quantization workflow. 
 
 Note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previously quantized and then dequantized model. This, while you can convert your q4_1 model to FP16 or FP32 GGUF formats and then requantize, you might get better results if you start with the original FP16 or FP32 GGUF format.
 
@@ -626,7 +626,7 @@ To run your pte model, use the following command (assuming you already generated
 
 ### Android
 
-Check out the [tutorial on how to build an Android app running your PyTorch models with Executorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html), and give your torchat models a spin.
+Check out the [tutorial on how to build an Android app running your PyTorch models with Executorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html), and give your torchchat models a spin.
 
 ![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png "Android app running Llama model")
 
@@ -735,18 +735,18 @@ List dependencies for these backends
 Set up ExecuTorch by following the instructions [here](https://pytorch.org/executorch/stable/getting-started-setup.html#setting-up-executorch).
 For convenience, we provide a script that does this for you.
 
-From the torchat root directory, run the following
+From the torchchat root directory, run the following
 ```
-export TORCHAT_ROOT=${PWD}
+export TORCHCHAT_ROOT=${PWD}
 ./scripts/install_et.sh
 ```
 
 This will create a build directory, git clone ExecuTorch to ./build/src, applies some patches to the ExecuTorch source code, install the ExecuTorch python libraries with pip, and install the required ExecuTorch C++ libraries to ./build/install.  This will take a while to complete.
 
-After ExecuTorch is installed, you can build runner-et from the torchat root directory with the following
+After ExecuTorch is installed, you can build runner-et from the torchchat root directory with the following
 
 ```
-export TORCHAT_ROOT=${PWD}
+export TORCHCHAT_ROOT=${PWD}
 cmake -S ./runner-et -B build/cmake-out -G Ninja
 cmake --build ./build/cmake-out
 ```
@@ -785,4 +785,4 @@ We welcome any feature requests, bug reports, or pull requests from the communit
 
 ## License
 
-Torchat is released under the [BSD 3 license](./LICENSE). However you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models.
+Torchchat is released under the [BSD 3 license](./LICENSE). However you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models.
