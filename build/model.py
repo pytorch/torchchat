@@ -24,7 +24,7 @@ def find_multiple(n: int, k: int) -> int:
 class ModelArgs:
     block_size: int = 2048
     vocab_size: int = 32000
-    n_layer: int = 32
+    n_layers: int = 32
     # n_head in gpt-fast
     n_heads: int = 32
     dim: int = 4096
@@ -93,13 +93,13 @@ class ModelArgs:
 
 transformer_configs = {
     "CodeLlama-7b-Python-hf": dict(
-        block_size=16384, vocab_size=32000, n_layer=32, dim=4096, rope_base=1000000
+        block_size=16384, vocab_size=32000, n_layers=32, dim=4096, rope_base=1000000
     ),
-    "7B": dict(n_layer=32, n_heads=32, dim=4096),
-    "13B": dict(n_layer=40, n_heads=40, dim=5120),
-    "30B": dict(n_layer=60, n_heads=52, dim=6656),
+    "7B": dict(n_layers=32, n_heads=32, dim=4096),
+    "13B": dict(n_layers=40, n_heads=40, dim=5120),
+    "30B": dict(n_layers=60, n_heads=52, dim=6656),
     "34B": dict(
-        n_layer=48,
+        n_layers=48,
         n_heads=64,
         dim=8192,
         vocab_size=32000,
@@ -108,10 +108,10 @@ transformer_configs = {
         rope_base=1000000,
     ),  # CodeLlama-34B-Python-hf
     "70B": dict(
-        n_layer=80, n_heads=64, dim=8192, n_local_heads=8, hidden_dim=28672
+        n_layers=80, n_heads=64, dim=8192, n_local_heads=8, hidden_dim=28672
     ),
     "Mistral-7B": dict(
-        n_layer=32,
+        n_layers=32,
         n_heads=32,
         n_local_heads=8,
         dim=4096,
@@ -119,7 +119,7 @@ transformer_configs = {
         vocab_size=32000,
     ),
     "Mistral-7B-Instruct-v0.1": dict(
-        n_layer=32,
+        n_layers=32,
         n_heads=32,
         n_local_heads=8,
         dim=4096,
@@ -127,15 +127,15 @@ transformer_configs = {
         vocab_size=32000,
     ),
     "Mistral-7B-Instruct-v0.2": dict(
-        n_layer=32,
+        n_layers=32,
         n_heads=32,
         n_local_heads=8,
         dim=4096,
         hidden_dim=14336,
         vocab_size=32000,
     ),
-    "stories15M": dict(n_layer=6, n_heads=6, dim=288),
-    "stories110M": dict(n_layer=12, n_heads=12, dim=768),
+    "stories15M": dict(n_layers=6, n_heads=6, dim=288),
+    "stories110M": dict(n_layers=12, n_heads=12, dim=768),
 }
 
 
@@ -169,7 +169,7 @@ class Transformer(nn.Module):
 
         self.tok_embeddings = nn.Embedding(config.vocab_size, config.dim)
         self.layers = nn.ModuleList(
-            TransformerBlock(config) for _ in range(config.n_layer)
+            TransformerBlock(config) for _ in range(config.n_layers)
         )
         self.norm = RMSNorm(config.dim, eps=config.norm_eps)
         self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
@@ -240,7 +240,7 @@ class Transformer(nn.Module):
         from build.gguf_loader import load_llama_from_gguf_file
         model = load_llama_from_gguf_file(gguf_path)
         return model
-    
+
 
 class TransformerBlock(nn.Module):
     def __init__(self, config: ModelArgs) -> None:
@@ -297,7 +297,7 @@ class Attention(nn.Module):
 
         return
 
-    
+
         def _unfuse_wqkv_state_dict(
             state_dict: Dict[str, torch.Tensor],
             dim: int,
