@@ -271,7 +271,9 @@ def main(args) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Export specific CLI.")
+    parser = argparse.ArgumentParser(prog="eval",
+                                    description="Export specific CLI.",
+                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     add_arguments_for_eval(parser)
     args = parser.parse_args()
     args = arg_init(args)

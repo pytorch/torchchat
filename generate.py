@@ -514,7 +514,9 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate specific CLI.")
+    parser = argparse.ArgumentParser(prog="generate",
+                                    description="Generate specific CLI.",
+                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     add_arguments_for_generate(parser)
     args = parser.parse_args()
     check_args(args, "generate")
