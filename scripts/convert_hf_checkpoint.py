@@ -22,11 +22,11 @@ from build.model import ModelArgs
 @torch.inference_mode()
 def convert_hf_checkpoint(
     *,
-    checkpoint_dir: Path = Path(
-        "checkpoints/meta-Transformer/Transformer-2-7b-chat-hf"
-    ),
+    checkpoint_dir: Optional[Path] = None,
     model_name: Optional[str] = None,
 ) -> None:
+    if checkpoint_dir is None:
+        checkpoint_dir = Path("checkpoints/meta-Transformer/Transformer-2-7b-chat-hf")
     if model_name is None:
         model_name = checkpoint_dir.name
 
