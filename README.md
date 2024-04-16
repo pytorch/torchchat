@@ -128,7 +128,7 @@ huggingface-cli login
 torchat --download tinyllamas/stories15M --output-dir /tmp/stories15M
 ```
 
-Some common models are recognized by torchat based on their filename through `Transformer.from_name()` to perform a fuzzy match against a table of known model architectures. Alternatively, you can specify the index into that table with the option `--params-table ${INDEX}` where the index is the dictionary key in the `transformer_configs`   
+Some common models are recognized by torchat based on their filename through `Transformer.from_name()` to perform a fuzzy match against a table of known model architectures. Alternatively, you can specify the index into that table with the option `--params-table ${INDEX}` where the index is the dictionary key in the `transformer_configs`
 dictionary specified [here](https://github.com/pytorch/torchat/blob/main/model.py#L85).  For our example, with the stories15M model, this would be expressed as
 `--params-table stories15M`. (We use the model constructor `Transformer.from_table()`)
 
@@ -138,13 +138,13 @@ The parameter file will should be in JSON format specifying thee parameters.  Yo
 
 The final way to initialize a torchat model is from GGUF. You load a GGUF model with the option `--load-gguf ${MODELNAME}.gguf`. Presently, the F16, F32, Q4_0, and Q6_K formats are supported and converted into native torchat models.
 
-You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsouly quantized and thend equantized model.) 
+You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsouly quantized and thend equantized model.)
 
 | GGUF Model | Tested | Eager | torch.compile | AOT Inductor | ExecuTorch | Fits on Mobile |
 |-----|--------|-------|-----|-----|-----|-----|
 | llama-2-7b.Q4_0.gguf |  🚧 | 🚧 | 🚧 | 🚧 | 🚧 |
 
-You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsoul;y quantized and thend equantized model.) 
+You may also dequantize GGUF models with the GGUF quantize tool, and then load and requantize with torchat native quantization options.  (Please note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previsoul;y quantized and thend equantized model.)
 
 
 ## Chat
@@ -294,7 +294,7 @@ Enable all export options for llama3 as described below
 
 Identify and enable a runner/run.cpp with a binary tiktoken optimizer.  (May already be available in OSS)
 we cannot presently run runner/run.cpp with llama3, until we have a C/C++ tokenizer im[plementation
-(initial tiktoken is python) 
+(initial tiktoken is python)
 
 ## Optimizing your model for server, desktop and mobile devices
 
@@ -316,7 +316,7 @@ linear operator (asymmetric) with HQQ | n/a |  work in progress | n/a |
 ## Model precision (dtype precision setting)
 
 You can generate models (for both export and generate, with eager, torch.compile, AOTI, ET, for all backends - mobile at present will primarily support fp32, with all options)
-specify the precision of the model with 
+specify the precision of the model with
 ```
 python generate.py --dtype [bf16 | fp16 | fp32] ...
 python export.py --dtype [bf16 | fp16 | fp32] ...
@@ -346,7 +346,7 @@ We can specify quantization parameters with the --quantize option. The
 quantize option takes a JSON/dictionary with quantizers and
 quantization options.
 
-generate and export (for both ET and AOTI) can both accept quantization options.  We only show a subset of the combinations 
+generate and export (for both ET and AOTI) can both accept quantization options.  We only show a subset of the combinations
 to avoid combinatorial explosion.
 
 #### Embedding quantization (8 bit integer, channelwise & groupwise)
@@ -509,7 +509,7 @@ operator.
 
 #### 4-bit integer quantization (int4)
 To compress your model even more, 4-bit integer quantization may be used.  To achieve good accuracy, we recommend the use
-of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.  
+of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.
 ```
 python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int4': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]
 ```
@@ -535,7 +535,7 @@ python generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso...
 #### Quantization with GPTQ (gptq)
 
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:gptq': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ] # may require additional options, check with AO team 
+python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:gptq': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ] # may require additional options, check with AO team
 ```
 
 Now you can run your model with the same command as before:
@@ -559,9 +559,9 @@ Ypu may then apply the standard quantization options, e.g., to add embedding tab
 
 ## Loading unsupported GGUF formats in torchat
 
-GGUF formats not presently supported natively in torchat may be converted to one of the supported formats with GGUF's `${GGUF}/quantize` utility to be loaded in torchat. If you convert to the FP16 or FP32 formats with GGUF's `quantize` utility, you may then requantize these models with torchat's quantization workflow. 
+GGUF formats not presently supported natively in torchat may be converted to one of the supported formats with GGUF's `${GGUF}/quantize` utility to be loaded in torchat. If you convert to the FP16 or FP32 formats with GGUF's `quantize` utility, you may then requantize these models with torchat's quantization workflow.
 
-Note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previously quantized and then dequantized model. This, while you can convert your q4_1 model to FP16 or FP32 GGUF formats and then requantize, you might get better results if you start with the original FP16 or FP32 GGUF format. 
+Note that quantizing and dequantizing is a lossy process, and you will get the best results by starting with the original unquantized model checkpoint, not a previously quantized and then dequantized model. This, while you can convert your q4_1 model to FP16 or FP32 GGUF formats and then requantize, you might get better results if you start with the original FP16 or FP32 GGUF format.
 
 To use the quantize tool, install the GGML tools at ${GGUF} . Then, you can, for example, convert a quantized model to f16 format:
 
@@ -786,4 +786,3 @@ We welcome any feature requests, bug reports, or pull requests from the communit
 ## License
 
 Torchat is released under the [BSD 3 license](./LICENSE). However you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models.
-
