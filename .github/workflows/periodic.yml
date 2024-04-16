@@ -1,0 +1,9 @@
+name: periodic
+
+on:
+  schedule:
+    - cron: '0,6,12,18 0 * * *'  # Runs at midnight UTC and every 6 hours
+  push:
+    tags:
+      - ciflow/periodic/*
+  workflow_dispatch:
