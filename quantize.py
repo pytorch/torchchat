@@ -702,7 +702,7 @@ def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, grou
 
     # avoid errors in MPSaround bfloat16 until int4pack_mm is in nightlies
     # print("MPS workaround active, will produce bogus results")
-    if "mps" in x.device:
+    if "mps" in str(x.device):
         new_shape = origin_x_size[:-1] + (out_features,)
         return torch.zero(new_shape, dtype=x.dtype, device=x.device)
     
