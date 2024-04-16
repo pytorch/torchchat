@@ -10,14 +10,14 @@ import torch
 import torch.nn.functional as F
 from torch.library import impl, impl_abstract
 
-torchat_lib = torch.library.Library("torchat", "DEF")
+torchchat_lib = torch.library.Library("torchchat", "DEF")
 
-torchat_lib.define(
+torchchat_lib.define(
     "embedding_int8(Tensor input, Tensor weight, " "Tensor scales) -> Tensor",
 )
 
 
-@impl(torchat_lib, "embedding_int8", "CompositeExplicitAutograd")
+@impl(torchchat_lib, "embedding_int8", "CompositeExplicitAutograd")
 def embedding_int8(
     input: torch.Tensor,
     weight: torch.Tensor,
@@ -66,13 +66,13 @@ def embedding_int8(
     return r.view(indices.size() + (-1,))
 
 
-torchat_lib.define(
+torchchat_lib.define(
     "linear_int8(Tensor input, Tensor weight, Tensor scales, "
     "Tensor bias = None) -> Tensor",
 )
 
 
-@impl(torchat_lib, "linear_int8", "CompositeExplicitAutograd")
+@impl(torchchat_lib, "linear_int8", "CompositeExplicitAutograd")
 def linear_int8(
     input: torch.Tensor,
     weight: torch.Tensor,
@@ -98,14 +98,14 @@ def linear_int8(
         )
 
 
-torchat_lib.define(
+torchchat_lib.define(
     "linear_int4(Tensor input, Tensor weight, Tensor scales_and_zeros, "
     "Tensor bias=None, *, int groupsize, int origin_in_features, "
     "int int_features, int out_features, bool padding = True) -> Tensor",
 )
 
 
-@impl(torchat_lib, "linear_int4", "CompositeExplicitAutograd")
+@impl(torchchat_lib, "linear_int4", "CompositeExplicitAutograd")
 def linear_int4(
     input: torch.Tensor,
     weight: torch.Tensor,
@@ -140,14 +140,14 @@ def linear_int4(
     return c
 
 
-torchat_lib.define(
+torchchat_lib.define(
     "linear_a8w4dq(Tensor input, Tensor weight, Tensor scales, "
     "Tensor zeros, int out_features, int groupsize, "
     "dtype precision) -> Tensor",
 )
 
 
-@impl(torchat_lib, "linear_a8w4dq", "CompositeExplicitAutograd")
+@impl(torchchat_lib, "linear_a8w4dq", "CompositeExplicitAutograd")
 def linear_a8w4dq(input, weight, scales, zeros, out_features, groupsize, precision):
     x = per_token_dynamic_quant(input)
     weight_int8 = weight
