@@ -743,7 +743,7 @@ def replace_linear_int4(
 class WeightOnlyInt4QuantHandler(QuantHandler):
     def __init__(self, mod, device, *, groupsize=128, inner_k_tiles=8, padding_allowed=True):
         self.mod = mod
-        self.device = device,
+        self.device = device
         self.groupsize = groupsize
         self.inner_k_tiles = inner_k_tiles
         self.padding_allowed = padding_allowed
