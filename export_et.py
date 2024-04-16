@@ -13,8 +13,9 @@ from build.model import Transformer
 
 from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
     XnnpackDynamicallyQuantizedPartitioner,
-    XnnpackPartitioner
+    XnnpackPartitioner,
 )
+
 # TODO: change back to executorch.examples.portable.utils
 # when executorch installs correctly
 
