@@ -545,6 +545,7 @@ def _main(
 
 
 def main(args):
+    is_chat = args.subcommand == "chat"
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)

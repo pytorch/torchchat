@@ -25,6 +25,7 @@ from build.model import Transformer
 
 @dataclass
 class BuilderArgs:
+    model: Optional[str] = None,
     checkpoint_path: Optional[Union[Path, str]] = None
     checkpoint_dir: Optional[Union[Path, str]] = None
     params_path: Optional[Union[Path, str]] = None
@@ -42,7 +43,7 @@ class BuilderArgs:
     def __post_init__(self):
         if not (
             (self.checkpoint_path and self.checkpoint_path.is_file())
-            or (self.checkpoint_dir and self.checkpoint_path.is_dir())
+            or (self.checkpoint_dir and self.checkpoint_dir.is_dir())
             or (self.gguf_path and self.gguf_path.is_file())
             or (self.dso_path and Path(self.dso_path).is_file())
             or (self.pte_path and Path(self.pte_path).is_file())
@@ -75,6 +76,10 @@ class BuilderArgs:
         if hasattr(args, "checkpoint_dir"):
             checkpoint_dir = args.checkpoint_dir    
 
+        checkpoint_path = Path(args.model_directory) / args.model / "model.pth" \
+            if args.model and not args.checkpoint_path \
+            else args.checkpoint_path
+
         is_chat_model = False
         if args.is_chat_model:
             is_chat_model = True
@@ -94,8 +99,8 @@ class BuilderArgs:
                     is_chat_model = True
 
         return cls(
-            checkpoint_path=args.checkpoint_path,
             checkpoint_dir=checkpoint_dir,
+            checkpoint_path=checkpoint_path,
             params_path=args.params_path,
             params_table=args.params_table,
             gguf_path=args.gguf_path,
@@ -132,12 +137,16 @@ class TokenizerArgs:
         is_sentencepiece = True
         is_tiktoken = False
 
+        checkpoint_dir = Path(args.model_directory) / args.model \
+            if not args.checkpoint_dir and args.model \
+            else args.checkpoint_dir
+
         if args.tokenizer_path:
             tokenizer_path = args.tokenizer_path
         elif args.checkpoint_path:
             tokenizer_path = args.checkpoint_path.parent / "tokenizer.model"
-        elif args.checkpoint_dir:
-            tokenizer_path = args.checkpoint_dir / "tokenizer.model"
+        elif checkpoint_dir:
+            tokenizer_path = checkpoint_dir / "tokenizer.model"
         else:
             raise RuntimeError("cannot find tokenizer model")
 
@@ -219,6 +228,8 @@ def _load_model_default(builder_args):
             model = Transformer.from_params(builder_args.params_path)
         elif builder_args.params_table:
             model = Transformer.from_table(builder_args.params_path)
+        elif builder_args.checkpoint_dir:
+            model = Transformer.from_name(builder_args.checkpoint_dir.name)
         else:
             model = Transformer.from_name(builder_args.checkpoint_path.parent.name)
 

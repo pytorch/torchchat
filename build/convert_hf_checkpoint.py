@@ -4,6 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -22,19 +23,20 @@ from build.model import ModelArgs
 @torch.inference_mode()
 def convert_hf_checkpoint(
     *,
-    checkpoint_dir: Optional[Path] = None,
+    model_dir: Optional[Path] = None,
     model_name: Optional[str] = None,
+    remove_bin_files: bool = False
 ) -> None:
-    if checkpoint_dir is None:
-        checkpoint_dir = Path("checkpoints/meta-Transformer/Transformer-2-7b-chat-hf")
+    if model_dir is None:
+        model_dir = Path("checkpoints/meta-Transformer/Transformer-2-7b-chat-hf")
     if model_name is None:
-        model_name = checkpoint_dir.name
+        model_name = model_dir.name
 
     config = ModelArgs.from_name(model_name)
     print(f"Model config {config.__dict__}")
 
     # Load the json file containing weight mapping
-    model_map_json = checkpoint_dir / "pytorch_model.bin.index.json"
+    model_map_json = model_dir / "pytorch_model.bin.index.json"
 
     assert model_map_json.is_file()
 
@@ -56,7 +58,7 @@ def convert_hf_checkpoint(
         "model.norm.weight": "norm.weight",
         "lm_head.weight": "output.weight",
     }
-    bin_files = {checkpoint_dir / bin for bin in bin_index["weight_map"].values()}
+    bin_files = {model_dir / bin for bin in bin_index["weight_map"].values()}
 
     def permute(w, n_heads):
         dim = config.dim
@@ -97,8 +99,12 @@ def convert_hf_checkpoint(
             del final_result[key]
             del final_result[key.replace("wq", "wk")]
             del final_result[key.replace("wq", "wv")]
-    print(f"Saving checkpoint to {checkpoint_dir / 'model.pth'}")
-    torch.save(final_result, checkpoint_dir / "model.pth")
+    print(f"Saving checkpoint to {model_dir / 'model.pth'}")
+    torch.save(final_result, model_dir / "model.pth")
+
+    if remove_bin_files:
+        for file in bin_files:
+            os.remove(file)
 
 
 if __name__ == "__main__":
@@ -114,6 +120,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     convert_hf_checkpoint(
-        checkpoint_dir=args.checkpoint_dir,
+        model_dir=args.checkpoint_dir,
         model_name=args.model_name,
     )
