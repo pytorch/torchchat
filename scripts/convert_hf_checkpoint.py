@@ -16,7 +16,7 @@ wd = Path(__file__).parent.parent
 sys.path.append(str(wd.resolve()))
 sys.path.append(str((wd / "build").resolve()))
 
-from model import ModelArgs
+from build.model import ModelArgs
 
 
 @torch.inference_mode()
