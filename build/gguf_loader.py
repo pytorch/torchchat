@@ -177,7 +177,9 @@ def load_weights(pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor],
                 parent,
                 _fqn_last(fqn),
                 WeightOnlyInt4Linear(
-                    in_features, out_features,
+                    "cpu", # TODO: should --device work for gguf load? (yes?!)
+                    in_features,
+                    out_features,
                     bias=False,
                     groupsize=Q4_0.groupsize,
                     inner_k_tiles=inner_k_tiles,
