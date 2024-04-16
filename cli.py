@@ -4,33 +4,33 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-import time
-import os
+import json
 from pathlib import Path
 
 import torch
-import torch.nn as nn
+
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
 strict = False
 
+
 def check_args(args, command_name: str):
     global strict
 
     # chat and generate support the same options
-    if command_name in  ["generate", "chat", "gui"]:
+    if command_name in ["generate", "chat", "gui"]:
         # examples, can add more. Note that attributes convert dash to _
-        disallowed_args = ['output_pte_path', 'output_dso_path' ]
+        disallowed_args = ["output_pte_path", "output_dso_path"]
     elif command_name == "export":
         # examples, can add more. Note that attributes convert dash to _
-        disallowed_args = ['pte_path', 'dso_path' ]
+        disallowed_args = ["pte_path", "dso_path"]
     elif command_name == "eval":
         # TBD
         disallowed_args = []
     else:
         raise RuntimeError(f"{command_name} is not a valid command")
-    
+
     for disallowed in disallowed_args:
         if hasattr(args, disallowed):
             text = f"command {command_name} does not support option {disallowed.replace('_', '-')}"
@@ -39,17 +39,25 @@ def check_args(args, command_name: str):
             else:
                 print(f"Warning: {text}")
 
-    
-def cli_args():
-    import argparse
 
-    parser = argparse.ArgumentParser(description="Your CLI description.")
+def add_arguments_for_generate(parser):
+    _add_arguments_common(parser)
 
+
+def add_arguments_for_eval(parser):
+    _add_arguments_common(parser)
+
+
+def add_arguments_for_export(parser):
+    _add_arguments_common(parser)
+
+
+def _add_arguments_common(parser):
     parser.add_argument(
         "--seed",
         type=int,
-        default=1234, # set None for release
-        help="Initialize torch seed"
+        default=1234,  # set None for release
+        help="Initialize torch seed",
     )
     parser.add_argument(
         "--prompt", type=str, default="Hello, my name is", help="Input prompt."
@@ -60,73 +68,34 @@ def cli_args():
         help="Whether to use tiktoken tokenizer.",
     )
     parser.add_argument(
-        "--export",
-        action="store_true",
-        help="Use torchat to export a model.",
-    )
-    parser.add_argument(
-        "--eval",
-        action="store_true",
-        help="Use torchat to eval a model.",
-    )
-    parser.add_argument(
-        "--generate",
-        action="store_true",
-        help="Use torchat to generate a sequence using a model.",
-    )
-    parser.add_argument(
         "--chat",
         action="store_true",
-        help="Use torchat to for an interactive chat session.",
-    )    
+        help="Use torchchat to for an interactive chat session.",
+    )
     parser.add_argument(
         "--gui",
         action="store_true",
-        help="Use torchat to for an interactive gui-chat session.",
-    )    
+        help="Use torchchat to for an interactive gui-chat session.",
+    )
+    parser.add_argument("--num-samples", type=int, default=1, help="Number of samples.")
     parser.add_argument(
-        "--num-samples",
-        type=int,
-        default=1,
-        help="Number of samples.")
+        "--max-new-tokens", type=int, default=200, help="Maximum number of new tokens."
+    )
+    parser.add_argument("--top-k", type=int, default=200, help="Top-k for sampling.")
     parser.add_argument(
-        "--max-new-tokens",
-        type=int,
-        default=200,
-        help="Maximum number of new tokens."
+        "--temperature", type=float, default=0.8, help="Temperature for sampling."
     )
     parser.add_argument(
-        "--top-k",
-        type=int,
-        default=200,
-        help="Top-k for sampling.")
-    parser.add_argument(
-        "--temperature",
-        type=float,
-        default=0.8,
-        help="Temperature for sampling."
-    )
-    parser.add_argument(
-        "--compile",
-        action="store_true",
-        help="Whether to compile the model."
+        "--compile", action="store_true", help="Whether to compile the model."
     )
     parser.add_argument(
         "--compile-prefill",
         action="store_true",
         help="Whether to compile the prefill (improves prefill perf, but higher compile times)",
     )
+    parser.add_argument("--profile", type=Path, default=None, help="Profile path.")
     parser.add_argument(
-        "--profile",
-        type=Path,
-        default=None,
-        help="Profile path."
-    )
-    parser.add_argument(
-        "--speculate-k",
-        type=int,
-        default=5,
-        help="Speculative execution depth."
+        "--speculate-k", type=int, default=5, help="Speculative execution depth."
     )
     parser.add_argument(
         "--draft-checkpoint-path",
@@ -163,31 +132,18 @@ def cli_args():
         type=Path,
         default=None,
         help="Model checkpoint path.",
-    )    
-    parser.add_argument(
-        "--output-pte-path",
-        type=str,
-        default=None,
-        help="Filename"
     )
+    parser.add_argument("--output-pte-path", type=str, default=None, help="Filename")
+    parser.add_argument("--output-dso-path", type=str, default=None, help="Filename")
     parser.add_argument(
-        "--output-dso-path",
-        type=str,
-        default=None,
-        help="Filename"
-    )
-    parser.add_argument(
-        "--dso-path",
-        type=Path,
-        default=None,
-        help="Use the specified AOTI DSO model."
+        "--dso-path", type=Path, default=None, help="Use the specified AOTI DSO model."
     )
     parser.add_argument(
         "--pte-path",
         type=Path,
         default=None,
-        help="Use the specified Executorch PTE model."
-    )    
+        help="Use the specified Executorch PTE model.",
+    )
     parser.add_argument(
         "-d",
         "--dtype",
@@ -196,48 +152,36 @@ def cli_args():
     )
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument(
-        "--quantize",
-        type=str,
-        default="{ }",
-        help="Quantization options."
+        "--quantize", type=str, default="{ }", help="Quantization options."
+    )
+    parser.add_argument("--params-table", type=str, default=None, help="Device to use")
+    parser.add_argument(
+        "--device", type=str, default=default_device, help="Device to use"
     )
     parser.add_argument(
-        "--device",
-        type=str,
-        default=default_device,
-        help="Device to use"
-    )
-    parser.add_argument(
-        "--params-table",
-        type=str,
-        default=None,
-        help="Device to use"
-    )
-    parser.add_argument(
-        '--tasks',
-        nargs='+',
+        "--tasks",
+        nargs="+",
         type=str,
         default=["hellaswag"],
-        help='list of lm-eluther tasks to evaluate usage: --tasks task1 task2'
+        help="list of lm-eluther tasks to evaluate usage: --tasks task1 task2",
     )
     parser.add_argument(
-        '--limit', type=int,
-        default=None,
-        help='number of samples to evaluate'
+        "--limit", type=int, default=None, help="number of samples to evaluate"
     )
     parser.add_argument(
-        '--max-seq-length',
+        "--max-seq-length",
         type=int,
         default=None,
-        help='maximum length sequence to evaluate')
-    
-    args = parser.parse_args()
+        help="maximum length sequence to evaluate",
+    )
 
-    if (Path(args.quantize).is_file()):
+
+def arg_init(args):
+
+    if Path(args.quantize).is_file():
         with open(args.quantize, "r") as f:
             args.quantize = json.loads(f.read())
 
     if args.seed:
-              torch.manual_seed(args.seed)
-
+        torch.manual_seed(args.seed)
     return args

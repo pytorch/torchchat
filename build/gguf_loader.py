@@ -5,28 +5,31 @@
 # LICENSE file in the root directory of this source tree.
 
 
-import argparse
-
 import copy
+import logging
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping, Dict
-import logging
-from quantize import WeightOnlyInt4Linear, pack_scales_and_zeros, group_dequantize_tensor_from_qparams
-from gguf_util import F16, F32, Q4_0, Q6_K
+from typing import Any, Dict
+
 import gguf
 
 import torch
 import torch.nn as nn
 
 from gguf import GGUFValueType, ReaderTensor
+from quantize import (
+    group_dequantize_tensor_from_qparams,
+    pack_scales_and_zeros,
+    WeightOnlyInt4Linear,
+)
+
+from build.gguf_util import F16, F32, Q4_0, Q6_K
 
 wd = Path(__file__).parent.resolve()
 sys.path.append(str(wd))
 
 from model import ModelArgs, Transformer
-from typing import Set
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -65,7 +68,7 @@ def _create_pt_model(
 ) -> nn.Module:
     llama_model_args = ModelArgs(
         dim=gguf_model_args.embedding_length,
-        n_layer=gguf_model_args.block_count,
+        n_layers=gguf_model_args.block_count,
         n_heads=gguf_model_args.attention.head_count,
         n_local_heads=gguf_model_args.attention.head_count_kv,
         vocab_size=gguf_model_args.vocab_size,
@@ -101,7 +104,9 @@ def _convert_gguf_tensor_name_to_llama_nn(gguf_name: str) -> str:
 
 def _build_model_args(metadata: dict[str, Any]) -> GGUFModelArgs:
     arch = metadata["general.architecture"]
-    assert arch == "llama", f"Only general.architecture=llama is supported, but got general.architecture={arch}"
+    assert (
+        arch == "llama"
+    ), f"Only general.architecture=llama is supported, but got general.architecture={arch}"
     return GGUFModelArgs(
         arch=arch,
         embedding_length=metadata[f"{arch}.embedding_length"],
@@ -118,6 +123,7 @@ def _build_model_args(metadata: dict[str, Any]) -> GGUFModelArgs:
             dimension_count=metadata.get(f"{arch}.rope.dimension_count", None),
         ),
     )
+
 
 def _fqn_lookup(fqn: str, module: torch.nn.Module) -> Any:
     if fqn == "":
@@ -147,7 +153,9 @@ def _fqn_last(fqn: str) -> str:
     return atoms[-1]
 
 
-def load_weights(pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor], inner_k_tiles = 8) -> None:
+def load_weights(
+    pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor], inner_k_tiles=8
+) -> None:
     fqns = []
     for fqn in pt_model.state_dict():
         assert _fqn_last(fqn) == "weight"
@@ -159,7 +167,10 @@ def load_weights(pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor],
 
         t = weight_map[f"{fqn}.weight"]
 
-        if isinstance(mod, torch.nn.Linear) and t.tensor_type == gguf.GGMLQuantizationType.Q4_0:
+        if (
+            isinstance(mod, torch.nn.Linear)
+            and t.tensor_type == gguf.GGMLQuantizationType.Q4_0
+        ):
             assert not mod.bias
             out_features = mod.out_features
             in_features = mod.in_features
@@ -167,29 +178,36 @@ def load_weights(pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor],
 
             q, s, z = Q4_0.unpack(t)
             scales_and_zeros = pack_scales_and_zeros(s, z)
-            weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(q, inner_k_tiles)
+            weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
+                q, inner_k_tiles
+            )
 
-            state_dict[f"{fqn}.weight"] = weight_int4pack.to('cpu')
-            state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros.to('cpu')
+            state_dict[f"{fqn}.weight"] = weight_int4pack.to("cpu")
+            state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros.to("cpu")
 
             parent = _fqn_lookup(_fqn_up(fqn), pt_model)
             setattr(
                 parent,
                 _fqn_last(fqn),
                 WeightOnlyInt4Linear(
-                    in_features, out_features,
+                    "cpu",  # TODO: should --device work for gguf load? (yes?!)
+                    in_features,
+                    out_features,
                     bias=False,
                     groupsize=Q4_0.groupsize,
                     inner_k_tiles=inner_k_tiles,
-                    use_cuda=False
-                )
+                ),
             )
         else:
             # All other weights are dequantized to float
             if t.tensor_type == gguf.GGMLQuantizationType.Q4_0:
-                as_float =  group_dequantize_tensor_from_qparams(*Q4_0.unpack(t), Q4_0.n_bit, Q4_0.groupsize)
+                as_float = group_dequantize_tensor_from_qparams(
+                    *Q4_0.unpack(t), Q4_0.n_bit, Q4_0.groupsize
+                )
             elif t.tensor_type == gguf.GGMLQuantizationType.Q6_K:
-                as_float = group_dequantize_tensor_from_qparams(*Q6_K.unpack(t), Q6_K.n_bit, Q6_K.groupsize)
+                as_float = group_dequantize_tensor_from_qparams(
+                    *Q6_K.unpack(t), Q6_K.n_bit, Q6_K.groupsize
+                )
             elif t.tensor_type == gguf.GGMLQuantizationType.F16:
                 as_float = F16.unpack(t)
             elif t.tensor_type == gguf.GGMLQuantizationType.F32:
@@ -197,7 +215,7 @@ def load_weights(pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor],
             else:
                 raise ValueError(f"Unsupported tensor type {t.tensor_type}")
 
-            state_dict[f"{fqn}.weight"] = as_float.to('cpu')
+            state_dict[f"{fqn}.weight"] = as_float.to("cpu")
 
     pt_model.load_state_dict(state_dict)
     return pt_model
@@ -243,7 +261,6 @@ def load_llama_from_gguf_file(gguf_file: str) -> torch.nn.Module:
 
     logger.info("Creating initial PT model.")
     pt_model = _create_pt_model(model_args)
-
 
     logger.info("Reading GGUF weights.")
     gguf_weights = GGUFWeights(tensors=reader.tensors)

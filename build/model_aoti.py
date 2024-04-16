@@ -1,17 +1,11 @@
-from ctypes import c_void_p
-
 import torch
 import torch.nn as nn
-from torch import empty
-from torch._dynamo.testing import rand_strided
 from torch._inductor.codecache import AsyncCompile
-from torch._inductor.utils import print_performance
-from torch._inductor.wrapper_benchmark import compiled_module_main
 
 # with open("./dso_model.h", "rb") as f:
 #     dso_src = f.read().decode("utf-8")
 
-dso_src =""
+dso_src = ""
 
 src = """
 #include <torch/csrc/inductor/aoti_runner/model_container_runner_cpu.h>
@@ -36,7 +30,6 @@ extern "C" void kernel(long *tokens, long *pos, float *logits)
 """
 
 
-
 class DSOModel(nn.Module):
     def __init__(self, config, dso_path) -> None:
         super().__init__()
@@ -44,8 +37,8 @@ class DSOModel(nn.Module):
 
         # build transformer model
         global src, dso_src
-        
-        src = src.replace('***my_model.so***', str(dso_path))
+
+        src = src.replace("***my_model.so***", str(dso_path))
         async_compile = AsyncCompile()
         self.transformer_model = async_compile.cpp_pybinding(
             ["long *", "long *", "float *"], dso_src + src
@@ -53,9 +46,8 @@ class DSOModel(nn.Module):
         async_compile.wait(globals())
         del async_compile
 
-
     def forward(self, x, input_pos):
-        vocab_size = self.config.vocab_size # 32000
+        vocab_size = self.config.vocab_size  # 32000
         assert x.dim() == 2 and x.size(0) == 1 and x.size(1) == 1
         logits = torch.empty(1, 1, vocab_size)
         x = x.to(torch.long)

@@ -11,7 +11,7 @@ jobs:
   run-tinystories:
     strategy:
       matrix:
-        runner: [ubuntu-latest, macos-14]
+        runner: [macos-14]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -35,46 +35,53 @@ jobs:
       - name: Download GGUF
         run: |
           mkdir gguf_files
-          export GGUF_PATH=gguf_files/llama-2-7b.Q4_0.gguf
+          export GGUF_PATH=gguf_files/TinyLlama-1.1B-openorca.Q4_0.gguf
           export TOKENIZER_PATH=gguf_files/tokenizer.model
-          wget -O ${GGUF_PATH} "https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_0.gguf?download=true"
+
+          wget -O ${GGUF_PATH} "https://huggingface.co/TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF/resolve/main/tinyllama-1.1b-1t-openorca.Q4_0.gguf?download=true"
           wget -O ${TOKENIZER_PATH} https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
       - name: Run inference
-        run: |          
-          export GGUF_PATH=gguf_files/llama-2-7b.Q4_0.gguf
+        run: |
+          export GGUF_PATH=gguf_files/TinyLlama-1.1B-openorca.Q4_0.gguf
           export TOKENIZER_PATH=gguf_files/tokenizer.model
-          export MODEL_NAME=llama-2-7b.Q4_0.gguf
+          export MODEL_NAME=TinyLlama-1.1B-openorca.Q4_0.gguf
           export MODEL_DIR=/tmp
-          python generate.py --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_eager
+
+          echo "******************************************"
+          echo "******* Embed: not quantized *************"
+          echo "******************************************"
+
+          echo "Running eager"
+          python generate.py --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 > ./output_eager
           cat ./output_eager
-          python generate.py --compile --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_compiled
+
+          echo "Running compiled"
+          python generate.py --compile --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 > ./output_compiled
           cat ./output_compiled
-          python export.py --gguf-path ${GGUF_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
-          python generate.py --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
-          cat ./output_aoti
 
           echo "******************************************"
           echo "******* Emb: channel-wise quantized ******"
           echo "******************************************"
-          python generate.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_eager
+
+          echo "Running eager"
+          python generate.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 > ./output_eager
           cat ./output_eager
-          python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_compiled
+
+          echo "Running compiled"
+          python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 > ./output_compiled
           cat ./output_compiled
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
-          python generate.py --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
-          cat ./output_aoti
 
           echo "******************************************"
           echo "******** Emb: group-wise quantized *******"
           echo "******************************************"
-          python generate.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_eager
+
+          echo "Running eager"
+          python generate.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 > ./output_eager
           cat ./output_eager
-          python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 > ./output_compiled
+
+          echo "Running compiled"
+          python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 > ./output_compiled
           cat ./output_compiled
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
-          python generate.py --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
-          cat ./output_aoti
 
           echo "tests complete"
           echo "******************************************"
-

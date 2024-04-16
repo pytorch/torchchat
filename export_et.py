@@ -4,34 +4,29 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-import time
-from pathlib import Path
 
 import torch
-import torch.nn as nn
-from torch.export import Dim, export
-from torch._export import capture_pre_autograd_graph
-
-from generate import decode_one_token
-from quantize import (
-    quantize_model, name_to_dtype, set_precision, get_precision,
-)
-from build.model import Transformer
 from build.model import Transformer
 
 from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
+    XnnpackDynamicallyQuantizedPartitioner,
     XnnpackPartitioner,
 )
-# from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
-#    XnnpackDynamicallyQuantizedPartitioner,
-#)
-from executorch_portable_utils import export_to_edge
+
 # TODO: change back to executorch.examples.portable.utils
 # when executorch installs correctly
 
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
 from executorch.exir.passes.quant_fusion_pass import QuantFusionPass
 from executorch.exir.passes.sym_shape_eval_pass import ConstraintBasedSymShapeEvalPass
+
+# from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
+#    XnnpackDynamicallyQuantizedPartitioner,
+# )
+from executorch_portable_utils import export_to_edge
+
+from quantize import get_precision
+from torch._export import capture_pre_autograd_graph
 
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -99,7 +94,7 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
         _skip_type_promotion=bool(target_precision == torch.float16),
     )
 
-    if target_precision == torch.float16: # or args.quantization_mode=="int4":
+    if target_precision == torch.float16:  # or args.quantization_mode=="int4":
         if state_dict_dtype != torch.float16:
             print("model.to torch.float16")
             model = model.to(dtype=torch.float16)
@@ -111,11 +106,11 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     else:
         raise ValueError(f"Unsupported dtype for ET export: {target_precision}")
 
-    with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]), torch.no_grad():
+    with torch.nn.attention.sdpa_kernel(
+        [torch.nn.attention.SDPBackend.MATH]
+    ), torch.no_grad():
         m = capture_pre_autograd_graph(
-            export_model,
-            input,
-            dynamic_shapes=dynamic_shapes
+            export_model, input, dynamic_shapes=dynamic_shapes
         )
 
         edge_manager = export_to_edge(
@@ -124,7 +119,7 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
             dynamic_shapes=dynamic_shapes,
             edge_compile_config=edge_config,
         )
-
+    edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
     edge_manager = edge_manager.to_backend(XnnpackPartitioner())
     export_program = edge_manager.to_executorch(
         ExecutorchBackendConfig(
