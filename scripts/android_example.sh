@@ -7,8 +7,8 @@
 
 set -eu
 
-cd ${TORCHAT_ROOT}
-echo "Inside: $TORCHAT_ROOT"
+cd ${TORCHCHAT_ROOT}
+echo "Inside: $TORCHCHAT_ROOT"
 
 which curl
 
@@ -25,8 +25,8 @@ else
   exit -1
 fi
 
-mkdir -p ${TORCHAT_ROOT}/build/android
-pushd ${TORCHAT_ROOT}/build/android
+mkdir -p ${TORCHCHAT_ROOT}/build/android
+pushd ${TORCHCHAT_ROOT}/build/android
 
 echo "Download Java 17"
 curl "${JAVA_URL}" -o jdk-17.0.10.tar.gz
@@ -69,8 +69,8 @@ pushd build/src/executorch/examples/demo-apps/android/LlamaDemo
 ./gradlew :app:build
 popd
 
-avdmanager create avd --name "torchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
-sdk/emulator/emulator @torchat &
+avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
+sdk/emulator/emulator @torchchat &
 
 adb wait-for-device
 adb shell mkdir /data/local/tmp/llama

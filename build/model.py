@@ -9,10 +9,11 @@ from typing import Dict, Optional
 
 import torch
 import torch.nn as nn
+
+from quantize import get_precision
 from torch import Tensor
 from torch.nn import functional as F
 
-from quantize import get_precision
 
 def find_multiple(n: int, k: int) -> int:
     if n % k == 0:
@@ -24,7 +25,7 @@ def find_multiple(n: int, k: int) -> int:
 class ModelArgs:
     block_size: int = 2048
     vocab_size: int = 32000
-    n_layer: int = 32
+    n_layers: int = 32
     # n_head in gpt-fast
     n_heads: int = 32
     dim: int = 4096
@@ -86,20 +87,22 @@ class ModelArgs:
                 config[1]
             ), name  # make sure only one 'best' match
         elif len(config) == 0:
-            raise ValueError(f"Unknown model directory name {name}. Must be one of {list(transformer_configs.keys())}.")
+            raise ValueError(
+                f"Unknown model directory name {name}. Must be one of {list(transformer_configs.keys())}."
+            )
 
         return cls(**transformer_configs[config[0]])
 
 
 transformer_configs = {
     "CodeLlama-7b-Python-hf": dict(
-        block_size=16384, vocab_size=32000, n_layer=32, dim=4096, rope_base=1000000
+        block_size=16384, vocab_size=32000, n_layers=32, dim=4096, rope_base=1000000
     ),
-    "7B": dict(n_layer=32, n_heads=32, dim=4096),
-    "13B": dict(n_layer=40, n_heads=40, dim=5120),
-    "30B": dict(n_layer=60, n_heads=52, dim=6656),
+    "7B": dict(n_layers=32, n_heads=32, dim=4096),
+    "13B": dict(n_layers=40, n_heads=40, dim=5120),
+    "30B": dict(n_layers=60, n_heads=52, dim=6656),
     "34B": dict(
-        n_layer=48,
+        n_layers=48,
         n_heads=64,
         dim=8192,
         vocab_size=32000,
@@ -107,11 +110,9 @@ transformer_configs = {
         hidden_dim=22016,
         rope_base=1000000,
     ),  # CodeLlama-34B-Python-hf
-    "70B": dict(
-        n_layer=80, n_heads=64, dim=8192, n_local_heads=8, hidden_dim=28672
-    ),
+    "70B": dict(n_layers=80, n_heads=64, dim=8192, n_local_heads=8, hidden_dim=28672),
     "Mistral-7B": dict(
-        n_layer=32,
+        n_layers=32,
         n_heads=32,
         n_local_heads=8,
         dim=4096,
@@ -119,7 +120,7 @@ transformer_configs = {
         vocab_size=32000,
     ),
     "Mistral-7B-Instruct-v0.1": dict(
-        n_layer=32,
+        n_layers=32,
         n_heads=32,
         n_local_heads=8,
         dim=4096,
@@ -127,25 +128,24 @@ transformer_configs = {
         vocab_size=32000,
     ),
     "Mistral-7B-Instruct-v0.2": dict(
-        n_layer=32,
+        n_layers=32,
         n_heads=32,
         n_local_heads=8,
         dim=4096,
         hidden_dim=14336,
         vocab_size=32000,
     ),
-    "stories15M": dict(n_layer=6, n_heads=6, dim=288),
-    "stories110M": dict(n_layer=12, n_heads=12, dim=768),
+    "stories15M": dict(n_layers=6, n_heads=6, dim=288),
+    "stories110M": dict(n_layers=12, n_heads=12, dim=768),
 }
 
 
 class KVCache(nn.Module):
-    def __init__(
-        self, max_batch_size, max_seq_length, n_heads, head_dim, dtype=None):
+    def __init__(self, max_batch_size, max_seq_length, n_heads, head_dim, dtype=None):
         # torch.float): # bfloat16    ):
         super().__init__()
         if not dtype:
-            dtype=get_precision()
+            dtype = get_precision()
         cache_shape = (max_batch_size, n_heads, max_seq_length, head_dim)
         self.register_buffer("k_cache", torch.zeros(cache_shape, dtype=dtype))
         self.register_buffer("v_cache", torch.zeros(cache_shape, dtype=dtype))
@@ -169,7 +169,7 @@ class Transformer(nn.Module):
 
         self.tok_embeddings = nn.Embedding(config.vocab_size, config.dim)
         self.layers = nn.ModuleList(
-            TransformerBlock(config) for _ in range(config.n_layer)
+            TransformerBlock(config) for _ in range(config.n_layers)
         )
         self.norm = RMSNorm(config.dim, eps=config.norm_eps)
         self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
@@ -238,9 +238,10 @@ class Transformer(nn.Module):
     @classmethod
     def from_gguf(cls, gguf_path: str):
         from build.gguf_loader import load_llama_from_gguf_file
+
         model = load_llama_from_gguf_file(gguf_path)
         return model
-    
+
 
 class TransformerBlock(nn.Module):
     def __init__(self, config: ModelArgs) -> None:
@@ -267,8 +268,12 @@ class Attention(nn.Module):
         # total_head_dim = (config.n_heads + 2 * config.n_local_heads) * config.head_dim
         # self.wqkv = nn.Linear(config.dim, total_head_dim, bias=False)
         self.wq = nn.Linear(config.dim, config.n_heads * config.head_dim, bias=False)
-        self.wk = nn.Linear(config.dim, config.n_local_heads * config.head_dim, bias=False)
-        self.wv = nn.Linear(config.dim, config.n_local_heads * config.head_dim, bias=False)
+        self.wk = nn.Linear(
+            config.dim, config.n_local_heads * config.head_dim, bias=False
+        )
+        self.wv = nn.Linear(
+            config.dim, config.n_local_heads * config.head_dim, bias=False
+        )
 
         self.wo = nn.Linear(config.dim, config.dim, bias=False)
         self.kv_cache = None
@@ -297,7 +302,6 @@ class Attention(nn.Module):
 
         return
 
-    
         def _unfuse_wqkv_state_dict(
             state_dict: Dict[str, torch.Tensor],
             dim: int,
@@ -306,15 +310,16 @@ class Attention(nn.Module):
                 if key.endswith("wqkv.weight"):
                     tensor = state_dict[key]
                     wq_key = key.replace("wqkv.weight", "wq.weight")
-                    state_dict[wq_key] = tensor[: dim]
+                    state_dict[wq_key] = tensor[:dim]
                     wk_key = key.replace("wqkv.weight", "wk.weight")
                     wv_key = key.replace("wqkv.weight", "wv.weight")
-                    wk, wv = tensor[dim :].chunk(2, 0)
+                    wk, wv = tensor[dim:].chunk(2, 0)
                     state_dict[wk_key] = wk
                     state_dict[wv_key] = wv
                     state_dict.pop(key)
                 else:
                     continue
+
         _unfuse_wqkv_state_dict(state_dict, self.dim)
 
     def forward(
@@ -325,7 +330,6 @@ class Attention(nn.Module):
         input_pos: Optional[Tensor] = None,
     ) -> Tensor:
         bsz, seqlen, _ = x.shape
-
 
         q = self.wq(x)
         k = self.wk(x)
@@ -379,8 +383,11 @@ class RMSNorm(nn.Module):
         output = self._norm(x.float()).type_as(x)
         return output * self.weight
 
+
 # transpsoed first two arguments to align with model in ET
-def precompute_freqs_cis(n_elem: int, seq_len: int, base: int = 10000, dtype=None) -> Tensor:
+def precompute_freqs_cis(
+    n_elem: int, seq_len: int, base: int = 10000, dtype=None
+) -> Tensor:
     if not dtype:
         dtype = get_precision()
     freqs = 1.0 / (
@@ -390,7 +397,7 @@ def precompute_freqs_cis(n_elem: int, seq_len: int, base: int = 10000, dtype=Non
     freqs = torch.outer(t, freqs)
     freqs_cis = torch.polar(torch.ones_like(freqs), freqs)
     cache = torch.stack([freqs_cis.real, freqs_cis.imag], dim=-1)
-    return cache.to(dtype=dtype) # bfloat16)
+    return cache.to(dtype=dtype)  # bfloat16)
 
 
 def apply_rotary_emb(x: Tensor, freqs_cis: Tensor) -> Tensor:

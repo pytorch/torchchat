@@ -3,14 +3,26 @@
 
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
-import sys
+import argparse
 import time
-from pathlib import Path
 from typing import Optional
 
 import torch
 import torch._dynamo.config
 import torch._inductor.config
+
+from build.builder import (
+    _initialize_model,
+    _initialize_tokenizer,
+    BuilderArgs,
+    TokenizerArgs,
+)
+
+from build.model import Transformer
+from cli import add_arguments_for_eval, arg_init
+from generate import encode_tokens, model_forward
+
+from quantize import set_precision
 
 torch._dynamo.config.automatic_dynamic_shapes = True
 torch._inductor.config.triton.unique_kernel_names = True
@@ -18,32 +30,26 @@ torch._inductor.config.epilogue_fusion = False
 torch._inductor.config.triton.cudagraphs = True
 torch._dynamo.config.cache_size_limit = 100000
 
-from cli import cli_args
-from quantize import name_to_dtype, set_precision
-
-from build.model import Transformer
 
 try:
     import lm_eval
+
     lm_eval_available = True
 except:
     lm_eval_available = False
 
-from build.builder import _initialize_model, _initialize_tokenizer, BuilderArgs, TokenizerArgs
-from generate import encode_tokens, model_forward
 
 if lm_eval_available:
-    try: # lm_eval version 0.4
+    try:  # lm_eval version 0.4
+        from lm_eval.evaluator import evaluate
         from lm_eval.models.huggingface import HFLM as eval_wrapper
         from lm_eval.tasks import get_task_dict
-        from lm_eval.evaluator import evaluate
-    except: #lm_eval version 0.3
-        from lm_eval import base
-        from lm_eval import tasks
-        from lm_eval import evaluator
-        eval_wrapper=base.BaseLM
-        get_task_dict=tasks.get_task_dict
-        evaluate=evaluator.evaluate
+    except:  # lm_eval version 0.3
+        from lm_eval import base, evaluator, tasks
+
+        eval_wrapper = base.BaseLM
+        get_task_dict = tasks.get_task_dict
+        evaluate = evaluator.evaluate
 
 
 def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
@@ -84,20 +90,22 @@ def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
 
     return seq, input_pos, max_seq_length
 
+
 class GPTFastEvalWrapper(eval_wrapper):
     """
     A wrapper class for GPTFast, providing integration with the lm-evaluation-harness library.
     """
+
     def __init__(
         self,
         model: Transformer,
         tokenizer,
-        max_seq_length: Optional[int]=None,
+        max_seq_length: Optional[int] = None,
     ):
         super().__init__()
         self._model = model
         self._tokenizer = tokenizer
-        self._device = torch.device('cuda')
+        self._device = torch.device("cuda")
         self._max_seq_length = 2048 if max_seq_length is None else max_seq_length
 
     @property
@@ -121,8 +129,7 @@ class GPTFastEvalWrapper(eval_wrapper):
         return self._device
 
     def tok_encode(self, string: str, **kwargs):
-        encoded = encode_tokens(self._tokenizer,
-            string, bos=True, device=self._device)
+        encoded = encode_tokens(self._tokenizer, string, bos=True, device=self._device)
         # encoded is a pytorch tensor, but some internal logic in the
         # eval harness expects it to be a list instead
         # TODO: verify this for multi-batch as well
@@ -138,19 +145,20 @@ class GPTFastEvalWrapper(eval_wrapper):
         inps = inps.squeeze(0)
 
         max_new_tokens = 1
-        seq, input_pos, max_seq_length = \
+        seq, input_pos, max_seq_length = (
             setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
                 self._model,
                 inps,
                 max_new_tokens,
                 self.max_length,
             )
+        )
         x = seq.index_select(0, input_pos).view(1, -1)
         logits = model_forward(self._model, x, input_pos)
         return logits
 
     def _model_generate(self, context, max_length, eos_token_id):
-        raise Exception('unimplemented')
+        raise Exception("unimplemented")
 
 
 @torch.no_grad()
@@ -185,8 +193,8 @@ def eval(
     except:
         pass
 
-    if 'hendrycks_test' in tasks:
-        tasks.remove('hendrycks_test')
+    if "hendrycks_test" in tasks:
+        tasks.remove("hendrycks_test")
         tasks += [x for x in lm_eval.tasks.hendrycks_test.create_all_tasks().keys()]
     task_dict = get_task_dict(tasks)
 
@@ -212,37 +220,30 @@ def main(args) -> None:
 
     builder_args = BuilderArgs.from_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
-    
-    checkpoint_path = args.checkpoint_path
-    checkpoint_dir = args.checkpoint_dir
-    params_path = args.params_path
-    params_table = args.params_table
-    gguf_path = args.gguf_path
-    tokenizer_path = args.tokenizer_path
-    dso_path = args.dso_path
-    pte_path = args.pte_path
     quantize = args.quantize
     device = args.device
-    model_dtype = args.dtype    
     tasks = args.tasks
     limit = args.limit
     max_seq_length = args.max_seq_length
-    use_tiktoken = args.tiktoken
-    
+
     print(f"Using device={device}")
-    set_precision(buildeer_args.precision)
+    set_precision(builder_args.precision)
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
     builder_args.setup_caches = False
     model = _initialize_model(
-        buildeer_args,
+        builder_args,
         quantize,
     )
 
     if compile:
-        assert not (builder_args.dso_path or builder_args.pte_path), "cannot compile exported model"
+        assert not (
+            builder_args.dso_path or builder_args.pte_path
+        ), "cannot compile exported model"
         global model_forward
-        model_forward = torch.compile(model_forward,  mode="reduce-overhead", dynamic=True, fullgraph=True)
+        model_forward = torch.compile(
+            model_forward, mode="reduce-overhead", dynamic=True, fullgraph=True
+        )
         torch._inductor.config.coordinate_descent_tuning = True
 
     t1 = time.time()
@@ -268,11 +269,10 @@ def main(args) -> None:
     for task, res in result["results"].items():
         print(f"{task}: {res}")
 
-if __name__ == '__main__':
-    def cli():
-        args = cli_args()
-        main(args)
-
 
 if __name__ == "__main__":
-        cli()
+    parser = argparse.ArgumentParser(description="Export specific CLI.")
+    add_arguments_for_eval(parser)
+    args = parser.parse_args()
+    args = arg_init(args)
+    main(args)

@@ -3,49 +3,57 @@
 
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+import argparse
 import itertools
-import sys
 import os
+import sys
 import time
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, Tuple
-from dataclasses import dataclass
 
 import torch
 import torch._dynamo.config
 import torch._inductor.config
 
-from build.builder import _load_model, _initialize_model, _initialize_tokenizer, BuilderArgs, TokenizerArgs
+from build.builder import (
+    _initialize_model,
+    _initialize_tokenizer,
+    _load_model,
+    BuilderArgs,
+    TokenizerArgs,
+)
 from build.model import Transformer
-from quantize import quantize_model, name_to_dtype, set_precision, get_precision
-from cli import cli_args
+from cli import add_arguments_for_generate, arg_init, check_args
+from quantize import set_precision
+
 
 @dataclass
 class GeneratorArgs:
-    prompt: str = "torchat is pronounced torch-chat and is so cool because"
-    chat: bool = False,
-    gui: bool = False,
-    num_samples: int =1,
-    max_new_tokens: int = 200,
-    top_k: int = 200,
-    temperature: int = 0, # deterministic argmax
-    compile: bool = False,
-    compile_prefill: bool = False,
-    speculate_k: int = 5,
+    prompt: str = "torchchat is pronounced torch-chat and is so cool because"
+    chat: bool = (False,)
+    gui: bool = (False,)
+    num_samples: int = (1,)
+    max_new_tokens: int = (200,)
+    top_k: int = (200,)
+    temperature: int = (0,)  # deterministic argmax
+    compile: bool = (False,)
+    compile_prefill: bool = (False,)
+    speculate_k: int = (5,)
 
     @classmethod
-    def from_args(cls, args): # -> GeneratorArgs:
+    def from_args(cls, args):  # -> GeneratorArgs:
         return cls(
-            prompt = args.prompt,
-            chat = args.chat,
-            gui = args.gui,
-            num_samples = args.num_samples,
-            max_new_tokens = args.max_new_tokens,
-            top_k = args.top_k,
-            temperature = args.temperature,
-            compile = args.compile,
-            compile_prefill = args.compile_prefill,
-            speculate_k = args.speculate_k,
+            prompt=args.prompt,
+            chat=args.chat,
+            gui=args.gui,
+            num_samples=args.num_samples,
+            max_new_tokens=args.max_new_tokens,
+            top_k=args.top_k,
+            temperature=args.temperature,
+            compile=args.compile,
+            compile_prefill=args.compile_prefill,
+            speculate_k=args.speculate_k,
         )
 
 
@@ -130,7 +138,7 @@ def decode_n_tokens(
     **sampling_kwargs,
 ):
     new_tokens, new_probs = [], []
-    for i in range(num_new_tokens):
+    for _ in range(num_new_tokens):
         with torch.backends.cuda.sdp_kernel(
             enable_flash=False, enable_mem_efficient=False, enable_math=True
         ):  # Actually better for Inductor to codegen attention here
@@ -151,6 +159,7 @@ def decode_n_tokens(
 #
 # except:
 #     print("compiled model load not successful, running eager model")
+
 
 def model_forward(model, x, input_pos):
     return model(x, input_pos)
@@ -336,20 +345,18 @@ def _main(
 
     is_chat = "chat" in str(os.path.basename(builder_args.checkpoint_path))
     if is_chat:
-            raise RuntimeError("need to stop filename based kludgery, at a minimum need to look at all pathnames. in particular, this now fails because chat is part of the pathname, yuck!")
+        raise RuntimeError(
+            "need to stop filename based kludgery, at a minimum need to look at all pathnames. in particular, this now fails because chat is part of the pathname, yuck!"
+        )
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
 
     builder_args.setup_caches = False
-    model = _initialize_model(
-        builder_args,
-        quantize
-    )
+    model = _initialize_model(builder_args, quantize)
 
     # will add a version of _initialize_model in future
     # (need additional args)
     if is_speculative:
-        from builder import _load_model
         speculative_builder_args = builder_args
 
         draft_model = _load_model(
@@ -359,7 +366,7 @@ def _main(
         draft_model = None
 
     encoded = encode_tokens(tokenizer, prompt, bos=True, device=builder_args.device)
-    print (encoded)
+    print(encoded)
     prompt_length = encoded.size(0)
 
     model_size = sum(
@@ -369,7 +376,9 @@ def _main(
         ]
     )
     if compile:
-        if is_speculative and builder_args.use_tp:  # and ("cuda" in builder_args.device):
+        if (
+            is_speculative and builder_args.use_tp
+        ):  # and ("cuda" in builder_args.device):
             torch._inductor.config.triton.cudagraph_trees = (
                 False  # Bug with cudagraph trees in this case
             )
@@ -401,7 +410,9 @@ def _main(
             prompt = input("What is your prompt? ")
             if is_chat:
                 prompt = f"{B_INST} {prompt.strip()} {E_INST}"
-            encoded = encode_tokens(tokenizer, prompt, bos=True, device=builder_args.device)
+            encoded = encode_tokens(
+                tokenizer, prompt, bos=True, device=builder_args.device
+            )
 
         if chat_mode and i >= 0:
             buffer = []
@@ -484,8 +495,6 @@ def main(args):
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
-    generator_args = GeneratorArgs.from_args(args)
-
     _main(
         builder_args,
         speculative_builder_args,
@@ -503,10 +512,11 @@ def main(args):
         args.quantize,
     )
 
-def cli():
-    args = cli_args()
-    main(args)
-
 
 if __name__ == "__main__":
-        cli()
+    parser = argparse.ArgumentParser(description="Generate specific CLI.")
+    add_arguments_for_generate(parser)
+    args = parser.parse_args()
+    check_args(args, "generate")
+    args = arg_init(args)
+    main(args)

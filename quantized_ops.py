@@ -10,16 +10,14 @@ import torch
 import torch.nn.functional as F
 from torch.library import impl, impl_abstract
 
-torchat_lib = torch.library.Library(
-    "torchat", "DEF"
+torchchat_lib = torch.library.Library("torchchat", "DEF")
+
+torchchat_lib.define(
+    "embedding_int8(Tensor input, Tensor weight, " "Tensor scales) -> Tensor",
 )
 
-torchat_lib.define(
-    "embedding_int8(Tensor input, Tensor weight, "
-    "Tensor scales) -> Tensor",
-)
 
-@impl(torchat_lib, "embedding_int8", "CompositeExplicitAutograd")
+@impl(torchchat_lib, "embedding_int8", "CompositeExplicitAutograd")
 def embedding_int8(
     input: torch.Tensor,
     weight: torch.Tensor,
@@ -27,9 +25,7 @@ def embedding_int8(
 ) -> torch.Tensor:
     indices = input
     # embedding_byte_weight_checks(weight, weight_scales, weight_zero_points)
-    groupsize = weight.size(1) // (
-        scales.size(1) if scales.dim() == 2 else 1
-    )
+    groupsize = weight.size(1) // (scales.size(1) if scales.dim() == 2 else 1)
     # ET definition
     if False:
         weight_zero_points = None
@@ -45,68 +41,82 @@ def embedding_int8(
         )
         return torch.ops.aten.embedding.default(weight, indices)
 
-    scales = scales.view(weight.shape[0], -1)   
+    scales = scales.view(weight.shape[0], -1)
     result_weights = F.embedding(indices, weight)
     result_scales = F.embedding(indices, scales)
 
-    rw_view = result_weights.to(dtype=result_scales.dtype).view(tuple(result_weights.shape[:-1]) + (scales.shape[1], -1, ))
-    rs_view = result_scales.view(tuple(result_scales.shape[:-1]) + (scales.shape[1], 1, ))
+    rw_view = result_weights.to(dtype=result_scales.dtype).view(
+        tuple(result_weights.shape[:-1])
+        + (
+            scales.shape[1],
+            -1,
+        )
+    )
+    rs_view = result_scales.view(
+        tuple(result_scales.shape[:-1])
+        + (
+            scales.shape[1],
+            1,
+        )
+    )
     # print(f"rw_view {rw_view.shape}")
     # print(f"rs_view {rs_view.shape}")
 
     r = rw_view * rs_view
     return r.view(indices.size() + (-1,))
-        
-        
-torchat_lib.define(
+
+
+torchchat_lib.define(
     "linear_int8(Tensor input, Tensor weight, Tensor scales, "
     "Tensor bias = None) -> Tensor",
 )
 
-@impl(torchat_lib, "linear_int8", "CompositeExplicitAutograd")
+
+@impl(torchchat_lib, "linear_int8", "CompositeExplicitAutograd")
 def linear_int8(
-        input: torch.Tensor,
-        weight: torch.Tensor,
-        scales: torch.Tensor,
-        bias: Optional[torch.Tensor] = None,
+    input: torch.Tensor,
+    weight: torch.Tensor,
+    scales: torch.Tensor,
+    bias: Optional[torch.Tensor] = None,
 ) -> torch.Tensor:
     assert bias is None, "bias != None not implemented"
-    
+
     scales = scales.view(scales.shape[0], -1)
     no_groups = scales.shape[1]
 
     # for now, we special-case channel-wise, because we know how to
-    # make that fast with Triton 
+    # make that fast with Triton
     if scales.shape[1] == 1:
         return F.linear(input, weight.to(dtype=input.dtype)) * scales
     else:
         return F.linear(
             input,
-            (weight.to(dtype=input.dtype).view(weight.shape[0],no_groups, -1)
-             * scales.view(weight.shape[0], no_groups, -1)
-            ).view(weight.shape[0], -1)
+            (
+                weight.to(dtype=input.dtype).view(weight.shape[0], no_groups, -1)
+                * scales.view(weight.shape[0], no_groups, -1)
+            ).view(weight.shape[0], -1),
         )
 
 
-
-torchat_lib.define(
+torchchat_lib.define(
     "linear_int4(Tensor input, Tensor weight, Tensor scales_and_zeros, "
     "Tensor bias=None, *, int groupsize, int origin_in_features, "
     "int int_features, int out_features, bool padding = True) -> Tensor",
 )
 
-@impl(torchat_lib, "linear_int4", "CompositeExplicitAutograd")
+
+@impl(torchchat_lib, "linear_int4", "CompositeExplicitAutograd")
 def linear_int4(
-        input: torch.Tensor,
-        weight: torch.Tensor,
-        scales_and_zeros: torch.Tensor,
-        bias: torch.Tensor,
-        *,
-        groupsize: int,
-        origin_in_features: int,
-        in_features: int,
-        out_features: int,
-        padding: bool = True,
+    input: torch.Tensor,
+    weight: torch.Tensor,
+    scales_and_zeros: torch.Tensor,
+    bias: torch.Tensor,
+    *,
+    groupsize: int,
+    origin_in_features: int,
+    in_features: int,
+    out_features: int,
+    padding: bool = True,
 ) -> torch.Tensor:
     assert bias is None, "bias != None not implemented"
 
@@ -116,7 +126,7 @@ def linear_int4(
     # the weight is in int4pack format
     # rename to remind ourselves of that
     weight_int4pack = weight
-    
+
     origin_input_size = input.size()
     input = input.reshape(-1, origin_input_size[-1])
     c = torch.ops.aten._weight_int4pack_mm(
@@ -130,16 +140,15 @@ def linear_int4(
     return c
 
 
-torchat_lib.define(
+torchchat_lib.define(
     "linear_a8w4dq(Tensor input, Tensor weight, Tensor scales, "
     "Tensor zeros, int out_features, int groupsize, "
     "dtype precision) -> Tensor",
 )
 
-@impl(torchat_lib, "linear_a8w4dq", "CompositeExplicitAutograd")
-def linear_a8w4dq(
-    input, weight, scales, zeros, out_features, groupsize, precision
-):
+
+@impl(torchchat_lib, "linear_a8w4dq", "CompositeExplicitAutograd")
+def linear_a8w4dq(input, weight, scales, zeros, out_features, groupsize, precision):
     x = per_token_dynamic_quant(input)
     weight_int8 = weight
     # TODO: verify and remove following reshape code

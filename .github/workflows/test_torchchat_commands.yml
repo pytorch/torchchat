@@ -1,0 +1,57 @@
+name: Run torchchat command tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  torchchat-command-load-test:
+    strategy:
+      matrix:
+        runner: [macos-14]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Install requirements
+        run: |
+          echo "Installing pip packages"
+          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt
+
+      - name: Download Stories files
+        run: |
+
+          mkdir -p checkpoints/stories15M
+          pushd checkpoints/stories15M
+          curl -fsSL -O https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+          curl -fsSL -O https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+          popd
+
+      - name: Test generate
+        run: |
+
+          export MODEL_PATH=checkpoints/stories15M/stories15M.pt
+          export MODEL_NAME=stories15M
+          export MODEL_DIR=/tmp
+          
+          python generate.py --device cpu --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager1
+          python torchchat.py generate --device cpu --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager2
+          cat ./output_eager1
+          cat ./output_eager2
+          echo "Tests complete."
+     
