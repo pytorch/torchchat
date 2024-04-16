@@ -699,6 +699,13 @@ def _int4_calc_padded_size(k, groupsize=1, innner_k_tiles=1):
 def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, groupsize):
     origin_x_size = x.size()
     x = x.reshape(-1, origin_x_size[-1])
+
+    # avoid errors in MPSaround bfloat16 until int4pack_mm is in nightlies
+    # print("MPS workaround active, will produce bogus results")
+    if "mps" in str(x.device):
+        new_shape = origin_x_size[:-1] + (out_features,)
+        return torch.zeros(new_shape, dtype=x.dtype, device=x.device)
+    
     c = torch.ops.aten._weight_int4pack_mm(
         x.to(torch.bfloat16), # TODO: should probably make a warning if x is not already bfloat16
         weight_int4pack,
@@ -713,22 +720,37 @@ def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, grou
 def _int4_check_linear_int4_k(k, groupsize = 1, inner_k_tiles = 1):
     return k % groupsize == 0 and k % (inner_k_tiles * 16) == 0
 
-def replace_linear_int4(module, groupsize, inner_k_tiles, padding_allowed, use_cuda=False):
+def replace_linear_int4(
+        module,
+        device,
+        groupsize,
+        inner_k_tiles,
+        padding_allowed,
+):
     for name, child in module.named_children():
         if isinstance(child, nn.Linear):
             if _int4_check_linear_int4_k(child.in_features, groupsize, inner_k_tiles) or padding_allowed:
-                setattr(module, name, WeightOnlyInt4Linear(
-                    child.in_features, child.out_features, bias=False,
-                    groupsize=groupsize, inner_k_tiles=inner_k_tiles, use_cuda=use_cuda
+                setattr(
+                    module,
+                    name,
+                    WeightOnlyInt4Linear(
+                        device,
+                        child.in_features,
+                        child.out_features,
+                        bias=False,
+                        groupsize=groupsize,
+                        inner_k_tiles=inner_k_tiles,
                 ))
         else:
-            replace_linear_int4(child, groupsize, inner_k_tiles, padding_allowed, use_cuda)
+            replace_linear_int4(
+                child, device, groupsize, inner_k_tiles, padding_allowed
+            )
 
 
 class WeightOnlyInt4QuantHandler(QuantHandler):
     def __init__(self, mod, device, *, groupsize=128, inner_k_tiles=8, padding_allowed=True):
         self.mod = mod
-        self.device = device,
+        self.device = device
         self.groupsize = groupsize
         self.inner_k_tiles = inner_k_tiles
         self.padding_allowed = padding_allowed
@@ -761,14 +783,16 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
                 weight_int4pack, scales_and_zeros = _int4_prepare_int4_weight_and_scales_and_zeros(
                     weight.to(torch.float), self.groupsize, self.inner_k_tiles
                 )
-                cur_state_dict[f"{fqn}.weight"] = weight_int4pack.to('cpu')
-                cur_state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros.to('cpu')
+                weight_int4pack = weight_int4pack.to(device=self.device)
+                scales_and_zeros = scales_and_zeros.to(device=self.device)
+                cur_state_dict[f"{fqn}.weight"] = weight_int4pack
+                cur_state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros
 
         return cur_state_dict
 
 
-    def convert_for_runtime(self, use_cuda=False):
-        replace_linear_int4(self.mod, self.groupsize, self.inner_k_tiles, self.padding_allowed, use_cuda)
+    def convert_for_runtime(self):
+        replace_linear_int4(self.mod, self.device, self.groupsize, self.inner_k_tiles, self.padding_allowed)
         return self.mod
 
     def quantized_model(self) -> nn.Module:
@@ -785,8 +809,14 @@ class WeightOnlyInt4Linear(torch.nn.Module):
     weight: torch.Tensor
 
     def __init__(
-            self, in_features: int, out_features: int,
-            bias=True, device=None, dtype=None, groupsize: int = 128, inner_k_tiles: int = 8, use_cuda=True,
+            self,
+            device: str,
+            in_features: int,
+            out_features: int,
+            bias=True,
+            dtype=None,
+            groupsize: int = 128,
+            inner_k_tiles: int = 8, 
     ) -> None:
         super().__init__()
         self.padding = not _int4_check_linear_int4_k(in_features, groupsize, inner_k_tiles)
@@ -805,12 +835,20 @@ class WeightOnlyInt4Linear(torch.nn.Module):
         assert in_features % (inner_k_tiles * 16) == 0, "require in_features % (innerKTiles * 16) == 0"
         self.register_buffer(
             "weight",
-            torch.empty((out_features // 8, in_features // (inner_k_tiles * 16), 32, inner_k_tiles // 2), dtype=torch.int32)
+            torch.empty(
+                (out_features // 8, in_features // (inner_k_tiles * 16), 32, inner_k_tiles // 2),
+                dtype=torch.int32,
+                device=device,
+            )
         )
         # MKG: torch.float
         self.register_buffer(
             "scales_and_zeros",
-            torch.empty((in_features // groupsize, out_features, 2), dtype=get_precision())
+            torch.empty(
+                (in_features // groupsize, out_features, 2),
+                dtype=get_precision(),
+                device=device,
+            )
         )
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
@@ -821,7 +859,10 @@ class WeightOnlyInt4Linear(torch.nn.Module):
             input = F.pad(input, pad=(0, self.in_features - self.origin_in_features))
         return linear_forward_int4(
             input,
-            self.weight, self.scales_and_zeros, self.out_features, self.groupsize
+            self.weight,
+            self.scales_and_zeros,
+            self.out_features,
+            self.groupsize
         )
 
 #########################################################################
@@ -1261,8 +1302,8 @@ class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
         super().__init__()
 
 
-    def convert_for_runtime(self, use_cuda):
-        replace_linear_int4(self.mod, self.groupsize, self.inner_k_tiles, self.padding, use_cuda)
+    def convert_for_runtime(self):
+        replace_linear_int4(self.mod, self.device, self.groupsize, self.inner_k_tiles, self.padding)
         return self.mod
 
     def quantized_model(self) -> nn.Module:
@@ -1350,6 +1391,7 @@ class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
 class WeightOnlyInt4HqqQuantHandler:
     def __init__(self, mod, device, *, groupsize):
         self.mod = mod
+        self.device = device
         self.groupsize = groupsize
 
     def create_quantized_state_dict(self):
@@ -1373,15 +1415,15 @@ class WeightOnlyInt4HqqQuantHandler:
         # we use Int4 packaged in an int8 for now, packing to follow
         # return WeightOnlyInt4QuantHandler(self.mod, self.groupsize).create_quantized_state_dict()
         return WeightOnlyInt8QuantHandler(
-            self.mod, bitwidth=4, groupsize=self.groupsize
+            self.mod, self.device, bitwidth=4, groupsize=self.groupsize
         ).create_quantized_state_dict()
 
     def convert_for_runtime(self):
         # we use Int4 packaged in an int8 for now, packing to follow
         # ALSO: all code must work for CPU, CUDA, MPS
-        # return WeightOnlyInt4GPTQQuantHandler(self.mod, self.groupsize).convert_for_runtime(use_cuda=True)
+        # return WeightOnlyInt4GPTQQuantHandler(self.mod, self.groupsize).convert_for_runtime()
         return WeightOnlyInt4GPTQQuantHandler(
-            self.mod, bitwidth=4, groupsize=self.groupsize
+            self.mod, self.device, bitwidth=4, groupsize=self.groupsize
         ).convert_for_runtime()
 
     def quantized_model(self) -> nn.Module:
