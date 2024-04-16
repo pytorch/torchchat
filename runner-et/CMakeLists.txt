@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.24)
 set(CMAKE_CXX_STANDARD 17)
 
-project(Torchat)
+project(Torchchat)
 
 include(CMakePrintHelpers)
-set(TORCHAT_ROOT $ENV{TORCHAT_ROOT})
-cmake_print_variables(TORCHAT_ROOT)
+set(TORCHCHAT_ROOT $ENV{TORCHCHAT_ROOT})
+cmake_print_variables(TORCHCHAT_ROOT)
 
-find_package(executorch CONFIG REQUIRED PATHS ${TORCHAT_ROOT}/build/install/lib/cmake/ExecuTorch)
-set(_common_include_directories ${TORCHAT_ROOT}/build/src)
+find_package(executorch CONFIG REQUIRED PATHS ${TORCHCHAT_ROOT}/build/install/lib/cmake/ExecuTorch)
+set(_common_include_directories ${TORCHCHAT_ROOT}/build/src)
 cmake_print_variables(_common_include_directories)
 
 target_include_directories(executorch INTERFACE ${_common_include_directories}) # Ideally ExecuTorch installation process would do this
@@ -19,7 +19,7 @@ target_link_libraries(
     runner_et PRIVATE
         executorch
         extension_module
-        ${TORCHAT_ROOT}/build/src/executorch/cmake-out/extension/data_loader/libextension_data_loader.a # This one does not get installed by ExecuTorch
+        ${TORCHCHAT_ROOT}/build/src/executorch/cmake-out/extension/data_loader/libextension_data_loader.a # This one does not get installed by ExecuTorch
         optimized_kernels
         portable_kernels
         cpublas

@@ -29,7 +29,7 @@ from quantize import get_precision, name_to_dtype, quantize_model, set_precision
 
 @dataclass
 class GeneratorArgs:
-    prompt: str = "torchat is pronounced torch-chat and is so cool because"
+    prompt: str = "torchchat is pronounced torch-chat and is so cool because"
     chat: bool = (False,)
     gui: bool = (False,)
     num_samples: int = (1,)
