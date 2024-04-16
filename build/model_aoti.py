@@ -1,12 +1,6 @@
-from ctypes import c_void_p
-
 import torch
 import torch.nn as nn
-from torch import empty
-from torch._dynamo.testing import rand_strided
 from torch._inductor.codecache import AsyncCompile
-from torch._inductor.utils import print_performance
-from torch._inductor.wrapper_benchmark import compiled_module_main
 
 # with open("./dso_model.h", "rb") as f:
 #     dso_src = f.read().decode("utf-8")
