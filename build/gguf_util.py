@@ -63,7 +63,7 @@ def test_by_to_float(source_file: str, target_file: str) -> None:
             )
             print("First 5 elements of converted source: ", source.reshape(-1)[0:5])
             print("First 5 elements of target: ", target.reshape(-1)[0:5])
-            assert False, "found mismatch"
+            raise AssertionError("found mismatch")
 
     print("All tensors match.")
 

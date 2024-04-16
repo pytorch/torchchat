@@ -5,14 +5,12 @@
 # LICENSE file in the root directory of this source tree.
 
 
-import argparse
-
 import copy
 import logging
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Mapping
+from typing import Any, Dict
 
 import gguf
 
@@ -30,8 +28,6 @@ from build.gguf_util import F16, F32, Q4_0, Q6_K
 
 wd = Path(__file__).parent.resolve()
 sys.path.append(str(wd))
-
-from typing import Set
 
 from model import ModelArgs, Transformer
 
