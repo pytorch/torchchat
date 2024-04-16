@@ -4,16 +4,16 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-import time
 import os
+import time
 from pathlib import Path
 
 import torch
 import torch.nn as nn
-from torch.export import Dim, export
-
-from quantize import quantize_model, name_to_dtype, set_precision, get_precision
 from cli import cli_args
+
+from quantize import get_precision, name_to_dtype, quantize_model, set_precision
+from torch.export import Dim, export
 
 try:
     executorch_export_available = True
@@ -22,12 +22,12 @@ except Exception as e:
     executorch_exception = f"ET EXPORT EXCEPTION: {e}"
     executorch_export_available = False
 
-from export_aoti import export_model as export_model_aoti
+from build.builder import _initialize_model, BuilderArgs, TokenizerArgs
 
 from build.model import Transformer
-from build.builder import _initialize_model, BuilderArgs, TokenizerArgs
+from export_aoti import export_model as export_model_aoti
 from generate import decode_one_token
-from quantize import quantize_model, name_to_dtype
+from quantize import name_to_dtype, quantize_model
 from torch._export import capture_pre_autograd_graph
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -40,7 +40,6 @@ def device_sync(device):
         pass
     else:
         print(f"device={device} is not yet suppported")
-
 
 
 def main(args):
@@ -70,7 +69,9 @@ def main(args):
                 print(f"Exporting model using Executorch to {output_pte_path}")
                 export_model_et(model, builder_args.device, args.output_pte_path, args)
             else:
-                print(f"Export with executorch requested but Executorch could not be loaded")
+                print(
+                    f"Export with executorch requested but Executorch could not be loaded"
+                )
                 print(executorch_exception)
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
@@ -81,6 +82,7 @@ def main(args):
 def cli():
     args = cli_args()
     main(args)
+
 
 if __name__ == "__main__":
     cli()
