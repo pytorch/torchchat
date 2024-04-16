@@ -41,18 +41,24 @@ def check_args(args, command_name: str):
 
 
 def add_arguments_for_generate(parser):
+    # Only generate specific options should be here
     _add_arguments_common(parser)
 
 
 def add_arguments_for_eval(parser):
+    # Only eval specific options should be here
     _add_arguments_common(parser)
 
 
 def add_arguments_for_export(parser):
+    # Only export specific options should be here
     _add_arguments_common(parser)
 
 
 def _add_arguments_common(parser):
+    # TODO: Refactor this so that only common options are here
+    # and subcommand-specific options are inside individual
+    # add_arguments_for_generate, add_arguments_for_export etc.
     parser.add_argument(
         "--seed",
         type=int,
