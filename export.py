@@ -4,16 +4,16 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+import argparse
 import os
-import time
-from pathlib import Path
 
 import torch
-import torch.nn as nn
-from cli import cli_args
 
-from quantize import get_precision, name_to_dtype, quantize_model, set_precision
-from torch.export import Dim, export
+from build.builder import _initialize_model, BuilderArgs
+from cli import add_arguments_for_export, arg_init, check_args
+from export_aoti import export_model as export_model_aoti
+
+from quantize import set_precision
 
 try:
     executorch_export_available = True
@@ -22,13 +22,6 @@ except Exception as e:
     executorch_exception = f"ET EXPORT EXCEPTION: {e}"
     executorch_export_available = False
 
-from build.builder import _initialize_model, BuilderArgs, TokenizerArgs
-
-from build.model import Transformer
-from export_aoti import export_model as export_model_aoti
-from generate import decode_one_token
-from quantize import name_to_dtype, quantize_model
-from torch._export import capture_pre_autograd_graph
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -44,7 +37,6 @@ def device_sync(device):
 
 def main(args):
     builder_args = BuilderArgs.from_args(args)
-    tokenizer_args = TokenizerArgs.from_args(args)
     quantize = args.quantize
 
     print(f"Using device={builder_args.device}")
@@ -70,7 +62,7 @@ def main(args):
                 export_model_et(model, builder_args.device, args.output_pte_path, args)
             else:
                 print(
-                    f"Export with executorch requested but Executorch could not be loaded"
+                    "Export with executorch requested but Executorch could not be loaded"
                 )
                 print(executorch_exception)
         if output_dso_path:
@@ -79,10 +71,10 @@ def main(args):
             export_model_aoti(model, builder_args.device, output_dso_path, args)
 
 
-def cli():
-    args = cli_args()
-    main(args)
-
-
 if __name__ == "__main__":
-    cli()
+    parser = argparse.ArgumentParser(description="Export specific CLI.")
+    add_arguments_for_export(parser)
+    args = parser.parse_args()
+    check_args(args, "export")
+    args = arg_init(args)
+    main(args)
