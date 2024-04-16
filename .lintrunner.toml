@@ -49,3 +49,32 @@ init_command = [
     '--requirement=requirements-lintrunner.txt',
 ]
 is_formatter = true
+
+#CLANGFORMAT
+[[linter]]
+code = 'CLANGFORMAT'
+include_patterns = [
+    '**/*.h',
+    '**/*.cpp',
+]
+command = [
+    'python',
+    '-m',
+    'lintrunner_adapters',
+    'run',
+    'clangformat_linter',
+    '--binary=clang-format',
+    '--fallback',
+    '--',
+    '@{{PATHSFILE}}'
+]
+init_command = [
+    'python',
+    '-m',
+    'lintrunner_adapters',
+    'run',
+    'pip_init',
+    '--dry-run={{DRYRUN}}',
+    '--requirement=requirements-lintrunner.txt',
+]
+is_formatter = true
