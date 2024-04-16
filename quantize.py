@@ -704,7 +704,7 @@ def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, grou
     # print("MPS workaround active, will produce bogus results")
     if "mps" in str(x.device):
         new_shape = origin_x_size[:-1] + (out_features,)
-        return torch.zero(new_shape, dtype=x.dtype, device=x.device)
+        return torch.zeros(new_shape, dtype=x.dtype, device=x.device)
     
     c = torch.ops.aten._weight_int4pack_mm(
         x.to(torch.bfloat16), # TODO: should probably make a warning if x is not already bfloat16
