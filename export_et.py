@@ -11,7 +11,10 @@ import torch
 import torch.nn as nn
 from build.model import Transformer
 
-from executorch.backends.xnnpack.partition.xnnpack_partitioner import XnnpackPartitioner
+from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
+    XnnpackDynamicallyQuantizedPartitioner,
+    XnnpackPartitioner,
+)
 
 # TODO: change back to executorch.examples.portable.utils
 # when executorch installs correctly
@@ -121,7 +124,7 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
             dynamic_shapes=dynamic_shapes,
             edge_compile_config=edge_config,
         )
-
+    edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
     edge_manager = edge_manager.to_backend(XnnpackPartitioner())
     export_program = edge_manager.to_executorch(
         ExecutorchBackendConfig(
