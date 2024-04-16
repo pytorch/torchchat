@@ -699,6 +699,13 @@ def _int4_calc_padded_size(k, groupsize=1, innner_k_tiles=1):
 def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, groupsize):
     origin_x_size = x.size()
     x = x.reshape(-1, origin_x_size[-1])
+
+    # avoid errors in MPSaround bfloat16 until int4pack_mm is in nightlies
+    # print("MPS workaround active, will produce bogus results")
+    if "mps" in x.device:
+        new_shape = origin_x_size[:-1] + (out_features,)
+        return torch.zero(new_shape, dtype=x.dtype, device=x.device)
+    
     c = torch.ops.aten._weight_int4pack_mm(
         x.to(torch.bfloat16), # TODO: should probably make a warning if x is not already bfloat16
         weight_int4pack,
