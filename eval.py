@@ -2,7 +2,7 @@
 # All rights reserved.
 
 # This source code is licensed under the license found in the
-# LICENSE file in the root directory of this source tree. 
+# LICENSE file in the root directory of this source tree.
 import argparse
 import time
 from typing import Optional
@@ -228,7 +228,7 @@ def main(args) -> None:
     tasks = args.tasks
     limit = args.limit
     max_seq_length = args.max_seq_length
-    
+
     print(f"Using device={builder_args.device}")
     set_precision(builder_args.precision)
 
