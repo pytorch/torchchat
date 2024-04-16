@@ -3,19 +3,19 @@
 
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
-import itertools
+
+import os
 import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 import torch
 import torch._dynamo.config
 import torch._inductor.config
-from cli import cli_args
 
-from quantize import get_precision, name_to_dtype, quantize_model, set_precision
+from quantize import name_to_dtype, quantize_model
 
 from sentencepiece import SentencePieceProcessor
 
@@ -110,7 +110,7 @@ class TokenizerArgs:
         elif args.checkpoint_dir:
             tokenizer_path = args.checkpoint_dir / "tokenizer.model"
         else:
-            raise RuntimeError(f"cannot find tokenizer model")
+            raise RuntimeError("cannot find tokenizer model")
 
         if not tokenizer_path.is_file():
             raise RuntimeError(f"did not find tokenizer at {tokenizer_path}")
@@ -243,7 +243,7 @@ def _initialize_model(
         # assert model_dtype == "float32", f"dtype setting not valid for a DSO model. Specify dtype during export."
         assert (
             quantize is None or quantize == "{ }"
-        ), f"quantize not valid for exported DSO model. Specify quantization during export."
+        ), "quantize not valid for exported DSO model. Specify quantization during export."
         try:
             model = model_
             # Replace model forward with the AOT-compiled forward
@@ -262,12 +262,12 @@ def _initialize_model(
         # assert model_dtype == "float32", f"dtype setting not valid for a DSO model. Specify dtype during export."
         assert (
             quantize is None or quantize == "{ }"
-        ), f"quantize not valid for exported PTE model. Specify quantization during export."
+        ), "quantize not valid for exported PTE model. Specify quantization during export."
         try:
             from build.model_et import PTEModel
 
             model = PTEModel(model_.config, builder_args.pte_path)
-        except Exception as e:
+        except Exception:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
     else:
         model = model_
