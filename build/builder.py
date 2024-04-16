@@ -165,7 +165,6 @@ def _load_model_not_gguf(
 ):
     assert not builder_args.gguf_path
 
-    use_cuda = "cuda" in builder_args.device
     with torch.device("meta"):
         if builder_args.params_path:
             model = Transformer.from_params(builder_args.params_path)
