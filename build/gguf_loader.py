@@ -181,7 +181,6 @@ def load_weights(pt_model: torch.nn.Module, weight_map: Dict[str, ReaderTensor],
                     bias=False,
                     groupsize=Q4_0.groupsize,
                     inner_k_tiles=inner_k_tiles,
-                    use_cuda=False
                 )
             )
         else:
