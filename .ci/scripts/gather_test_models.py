@@ -28,7 +28,7 @@ JOB_RUNNERS = {
         "macos-14": "aarch64",
     },
     "gpu": {
-        "linux.g5.4xlarge.nvidia.gpu": "cuda",
+        "linux.g5.12xlarge.nvidia.gpu": "cuda",
     },
 }
 
