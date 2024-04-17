@@ -1,7 +1,8 @@
 from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache
 from build.model import Attention
+from torch import nn
 
-class AttentionWithSDPA(nn.Module):
+class SDPAAttention(nn.Module):
     def __init__(self, attention: Attention):
         super().__init__()
 
@@ -51,3 +52,11 @@ class AttentionWithSDPA(nn.Module):
         )
         output = output.view(bsz, seqlen, self.dim)
         return self.wo(output)
+
+
+def replace_attention_with_sdpa_attention(module: nn.Module):
+    for name, child in module.named_children():
+        if isinstance(child, Attention):
+            setattr(module, name, SDPAAttention(child))
+        else:
+            replace_attention_with_sdpa_attention(child)
