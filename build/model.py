@@ -247,9 +247,9 @@ class Transformer(nn.Module):
 
     @classmethod
     def from_gguf(cls, gguf_path: str):
-        from build.gguf_loader import load_llama_from_gguf_file
-
-        model = load_llama_from_gguf_file(gguf_path)
+        from build.gguf_loader import load_model_and_state_dict
+        model, state_dict = load_model_and_state_dict(gguf_path, load_as_quantized=True, inner_k_tiles=8)
+        model.load_state_dict(state_dict, assign=True)
         return model
 
 
