@@ -305,7 +305,7 @@ def generate(
     return seq, generate_stats
 
 
-def encode_tokens(tokenizer, string, bos=True, device):
+def encode_tokens(tokenizer, string, bos=True, device="cpu"):
     tokens = tokenizer.encode(string)
     if bos:
         tokens = [tokenizer.bos_id()] + tokens
