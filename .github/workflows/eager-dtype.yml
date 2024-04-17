@@ -1,4 +1,4 @@
-name: Compile-dtype main
+name: Eager-dtype main
 
 on:
   push:
