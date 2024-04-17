@@ -135,6 +135,5 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     print("The methods are: ", export_program.methods)
     with open(output_path, "wb") as f:
         export_program.write_to_file(f)
-    # save_pte_program(export_program, output_path)
 
     return output_path

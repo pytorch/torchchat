@@ -151,8 +151,14 @@ transformer_configs = {
 
 
 class KVCache(nn.Module):
-    def __init__(self, max_batch_size, max_seq_length, n_heads, head_dim, dtype=None):
-        # torch.float): # bfloat16    ):
+    def __init__(
+        self,
+        max_batch_size: int,
+        max_seq_length: int,
+        n_heads: int,
+        head_dim: int,
+        dtype=None,
+    ):
         super().__init__()
         if not dtype:
             dtype = get_precision()
@@ -170,6 +176,43 @@ class KVCache(nn.Module):
         v_out[:, :, input_pos] = v_val
 
         return k_out, v_out
+
+
+class SDPA(nn.Module):
+    def __init__(
+        self,
+        kv_cache: KVCache,
+        mask,
+        dim: int,
+        n_rep: int,
+    ):
+        super().__init__()
+        self.kv_cache = kv_cache
+        self.mask = mask
+        self.dim = dim
+        self.n_rep = n_rep
+
+    def forward(
+        self,
+        input_pos: torch.Tensor,
+        q: torch.Tensor,
+        k: torch.Tensor,
+        v: torch.Tensor,
+        bsz,
+        seqlen,
+    ) -> torch.Tensor:
+        q = q.transpose(1, 2)  # (bs, n_local_heads, seqlen, head_dim)
+        k = k.transpose(1, 2)
+        v = v.transpose(1, 2)
+
+        k, v = self.kv_cache.update(input_pos, k, v)
+        mask = self.mask[None, None, input_pos]
+
+        k = k.repeat_interleave(self.n_rep, dim=1)
+        v = v.repeat_interleave(self.n_rep, dim=1)
+        y = F.scaled_dot_product_attention(q, k, v, attn_mask=mask, dropout_p=0.0)
+
+        return y.transpose(1, 2).contiguous().view(bsz, seqlen, self.dim)
 
 
 class Transformer(nn.Module):
@@ -195,17 +238,18 @@ class Transformer(nn.Module):
             and self.max_batch_size >= max_batch_size
         ):
             return
+
         head_dim = self.config.dim // self.config.n_heads
+        assert self.config.n_heads % self.config.n_local_heads == 0
+        n_rep = self.config.n_heads // self.config.n_local_heads
+
+
         max_seq_length = find_multiple(max_seq_length, 8)
         self.max_seq_length = max_seq_length
         self.max_batch_size = max_batch_size
-        for b in self.layers:
-            b.attention.kv_cache = KVCache(
-                max_batch_size, max_seq_length, self.config.n_local_heads, head_dim
-            )
 
         freqs_cis = precompute_freqs_cis(
-            self.config.dim // self.config.n_heads,
+            head_dim,
             self.config.block_size * 2,
             self.config.rope_base,
         )
@@ -214,6 +258,18 @@ class Transformer(nn.Module):
             torch.ones(self.max_seq_length, self.max_seq_length, dtype=torch.bool)
         )
         self.register_buffer("causal_mask", causal_mask, persistent=True)
+
+
+        for b in self.layers:
+            b.attention.kv_cache = KVCache(
+                max_batch_size, max_seq_length, self.config.n_local_heads, head_dim,
+            )
+            b.attention.SDPA = SDPA(
+                kv_cache=b.attention.kv_cache,
+                mask=self.causal_mask,
+                dim=self.config.dim,
+                n_rep=n_rep,
+            )
 
     def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         # print ("*")
