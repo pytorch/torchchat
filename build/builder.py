@@ -81,7 +81,7 @@ class BuilderArgs:
                 path = str(path)
                 if path.endswith('/'):
                     path = path[:-1]
-                    path_basename = os.path.basename(path)
+                path_basename = os.path.basename(path)
                 if "chat" in path_basename:
                     is_chat_model = True
                     
