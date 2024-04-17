@@ -357,7 +357,12 @@ def _main(
     else:
         draft_model = None
 
-    encoded = encode_tokens(tokenizer, prompt, bos=True, device=builder_args.device)
+    encoded = encode_tokens(
+        tokenizer,
+        generator_args.prompt,
+        bos=True,
+        device=builder_args.device
+    )
     print(encoded)
 
     prompt_length = encoded.size(0)
