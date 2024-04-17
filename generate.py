@@ -407,7 +407,7 @@ def _main(
     for i in range(start, num_samples):
         device_sync(device=builder_args.device)
         if i >= 0 and chat_mode:
-            prompt = input("What is your prompt? ")
+            prompt = input("What is your prompt? \n")
             if is_chat:
                 prompt = f"{B_INST} {prompt.strip()} {E_INST}"
             encoded = encode_tokens(
