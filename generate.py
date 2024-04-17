@@ -31,6 +31,7 @@ from quantize import set_precision
 @dataclass
 class GeneratorArgs:
     prompt: str = "torchchat is pronounced torch-chat and is so cool because"
+    encoded_prompt: Optional[torch.Tensor] = None
     chat_mode: bool = False
     gui_mode: bool = False
     num_samples: int = 1
@@ -45,6 +46,7 @@ class GeneratorArgs:
     def from_args(cls, args):  # -> GeneratorArgs:
         return cls(
             prompt=args.prompt,
+            encoded_prompt=None,
             chat_mode=args.chat,
             gui_mode=args.gui,
             num_samples=args.num_samples,
@@ -432,7 +434,6 @@ def _main(
         t0 = time.perf_counter()
         import contextlib
 
-        generator_args.encoded_prompt = encoded
         if (i != generator_args.num_samples - 1 or not profile) or (
             use_tp and rank != 0
         ):
