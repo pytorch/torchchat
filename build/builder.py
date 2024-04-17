@@ -68,7 +68,7 @@ class BuilderArgs:
     @classmethod
     def from_args(cls, args):  # -> BuilderArgs:
         is_chat_model = False
-        if args.is_chat_mode:
+        if args.is_chat_model:
             is_chat_model = True
         else:
             for path in [
