@@ -29,9 +29,6 @@ if __name__ == "__main__":
         help="Use `download`, `generate`, `eval`, `export` or `browser` followed by subcommand specific options.",
     )
 
-    parser_chat = subparsers.add_parser("chat")
-    add_arguments_for_generate(parser_chat)
-
     parser_download = subparsers.add_parser("download")
     add_arguments_for_download(parser_download)
 
@@ -58,8 +55,8 @@ if __name__ == "__main__":
         from download import main as download_main
 
         download_main(args)
-    elif args.subcommand == "generate" or args.subcommand == "chat":
-        check_args(args, args.subcommand)
+    elif args.subcommand == "generate":
+        check_args(args, "generate")
         from generate import main as generate_main
 
         generate_main(args)
