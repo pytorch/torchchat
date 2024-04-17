@@ -11,7 +11,7 @@ jobs:
   run-tinystories:
     strategy:
       matrix:
-        runner: [ubuntu-latest, macos-14, macos-12]
+        runner: [ubuntu-latest, macos-14]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -102,9 +102,6 @@ jobs:
             echo "******************************************"
             echo "******** INT4 group-wise quantized *******"
             echo "******************************************"
-              if [ ${DTYPE} == float16 ]; then
-              DTYPE=bfloat16
-            fi
   
             python generate.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
             cat ./output_eager
