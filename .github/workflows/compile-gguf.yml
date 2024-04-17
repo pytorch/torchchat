@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-tinystories:
+  run-tinystories with gguf:
     strategy:
       matrix:
         runner: [macos-14]

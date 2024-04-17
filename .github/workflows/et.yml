@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-tinystories:
+  run-tinystories with et:
     strategy:
       matrix:
         runner: [32-core-ubuntu]
