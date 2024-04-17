@@ -134,7 +134,7 @@ jobs:
           export GGUF_TOKENIZER_PATH=gguf_files/tokenizer.model
 
           python torchchat.py export --gguf-path ${GGUF_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
-          python torchchat.py generate --pte-path ${PWD}/${MODEL_NAME}.pte --tokenizer-path ${GGUF_TOKENIZER_PATH} --max-new-tokens 10 --temperature 0 > ${PWD}/output_et
+          python torchchat.py generate --gguf-path ${GGUF_PATH} --pte-path ${PWD}/${MODEL_NAME}.pte --tokenizer-path ${GGUF_TOKENIZER_PATH} --temperature 0 --max-new-tokens 20 > ${PWD}/output_et
           cat ${PWD}/output_et
 
           echo "Tests complete."
