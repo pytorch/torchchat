@@ -31,15 +31,15 @@ from quantize import set_precision
 @dataclass
 class GeneratorArgs:
     prompt: str = "torchchat is pronounced torch-chat and is so cool because"
-    chat: bool = (False,)
-    gui: bool = (False,)
-    num_samples: int = (1,)
-    max_new_tokens: int = (200,)
-    top_k: int = (200,)
-    temperature: int = (0,)  # deterministic argmax
-    compile: bool = (False,)
-    compile_prefill: bool = (False,)
-    speculate_k: int = (5,)
+    chat: bool = False
+    gui: bool = False
+    num_samples: int = 1
+    max_new_tokens: int = 200
+    top_k: int = 200
+    temperature: int = 0  # deterministic argmax
+    compile: bool = False
+    compile_prefill: bool = False
+    speculate_k: int = 5
 
     @classmethod
     def from_args(cls, args):  # -> GeneratorArgs:
