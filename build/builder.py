@@ -154,18 +154,10 @@ wd = Path(__file__).parent.parent.resolve()
 sys.path.append(str(wd))
 
 
-def _load_model(builder_args):
-    if builder_args.gguf_path:
-        model = Transformer.from_gguf(builder_args.gguf_path)
-
-        # TODO: to take advantage of mmap, maybe we write converted gguf to file
-        # and read back in?
-        # TODO: should we add check that builder_args.precision is aligned with quant scheme, e.g., bfloat16
-        # is needed for int4
-        model = model.to(device=builder_args.device, dtype=builder_args.precision)
-        return model.eval()
-    else:
-        return _load_model_not_gguf(builder_args)
+def _load_model_gguf(builder_args):
+    assert builder_args.gguf_path
+    model = Transformer.from_gguf(builder_args.gguf_path)
+    return model
 
 
 def _load_model_not_gguf(builder_args):
@@ -218,9 +210,17 @@ def _load_model_not_gguf(builder_args):
 
     model.load_state_dict(checkpoint, assign=True, strict=False)
 
+    return model
+
+
+def _load_model(builder_args):
+    if builder_args.gguf_path:
+        model = _load_model_gguf(builder_args)
+    else:
+        model = _load_model_not_gguf(builder_args)
+
     if builder_args.use_tp:
         from tp import apply_tp
-
         print("Applying tensor parallel to model ...")
         apply_tp(model)
 
