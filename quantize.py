@@ -515,11 +515,7 @@ class WeightOnlyInt8Linear(torch.nn.Module):
 
 
 def replace_embedding_weight_only_grouped_int8_per_channel(
-        module,
-        device,
-        bitwidth: int = 8,
-        groupsize: Optional[int] = None,
-        packed=False
+    module, device, bitwidth: int = 8, groupsize: Optional[int] = None, packed=False
 ):
     for name, child in module.named_children():
         # print(f"name: {name}")
