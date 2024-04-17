@@ -35,7 +35,8 @@ class BuilderArgs:
     precision: torch.dtype = torch.float32
     setup_caches: bool = False
     use_tp: bool = False
-
+    is_chat_model: bool = False
+    
     def __post_init__(self):
         if not (
             (self.checkpoint_path and self.checkpoint_path.is_file())
@@ -66,6 +67,24 @@ class BuilderArgs:
 
     @classmethod
     def from_args(cls, args):  # -> BuilderArgs:
+        is_chat_model = False
+        if args.is_chat_model:
+            is_chat_model = True
+        else:
+            for path in [
+                args.checkpoint_path,
+                args.checkpoint_dir,
+                args.dso_path,
+                args.pte_path,
+                args.gguf_path
+            ]:
+                path = str(path)
+                if path.endswith('/'):
+                    path = path[:-1]
+                path_basename = os.path.basename(path)
+                if "chat" in path_basename:
+                    is_chat_model = True
+                    
         return cls(
             checkpoint_path=args.checkpoint_path,
             checkpoint_dir=args.checkpoint_dir,
@@ -78,6 +97,7 @@ class BuilderArgs:
             precision=name_to_dtype(args.dtype),
             setup_caches=(args.output_dso_path or args.output_pte_path),
             use_tp=False,
+            is_chat_model=is_chat_model,
         )
 
     @classmethod

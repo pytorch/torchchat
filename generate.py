@@ -27,6 +27,7 @@ from build.model import Transformer
 from cli import add_arguments_for_generate, arg_init, check_args
 from quantize import set_precision
 
+B_INST, E_INST = "[INST]", "[/INST]"
 
 @dataclass
 class GeneratorArgs:
@@ -343,11 +344,16 @@ def _main(
     set_precision(builder_args.precision)
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
-    is_chat = "chat" in str(os.path.basename(builder_args.checkpoint_path))
-    if is_chat:
-        raise RuntimeError(
-            "need to stop filename based kludgery, at a minimum need to look at all pathnames. in particular, this now fails because chat is part of the pathname, yuck!"
-        )
+    if generator_args.chat_mode and not builder_args.is_chat_model:
+        print("""
+*******************************************************
+ This model is not known to support the chat function.
+ We will enable chat mode based on your instructions.
+ If the model is not trained to support chat, it will
+ produce nonsensical or false output.
+*******************************************************
+        """)
+        # raise RuntimeError("You need to use --is-chat-model to indicate model has chat support.")
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
 
@@ -410,7 +416,7 @@ def _main(
         device_sync(device=builder_args.device)
         if i >= 0 and generator_args.chat_mode:
             prompt = input("What is your prompt? ")
-            if is_chat:
+            if builder_args.is_chat_model:
                 prompt = f"{B_INST} {prompt.strip()} {E_INST}"
             encoded = encode_tokens(
                 tokenizer, prompt, bos=True, device=builder_args.device
