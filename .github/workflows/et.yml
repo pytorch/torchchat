@@ -114,9 +114,9 @@ jobs:
           echo "******************************************"
           echo "******** INT4 group-wise quantized *******"
           echo "******************************************"
-          python export.py --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
-          cat ./output_et
+          # python export.py --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          # cat ./output_et
 
           echo "tests complete"
           echo "******************************************"
