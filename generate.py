@@ -63,7 +63,7 @@ def device_sync(device):
     elif ("cpu" in device) or ("mps" in device):
         pass
     else:
-        print(f"device={ device } is not yet suppported")
+        print(f"device={device} is not yet suppported")
 
 
 torch._inductor.config.coordinate_descent_tuning = True
@@ -491,7 +491,7 @@ def main(args):
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
     generator_args = GeneratorArgs.from_args(args)
-    
+
     _main(
         builder_args,
         speculative_builder_args,
