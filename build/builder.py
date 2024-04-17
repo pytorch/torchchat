@@ -9,7 +9,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import torch
 import torch._dynamo.config
@@ -29,6 +29,7 @@ class BuilderArgs:
     params_path: Optional[Union[Path, str]] = None
     params_table: Optional[str] = None
     gguf_path: Optional[Union[Path, str]] = None
+    gguf_kwargs: Optional[dict[str, Any]] = None
     dso_path: Optional[Union[Path, str]] = None
     pte_path: Optional[Union[Path, str]] = None
     device: str = "cpu"
@@ -91,6 +92,7 @@ class BuilderArgs:
             params_path=args.params_path,
             params_table=args.params_table,
             gguf_path=args.gguf_path,
+            gguf_kwargs=None,
             dso_path=args.dso_path,
             pte_path=args.pte_path,
             device=args.device,
@@ -176,7 +178,11 @@ sys.path.append(str(wd))
 
 def _load_model_gguf(builder_args):
     assert builder_args.gguf_path
-    model = Transformer.from_gguf(builder_args.gguf_path)
+    if builder_args.gguf_kwargs is None:
+        kwargs = {}
+    else:
+        kwargs = builder_args.gguf_kwargs
+    model = Transformer.from_gguf(builder_args.gguf_path, **kwargs)
     return model
 
 

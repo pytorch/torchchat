@@ -60,6 +60,13 @@ jobs:
           wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
           wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
           popd
+
+          mkdir gguf_files
+          export GGUF_PATH=gguf_files/TinyLlama-1.1B-openorca.Q4_0.gguf
+          export GGUF_TOKENIZER_PATH=gguf_files/tokenizer.model
+          wget -O ${GGUF_PATH} "https://huggingface.co/TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF/resolve/main/tinyllama-1.1b-1t-openorca.Q4_0.gguf?download=true"
+          wget -O ${GGUF_TOKENIZER_PATH} https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+
       - name: Run inference
         run: |
           export MODEL_PATH=${PWD}/checkpoints/stories15M/stories15M.pt
@@ -75,7 +82,7 @@ jobs:
           echo "Tests complete."
 
       - name: Run inference
-        run: |          
+        run: |
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
@@ -121,3 +128,13 @@ jobs:
           echo "tests complete"
           echo "******************************************"
 
+      - name: Run GGUF export + inference
+        run: |
+          export GGUF_PATH=gguf_files/TinyLlama-1.1B-openorca.Q4_0.gguf
+          export GGUF_TOKENIZER_PATH=gguf_files/tokenizer.model
+
+          python torchchat.py export --gguf-path ${GGUF_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
+          python torchchat.py generate --pte-path ${PWD}/${MODEL_NAME}.pte --tokenizer-path ${GGUF_TOKENIZER_PATH} --max-new-tokens 10 --temperature 0 > ${PWD}/output_et
+          cat ${PWD}/output_et
+
+          echo "Tests complete."
