@@ -182,8 +182,8 @@ def load_model_and_state_dict(gguf_file: str, load_as_quantized: bool) -> torch.
                 q, inner_k_tiles
             )
 
-            state_dict[f"{fqn}.weight"] = weight_int4pack.to("cpu")
-            state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros.to("cpu")
+            state_dict[f"{fqn}.weight"] = weight_int4pack
+            state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros
 
             parent = _fqn_lookup(_fqn_up(fqn), model)
             setattr(
