@@ -233,7 +233,6 @@ def generate(
     model: Transformer,
     generator_args: Generator_Args,
     *,
-    chat_mode: bool,
     draft_model: Transformer,
     speculate_k: Optional[int] = 8,
     callback=lambda x: x,
@@ -247,7 +246,7 @@ def generate(
     # create an empty tensor of the expected final shape and fill in the current tokens
     T = prompt.size(0)
     T_new = T + generator_args.max_new_tokens
-    if chat_mode:
+    if generator_args.chat_mode:
         max_seq_length = 350
     else:
         max_seq_length = min(T_new, model.config.block_size)
