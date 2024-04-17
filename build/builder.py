@@ -14,14 +14,12 @@ from typing import Any, Dict, Optional, Union
 import torch
 import torch._dynamo.config
 import torch._inductor.config
-
-from build.model import model_aliases
 from quantize import name_to_dtype, quantize_model
 
 from sentencepiece import SentencePieceProcessor
 from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
-from build.model import Transformer
+from build.model import model_aliases, Transformer
 
 
 @dataclass
@@ -77,9 +75,11 @@ class BuilderArgs:
             checkpoint_dir = args.checkpoint_dir
 
         model = resolve_model_name(args.model) if args.model else None
-        checkpoint_path = Path(args.model_directory) / model / "model.pth" \
-            if model and not args.checkpoint_path \
+        checkpoint_path = (
+            Path(args.model_directory) / model / "model.pth"
+            if model and not args.checkpoint_path
             else args.checkpoint_path
+        )
 
         is_chat_model = False
         if args.is_chat_model:
@@ -139,9 +139,11 @@ class TokenizerArgs:
         is_tiktoken = False
 
         model = resolve_model_name(args.model) if args.model else None
-        checkpoint_dir = Path(args.model_directory) / model \
-            if not args.checkpoint_dir and args.model \
+        checkpoint_dir = (
+            Path(args.model_directory) / model
+            if not args.checkpoint_dir and args.model
             else args.checkpoint_dir
+        )
 
         if args.tokenizer_path:
             tokenizer_path = args.tokenizer_path

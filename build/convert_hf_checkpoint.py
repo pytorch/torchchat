@@ -25,7 +25,7 @@ def convert_hf_checkpoint(
     *,
     model_dir: Optional[Path] = None,
     model_name: Optional[str] = None,
-    remove_bin_files: bool = False
+    remove_bin_files: bool = False,
 ) -> None:
     if model_dir is None:
         model_dir = Path("checkpoints/meta-Transformer/Transformer-2-7b-chat-hf")

@@ -97,4 +97,6 @@ if __name__ == "__main__":
         command = ["flask", "--app", "chat_in_browser:create_app(" + formatted_args + ")", "run", "--port", f"{port}"]
         subprocess.run(command)
     else:
-        raise RuntimeError("Must specify a valid subcommand: download, chat, generate, export, or eval.")
+        raise RuntimeError(
+            "Must specify a valid subcommand: download, chat, generate, export, or eval."
+        )

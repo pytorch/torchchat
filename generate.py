@@ -53,12 +53,8 @@ class GeneratorArgs:
     def from_args(cls, args):  # -> GeneratorArgs:
         return cls(
             prompt=args.prompt,
-<<<<<<< HEAD
             encoded_prompt=None,
             chat_mode=args.chat,
-=======
-            chat_mode=hasattr(args, "subcommand") and args.subcommand == "chat",
->>>>>>> 0dc48b0 (Merge GenerateArgs changes)
             gui_mode=args.gui,
             num_samples=args.num_samples,
             max_new_tokens=args.max_new_tokens,

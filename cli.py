@@ -54,7 +54,7 @@ def _add_arguments_common(parser):
         type=str,
         nargs="?",
         default=None,
-        help="Model name or HuggingFace model path."
+        help="Model name or HuggingFace model path.",
     )
 
     # TODO: Refactor this so that only common options are here
@@ -184,21 +184,21 @@ def _add_arguments_common(parser):
         "--max-seq-length",
         type=int,
         default=None,
-        help='maximum length sequence to evaluate'
+        help="maximum length sequence to evaluate",
     )
     parser.add_argument(
-        '--hf-token',
+        "--hf-token",
         type=str,
         default=None,
-        help='A HuggingFace API token to use when downloading model artifacts'
+        help="A HuggingFace API token to use when downloading model artifacts",
     )
     parser.add_argument(
-        '--model-directory',
+        "--model-directory",
         type=Path,
-        default='.model-artifacts',
-        help='The directory to store downloaded model artifacts'
+        default=".model-artifacts",
+        help="The directory to store downloaded model artifacts",
     )
-    
+
 
 def arg_init(args):
 
