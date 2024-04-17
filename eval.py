@@ -21,6 +21,7 @@ from build.builder import (
 
 from build.model import Transformer
 from cli import add_arguments_for_eval, arg_init
+from download import download_and_convert, is_model_downloaded
 from generate import encode_tokens, model_forward
 
 from quantize import set_precision
@@ -221,6 +222,10 @@ def main(args) -> None:
         max_seq_length (Optional[int]): The maximum sequence length allowed for input text.
 
     """
+
+    # If a named model was provided and not downloaded, download it.
+    if args.model and not is_model_downloaded(args.model, args.model_directory):
+        download_and_convert(args.model, args.model_directory, args.hf_token)
 
     builder_args = BuilderArgs.from_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)

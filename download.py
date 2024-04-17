@@ -6,46 +6,57 @@
 import os
 
 from build.convert_hf_checkpoint import convert_hf_checkpoint
+from build.model import model_aliases
 from pathlib import Path
 from typing import Optional
 
 from requests.exceptions import HTTPError
 
-
-def hf_download(
-        repo_id: Optional[str] = None, 
-        model_dir: Optional[Path] = None,
+def download_and_convert(
+        model: str,
+        models_dir: Path,
         hf_token: Optional[str] = None) -> None:
     from huggingface_hub import snapshot_download
 
-    if model_dir is None:
-        model_dir = Path(".model-artifacts/{repo_id}")
+    if model in model_aliases:
+        model = model_aliases[model]
 
+    model_dir = models_dir / model
+    os.makedirs(model_dir, exist_ok=True)
+
+    # Download and store the HF model artifacts.
+    print(f"Downloading {model} from HuggingFace...")
     try:
         snapshot_download(
-            repo_id,
+            model,
             local_dir=model_dir,
             local_dir_use_symlinks=False,
             token=hf_token,
             ignore_patterns="*safetensors*")
     except HTTPError as e:
         if e.response.status_code == 401:
-            print("You need to pass a valid `--hf_token=...` to download private checkpoints.")
+            raise RuntimeError("You need to pass a valid `--hf_token=...` to download private checkpoints.")
         else:
             raise e
 
-
-def main(args):
-    model_dir = Path(args.model_directory) / args.model
-    os.makedirs(model_dir, exist_ok=True)
-
-    # Download and store the HF model artifacts.
-    print(f"Downloading {args.model} from HuggingFace...")
-    hf_download(args.model, model_dir, args.hf_token)
-
     # Convert the model to the torchchat format.
-    print(f"Converting {args.model} to torchchat format...")
+    print(f"Converting {model} to torchchat format...")
     convert_hf_checkpoint(
         model_dir=model_dir,
-        model_name=Path(args.model),
+        model_name=Path(model),
         remove_bin_files=True)
+
+def is_model_downloaded(
+        model: str, 
+        models_dir: Path) -> bool:
+    if model in model_aliases:
+        model = model_aliases[model]
+
+    model_dir = models_dir / model
+
+    # TODO Can we be more thorough here?
+    return os.path.isdir(model_dir)
+
+
+def main(args):
+    download_and_convert(args.model, args.model_directory, args.hf_token)

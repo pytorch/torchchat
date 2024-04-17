@@ -194,7 +194,7 @@ def _add_arguments_common(parser):
     )
     parser.add_argument(
         '--model-directory',
-        type=str,
+        type=Path,
         default='.model-artifacts',
         help='The directory to store downloaded model artifacts'
     )
