@@ -79,6 +79,11 @@ def _add_arguments_common(parser):
         help="Use torchchat to for an interactive chat session.",
     )
     parser.add_argument(
+        "--is-chat-model",
+        action="store_true",
+        help="Use torchchat to for an interactive chat session.",
+    )
+    parser.add_argument(
         "--gui",
         action="store_true",
         help="Use torchchat to for an interactive gui-chat session.",
