@@ -434,8 +434,9 @@ def _main(
         t0 = time.perf_counter()
         import contextlib
 
-        generator_args.encoded_prompt = encoded
-        if (i != generator_args.num_samples - 1 or not profile) or (use_tp and rank != 0):
+        if (i != generator_args.num_samples - 1 or not profile) or (
+            use_tp and rank != 0
+        ):
             prof = contextlib.nullcontext()
         else:
             torch.profiler._utils._init_for_cuda_graphs()
@@ -495,7 +496,7 @@ def main(args):
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
     generator_args = GeneratorArgs.from_args(args)
-    
+
     _main(
         builder_args,
         speculative_builder_args,
