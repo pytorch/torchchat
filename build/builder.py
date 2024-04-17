@@ -15,6 +15,7 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 
+from build.model import model_aliases
 from quantize import name_to_dtype, quantize_model
 
 from sentencepiece import SentencePieceProcessor
@@ -25,7 +26,6 @@ from build.model import Transformer
 
 @dataclass
 class BuilderArgs:
-    model: Optional[str] = None,
     checkpoint_path: Optional[Union[Path, str]] = None
     checkpoint_dir: Optional[Union[Path, str]] = None
     params_path: Optional[Union[Path, str]] = None
@@ -74,10 +74,11 @@ class BuilderArgs:
         # Handle disabled checkpoint_dir option
         checkpoint_dir = None
         if hasattr(args, "checkpoint_dir"):
-            checkpoint_dir = args.checkpoint_dir    
+            checkpoint_dir = args.checkpoint_dir
 
-        checkpoint_path = Path(args.model_directory) / args.model / "model.pth" \
-            if args.model and not args.checkpoint_path \
+        model = resolve_model_name(args.model) if args.model else None
+        checkpoint_path = Path(args.model_directory) / model / "model.pth" \
+            if model and not args.checkpoint_path \
             else args.checkpoint_path
 
         is_chat_model = False
@@ -137,7 +138,8 @@ class TokenizerArgs:
         is_sentencepiece = True
         is_tiktoken = False
 
-        checkpoint_dir = Path(args.model_directory) / args.model \
+        model = resolve_model_name(args.model) if args.model else None
+        checkpoint_dir = Path(args.model_directory) / model \
             if not args.checkpoint_dir and args.model \
             else args.checkpoint_dir
 
@@ -367,4 +369,10 @@ def validate_args(model: Transformer, tokenizer_args: TokenizerArgs):
     is_tiktoken = tokenizer_args.is_tiktoken
     if use_tiktoken != is_tiktoken:
         raise RuntimeError(f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}")
-    
+
+def resolve_model_name(model: str) -> str:
+    # If the provided model name is an alias, retrieve the full path.
+    if model in model_aliases:
+        return model_aliases[model]
+    else:
+        return model
