@@ -67,9 +67,9 @@ class BuilderArgs:
 
     @classmethod
     def from_args(cls, args):  # -> BuilderArgs:
-        is_chat_mode = False
+        is_chat_model = False
         if args.is_chat_mode:
-            is_chat_mode = True
+            is_chat_model = True
         else:
             for path in [
                 args.checkpoint_path,
@@ -83,7 +83,7 @@ class BuilderArgs:
                     path = path[:-1]
                     path_basename = os.path.basename(path)
                 if "chat" in path_basename:
-                    args.is_chat_mode = True
+                    is_chat_model = True
                     
         return cls(
             checkpoint_path=args.checkpoint_path,
@@ -97,7 +97,7 @@ class BuilderArgs:
             precision=name_to_dtype(args.dtype),
             setup_caches=(args.output_dso_path or args.output_pte_path),
             use_tp=False,
-            is_chat_mode=is_chat_mode,
+            is_chat_model=is_chat_model,
         )
 
     @classmethod
