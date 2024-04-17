@@ -14,6 +14,8 @@ from cli import (
     check_args,
 )
 
+import logging
+
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
@@ -35,6 +37,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     args = arg_init(args)
+    logging.basicConfig(format='%(message)s', level=logging.DEBUG if args.verbose else logging.INFO)
 
     if args.subcommand == "generate":
         check_args(args, "generate")
