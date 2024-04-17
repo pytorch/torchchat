@@ -176,6 +176,23 @@ wd = Path(__file__).parent.parent.resolve()
 sys.path.append(str(wd))
 
 
+# TODO: remove these once ET supports _weight_int4pack_mm
+def _set_gguf_kwargs(builder_args, is_et, context: str):
+    assert context in ["export", "generate"]
+    assert builder_args.gguf_kwargs is None
+
+    if builder_args.gguf_path is None:
+        print("No gguf_path provided, so ignoring set_gguf_kwargs.")
+        return
+
+    builder_args.gguf_kwargs = {}
+    if is_et:
+        builder_args.gguf_kwargs["load_as_quantized"] = False
+
+def _unset_gguf_kwargs(builder_args):
+    builder_args.gguf_kwargs = None
+
+
 def _load_model_gguf(builder_args):
     assert builder_args.gguf_path
     if builder_args.gguf_kwargs is None:
@@ -260,6 +277,15 @@ def _initialize_model(
 ):
     print("Loading model ...")
     t0 = time.time()
+
+    if builder_args.gguf_path and (builder_args.dso_path or builder_args.pte_path):
+        print("Setting gguf_kwargs for generate.")
+        is_dso = builder_args.dso_path is not None
+        is_pte = builder_args.pte_path is not None
+        assert not (is_dso and is_pte)
+        assert builder_args.gguf_kwargs is None
+        _set_gguf_kwargs(builder_args, is_et=is_pte, context="generate")
+
     model_ = _load_model(builder_args)
     device_sync(device=builder_args.device)
     print(f"Time to load model: {time.time() - t0:.02f} seconds")

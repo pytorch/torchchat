@@ -9,7 +9,7 @@ import os
 
 import torch
 
-from build.builder import _initialize_model, BuilderArgs
+from build.builder import _initialize_model, BuilderArgs, _set_gguf_kwargs, _unset_gguf_kwargs
 from cli import add_arguments_for_export, arg_init, check_args
 from export_aoti import export_model as export_model_aoti
 
@@ -50,6 +50,8 @@ def main(args):
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
 
+    # TODO: clean this up
+    # This mess is because ET does not support _weight_int4pack_mm right now
     if not builder_args.gguf_path:
         model = _initialize_model(
             builder_args,
@@ -59,21 +61,21 @@ def main(args):
         model_to_dso = model
     else:
         if output_pte_path:
-            assert builder_args.gguf_kwargs is None
-            # TODO: ET does not support _weight_int4pack_mm right now,
-            # so GGUF is converted to float
-            builder_args.gguf_kwargs = {"load_as_quantized": False}
+            _set_gguf_kwargs(builder_args, is_et=True, context="export")
             model_to_pte = _initialize_model(
                 builder_args,
                 quantize,
             )
-            builder_args.gguf_kwargs = None
+            _unset_gguf_kwargs(builder_args)
+
         if output_dso_path:
-            assert builder_args.gguf_kwargs is None
+            _set_gguf_kwargs(builder_args, is_et=False, context="export")
             model_to_dso = _initialize_model(
                 builder_args,
                 quantize,
             )
+            _unset_gguf_kwargs(builder_args)
+
 
     with torch.no_grad():
         if output_pte_path:
