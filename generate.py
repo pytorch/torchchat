@@ -314,6 +314,9 @@ def encode_tokens(tokenizer, string, bos=True, device="cpu"):
     return torch.tensor(tokens, dtype=torch.int, device=device)
 
 
+B_INST, E_INST = "[INST]", "[/INST]"
+
+
 def _main(
     builder_args: BuilderArgs,
     speculative_builder_args: BuilderArgs,
@@ -330,6 +333,7 @@ def _main(
     #    from tp import maybe_init_dist
     #    rank = maybe_init_dist()
     use_tp = False
+    rank: Optional[int] = None
     #    if use_tp:
     #        if rank != 0:
     #            # only print on rank 0
@@ -417,8 +421,9 @@ def _main(
             period_id = tokenizer.encode(".")[0]
             done_generating = False
 
-            def callback(x):
-                nonlocal done_generating
+            def callback(
+                x, buffer=buffer, period_id=period_id, done_generating=done_generating
+            ):
                 if done_generating:
                     return
                 buffer.append(tokenizer.decode([period_id] + x.tolist())[1:])
@@ -430,7 +435,10 @@ def _main(
                 # print(, end='', flush=True)
 
         else:
-            callback = lambda x: x
+
+            def callback(x):
+                return x
+
         t0 = time.perf_counter()
         import contextlib
 
