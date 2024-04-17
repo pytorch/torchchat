@@ -11,7 +11,7 @@ install_pip_dependencies() {
   echo "Intalling common pip packages"
 
   pip install wheel
-  pip install cmake
+  pip install "cmake>=3.19"
   pip install ninja
   pip install zstd
   pushd ${TORCHCHAT_ROOT}
@@ -26,6 +26,7 @@ install_executorch() {
   pushd ${TORCHCHAT_ROOT}/et-build/src
   git clone https://github.com/pytorch/executorch.git
   cd executorch
+  git checkout viable/strict
   echo "Install executorch: submodule update"
   git submodule sync
   git submodule update --init
