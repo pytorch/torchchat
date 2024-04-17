@@ -444,13 +444,13 @@ def _main(
             y, metrics = generate(
                 model,
                 encoded,
-                max_new_tokens,
+                generator_args.max_new_tokens,
                 draft_model=draft_model,
-                speculate_k=speculate_k,
+                speculate_k=generator_args.speculate_k,
                 chat_mode=generator_args.chat_mode,
                 callback=callback,
-                temperature=temperature,
-                top_k=top_k,
+                temperature=generator_args.temperature,
+                top_k=generator_args.top_k,
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
         if i == -1:
