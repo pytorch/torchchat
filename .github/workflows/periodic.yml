@@ -7,3 +7,171 @@ on:
     tags:
       - ciflow/periodic/*
   workflow_dispatch:
+
+jobs:
+  gather-models-cpu:
+    runs-on: ubuntu-22.04
+    outputs:
+      models: ${{ steps.gather-models-cpu.outputs.models }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'false'
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Extract the list of models to run on CPU
+        id: gather-models-cpu
+        run: |
+          set -eux
+          PYTHONPATH="${PWD}" python .ci/scripts/gather_test_models.py --event "periodic" --backend "cpu"
+  test-cpu-compile:
+    name: test-cpu-compile (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Print machine info
+        run: |
+          echo "$(uname -a)"
+      - name: Install dependencies
+        run: |
+          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt
+          pip list
+      - name: Download checkpoints
+        run: |
+          bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
+      - name: Run validation
+        run: |
+          pushd ${TORCHCHAT_ROOT}
+          bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "compile"
+  test-cpu-aoti:
+    name: test-cpu-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Print machine info
+        run: |
+          echo "$(uname -a)"
+      - name: Install dependencies
+        run: |
+          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt
+          pip list
+      - name: Download checkpoints
+        run: |
+          bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
+      - name: Run validation
+        run: |
+          pushd ${TORCHCHAT_ROOT}
+          bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "aoti"
+  gather-models-gpu:
+    runs-on: ubuntu-22.04
+    outputs:
+      models: ${{ steps.gather-models-gpu.outputs.models }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'false'
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Extract the list of models to run on GPU
+        id: gather-models-gpu
+        run: |
+          set -eux
+          PYTHONPATH="${PWD}" python .ci/scripts/gather_test_models.py --event "periodic" --backend "gpu"
+  test-gpu-compile:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    name: test-gpu-compile (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-gpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
+      fail-fast: false
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      script: |
+        echo "::group::Print machine info"
+        nvidia-smi
+        echo "::endgroup::"
+
+        echo "::group::Install required packages"
+        pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install -r ./requirements.txt
+        pip list
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoint"
+        export REPO_NAME=${{ matrix.repo_name }}
+        bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
+        echo "::endgroup::"
+
+        echo "::group::Convert checkpoint"
+        bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+        echo "::endgroup::"
+
+        echo "::group::Run inference"
+        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "compile"
+        echo "::endgroup::"
+  test-gpu-aoti:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    name: test-gpu-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-gpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
+      fail-fast: false
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      script: |
+        echo "::group::Print machine info"
+        nvidia-smi
+        echo "::endgroup::"
+
+        echo "::group::Install required packages"
+        pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install -r ./requirements.txt
+        pip list
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoint"
+        export REPO_NAME=${{ matrix.repo_name }}
+        bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
+        echo "::endgroup::"
+
+        echo "::group::Convert checkpoint"
+        bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+        echo "::endgroup::"
+
+        echo "::group::Run inference"
+        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti"
+        echo "::endgroup::"
