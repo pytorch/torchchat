@@ -198,12 +198,6 @@ def _add_arguments_common(parser):
         default=".model-artifacts",
         help="The directory to store downloaded model artifacts",
     )
-    parser.add_argument(
-        "--chat",
-        action="store_true",
-        help="Use torchchat to for an interactive chat session.",
-    )
-
 
 def arg_init(args):
 

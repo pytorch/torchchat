@@ -105,7 +105,11 @@ class ModelArgs:
 
 # Aliases for well-known models. Maps a short name to a HuggingFace path. These
 # can be used from the CLI in-place of the full model path.
-model_aliases = {"llama2": "meta-llama/Llama-2-7b-chat-hf"}
+model_aliases = {
+    "llama2": "meta-llama/Llama-2-7b-chat-hf",
+    "llama2-7": "meta-llama/Llama-2-7b-chat-hf",
+    "mistral-7b-instruct": "mistralai/Mistral-7B-Instruct-v0.2",
+}
 
 transformer_configs = {
     "CodeLlama-7b-Python-hf": {
