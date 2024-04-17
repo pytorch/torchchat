@@ -231,8 +231,10 @@ def speculative_decode(
 @torch.no_grad()
 def generate(
     model: Transformer,
-    generator_args: Generator_Args,
+    prompt: torch.Tensor,
+    max_new_tokens: int,
     *,
+    chat_mode: bool,
     draft_model: Transformer,
     speculate_k: Optional[int] = 8,
     callback=lambda x: x,
@@ -241,12 +243,12 @@ def generate(
     """
     Takes a conditioning sequence (prompt) as input and continues to generate as many tokens as requested.
     """
-    prompt = generator_args.encoded_prompt
+
     is_speculative = draft_model is not None
     # create an empty tensor of the expected final shape and fill in the current tokens
     T = prompt.size(0)
-    T_new = T + generator_args.max_new_tokens
-    if generator_args.chat_mode:
+    T_new = T + max_new_tokens
+    if chat_mode:
         max_seq_length = 350
     else:
         max_seq_length = min(T_new, model.config.block_size)
@@ -295,7 +297,7 @@ def generate(
             model,
             next_token.view(1, -1),
             input_pos,
-            generator_args.max_new_tokens - 1,
+            max_new_tokens - 1,
             callback=callback,
             **sampling_kwargs,
         )
@@ -432,6 +434,7 @@ def _main(
         t0 = time.perf_counter()
         import contextlib
 
+        generator_args.encoded_prompt = encoded
         if (i != generator_args.num_samples - 1 or not profile) or (use_tp and rank != 0):
             prof = contextlib.nullcontext()
         else:
@@ -440,12 +443,14 @@ def _main(
         with prof:
             y, metrics = generate(
                 model,
+                encoded,
+                max_new_tokens,
                 draft_model=draft_model,
-                speculate_k=generator_args.speculate_k,
+                speculate_k=speculate_k,
                 chat_mode=generator_args.chat_mode,
                 callback=callback,
-                temperature=generator_args.temperature,
-                top_k=generator_args.top_k,
+                temperature=temperature,
+                top_k=top_k,
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
         if i == -1:
@@ -499,7 +504,6 @@ def main(args):
         args.compile,
         args.compile_prefill,
         args.profile,
-        args.speculate_k,
         args.quantize,
     )
 
