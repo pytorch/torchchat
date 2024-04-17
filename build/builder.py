@@ -160,7 +160,7 @@ def _load_model_gguf(builder_args):
     return model
 
 
-def _load_model_not_gguf(builder_args):
+def _load_model_default(builder_args):
     assert not builder_args.gguf_path
 
     with torch.device("meta"):
@@ -217,7 +217,7 @@ def _load_model(builder_args):
     if builder_args.gguf_path:
         model = _load_model_gguf(builder_args)
     else:
-        model = _load_model_not_gguf(builder_args)
+        model = _load_model_default(builder_args)
 
     if builder_args.use_tp:
         from tp import apply_tp

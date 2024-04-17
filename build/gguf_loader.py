@@ -139,7 +139,7 @@ def load_model(gguf_file: str) -> torch.nn.Module:
     return model
 
 
-def load_model_and_state_dict(gguf_file: str, load_as_quantized: bool) -> torch.nn.Module:
+def load_model_and_state_dict(gguf_file: str, load_as_quantized: bool, *, inner_k_tiles = 8) -> torch.nn.Module:
     """
     Parses the GGUF file and returns an nn.Module on meta device along with a state_dict
     that can be loaded into it.
@@ -155,8 +155,6 @@ def load_model_and_state_dict(gguf_file: str, load_as_quantized: bool) -> torch.
         _convert_gguf_tensor_name_to_llama_nn(tensor.name): tensor
         for tensor in reader.tensors
     }
-
-    inner_k_tiles = 8 # used when load_as_quantized = True
 
     state_dict = {}
     for fqn in weight_map:
