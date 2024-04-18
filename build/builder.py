@@ -4,9 +4,9 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+import logging
 import os
 import sys
-import logging
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -23,6 +23,7 @@ from sentencepiece import SentencePieceProcessor
 from build.model import Transformer
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class BuilderArgs:
@@ -79,10 +80,10 @@ class BuilderArgs:
                 args.checkpoint_dir,
                 args.dso_path,
                 args.pte_path,
-                args.gguf_path
+                args.gguf_path,
             ]:
                 path = str(path)
-                if path.endswith('/'):
+                if path.endswith("/"):
                     path = path[:-1]
                 path_basename = os.path.basename(path)
                 if "chat" in path_basename:
@@ -191,6 +192,7 @@ def _set_gguf_kwargs(builder_args, is_et, context: str):
     if is_et:
         builder_args.gguf_kwargs["load_as_quantized"] = False
 
+
 def _unset_gguf_kwargs(builder_args):
     builder_args.gguf_kwargs = None
 
@@ -266,6 +268,7 @@ def _load_model(builder_args):
 
     if builder_args.use_tp:
         from tp import apply_tp
+
         logging.info("Applying tensor parallel to model ...")
         apply_tp(model)
 

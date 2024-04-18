@@ -5,10 +5,10 @@
 # LICENSE file in the root directory of this source tree.
 
 import json
+import logging
 from functools import reduce
 from math import gcd
 from typing import Dict, Optional, Tuple
-import logging
 
 logger = logging.getLogger(__name__)
 
