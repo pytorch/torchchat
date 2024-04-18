@@ -322,11 +322,22 @@ B_INST, E_INST = "[INST]", "[/INST]"
 def get_device_info(name: str) -> str:
     import platform
     from subprocess import check_output
+
     if name == "cpu":
         if platform.system() == "Darwin":
-            return check_output(["sysctl", "-n", "machdep.cpu.brand_string"]).decode("utf-8").strip()
+            return (
+                check_output(["sysctl", "-n", "machdep.cpu.brand_string"])
+                .decode("utf-8")
+                .strip()
+            )
         if platform.system() == "Linux":
-            return check_output(["sed", "-nr", "s/^model name\\s+: (.*)$/\\1/p", "/proc/cpuinfo"]).decode("utf-8").split("\n")[0]
+            return (
+                check_output(
+                    ["sed", "-nr", "s/^model name\\s+: (.*)$/\\1/p", "/proc/cpuinfo"]
+                )
+                .decode("utf-8")
+                .split("\n")[0]
+            )
     if name == "cuda":
         return torch.cuda.get_device_name(0)
     return ""
