@@ -161,7 +161,7 @@ def _add_arguments_common(parser):
         default="float32",
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
-    parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("-ll", "--log-level", default='info', type=str.upper, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], help="Log level to display")
     parser.add_argument(
         "--quantize", type=str, default="{ }", help="Quantization options."
     )

@@ -37,7 +37,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args = arg_init(args)
     logging.basicConfig(
-        format="%(message)s", level=logging.DEBUG if args.verbose else logging.INFO
+        format="%(message)s", level=logging.getLevelName(args.log_level)
     )
 
     if args.subcommand == "generate":

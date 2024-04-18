@@ -70,7 +70,7 @@ def device_sync(device):
     elif ("cpu" in device) or ("mps" in device):
         pass
     else:
-        logging.error(f"device={ device } is not yet suppported")
+        logger.error(f"device={ device } is not yet suppported")
 
 
 torch._inductor.config.coordinate_descent_tuning = True
@@ -115,7 +115,7 @@ def prefill(
     sequential_prefill=True,
     **sampling_kwargs,
 ) -> torch.Tensor:
-    logging.debug(f"x: {x}, input_pos: {input_pos}")
+    logger.debug(f"x: {x}, input_pos: {input_pos}")
     width = x.size(1)
     assert input_pos.size(0) == width
     sequential_prefill = True
@@ -123,7 +123,7 @@ def prefill(
     if sequential_prefill:
         for i in range(width):
             x_sliced, ip_sliced = x[:, i].view(-1, 1), input_pos[i].view(-1)
-            logging.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
+            logger.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
             logits = model(x_sliced, ip_sliced)  # (x[:, i], input_pos[i])
     else:
         # input_pos: [B, S]
@@ -342,7 +342,7 @@ def _main(
     #            # only print on rank 0
     #            print = lambda *args, **kwargs: None
 
-    logging.info(f"Using device={builder_args.device}")
+    logger.info(f"Using device={builder_args.device}")
     set_precision(builder_args.precision)
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
@@ -380,7 +380,7 @@ def _main(
     encoded = encode_tokens(
         tokenizer, generator_args.prompt, bos=True, device=builder_args.device
     )
-    logging.debug(encoded)
+    logger.debug(encoded)
     prompt_length = encoded.size(0)
 
     model_size = sum(
@@ -475,7 +475,7 @@ def _main(
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
         if i == -1:
-            logging.info(f"Compilation time: {time.perf_counter() - t0:.2f} seconds")
+            logger.info(f"Compilation time: {time.perf_counter() - t0:.2f} seconds")
             continue
         if hasattr(prof, "export_chrome_trace"):
             if use_tp:
@@ -492,23 +492,23 @@ def _main(
         tokens_generated = y.size(0) - prompt_length
         tokens_sec = tokens_generated / t
         aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-        logging.info(
+        logger.info(
             f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_sec:.02f} tokens/sec"
         )
-        logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
+        logger.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
     print("==========")
     if is_speculative:
         counts_aggregated = [sum(i) for i in zip(*aggregate_metrics["accept_counts"])]
         acceptance_probs = [i / sum(counts_aggregated) for i in counts_aggregated]
-        logging.info(f"Acceptance probs: {acceptance_probs}")
-        logging.info(
+        logger.info(f"Acceptance probs: {acceptance_probs}")
+        logger.info(
             f"Mean Accepted: {sum([idx * i for idx, i in enumerate(counts_aggregated)])/sum(counts_aggregated)}"
         )
 
-    logging.info(
+    logger.info(
         f"Average tokens/sec: {torch.mean(torch.tensor(aggregate_metrics['tokens_per_sec'])).item():.2f}"
     )
-    logging.info(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
+    logger.info(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
 
 def main(args):
