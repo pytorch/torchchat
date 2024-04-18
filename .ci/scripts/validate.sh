@@ -85,14 +85,10 @@ function generate_compiled_model_output() {
         echo "******************************************"
         echo "******** INT4 group-wise quantized *******"
         echo "******************************************"
-        if [ "$DTYPE" = float16 ]; then
-            echo "Skipping INT4 groupwise quantization for float16 because torch.compile fails"
-        else
-            python -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
-            cat "$MODEL_DIR/output_eager"
-            python -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-            cat "$MODEL_DIR/output_compiled"
-        fi
+        python -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
+        cat "$MODEL_DIR/output_eager"
+        python -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
+        cat "$MODEL_DIR/output_compiled"
     done
 }
 
@@ -157,16 +153,12 @@ function generate_aoti_model_output() {
         echo "******************************************"
         echo "******** INT4 group-wise quantized *******"
         echo "******************************************"
-        if [ "$DTYPE" = float16 ]; then
-            echo "Skipping INT4 groupwise quantization for float16 because AOTI fails"
+        if [ $(uname -s) == "Linux" ]; then
+            echo "Skipping INT4 groupwise quantization because AOTI fails"
         else
-            if [ $(uname -s) == "Linux" ]; then
-                echo "Skipping INT4 groupwise quantization because AOTI fails"
-            else
-                python -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-                python -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-                cat "$MODEL_DIR/output_aoti"
-            fi
+            python -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+            python -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
+            cat "$MODEL_DIR/output_aoti"
         fi
     done
 }
