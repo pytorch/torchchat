@@ -64,15 +64,15 @@ def _download_direct(
 def download_and_convert(
     model: str, models_dir: Path, hf_token: Optional[str] = None
 ) -> None:
-    model_config, model_name = resolve_model_config(model)
+    model_config = resolve_model_config(model)
 
     if (
         model_config.distribution_channel
         == ModelDistributionChannel.HuggingFaceSnapshot
     ):
-        _download_and_convert_hf_snapshot(model_name, models_dir, hf_token)
+        _download_and_convert_hf_snapshot(model_config.name, models_dir, hf_token)
     elif model_config.distribution_channel == ModelDistributionChannel.DirectDownload:
-        _download_direct(model_name, model_config.distribution_path, models_dir)
+        _download_direct(model_config.name, model_config.distribution_path, models_dir)
     else:
         raise RuntimeError(
             f"Unknown distribution channel {model_config.distribution_channel}."
@@ -80,9 +80,9 @@ def download_and_convert(
 
 
 def is_model_downloaded(model: str, models_dir: Path) -> bool:
-    _, model_name = resolve_model_config(model)
+    model_config = resolve_model_config(model)
 
-    model_dir = models_dir / model_name
+    model_dir = models_dir / model_config.name
     return os.path.isdir(model_dir)
 
 

@@ -23,9 +23,12 @@ def find_multiple(n: int, k: int) -> int:
     return n + k - (n % k)
 
 
-class ModelDistributionChannel(Enum):
-    HuggingFaceSnapshot = 1
-    DirectDownload = 2
+# Specifies the distribution channel to download model artifacts
+# from. Enum variants are specified as strings to simplify JSON
+# (de)serialization.
+class ModelDistributionChannel(str, Enum):
+    HuggingFaceSnapshot = "HuggingFaceSnapshot"
+    DirectDownload = "DirectDownload"
 
 
 @dataclass
@@ -125,6 +128,7 @@ There are two supported distribution channels:
 """
 @dataclass
 class ModelConfig:
+    name: str = field(default="")
     aliases: Sequence[str] = field(default_factory=list)
     distribution_path: Union[str, Sequence[str]] = field(default="")
     distribution_channel: ModelDistributionChannel = field(
@@ -133,12 +137,15 @@ class ModelConfig:
     checkpoint_file: str = field(default="model.pth")
 
 
+# Keys are stored in lowercase.
 model_aliases: Dict[str, str] = None
 model_configs: Dict[str, ModelConfig] = None
 
-def resolve_model_config(model: str) -> Tuple[ModelConfig, str]:
+def resolve_model_config(model: str) -> ModelConfig:
     global model_aliases
     global model_configs
+
+    model = model.lower()
 
     # Lazy load model config from JSON.
     if not model_configs:
@@ -149,10 +156,13 @@ def resolve_model_config(model: str) -> Tuple[ModelConfig, str]:
             model_config_dict = json.load(f)
         for key, value in model_config_dict.items():
             config = ModelConfig(**value)
+            config.name = key
+
+            key = key.lower()
             model_configs[key] = config
 
             for alias in config.aliases:
-                model_aliases[alias] = key
+                model_aliases[alias.lower()] = key
 
 
     if model in model_aliases:
@@ -161,7 +171,7 @@ def resolve_model_config(model: str) -> Tuple[ModelConfig, str]:
     if not model in model_configs:
         raise ValueError(f"Unknown model '{model}'.")
 
-    return model_configs[model], model
+    return model_configs[model]
 
 
 transformer_configs = {

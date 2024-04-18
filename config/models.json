@@ -10,7 +10,6 @@
         "distribution_path": "mistralai/Mistral-7B-Instruct-v0.2"
     },
     "stories15M": {
-        "aliases": ["stories15m"],
         "distribution_channel": "DirectDownload",
         "distribution_path": [
             "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt",
@@ -19,7 +18,6 @@
         "checkpoint_file": "stories15M.pt"
     },
     "stories110M": {
-        "aliases": ["stories110m"],
         "distribution_channel": "DirectDownload",
         "distribution_path": [
             "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.pt",

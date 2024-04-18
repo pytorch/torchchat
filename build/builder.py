@@ -76,10 +76,10 @@ class BuilderArgs:
 
         checkpoint_path = args.checkpoint_path
         if args.model:  # Using a named, well-known model
-            model_config, model_name = resolve_model_config(args.model)
+            model_config = resolve_model_config(args.model)
 
             checkpoint_path = (
-                Path(args.model_directory) / model_name / model_config.checkpoint_file
+                Path(args.model_directory) / model_config.name / model_config.checkpoint_file
             )
 
         is_chat_model = False
@@ -146,9 +146,9 @@ class TokenizerArgs:
 >>>>>>> 2a3f7f1 (Add model config for known models)
 
         if args.model:  # Using a named, well-known model
-            _, model_name = resolve_model_config(args.model)
+            model_config = resolve_model_config(args.model)
 
-            checkpoint_dir = Path(args.model_directory) / model_name
+            checkpoint_dir = Path(args.model_directory) / model_config.name
 
         if args.tokenizer_path:
             tokenizer_path = args.tokenizer_path
