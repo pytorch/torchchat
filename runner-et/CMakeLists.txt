@@ -19,7 +19,6 @@ MESSAGE(STATUS "Using ET BUILD DIR: --[${ET_BUILD_DIR}]--")
 
 project(Torchchat)
 
-include(Utils.cmake)
 include(CMakePrintHelpers)
 include(Utils.cmake)
 set(TORCHCHAT_ROOT $ENV{TORCHCHAT_ROOT})
@@ -42,18 +41,18 @@ target_link_libraries(
         executorch
         extension_module
         ${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/extension/data_loader/libextension_data_loader.a # This one does not get installed by ExecuTorch
-        ${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/examples/models/llama2/custom_ops/libcustom_ops_lib.a # This one does not get installed by ExecuTorch
-        ${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/examples/models/llama2/custom_ops/libcustom_ops.a # This one does not get installed by ExecuTorch
         optimized_kernels
         portable_kernels
         cpublas
         eigen_blas
+        ${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/examples/models/llama2/custom_ops/libcustom_ops.a # This one does not get installed by ExecuTorch
         # The libraries below need to be whole-archived linked
         optimized_native_cpu_ops_lib
         xnnpack_backend
         XNNPACK
         pthreadpool
         cpuinfo
+        # ${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/examples/models/llama2/custom_ops/libcustom_ops_lib.a # This one does not get installed by ExecuTorch
 )
 target_link_options_shared_lib(executorch)
 target_link_options_shared_lib(optimized_native_cpu_ops_lib)
@@ -61,3 +60,4 @@ target_link_options_shared_lib(xnnpack_backend)
 target_link_options_shared_lib(XNNPACK)
 target_link_options_shared_lib(pthreadpool)
 target_link_options_shared_lib(cpuinfo)
+target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/examples/models/llama2/custom_ops/libcustom_ops_lib.a>")
