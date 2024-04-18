@@ -14,13 +14,13 @@ from typing import Any, Dict, Optional, Union
 import torch
 import torch._dynamo.config
 import torch._inductor.config
+from config.model_config import resolve_model_config
 from quantize import name_to_dtype, quantize_model
 
 from sentencepiece import SentencePieceProcessor
 from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
 from build.model import Transformer
-from config.model_config import resolve_model_config
 
 
 @dataclass
@@ -80,7 +80,9 @@ class BuilderArgs:
             model_config = resolve_model_config(args.model)
 
             checkpoint_path = (
-                Path(args.model_directory) / model_config.name / model_config.checkpoint_file
+                Path(args.model_directory)
+                / model_config.name
+                / model_config.checkpoint_file
             )
 
         is_chat_model = False

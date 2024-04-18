@@ -4,10 +4,8 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 import json
-from dataclasses import dataclass, field
-from enum import Enum
-from pathlib import Path
-from typing import Dict, Optional, Sequence, Tuple, Union
+from dataclasses import dataclass
+from typing import Dict, Optional
 
 import torch
 import torch.nn as nn
@@ -21,14 +19,6 @@ def find_multiple(n: int, k: int) -> int:
     if n % k == 0:
         return n
     return n + k - (n % k)
-
-
-# Specifies the distribution channel to download model artifacts
-# from. Enum variants are specified as strings to simplify JSON
-# (de)serialization.
-class ModelDistributionChannel(str, Enum):
-    HuggingFaceSnapshot = "HuggingFaceSnapshot"
-    DirectDownload = "DirectDownload"
 
 
 @dataclass
@@ -262,7 +252,6 @@ class Transformer(nn.Module):
     @classmethod
     def from_gguf(cls, gguf_path: str, **kwargs):
         from build.gguf_loader import load_model_and_state_dict
-        model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
 
         model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
         if state_dict != {}:

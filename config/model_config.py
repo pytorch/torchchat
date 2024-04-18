@@ -7,7 +7,7 @@ import json
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Optional, Sequence, Tuple, Union
+from typing import Dict, Sequence, Union
 
 """
 Known Model Configs:
@@ -27,8 +27,8 @@ There are two supported distribution channels:
 # Specifies the distribution channel to download model artifacts from. Enum
 # variants are specified as strings to simplify JSON (de)serialization.
 class ModelDistributionChannel(str, Enum):
-    # Download a full model snapshot (such as meta-llama/Llama-2-7b-chat-hf)
-    # and convert to torchchat format.
+    # Download a full model snapshot from HuggingFace, such as
+    # meta-llama/Llama-2-7b-chat-hf and convert to torchchat format.
     HuggingFaceSnapshot = "HuggingFaceSnapshot"
 
     # Download one or more files over HTTP(S).
@@ -50,6 +50,7 @@ class ModelConfig:
 model_aliases: Dict[str, str] = None
 model_configs: Dict[str, ModelConfig] = None
 
+
 def resolve_model_config(model: str) -> ModelConfig:
     global model_aliases
     global model_configs
@@ -61,7 +62,9 @@ def resolve_model_config(model: str) -> ModelConfig:
         model_aliases = {}
         model_configs = {}
 
-        with open(Path(__file__).parent.parent / "config" / "data" / "models.json", "r") as f:
+        with open(
+            Path(__file__).parent.parent / "config" / "data" / "models.json", "r"
+        ) as f:
             model_config_dict = json.load(f)
 
         for key, value in model_config_dict.items():
@@ -74,11 +77,10 @@ def resolve_model_config(model: str) -> ModelConfig:
             for alias in config.aliases:
                 model_aliases[alias.lower()] = key
 
-
     if model in model_aliases:
         model = model_aliases[model]
 
-    if not model in model_configs:
+    if model not in model_configs:
         raise ValueError(f"Unknown model '{model}'.")
 
     return model_configs[model]
