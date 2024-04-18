@@ -139,7 +139,7 @@ def load_model(gguf_file: str) -> torch.nn.Module:
     return model
 
 
-def load_model_and_state_dict(gguf_file: str, load_as_quantized: bool, *, inner_k_tiles = 8) -> torch.nn.Module:
+def load_model_and_state_dict(gguf_file: str, *, load_state_dict: bool = True, load_as_quantized: bool = True, inner_k_tiles = 8) -> torch.nn.Module:
     """
     Parses the GGUF file and returns an nn.Module on meta device along with a state_dict
     that can be loaded into it.
@@ -174,14 +174,14 @@ def load_model_and_state_dict(gguf_file: str, load_as_quantized: bool, *, inner_
             in_features = mod.in_features
             assert all(t.shape == (in_features, out_features))
 
-            q, s, z = Q4_0.unpack(t)
-            scales_and_zeros = pack_scales_and_zeros(s, z)
-            weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
-                q, inner_k_tiles
-            )
-
-            state_dict[f"{fqn}.weight"] = weight_int4pack
-            state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros
+            if load_state_dict:
+                q, s, z = Q4_0.unpack(t)
+                scales_and_zeros = pack_scales_and_zeros(s, z)
+                weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
+                    q, inner_k_tiles
+                )
+                state_dict[f"{fqn}.weight"] = weight_int4pack
+                state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros
 
             parent = _fqn_lookup(_fqn_up(fqn), model)
             setattr(
@@ -197,8 +197,10 @@ def load_model_and_state_dict(gguf_file: str, load_as_quantized: bool, *, inner_
                 ),
             )
         else:
-            state_dict[f"{fqn}.weight"] = to_float(t)
+            if load_state_dict:
+                state_dict[f"{fqn}.weight"] = to_float(t)
 
+    assert (state_dict == {}) == (not load_state_dict)
     return model, state_dict
 
 

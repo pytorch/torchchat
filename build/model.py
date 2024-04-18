@@ -246,10 +246,11 @@ class Transformer(nn.Module):
         return cls(ModelArgs.from_params(params_path))
 
     @classmethod
-    def from_gguf(cls, gguf_path: str):
+    def from_gguf(cls, gguf_path: str, **kwargs):
         from build.gguf_loader import load_model_and_state_dict
-        model, state_dict = load_model_and_state_dict(gguf_path, load_as_quantized=True, inner_k_tiles=8)
-        model.load_state_dict(state_dict, assign=True)
+        model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
+        if state_dict != {}:
+            model.load_state_dict(state_dict, assign=True)
         return model
 
 

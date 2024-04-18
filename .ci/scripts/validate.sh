@@ -25,69 +25,75 @@ function generate_compiled_model_output() {
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
 
-    echo ""############### Run inference with torch.compile "###############"
-    echo ""
-    echo "******************************************"
-    echo "************** non-quantized *************"
-    echo "******************************************"
-    python -W ignore generate.py --compile --checkpoint-path "$CHECKPOINT_PATH" --prompt "$PROMPT" --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-    cat "$MODEL_DIR/output_compiled"
+    for DTYPE in float32 bfloat16 float16; do
+        echo ""############### Run inference with torch.compile for dtype $DTYPE "###############"
+        echo ""
+        echo "******************************************"
+        echo "************** non-quantized *************"
+        echo "******************************************"
+        python -W ignore generate.py --dtype ${DTYPE} --compile --checkpoint-path "$CHECKPOINT_PATH" --prompt "$PROMPT" --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
+        cat "$MODEL_DIR/output_compiled"
 
-    echo "******************************************"
-    echo "******* Emb: channel-wise quantized ******"
-    echo "******************************************"
-    python -W ignore generate.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
-    cat "$MODEL_DIR/output_eager"
-    python -W ignore generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-    cat "$MODEL_DIR/output_compiled"
+        echo "******************************************"
+        echo "******* Emb: channel-wise quantized ******"
+        echo "******************************************"
+        python -W ignore generate.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
+        cat "$MODEL_DIR/output_eager"
+        python -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
+        cat "$MODEL_DIR/output_compiled"
 
-    echo "******************************************"
-    echo "******** Emb: group-wise quantized *******"
-    echo "******************************************"
-    python -W ignore generate.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
-    cat "$MODEL_DIR/output_eager"
-    python -W ignore generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-    cat "$MODEL_DIR/output_compiled"
+        echo "******************************************"
+        echo "******** Emb: group-wise quantized *******"
+        echo "******************************************"
+        python -W ignore generate.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
+        cat "$MODEL_DIR/output_eager"
+        python -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
+        cat "$MODEL_DIR/output_compiled"
 
-    echo "***********************************************"
-    echo "******* Emb: 4bit channel-wise quantized ******"
-    echo "***********************************************"
-    python -W ignore generate.py --quant '{"embedding" : {"bitwidth": 4, "groupsize": 0, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
-    cat "$MODEL_DIR/output_eager"
-    python -W ignore generate.py --compile --quant '{"embedding" : {"bitwidth": 4, "groupsize": 0, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-    cat "$MODEL_DIR/output_compiled"
+        echo "***********************************************"
+        echo "******* Emb: 4bit channel-wise quantized ******"
+        echo "***********************************************"
+        python -W ignore generate.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 4, "groupsize": 0, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
+        cat "$MODEL_DIR/output_eager"
+        python -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"embedding" : {"bitwidth": 4, "groupsize": 0, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
+        cat "$MODEL_DIR/output_compiled"
 
-    echo "***********************************************"
-    echo "******** Emb: 4bit group-wise quantized *******"
-    echo "***********************************************"
-    python -W ignore generate.py --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
-    cat "$MODEL_DIR/output_eager"
-    python -W ignore generate.py --compile --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-    cat "$MODEL_DIR/output_compiled"
+        echo "***********************************************"
+        echo "******** Emb: 4bit group-wise quantized *******"
+        echo "***********************************************"
+        python -W ignore generate.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
+        cat "$MODEL_DIR/output_eager"
+        python -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
+        cat "$MODEL_DIR/output_compiled"
 
-    echo "******************************************"
-    echo "******* INT8 channel-wise quantized ******"
-    echo "******************************************"
-    python -W ignore generate.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
-    cat "$MODEL_DIR/output_eager"
-    python -W ignore generate.py --compile --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-    cat "$MODEL_DIR/output_compiled"
+        echo "******************************************"
+        echo "******* INT8 channel-wise quantized ******"
+        echo "******************************************"
+        python -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
+        cat "$MODEL_DIR/output_eager"
+        python -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
+        cat "$MODEL_DIR/output_compiled"
 
-    echo "******************************************"
-    echo "******** INT8 group-wise quantized *******"
-    echo "******************************************"
-    python -W ignore generate.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
-    cat "$MODEL_DIR/output_eager"
-    python -W ignore generate.py --compile --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-    cat "$MODEL_DIR/output_compiled"
+        echo "******************************************"
+        echo "******** INT8 group-wise quantized *******"
+        echo "******************************************"
+        python -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
+        cat "$MODEL_DIR/output_eager"
+        python -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
+        cat "$MODEL_DIR/output_compiled"
 
-    echo "******************************************"
-    echo "******** INT4 group-wise quantized *******"
-    echo "******************************************"
-    python -W ignore generate.py --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
-    cat "$MODEL_DIR/output_eager"
-    python -W ignore generate.py --compile --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-    cat "$MODEL_DIR/output_compiled"
+        echo "******************************************"
+        echo "******** INT4 group-wise quantized *******"
+        echo "******************************************"
+        if [ "$DTYPE" = float16 ]; then
+            echo "Skipping INT4 groupwise quantization for float16 because torch.compile fails"
+        else
+            python -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
+            cat "$MODEL_DIR/output_eager"
+            python -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
+            cat "$MODEL_DIR/output_compiled"
+        fi
+    done
 }
 
 function generate_aoti_model_output() {
@@ -96,63 +102,73 @@ function generate_aoti_model_output() {
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
 
-    echo ""############### Run inference with AOT Inductor "###############"
-    echo ""
-    echo "******************************************"
-    echo "************** non-quantized *************"
-    echo "******************************************"
-    python -W ignore export.py --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path "${MODEL_DIR}/${MODEL_NAME}.so" --device "$TARGET_DEVICE" || exit 1
-    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --dso-path "$MODEL_DIR/${MODEL_NAME}.so" --prompt "$PROMPT" --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-    cat "$MODEL_DIR/output_aoti"
+    for DTYPE in float32 bfloat16 float16; do
+        echo ""############### Run inference with AOT Inductor  for dtype $DTYPE "###############"
+        echo ""
+        echo "******************************************"
+        echo "************** non-quantized *************"
+        echo "******************************************"
+        python -W ignore export.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path "${MODEL_DIR}/${MODEL_NAME}.so" --device "$TARGET_DEVICE" || exit 1
+        python -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --dso-path "$MODEL_DIR/${MODEL_NAME}.so" --prompt "$PROMPT" --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
+        cat "$MODEL_DIR/output_aoti"
 
-    echo "******************************************"
-    echo "******* Emb: channel-wise quantized ******"
-    echo "******************************************"
-    python -W ignore export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-    cat "$MODEL_DIR/output_aoti"
+        echo "******************************************"
+        echo "******* Emb: channel-wise quantized ******"
+        echo "******************************************"
+        python -W ignore export.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+        python -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
+        cat "$MODEL_DIR/output_aoti"
 
-    echo "******************************************"
-    echo "******** Emb: group-wise quantized *******"
-    echo "******************************************"
-    python -W ignore export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-    cat "$MODEL_DIR/output_aoti"
+        echo "******************************************"
+        echo "******** Emb: group-wise quantized *******"
+        echo "******************************************"
+        python -W ignore export.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+        python -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
+        cat "$MODEL_DIR/output_aoti"
 
-    echo "***********************************************"
-    echo "******* Emb: 4bit channel-wise quantized ******"
-    echo "***********************************************"
-    python -W ignore export.py --quant '{"embedding" : {"bitwidth": 4, "groupsize": 0, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-    cat "$MODEL_DIR/output_aoti"
+        echo "***********************************************"
+        echo "******* Emb: 4bit channel-wise quantized ******"
+        echo "***********************************************"
+        python -W ignore export.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 4, "groupsize": 0, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+        python -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
+        cat "$MODEL_DIR/output_aoti"
 
-    echo "***********************************************"
-    echo "******** Emb: 4bit group-wise quantized *******"
-    echo "***********************************************"
-    python -W ignore export.py --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-    cat "$MODEL_DIR/output_aoti"
+        echo "***********************************************"
+        echo "******** Emb: 4bit group-wise quantized *******"
+        echo "***********************************************"
+        python -W ignore export.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+        python -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
+        cat "$MODEL_DIR/output_aoti"
 
-    echo "******************************************"
-    echo "******* INT8 channel-wise quantized ******"
-    echo "******************************************"
-    python -W ignore export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-    cat "$MODEL_DIR/output_aoti"
+        echo "******************************************"
+        echo "******* INT8 channel-wise quantized ******"
+        echo "******************************************"
+        python -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+        python -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
+        cat "$MODEL_DIR/output_aoti"
 
-    echo "******************************************"
-    echo "******** INT8 group-wise quantized *******"
-    echo "******************************************"
-    python -W ignore export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-    cat "$MODEL_DIR/output_aoti"
+        echo "******************************************"
+        echo "******** INT8 group-wise quantized *******"
+        echo "******************************************"
+        python -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+        python -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
+        cat "$MODEL_DIR/output_aoti"
 
-    echo "******************************************"
-    echo "******** INT4 group-wise quantized *******"
-    echo "******************************************"
-    python -W ignore export.py --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-    python -W ignore generate.py --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-    cat "$MODEL_DIR/output_aoti"
+        echo "******************************************"
+        echo "******** INT4 group-wise quantized *******"
+        echo "******************************************"
+        if [ "$DTYPE" = float16 ]; then
+            echo "Skipping INT4 groupwise quantization for float16 because AOTI fails"
+        else
+            if [ $(uname -s) == "Linux" ]; then
+                echo "Skipping INT4 groupwise quantization because AOTI fails"
+            else
+                python -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+                python -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
+                cat "$MODEL_DIR/output_aoti"
+            fi
+        fi
+    done
 }
 
 function generate_executorch_model_output() {

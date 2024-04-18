@@ -109,7 +109,12 @@ def sample(logits, temperature: float = 1.0, top_k: Optional[int] = None):
 
 
 def prefill(
-    model: Transformer, x: torch.Tensor, input_pos: torch.Tensor, **sampling_kwargs
+        model: Transformer,
+        x: torch.Tensor,
+        input_pos: torch.Tensor,
+        *,
+        sequential_prefill = True,
+        **sampling_kwargs
 ) -> torch.Tensor:
     logging.debug(f"x: {x}, input_pos: {input_pos}")
     width = x.size(1)
@@ -160,13 +165,6 @@ def decode_n_tokens(
             cur_token = next_token.view(1, -1)
 
     return new_tokens, new_probs
-
-
-# try:
-#     from .thin_wrapper import model_forward
-#
-# except:
-#     print("compiled model load not successful, running eager model")
 
 
 def model_forward(model, x, input_pos):
