@@ -415,9 +415,9 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
                         and fqn not in ["output", "final_proj"]
                     )
                 ):
-                    print(
-                        f"quantize {self.node_type} {fqn, mod} with groupsize {self.groupsize}, bitwidth {self.bitwidth}"
-                    )
+                    # print(
+                    #     f"quantize {self.node_type} {fqn, mod} with groupsize {self.groupsize}, bitwidth {self.bitwidth}"
+                    # )
 
                     # print(f"initial weight shape {mod.weight.shape}")
                     input_weight = mod.weight.float()
@@ -469,7 +469,7 @@ class WeightOnlyInt8Linear(torch.nn.Module):
         dtype=None,
     ) -> None:
         super().__init__()
-        print(f"group size: {groupsize}")
+        # print(f"group size: {groupsize}")
 
         self.in_features = in_features
         self.out_features = out_features
@@ -579,9 +579,9 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
                 # print(f"weights size: {mod.weight.size()}")
                 # print(f"quantize {fqn}...")
 
-                print(
-                    f"quantize {fqn, mod} with groupsize {self.groupsize}, bitwidth {self.bitwidth}"
-                )
+                # print(
+                #     f"quantize {fqn, mod} with groupsize {self.groupsize}, bitwidth {self.bitwidth}"
+                # )
                 weight, scales, _ = dynamically_quantize_per_channel(
                     mod.weight.float(),
                     range_min,
@@ -750,6 +750,7 @@ def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, grou
         new_shape = origin_x_size[:-1] + (out_features,)
         return torch.zeros(new_shape, dtype=x.dtype, device=x.device)
 
+
     if ((x.dtype == torch.float32) and ("cpu" in str(x.device))) or "cuda" in str(
         x.device
     ):
@@ -833,7 +834,7 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
                 out_features = mod.out_features
                 in_features = mod.in_features
                 assert out_features % 8 == 0, "require out_features % 8 == 0"
-                print(f"linear: {fqn}, in={in_features}, out={out_features}")
+                # print(f"linear: {fqn}, in={in_features}, out={out_features}")
 
                 weight = mod.weight.data
                 if not _int4_check_linear_int4_k(
