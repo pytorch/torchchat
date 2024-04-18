@@ -270,6 +270,7 @@ def _load_model(builder_args):
         from tp import apply_tp
 
         logging.info("Applying tensor parallel to model ...")
+
         apply_tp(model)
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)

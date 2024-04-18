@@ -7,7 +7,6 @@ import argparse
 import itertools
 
 import logging
-import os
 import sys
 import time
 from dataclasses import dataclass
@@ -109,12 +108,12 @@ def sample(logits, temperature: float = 1.0, top_k: Optional[int] = None):
 
 
 def prefill(
-        model: Transformer,
-        x: torch.Tensor,
-        input_pos: torch.Tensor,
-        *,
-        sequential_prefill = True,
-        **sampling_kwargs
+    model: Transformer,
+    x: torch.Tensor,
+    input_pos: torch.Tensor,
+    *,
+    sequential_prefill=True,
+    **sampling_kwargs,
 ) -> torch.Tensor:
     logging.debug(f"x: {x}, input_pos: {input_pos}")
     width = x.size(1)
@@ -348,7 +347,7 @@ def _main(
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
     if generator_args.chat_mode and not builder_args.is_chat_model:
-        # This is not a log message, it's a dangerous condition message 
+        # This is not a log message, it's a dangerous condition message
         # that we must ensure is displayed
         print(
             """

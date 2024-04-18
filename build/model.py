@@ -248,6 +248,7 @@ class Transformer(nn.Module):
     @classmethod
     def from_gguf(cls, gguf_path: str, **kwargs):
         from build.gguf_loader import load_model_and_state_dict
+
         model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
         if state_dict != {}:
             model.load_state_dict(state_dict, assign=True)
