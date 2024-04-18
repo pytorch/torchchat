@@ -3,7 +3,7 @@ from build.model import Attention, apply_rotary_emb
 from torch import nn
 import torch
 
-class SDPAAttention(nn.Module):
+class CustomSDPAAttention(nn.Module):
     def __init__(self, attention: Attention):
         super().__init__()
 
@@ -49,9 +49,9 @@ class SDPAAttention(nn.Module):
         return self.wo(output)
 
 
-def replace_attention_with_sdpa_attention(module: nn.Module):
+def replace_attention_with_custom_sdpa_attention(module: nn.Module):
     for name, child in module.named_children():
         if isinstance(child, Attention):
-            setattr(module, name, SDPAAttention(child))
+            setattr(module, name, CustomSDPAAttention(child))
         else:
             replace_attention_with_sdpa_attention(child)
