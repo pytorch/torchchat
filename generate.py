@@ -319,6 +319,19 @@ def encode_tokens(tokenizer, string, bos=True, device="cpu"):
 B_INST, E_INST = "[INST]", "[/INST]"
 
 
+def get_device_info(name: str) -> str:
+    import platform
+    from subprocess import check_output
+    if name == "cpu":
+        if platform.system() == "Darwin":
+            return check_output(["sysctl", "-n", "machdep.cpu.brand_string"]).decode("utf-8").strip()
+        if platform.system() == "Linux":
+            return check_output(["sed", "-nr", "s/^model name\\s+: (.*)$/\\1/p", "/proc/cpuinfo"]).decode("utf-8").split("\n")[0]
+    if name == "cuda":
+        return torch.cuda.get_device_name(0)
+    return ""
+
+
 def _main(
     builder_args: BuilderArgs,
     speculative_builder_args: BuilderArgs,
@@ -341,7 +354,7 @@ def _main(
     #            # only print on rank 0
     #            print = lambda *args, **kwargs: None
 
-    logging.info(f"Using device={builder_args.device}")
+    print(f"Using device={builder_args.device} {get_device_info(builder_args.device)}")
     set_precision(builder_args.precision)
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
