@@ -6,6 +6,7 @@
 
 import os
 import sys
+import logging
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -21,6 +22,7 @@ from sentencepiece import SentencePieceProcessor
 
 from build.model import Transformer
 
+logger = logging.getLogger(__name__)
 
 @dataclass
 class BuilderArgs:
@@ -37,7 +39,7 @@ class BuilderArgs:
     setup_caches: bool = False
     use_tp: bool = False
     is_chat_model: bool = False
-    
+
     def __post_init__(self):
         if not (
             (self.checkpoint_path and self.checkpoint_path.is_file())
@@ -54,15 +56,15 @@ class BuilderArgs:
             raise RuntimeError("specify either DSO path or PTE path, but not both")
 
         if self.checkpoint_path and (self.dso_path or self.pte_path):
-            print(
+            logging.warning(
                 "Warning: checkpoint path ignored because an exported DSO or PTE path specified"
             )
         if self.checkpoint_dir and (self.dso_path or self.pte_path):
-            print(
+            logging.warning(
                 "Warning: checkpoint dir ignored because an exported DSO or PTE path specified"
             )
         if self.gguf_path and (self.dso_path or self.pte_path):
-            print(
+            logging.warning(
                 "Warning: GGUF path ignored because an exported DSO or PTE path specified"
             )
 
@@ -85,7 +87,7 @@ class BuilderArgs:
                 path_basename = os.path.basename(path)
                 if "chat" in path_basename:
                     is_chat_model = True
-                    
+
         return cls(
             checkpoint_path=args.checkpoint_path,
             checkpoint_dir=args.checkpoint_dir,
@@ -163,7 +165,7 @@ def device_sync(device):
     elif ("cpu" in device) or ("mps" in device):
         pass
     else:
-        print(f"device={ device } is not yet suppported")
+        logging.error(f"device={ device } is not yet suppported")
 
 
 torch._inductor.config.coordinate_descent_tuning = True
@@ -182,7 +184,7 @@ def _set_gguf_kwargs(builder_args, is_et, context: str):
     assert builder_args.gguf_kwargs is None
 
     if builder_args.gguf_path is None:
-        print("No gguf_path provided, so ignoring set_gguf_kwargs.")
+        logging.info("No gguf_path provided, so ignoring set_gguf_kwargs.")
         return
 
     builder_args.gguf_kwargs = {}
@@ -221,7 +223,7 @@ def _load_model_default(builder_args):
         builder_args.checkpoint_path = None
         for i in range(4):
             cp_name = f"consolidated.{i}.pth"
-            print(f"Loading {cp_name}")
+            logging.info(f"Loading {cp_name}")
             cps.append(
                 torch.load(
                     os.path.join(builder_args.checkpoint_dir, cp_name),
@@ -264,7 +266,7 @@ def _load_model(builder_args):
 
     if builder_args.use_tp:
         from tp import apply_tp
-        print("Applying tensor parallel to model ...")
+        logging.info("Applying tensor parallel to model ...")
         apply_tp(model)
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
@@ -275,11 +277,11 @@ def _initialize_model(
     builder_args,
     quantize,
 ):
-    print("Loading model ...")
+    logging.info("Loading model ...")
     t0 = time.time()
 
     if builder_args.gguf_path and (builder_args.dso_path or builder_args.pte_path):
-        print("Setting gguf_kwargs for generate.")
+        logging.info("Setting gguf_kwargs for generate.")
         is_dso = builder_args.dso_path is not None
         is_pte = builder_args.pte_path is not None
         assert not (is_dso and is_pte)
@@ -288,7 +290,7 @@ def _initialize_model(
 
     model_ = _load_model(builder_args)
     device_sync(device=builder_args.device)
-    print(f"Time to load model: {time.time() - t0:.02f} seconds")
+    logging.info(f"Time to load model: {time.time() - t0:.02f} seconds")
 
     if builder_args.dso_path:
         # make sure user did not try to set dtype
@@ -328,7 +330,7 @@ def _initialize_model(
             t0q = time.time()
             quantize_model(model, builder_args.device, quantize)
             device_sync(device=builder_args.device)
-            print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
+            logging.info(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
 
         if builder_args.setup_caches:
             max_seq_length = 350

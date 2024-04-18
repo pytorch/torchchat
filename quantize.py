@@ -8,6 +8,9 @@ import json
 from functools import reduce
 from math import gcd
 from typing import Dict, Optional, Tuple
+import logging
+
+logger = logging.getLogger(__name__)
 
 import torch
 import torch.nn as nn
@@ -162,7 +165,7 @@ def dynamically_quantize_per_channel(
         items = groupsize
     else:
         assert groupsize > 0, "group size must be positive"
-        print(
+        logging.info(
             f"row-size of weight matrix {x_shape_1} is not divisible by group size {groupsize}, using nearest neighbor rounding"
         )
         assert (
@@ -854,7 +857,7 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
                         import torch.nn.functional as F
                         from build.model import find_multiple
 
-                        print(
+                        logging.warning(
                             f"warning: {fqn} is padded to satisfy in_features % 1024 == 0"
                         )
                         padded_in_features = find_multiple(in_features, 1024)
@@ -862,7 +865,7 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
                             weight, pad=(0, padded_in_features - in_features)
                         )
                     else:
-                        print(
+                        logging.warning(
                             f"warning: {fqn} is skipped, int4 requires that in_features is 32, 64, or is divisible by 1024, "
                             + "and that groupsize and inner_k_tiles*16 evenly divide into it"
                         )
@@ -1327,7 +1330,7 @@ class GPTQQuantHandler(QuantHandler):
         except:
             pass
         task_dict = get_task_dict(calibration_tasks)
-        print("Obtaining GPTQ calibration inputs on: ", calibration_tasks)
+        logging.info("Obtaining GPTQ calibration inputs on: ", calibration_tasks)
 
         evaluate(
             input_recorder,
@@ -1340,7 +1343,7 @@ class GPTQQuantHandler(QuantHandler):
             + "use option pad_calibration_inputs, or decrease calibration_sequence_length (currently "
             + f"{calibration_seq_length})"
         )
-        print(f"Obtained {len(inputs[0].values)} calibration samples")
+        logging.info(f"Obtained {len(inputs[0].values)} calibration samples")
         return inputs
 
     @torch.no_grad()
@@ -1363,7 +1366,7 @@ class GPTQQuantHandler(QuantHandler):
             calibration_seq_length,
             pad_calibration_inputs,
         )
-        print("Tracing model for GPTQ")
+        logging.info("Tracing model for GPTQ")
         GPTQ_runner = GenericGPTQRunner(
             self.mod,
             inputs,
@@ -1379,7 +1382,7 @@ class GPTQQuantHandler(QuantHandler):
             self.skip_layer_func,
         )
 
-        print("Applying GPTQ to weights")
+        logging.info("Applying GPTQ to weights")
         GPTQ_runner.run()
         return GPTQ_runner.get_quantized_state_dict()
 
