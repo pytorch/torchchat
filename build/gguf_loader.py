@@ -132,15 +132,11 @@ def load_model(gguf_file: str) -> torch.nn.Module:
 
 
 def load_model_and_state_dict(
-<<<<<<< HEAD
     gguf_file: str,
     *,
     load_state_dict: bool = True,
     load_as_quantized: bool = True,
     inner_k_tiles=8,
-=======
-    gguf_file: str, load_as_quantized: bool, *, inner_k_tiles=8
->>>>>>> bce0b15 (Run lint)
 ) -> torch.nn.Module:
     """
     Parses the GGUF file and returns an nn.Module on meta device along with a state_dict

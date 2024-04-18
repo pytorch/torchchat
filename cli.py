@@ -54,7 +54,37 @@ def _add_arguments_common(parser):
         type=str,
         nargs="?",
         default=None,
-        help="Model name or HuggingFace model path.",
+        help="Model name for well-known models.",
+    )
+    parser.add_argument(
+        "--checkpoint-path",
+        type=Path,
+        default=None,
+        help="Model checkpoint path.",
+    )
+    parser.add_argument(
+        "--checkpoint-dir",
+        type=Path,
+        default=None,
+        help="Model checkpoint directory.",
+    )
+    parser.add_argument(
+        "--params-path",
+        type=Path,
+        default=None,
+        help="Parameter file path.",
+    )
+    parser.add_argument(
+        "--gguf-path",
+        type=Path,
+        default=None,
+        help="GGUF file path.",
+    )
+    parser.add_argument(
+        "--tokenizer-path",
+        type=Path,
+        default=None,
+        help="Model tokenizer path.",
     )
 
     # TODO: Refactor this so that only common options are here
@@ -198,6 +228,7 @@ def _add_arguments_common(parser):
         default=".model-artifacts",
         help="The directory to store downloaded model artifacts",
     )
+
 
 def arg_init(args):
 

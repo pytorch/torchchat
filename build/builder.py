@@ -19,7 +19,7 @@ from quantize import name_to_dtype, quantize_model
 from sentencepiece import SentencePieceProcessor
 from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
-from build.model import model_aliases, Transformer
+from build.model import resolve_model_config, Transformer
 
 
 @dataclass
@@ -74,12 +74,13 @@ class BuilderArgs:
         if hasattr(args, "checkpoint_dir"):
             checkpoint_dir = args.checkpoint_dir
 
-        model = resolve_model_name(args.model) if args.model else None
-        checkpoint_path = (
-            Path(args.model_directory) / model / "model.pth"
-            if model and not args.checkpoint_path
-            else args.checkpoint_path
-        )
+        checkpoint_path = args.checkpoint_path
+        if args.model:  # Using a named, well-known model
+            model_config, model_name = resolve_model_config(args.model)
+
+            checkpoint_path = (
+                Path(args.model_directory) / model_name / model_config.checkpoint_file
+            )
 
         is_chat_model = False
         if args.is_chat_model:
@@ -135,15 +136,19 @@ class TokenizerArgs:
 
     @classmethod
     def from_args(cls, args):  # -> TokenizerArgs:
+<<<<<<< HEAD
         is_sentencepiece = True
         is_tiktoken = False
+=======
+        is_SentencePiece = True
+        is_TikToken = False
+        checkpoint_dir = args.checkpoint_dir
+>>>>>>> 2a3f7f1 (Add model config for known models)
 
-        model = resolve_model_name(args.model) if args.model else None
-        checkpoint_dir = (
-            Path(args.model_directory) / model
-            if not args.checkpoint_dir and args.model
-            else args.checkpoint_dir
-        )
+        if args.model:  # Using a named, well-known model
+            _, model_name = resolve_model_config(args.model)
+
+            checkpoint_dir = Path(args.model_directory) / model_name
 
         if args.tokenizer_path:
             tokenizer_path = args.tokenizer_path
@@ -232,8 +237,6 @@ def _load_model_default(builder_args):
             model = Transformer.from_params(builder_args.params_path)
         elif builder_args.params_table:
             model = Transformer.from_table(builder_args.params_path)
-        elif builder_args.checkpoint_dir:
-            model = Transformer.from_name(builder_args.checkpoint_dir.name)
         else:
             model = Transformer.from_name(builder_args.checkpoint_path.parent.name)
 

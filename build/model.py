@@ -4,8 +4,10 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 import json
-from dataclasses import dataclass
-from typing import Dict, Optional
+from dataclasses import dataclass, field
+from enum import Enum
+from pathlib import Path
+from typing import Dict, Optional, Sequence, Tuple, Union
 
 import torch
 import torch.nn as nn
@@ -19,6 +21,11 @@ def find_multiple(n: int, k: int) -> int:
     if n % k == 0:
         return n
     return n + k - (n % k)
+
+
+class ModelDistributionChannel(Enum):
+    HuggingFaceSnapshot = 1
+    DirectDownload = 2
 
 
 @dataclass
@@ -103,13 +110,79 @@ class ModelArgs:
         return cls(**transformer_configs[config[0]])
 
 
-# Aliases for well-known models. Maps a short name to a HuggingFace path. These
-# can be used from the CLI in-place of the full model path.
-model_aliases = {
-    "llama2": "meta-llama/Llama-2-7b-chat-hf",
-    "llama2-7": "meta-llama/Llama-2-7b-chat-hf",
-    "mistral-7b-instruct": "mistralai/Mistral-7B-Instruct-v0.2",
+# Model configuration for known models.
+@dataclass
+class ModelConfig:
+    aliases: Sequence[str] = field(default_factory=list)
+    distribution_path: Union[str, Sequence[str]] = field(default="")
+    distribution_channel: ModelDistributionChannel = field(
+        default=ModelDistributionChannel.HuggingFaceSnapshot
+    )
+    checkpoint_file: str = field(default="model.pth")
+
+    @classmethod
+    def from_name(cls, name: str):
+        if name in model_configs:
+            return cls(**model_configs[name])
+
+        raise ValueError(f"Unknown model {name}.")
+
+"""
+Known Model Configs:
+
+For models that are known to work with torchchat, we provide a config here to
+support automatically downloading the model and converting to the expected
+format for use with torchchat.
+
+There are two supported distribution channels:
+
+1) HuggingFaceSnapshot: Download a model from HuggingFace.
+2) DirectDownload: Download a list of model artifacts from URLs. No conversion
+   is done.
+"""
+
+model_configs = {
+    "meta-llama/Llama-2-7b-chat-hf": {
+        "aliases": ["llama2", "llama2-7b"],
+        "distribution_channel": ModelDistributionChannel.HuggingFaceSnapshot,
+        "distribution_path": "meta-llama/Llama-2-7b-chat-hf",
+    },
+    "mistralai/Mistral-7B-Instruct-v0.2": {
+        "aliases": ["mistral-7b-instruct"],
+        "distribution_channel": ModelDistributionChannel.HuggingFaceSnapshot,
+        "distribution_path": "mistralai/Mistral-7B-Instruct-v0.2",
+    },
+    "stories15M": {
+        "distribution_channel": ModelDistributionChannel.DirectDownload,
+        "distribution_path": [
+            "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt",
+            "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model",
+        ],
+        "checkpoint_file": "stories15M.pt",
+    },
+    "stories110M": {
+        "distribution_channel": ModelDistributionChannel.DirectDownload,
+        "distribution_path": [
+            "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.pt",
+            "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model",
+        ],
+        "checkpoint_file": "stories110M.pt",
+    },
 }
+
+model_aliases: Dict[str, str] = {}
+for name, config in model_configs.items():
+    if "aliases" in config:
+        for alias in config["aliases"]:
+            model_aliases[alias] = name
+
+
+def resolve_model_config(model: str) -> Tuple[ModelConfig, str]:
+    if model in model_aliases:
+        model = model_aliases[model]
+
+    return ModelConfig.from_name(model), model
+
 
 transformer_configs = {
     "CodeLlama-7b-Python-hf": {
@@ -260,6 +333,7 @@ class Transformer(nn.Module):
     @classmethod
     def from_gguf(cls, gguf_path: str, **kwargs):
         from build.gguf_loader import load_model_and_state_dict
+        model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
 
         model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
         if state_dict != {}:

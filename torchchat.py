@@ -95,5 +95,5 @@ if __name__ == "__main__":
         subprocess.run(command)
     else:
         raise RuntimeError(
-            "Must specify a valid subcommand: download, chat, generate, export, or eval."
+            "Must specify a valid subcommand: download, generate, export, or eval."
         )
