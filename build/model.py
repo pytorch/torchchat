@@ -110,7 +110,19 @@ class ModelArgs:
         return cls(**transformer_configs[config[0]])
 
 
-# Model configuration for known models.
+"""
+Known Model Configs:
+
+For models that are known to work with torchchat, we provide a config under
+config/models.json to support automatically downloading the model and
+converting to the expected format for use with torchchat.
+
+There are two supported distribution channels:
+
+1) HuggingFaceSnapshot: Download a model from HuggingFace.
+2) DirectDownload: Download a list of model artifacts from URLs. No conversion
+   is done.
+"""
 @dataclass
 class ModelConfig:
     aliases: Sequence[str] = field(default_factory=list)
@@ -120,68 +132,36 @@ class ModelConfig:
     )
     checkpoint_file: str = field(default="model.pth")
 
-    @classmethod
-    def from_name(cls, name: str):
-        if name in model_configs:
-            return cls(**model_configs[name])
 
-        raise ValueError(f"Unknown model {name}.")
-
-"""
-Known Model Configs:
-
-For models that are known to work with torchchat, we provide a config here to
-support automatically downloading the model and converting to the expected
-format for use with torchchat.
-
-There are two supported distribution channels:
-
-1) HuggingFaceSnapshot: Download a model from HuggingFace.
-2) DirectDownload: Download a list of model artifacts from URLs. No conversion
-   is done.
-"""
-
-model_configs = {
-    "meta-llama/Llama-2-7b-chat-hf": {
-        "aliases": ["llama2", "llama2-7b"],
-        "distribution_channel": ModelDistributionChannel.HuggingFaceSnapshot,
-        "distribution_path": "meta-llama/Llama-2-7b-chat-hf",
-    },
-    "mistralai/Mistral-7B-Instruct-v0.2": {
-        "aliases": ["mistral-7b-instruct"],
-        "distribution_channel": ModelDistributionChannel.HuggingFaceSnapshot,
-        "distribution_path": "mistralai/Mistral-7B-Instruct-v0.2",
-    },
-    "stories15M": {
-        "distribution_channel": ModelDistributionChannel.DirectDownload,
-        "distribution_path": [
-            "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt",
-            "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model",
-        ],
-        "checkpoint_file": "stories15M.pt",
-    },
-    "stories110M": {
-        "distribution_channel": ModelDistributionChannel.DirectDownload,
-        "distribution_path": [
-            "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.pt",
-            "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model",
-        ],
-        "checkpoint_file": "stories110M.pt",
-    },
-}
-
-model_aliases: Dict[str, str] = {}
-for name, config in model_configs.items():
-    if "aliases" in config:
-        for alias in config["aliases"]:
-            model_aliases[alias] = name
-
+model_aliases: Dict[str, str] = None
+model_configs: Dict[str, ModelConfig] = None
 
 def resolve_model_config(model: str) -> Tuple[ModelConfig, str]:
+    global model_aliases
+    global model_configs
+
+    # Lazy load model config from JSON.
+    if not model_configs:
+        model_aliases = {}
+        model_configs = {}
+
+        with open(Path(__file__).parent.parent / "config" / "models.json", "r") as f:
+            model_config_dict = json.load(f)
+        for key, value in model_config_dict.items():
+            config = ModelConfig(**value)
+            model_configs[key] = config
+
+            for alias in config.aliases:
+                model_aliases[alias] = key
+
+
     if model in model_aliases:
         model = model_aliases[model]
 
-    return ModelConfig.from_name(model), model
+    if not model in model_configs:
+        raise ValueError(f"Unknown model '{model}'.")
+
+    return model_configs[model], model
 
 
 transformer_configs = {

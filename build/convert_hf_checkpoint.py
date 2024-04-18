@@ -99,7 +99,7 @@ def convert_hf_checkpoint(
             del final_result[key]
             del final_result[key.replace("wq", "wk")]
             del final_result[key.replace("wq", "wv")]
-    print(f"Saving checkpoint to {model_dir / 'model.pth'}...")
+    print(f"Saving checkpoint to {model_dir / 'model.pth'}. This may take a while.")
     torch.save(final_result, model_dir / "model.pth")
     print("Done.")
 

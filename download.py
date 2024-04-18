@@ -35,8 +35,9 @@ def _download_and_convert_hf_snapshot(
     except HTTPError as e:
         if e.response.status_code == 401:
             raise RuntimeError(
-                "You need to pass a valid `--hf_token=...` to download private checkpoints."
+                "Access denied. Run huggingface-cli login to authenticate."
             )
+            os.rmdir(model_dir)
         else:
             raise e
 
