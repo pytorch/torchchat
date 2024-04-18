@@ -5,6 +5,14 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
+################################################################################
+# Usage:
+#   bash script.sh [cpu|cuda] [model_repo] [optional_command]
+# Arguments:
+#   cpu|cuda: Specify the device to run validation on (cpu or cuda).
+#   model_repo: Model repository name to validate (e.g., tinyllamas/stories15M).
+#   optional_command: (optional) Specify additional command "compile", "aoti" or "executorch" to run the selected validation.
+################################################################################
 
 set -eu
 
@@ -75,7 +83,7 @@ MODEL_REPOS=(
     "mistralai/Mistral-7B-v0.1"
     "mistralai/Mistral-7B-Instruct-v0.1"
     "mistralai/Mistral-7B-Instruct-v0.2"
-    # "openlm-research/open_llama_7b"
+    "openlm-research/open_llama_7b"
     "codellama/CodeLlama-7b-Python-hf"
     "codellama/CodeLlama-34b-Python-hf"
     # "meta-llama/Llama-2-7b-chat-hf"

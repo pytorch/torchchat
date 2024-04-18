@@ -535,7 +535,7 @@ def replace_embedding_weight_only_grouped_int8_per_channel(
             )
         else:
             replace_embedding_weight_only_grouped_int8_per_channel(
-                child, bitwidth, groupsize, packed
+                child, device, bitwidth, groupsize, packed
             )
 
 

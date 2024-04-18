@@ -1,9 +1,6 @@
-from ctypes import c_void_p
-
 import torch
 import torch.nn as nn
 from executorch.extension.pybindings import portable_lib as exec_lib
-from torch import empty
 
 
 class PTEModel(nn.Module):

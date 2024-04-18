@@ -8,7 +8,7 @@ from typing import Optional
 
 import torch
 import torch.nn.functional as F
-from torch.library import impl, impl_abstract
+from torch.library import impl
 
 torchchat_lib = torch.library.Library("torchchat", "DEF")
 
@@ -25,21 +25,21 @@ def embedding_int8(
 ) -> torch.Tensor:
     indices = input
     # embedding_byte_weight_checks(weight, weight_scales, weight_zero_points)
-    groupsize = weight.size(1) // (scales.size(1) if scales.dim() == 2 else 1)
+    # groupsize = weight.size(1) // (scales.size(1) if scales.dim() == 2 else 1)
     # ET definition
-    if False:
-        weight_zero_points = None
-        weight = torch.ops.quantized_decomposed.dequantize_per_channel_group.default(
-            weight,
-            weight_scales,
-            weight_zero_points,
-            weight_quant_min,
-            weight_quant_max,
-            weight.dtype,
-            groupsize,
-            weight_scales.dtype,
-        )
-        return torch.ops.aten.embedding.default(weight, indices)
+    # if False:
+    #     weight_zero_points = None
+    #     weight = torch.ops.quantized_decomposed.dequantize_per_channel_group.default(
+    #         weight,
+    #         weight_scales,
+    #         weight_zero_points,
+    #         weight_quant_min,
+    #         weight_quant_max,
+    #         weight.dtype,
+    #         groupsize,
+    #         weight_scales.dtype,
+    #     )
+    #     return torch.ops.aten.embedding.default(weight, indices)
 
     scales = scales.view(weight.shape[0], -1)
     result_weights = F.embedding(indices, weight)

@@ -27,26 +27,29 @@ from build.model import Transformer
 from cli import add_arguments_for_generate, arg_init, check_args
 from quantize import set_precision
 
+B_INST, E_INST = "[INST]", "[/INST]"
 
 @dataclass
 class GeneratorArgs:
     prompt: str = "torchchat is pronounced torch-chat and is so cool because"
-    chat: bool = (False,)
-    gui: bool = (False,)
-    num_samples: int = (1,)
-    max_new_tokens: int = (200,)
-    top_k: int = (200,)
-    temperature: int = (0,)  # deterministic argmax
-    compile: bool = (False,)
-    compile_prefill: bool = (False,)
-    speculate_k: int = (5,)
+    encoded_prompt: Optional[torch.Tensor] = None
+    chat_mode: bool = False
+    gui_mode: bool = False
+    num_samples: int = 1
+    max_new_tokens: int = 200
+    top_k: int = 200
+    temperature: int = 0  # deterministic argmax
+    compile: bool = False
+    compile_prefill: bool = False
+    speculate_k: int = 5
 
     @classmethod
     def from_args(cls, args):  # -> GeneratorArgs:
         return cls(
             prompt=args.prompt,
-            chat=args.chat,
-            gui=args.gui,
+            encoded_prompt=None,
+            chat_mode=args.chat,
+            gui_mode=args.gui,
             num_samples=args.num_samples,
             max_new_tokens=args.max_new_tokens,
             top_k=args.top_k,
@@ -305,27 +308,24 @@ def generate(
     return seq, generate_stats
 
 
-def encode_tokens(tokenizer, string, bos=True, device="cuda"):
+def encode_tokens(tokenizer, string, bos=True, device="cpu"):
     tokens = tokenizer.encode(string)
     if bos:
         tokens = [tokenizer.bos_id()] + tokens
     return torch.tensor(tokens, dtype=torch.int, device=device)
 
 
+B_INST, E_INST = "[INST]", "[/INST]"
+
+
 def _main(
     builder_args: BuilderArgs,
     speculative_builder_args: BuilderArgs,
     tokenizer_args: TokenizerArgs,
-    prompt: str = "Hello, my name is",
-    chat_mode: bool = False,
-    num_samples: int = 5,
-    max_new_tokens: int = 100,
-    top_k: int = 200,
-    temperature: float = 0.8,
+    generator_args: GeneratorArgs,
     compile: bool = True,
     compile_prefill: bool = False,
     profile: Optional[Path] = None,
-    speculate_k: int = 5,
     quantize=None,
 ) -> None:
     """Generates text samples based on a pre-trained Transformer model and tokenizer."""
@@ -334,6 +334,7 @@ def _main(
     #    from tp import maybe_init_dist
     #    rank = maybe_init_dist()
     use_tp = False
+    rank: Optional[int] = None
     #    if use_tp:
     #        if rank != 0:
     #            # only print on rank 0
@@ -343,11 +344,16 @@ def _main(
     set_precision(builder_args.precision)
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
-    is_chat = "chat" in str(os.path.basename(builder_args.checkpoint_path))
-    if is_chat:
-        raise RuntimeError(
-            "need to stop filename based kludgery, at a minimum need to look at all pathnames. in particular, this now fails because chat is part of the pathname, yuck!"
-        )
+    if generator_args.chat_mode and not builder_args.is_chat_model:
+        print("""
+*******************************************************
+ This model is not known to support the chat function.
+ We will enable chat mode based on your instructions.
+ If the model is not trained to support chat, it will
+ produce nonsensical or false output.
+*******************************************************
+        """)
+        # raise RuntimeError("You need to use --is-chat-model to indicate model has chat support.")
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
 
@@ -365,7 +371,9 @@ def _main(
     else:
         draft_model = None
 
-    encoded = encode_tokens(tokenizer, prompt, bos=True, device=builder_args.device)
+    encoded = encode_tokens(
+        tokenizer, generator_args.prompt, bos=True, device=builder_args.device
+    )
     print(encoded)
     prompt_length = encoded.size(0)
 
@@ -404,23 +412,24 @@ def _main(
     }
     start = -1 if compile else 0
 
-    for i in range(start, num_samples):
+    for i in range(start, generator_args.num_samples):
         device_sync(device=builder_args.device)
-        if i >= 0 and chat_mode:
+        if i >= 0 and generator_args.chat_mode:
             prompt = input("What is your prompt? \n")
-            if is_chat:
+            if builder_args.is_chat_model:
                 prompt = f"{B_INST} {prompt.strip()} {E_INST}"
             encoded = encode_tokens(
                 tokenizer, prompt, bos=True, device=builder_args.device
             )
 
-        if chat_mode and i >= 0:
+        if generator_args.chat_mode and i >= 0:
             buffer = []
             period_id = tokenizer.encode(".")[0]
             done_generating = False
 
-            def callback(x):
-                nonlocal done_generating
+            def callback(
+                x, buffer=buffer, period_id=period_id, done_generating=done_generating
+            ):
                 if done_generating:
                     return
                 buffer.append(tokenizer.decode([period_id] + x.tolist())[1:])
@@ -432,11 +441,16 @@ def _main(
                 # print(, end='', flush=True)
 
         else:
-            callback = lambda x: x
+
+            def callback(x):
+                return x
+
         t0 = time.perf_counter()
         import contextlib
 
-        if (i != num_samples - 1 or not profile) or (use_tp and rank != 0):
+        if (i != generator_args.num_samples - 1 or not profile) or (
+            use_tp and rank != 0
+        ):
             prof = contextlib.nullcontext()
         else:
             torch.profiler._utils._init_for_cuda_graphs()
@@ -445,13 +459,13 @@ def _main(
             y, metrics = generate(
                 model,
                 encoded,
-                max_new_tokens,
+                generator_args.max_new_tokens,
                 draft_model=draft_model,
-                speculate_k=speculate_k,
-                chat_mode=chat_mode,
+                speculate_k=generator_args.speculate_k,
+                chat_mode=generator_args.chat_mode,
                 callback=callback,
-                temperature=temperature,
-                top_k=top_k,
+                temperature=generator_args.temperature,
+                top_k=generator_args.top_k,
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
         if i == -1:
@@ -465,7 +479,7 @@ def _main(
         device_sync(device=builder_args.device)
         t = time.perf_counter() - t0
 
-        if not chat_mode:
+        if not generator_args.chat_mode:
             print(tokenizer.decode(y.tolist()))
         else:
             print()
@@ -495,20 +509,16 @@ def main(args):
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
+    generator_args = GeneratorArgs.from_args(args)
+
     _main(
         builder_args,
         speculative_builder_args,
         tokenizer_args,
-        args.prompt,
-        args.chat,
-        args.num_samples,
-        args.max_new_tokens,
-        args.top_k,
-        args.temperature,
+        generator_args,
         args.compile,
         args.compile_prefill,
         args.profile,
-        args.speculate_k,
         args.quantize,
     )
 

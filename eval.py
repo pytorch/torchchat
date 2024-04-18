@@ -165,7 +165,7 @@ class GPTFastEvalWrapper(eval_wrapper):
 def eval(
     model: Transformer,
     tokenizer,
-    tasks: list = ["hellaswag"],
+    tasks: Optional[list] = None,
     limit: Optional[int] = None,
     max_seq_length: Optional[int] = None,
 ) -> dict:
@@ -182,6 +182,9 @@ def eval(
     Returns:
         eval_results (dict): A dictionary of evaluation results for the specified task(s).
     """
+    if tasks is None:
+        tasks = ["hellaswag"]
+
     model_eval_wrapper = GPTFastEvalWrapper(
         model,
         tokenizer,
@@ -195,7 +198,7 @@ def eval(
 
     if "hendrycks_test" in tasks:
         tasks.remove("hendrycks_test")
-        tasks += [x for x in lm_eval.tasks.hendrycks_test.create_all_tasks().keys()]
+        tasks += list(lm_eval.tasks.hendrycks_test.create_all_tasks().keys())
     task_dict = get_task_dict(tasks)
 
     eval_results = evaluate(

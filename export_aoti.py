@@ -4,20 +4,11 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-import itertools
-import sys
-import time
-from pathlib import Path
-from typing import Optional, Tuple
 
 import torch
 import torch.nn as nn
 
-from build.model import Transformer
-
-from generate import decode_one_token
-from quantize import quantize_model
-from torch.export import Dim, export
+from torch.export import Dim
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 

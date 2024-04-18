@@ -4,11 +4,8 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-import time
-from pathlib import Path
 
 import torch
-import torch.nn as nn
 from build.model import Transformer
 
 from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
@@ -28,10 +25,8 @@ from executorch.exir.passes.sym_shape_eval_pass import ConstraintBasedSymShapeEv
 # )
 from executorch_portable_utils import export_to_edge
 
-from generate import decode_one_token
-from quantize import get_precision, name_to_dtype, quantize_model, set_precision
+from quantize import get_precision
 from torch._export import capture_pre_autograd_graph
-from torch.export import Dim, export
 
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'

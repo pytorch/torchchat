@@ -95,48 +95,58 @@ class ModelArgs:
 
 
 transformer_configs = {
-    "CodeLlama-7b-Python-hf": dict(
-        block_size=16384, vocab_size=32000, n_layers=32, dim=4096, rope_base=1000000
-    ),
-    "7B": dict(n_layers=32, n_heads=32, dim=4096),
-    "13B": dict(n_layers=40, n_heads=40, dim=5120),
-    "30B": dict(n_layers=60, n_heads=52, dim=6656),
-    "34B": dict(
-        n_layers=48,
-        n_heads=64,
-        dim=8192,
-        vocab_size=32000,
-        n_local_heads=8,
-        hidden_dim=22016,
-        rope_base=1000000,
-    ),  # CodeLlama-34B-Python-hf
-    "70B": dict(n_layers=80, n_heads=64, dim=8192, n_local_heads=8, hidden_dim=28672),
-    "Mistral-7B": dict(
-        n_layers=32,
-        n_heads=32,
-        n_local_heads=8,
-        dim=4096,
-        hidden_dim=14336,
-        vocab_size=32000,
-    ),
-    "Mistral-7B-Instruct-v0.1": dict(
-        n_layers=32,
-        n_heads=32,
-        n_local_heads=8,
-        dim=4096,
-        hidden_dim=14336,
-        vocab_size=32000,
-    ),
-    "Mistral-7B-Instruct-v0.2": dict(
-        n_layers=32,
-        n_heads=32,
-        n_local_heads=8,
-        dim=4096,
-        hidden_dim=14336,
-        vocab_size=32000,
-    ),
-    "stories15M": dict(n_layers=6, n_heads=6, dim=288),
-    "stories110M": dict(n_layers=12, n_heads=12, dim=768),
+    "CodeLlama-7b-Python-hf": {
+        "block_size": 16384,
+        "vocab_size": 32000,
+        "n_layers": 32,
+        "dim": 4096,
+        "rope_base": 1000000,
+    },
+    "7B": {"n_layers": 32, "n_heads": 32, "dim": 4096},
+    "13B": {"n_layers": 40, "n_heads": 40, "dim": 5120},
+    "30B": {"n_layers": 60, "n_heads": 52, "dim": 6656},
+    "34B": {
+        "n_layers": 48,
+        "n_heads": 64,
+        "dim": 8192,
+        "vocab_size": 32000,
+        "n_local_heads": 8,
+        "hidden_dim": 22016,
+        "rope_base": 1000000,
+    },  # CodeLlama-34B-Python-hf
+    "70B": {
+        "n_layers": 80,
+        "n_heads": 64,
+        "dim": 8192,
+        "n_local_heads": 8,
+        "hidden_dim": 28672,
+    },
+    "Mistral-7B": {
+        "n_layers": 32,
+        "n_heads": 32,
+        "n_local_heads": 8,
+        "dim": 4096,
+        "hidden_dim": 14336,
+        "vocab_size": 32000,
+    },
+    "Mistral-7B-Instruct-v0.1": {
+        "n_layers": 32,
+        "n_heads": 32,
+        "n_local_heads": 8,
+        "dim": 4096,
+        "hidden_dim": 14336,
+        "vocab_size": 32000,
+    },
+    "Mistral-7B-Instruct-v0.2": {
+        "n_layers": 32,
+        "n_heads": 32,
+        "n_local_heads": 8,
+        "dim": 4096,
+        "hidden_dim": 14336,
+        "vocab_size": 32000,
+    },
+    "stories15M": {"n_layers": 6, "n_heads": 6, "dim": 288},
+    "stories110M": {"n_layers": 12, "n_heads": 12, "dim": 768},
 }
 
 
@@ -216,7 +226,7 @@ class Transformer(nn.Module):
         freqs_cis = self.freqs_cis[input_pos]
         x = self.tok_embeddings(idx)
 
-        for i, layer in enumerate(self.layers):
+        for _, layer in enumerate(self.layers):
             x = layer(x, input_pos, freqs_cis, mask)
         x = self.norm(x)
         logits = self.output(x)
@@ -236,10 +246,11 @@ class Transformer(nn.Module):
         return cls(ModelArgs.from_params(params_path))
 
     @classmethod
-    def from_gguf(cls, gguf_path: str):
-        from build.gguf_loader import load_llama_from_gguf_file
-
-        model = load_llama_from_gguf_file(gguf_path)
+    def from_gguf(cls, gguf_path: str, **kwargs):
+        from build.gguf_loader import load_model_and_state_dict
+        model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
+        if state_dict != {}:
+            model.load_state_dict(state_dict, assign=True)
         return model
 
 
@@ -344,7 +355,7 @@ class Attention(nn.Module):
         q = apply_rotary_emb(q, freqs_cis)
         k = apply_rotary_emb(k, freqs_cis)
 
-        q, k, v = map(lambda x: x.transpose(1, 2), (q, k, v))
+        q, k, v = (x.transpose(1, 2) for x in (q, k, v))
 
         if self.kv_cache is not None:
             k, v = self.kv_cache.update(input_pos, k, v)

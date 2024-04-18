@@ -11,7 +11,7 @@ install_pip_dependencies() {
   echo "Intalling common pip packages"
 
   pip install wheel
-  pip install cmake
+  pip install "cmake>=3.19"
   pip install ninja
   pip install zstd
   pushd ${TORCHCHAT_ROOT}
@@ -20,19 +20,20 @@ install_pip_dependencies() {
 }
 
 install_executorch() {
-  echo "Cloning executorch to ${TORCHCHAT_ROOT}/build/src"
-  rm -rf ${TORCHCHAT_ROOT}/build
-  mkdir -p ${TORCHCHAT_ROOT}/build/src
-  pushd ${TORCHCHAT_ROOT}/build/src
+  echo "Cloning executorch to ${TORCHCHAT_ROOT}/et-build/src"
+  rm -rf ${TORCHCHAT_ROOT}/et-build
+  mkdir -p ${TORCHCHAT_ROOT}/et-build/src
+  pushd ${TORCHCHAT_ROOT}/et-build/src
   git clone https://github.com/pytorch/executorch.git
   cd executorch
+  git checkout viable/strict
   echo "Install executorch: submodule update"
   git submodule sync
   git submodule update --init
 
   echo "Applying fixes"
-  cp ${TORCHCHAT_ROOT}/scripts/fixes_et/module.cpp ${TORCHCHAT_ROOT}/build/src/executorch/extension/module/module.cpp # ET uses non-standard C++ that does not compile in GCC
-  cp ${TORCHCHAT_ROOT}/scripts/fixes_et/managed_tensor.h ${TORCHCHAT_ROOT}/build/src/executorch/extension/runner_util/managed_tensor.h # ET is missing headers for vector/memory.  This causes downstream issues when building runner-et.
+  cp ${TORCHCHAT_ROOT}/scripts/fixes_et/module.cpp ${TORCHCHAT_ROOT}/et-build/src/executorch/extension/module/module.cpp # ET uses non-standard C++ that does not compile in GCC
+  cp ${TORCHCHAT_ROOT}/scripts/fixes_et/managed_tensor.h ${TORCHCHAT_ROOT}/et-build/src/executorch/extension/runner_util/managed_tensor.h # ET is missing headers for vector/memory.  This causes downstream issues when building runner-et.
 
   echo "Building and installing python libraries"
   echo "Building and installing python libraries"
@@ -50,7 +51,7 @@ install_executorch() {
   mkdir cmake-out
   cmake -DCMAKE_BUILD_TYPE=Release -DEXECUTORCH_BUILD_OPTIMIZED=ON -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out -G Ninja
   cmake --build cmake-out
-  cmake --install cmake-out --prefix ${TORCHCHAT_ROOT}/build/install
+  cmake --install cmake-out --prefix ${TORCHCHAT_ROOT}/et-build/install
   popd
 }
 
