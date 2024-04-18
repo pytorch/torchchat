@@ -3,17 +3,41 @@ from build.model import Attention, apply_rotary_emb
 from torch import nn
 import torch
 
+class CustomKVCache(nn.Module):
+    def __init__(self, max_batch_size, max_seq_length, n_heads, head_dim, dtype):
+        super().__init__()
+
+        # This is flipped around from what is in build.model's KVCache
+        cache_shape = (max_batch_size, max_seq_length, n_heads, head_dim)
+        self.register_buffer(
+            "k_cache", torch.zeros(cache_shape, dtype=dtype, device="cpu")
+        )
+        self.register_buffer(
+            "v_cache", torch.zeros(cache_shape, dtype=dtype, device="cpu")
+        )
+
+    def update(self, input_pos, k_val, v_val):
+        k_out = self.k_cache
+        v_out = self.v_cache
+        k_out[:, :, input_pos] = k_val
+        v_out[:, :, input_pos] = v_val
+
+        return k_out, v_out
+
+
 class CustomSDPAAttention(nn.Module):
     def __init__(self, attention: Attention):
         super().__init__()
-
 
         self.wq = attention.wq
         self.wk = attention.wk
         self.wv = attention.wv
 
         self.wo = attention.wo
-        self.kv_cache = attention.kv_cache
+
+        max_batch_size, n_heads, max_seq_length, head_dim = attention.kv_cache.k_cache.shape
+        cache_dtype = attention.kv_cache.k_cache.dtype
+        self.kv_cache = CustomKVCache(max_batch_size, max_seq_length, n_heads, head_dim, cache_dtype)
 
         self.n_heads = attention.n_heads
         self.head_dim = attention.head_dim
