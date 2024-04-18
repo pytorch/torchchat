@@ -1,6 +1,7 @@
 from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache
-from build.model import Attention
+from build.model import Attention, apply_rotary_emb
 from torch import nn
+import torch
 
 class SDPAAttention(nn.Module):
     def __init__(self, attention: Attention):
@@ -19,13 +20,7 @@ class SDPAAttention(nn.Module):
         self.n_local_heads = attention.n_local_heads
         self.dim = attention.dim
 
-    def forward(
-        self,
-        x: Tensor,
-        freqs_cis: Tensor,
-        mask: Tensor,
-        input_pos: Optional[Tensor] = None,
-    ) -> Tensor:
+    def forward(self, x, freqs_cis, mask, input_pos = None):
         bsz, seqlen, _ = x.shape
 
         q = self.wq(x)
