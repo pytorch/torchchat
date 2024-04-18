@@ -19,6 +19,7 @@ MESSAGE(STATUS "Using ET BUILD DIR: --[${ET_BUILD_DIR}]--")
 
 project(Torchchat)
 
+include(Utils.cmake)
 include(CMakePrintHelpers)
 include(Utils.cmake)
 set(TORCHCHAT_ROOT $ENV{TORCHCHAT_ROOT})
@@ -40,7 +41,9 @@ target_link_libraries(
     runner_et PRIVATE
         executorch
         extension_module
-        ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch/${CMAKE_OUT_DIR}/extension/data_loader/libextension_data_loader.a # This one does not get installed by ExecuTorch
+        ${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/extension/data_loader/libextension_data_loader.a # This one does not get installed by ExecuTorch
+        ${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/examples/models/llama2/custom_ops/libcustom_ops_lib.a # This one does not get installed by ExecuTorch
+        ${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/examples/models/llama2/custom_ops/libcustom_ops.a # This one does not get installed by ExecuTorch
         optimized_kernels
         portable_kernels
         cpublas
