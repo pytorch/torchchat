@@ -679,3 +679,58 @@ jobs:
 
           echo "tests complete"
           echo "******************************************"
+  runner-et:
+    strategy:
+      matrix:
+        runner: [32-core-ubuntu]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Install requirements
+        run: |
+          echo "Intalling pip packages"
+          pip install wheel
+          pip install cmake
+          pip install ninja
+          pip install zstd
+          pip install -r requirements.txt
+
+          export TORCHCHAT_ROOT=${PWD}
+          export ENABLE_ET_PYBIND=false
+          ./scripts/install_et.sh $ENABLE_ET_PYBIND
+          cmake -S ./runner-et -B et-build/cmake-out -G Ninja
+          cmake --build ./et-build/cmake-out
+      - name: Download checkpoints
+        run: |
+          mkdir -p checkpoints/stories15M
+          pushd checkpoints/stories15M
+          wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+          popd
+      - name: Run inference
+        run: |
+          export MODEL_DIR=${PWD}/checkpoints/stories15M
+          export PROMPT="Once upon a time in a land far away"
+
+          python torchchat.py generate --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}"  > ${PWD}/output_eager
+          cat ${PWD}/output_eager
+
+          python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-pte-path ${PWD}/stories15M.pte
+
+          ./et-build/cmake-out/runner_et ${PWD}/stories15M.pte -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}" > ${PWD}/output_et
+          cat ${PWD}/output_et
+
+          echo "Tests complete."
