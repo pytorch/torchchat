@@ -54,4 +54,4 @@ def replace_attention_with_custom_sdpa_attention(module: nn.Module):
         if isinstance(child, Attention):
             setattr(module, name, CustomSDPAAttention(child))
         else:
-            replace_attention_with_sdpa_attention(child)
+            replace_attention_with_custom_sdpa_attention(child)
