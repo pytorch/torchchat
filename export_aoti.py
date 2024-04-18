@@ -10,6 +10,8 @@ import torch.nn as nn
 
 from torch.export import Dim
 
+logger = logging.getLogger(__name__)
+
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
@@ -19,7 +21,7 @@ def device_sync(device):
     elif ("cpu" in device) or ("mps" in device):
         pass
     else:
-        print(f"device={device} is not yet suppported")
+        logging.error(f"device={device} is not yet suppported")
 
 
 def export_model(model: nn.Module, device, output_path, args=None):
@@ -32,7 +34,7 @@ def export_model(model: nn.Module, device, output_path, args=None):
         torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
     )
 
-    print(f"len(input)={len(input)}")
+    logging.debug(f"len(input)={len(input)}")
 
     seq = Dim("seq", min=1, max=max_seq_length)
     # Specify that the first dimension of each input is that batch size

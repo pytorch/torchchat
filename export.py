@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import argparse
+import logging
 import os
 
 import torch
@@ -19,6 +20,8 @@ from cli import add_arguments_for_export, arg_init, check_args
 from export_aoti import export_model as export_model_aoti
 
 from quantize import set_precision
+
+logger = logging.getLogger(__name__)
 
 try:
     executorch_export_available = True
@@ -37,14 +40,14 @@ def device_sync(device):
     elif ("cpu" in device) or ("mps" in device):
         pass
     else:
-        print(f"device={device} is not yet suppported")
+        logging.error(f"device={device} is not yet suppported")
 
 
 def main(args):
     builder_args = BuilderArgs.from_args(args)
     quantize = args.quantize
 
-    print(f"Using device={builder_args.device}")
+    logging.info(f"Using device={builder_args.device}")
     set_precision(builder_args.precision)
 
     builder_args.dso_path = None
@@ -83,20 +86,20 @@ def main(args):
     with torch.no_grad():
         if output_pte_path:
             output_pte_path = str(os.path.abspath(output_pte_path))
-            print(f">{output_pte_path}<")
+            logging.debug(f">{output_pte_path}<")
             if executorch_export_available:
-                print(f"Exporting model using Executorch to {output_pte_path}")
+                logging.info(f"Exporting model using Executorch to {output_pte_path}")
                 export_model_et(
                     model_to_pte, builder_args.device, args.output_pte_path, args
                 )
             else:
-                print(
+                logging.error(
                     "Export with executorch requested but Executorch could not be loaded"
                 )
-                print(executorch_exception)
+                logging.error(executorch_exception)
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
-            print(f"Exporting model using AOT Inductor to {output_dso_path}")
+            logging.info(f"Exporting model using AOT Inductor to {output_dso_path}")
             export_model_aoti(model_to_dso, builder_args.device, output_dso_path, args)
 
 

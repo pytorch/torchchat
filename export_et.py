@@ -28,6 +28,7 @@ from executorch_portable_utils import export_to_edge
 from quantize import get_precision
 from torch._export import capture_pre_autograd_graph
 
+logger = logging.getLogger(__name__)
 
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -38,7 +39,7 @@ def device_sync(device):
     elif ("cpu" in device) or ("mps" in device):
         pass
     else:
-        print(f"device={device} is not yet suppported")
+        logging.error(f"device={device} is not yet suppported")
 
 
 def materialze_broadcast_of_rope_freq_cis(
@@ -76,7 +77,7 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     # applied wrapper already in export.
     # export_model = model_wrapper(model, device=device)
     export_model = model
-    print(export_model)
+    logging.debug(export_model)
 
     input = (
         torch.tensor([[1]], dtype=torch.long, device=device),
@@ -96,12 +97,12 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
 
     if target_precision == torch.float16:  # or args.quantization_mode=="int4":
         if state_dict_dtype != torch.float16:
-            print("model.to torch.float16")
+            logging.debug("model.to torch.float16")
             model = model.to(dtype=torch.float16)
             state_dict_dtype = torch.float16
     elif target_precision == torch.float32:
         if state_dict_dtype != torch.float32:
-            print("model.to torch.float32")
+            logging.debug("model.to torch.float32")
             model = model.to(dtype=torch.float32)
     else:
         raise ValueError(f"Unsupported dtype for ET export: {target_precision}")
@@ -132,7 +133,7 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
         )
     )
 
-    print("The methods are: ", export_program.methods)
+    logging.info("The methods are: ", export_program.methods)
     with open(output_path, "wb") as f:
         export_program.write_to_file(f)
     # save_pte_program(export_program, output_path)

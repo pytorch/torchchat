@@ -4,6 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 import argparse
+import logging
 import time
 from typing import Optional
 
@@ -23,6 +24,8 @@ from cli import add_arguments_for_eval, arg_init
 from generate import encode_tokens, model_forward
 
 from quantize import set_precision
+
+logger = logging.getLogger(__name__)
 
 torch._dynamo.config.automatic_dynamic_shapes = True
 torch._inductor.config.triton.unique_kernel_names = True
@@ -229,7 +232,7 @@ def main(args) -> None:
     limit = args.limit
     max_seq_length = args.max_seq_length
 
-    print(f"Using device={device}")
+    logging.info(f"Using device={device}")
     set_precision(builder_args.precision)
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
@@ -259,13 +262,13 @@ def main(args) -> None:
     )
     print(f"Time to run eval: {time.time() - t1:.02f} seconds.")
     if builder_args.dso_path:
-        print(f"For model {builder_args.dso_path}")
+        logging.info(f"For model {builder_args.dso_path}")
     elif builder_args.pte_path:
-        print(f"For model {builder_args.pte_path}")
+        logging.info(f"For model {builder_args.pte_path}")
     elif builder_args.checkpoint_path:
-        print(f"For model {builder_args.checkpoint_path}")
+        logging.info(f"For model {builder_args.checkpoint_path}")
     elif builder_args.checkpoint_dir:
-        print(f"For model {builder_args.checkpoint_dir}")
+        logging.info(f"For model {builder_args.checkpoint_dir}")
     else:
         raise RuntimeError("Well That's Fine. How did we get here")
 
