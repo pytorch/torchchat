@@ -9,7 +9,7 @@ import os
 
 import torch
 
-from build.builder import _initialize_model, BuilderArgs
+from build.builder import _initialize_model, BuilderArgs, _set_gguf_kwargs, _unset_gguf_kwargs
 from cli import add_arguments_for_export, arg_init, check_args
 from export_aoti import export_model as export_model_aoti
 
@@ -42,16 +42,40 @@ def main(args):
     print(f"Using device={builder_args.device}")
     set_precision(builder_args.precision)
 
+
     builder_args.dso_path = None
     builder_args.pte_path = None
     builder_args.setup_caches = True
-    model = _initialize_model(
-        builder_args,
-        quantize,
-    )
 
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
+
+    # TODO: clean this up
+    # This mess is because ET does not support _weight_int4pack_mm right now
+    if not builder_args.gguf_path:
+        model = _initialize_model(
+            builder_args,
+            quantize,
+        )
+        model_to_pte = model
+        model_to_dso = model
+    else:
+        if output_pte_path:
+            _set_gguf_kwargs(builder_args, is_et=True, context="export")
+            model_to_pte = _initialize_model(
+                builder_args,
+                quantize,
+            )
+            _unset_gguf_kwargs(builder_args)
+
+        if output_dso_path:
+            _set_gguf_kwargs(builder_args, is_et=False, context="export")
+            model_to_dso = _initialize_model(
+                builder_args,
+                quantize,
+            )
+            _unset_gguf_kwargs(builder_args)
+
 
     with torch.no_grad():
         if output_pte_path:
@@ -59,7 +83,7 @@ def main(args):
             print(f">{output_pte_path}<")
             if executorch_export_available:
                 print(f"Exporting model using Executorch to {output_pte_path}")
-                export_model_et(model, builder_args.device, args.output_pte_path, args)
+                export_model_et(model_to_pte, builder_args.device, args.output_pte_path, args)
             else:
                 print(
                     "Export with executorch requested but Executorch could not be loaded"
@@ -68,7 +92,7 @@ def main(args):
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
             print(f"Exporting model using AOT Inductor to {output_dso_path}")
-            export_model_aoti(model, builder_args.device, output_dso_path, args)
+            export_model_aoti(model_to_dso, builder_args.device, output_dso_path, args)
 
 
 if __name__ == "__main__":
