@@ -49,7 +49,7 @@ install_executorch() {
   echo "Building and installing C++ libraries"
   echo "Inside: ${PWD}"
   mkdir cmake-out
-  cmake -DCMAKE_BUILD_TYPE=Release -DEXECUTORCH_BUILD_OPTIMIZED=ON -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out -G Ninja
+  cmake -DCMAKE_BUILD_TYPE=Release -DEXECUTORCH_ENABLE_LOGGING=ON -DEXECUTORCH_LOG_LEVEL=Info -DEXECUTORCH_BUILD_OPTIMIZED=ON -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON -DEXECUTORCH_BUILD_XNNPACK=ON -S . -B cmake-out -G Ninja
   cmake --build cmake-out
   cmake --install cmake-out --prefix ${TORCHCHAT_ROOT}/et-build/install
   popd
