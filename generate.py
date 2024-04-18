@@ -348,7 +348,9 @@ def _main(
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
     if generator_args.chat_mode and not builder_args.is_chat_model:
-        logging.warning(
+        # This is not a log message, it's a dangerous condition message 
+        # that we must ensure is displayed
+        print(
             """
 *******************************************************
  This model is not known to support the chat function.
