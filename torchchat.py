@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import argparse
+import logging
 
 from cli import (
     add_arguments_for_eval,
@@ -35,6 +36,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     args = arg_init(args)
+    logging.basicConfig(
+        format="%(message)s", level=logging.DEBUG if args.verbose else logging.INFO
+    )
 
     if args.subcommand == "generate":
         check_args(args, "generate")
