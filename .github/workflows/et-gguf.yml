@@ -1,0 +1,129 @@
+name: Compile main
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  run-tinystories:
+    strategy:
+      matrix:
+        runner: [32-core-ubuntu]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Install requirements
+        run: |
+          echo "Intalling pip packages"
+          pip install wheel
+          pip install cmake
+          pip install ninja
+          pip install zstd
+          pip install -r requirements.txt
+
+          echo "Executorch: cloning"
+          mkdir etorch
+          cd etorch
+          git clone https://github.com/pytorch/executorch.git
+          cd executorch
+          echo "Inside: ${PWD}"
+
+          echo "Executorch: submodule update"
+          git submodule sync
+          git submodule update --init
+
+          echo "Executorch: installing python interface"
+          ./install_requirements.sh --pybind xnnpack
+
+          cd ../..
+          echo "Inside: ${PWD}"
+      - name: Install GGUF requirements
+        run: |
+          echo "Intalling pip packages"
+          pip install gguf
+
+          git clone https://github.com/ggerganov/llama.cpp.git
+          pushd llama.cpp
+          make
+          popd
+      - name: Download GGUF files
+        run: |
+          mkdir gguf_files
+          wget -O gguf_files/llama-2-7b.Q4_0.gguf "https://huggingface.co/TheBooke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_0.gguf?download=true"
+          ./llama.cpp/quantize --allow-requantize gguf_files/llama-2-7b.Q4_0.gguf gguf_files/llama-2-7b.Q4_0.requant_F32.gguf F32
+      - name: Run inference
+        run: |
+          export MODEL_PATH=${PWD}/gguf_files/llama-2-7b.Q4_0.gguf
+          export MODEL_NAME=llama-2-7b_Q4_0_gguf
+
+          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 > ${PWD}/output_eager
+          cat ${PWD}/output_eager
+
+          python export.py --gguf-path ${MODEL_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
+          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${PWD}/${MODEL_NAME}.pte  > ${PWD}/output_et
+          cat ${PWD}/output_et
+
+          echo "Tests complete."
+
+      - name: Run inference
+        run: |          
+          export MODEL_PATH=ggufs/stories15M/stories15M.pt
+          export MODEL_NAME=stories15M
+          export MODEL_DIR=/tmp
+          python export.py --gguf-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          cat ./output_et
+
+          echo "******************************************"
+          echo "******* Emb: channel-wise quantized ******"
+          echo "******************************************"
+          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          cat ./output_et
+
+          echo "******************************************"
+          echo "******** Emb: group-wise quantized *******"
+          echo "******************************************"
+          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          cat ./output_et
+
+          echo "******************************************"
+          echo "******* INT8 channel-wise quantized ******"
+          echo "******************************************"
+          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          cat ./output_et
+
+          echo "******************************************"
+          echo "******** INT8 group-wise quantized *******"
+          echo "******************************************"
+          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          cat ./output_et
+
+          echo "******************************************"
+          echo "******** INT4 group-wise quantized *******"
+          echo "******************************************"
+          # python export.py --quant '{"linear:int4" : {"groupsize": 32}}' --gguf-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          # cat ./output_et
+
+          echo "tests complete"
+          echo "******************************************"
+
