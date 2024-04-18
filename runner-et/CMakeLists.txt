@@ -1,6 +1,22 @@
 cmake_minimum_required(VERSION 3.24)
 set(CMAKE_CXX_STANDARD 17)
 
+IF(DEFINED ENV{ET_BUILD_DIR})
+  set(ET_BUILD_DIR $ENV{ET_BUILD_DIR})
+ELSE()
+  set(ET_BUILD_DIR "et-build")
+ENDIF()
+
+MESSAGE(STATUS "Using ET BUILD DIR: --[${ET_BUILD_DIR}]--")
+
+IF(DEFINED ENV{CMAKE_OUT_DIR})
+  set(CMAKE_OUT_DIR $ENV{CMAKE_OUT_DIR})
+ELSE()
+  set(CMAKE_OUT_DIR "cmake-out")
+ENDIF()
+
+MESSAGE(STATUS "Using ET BUILD DIR: --[${ET_BUILD_DIR}]--")
+
 project(Torchchat)
 
 include(CMakePrintHelpers)
@@ -8,8 +24,12 @@ include(Utils.cmake)
 set(TORCHCHAT_ROOT $ENV{TORCHCHAT_ROOT})
 cmake_print_variables(TORCHCHAT_ROOT)
 
-find_package(executorch CONFIG REQUIRED PATHS ${TORCHCHAT_ROOT}/et-build/install/lib/cmake/ExecuTorch)
-set(_common_include_directories ${TORCHCHAT_ROOT}/et-build/src)
+MESSAGE(STATUS "Looking for excutorch in ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/cmake/ExecuTorch")
+set(executorch_DIR ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/cmake/ExecuTorch)
+find_package(executorch CONFIG REQUIRED PATHS ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/cmake/ExecuTorch)
+MESSAGE(STATUS "Found executorch cmake config.")
+
+set(_common_include_directories ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src)
 cmake_print_variables(_common_include_directories)
 
 target_include_directories(executorch INTERFACE ${_common_include_directories}) # Ideally ExecuTorch installation process would do this
@@ -20,7 +40,7 @@ target_link_libraries(
     runner_et PRIVATE
         executorch
         extension_module
-        ${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/extension/data_loader/libextension_data_loader.a # This one does not get installed by ExecuTorch
+        ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch/${CMAKE_OUT_DIR}/extension/data_loader/libextension_data_loader.a # This one does not get installed by ExecuTorch
         optimized_kernels
         portable_kernels
         cpublas
@@ -32,6 +52,7 @@ target_link_libraries(
         pthreadpool
         cpuinfo
 )
+target_link_options_shared_lib(executorch)
 target_link_options_shared_lib(optimized_native_cpu_ops_lib)
 target_link_options_shared_lib(xnnpack_backend)
 target_link_options_shared_lib(XNNPACK)
