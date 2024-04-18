@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 project(Torchchat)
 
 include(CMakePrintHelpers)
+include(Utils.cmake)
 set(TORCHCHAT_ROOT $ENV{TORCHCHAT_ROOT})
 cmake_print_variables(TORCHCHAT_ROOT)
 
@@ -24,13 +25,15 @@ target_link_libraries(
         portable_kernels
         cpublas
         eigen_blas
+        # The libraries below need to be whole-archived linked
         optimized_native_cpu_ops_lib
+        xnnpack_backend
+        XNNPACK
+        pthreadpool
+        cpuinfo
 )
-target_link_options(
-  optimized_native_cpu_ops_lib INTERFACE "SHELL:LINKER:--whole-archive \
-  $<TARGET_FILE:optimized_native_cpu_ops_lib> \
-  LINKER:--no-whole-archive")
-target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,xnnpack_backend">)
-target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,XNNPACK">)
-target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,pthreadpool">)
-target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,cpuinfo">)
+target_link_options_shared_lib(optimized_native_cpu_ops_lib)
+target_link_options_shared_lib(xnnpack_backend)
+target_link_options_shared_lib(XNNPACK)
+target_link_options_shared_lib(pthreadpool)
+target_link_options_shared_lib(cpuinfo)
