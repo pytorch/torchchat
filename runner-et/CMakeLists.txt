@@ -24,8 +24,12 @@ target_link_libraries(
         portable_kernels
         cpublas
         eigen_blas
+        optimized_native_cpu_ops_lib
 )
-target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,optimized_native_cpu_ops_lib">)
+target_link_options(
+  optimized_native_cpu_ops_lib INTERFACE "SHELL:LINKER:--whole-archive \
+  $<TARGET_FILE:optimized_native_cpu_ops_lib> \
+  LINKER:--no-whole-archive")
 target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,xnnpack_backend">)
 target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,XNNPACK">)
 target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,pthreadpool">)
