@@ -744,13 +744,6 @@ def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, grou
     origin_x_size = x.size()
     x = x.reshape(-1, origin_x_size[-1])
 
-    # avoid errors in MPSaround bfloat16 until int4pack_mm is in nightlies
-    # print("MPS workaround active, will produce bogus results")
-    if "mps" in str(x.device):
-        new_shape = origin_x_size[:-1] + (out_features,)
-        return torch.zeros(new_shape, dtype=x.dtype, device=x.device)
-
-
     if ((x.dtype == torch.float32) and ("cpu" in str(x.device))) or "cuda" in str(
         x.device
     ):
