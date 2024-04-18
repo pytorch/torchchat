@@ -744,9 +744,8 @@ def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, grou
     origin_x_size = x.size()
     x = x.reshape(-1, origin_x_size[-1])
 
-    if ((x.dtype == torch.float32) and ("cpu" in str(x.device))) or "cuda" in str(
-        x.device
-    ):
+    if ((x.dtype == torch.float32) and (("mps" in str(x.device))
+        or ("cpu" in str(x.device))) or "cuda" in str(x.device):
         c = torch.ops.aten._weight_int4pack_mm(
             x.to(
                 torch.bfloat16
