@@ -5,6 +5,8 @@
 # LICENSE file in the root directory of this source tree.
 import argparse
 import itertools
+
+import logging
 import os
 import sys
 import time
@@ -27,10 +29,10 @@ from build.model import Transformer
 from cli import add_arguments_for_generate, arg_init, check_args
 from quantize import set_precision
 
-import logging
 logger = logging.getLogger(__name__)
 
 B_INST, E_INST = "[INST]", "[/INST]"
+
 
 @dataclass
 class GeneratorArgs:
@@ -348,14 +350,16 @@ def _main(
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
     if generator_args.chat_mode and not builder_args.is_chat_model:
-        logging.warning("""
+        logging.warning(
+            """
 *******************************************************
  This model is not known to support the chat function.
  We will enable chat mode based on your instructions.
  If the model is not trained to support chat, it will
  produce nonsensical or false output.
 *******************************************************
-        """)
+        """
+        )
         # raise RuntimeError("You need to use --is-chat-model to indicate model has chat support.")
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
