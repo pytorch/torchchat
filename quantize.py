@@ -10,12 +10,11 @@ from functools import reduce
 from math import gcd
 from typing import Dict, Optional, Tuple
 
-logger = logging.getLogger(__name__)
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+logger = logging.getLogger(__name__)
 
 try:
     from eval import evaluate, get_task_dict, lm_eval

@@ -5,6 +5,8 @@
 # LICENSE file in the root directory of this source tree.
 
 
+import logging
+
 import torch
 from build.model import Transformer
 
