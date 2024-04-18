@@ -113,67 +113,6 @@ class ModelArgs:
         return cls(**transformer_configs[config[0]])
 
 
-"""
-Known Model Configs:
-
-For models that are known to work with torchchat, we provide a config under
-config/models.json to support automatically downloading the model and
-converting to the expected format for use with torchchat.
-
-There are two supported distribution channels:
-
-1) HuggingFaceSnapshot: Download a model from HuggingFace.
-2) DirectDownload: Download a list of model artifacts from URLs. No conversion
-   is done.
-"""
-@dataclass
-class ModelConfig:
-    name: str = field(default="")
-    aliases: Sequence[str] = field(default_factory=list)
-    distribution_path: Union[str, Sequence[str]] = field(default="")
-    distribution_channel: ModelDistributionChannel = field(
-        default=ModelDistributionChannel.HuggingFaceSnapshot
-    )
-    checkpoint_file: str = field(default="model.pth")
-
-
-# Keys are stored in lowercase.
-model_aliases: Dict[str, str] = None
-model_configs: Dict[str, ModelConfig] = None
-
-def resolve_model_config(model: str) -> ModelConfig:
-    global model_aliases
-    global model_configs
-
-    model = model.lower()
-
-    # Lazy load model config from JSON.
-    if not model_configs:
-        model_aliases = {}
-        model_configs = {}
-
-        with open(Path(__file__).parent.parent / "config" / "models.json", "r") as f:
-            model_config_dict = json.load(f)
-        for key, value in model_config_dict.items():
-            config = ModelConfig(**value)
-            config.name = key
-
-            key = key.lower()
-            model_configs[key] = config
-
-            for alias in config.aliases:
-                model_aliases[alias.lower()] = key
-
-
-    if model in model_aliases:
-        model = model_aliases[model]
-
-    if not model in model_configs:
-        raise ValueError(f"Unknown model '{model}'.")
-
-    return model_configs[model]
-
-
 transformer_configs = {
     "CodeLlama-7b-Python-hf": {
         "block_size": 16384,

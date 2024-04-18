@@ -19,7 +19,8 @@ from quantize import name_to_dtype, quantize_model
 from sentencepiece import SentencePieceProcessor
 from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
-from build.model import resolve_model_config, Transformer
+from build.model import Transformer
+from config.model_config import resolve_model_config
 
 
 @dataclass

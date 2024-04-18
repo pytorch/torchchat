@@ -9,7 +9,8 @@ from pathlib import Path
 from typing import Optional, Sequence
 
 from build.convert_hf_checkpoint import convert_hf_checkpoint
-from build.model import ModelConfig, ModelDistributionChannel, resolve_model_config
+from build.model import ModelDistributionChannel
+from config.model_config import ModelConfig, resolve_model_config
 
 from requests.exceptions import HTTPError
 
