@@ -27,7 +27,7 @@ function convert_checkpoint() {
         return 0
     fi
     echo "Convert Huggingface checkpoint for $MODEL_REPO"
-    python scripts/convert_hf_checkpoint.py --checkpoint-dir "checkpoints/$MODEL_REPO"
+    python3 scripts/convert_hf_checkpoint.py --checkpoint-dir "checkpoints/$MODEL_REPO"
 }
 
 
