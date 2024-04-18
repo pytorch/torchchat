@@ -1,7 +1,4 @@
 # -*- coding: UTF-8 -*-
-"""
-hello_jinja2: Get start with Jinja2 templates
-"""
 from flask import Flask, render_template, request
 from cli import add_arguments_for_generate, arg_init, check_args
 from generate import main as generate_main
