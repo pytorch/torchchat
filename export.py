@@ -9,7 +9,12 @@ import os
 
 import torch
 
-from build.builder import _initialize_model, BuilderArgs, _set_gguf_kwargs, _unset_gguf_kwargs
+from build.builder import (
+    _initialize_model,
+    _set_gguf_kwargs,
+    _unset_gguf_kwargs,
+    BuilderArgs,
+)
 from cli import add_arguments_for_export, arg_init, check_args
 from export_aoti import export_model as export_model_aoti
 
@@ -41,7 +46,6 @@ def main(args):
 
     print(f"Using device={builder_args.device}")
     set_precision(builder_args.precision)
-
 
     builder_args.dso_path = None
     builder_args.pte_path = None
@@ -76,14 +80,15 @@ def main(args):
             )
             _unset_gguf_kwargs(builder_args)
 
-
     with torch.no_grad():
         if output_pte_path:
             output_pte_path = str(os.path.abspath(output_pte_path))
             print(f">{output_pte_path}<")
             if executorch_export_available:
                 print(f"Exporting model using Executorch to {output_pte_path}")
-                export_model_et(model_to_pte, builder_args.device, args.output_pte_path, args)
+                export_model_et(
+                    model_to_pte, builder_args.device, args.output_pte_path, args
+                )
             else:
                 print(
                     "Export with executorch requested but Executorch could not be loaded"

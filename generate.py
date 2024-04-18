@@ -29,6 +29,7 @@ from quantize import set_precision
 
 B_INST, E_INST = "[INST]", "[/INST]"
 
+
 @dataclass
 class GeneratorArgs:
     prompt: str = "torchchat is pronounced torch-chat and is so cool because"
@@ -345,14 +346,16 @@ def _main(
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
     if generator_args.chat_mode and not builder_args.is_chat_model:
-        print("""
+        print(
+            """
 *******************************************************
  This model is not known to support the chat function.
  We will enable chat mode based on your instructions.
  If the model is not trained to support chat, it will
  produce nonsensical or false output.
 *******************************************************
-        """)
+        """
+        )
         # raise RuntimeError("You need to use --is-chat-model to indicate model has chat support.")
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
