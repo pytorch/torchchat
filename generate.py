@@ -5,6 +5,8 @@
 # LICENSE file in the root directory of this source tree.
 import argparse
 import itertools
+
+import logging
 import os
 import sys
 import time
@@ -27,7 +29,10 @@ from build.model import Transformer
 from cli import add_arguments_for_generate, arg_init, check_args
 from quantize import set_precision
 
+logger = logging.getLogger(__name__)
+
 B_INST, E_INST = "[INST]", "[/INST]"
+
 
 @dataclass
 class GeneratorArgs:
@@ -66,7 +71,7 @@ def device_sync(device):
     elif ("cpu" in device) or ("mps" in device):
         pass
     else:
-        print(f"device={ device } is not yet suppported")
+        logging.error(f"device={ device } is not yet suppported")
 
 
 torch._inductor.config.coordinate_descent_tuning = True
@@ -111,7 +116,7 @@ def prefill(
         sequential_prefill = True,
         **sampling_kwargs
 ) -> torch.Tensor:
-    # print(f"x: {x}, input_pos: {input_pos}")
+    logging.debug(f"x: {x}, input_pos: {input_pos}")
     width = x.size(1)
     assert input_pos.size(0) == width
     sequential_prefill = True
@@ -119,7 +124,7 @@ def prefill(
     if sequential_prefill:
         for i in range(width):
             x_sliced, ip_sliced = x[:, i].view(-1, 1), input_pos[i].view(-1)
-            #print(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
+            logging.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
             logits = model(x_sliced, ip_sliced)  # (x[:, i], input_pos[i])
     else:
         # input_pos: [B, S]
@@ -338,19 +343,21 @@ def _main(
     #            # only print on rank 0
     #            print = lambda *args, **kwargs: None
 
-    print(f"Using device={builder_args.device}")
+    logging.info(f"Using device={builder_args.device}")
     set_precision(builder_args.precision)
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
     if generator_args.chat_mode and not builder_args.is_chat_model:
-        print("""
+        logging.warning(
+            """
 *******************************************************
  This model is not known to support the chat function.
  We will enable chat mode based on your instructions.
  If the model is not trained to support chat, it will
  produce nonsensical or false output.
 *******************************************************
-        """)
+        """
+        )
         # raise RuntimeError("You need to use --is-chat-model to indicate model has chat support.")
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
@@ -372,7 +379,7 @@ def _main(
     encoded = encode_tokens(
         tokenizer, generator_args.prompt, bos=True, device=builder_args.device
     )
-    # print(encoded)
+    logging.debug(encoded)
     prompt_length = encoded.size(0)
 
     model_size = sum(
@@ -467,7 +474,7 @@ def _main(
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
         if i == -1:
-            print(f"Compilation time: {time.perf_counter() - t0:.2f} seconds")
+            logging.info(f"Compilation time: {time.perf_counter() - t0:.2f} seconds")
             continue
         if hasattr(prof, "export_chrome_trace"):
             if use_tp:
@@ -484,23 +491,23 @@ def _main(
         tokens_generated = y.size(0) - prompt_length
         tokens_sec = tokens_generated / t
         aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-        print(
+        logging.info(
             f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_sec:.02f} tokens/sec"
         )
-        print(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
+        logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
     print("==========")
     if is_speculative:
         counts_aggregated = [sum(i) for i in zip(*aggregate_metrics["accept_counts"])]
         acceptance_probs = [i / sum(counts_aggregated) for i in counts_aggregated]
-        print(f"Acceptance probs: {acceptance_probs}")
-        print(
+        logging.info(f"Acceptance probs: {acceptance_probs}")
+        logging.info(
             f"Mean Accepted: {sum([idx * i for idx, i in enumerate(counts_aggregated)])/sum(counts_aggregated)}"
         )
 
-    print(
+    logging.info(
         f"Average tokens/sec: {torch.mean(torch.tensor(aggregate_metrics['tokens_per_sec'])).item():.2f}"
     )
-    print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
+    logging.info(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
 
 def main(args):
