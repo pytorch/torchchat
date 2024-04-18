@@ -2,7 +2,7 @@ name: periodic
 
 on:
   schedule:
-    - cron: '0,6,12,18 0 * * *'  # Runs at midnight UTC and every 6 hours
+    - cron: '0,12 0 * * *'  # Runs at midnight UTC and every 12 hours
   push:
     tags:
       - ciflow/periodic/*
@@ -115,7 +115,7 @@ jobs:
       matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
       fail-fast: false
     with:
-      runner: linux.g5.4xlarge.nvidia.gpu
+      runner: linux.8xlarge.nvidia.gpu
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
       script: |
@@ -149,7 +149,7 @@ jobs:
       matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
       fail-fast: false
     with:
-      runner: linux.g5.4xlarge.nvidia.gpu
+      runner: linux.g4dn.12xlarge.nvidia.gpu
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
       script: |
