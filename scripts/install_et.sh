@@ -10,12 +10,12 @@ set -exu
 install_pip_dependencies() {
   echo "Intalling common pip packages"
 
-  pip install wheel
-  pip install "cmake>=3.19"
-  pip install ninja
-  pip install zstd
+  pip3 install wheel
+  pip3 install "cmake>=3.19"
+  pip3 install ninja
+  pip3 install zstd
   pushd ${TORCHCHAT_ROOT}
-  pip install -r ./requirements.txt
+  pip3 install -r ./requirements.txt
   popd
 }
 
@@ -44,7 +44,7 @@ install_executorch() {
       echo "Installing pybind"
       bash ./install_requirements.sh --pybind xnnpack
   fi
-  pip list
+  pip3 list
 
   echo "Building and installing C++ libraries"
   echo "Inside: ${PWD}"
