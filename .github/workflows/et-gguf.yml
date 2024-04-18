@@ -64,64 +64,64 @@ jobs:
       - name: Download GGUF files
         run: |
           mkdir gguf_files
-          wget -O gguf_files/llama-2-7b.Q4_0.gguf "https://huggingface.co/TheBooke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_0.gguf?download=true"
+          wget -O gguf_files/llama-2-7b.Q4_0.gguf "https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_0.gguf?download=true"
           ./llama.cpp/quantize --allow-requantize gguf_files/llama-2-7b.Q4_0.gguf gguf_files/llama-2-7b.Q4_0.requant_F32.gguf F32
       - name: Run inference
         run: |
-          export MODEL_PATH=${PWD}/gguf_files/llama-2-7b.Q4_0.gguf
+          export GGUF_PATH=${PWD}/gguf_files/llama-2-7b.Q4_0.gguf
           export MODEL_NAME=llama-2-7b_Q4_0_gguf
 
-          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 > ${PWD}/output_eager
+          python generate.py --gguf-path ${GGUF_PATH} --temperature 0 > ${PWD}/output_eager
           cat ${PWD}/output_eager
 
-          python export.py --gguf-path ${MODEL_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
-          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${PWD}/${MODEL_NAME}.pte  > ${PWD}/output_et
+          python export.py --gguf-path ${GGUF_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
+          python generate.py --gguf-path ${GGUF_PATH} --temperature 0 --pte-path ${PWD}/${MODEL_NAME}.pte  > ${PWD}/output_et
           cat ${PWD}/output_et
 
           echo "Tests complete."
 
       - name: Run inference
         run: |          
-          export MODEL_PATH=ggufs/stories15M/stories15M.pt
+          export GGUF_PATH=ggufs/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
-          python export.py --gguf-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          python export.py --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python generate.py --gguf-path ${GGUF_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
           cat ./output_et
 
           echo "******************************************"
           echo "******* Emb: channel-wise quantized ******"
           echo "******************************************"
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python generate.py --gguf-path ${GGUF_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
           cat ./output_et
 
           echo "******************************************"
           echo "******** Emb: group-wise quantized *******"
           echo "******************************************"
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python generate.py --gguf-path ${GGUF_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
           cat ./output_et
 
           echo "******************************************"
           echo "******* INT8 channel-wise quantized ******"
           echo "******************************************"
-          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python generate.py --gguf-path ${GGUF_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
           cat ./output_et
 
           echo "******************************************"
           echo "******** INT8 group-wise quantized *******"
           echo "******************************************"
-          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python generate.py --gguf-path ${GGUF_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
           cat ./output_et
 
           echo "******************************************"
           echo "******** INT4 group-wise quantized *******"
           echo "******************************************"
-          # python export.py --quant '{"linear:int4" : {"groupsize": 32}}' --gguf-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          # python generate.py --gguf-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          # python export.py --quant '{"linear:int4" : {"groupsize": 32}}' --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python generate.py --gguf-path ${GGUF_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
           # cat ./output_et
 
           echo "tests complete"
