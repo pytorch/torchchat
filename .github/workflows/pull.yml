@@ -682,7 +682,7 @@ jobs:
   runner-et:
     strategy:
       matrix:
-        runner: [macos-14-xlarge, 32-core-ubuntu]
+        runner: [macos-14-xlarge]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
