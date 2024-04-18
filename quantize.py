@@ -415,9 +415,9 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
                         and fqn not in ["output", "final_proj"]
                     )
                 ):
-                    print(
-                        f"quantize {self.node_type} {fqn, mod} with groupsize {self.groupsize}, bitwidth {self.bitwidth}"
-                    )
+                    # print(
+                    #     f"quantize {self.node_type} {fqn, mod} with groupsize {self.groupsize}, bitwidth {self.bitwidth}"
+                    # )
 
                     # print(f"initial weight shape {mod.weight.shape}")
                     input_weight = mod.weight.float()
@@ -469,7 +469,7 @@ class WeightOnlyInt8Linear(torch.nn.Module):
         dtype=None,
     ) -> None:
         super().__init__()
-        print(f"group size: {groupsize}")
+        # print(f"group size: {groupsize}")
 
         self.in_features = in_features
         self.out_features = out_features
@@ -579,9 +579,9 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
                 # print(f"weights size: {mod.weight.size()}")
                 # print(f"quantize {fqn}...")
 
-                print(
-                    f"quantize {fqn, mod} with groupsize {self.groupsize}, bitwidth {self.bitwidth}"
-                )
+                # print(
+                #     f"quantize {fqn, mod} with groupsize {self.groupsize}, bitwidth {self.bitwidth}"
+                # )
                 weight, scales, _ = dynamically_quantize_per_channel(
                     mod.weight.float(),
                     range_min,
@@ -831,7 +831,7 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
                 out_features = mod.out_features
                 in_features = mod.in_features
                 assert out_features % 8 == 0, "require out_features % 8 == 0"
-                print(f"linear: {fqn}, in={in_features}, out={out_features}")
+                # print(f"linear: {fqn}, in={in_features}, out={out_features}")
 
                 weight = mod.weight.data
                 if not _int4_check_linear_int4_k(
