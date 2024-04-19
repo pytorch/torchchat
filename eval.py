@@ -20,7 +20,11 @@ from build.builder import (
 )
 
 from build.model import Transformer
-from cli import add_arguments_for_eval, arg_init
+from cli import (
+    add_arguments,
+    add_arguments_for_eval,
+    arg_init,
+)
 from download import download_and_convert, is_model_downloaded
 from generate import encode_tokens, model_forward
 
@@ -281,7 +285,8 @@ def main(args) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Export specific CLI.")
+    parser = argparse.ArgumentParser(description="torchchat eval CLI")
+    add_arguments(parser)
     add_arguments_for_eval(parser)
     args = parser.parse_args()
     args = arg_init(args)
