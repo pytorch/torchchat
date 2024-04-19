@@ -554,7 +554,7 @@ jobs:
         # NS: Remove previous installation  of torch first
         # as this script does not isntall anything into conda env but rather as system dep
         pip uninstall -y torch || true
-      
+
         set -eou pipefail
 
         echo "::group::Print machine info"
@@ -737,33 +737,36 @@ jobs:
 
           echo "Tests complete."
   runner-aoti:
+    name: test-runner-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
     strategy:
-      matrix:
-        runner: [ubuntu-22.04]
-    runs-on: ${{matrix.runner}}
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: '3.11'
       - name: Print machine info
         run: |
-          uname -a
-          if [ $(uname -s) == Darwin ]; then
-            sysctl machdep.cpu.brand_string
-            sysctl machdep.cpu.core_count
-          fi
-      - name: Install requirements
+          echo "$(uname -a)"
+      - name: Install dependencies
         run: |
-          echo "Intalling pip packages"
+          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
-          cd runner-aoti
+          pip list
+
+          cd ${TORCHCHAT_ROOT}/runner-aoti
           cmake -Bbuild -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'`
           cmake --build build
           cd ..
-      - name: Download checkpoints
+      - name: Download checkpoint
         run: |
           mkdir -p checkpoints/stories15M
           pushd checkpoints/stories15M
