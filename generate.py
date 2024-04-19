@@ -394,9 +394,8 @@ def _main(
         # raise RuntimeError("You need to use --is-chat-model to indicate model has chat support.")
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
-
     builder_args.setup_caches = False
-    model = _initialize_model(builder_args, quantize)
+    model = _initialize_model(builder_args, quantize, tokenizer)
     validate_args(model, tokenizer_args)
 
     # will add a version of _initialize_model in future
