@@ -24,6 +24,7 @@ from executorch.exir.passes.sym_shape_eval_pass import ConstraintBasedSymShapeEv
 #    XnnpackDynamicallyQuantizedPartitioner,
 # )
 from executorch_portable_utils import export_to_edge
+from export_et_util import replace_attention_with_custom_sdpa_attention
 
 from quantize import get_precision
 from torch._export import capture_pre_autograd_graph
@@ -106,6 +107,9 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     else:
         raise ValueError(f"Unsupported dtype for ET export: {target_precision}")
 
+
+
+    replace_attention_with_custom_sdpa_attention(export_model)
     with torch.nn.attention.sdpa_kernel(
         [torch.nn.attention.SDPBackend.MATH]
     ), torch.no_grad():
@@ -135,6 +139,5 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     print("The methods are: ", export_program.methods)
     with open(output_path, "wb") as f:
         export_program.write_to_file(f)
-    # save_pte_program(export_program, output_path)
 
     return output_path
