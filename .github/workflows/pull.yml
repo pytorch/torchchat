@@ -49,12 +49,13 @@ jobs:
           pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
           pip list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
           bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
       - name: Run validation
         run: |
-          python3 -c "import torch;print(torch.__version__, torch.version.git_version)"
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           pushd ${TORCHCHAT_ROOT}
           bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
           bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "compile"
@@ -83,6 +84,7 @@ jobs:
           pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
           pip list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
           bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
@@ -127,6 +129,7 @@ jobs:
         pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
         pip install -r ./requirements.txt
         pip list
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
         echo "::group::Download checkpoint"
@@ -161,6 +164,7 @@ jobs:
         pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
         pip install -r ./requirements.txt
         pip list
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
         echo "::group::Download checkpoint"
@@ -216,6 +220,10 @@ jobs:
 
           echo "Executorch: installing python interface"
           ./install_requirements.sh --pybind xnnpack
+
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
+          python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
 
           cd ../..
           echo "Inside: ${PWD}"
@@ -329,6 +337,7 @@ jobs:
           echo "Installing pip packages"
           pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
       - name: Download Stories files
         run: |
@@ -375,6 +384,7 @@ jobs:
         run: |
           pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
           mkdir -p checkpoints/stories15M
@@ -455,6 +465,7 @@ jobs:
         ls -la
         pwd
         pip install -r requirements.txt
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
         echo "::group::Download checkpoints"
@@ -524,6 +535,7 @@ jobs:
           pip install gguf
           pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
           git clone https://github.com/ggerganov/llama.cpp.git
           pushd llama.cpp
@@ -554,7 +566,7 @@ jobs:
         # NS: Remove previous installation  of torch first
         # as this script does not isntall anything into conda env but rather as system dep
         pip uninstall -y torch || true
-      
+
         set -eou pipefail
 
         echo "::group::Print machine info"
@@ -569,6 +581,7 @@ jobs:
         ls -la
         pwd
         pip install -r requirements.txt
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
         echo "::group::Download checkpoints"
@@ -632,6 +645,7 @@ jobs:
           pip install gguf
           pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download GGUF
         run: |
           mkdir gguf_files
@@ -712,6 +726,9 @@ jobs:
           export TORCHCHAT_ROOT=${PWD}
           export ENABLE_ET_PYBIND=false
           ./scripts/install_et.sh $ENABLE_ET_PYBIND
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
+          python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
           cmake -S ./runner-et -B et-build/cmake-out -G Ninja
           cmake --build ./et-build/cmake-out
       - name: Download checkpoints
