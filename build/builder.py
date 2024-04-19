@@ -18,6 +18,7 @@ import torch._inductor.config
 from quantize import name_to_dtype, quantize_model
 
 from sentencepiece import SentencePieceProcessor
+from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
 from build.model import Transformer
 
@@ -68,13 +69,19 @@ class BuilderArgs:
 
     @classmethod
     def from_args(cls, args):  # -> BuilderArgs:
+
+        # Handle disabled checkpoint_dir option
+        checkpoint_dir = None
+        if hasattr(args, "checkpoint_dir"):
+            checkpoint_dir = args.checkpoint_dir    
+
         is_chat_model = False
         if args.is_chat_model:
             is_chat_model = True
         else:
             for path in [
                 args.checkpoint_path,
-                args.checkpoint_dir,
+                checkpoint_dir,
                 args.dso_path,
                 args.pte_path,
                 args.gguf_path,
@@ -88,7 +95,7 @@ class BuilderArgs:
 
         return cls(
             checkpoint_path=args.checkpoint_path,
-            checkpoint_dir=args.checkpoint_dir,
+            checkpoint_dir=checkpoint_dir,
             params_path=args.params_path,
             params_table=args.params_table,
             gguf_path=args.gguf_path,
@@ -152,7 +159,7 @@ def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
     if tokenizer_args.is_SentencePiece:
         return SentencePieceProcessor(model_file=str(tokenizer_args.tokenizer_path))
     elif tokenizer_args.is_TikToken:
-        raise RuntimeError("TikToken not implemented yet!")
+        return TiktokenTokenizer(model_path=str(tokenizer_args.tokenizer_path))
     else:
         raise RuntimeError("must specify a valid tokenizer in TokenizerArgs")
 

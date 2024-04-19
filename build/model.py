@@ -55,8 +55,13 @@ class ModelArgs:
 
     @classmethod
     def from_params(cls, params_path):
+        replace = [("rope_theta", "rope_base"), ("n_kv_heads", "n_local_heads")]
         with open(params_path, "r") as f:
             params = json.loads(f.read())
+            # Patch for llama3
+            for _from, _to in replace:
+                if _from in params:
+                    params[_to] = params.pop(_from)
         return cls(**params)
 
     @classmethod
@@ -121,11 +126,22 @@ transformer_configs = {
         "n_local_heads": 8,
         "hidden_dim": 28672,
     },
+    "Meta-Llama-3-8B": {
+        "dim": 4096,
+        "ffn_dim_multiplier": 1.3,
+        "multiple_of": 1024,
+        "n_heads": 32,
+        "n_local_heads": 8,  # n_kv_heads
+        "n_layers": 32,
+        "rope_base": 500000.0,  # rope_theta
+        "vocab_size": 128256,
+    },
     "Mistral-7B": {
         "n_layers": 32,
         "n_heads": 32,
         "n_local_heads": 8,
         "dim": 4096,
+>>>>>>> d64aea9fc0339d3e78d2d0105a2667e693f6e7d4
         "hidden_dim": 14336,
         "vocab_size": 32000,
     },
