@@ -87,6 +87,11 @@ class BuilderArgs:
                 if "chat" in path_basename:
                     is_chat_model = True
 
+        # Handle disabled checkpoint_dir option
+        checkpoint_dir = None
+        if hasattr(args, "checkpoint_dir"):
+            checkpoint_dir = args.checkpoint_dir
+            
         return cls(
             checkpoint_path=args.checkpoint_path,
             checkpoint_dir=args.checkpoint_dir,
