@@ -47,7 +47,7 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
           pip list
       - name: Download checkpoints
@@ -80,7 +80,7 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
           pip list
       - name: Download checkpoints
@@ -124,7 +124,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
         pip install -r ./requirements.txt
         pip list
         echo "::endgroup::"
@@ -158,7 +158,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
         pip install -r ./requirements.txt
         pip list
         echo "::endgroup::"
