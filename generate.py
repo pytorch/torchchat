@@ -452,7 +452,7 @@ def _main(
     for i in range(start, generator_args.num_samples):
         device_sync(device=builder_args.device)
         if i >= 0 and generator_args.chat_mode:
-            prompt = input("What is your prompt? ")
+            prompt = input("What is your prompt? \n")
             if builder_args.is_chat_model:
                 prompt = f"{B_INST} {prompt.strip()} {E_INST}"
             encoded = encode_tokens(
