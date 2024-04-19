@@ -736,3 +736,52 @@ jobs:
           cat ${PWD}/output_et
 
           echo "Tests complete."
+  runner-aoti:
+    strategy:
+      matrix:
+        runner: [ubuntu-22.04]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Install requirements
+        run: |
+          echo "Intalling pip packages"
+          pip install -r requirements.txt
+          cd runner-aoti
+          cmake -Bbuild -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'`
+          cmake --build build
+          cd ..
+      - name: Download checkpoints
+        run: |
+          mkdir -p checkpoints/stories15M
+          pushd checkpoints/stories15M
+          wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+          popd
+      - name: Run inference
+        run: |
+          export MODEL_DIR=${PWD}/checkpoints/stories15M
+          export PROMPT="Once upon a time in a land far away"
+
+          python torchchat.py generate --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}"  > ${PWD}/output_eager
+          cat ${PWD}/output_eager
+
+          python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-dso-path /tmp/model.so
+
+          ./runner-aoti/build/run /tmp/model.so -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}" > ${PWD}/output_aoti
+          cat ${PWD}/output_aoti
+
+          echo "Tests complete."
