@@ -69,13 +69,19 @@ class BuilderArgs:
 
     @classmethod
     def from_args(cls, args):  # -> BuilderArgs:
+
+        # Handle disabled checkpoint_dir option
+        checkpoint_dir = None
+        if hasattr(args, "checkpoint_dir"):
+            checkpoint_dir = args.checkpoint_dir    
+
         is_chat_model = False
         if args.is_chat_model:
             is_chat_model = True
         else:
             for path in [
                 args.checkpoint_path,
-                args.checkpoint_dir,
+                checkpoint_dir,
                 args.dso_path,
                 args.pte_path,
                 args.gguf_path,
@@ -89,7 +95,7 @@ class BuilderArgs:
 
         return cls(
             checkpoint_path=args.checkpoint_path,
-            checkpoint_dir=args.checkpoint_dir,
+            checkpoint_dir=checkpoint_dir,
             params_path=args.params_path,
             params_table=args.params_table,
             gguf_path=args.gguf_path,
