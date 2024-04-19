@@ -37,7 +37,8 @@ class ModelArgs:
     norm_eps: float = 1e-5
     multiple_of: int = 256
     ffn_dim_multiplier: Optional[int] = None
-
+    use_tiktoken: bool = False
+    
     def __post_init__(self):
         if self.n_local_heads == -1:
             self.n_local_heads = self.n_heads
@@ -52,7 +53,10 @@ class ModelArgs:
                 hidden_dim = int(self.ffn_dim_multiplier * hidden_dim)
             self.hidden_dim = find_multiple(hidden_dim, multiple_of)
         self.head_dim = self.dim // self.n_heads
+        if isinstance(self.use_tiktoken, str):
+            self.use_tiktoken = (self.use_tiktoken == "True")
 
+            
     @classmethod
     def from_params(cls, params_path):
         replace = [("rope_theta", "rope_base"), ("n_kv_heads", "n_local_heads")]
@@ -135,6 +139,7 @@ transformer_configs = {
         "n_layers": 32,
         "rope_base": 500000.0,  # rope_theta
         "vocab_size": 128256,
+        "use_tiktoken": True,
     },
     "Mistral-7B": {
         "n_layers": 32,
