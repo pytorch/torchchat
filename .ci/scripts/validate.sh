@@ -168,12 +168,29 @@ function generate_aoti_model_output() {
             if [ $(uname -s) == "Linux" ]; then
                 echo "Skipping INT4 groupwise quantization because AOTI fails"
             else
-                echo "Target device: ${TARGET_DEVICE}"
+                echo "PARAMS BEFORE linear:int4:"
+                echo "DTYPE: ${DTYPE}"
+                echo "CHECKPOINT_PATH: ${CHECKPOINT_PATH}"
+                echo "DSO: ${MODEL_DIR}/${MODEL_NAME}.so"
+                echo "DEVICE: "$TARGET_DEVICE"
+
+                echo "RUNNING EXPORT"
                 python -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+
+                echo "RUNNING GENERATE"
                 python -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
                 cat "$MODEL_DIR/output_aoti"
 
+
+                echo "PARAMS BEFORE linear:int4-gptq"
+                echo "DTYPE: ${DTYPE}"
+                echo "CHECKPOINT_PATH: ${CHECKPOINT_PATH}"
+                echo "DSO: ${MODEL_DIR}/${MODEL_NAME}.so"
+                echo "DEVICE: "$TARGET_DEVICE"
+
+                echo "RUNNING EXPORT"
                 python -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4-gptq" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+                echo "RUNNING GENERATE"
                 python -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
                 cat "$MODEL_DIR/output_aoti"
             fi
