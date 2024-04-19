@@ -14,7 +14,7 @@ from typing import Any, Dict, Optional, Union
 import torch
 import torch._dynamo.config
 import torch._inductor.config
-
+from config.model_config import resolve_model_config
 from quantize import name_to_dtype, quantize_model
 
 from sentencepiece import SentencePieceProcessor
@@ -42,7 +42,7 @@ class BuilderArgs:
     def __post_init__(self):
         if not (
             (self.checkpoint_path and self.checkpoint_path.is_file())
-            or (self.checkpoint_dir and self.checkpoint_path.is_dir())
+            or (self.checkpoint_dir and self.checkpoint_dir.is_dir())
             or (self.gguf_path and self.gguf_path.is_file())
             or (self.dso_path and Path(self.dso_path).is_file())
             or (self.pte_path and Path(self.pte_path).is_file())
@@ -73,7 +73,17 @@ class BuilderArgs:
         # Handle disabled checkpoint_dir option
         checkpoint_dir = None
         if hasattr(args, "checkpoint_dir"):
-            checkpoint_dir = args.checkpoint_dir    
+            checkpoint_dir = args.checkpoint_dir
+
+        checkpoint_path = args.checkpoint_path
+        if args.model:  # Using a named, well-known model
+            model_config = resolve_model_config(args.model)
+
+            checkpoint_path = (
+                Path(args.model_directory)
+                / model_config.name
+                / model_config.checkpoint_file
+            )
 
         is_chat_model = False
         if args.is_chat_model:
@@ -86,16 +96,17 @@ class BuilderArgs:
                 args.pte_path,
                 args.gguf_path,
             ]:
-                path = str(path)
-                if path.endswith("/"):
-                    path = path[:-1]
-                path_basename = os.path.basename(path)
-                if "chat" in path_basename:
-                    is_chat_model = True
+                if path is not None:
+                    path = str(path)
+                    if path.endswith("/"):
+                        path = path[:-1]
+                    path_basename = os.path.basename(path)
+                    if "chat" in path_basename:
+                        is_chat_model = True
 
         return cls(
-            checkpoint_path=args.checkpoint_path,
             checkpoint_dir=checkpoint_dir,
+            checkpoint_path=checkpoint_path,
             params_path=args.params_path,
             params_table=args.params_table,
             gguf_path=args.gguf_path,
@@ -134,9 +145,12 @@ class TokenizerArgs:
 
         if args.tokenizer_path:
             tokenizer_path = args.tokenizer_path
+        elif args.model:  # Using a named, well-known model
+            model_config = resolve_model_config(args.model)
+            tokenizer_path = Path(args.model_directory) / model_config.name / "tokenizer.model"
         elif args.checkpoint_path:
             tokenizer_path = args.checkpoint_path.parent / "tokenizer.model"
-        elif args.checkpoint_dir:
+        elif hasattr(args, "checkpoint_dir") and args.checkpoint_dir:
             tokenizer_path = args.checkpoint_dir / "tokenizer.model"
         else:
             raise RuntimeError("cannot find tokenizer model")
@@ -355,6 +369,15 @@ def tokenizer_setting_to_name(tiktoken: bool = False) -> str:
 def validate_args(model: Transformer, tokenizer_args: TokenizerArgs):
     use_tiktoken = model.config.use_tiktoken
     is_tiktoken = tokenizer_args.is_tiktoken
-    if use_tiktoken != is_tiktoken:
+
+    if use_tiktoken is None:
+        model.config.use_tiktoken = is_tiktoken
+    elif use_tiktoken != is_tiktoken:
         raise RuntimeError(f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}")
-    
+
+def resolve_model_name(model: str) -> str:
+    # If the provided model name is an alias, retrieve the full path.
+    if model in model_aliases:
+        return model_aliases[model]
+    else:
+        return model

@@ -1,0 +1,28 @@
+{
+    "meta-llama/Llama-2-7b-chat-hf": {
+        "aliases": ["llama2", "llama2-7b"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/Llama-2-7b-chat-hf"
+    },
+    "mistralai/Mistral-7B-Instruct-v0.2": {
+        "aliases": ["mistral-7b-instruct"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "mistralai/Mistral-7B-Instruct-v0.2"
+    },
+    "stories15M": {
+        "distribution_channel": "DirectDownload",
+        "distribution_path": [
+            "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt",
+            "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
+        ],
+        "checkpoint_file": "stories15M.pt"
+    },
+    "stories110M": {
+        "distribution_channel": "DirectDownload",
+        "distribution_path": [
+            "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.pt",
+            "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
+        ],
+        "checkpoint_file": "stories110M.pt"
+    }
+}

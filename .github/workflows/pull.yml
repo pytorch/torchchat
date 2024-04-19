@@ -49,12 +49,13 @@ jobs:
           pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
           pip list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
           bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
       - name: Run validation
         run: |
-          python3 -c "import torch;print(torch.__version__, torch.version.git_version)"
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           pushd ${TORCHCHAT_ROOT}
           bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
           bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "compile"
@@ -83,6 +84,7 @@ jobs:
           pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
           pip list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
           bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
@@ -127,6 +129,7 @@ jobs:
         pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
         pip install -r ./requirements.txt
         pip list
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
         echo "::group::Download checkpoint"
@@ -161,6 +164,7 @@ jobs:
         pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
         pip install -r ./requirements.txt
         pip list
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
         echo "::group::Download checkpoint"
@@ -216,6 +220,10 @@ jobs:
 
           echo "Executorch: installing python interface"
           ./install_requirements.sh --pybind xnnpack
+
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
+          python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
 
           cd ../..
           echo "Inside: ${PWD}"
@@ -329,6 +337,7 @@ jobs:
           echo "Installing pip packages"
           pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
       - name: Download Stories files
         run: |
@@ -351,6 +360,11 @@ jobs:
           cat ./output_eager1
           cat ./output_eager2
           echo "Tests complete."
+
+      - name: Test download
+        run: |
+
+          python torchchat.py generate stories15M
 
   test-tinystories-eager:
     strategy:
@@ -375,6 +389,7 @@ jobs:
         run: |
           pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
           mkdir -p checkpoints/stories15M
@@ -455,6 +470,7 @@ jobs:
         ls -la
         pwd
         pip install -r requirements.txt
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
         echo "::group::Download checkpoints"
@@ -524,6 +540,7 @@ jobs:
           pip install gguf
           pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
           git clone https://github.com/ggerganov/llama.cpp.git
           pushd llama.cpp
@@ -554,7 +571,7 @@ jobs:
         # NS: Remove previous installation  of torch first
         # as this script does not isntall anything into conda env but rather as system dep
         pip uninstall -y torch || true
-      
+
         set -eou pipefail
 
         echo "::group::Print machine info"
@@ -569,6 +586,7 @@ jobs:
         ls -la
         pwd
         pip install -r requirements.txt
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
         echo "::group::Download checkpoints"
@@ -632,6 +650,7 @@ jobs:
           pip install gguf
           pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download GGUF
         run: |
           mkdir gguf_files
@@ -712,6 +731,9 @@ jobs:
           export TORCHCHAT_ROOT=${PWD}
           export ENABLE_ET_PYBIND=false
           ./scripts/install_et.sh $ENABLE_ET_PYBIND
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
+          python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
           cmake -S ./runner-et -B et-build/cmake-out -G Ninja
           cmake --build ./et-build/cmake-out
       - name: Download checkpoints
@@ -734,5 +756,57 @@ jobs:
 
           ./et-build/cmake-out/runner_et ${PWD}/stories15M.pte -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}" > ${PWD}/output_et
           cat ${PWD}/output_et
+
+          echo "Tests complete."
+  runner-aoti:
+    name: test-runner-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Print machine info
+        run: |
+          echo "$(uname -a)"
+      - name: Install dependencies
+        run: |
+          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt
+          pip list
+
+          cd ${TORCHCHAT_ROOT}/runner-aoti
+          cmake -Bbuild -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'`
+          cmake --build build
+          cd ..
+      - name: Download checkpoint
+        run: |
+          mkdir -p checkpoints/stories15M
+          pushd checkpoints/stories15M
+          wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+          popd
+      - name: Run inference
+        run: |
+          export MODEL_DIR=${PWD}/checkpoints/stories15M
+          export PROMPT="Once upon a time in a land far away"
+
+          python torchchat.py generate --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}"  > ${PWD}/output_eager
+          cat ${PWD}/output_eager
+
+          python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-dso-path /tmp/model.so
+
+          ./runner-aoti/build/run /tmp/model.so -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}" > ${PWD}/output_aoti
+          cat ${PWD}/output_aoti
 
           echo "Tests complete."

@@ -26,7 +26,13 @@ from build.builder import (
     TokenizerArgs,
 )
 from build.model import Transformer
-from cli import add_arguments_for_generate, arg_init, check_args
+from cli import (
+    add_arguments,
+    add_arguments_for_generate,
+    arg_init,
+    check_args,
+)
+from download import download_and_convert, is_model_downloaded
 from quantize import set_precision
 
 logger = logging.getLogger(__name__)
@@ -544,6 +550,10 @@ def _main(
 
 
 def main(args):
+    # If a named model was provided and not downloaded, download it.
+    if args.model and not is_model_downloaded(args.model, args.model_directory):
+        download_and_convert(args.model, args.model_directory, args.hf_token)
+
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
@@ -562,7 +572,8 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate specific CLI.")
+    parser = argparse.ArgumentParser(description="torchchat generate CLI")
+    add_arguments(parser)
     add_arguments_for_generate(parser)
     args = parser.parse_args()
     check_args(args, "generate")

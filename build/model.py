@@ -37,7 +37,7 @@ class ModelArgs:
     norm_eps: float = 1e-5
     multiple_of: int = 256
     ffn_dim_multiplier: Optional[int] = None
-    use_tiktoken: bool = False
+    use_tiktoken: Optional[bool] = None
     
     def __post_init__(self):
         if self.n_local_heads == -1:

@@ -20,7 +20,12 @@ from build.builder import (
 )
 
 from build.model import Transformer
-from cli import add_arguments_for_eval, arg_init
+from cli import (
+    add_arguments,
+    add_arguments_for_eval,
+    arg_init,
+)
+from download import download_and_convert, is_model_downloaded
 from generate import encode_tokens, model_forward
 
 torch._dynamo.config.automatic_dynamic_shapes = True
@@ -224,6 +229,10 @@ def main(args) -> None:
 
     """
 
+    # If a named model was provided and not downloaded, download it.
+    if args.model and not is_model_downloaded(args.model, args.model_directory):
+        download_and_convert(args.model, args.model_directory, args.hf_token)
+
     builder_args = BuilderArgs.from_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
     quantize = args.quantize
@@ -282,7 +291,8 @@ def main(args) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Export specific CLI.")
+    parser = argparse.ArgumentParser(description="torchchat eval CLI")
+    add_arguments(parser)
     add_arguments_for_eval(parser)
     args = parser.parse_args()
     args = arg_init(args)

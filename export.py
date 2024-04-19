@@ -17,7 +17,13 @@ from build.builder import (
     TokenizerArgs,
     _initialize_tokenizer
 )
-from cli import add_arguments_for_export, arg_init, check_args
+from cli import (
+    add_arguments,
+    add_arguments_for_export,
+    arg_init,
+    check_args,
+)
+from download import download_and_convert, is_model_downloaded
 from export_aoti import export_model as export_model_aoti
 
 from quantize import set_precision
@@ -43,6 +49,10 @@ def device_sync(device):
 
 
 def main(args):
+    # If a named model was provided and not downloaded, download it.
+    if args.model and not is_model_downloaded(args.model, args.model_directory):
+        download_and_convert(args.model, args.model_directory, args.hf_token)
+
     builder_args = BuilderArgs.from_args(args)
     quantize = args.quantize
 
@@ -111,7 +121,8 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Export specific CLI.")
+    parser = argparse.ArgumentParser(description="torchchat export CLI")
+    add_arguments(parser)
     add_arguments_for_export(parser)
     args = parser.parse_args()
     check_args(args, "export")

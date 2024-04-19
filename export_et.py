@@ -30,6 +30,7 @@ from quantize import get_precision
 from torch._export import capture_pre_autograd_graph
 
 
+# CPU is always available and also exportable to ExecuTorch
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
