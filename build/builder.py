@@ -367,7 +367,10 @@ def tokenizer_setting_to_name(tiktoken: bool = False) -> str:
 def validate_args(model: Transformer, tokenizer_args: TokenizerArgs):
     use_tiktoken = model.config.use_tiktoken
     is_tiktoken = tokenizer_args.is_tiktoken
-    if use_tiktoken != is_tiktoken:
+
+    if use_tiktoken is None:
+        model.config.use_tiktoken = is_tiktoken
+    elif use_tiktoken != is_tiktoken:
         raise RuntimeError(f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}")
 
 def resolve_model_name(model: str) -> str:
