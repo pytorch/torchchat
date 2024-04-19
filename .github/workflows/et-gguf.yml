@@ -49,6 +49,7 @@ jobs:
 
           echo "Executorch: installing python interface"
           ./install_requirements.sh --pybind xnnpack
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
           cd ../..
           echo "Inside: ${PWD}"
@@ -83,7 +84,7 @@ jobs:
           echo "Tests complete."
 
       - name: Run inference
-        run: |          
+        run: |
           export GGUF_PATH=ggufs/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
@@ -128,4 +129,3 @@ jobs:
 
           echo "tests complete"
           echo "******************************************"
-
