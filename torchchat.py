@@ -6,11 +6,14 @@
 
 import argparse
 import logging
+import subprocess
+import sys
 
 from cli import (
     add_arguments_for_eval,
     add_arguments_for_export,
     add_arguments_for_generate,
+    add_arguments_for_browser,
     arg_init,
     check_args,
 )
@@ -34,6 +37,9 @@ if __name__ == "__main__":
     parser_export = subparsers.add_parser("export")
     add_arguments_for_export(parser_export)
 
+    parser_browser = subparsers.add_parser("browser")
+    add_arguments_for_browser(parser_browser)
+
     args = parser.parse_args()
     args = arg_init(args)
     logging.basicConfig(
@@ -54,5 +60,13 @@ if __name__ == "__main__":
         from export import main as export_main
 
         export_main(args)
+    elif args.subcommand == "browser":
+        # TODO: add check_args()
+
+        # Assume the user wants "chat" when entering "browser". TODO: add support for "generate" as well
+        args_plus_chat = ['"{}"'.format(s) for s in sys.argv[2:]] + ["\"--chat\""]
+        formatted_args = ", ".join(args_plus_chat)
+        command = ["flask", "--app", "chat_in_browser:create_app(" + formatted_args + ")", "run"]
+        subprocess.run(command)
     else:
         raise RuntimeError("Must specify valid subcommands: generate, export, eval")

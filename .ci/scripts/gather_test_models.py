@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 #
@@ -67,7 +67,7 @@ def model_should_run_on_event(model: str, event: str) -> bool:
     elif event == "push":
         return model in []
     elif event == "periodic":
-        return model in ["mistralai/Mistral-7B-v0.1", "openlm-research/open_llama_7b"]
+        return model in ["openlm-research/open_llama_7b"]
     else:
         return False
 
