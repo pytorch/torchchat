@@ -21,6 +21,7 @@ from build.builder import (
     _initialize_model,
     _initialize_tokenizer,
     _load_model,
+    validate_args,
     BuilderArgs,
     TokenizerArgs,
 )
@@ -396,6 +397,7 @@ def _main(
 
     builder_args.setup_caches = False
     model = _initialize_model(builder_args, quantize)
+    validate_args(model, tokenizer_args)
 
     # will add a version of _initialize_model in future
     # (need additional args)
