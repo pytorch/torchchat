@@ -378,7 +378,6 @@ def _main(
     set_precision(builder_args.precision)
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
-    validate_args(model, tokenizer_args)
     if generator_args.chat_mode and not builder_args.is_chat_model:
         # This is not a log message, it's a dangerous condition message
         # that we must ensure is displayed
@@ -398,6 +397,7 @@ def _main(
 
     builder_args.setup_caches = False
     model = _initialize_model(builder_args, quantize)
+    validate_args(model, tokenizer_args)
 
     # will add a version of _initialize_model in future
     # (need additional args)
