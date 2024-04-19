@@ -85,27 +85,27 @@ class Tokenizer:
             mergeable_ranks=mergeable_ranks,
             special_tokens=self.special_tokens,
         )
-        logger.info(f"Reloaded SentencePiece model from {model_path}")
+        logger.info(f"Reloaded Tiktoken model from {model_path}")
 
         # BOS / EOS token IDs
         self.n_words: int = self.model.n_vocab
-        self.bos_id: int = self.special_tokens["<|begin_of_text|>"]
-        self.eos_id: int = self.special_tokens["<|end_of_text|>"]
+        self._bos_id: int = self.special_tokens["<|begin_of_text|>"]
+        self._eos_id: int = self.special_tokens["<|end_of_text|>"]
         self.pad_id: int = -1
         self.stop_tokens = {
             self.special_tokens["<|end_of_text|>"],
             self.special_tokens["<|eot_id|>"],
         }
         logger.info(
-            f"#words: {self.n_words} - BOS ID: {self.bos_id} - EOS ID: {self.eos_id}"
+            f"#words: {self.n_words} - BOS ID: {self._bos_id} - EOS ID: {self._eos_id}"
         )
 
     def encode(
         self,
         s: str,
         *,
-        bos: bool,
-        eos: bool,
+        bos: bool = False,
+        eos: bool = False,
         allowed_special: Union[Literal["all"], AbstractSet[str]] = set(),  # noqa B006
         disallowed_special: Union[Literal["all"], Collection[str]] = (),
     ) -> List[int]:
@@ -158,10 +158,16 @@ class Tokenizer:
                 )
             )
         if bos:
-            t.insert(0, self.bos_id)
+            t.insert(0, self._bos_id)
         if eos:
-            t.append(self.eos_id)
+            t.append(self._eos_id)
         return t
+
+    def bos_id(self) -> int:
+        return self._bos_id
+
+    def eos_id(self) -> int:
+        return self._eos_id
 
     def decode(self, t: Sequence[int]) -> str:
         """
