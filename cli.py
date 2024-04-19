@@ -9,36 +9,10 @@ from pathlib import Path
 
 import torch
 
+default_device = "cpu" 
 
-default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
-
-strict = False
-
-
-def check_args(args, command_name: str):
-    global strict
-
-    # chat and generate support the same options
-    if command_name in ["generate", "chat", "gui"]:
-        # examples, can add more. Note that attributes convert dash to _
-        disallowed_args = ["output_pte_path", "output_dso_path"]
-    elif command_name == "export":
-        # examples, can add more. Note that attributes convert dash to _
-        disallowed_args = ["pte_path", "dso_path"]
-    elif command_name == "eval":
-        # TBD
-        disallowed_args = []
-    else:
-        raise RuntimeError(f"{command_name} is not a valid command")
-
-    for disallowed in disallowed_args:
-        if hasattr(args, disallowed):
-            text = f"command {command_name} does not support option {disallowed.replace('_', '-')}"
-            if strict:
-                raise RuntimeError(text)
-            else:
-                print(f"Warning: {text}")
-
+def check_args(args, name: str) -> None:
+    pass
 
 def add_arguments_for_generate(parser):
     # Only generate specific options should be here
@@ -123,12 +97,12 @@ def _add_arguments_common(parser):
         default="not_specified",
         help="Model checkpoint path.",
     )
-    parser.add_argument(
-        "--checkpoint-dir",
-        type=Path,
-        default=None,
-        help="Model checkpoint directory.",
-    )
+    # parser.add_argument(
+    #     "--checkpoint-dir",
+    #     type=Path,
+    #     default=None,
+    #     help="Model checkpoint directory.",
+    # )
     parser.add_argument(
         "--params-path",
         type=Path,
