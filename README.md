@@ -32,14 +32,10 @@ python torchchat.py --help
 
 ```
 
-### Dowenload a Model and Tokenizer
+### Generating Text
 
 ```
-#download a model
-python torchchat.py download llama2
-
-#generate text using the model
-
+python torchchat.py generate stories15M
 ```
 That’s all there is to it!
 Read on to learn how to use the full power of torchchat.
@@ -48,7 +44,15 @@ Read on to learn how to use the full power of torchchat.
 For the full details on all commands and parameters run `python torchchat.py --help`
 
 ### Download
-TODO: Fill this out
+For supported models, torchchat can download model weights. Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace
+account and install `huggingface-cli`.
+
+To install `huggingface-cli`, run `pip install huggingface-cli`. After installing, create a user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens). Run `huggingface-cli login`, which will prompt for the newly created token. Once this is done, torchchat will be able to download model artifacts from
+HuggingFace.
+
+```
+python torchchat.py download llama2
+```
 
 ### Chat
 Designed for interactive and conversational use.
@@ -69,7 +73,7 @@ For more information run `python torchchat.py generate --help`
 
 **Examples**
 ```
-#Generate for Mac with some parameters
+python torchchat.py generate llama2 --device=cpu --dtype=fp16
 ```
 
 ### Export
@@ -80,7 +84,7 @@ For more information run `python torchchat.py export --help`
 **Examples**
 
 ```
-#Export Example
+python torchchat.py export stories15M --output-pte-path=stories15m.pte
 ```
 
 ### Browser
