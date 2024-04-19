@@ -64,7 +64,7 @@ if __name__ == "__main__":
         # TODO: add check_args()
 
         # Assume the user wants "chat" when entering "browser". TODO: add support for "generate" as well
-        args_plus_chat = ['"{}"'.format(s) for s in sys.argv[2:]] + ["\"--chat\""]
+        args_plus_chat = ['"{}"'.format(s) for s in sys.argv[2:]] + ['"--chat"'] + ['"--num-samples"'] + ['"1000000"']
         formatted_args = ", ".join(args_plus_chat)
         command = ["flask", "--app", "chat_in_browser:create_app(" + formatted_args + ")", "run"]
         subprocess.run(command)
