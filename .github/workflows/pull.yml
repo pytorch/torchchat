@@ -54,6 +54,7 @@ jobs:
           bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
       - name: Run validation
         run: |
+	  python3 -c "import torch;print(torch.__version__, torch.version.git_version)"
           pushd ${TORCHCHAT_ROOT}
           bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
           bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "compile"
