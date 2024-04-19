@@ -107,7 +107,7 @@ class GPTFastEvalWrapper(eval_wrapper):
         max_seq_length: Optional[int] = None,
         device = "cpu"
     ):
-        super().__init__()
+        super().__init__(device=device)
         self._model = model
         self._tokenizer = tokenizer
         self._device = torch.device(device)

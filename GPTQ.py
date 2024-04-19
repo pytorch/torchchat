@@ -38,11 +38,12 @@ class InputRecorder(GPTFastEvalWrapper):
         tokenizer,
         calibration_seq_length,
         pad_calibration_inputs=False,
+        device="cpu",
     ):
-        super().__init__(model, tokenizer, calibration_seq_length)
+        print("device:", device)
+        super().__init__(model, tokenizer, calibration_seq_length, device=device)
         self._model = model
         self._tokenizer = tokenizer
-        self._device = torch.device("cpu")
         self.vocab_size = model.config.vocab_size
         self.calibration_seq_length = calibration_seq_length
         self.pad_calibration_inputs = pad_calibration_inputs

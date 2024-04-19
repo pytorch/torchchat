@@ -220,12 +220,6 @@ def add_arguments(parser):
         )
     )
     parser.add_argument(
-        "--quantize",
-        type=str,
-        default="{ }",
-        help="Quantization options",
-    )
-    parser.add_argument(
         "--params-table",
         type=str,
         default=None,

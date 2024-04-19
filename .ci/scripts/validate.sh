@@ -90,22 +90,18 @@ function generate_compiled_model_output() {
             cat "$MODEL_DIR/output_eager"
             python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
             cat "$MODEL_DIR/output_compiled"
-        fi
 
-        echo "******************************************"
-        echo "******** INT4 group-wise quantized *******"
-        echo "******************************************"
-        if [ "$DTYPE" = float16 ]; then
-            echo "Skipping INT4 groupwise quantization for float16 because torch.compile fails"
-        else
+            echo "******************************************"
+            echo "******** INT4 group-wise quantized *******"
+            echo "******************************************"
             python3 -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
             cat "$MODEL_DIR/output_eager"
             python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
             cat "$MODEL_DIR/output_compiled"
-            # python3 -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int4-gptq" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-            # cat "$MODEL_DIR/output_eager"
-            python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4-gptq" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-            cat "$MODEL_DIR/output_compiled"
+            if [ "$TARGET_DEVICE" == "cuda" ]; then
+                python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4-gptq" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
+                cat "$MODEL_DIR/output_compiled"
+            fi
         fi
     done
 }
@@ -184,13 +180,11 @@ function generate_aoti_model_output() {
         if [ $(uname -s) == "Linux" ]; then
             echo "Skipping INT4 groupwise quantization because AOTI fails"
         else
-            if [ $(uname -s) == "Linux" ]; then
-                echo "Skipping INT4 groupwise quantization because AOTI fails"
-            else
-                python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-                python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-                cat "$MODEL_DIR/output_aoti"
+            python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+            python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
+            cat "$MODEL_DIR/output_aoti"
 
+            if [ "$TARGET_DEVICE" == "cuda" ]; then
                 python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4-gptq" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
                 python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
                 cat "$MODEL_DIR/output_aoti"
@@ -222,15 +216,33 @@ function eval_model() {
         echo "******************************************"
         echo "************** non-quantized *************"
         echo "******************************************"
-        python -W ignore eval.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
+        python -W ignore eval.py --compile --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
         cat "$MODEL_DIR/eval"
+        # extract perplexity number and compare with a constant
+        local REF_PERPLEXITY=100000
+        PERPLEXITY=cat "$MODEL_DIR/eval" | tail -n 1 log | awk -F '[, ]' '{print $4}'
+        # == 1 meaning the check succeeded
+        if [ "$(echo "$PERPLEXITY >= $REF_PERPLEXITY" | bc)" == 1]; then
+            echo "perplexity checking failed for non-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE"
+        else
+            echo "perplexity checking succeeded for non-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE"
+        fi;
 
         echo "******************************************"
         echo "******** INT4 group-wise quantized *******"
         echo "******************************************"
 
-        python -W ignore eval.py --compile --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
+        QUANT_OPTIONS='{"linear:int4" : {"groupsize": 32}}'
+        python -W ignore eval.py --compile --dtype ${DTYPE} --quant $QUANT_OPTIONS --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
         cat "$MODEL_DIR/eval"
+        local REF_PERPLEXITY=100000
+        PERPLEXITY=cat "$MODEL_DIR/eval" | tail -n 1 log | awk -F '[, ]' '{print $4}'
+        # == 1 meaning the check succeeded
+        if [ "$(echo "$PERPLEXITY >= $REF_PERPLEXITY" | bc)" == 1]; then
+            echo "perplexity checking failed for int4-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE $QUANT_OPTIONS"
+        else
+            echo "perplexity checking succeeded for int4-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE $QUANT_OPTIONS"
+        fi;
     done
 }
 
@@ -286,5 +298,4 @@ else
     run_compile
     run_aoti
     run_executorch
-    run_eval
 fi

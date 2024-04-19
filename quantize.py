@@ -881,6 +881,7 @@ class WeightOnlyInt4Linear(torch.nn.Module):
     in_features: int
     out_features: int
     weight: torch.Tensor
+    scales_and_zeros: torch.Tensor
 
     def __init__(
         self,
@@ -1033,6 +1034,7 @@ class GPTQQuantHandler(QuantHandler):
         calibration_limit,
         calibration_seq_length,
         pad_calibration_inputs,
+        device,
     ) -> "MultiInput":
         from GPTQ import InputRecorder
         input_recorder = InputRecorder(
@@ -1040,6 +1042,7 @@ class GPTQQuantHandler(QuantHandler):
             tokenizer,
             calibration_seq_length,
             pad_calibration_inputs,
+            device,
         )
 
         try:
@@ -1077,6 +1080,7 @@ class GPTQQuantHandler(QuantHandler):
         calibration_limit,
         calibration_seq_length,
         pad_calibration_inputs,
+        device,
     ) -> Dict:  # "StateDict":
         inputs = GPTQQuantHandler.get_inputs(
             self.mod,
@@ -1085,6 +1089,7 @@ class GPTQQuantHandler(QuantHandler):
             calibration_limit,
             calibration_seq_length,
             pad_calibration_inputs,
+            device=device,
         )
         print("Tracing model for GPTQ")
         from GPTQ import GenericGPTQRunner
@@ -1195,6 +1200,7 @@ class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
             calibration_limit=self.calibration_limit,
             calibration_seq_length=self.calibration_seq_length,
             pad_calibration_inputs=self.pad_calibration_inputs,
+            device=self.device,
         )
         self.convert_for_runtime()
         self.mod.load_state_dict(model_updated_state_dict, strict=False)
