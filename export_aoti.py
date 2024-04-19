@@ -10,6 +10,7 @@ import torch.nn as nn
 
 from torch.export import Dim
 
+# CPU is always available and also exportable to ExecuTorch
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
