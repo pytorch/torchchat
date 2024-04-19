@@ -10,6 +10,7 @@ import subprocess
 import sys
 
 from cli import (
+    add_arguments_for_download,
     add_arguments_for_eval,
     add_arguments_for_export,
     add_arguments_for_generate,
@@ -25,8 +26,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Top-level command")
     subparsers = parser.add_subparsers(
         dest="subcommand",
-        help="Use `generate`, `eval`, `export` or `browser` followed by subcommand specific options.",
+        help="Use `download`, `generate`, `eval`, `export` or `browser` followed by subcommand specific options.",
     )
+
+    parser_download = subparsers.add_parser("download")
+    add_arguments_for_download(parser_download)
 
     parser_generate = subparsers.add_parser("generate")
     add_arguments_for_generate(parser_generate)
@@ -46,7 +50,12 @@ if __name__ == "__main__":
         format="%(message)s", level=logging.DEBUG if args.verbose else logging.INFO
     )
 
-    if args.subcommand == "generate":
+    if args.subcommand == "download":
+        check_args(args, "download")
+        from download import main as download_main
+
+        download_main(args)
+    elif args.subcommand == "generate":
         check_args(args, "generate")
         from generate import main as generate_main
 
@@ -85,4 +94,6 @@ if __name__ == "__main__":
         command = ["flask", "--app", "chat_in_browser:create_app(" + formatted_args + ")", "run", "--port", f"{port}"]
         subprocess.run(command)
     else:
-        raise RuntimeError("Must specify valid subcommands: generate, export, eval")
+        raise RuntimeError(
+            "Must specify a valid subcommand: download, generate, export, or eval."
+        )
