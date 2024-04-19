@@ -347,3 +347,11 @@ def _initialize_model(
         model.to(dtype=builder_args.precision)
 
     return model
+
+def tokenizer_setting_to_name(tiktoken: bool = False) -> str:
+    return "TikToken" if tiktoken else "SentencePiece"
+
+def validate_args(model_args: ModelArgs, tokenizer_args: TokenizerArgs):
+    if model_args.use_tiktoken != tokenizer_args.is_tiktoken:
+        raise RuntimeError(f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(tokenizer_args.is_tiktoken)}")
+    

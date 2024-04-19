@@ -14,6 +14,7 @@ import torch._inductor.config
 from build.builder import (
     _initialize_model,
     _initialize_tokenizer,
+    validate_args,
     BuilderArgs,
     TokenizerArgs,
 )
@@ -238,6 +239,7 @@ def main(args) -> None:
         builder_args,
         quantize,
     )
+    validate_args(model.config, tokenizer_args)
 
     if compile:
         assert not (
