@@ -14,11 +14,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-try:
-    from eval import evaluate, get_task_dict, lm_eval
-    from GPTQ import GenericGPTQRunner, InputRecorder
-except:
-    pass
 
 ##########################################################################
 ###               dtype name to torch.dtype mapping                    ###
@@ -58,7 +53,7 @@ name_to_dtype_dict = {
 ###                  process quantization dictionary                   ###
 
 
-def quantize_model(model: nn.Module, device, quantize_options):
+def quantize_model(model: nn.Module, device, quantize_options, tokenizer = None):
     """
     Quantize the specified model using the quantizers described by
     a quantization dict of the form:
@@ -106,10 +101,11 @@ def quantize_model(model: nn.Module, device, quantize_options):
             assert 'groupsize' in list(q_kwargs.keys()), f"a8w4dq quantization option must specify groupsize. Specified options {q_kwargs}"
             model = Int8DynActInt4WeightQuantizer(groupsize=q_kwargs['groupsize']
             ).quantize(model)
-        elif quantizer == "linear:gptq":
+        elif quantizer == "linear:int4-gptq":
+            assert tokenizer is not None, "tokenizer required for linear:int4-gptq quantization"
             linears_quantized = True
             model = WeightOnlyInt4GPTQQuantHandler(
-                model, device, **q_kwargs
+                model, tokenizer, device, **q_kwargs
             ).quantized_model()
         elif quantizer == "linear:hqq":
             linears_quantized = True
@@ -776,10 +772,6 @@ def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, grou
     return c
 
 
-def _int4_check_linear_int4_k(k, groupsize=1, inner_k_tiles=1):
-    return k % groupsize == 0 and k % (inner_k_tiles * 16) == 0
-
-
 def replace_linear_int4(
     module,
     device,
@@ -790,7 +782,7 @@ def replace_linear_int4(
     for name, child in module.named_children():
         if isinstance(child, nn.Linear):
             if (
-                _int4_check_linear_int4_k(child.in_features, groupsize, inner_k_tiles)
+                _check_linear_int4_k(child.in_features, groupsize, inner_k_tiles)
                 or padding_allowed
             ):
                 setattr(
@@ -835,7 +827,7 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
                 # print(f"linear: {fqn}, in={in_features}, out={out_features}")
 
                 weight = mod.weight.data
-                if not _int4_check_linear_int4_k(
+                if not _check_linear_int4_k(
                     in_features, self.groupsize, self.inner_k_tiles
                 ):
                     if self.padding_allowed:
@@ -901,7 +893,7 @@ class WeightOnlyInt4Linear(torch.nn.Module):
         inner_k_tiles: int = 8,
     ) -> None:
         super().__init__()
-        self.padding = not _int4_check_linear_int4_k(
+        self.padding = not _check_linear_int4_k(
             in_features, groupsize, inner_k_tiles
         )
         if self.padding:
@@ -958,8 +950,8 @@ class WeightOnlyInt4Linear(torch.nn.Module):
 #########################################################################
 #####                           GPTQ                                #####
 
-def _check_linear_int4_k(k, groupsize=1):
-    return k % groupsize == 0
+def _check_linear_int4_k(k, groupsize = 1, inner_k_tiles = 1):
+    return k % groupsize == 0 and k % (inner_k_tiles * 16) == 0
 
 
 class GPTQQuantHandler(QuantHandler):
@@ -1042,6 +1034,7 @@ class GPTQQuantHandler(QuantHandler):
         calibration_seq_length,
         pad_calibration_inputs,
     ) -> "MultiInput":
+        from GPTQ import InputRecorder
         input_recorder = InputRecorder(
             model,
             tokenizer,
@@ -1050,12 +1043,15 @@ class GPTQQuantHandler(QuantHandler):
         )
 
         try:
+            import lm_eval
             lm_eval.tasks.initialize_tasks()
         except:
             pass
+        from eval import get_task_dict
         task_dict = get_task_dict(calibration_tasks)
         print("Obtaining GPTQ calibration inputs on: ", calibration_tasks)
 
+        from eval import evaluate
         evaluate(
             input_recorder,
             task_dict,
@@ -1074,9 +1070,9 @@ class GPTQQuantHandler(QuantHandler):
     def create_quantized_state_dict(
         self,
         tokenizer,
+        groupsize,
         blocksize,
         percdamp,
-        groupsize,
         calibration_tasks,
         calibration_limit,
         calibration_seq_length,
@@ -1091,6 +1087,7 @@ class GPTQQuantHandler(QuantHandler):
             pad_calibration_inputs,
         )
         print("Tracing model for GPTQ")
+        from GPTQ import GenericGPTQRunner
         GPTQ_runner = GenericGPTQRunner(
             self.mod,
             inputs,
@@ -1115,14 +1112,34 @@ class GPTQQuantHandler(QuantHandler):
 
 
 class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
-    def __init__(self, mod, device, *, groupsize=128, inner_k_tiles=8, padding=True):
+    def __init__(self,
+        mod,
+        tokenizer,
+        device,
+        *,
+        groupsize=128,
+        inner_k_tiles=8,
+        padding_allowed=True,
+        blocksize=128,
+        percdamp=0.01,
+        calibration_tasks=["wikitext"],
+        calibration_limit=10,
+        calibration_seq_length=100,
+        pad_calibration_inputs=False,
+    ):
         from build.model import find_multiple
-
         self.mod = mod
+        self.tokenizer=tokenizer
         self.device = device
         self.groupsize = groupsize
         self.inner_k_tiles = inner_k_tiles
-        self.padding = padding
+        self.padding_allowed = padding_allowed
+        self.blocksize = blocksize
+        self.percdamp=percdamp
+        self.calibration_limit = calibration_limit
+        self.calibration_tasks = calibration_tasks
+        self.calibration_seq_length = calibration_seq_length
+        self.pad_calibration_inputs = pad_calibration_inputs
         self.get_qparams_func = lambda w: get_group_qparams(w, 4, groupsize)
         self.quantize_func = lambda w, qparams: group_quantize_tensor_from_qparams(
             w, qparams[0], qparams[1], 4, groupsize
@@ -1133,16 +1150,19 @@ class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
         self.combine_qparams_list_func = lambda qparams_list: [
             torch.cat(x, dim=1) for x in zip(*qparams_list)
         ]
-        # skip unless padding=True or its correctly sized
+        # skip unless padding_allowed=True or its correctly sized
         self.skip_layer_func = lambda linear_weight: not (
             _check_linear_int4_k(linear_weight.shape[-1], groupsize, inner_k_tiles)
-            or padding
+            or padding_allowed
         )
 
         # we need to do the padding here, both for q and the qparams if necessary
         def make_names_and_values_dict_func(q, qparams):
             k = q.shape[1]
-            new_k = find_multiple(k, 1024)
+            if not _check_linear_int4_k(k, groupsize, inner_k_tiles):
+                new_k = find_multiple(k, 1024)
+            else:
+                new_k = k
             # how much we need to pad the weight
             delta_k = new_k - q.shape[1]
             final_q = torch.ops.aten._convert_weight_to_int4pack(
@@ -1161,14 +1181,23 @@ class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
 
     def convert_for_runtime(self):
         replace_linear_int4(
-            self.mod, self.device, self.groupsize, self.inner_k_tiles, self.padding
+            self.mod, self.device, self.groupsize, self.inner_k_tiles, self.padding_allowed
         )
         return self.mod
 
     def quantized_model(self) -> nn.Module:
-        model_updated_state_dict = self.create_quantized_state_dict()
+        model_updated_state_dict = self.create_quantized_state_dict(
+            tokenizer=self.tokenizer,
+            groupsize=self.groupsize,
+            blocksize=self.blocksize,
+            percdamp=self.percdamp,
+            calibration_tasks=self.calibration_tasks,
+            calibration_limit=self.calibration_limit,
+            calibration_seq_length=self.calibration_seq_length,
+            pad_calibration_inputs=self.pad_calibration_inputs,
+        )
         self.convert_for_runtime()
-        self.mod.load_state_dict(model_updated_state_dict)
+        self.mod.load_state_dict(model_updated_state_dict, strict=False)
         return self.mod
 
 

@@ -23,8 +23,6 @@ from build.model import Transformer
 from cli import add_arguments_for_eval, arg_init
 from generate import encode_tokens, model_forward
 
-from quantize import set_precision
-
 torch._dynamo.config.automatic_dynamic_shapes = True
 torch._inductor.config.triton.unique_kernel_names = True
 torch._inductor.config.epilogue_fusion = False
@@ -102,11 +100,12 @@ class GPTFastEvalWrapper(eval_wrapper):
         model: Transformer,
         tokenizer,
         max_seq_length: Optional[int] = None,
+        device = "cuda",
     ):
         super().__init__()
         self._model = model
         self._tokenizer = tokenizer
-        self._device = torch.device("cuda")
+        self._device = torch.device(device)
         self._max_seq_length = 2048 if max_seq_length is None else max_seq_length
 
     @property
@@ -169,6 +168,7 @@ def eval(
     tasks: Optional[list] = None,
     limit: Optional[int] = None,
     max_seq_length: Optional[int] = None,
+    device: str="cuda",
 ) -> dict:
     """
     Evaluates a language model on a specified task using the lm-evaluation-harness library.
@@ -184,12 +184,14 @@ def eval(
         eval_results (dict): A dictionary of evaluation results for the specified task(s).
     """
     if tasks is None:
-        tasks = ["hellaswag"]
+        tasks = ["wikitext"]
 
     model_eval_wrapper = GPTFastEvalWrapper(
         model,
         tokenizer,
         max_seq_length,
+        device,
+
     )
 
     try:
@@ -228,9 +230,11 @@ def main(args) -> None:
     device = args.device
     tasks = args.tasks
     limit = args.limit
+    compile = args.compile
     max_seq_length = args.max_seq_length
 
     print(f"Using device={device}")
+    from quantize import set_precision
     set_precision(builder_args.precision)
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
@@ -238,6 +242,7 @@ def main(args) -> None:
     model = _initialize_model(
         builder_args,
         quantize,
+        tokenizer,
     )
     validate_args(model, tokenizer_args)
 
@@ -253,11 +258,12 @@ def main(args) -> None:
 
     t1 = time.time()
     result = eval(
-        model,
+        model.to(device),
         tokenizer,
         tasks,
         limit,
         max_seq_length,
+        device,
     )
     print(f"Time to run eval: {time.time() - t1:.02f} seconds.")
     if builder_args.dso_path:
