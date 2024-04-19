@@ -101,7 +101,7 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer = None)
             assert 'groupsize' in list(q_kwargs.keys()), f"a8w4dq quantization option must specify groupsize. Specified options {q_kwargs}"
             model = Int8DynActInt4WeightQuantizer(groupsize=q_kwargs['groupsize']
             ).quantize(model)
-        elif quantizer == "linear:gptq":
+        elif quantizer == "linear:int4-gptq":
             linears_quantized = True
             model = WeightOnlyInt4GPTQQuantHandler(
                 model, tokenizer, device, **q_kwargs
