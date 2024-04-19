@@ -361,6 +361,11 @@ jobs:
           cat ./output_eager2
           echo "Tests complete."
 
+      - name: Test download
+        run: |
+
+          python torchchat.py generate stories15M
+
   test-tinystories-eager:
     strategy:
       matrix:
