@@ -37,8 +37,6 @@ def create_app(*args):
         output = ""
         while True:
             line = proc.stdout.readline()
-            print("\tprinting `line`")
-            print(line.decode('utf-8') + "\n")
             if line.decode('utf-8').startswith("What is your prompt?"):
                 break
             output += line.decode('utf-8').strip() + "\n"
