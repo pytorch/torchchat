@@ -141,7 +141,6 @@ transformer_configs = {
         "n_heads": 32,
         "n_local_heads": 8,
         "dim": 4096,
->>>>>>> d64aea9fc0339d3e78d2d0105a2667e693f6e7d4
         "hidden_dim": 14336,
         "vocab_size": 32000,
     },
