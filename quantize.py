@@ -746,14 +746,10 @@ def linear_forward_int4(x, weight_int4pack, scales_and_zeros, out_features, grou
 
     if "cuda" in str(x.device):
         c = torch.ops.aten._weight_int4pack_mm(
-            x.to(
-                torch.bfloat16
-            ),  # TODO: should probably make a warning if x is not already bfloat16
+            x.to(torch.bfloat16),
             weight_int4pack,
             groupsize,
-            scales_and_zeros.to(
-                torch.bfloat16
-            ),  # TODO: should probably make a warning if not already bfloat16
+            scales_and_zeros.to(torch.bfloat16),
         ).to(
             x.dtype
         )  # cast back to x.dtype
