@@ -15,7 +15,7 @@ Torchchat is an easy to use library for leveraging LLMs on edge devices includin
 
 ## Quick Start
 ### Initialize the Environment
-The following steps requires you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) and [virtualenv]https://virtualenv.pypa.io/en/latest/installation.html) installed
+The following steps requires you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) and [virtualenv](https://virtualenv.pypa.io/en/latest/installation.html) installed
 
 ```
 # set up a virtual environment
