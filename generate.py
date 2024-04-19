@@ -26,7 +26,12 @@ from build.builder import (
     TokenizerArgs,
 )
 from build.model import Transformer
-from cli import add_arguments_for_generate, arg_init, check_args
+from cli import (
+    add_arguments,
+    add_arguments_for_generate,
+    arg_init,
+    check_args,
+)
 from download import download_and_convert, is_model_downloaded
 from quantize import set_precision
 
@@ -568,7 +573,8 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate specific CLI.")
+    parser = argparse.ArgumentParser(description="torchchat generate CLI")
+    add_arguments(parser)
     add_arguments_for_generate(parser)
     args = parser.parse_args()
     check_args(args, "generate")
