@@ -14,6 +14,8 @@ from build.builder import (
     _set_gguf_kwargs,
     _unset_gguf_kwargs,
     BuilderArgs,
+    TokenizerArgs,
+    _initialize_tokenizer
 )
 from cli import (
     add_arguments,
@@ -67,9 +69,17 @@ def main(args):
     # TODO: clean this up
     # This mess is because ET does not support _weight_int4pack_mm right now
     if not builder_args.gguf_path:
+        # tokenizer needed for quantization so get that here,
+        try:
+            tokenizer_args = TokenizerArgs.from_args(args)
+            tokenizer = _initialize_tokenizer(tokenizer_args)
+        except:
+            tokenizer = None
+
         model = _initialize_model(
             builder_args,
             quantize,
+            tokenizer,
         )
         model_to_pte = model
         model_to_dso = model

@@ -297,6 +297,7 @@ def _load_model(builder_args):
 def _initialize_model(
     builder_args,
     quantize,
+    tokenizer = None,
 ):
     print("Loading model ...")
     t0 = time.time()
@@ -349,7 +350,7 @@ def _initialize_model(
 
         if quantize:
             t0q = time.time()
-            quantize_model(model, builder_args.device, quantize)
+            quantize_model(model, builder_args.device, quantize, tokenizer)
             device_sync(device=builder_args.device)
             print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
 
