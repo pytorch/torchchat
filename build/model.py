@@ -53,7 +53,7 @@ class ModelArgs:
                 hidden_dim = int(self.ffn_dim_multiplier * hidden_dim)
             self.hidden_dim = find_multiple(hidden_dim, multiple_of)
         self.head_dim = self.dim // self.n_heads
-        if is_instance(self.use_tiktoken, str):
+        if isinstance(self.use_tiktoken, str):
             self.use_tiktoken = (self.use_tiktoken == "True")
 
             
