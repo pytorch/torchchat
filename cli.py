@@ -14,6 +14,11 @@ default_device = "cpu"
 def check_args(args, name: str) -> None:
     pass
 
+def add_arguments_for_download(parser):
+    # Only download specific options should be here
+    _add_arguments_common(parser)
+
+
 def add_arguments_for_generate(parser):
     # Only generate specific options should be here
     _add_arguments_common(parser)
@@ -39,6 +44,19 @@ def add_arguments_for_browser(parser):
     )
 
 def _add_arguments_common(parser):
+    # Model specification. TODO Simplify this.
+    # A model can be specified using a positional model name or HuggingFace
+    # path. Alternatively, the model can be specified via --gguf-path or via
+    # an explicit --checkpoint-dir, --checkpoint-path, or --tokenizer-path.
+
+    parser.add_argument(
+        "model",
+        type=str,
+        nargs="?",
+        default=None,
+        help="Model name for well-known models.",
+    )
+
     # TODO: Refactor this so that only common options are here
     # and subcommand-specific options are inside individual
     # add_arguments_for_generate, add_arguments_for_export etc.
@@ -167,6 +185,18 @@ def _add_arguments_common(parser):
         type=int,
         default=None,
         help="maximum length sequence to evaluate",
+    )
+    parser.add_argument(
+        "--hf-token",
+        type=str,
+        default=None,
+        help="A HuggingFace API token to use when downloading model artifacts",
+    )
+    parser.add_argument(
+        "--model-directory",
+        type=Path,
+        default=".model-artifacts",
+        help="The directory to store downloaded model artifacts",
     )
 
 
