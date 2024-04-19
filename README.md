@@ -25,6 +25,7 @@ source .venv/torchchat/bin/activate
 # get the code and dependencies
 git clone https://github.com/pytorch/torchchat.git
 cd torchchat
+pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121”
 pip install -r requirements.txt
 
 # ensure everything installed correctly. If this command works you'll see a welcome message and some details
