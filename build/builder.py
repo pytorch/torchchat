@@ -139,26 +139,18 @@ class TokenizerArgs:
 
     @classmethod
     def from_args(cls, args):  # -> TokenizerArgs:
-<<<<<<< HEAD
         is_sentencepiece = True
         is_tiktoken = False
-=======
-        is_SentencePiece = True
-        is_TikToken = False
-        checkpoint_dir = args.checkpoint_dir
->>>>>>> 2a3f7f1 (Add model config for known models)
-
-        if args.model:  # Using a named, well-known model
-            model_config = resolve_model_config(args.model)
-
-            checkpoint_dir = Path(args.model_directory) / model_config.name
 
         if args.tokenizer_path:
             tokenizer_path = args.tokenizer_path
+        elif args.model:  # Using a named, well-known model
+            model_config = resolve_model_config(args.model)
+            tokenizer_path = Path(args.model_directory) / model_config.name / "tokenizer.model"
         elif args.checkpoint_path:
             tokenizer_path = args.checkpoint_path.parent / "tokenizer.model"
-        elif checkpoint_dir:
-            tokenizer_path = checkpoint_dir / "tokenizer.model"
+        elif hasattr(args, "checkpoint_dir") and args.checkpoint_dir:
+            tokenizer_path = args.checkpoint_dir / "tokenizer.model"
         else:
             raise RuntimeError("cannot find tokenizer model")
 
