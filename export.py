@@ -15,7 +15,12 @@ from build.builder import (
     _unset_gguf_kwargs,
     BuilderArgs,
 )
-from cli import add_arguments_for_export, arg_init, check_args
+from cli import (
+    add_arguments,
+    add_arguments_for_export,
+    arg_init,
+    check_args,
+)
 from download import download_and_convert, is_model_downloaded
 from export_aoti import export_model as export_model_aoti
 
@@ -106,7 +111,8 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Export specific CLI.")
+    parser = argparse.ArgumentParser(description="torchchat export CLI")
+    add_arguments(parser)
     add_arguments_for_export(parser)
     args = parser.parse_args()
     check_args(args, "export")
