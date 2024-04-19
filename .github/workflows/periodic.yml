@@ -47,7 +47,7 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
           pip list
       - name: Download checkpoints
@@ -80,7 +80,7 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
           pip list
       - name: Download checkpoints
@@ -124,7 +124,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
         pip install -r ./requirements.txt
         pip list
         echo "::endgroup::"
@@ -140,5 +140,37 @@ jobs:
 
         echo "::group::Run inference"
         bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "compile"
+  test-gpu-aoti:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    name: test-gpu-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-gpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
+      fail-fast: false
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      script: |
+        echo "::group::Print machine info"
+        nvidia-smi
+        echo "::endgroup::"
+
+        echo "::group::Install required packages"
+        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install -r ./requirements.txt
+        pip list
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoint"
+        export REPO_NAME=${{ matrix.repo_name }}
+        bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
+        echo "::endgroup::"
+
+        echo "::group::Convert checkpoint"
+        bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+        echo "::endgroup::"
+
+        echo "::group::Run inference"
         bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti"
         echo "::endgroup::"
