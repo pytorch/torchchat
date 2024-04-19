@@ -41,8 +41,8 @@ target_link_libraries(
     runner_et PRIVATE
         executorch
         extension_module
-        ${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/extension/data_loader/libextension_data_loader.a # This one does not get installed by ExecuTorch
-        ${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/examples/models/llama2/custom_ops/libcustom_ops.a # This one does not get installed by ExecuTorch
+        ${TORCHCHAT_ROOT}/et-build/src/executorch/${CMAKE_OUT_DIR}/extension/data_loader/libextension_data_loader.a # This one does not get installed by ExecuTorch
+        ${TORCHCHAT_ROOT}/et-build/src/executorch/${CMAKE_OUT_DIR}/examples/models/llama2/custom_ops/libcustom_ops.a # This one does not get installed by ExecuTorch
         optimized_kernels
         portable_kernels
         cpublas
@@ -60,19 +60,19 @@ target_link_options_shared_lib(XNNPACK)
 target_link_options_shared_lib(pthreadpool)
 target_link_options_shared_lib(cpuinfo)
 target_link_options_shared_lib(executorch)
-target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/examples/models/llama2/custom_ops/libcustom_ops_lib.a>")
+target_link_libraries(runner_et PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/et-build/src/executorch/${CMAKE_OUT_DIR}/examples/models/llama2/custom_ops/libcustom_ops_lib.a>")
 
 # Adding target_link_options_shared_lib as commented out below leads to this:
 #
 # CMake Error at Utils.cmake:22 (target_link_options):
 #   Cannot specify link options for target
-#   "/Users/scroy/etorch/torchchat/et-build/src/executorch/cmake-out/examples/models/llama2/custom_ops/libcustom_ops_lib.a"
+#   "/Users/scroy/etorch/torchchat/et-build/src/executorch/${CMAKE_OUT_DIR}/examples/models/llama2/custom_ops/libcustom_ops_lib.a"
 #   which is not built by this project.
 # Call Stack (most recent call first):
 #   Utils.cmake:30 (macos_kernel_link_options)
 #   CMakeLists.txt:41 (target_link_options_shared_lib)
 #
-#target_link_options_shared_lib("${TORCHCHAT_ROOT}/et-build/src/executorch/cmake-out/examples/models/llama2/custom_ops/libcustom_ops_lib.a") # This one does not get installed by ExecuTorch
+#target_link_options_shared_lib("${TORCHCHAT_ROOT}/et-build/src/executorch/${CMAKE_OUT_DIR}/examples/models/llama2/custom_ops/libcustom_ops_lib.a") # This one does not get installed by ExecuTorch
 
 # This works on mac, but appears to run into issues on linux
 # It is needed to solve:
