@@ -141,7 +141,7 @@ def _add_arguments_common(parser):
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument(
         "--quantize", type=str, default="{ }", help=(
-            'Quantization options. pass in like {"<mode>" : {"<argname1>" : <argval1>, "<argname2>" : <argval2>,...},} '+
+            'Quantization options. pass in as {"<mode>" : {"<argname1>" : <argval1>, "<argname2>" : <argval2>,...},} '+
             'modes are: embedding, linear:int8, linear:int4, linear:int4-gptq, linear:int4-hqq, linear:a8w4dq, precision.'
         )
     )
