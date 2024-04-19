@@ -9,7 +9,7 @@ from pathlib import Path
 
 import torch
 
-default_device = "cpu" 
+default_device = "cpu"
 
 def check_args(args, name: str) -> None:
     pass
@@ -29,8 +29,14 @@ def add_arguments_for_export(parser):
     _add_arguments_common(parser)
 
 def add_arguments_for_browser(parser):
-    # Only export specific options should be here
+    # Only browser specific options should be here
     _add_arguments_common(parser)
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=5000,
+        help="Port for the web server for browser mode."
+    )
 
 def _add_arguments_common(parser):
     # TODO: Refactor this so that only common options are here
