@@ -63,7 +63,8 @@ if __name__ == "__main__":
     elif args.subcommand == "browser":
         # TODO: add check_args()
 
-        # Look for port
+        # Look for port from cmd args. Default to 5000 if not found.
+        # The port args will be passed directly to the Flask app.
         port = 5000
         i = 2
         while i < len(sys.argv):
