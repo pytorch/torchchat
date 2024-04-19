@@ -74,9 +74,10 @@ def canonical_path(path):
 
 def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
 
-    # applied wrapper already in export.
-    # export_model = model_wrapper(model, device=device)
-    export_model = model
+    # export_model = model
+    # rewrite int4 linears to a8w4dq linears
+    from quantize import Int4Dyn8Int4MapHandler
+    export_model = Int4Dyn8Int4MapHandler(model).convert_model()
     print(export_model)
 
     input = (

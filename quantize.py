@@ -1221,3 +1221,82 @@ class WeightOnlyInt4HqqQuantHandler:
 
 
 ##################################################################
+
+#########################################################################
+#####          Weight-only int8 per-channel quantized code         ######
+
+
+def replace_int4_a8w4dq(
+    module, device
+):
+    from torchao.quantization.GPTQ import Int8DynActInt4WeightLinear
+    for name, child in module.named_children():
+        # print(f"name: {name}")
+        if isinstance(child, WeightOnlyInt4Linear):
+            setattr(
+                module,
+                name,
+                Int8DynActInt4WeightLinear(
+                    in_features=child.in_features,
+                    out_features=child.out_features,
+                    bias=child.bias,
+                    device=child.weight.device,
+                    dtype=child.dtype,
+                    groupsize=child.group_size,
+                    precision=get_precision(),
+                    ### THIS IS NOT RIGHT. I PREVIOUSLY HEARD THAT A8W4
+                    ### needs zeros because it's asymmetric?
+                    scales_precision=scales_and_zeros,
+                    ),
+                )
+        else:
+            replace_linear_weight_only_int8_per_channel(
+                child, device
+            )
+
+
+class Int4Dyn8Int4MapHandler(QuantHandler):
+    def __init__(
+        self,
+        mod,
+        device = "cpu"
+    ):
+        self.mod = mod
+        self.device = device
+
+    @torch.no_grad()
+    def create_quantized_state_dict(self) -> Dict:
+        cur_state_dict = self.mod.state_dict()
+
+        for fqn, mod in self.mod.named_modules():
+            # print(f"maybe? quantize {fqn}...{type(mod)}")
+            if isinstance(mod, WeightOnlyInt4Linear):
+                print(f"candidate {fqn}, nodetype {self.node_type}")
+                weight = mod.weight
+
+                if input_weight.dtype != torch.uint8:
+                    raise RuntimeError("corrupt model, WeightOnlyInt4Linear jas non uint8 weights")
+
+                for i in range(weight.size(1)):
+                    weight[:,i] = (
+                        weight[:,i].div(16, rounding_mode="trunc") +
+                        weight[:,i].remainder(16).mul(16)
+                    )                       
+                    cur_state_dict[f"{fqn}.weight"] = weight
+
+        return cur_state_dict
+
+    def convert_for_runtime(self) -> nn.Module:
+        replace_int4_a8w4dq
+            self.mod, self.device
+        )
+        return self.mod
+
+    def quantized_model(self) -> nn.Module:
+        model_updated_state_dict = self.create_quantized_state_dict()
+        self.convert_for_runtime()
+        self.mod.load_state_dict(model_updated_state_dict)
+        return self.mod
+
+
+
