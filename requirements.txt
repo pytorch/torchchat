@@ -21,3 +21,12 @@ numpy
 gguf
 lm-eval
 blobfile
+
+# Build tools
+wheel
+cmake
+ninja
+zstd
+
+# Browser mode
+flask
