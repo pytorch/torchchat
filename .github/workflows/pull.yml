@@ -448,6 +448,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install requirements"
+        # NS: Remove previos installation first as this script does not isntall anything into conda env but rather as system dep
+        pip uninstall -y torch || true
         # Install requirements
         pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
         ls -la
