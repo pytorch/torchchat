@@ -1,0 +1,69 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+pre {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 20px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+form {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+  margin: 20px;
+}
+
+label {
+  font-weight: bold;
+  color: #555;
+}
+
+input[type="text"] {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+
+input[type="submit"] {
+  background-color: #D00000; /* PyTorch red */
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+input[type="submit"]:hover {
+  background-color: #b30000;
+}
+
+.logo-container {
+  width: 33%;
+  position: fixed;
+  right: 0;
+  text-align: center;
+  padding: 20px;
+}
+.logo {
+  width: 100%;
+  max-width: 300px; /* Adjust as needed */
+}
+.chat-title {
+  color: #D00000; /* PyTorch red */
+  font-size: 3em; /* Adjust as needed */
+}
