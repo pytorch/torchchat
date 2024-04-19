@@ -753,3 +753,55 @@ jobs:
           cat ${PWD}/output_et
 
           echo "Tests complete."
+  runner-aoti:
+    name: test-runner-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Print machine info
+        run: |
+          echo "$(uname -a)"
+      - name: Install dependencies
+        run: |
+          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt
+          pip list
+
+          cd ${TORCHCHAT_ROOT}/runner-aoti
+          cmake -Bbuild -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'`
+          cmake --build build
+          cd ..
+      - name: Download checkpoint
+        run: |
+          mkdir -p checkpoints/stories15M
+          pushd checkpoints/stories15M
+          wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+          popd
+      - name: Run inference
+        run: |
+          export MODEL_DIR=${PWD}/checkpoints/stories15M
+          export PROMPT="Once upon a time in a land far away"
+
+          python torchchat.py generate --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}"  > ${PWD}/output_eager
+          cat ${PWD}/output_eager
+
+          python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-dso-path /tmp/model.so
+
+          ./runner-aoti/build/run /tmp/model.so -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}" > ${PWD}/output_aoti
+          cat ${PWD}/output_aoti
+
+          echo "Tests complete."
