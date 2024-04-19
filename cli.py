@@ -54,6 +54,9 @@ def add_arguments_for_export(parser):
     # Only export specific options should be here
     _add_arguments_common(parser)
 
+def add_arguments_for_browser(parser):
+    # Only export specific options should be here
+    _add_arguments_common(parser)
 
 def _add_arguments_common(parser):
     # TODO: Refactor this so that only common options are here

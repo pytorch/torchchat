@@ -1,7 +1,4 @@
 # -*- coding: UTF-8 -*-
-"""
-hello_jinja2: Get start with Jinja2 templates
-"""
 from flask import Flask, render_template, request
 from cli import add_arguments_for_generate, arg_init, check_args
 from generate import main as generate_main
@@ -40,8 +37,6 @@ def create_app(*args):
         output = ""
         while True:
             line = proc.stdout.readline()
-            print("\tprinting `line`")
-            print(line.decode('utf-8') + "\n")
             if line.decode('utf-8').startswith("What is your prompt?"):
                 break
             output += line.decode('utf-8').strip() + "\n"
