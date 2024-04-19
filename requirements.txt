@@ -27,3 +27,6 @@ wheel
 cmake
 ninja
 zstd
+
+# Browser mode
+flask
