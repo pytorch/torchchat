@@ -18,6 +18,7 @@ import torch._inductor.config
 from quantize import name_to_dtype, quantize_model
 
 from sentencepiece import SentencePieceProcessor
+from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
 from build.model import Transformer
 
@@ -152,7 +153,7 @@ def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
     if tokenizer_args.is_SentencePiece:
         return SentencePieceProcessor(model_file=str(tokenizer_args.tokenizer_path))
     elif tokenizer_args.is_TikToken:
-        raise RuntimeError("TikToken not implemented yet!")
+        return TiktokenTokenizer(model_path=str(tokenizer_args.tokenizer_path))
     else:
         raise RuntimeError("must specify a valid tokenizer in TokenizerArgs")
 
