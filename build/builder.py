@@ -124,13 +124,13 @@ class BuilderArgs:
 @dataclass
 class TokenizerArgs:
     tokenizer_path: Optional[Union[Path, str]] = None
-    is_SentencePiece: bool = True
-    is_TikToken: bool = False
+    is_sentencepiece: bool = True
+    is_tiktoken: bool = False
 
     @classmethod
     def from_args(cls, args):  # -> TokenizerArgs:
-        is_SentencePiece = True
-        is_TikToken = False
+        is_sentencepiece = True
+        is_tiktoken = False
 
         if args.tokenizer_path:
             tokenizer_path = args.tokenizer_path
@@ -145,20 +145,20 @@ class TokenizerArgs:
             raise RuntimeError(f"did not find tokenizer at {tokenizer_path}")
 
         if args.tiktoken:
-            is_SentencePiece = False
-            is_TikToken = True
+            is_sentencepiece = False
+            is_tiktoken = True
 
         return cls(
             tokenizer_path=tokenizer_path,
-            is_SentencePiece=is_SentencePiece,
-            is_TikToken=is_TikToken,
+            is_sentencepiece=is_sentencepiece,
+            is_tiktoken=is_tiktoken,
         )
 
 
 def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
-    if tokenizer_args.is_SentencePiece:
+    if tokenizer_args.is_sentencepiece:
         return SentencePieceProcessor(model_file=str(tokenizer_args.tokenizer_path))
-    elif tokenizer_args.is_TikToken:
+    elif tokenizer_args.is_tiktoken:
         return TiktokenTokenizer(model_path=str(tokenizer_args.tokenizer_path))
     else:
         raise RuntimeError("must specify a valid tokenizer in TokenizerArgs")
@@ -351,7 +351,9 @@ def _initialize_model(
 def tokenizer_setting_to_name(tiktoken: bool = False) -> str:
     return "TikToken" if tiktoken else "SentencePiece"
 
-def validate_args(model_args: ModelArgs, tokenizer_args: TokenizerArgs):
-    if model_args.use_tiktoken != tokenizer_args.is_tiktoken:
-        raise RuntimeError(f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(tokenizer_args.is_tiktoken)}")
+def validate_args(model: Transformer, tokenizer_args: TokenizerArgs):
+    use_tiktoken = model.config.use_tiktoken
+    is_tiktoken = tokenizer_args.is_tiktoken
+    if use_tiktoken != is_tiktoken:
+        raise RuntimeError(f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}")
     

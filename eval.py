@@ -239,7 +239,7 @@ def main(args) -> None:
         builder_args,
         quantize,
     )
-    validate_args(model.config, tokenizer_args)
+    validate_args(model, tokenizer_args)
 
     if compile:
         assert not (

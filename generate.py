@@ -378,7 +378,7 @@ def _main(
     set_precision(builder_args.precision)
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
-    validate_args(model.config, tokenizer_args)
+    validate_args(model, tokenizer_args)
     if generator_args.chat_mode and not builder_args.is_chat_model:
         # This is not a log message, it's a dangerous condition message
         # that we must ensure is displayed
