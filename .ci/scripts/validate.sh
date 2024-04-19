@@ -88,6 +88,7 @@ function generate_compiled_model_output() {
         if [ "$DTYPE" = float16 ]; then
             echo "Skipping INT4 groupwise quantization for float16 because torch.compile fails"
         else
+            echo "Target device: ${TARGET_DEVICE}"
             python -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
             cat "$MODEL_DIR/output_eager"
             python -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
@@ -167,6 +168,7 @@ function generate_aoti_model_output() {
             if [ $(uname -s) == "Linux" ]; then
                 echo "Skipping INT4 groupwise quantization because AOTI fails"
             else
+                echo "Target device: ${TARGET_DEVICE}"
                 python -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
                 python -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
                 cat "$MODEL_DIR/output_aoti"
@@ -208,7 +210,7 @@ function eval_model() {
         echo "******************************************"
         echo "******** INT4 group-wise quantized *******"
         echo "******************************************"
-
+        echo "Target device: ${TARGET_DEVICE}"
         python -W ignore eval.py --compile --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
         cat "$MODEL_DIR/eval"
     done
