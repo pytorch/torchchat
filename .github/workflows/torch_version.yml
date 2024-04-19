@@ -1,0 +1,43 @@
+name: torch version
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  gguf-load-test:
+    strategy:
+      matrix:
+        runner: [macos-14]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Install requirements
+        run: |
+          echo "Intalling pip packages"
+          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt
+      - name: Load files
+        run: |
+          touch test.py
+          echo "import torch"  >> test.py
+          echo 'print(f"torch version gitversion is {torch.version.git_version}")' >> test.py
+          cat test.py
+          python test.py
+
+          echo "Tests complete."
