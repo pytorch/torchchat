@@ -129,22 +129,6 @@ transformer_configs = {
         "hidden_dim": 14336,
         "vocab_size": 32000,
     },
-    "Mistral-7B-Instruct-v0.1": {
-        "n_layers": 32,
-        "n_heads": 32,
-        "n_local_heads": 8,
-        "dim": 4096,
-        "hidden_dim": 14336,
-        "vocab_size": 32000,
-    },
-    "Mistral-7B-Instruct-v0.2": {
-        "n_layers": 32,
-        "n_heads": 32,
-        "n_local_heads": 8,
-        "dim": 4096,
-        "hidden_dim": 14336,
-        "vocab_size": 32000,
-    },
     "stories15M": {"n_layers": 6, "n_heads": 6, "dim": 288},
     "stories110M": {"n_layers": 12, "n_heads": 12, "dim": 768},
 }
