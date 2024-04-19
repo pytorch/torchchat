@@ -9,7 +9,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 import torch
 import torch._dynamo.config
@@ -29,7 +29,7 @@ class BuilderArgs:
     params_path: Optional[Union[Path, str]] = None
     params_table: Optional[str] = None
     gguf_path: Optional[Union[Path, str]] = None
-    gguf_kwargs: Optional[dict[str, Any]] = None
+    gguf_kwargs: Optional[Dict[str, Any]] = None
     dso_path: Optional[Union[Path, str]] = None
     pte_path: Optional[Union[Path, str]] = None
     device: str = "cpu"
@@ -37,7 +37,7 @@ class BuilderArgs:
     setup_caches: bool = False
     use_tp: bool = False
     is_chat_model: bool = False
-    
+
     def __post_init__(self):
         if not (
             (self.checkpoint_path and self.checkpoint_path.is_file())
@@ -77,15 +77,15 @@ class BuilderArgs:
                 args.checkpoint_dir,
                 args.dso_path,
                 args.pte_path,
-                args.gguf_path
+                args.gguf_path,
             ]:
                 path = str(path)
-                if path.endswith('/'):
+                if path.endswith("/"):
                     path = path[:-1]
                 path_basename = os.path.basename(path)
                 if "chat" in path_basename:
                     is_chat_model = True
-                    
+
         return cls(
             checkpoint_path=args.checkpoint_path,
             checkpoint_dir=args.checkpoint_dir,
@@ -189,6 +189,7 @@ def _set_gguf_kwargs(builder_args, is_et, context: str):
     if is_et:
         builder_args.gguf_kwargs["load_as_quantized"] = False
 
+
 def _unset_gguf_kwargs(builder_args):
     builder_args.gguf_kwargs = None
 
@@ -264,6 +265,7 @@ def _load_model(builder_args):
 
     if builder_args.use_tp:
         from tp import apply_tp
+
         print("Applying tensor parallel to model ...")
         apply_tp(model)
 

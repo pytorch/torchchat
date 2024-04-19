@@ -5,7 +5,8 @@
 # LICENSE file in the root directory of this source tree.
 import argparse
 import itertools
-import os
+
+import logging
 import sys
 import time
 from dataclasses import dataclass
@@ -27,7 +28,10 @@ from build.model import Transformer
 from cli import add_arguments_for_generate, arg_init, check_args
 from quantize import set_precision
 
+logger = logging.getLogger(__name__)
+
 B_INST, E_INST = "[INST]", "[/INST]"
+
 
 @dataclass
 class GeneratorArgs:
@@ -66,7 +70,7 @@ def device_sync(device):
     elif ("cpu" in device) or ("mps" in device):
         pass
     else:
-        print(f"device={ device } is not yet suppported")
+        logging.error(f"device={ device } is not yet suppported")
 
 
 torch._inductor.config.coordinate_descent_tuning = True
@@ -87,7 +91,7 @@ def multinomial_sample_one_no_sync(
 
 
 def logits_to_probs(logits, temperature: float = 1.0, top_k: Optional[int] = None):
-    logits = logits / max(temperature, 1e-5)
+    logits = logits / max(temperature, 1e-5 if logits.dtype != torch.float16 else 1e-3)
 
     if top_k is not None:
         v, _ = torch.topk(logits, min(top_k, logits.size(-1)))
@@ -97,16 +101,25 @@ def logits_to_probs(logits, temperature: float = 1.0, top_k: Optional[int] = Non
     return probs
 
 
-def sample(logits, temperature: float = 1.0, top_k: Optional[int] = None):
+def sample(logits, need_probs: bool, temperature: float = 1.0,top_k: Optional[int] = None):
+    if temperature == 0 and not need_probs:
+        _, idx_next = torch.topk(logits, k=1, dim=-1)
+        idx_next = idx_next.squeeze(dim=(0, 1))
+        return (idx_next, None)
     probs = logits_to_probs(logits[0, -1], temperature, top_k)
     idx_next = multinomial_sample_one_no_sync(probs)
     return idx_next, probs
 
 
 def prefill(
-    model: Transformer, x: torch.Tensor, input_pos: torch.Tensor, **sampling_kwargs
+    model: Transformer,
+    x: torch.Tensor,
+    input_pos: torch.Tensor,
+    *,
+    sequential_prefill=True,
+    **sampling_kwargs,
 ) -> torch.Tensor:
-    print(f"x: {x}, input_pos: {input_pos}")
+    logging.debug(f"x: {x}, input_pos: {input_pos}")
     width = x.size(1)
     assert input_pos.size(0) == width
     sequential_prefill = True
@@ -114,22 +127,22 @@ def prefill(
     if sequential_prefill:
         for i in range(width):
             x_sliced, ip_sliced = x[:, i].view(-1, 1), input_pos[i].view(-1)
-            print(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
+            logging.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
             logits = model(x_sliced, ip_sliced)  # (x[:, i], input_pos[i])
     else:
         # input_pos: [B, S]
         logits = model(x, input_pos)
 
-    return sample(logits, **sampling_kwargs)[0]
+    return sample(logits, need_probs=False, **sampling_kwargs)[0]
 
 
 def decode_one_token(
-    model: Transformer, x: torch.Tensor, input_pos: torch.Tensor, **sampling_kwargs
-) -> Tuple[torch.Tensor, torch.Tensor]:
+    model: Transformer, x: torch.Tensor, input_pos: torch.Tensor, need_probs: bool, **sampling_kwargs
+) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
     # input_pos: [B, 1]
     assert input_pos.shape[-1] == 1
     logits = model(x, input_pos)
-    return sample(logits, **sampling_kwargs)
+    return sample(logits, need_probs=need_probs, **sampling_kwargs)
 
 
 def decode_n_tokens(
@@ -137,31 +150,25 @@ def decode_n_tokens(
     cur_token: torch.Tensor,
     input_pos: torch.Tensor,
     num_new_tokens: int,
+    need_probs: bool,
     callback=lambda _: _,
     **sampling_kwargs,
 ):
     new_tokens, new_probs = [], []
     for _ in range(num_new_tokens):
-        with torch.backends.cuda.sdp_kernel(
-            enable_flash=False, enable_mem_efficient=False, enable_math=True
-        ):  # Actually better for Inductor to codegen attention here
+        # Actually better for Inductor to codegen attention here
+        with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]):
             next_token, next_prob = decode_one_token(
-                model, cur_token, input_pos, **sampling_kwargs
+                model, cur_token, input_pos, need_probs=need_probs, **sampling_kwargs
             )
             input_pos += 1
             new_tokens.append(next_token.clone())
             callback(new_tokens[-1])
-            new_probs.append(next_prob.clone())
+            if need_probs:
+                new_probs.append(next_prob.clone())
             cur_token = next_token.view(1, -1)
 
     return new_tokens, new_probs
-
-
-# try:
-#     from .thin_wrapper import model_forward
-#
-# except:
-#     print("compiled model load not successful, running eager model")
 
 
 def model_forward(model, x, input_pos):
@@ -186,6 +193,7 @@ def speculative_decode(
         cur_token.view(1, -1),
         orig_input_pos.clone(),
         speculate_k,
+        need_probs=True,
         **sampling_kwargs,
     )
 
@@ -300,6 +308,7 @@ def generate(
             input_pos,
             max_new_tokens - 1,
             callback=callback,
+            need_probs = False,
             **sampling_kwargs,
         )
         seq[T + 1 :] = torch.cat(generated_tokens)
@@ -316,6 +325,30 @@ def encode_tokens(tokenizer, string, bos=True, device="cpu"):
 
 
 B_INST, E_INST = "[INST]", "[/INST]"
+
+
+def get_device_info(name: str) -> str:
+    import platform
+    from subprocess import check_output
+
+    if name == "cpu":
+        if platform.system() == "Darwin":
+            return (
+                check_output(["sysctl", "-n", "machdep.cpu.brand_string"])
+                .decode("utf-8")
+                .strip()
+            )
+        if platform.system() == "Linux":
+            return (
+                check_output(
+                    ["sed", "-nr", "s/^model name\\s+: (.*)$/\\1/p", "/proc/cpuinfo"]
+                )
+                .decode("utf-8")
+                .split("\n")[0]
+            )
+    if name == "cuda":
+        return torch.cuda.get_device_name(0)
+    return ""
 
 
 def _main(
@@ -340,19 +373,23 @@ def _main(
     #            # only print on rank 0
     #            print = lambda *args, **kwargs: None
 
-    print(f"Using device={builder_args.device}")
+    print(f"Using device={builder_args.device} {get_device_info(builder_args.device)}")
     set_precision(builder_args.precision)
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
     if generator_args.chat_mode and not builder_args.is_chat_model:
-        print("""
+        # This is not a log message, it's a dangerous condition message
+        # that we must ensure is displayed
+        print(
+            """
 *******************************************************
  This model is not known to support the chat function.
  We will enable chat mode based on your instructions.
  If the model is not trained to support chat, it will
  produce nonsensical or false output.
 *******************************************************
-        """)
+        """
+        )
         # raise RuntimeError("You need to use --is-chat-model to indicate model has chat support.")
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
@@ -374,7 +411,7 @@ def _main(
     encoded = encode_tokens(
         tokenizer, generator_args.prompt, bos=True, device=builder_args.device
     )
-    print(encoded)
+    logging.debug(encoded)
     prompt_length = encoded.size(0)
 
     model_size = sum(
@@ -469,7 +506,7 @@ def _main(
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
         if i == -1:
-            print(f"Compilation time: {time.perf_counter() - t0:.2f} seconds")
+            logging.info(f"Compilation time: {time.perf_counter() - t0:.2f} seconds")
             continue
         if hasattr(prof, "export_chrome_trace"):
             if use_tp:
@@ -486,23 +523,23 @@ def _main(
         tokens_generated = y.size(0) - prompt_length
         tokens_sec = tokens_generated / t
         aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-        print(
+        logging.info(
             f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_sec:.02f} tokens/sec"
         )
-        print(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
+        logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
     print("==========")
     if is_speculative:
         counts_aggregated = [sum(i) for i in zip(*aggregate_metrics["accept_counts"])]
         acceptance_probs = [i / sum(counts_aggregated) for i in counts_aggregated]
-        print(f"Acceptance probs: {acceptance_probs}")
-        print(
+        logging.info(f"Acceptance probs: {acceptance_probs}")
+        logging.info(
             f"Mean Accepted: {sum([idx * i for idx, i in enumerate(counts_aggregated)])/sum(counts_aggregated)}"
         )
 
-    print(
+    logging.info(
         f"Average tokens/sec: {torch.mean(torch.tensor(aggregate_metrics['tokens_per_sec'])).item():.2f}"
     )
-    print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
+    logging.info(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
 
 def main(args):
