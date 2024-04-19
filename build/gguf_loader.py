@@ -8,27 +8,21 @@
 import copy
 import logging
 import sys
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import gguf
 
 import torch
-import torch.nn as nn
 
 wd = Path(__file__).parent.resolve()
 sys.path.append(str(wd))
 
-from gguf import GGUFValueType, ReaderTensor
-from quantize import (
-    group_dequantize_tensor_from_qparams,
-    pack_scales_and_zeros,
-    WeightOnlyInt4Linear,
-)
-
-from build.gguf_util import F16, F32, Q4_0, Q6_K, to_float
+from gguf import GGUFValueType
 from model import ModelArgs, Transformer
+from quantize import pack_scales_and_zeros, WeightOnlyInt4Linear
+
+from build.gguf_util import Q4_0, to_float
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -116,9 +110,7 @@ def load_model(gguf_file: str) -> torch.nn.Module:
     metadata = _get_metadata(reader)
 
     arch = metadata["general.architecture"]
-    assert (
-        arch == "llama"
-    ), "Only LLaMa models are supported by this converter."
+    assert arch == "llama", "Only LLaMa models are supported by this converter."
 
     model_args = ModelArgs(
         dim=metadata[f"{arch}.embedding_length"],
@@ -139,7 +131,13 @@ def load_model(gguf_file: str) -> torch.nn.Module:
     return model
 
 
-def load_model_and_state_dict(gguf_file: str, *, load_state_dict: bool = True, load_as_quantized: bool = True, inner_k_tiles = 8) -> torch.nn.Module:
+def load_model_and_state_dict(
+    gguf_file: str,
+    *,
+    load_state_dict: bool = True,
+    load_as_quantized: bool = True,
+    inner_k_tiles=8,
+) -> torch.nn.Module:
     """
     Parses the GGUF file and returns an nn.Module on meta device along with a state_dict
     that can be loaded into it.

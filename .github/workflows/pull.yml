@@ -46,7 +46,7 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
           pip list
       - name: Download checkpoints
@@ -54,6 +54,7 @@ jobs:
           bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
       - name: Run validation
         run: |
+          python3 -c "import torch;print(torch.__version__, torch.version.git_version)"
           pushd ${TORCHCHAT_ROOT}
           bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
           bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "compile"
@@ -79,7 +80,7 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
           pip list
       - name: Download checkpoints
@@ -123,7 +124,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
         pip install -r ./requirements.txt
         pip list
         echo "::endgroup::"
@@ -157,7 +158,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
         pip install -r ./requirements.txt
         pip list
         echo "::endgroup::"
@@ -285,10 +286,10 @@ jobs:
           cat ./output_et
 
           echo "******************************************"
-          echo "******** INT4 group-wise quantized *******"
+          echo "******** ET: a8w4dq INT4 group-wise quantized *******"
           echo "******************************************"
-          # python export.py --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          # python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
+          python export.py --quant '{"linear:a8w4dq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
           # cat ./output_et
 
           echo "tests complete"
@@ -326,7 +327,7 @@ jobs:
       - name: Install requirements
         run: |
           echo "Installing pip packages"
-          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
 
       - name: Download Stories files
@@ -372,7 +373,7 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
       - name: Download checkpoints
         run: |
@@ -436,19 +437,21 @@ jobs:
     with:
       runner: macos-m1-stable
       script: |
+        set -x
+        # NS: Remove previous installation  of torch first
+        # as this script does not isntall anything into conda env but rather as system dep
+        pip uninstall -y torch || true
         set -eou pipefail
 
         echo "::group::Print machine info"
         uname -a
-        if [ $(uname -s) == Darwin ]; then
-          sysctl machdep.cpu.brand_string
-          sysctl machdep.cpu.core_count
-        fi
+        sysctl machdep.cpu.brand_string
+        sysctl machdep.cpu.core_count
         echo "::endgroup::"
 
         echo "::group::Install requirements"
         # Install requirements
-        pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
         ls -la
         pwd
         pip install -r requirements.txt
@@ -519,7 +522,7 @@ jobs:
         run: |
           echo "Intalling pip packages"
           pip install gguf
-          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
 
           git clone https://github.com/ggerganov/llama.cpp.git
@@ -547,19 +550,22 @@ jobs:
     with:
       runner: macos-m1-stable
       script: |
+        set -x
+        # NS: Remove previous installation  of torch first
+        # as this script does not isntall anything into conda env but rather as system dep
+        pip uninstall -y torch || true
+      
         set -eou pipefail
 
         echo "::group::Print machine info"
         uname -a
-        if [ $(uname -s) == Darwin ]; then
-          sysctl machdep.cpu.brand_string
-          sysctl machdep.cpu.core_count
-        fi
+        sysctl machdep.cpu.brand_string
+        sysctl machdep.cpu.core_count
         echo "::endgroup::"
 
         echo "::group::Install requirements"
         # Install requirements
-        pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
         ls -la
         pwd
         pip install -r requirements.txt
@@ -624,7 +630,7 @@ jobs:
       - name: Install requirements
         run: |
           pip install gguf
-          pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
           pip install -r requirements.txt
       - name: Download GGUF
         run: |
@@ -679,3 +685,54 @@ jobs:
 
           echo "tests complete"
           echo "******************************************"
+  runner-et:
+    strategy:
+      matrix:
+        runner: [macos-14-xlarge]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Install requirements
+        run: |
+          echo "Intalling pip packages"
+          pip install -r requirements.txt
+
+          export TORCHCHAT_ROOT=${PWD}
+          export ENABLE_ET_PYBIND=false
+          ./scripts/install_et.sh $ENABLE_ET_PYBIND
+          cmake -S ./runner-et -B et-build/cmake-out -G Ninja
+          cmake --build ./et-build/cmake-out
+      - name: Download checkpoints
+        run: |
+          mkdir -p checkpoints/stories15M
+          pushd checkpoints/stories15M
+          wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+          popd
+      - name: Run inference
+        run: |
+          export MODEL_DIR=${PWD}/checkpoints/stories15M
+          export PROMPT="Once upon a time in a land far away"
+
+          python torchchat.py generate --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}"  > ${PWD}/output_eager
+          cat ${PWD}/output_eager
+
+          python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-pte-path ${PWD}/stories15M.pte
+
+          ./et-build/cmake-out/runner_et ${PWD}/stories15M.pte -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}" > ${PWD}/output_et
+          cat ${PWD}/output_et
+
+          echo "Tests complete."

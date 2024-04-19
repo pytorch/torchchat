@@ -9,7 +9,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 import torch
 import torch._dynamo.config
@@ -18,6 +18,7 @@ import torch._inductor.config
 from quantize import name_to_dtype, quantize_model
 
 from sentencepiece import SentencePieceProcessor
+from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
 from build.model import Transformer
 
@@ -29,7 +30,7 @@ class BuilderArgs:
     params_path: Optional[Union[Path, str]] = None
     params_table: Optional[str] = None
     gguf_path: Optional[Union[Path, str]] = None
-    gguf_kwargs: Optional[dict[str, Any]] = None
+    gguf_kwargs: Optional[Dict[str, Any]] = None
     dso_path: Optional[Union[Path, str]] = None
     pte_path: Optional[Union[Path, str]] = None
     device: str = "cpu"
@@ -77,10 +78,10 @@ class BuilderArgs:
                 args.checkpoint_dir,
                 args.dso_path,
                 args.pte_path,
-                args.gguf_path
+                args.gguf_path,
             ]:
                 path = str(path)
-                if path.endswith('/'):
+                if path.endswith("/"):
                     path = path[:-1]
                 path_basename = os.path.basename(path)
                 if "chat" in path_basename:
@@ -152,7 +153,7 @@ def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
     if tokenizer_args.is_SentencePiece:
         return SentencePieceProcessor(model_file=str(tokenizer_args.tokenizer_path))
     elif tokenizer_args.is_TikToken:
-        raise RuntimeError("TikToken not implemented yet!")
+        return TiktokenTokenizer(model_path=str(tokenizer_args.tokenizer_path))
     else:
         raise RuntimeError("must specify a valid tokenizer in TokenizerArgs")
 
@@ -188,6 +189,7 @@ def _set_gguf_kwargs(builder_args, is_et, context: str):
     builder_args.gguf_kwargs = {}
     if is_et:
         builder_args.gguf_kwargs["load_as_quantized"] = False
+
 
 def _unset_gguf_kwargs(builder_args):
     builder_args.gguf_kwargs = None
@@ -264,6 +266,7 @@ def _load_model(builder_args):
 
     if builder_args.use_tp:
         from tp import apply_tp
+
         print("Applying tensor parallel to model ...")
         apply_tp(model)
 

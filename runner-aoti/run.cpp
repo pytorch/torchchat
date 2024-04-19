@@ -2,5 +2,5 @@
 /* this uses the same logic regardless of AOTI OR ET */
 /* but requires different data types - ATen vs ETen  */
 
-#define __AOTI__MODEL
+#define __AOTI_MODEL__
 #include "../runner/run.cpp"

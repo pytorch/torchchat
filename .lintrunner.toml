@@ -4,7 +4,7 @@ merge_base_with = "origin/main"
 code = 'FLAKE8'
 include_patterns = ['**/*.py']
 command = [
-    'python',
+    'python3',
     '-m',
     'lintrunner_adapters',
     'run',
@@ -13,7 +13,7 @@ command = [
     '@{{PATHSFILE}}'
 ]
 init_command = [
-    'python',
+    'python3',
     '-m',
     'lintrunner_adapters',
     'run',
@@ -30,7 +30,7 @@ include_patterns = [
     '**/*.pyi',
 ]
 command = [
-    'python',
+    'python3',
     '-m',
     'lintrunner_adapters',
     'run',
@@ -39,7 +39,7 @@ command = [
     '@{{PATHSFILE}}'
 ]
 init_command = [
-    'python',
+    'python3',
     '-m',
     'lintrunner_adapters',
     'run',
@@ -58,7 +58,7 @@ include_patterns = [
     '**/*.cpp',
 ]
 command = [
-    'python',
+    'python3',
     '-m',
     'lintrunner_adapters',
     'run',
@@ -69,7 +69,7 @@ command = [
     '@{{PATHSFILE}}'
 ]
 init_command = [
-    'python',
+    'python3',
     '-m',
     'lintrunner_adapters',
     'run',
