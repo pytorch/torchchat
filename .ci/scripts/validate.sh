@@ -25,7 +25,7 @@ function generate_compiled_model_output() {
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
 
-    for DTYPE in float32 bfloat16 float16; do
+    for DTYPE in bfloat16 float16 float32; do
         echo ""############### Run inference with torch.compile for dtype $DTYPE "###############"
         echo ""
         echo "******************************************"
@@ -98,7 +98,7 @@ function generate_aoti_model_output() {
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
 
-    for DTYPE in float32 bfloat16 float16; do
+    for DTYPE in bfloat16 float16 float32; do
         echo ""############### Run inference with AOT Inductor  for dtype $DTYPE "###############"
         echo ""
         echo "******************************************"
