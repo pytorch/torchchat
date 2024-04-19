@@ -7,6 +7,7 @@ import sys
 
 
 convo = ""
+disable_input = False
 
 def create_app(*args):
     app = Flask(__name__)
@@ -20,12 +21,14 @@ def create_app(*args):
     @app.route('/')
     def main():
         output = ""
+        global disable_input
+
         while True:
             line = proc.stdout.readline()
             if line.decode('utf-8').startswith("What is your prompt?"):
                 break
             output += line.decode('utf-8').strip() + "\n"
-        return render_template('chat.html', convo="Hello! What is your prompt?")
+        return render_template('chat.html', convo="Hello! What is your prompt?", disable_input=disable_input)
 
     @app.route('/chat', methods=['POST'])
     def chat():
@@ -35,9 +38,14 @@ def create_app(*args):
         proc.stdin.flush()
 
         output = ""
+        global disable_input
+
         while True:
             line = proc.stdout.readline()
             if line.decode('utf-8').startswith("What is your prompt?"):
+                break
+            if line.decode('utf-8').startswith("=========="):
+                disable_input = True
                 break
             output += line.decode('utf-8').strip() + "\n"
 
@@ -47,6 +55,6 @@ def create_app(*args):
             convo += "Your prompt:\n" + _prompt + "\n\n"
             convo += "My response:\n" + output + "\n\n"
 
-        return render_template('chat.html', convo=convo)
+        return render_template('chat.html', convo=convo, disable_input=disable_input)
 
     return app
