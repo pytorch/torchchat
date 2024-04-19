@@ -348,7 +348,7 @@ def _main(
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
     if generator_args.chat_mode and not builder_args.is_chat_model:
-        # This is not a log message, it's a dangerous condition message 
+        # This is not a log message, it's a dangerous condition message
         # that we must ensure is displayed
         print(
             """
@@ -365,7 +365,7 @@ def _main(
     tokenizer = _initialize_tokenizer(tokenizer_args)
 
     builder_args.setup_caches = False
-    model = _initialize_model(builder_args, quantize)
+    model = _initialize_model(builder_args, quantize, tokenizer)
 
     # will add a version of _initialize_model in future
     # (need additional args)

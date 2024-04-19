@@ -37,7 +37,7 @@ class BuilderArgs:
     setup_caches: bool = False
     use_tp: bool = False
     is_chat_model: bool = False
-    
+
     def __post_init__(self):
         if not (
             (self.checkpoint_path and self.checkpoint_path.is_file())
@@ -85,7 +85,7 @@ class BuilderArgs:
                 path_basename = os.path.basename(path)
                 if "chat" in path_basename:
                     is_chat_model = True
-                    
+
         return cls(
             checkpoint_path=args.checkpoint_path,
             checkpoint_dir=args.checkpoint_dir,
@@ -274,6 +274,7 @@ def _load_model(builder_args):
 def _initialize_model(
     builder_args,
     quantize,
+    tokenizer = None,
 ):
     print("Loading model ...")
     t0 = time.time()
@@ -326,7 +327,7 @@ def _initialize_model(
 
         if quantize:
             t0q = time.time()
-            quantize_model(model, builder_args.device, quantize)
+            quantize_model(model, builder_args.device, quantize, tokenizer)
             device_sync(device=builder_args.device)
             print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
 
