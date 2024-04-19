@@ -23,9 +23,10 @@ MODEL_REPOS = {
 
 JOB_RUNNERS = {
     "cpu": {
-        "32-core-ubuntu": "x86_64",
-        # "macos-12": "x86_64", # not working for complie and ExecuTorch yet
-        "macos-14": "aarch64",
+        "8-core-ubuntu": "linux x86_64",
+        "macos-latest-large": "mac x86_64", # not working for complie and ExecuTorch yet
+        "macos-14": "mac aarch64",
+        "4-core-ubuntu-arm": "linux aarch64",
     },
     "gpu": {
         "linux.g5.4xlarge.nvidia.gpu": "cuda",
