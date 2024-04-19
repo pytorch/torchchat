@@ -25,7 +25,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Top-level command")
     subparsers = parser.add_subparsers(
         dest="subcommand",
-        help="Use `generate`, `eval` or `export` followed by subcommand specific options.",
+        help="Use `generate`, `eval`, `export` or `browser` followed by subcommand specific options.",
     )
 
     parser_generate = subparsers.add_parser("generate")
@@ -63,10 +63,25 @@ if __name__ == "__main__":
     elif args.subcommand == "browser":
         # TODO: add check_args()
 
+        # Look for port
+        port = 5000
+        i = 2
+        while i < len(sys.argv):
+            # Check if the current argument is '--port'
+            if sys.argv[i] == '--port':
+                # Check if there's a value immediately following '--port'
+                if i + 1 < len(sys.argv):
+                    # Extract the value and remove '--port' and the value from sys.argv
+                    port = sys.argv[i + 1]
+                    del sys.argv[i:i+2]  # Delete '--port' and the value
+                    break  # Exit loop since port is found
+            else:
+                i += 1
+
         # Assume the user wants "chat" when entering "browser". TODO: add support for "generate" as well
         args_plus_chat = ['"{}"'.format(s) for s in sys.argv[2:]] + ["\"--chat\""]
         formatted_args = ", ".join(args_plus_chat)
-        command = ["flask", "--app", "chat_in_browser:create_app(" + formatted_args + ")", "run"]
+        command = ["flask", "--app", "chat_in_browser:create_app(" + formatted_args + ")", "run", "--port", f"{port}"]
         subprocess.run(command)
     else:
         raise RuntimeError("Must specify valid subcommands: generate, export, eval")
