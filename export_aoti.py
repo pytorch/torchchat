@@ -10,8 +10,8 @@ import torch.nn as nn
 
 from torch.export import Dim
 
-# CPU is always available and also exportable to ExecuTorch
-default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
+# Prefer CUDA if available, otherwise MPS if available, otherwise CPU
+default_device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.mps.is_available() else 'cpu'
 
 
 def device_sync(device):

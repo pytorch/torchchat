@@ -21,7 +21,8 @@ from cli import (
     check_args,
 )
 
-default_device = "cpu"
+# Prefer CUDA if available, otherwise MPS if available, otherwise CPU
+default_device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.mps.is_available() else 'cpu'
 
 
 if __name__ == "__main__":
