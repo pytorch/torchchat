@@ -23,7 +23,6 @@ def find_multiple(n: int, k: int) -> int:
     return n + k - (n % k)
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
-# config_path = Path(config_dir)
 
 @dataclass
 class ModelArgs:
@@ -42,7 +41,7 @@ class ModelArgs:
     multiple_of: int = 256
     ffn_dim_multiplier: Optional[int] = None
     use_tiktoken: Optional[bool] = None
-    
+
     def __post_init__(self):
         if self.n_local_heads == -1:
             self.n_local_heads = self.n_heads
@@ -60,7 +59,7 @@ class ModelArgs:
         if isinstance(self.use_tiktoken, str):
             self.use_tiktoken = (self.use_tiktoken == "True")
 
-            
+
     @classmethod
     def from_params(cls, params_path):
         replace = [("rope_theta", "rope_base"), ("n_kv_heads", "n_local_heads")]
