@@ -1,0 +1,1 @@
+{"n_layers": 80, "n_heads": 64, "dim": 8192, "n_local_heads": 8, "hidden_dim": 28672}
