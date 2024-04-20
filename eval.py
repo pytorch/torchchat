@@ -14,17 +14,13 @@ import torch._inductor.config
 from build.builder import (
     _initialize_model,
     _initialize_tokenizer,
-    validate_args,
     BuilderArgs,
     TokenizerArgs,
+    validate_args,
 )
 
 from build.model import Transformer
-from cli import (
-    add_arguments,
-    add_arguments_for_eval,
-    arg_init,
-)
+from cli import add_arguments, add_arguments_for_eval, arg_init
 from download import download_and_convert, is_model_downloaded
 from generate import encode_tokens, model_forward
 
@@ -105,7 +101,7 @@ class GPTFastEvalWrapper(eval_wrapper):
         model: Transformer,
         tokenizer,
         max_seq_length: Optional[int] = None,
-        device = "cpu"
+        device="cpu",
     ):
         super().__init__(device=device)
         self._model = model
@@ -173,7 +169,7 @@ def eval(
     tasks: Optional[list] = None,
     limit: Optional[int] = None,
     max_seq_length: Optional[int] = None,
-    device: str = "cpu"
+    device: str = "cpu",
 ) -> dict:
     """
     Evaluates a language model on a specified task using the lm-evaluation-harness library.
@@ -192,10 +188,7 @@ def eval(
         tasks = ["wikitext"]
 
     model_eval_wrapper = GPTFastEvalWrapper(
-        model,
-        tokenizer,
-        max_seq_length,
-        device=device
+        model, tokenizer, max_seq_length, device=device
     )
 
     try:
@@ -243,6 +236,7 @@ def main(args) -> None:
 
     print(f"Using device={device}")
     from quantize import set_precision
+
     set_precision(builder_args.precision)
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
