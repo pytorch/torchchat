@@ -78,7 +78,7 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer = None)
             
 #########################################################################
 ###                QuantHandler API definition                        ###
-
+###               (unify with torchao in future)                      ###
 
 class QuantHandler:
     def __init__(self, mod, device = "cpu", tokenizer = None):
@@ -353,7 +353,7 @@ def replace_linear_weight_only_int8_per_channel(
     module, device, node_type, groupsize=None
 ):
     if groupsize is not None and groupsize != 0:
-        pass  # groupsize = 2 ** groupsize
+        pass 
 
     for name, child in module.named_children():
         # print(f"name: {name}")
@@ -503,8 +503,8 @@ class WeightOnlyInt8Linear(torch.nn.Module):
         scales = scales.view(scales.shape[0], -1)
         no_groups = scales.shape[1]
 
-        # need a formulation / custom op for good performance on both eager, CUDA compiled, CPU compiled and ET exported
-        # maybe use IR-based rewriting?
+        # need a formulation / custom op for good performance
+        # on eager, CUDA compiled, CPU compiled and ET exported
 
         # for now, we special-case channel-wise, because we know how to make that fast (but does not work for groupwise)
         if scales.shape[1] == 1:
@@ -584,7 +584,6 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 
         for fqn, mod in self.mod.named_modules():
             if isinstance(mod, nn.Embedding):
-                # print("****")
                 # print(f"Embedding identified: {fqn, mod}")
                 # print(f"weights size: {mod.weight.size()}")
                 # print(f"quantize {fqn}...")
@@ -929,7 +928,6 @@ class WeightOnlyInt4Linear(torch.nn.Module):
                 device=device,
             ),
         )
-        # MKG: torch.float
         self.register_buffer(
             "scales_and_zeros",
             torch.empty(
@@ -940,8 +938,6 @@ class WeightOnlyInt4Linear(torch.nn.Module):
         )
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
-        # MKG torch.float
-        # input = input.to(torch.float)
         if self.padding:
             import torch.nn.functional as F
 
