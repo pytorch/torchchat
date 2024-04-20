@@ -38,7 +38,26 @@ def convert_hf_checkpoint(
     # Load the json file containing weight mapping
     model_map_json = model_dir / "pytorch_model.bin.index.json"
 
-    assert model_map_json.is_file()
+    # If there is no weight mapping, check for a consolidated model and
+    # tokenizer we can move. Llama 2 and Mistral have weight mappings, while
+    # Llama 3 has a consolidated model and tokenizer.
+    # Otherwise raise an error.
+    if not model_map_json.is_file():
+        consolidated_pth = model_dir / "original" / "consolidated.00.pth"
+        tokenizer_pth = model_dir / "original" / "tokenizer.model"
+        if consolidated_pth.is_file() and tokenizer_pth.is_file():
+            # Confirm we can load it
+            loaded_result = torch.load(
+                str(consolidated_pth), map_location="cpu", mmap=True, weights_only=True
+            )
+            del loaded_result  # No longer needed
+            print(f"Moving checkpoint to {model_dir / 'model.pth'}.")
+            os.rename(consolidated_pth, model_dir / "model.pth")
+            os.rename(tokenizer_pth, model_dir / "tokenizer.model")
+            print("Done.")
+            return
+        else:
+            raise RuntimeError(f"Could not find {model_map_json} or {consolidated_pth} plus {tokenizer_pth}")
 
     with open(model_map_json) as json_map:
         bin_index = json.load(json_map)
@@ -111,7 +130,7 @@ def convert_hf_checkpoint(
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Convert HuggingFace checkpoint.")
+    parser = argparse.ArgumentParser(description="Convert Hugging Face checkpoint.")
     parser.add_argument(
         "--checkpoint-dir",
         type=Path,
