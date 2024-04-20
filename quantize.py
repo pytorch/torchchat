@@ -1234,8 +1234,6 @@ class WeightOnlyInt4HqqQuantHandler:
                         )
                     )
 
-        # we use Int4 pacdfler(Qkaged in an int8 for now, packing to follow
-        # return WeightOnlyInt4QuantHandler(self.mod, self.groupsize).create_quantized_state_dict()
         return WeightOnlyInt4QuantHandler(
             self.mod, self.device, groupsize=self.groupsize
         ).create_quantized_state_dict()
@@ -1245,7 +1243,7 @@ class WeightOnlyInt4HqqQuantHandler:
         # ALSO: all code must work for CPU, CUDA, MPS
         # return WeightOnlyInt4GPTQQuantHandler(self.mod, self.groupsize).convert_for_runtime()
         return WeightOnlyInt4GPTQQuantHandler(
-            self.mod, self.device, groupsize=self.groupsize
+            self.mod, None, self.device, groupsize=self.groupsize
         ).convert_for_runtime()
 
     def quantized_model(self) -> nn.Module:
