@@ -57,7 +57,7 @@ jobs:
           echo "**********************************************"
           echo "******** INT4 HQQ group-wise quantized *******"
           echo "**********************************************"
-          python generate.py --dtype ${DTYPE} --device cuda --quant '{"linear:hqq" : {"grou_psize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+          python generate.py --dtype ${DTYPE} --device cuda --quant '{"linear:hqq" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
           cat ./output_eager
           python generate.py --dtype ${DTYPE} --device cuda --compile --quant '{"linear:hqq" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
           cat ./output_compiled
