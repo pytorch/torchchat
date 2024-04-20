@@ -9,6 +9,11 @@
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Llama-2-7b-chat-hf"
     },
+    "meta-llama/CodeLlama-7b-Python-hf": {
+        "aliases": ["codellama", "codellama-7b"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/CodeLlama-7b-Python-hf"
+    },
     "mistralai/Mistral-7B-Instruct-v0.2": {
         "aliases": ["mistral-7b", "mistral-7b-instruct"],
         "distribution_channel": "HuggingFaceSnapshot",
