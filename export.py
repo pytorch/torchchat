@@ -95,13 +95,13 @@ def main(args):
             output_pte_path = str(os.path.abspath(output_pte_path))
             print(f">{output_pte_path}<")
             if executorch_export_available:
-                print(f"Exporting model using Executorch to {output_pte_path}")
+                print(f"Exporting model using ExecuTorch to {output_pte_path}")
                 export_model_et(
                     model_to_pte, builder_args.device, args.output_pte_path, args
                 )
             else:
                 print(
-                    "Export with executorch requested but Executorch could not be loaded"
+                    "Export with executorch requested but ExecuTorch could not be loaded"
                 )
                 print(executorch_exception)
         if output_dso_path:
