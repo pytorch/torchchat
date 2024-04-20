@@ -46,8 +46,8 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cpu
           pip list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -81,8 +81,8 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cpu
           pip list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -126,8 +126,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip install -r ./requirements.txt --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install --pre torch  --extra-index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install -r ./requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cu121
         pip list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -161,8 +161,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip install -r ./requirements.txt --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install --pre torch  --extra-index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install -r ./requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cu121
         pip list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -205,7 +205,7 @@ jobs:
           pip install cmake
           pip install ninja
           pip install zstd
-          pip install -r requirements.txt --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cpu
 
           echo "Executorch: cloning"
           mkdir etorch
@@ -335,8 +335,8 @@ jobs:
       - name: Install requirements
         run: |
           echo "Installing pip packages"
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt   --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt   --extra-index-url https://download.pytorch.org/whl/nightly/cpu
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
       - name: Download Stories files
@@ -387,8 +387,8 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt  --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
@@ -466,10 +466,10 @@ jobs:
 
         echo "::group::Install requirements"
         # Install requirements
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+        pip install --pre torch  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
         ls -la
         pwd
-        pip install -r requirements.txt  --index-url https://download.pytorch.org/whl/nightly/cpu
+        pip install -r requirements.txt  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -538,8 +538,8 @@ jobs:
         run: |
           echo "Intalling pip packages"
           pip install gguf
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt  --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
           git clone https://github.com/ggerganov/llama.cpp.git
@@ -582,10 +582,10 @@ jobs:
 
         echo "::group::Install requirements"
         # Install requirements
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+        pip install --pre torch  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
         ls -la
         pwd
-        pip install -r requirements.txt  --index-url https://download.pytorch.org/whl/nightly/cpu
+        pip install -r requirements.txt  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -648,8 +648,8 @@ jobs:
       - name: Install requirements
         run: |
           pip install gguf
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt  --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download GGUF
         run: |
@@ -726,7 +726,7 @@ jobs:
       - name: Install requirements
         run: |
           echo "Intalling pip packages"
-          pip install -r requirements.txt  --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
 
           export TORCHCHAT_ROOT=${PWD}
           export ENABLE_ET_PYBIND=false
@@ -780,8 +780,8 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt  --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install --pre torch --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install -r requirements.txt  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
           pip list
 
           cd ${TORCHCHAT_ROOT}/runner-aoti
