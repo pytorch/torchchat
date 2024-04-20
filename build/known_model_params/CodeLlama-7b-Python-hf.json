@@ -1,0 +1,1 @@
+{"block_size": 16384, "vocab_size": 32000, "n_layers": 32, "dim": 4096, "rope_base": 1000000}
