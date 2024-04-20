@@ -22,8 +22,8 @@ def find_multiple(n: int, k: int) -> int:
         return n
     return n + k - (n % k)
 
-config_dir = f"{str(Path(__file__).parent)}/known_model_params"
-config_path = Path(config_dir)
+config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
+# config_path = Path(config_dir)
 
 @dataclass
 class ModelArgs:
@@ -75,22 +75,21 @@ class ModelArgs:
     @classmethod
     def from_table(cls, name: str):
         print(f"name {name}")
-        json_path = Path(f"{config_dir}/{name}.json")
+        json_path = config_path / f"{name}.json"
         if json_path.is_file():
             return ModelArgs.from_params(json_path)
         else:
-            config_dir = f"{__file__}/known_model_params"
-            known_model_params = [config.replace(".json", "") for config in os.listdir(config_dir)]
+            known_model_params = [config.replace(".json", "") for config in os.listdir(config_path)]
             raise RuntimeError(f"unknown table index {name} for transformer config, must be from {known_model_params}")
 
     @classmethod
     def from_name(cls, name: str):
         print(f"name {name}")
-        json_path=f"{config_dir}/{name}.json"
+        json_path=config_path / f"{name}.json"
         if Path(json_path).is_file():
             return ModelArgs.from_params(json_path)
 
-        known_model_params = [config.replace(".json", "") for config in os.listdir(config_dir)]
+        known_model_params = [config.replace(".json", "") for config in os.listdir(config_path)]
 
         print(f"known configs: {known_model_params}")
         # fuzzy search
@@ -112,7 +111,7 @@ class ModelArgs:
                 f"Unknown model directory name {name}. Must be one of {known_model_params}."
             )
 
-        return ModelArgs.from_params(f"{config_dir}/{config[0]}.json")
+        return ModelArgs.from_params(config_path / f"{config[0]}.json")
 
 
 
