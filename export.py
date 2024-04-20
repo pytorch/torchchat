@@ -11,18 +11,13 @@ import torch
 
 from build.builder import (
     _initialize_model,
+    _initialize_tokenizer,
     _set_gguf_kwargs,
     _unset_gguf_kwargs,
     BuilderArgs,
     TokenizerArgs,
-    _initialize_tokenizer
 )
-from cli import (
-    add_arguments,
-    add_arguments_for_export,
-    arg_init,
-    check_args,
-)
+from cli import add_arguments, add_arguments_for_export, arg_init, check_args
 from download import download_and_convert, is_model_downloaded
 from export_aoti import export_model as export_model_aoti
 

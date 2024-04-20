@@ -108,8 +108,6 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     else:
         raise ValueError(f"Unsupported dtype for ET export: {target_precision}")
 
-
-
     replace_attention_with_custom_sdpa_attention(export_model)
     with torch.nn.attention.sdpa_kernel(
         [torch.nn.attention.SDPBackend.MATH]
