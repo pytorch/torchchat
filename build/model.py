@@ -6,6 +6,8 @@
 import json
 from dataclasses import dataclass
 from typing import Dict, Optional
+from pathlib import Path
+import os
 
 import torch
 import torch.nn as nn
@@ -20,6 +22,8 @@ def find_multiple(n: int, k: int) -> int:
         return n
     return n + k - (n % k)
 
+config_dir = f"{str(Path(__file__).parent)}/known_model_params"
+config_path = Path(config_dir)
 
 @dataclass
 class ModelArgs:
@@ -70,20 +74,28 @@ class ModelArgs:
     @classmethod
     def from_table(cls, name: str):
         print(f"name {name}")
-        if name in transformer_configs:
-            return cls(**transformer_configs[name])
+        json_path = Path(f"{config_dir}/{name}.json")
+        if json_path.is_file():
+            return ModelArgs.from_params(json_path)
         else:
-            raise RuntimeError(f"unknown table index {name} for transformer_configs")
+            config_dir = f"{__file__}/known_model_params"
+            known_model_params = [config.replace(".json", "") for config in os.listdir(config_dir)]
+            raise RuntimeError(f"unknown table index {name} for transformer config, must be from {known_model_params}")
 
     @classmethod
     def from_name(cls, name: str):
-        print(f"name {name}")
-        if name in transformer_configs:
-            return cls(**transformer_configs[name])
-        # fuzzy search
+        print(f"Name {name}")
+        json_path=f"{config_dir}/{name}.json"
+        if Path(json_path).is_file():
+            return ModelArgs.from_params(json_path)
+
+        known_model_params = [config.replace(".json", "") for config in os.listdir(config_dir)]
+
+        # Fuzzy search by name (e.g. "7B" and "Mistral-7B")
+        print(f"Known configs: {known_model_params}")
         config = [
             config
-            for config in transformer_configs
+            for config in known_model_params
             if config in str(name).upper() or config in str(name)
         ]
 
@@ -96,61 +108,11 @@ class ModelArgs:
             ), name  # make sure only one 'best' match
         elif len(config) == 0:
             raise ValueError(
-                f"Unknown model directory name {name}. Must be one of {list(transformer_configs.keys())}."
+                f"Unknown model directory name {name}. Must be one of {known_model_params}."
             )
 
-        return cls(**transformer_configs[config[0]])
+        return ModelArgs.from_params(f"{config_dir}/{config[0]}.json")
 
-
-transformer_configs = {
-    "CodeLlama-7b-Python-hf": {
-        "block_size": 16384,
-        "vocab_size": 32000,
-        "n_layers": 32,
-        "dim": 4096,
-        "rope_base": 1000000,
-    },
-    "7B": {"n_layers": 32, "n_heads": 32, "dim": 4096},
-    "13B": {"n_layers": 40, "n_heads": 40, "dim": 5120},
-    "30B": {"n_layers": 60, "n_heads": 52, "dim": 6656},
-    "34B": {
-        "n_layers": 48,
-        "n_heads": 64,
-        "dim": 8192,
-        "vocab_size": 32000,
-        "n_local_heads": 8,
-        "hidden_dim": 22016,
-        "rope_base": 1000000,
-    },  # CodeLlama-34B-Python-hf
-    "70B": {
-        "n_layers": 80,
-        "n_heads": 64,
-        "dim": 8192,
-        "n_local_heads": 8,
-        "hidden_dim": 28672,
-    },
-    "Meta-Llama-3-8B": {
-        "dim": 4096,
-        "ffn_dim_multiplier": 1.3,
-        "multiple_of": 1024,
-        "n_heads": 32,
-        "n_local_heads": 8,  # n_kv_heads
-        "n_layers": 32,
-        "rope_base": 500000.0,  # rope_theta
-        "vocab_size": 128256,
-        "use_tiktoken": True,
-    },
-    "Mistral-7B": {
-        "n_layers": 32,
-        "n_heads": 32,
-        "n_local_heads": 8,
-        "dim": 4096,
-        "hidden_dim": 14336,
-        "vocab_size": 32000,
-    },
-    "stories15M": {"n_layers": 6, "n_heads": 6, "dim": 288},
-    "stories110M": {"n_layers": 12, "n_heads": 12, "dim": 768},
-}
 
 
 class KVCache(nn.Module):

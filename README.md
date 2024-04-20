@@ -1,17 +1,18 @@
-# Easy to Use LLM Runner for PC, Mobile and Embedded Devices
-Torchchat is an easy to use library for leveraging LLMs on edge devices including mobile phones and desktops.
+# Chat with LLMs Everywhere
+Torchchat is an easy-to-use library for running large language models (LLMs) on edge devices including mobile phones and desktops.
 
 ## Highlights
-- Command line interaction with popular LLMs such as Llama2, Llama3, Stories, Mistral and more
-  - Supporting both GGUF fp32/16 and the HF Format
-- Supports popular hardware/OS
+- Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
+  - Supporting both GGUF fp32/16 and the Hugging Face checkpoint format
+- PyTorch-native execution with performance
+- Supports popular hardware and OS
   - Linux (x86)
   - Mac OS (M1/M2/M3)
-  - Android (devices that handle XNNPACK)
-  - iOS 17+ (iPhone 13 pro+)
-- Multiple Data Types including: float32, float16, bfloat16
-- Multiple Quantization Schemes
-- Multiple Execution Modes including: Eager, AOTI and ExecuTorch
+  - Android (Devices that support XNNPACK)
+  - iOS 17+ (iPhone 13 Pro+)
+- Multiple data types including: float32, float16, bfloat16
+- Multiple quantization schemes
+- Multiple execution modes including: Eager, Compile, AOT Inductor (AOTI) and ExecuTorch
 
 ## Quick Start
 ### Initialize the Environment
@@ -51,7 +52,7 @@ To install `huggingface-cli`, run `pip install huggingface-cli`. After installin
 HuggingFace.
 
 ```
-python torchchat.py download llama2
+python torchchat.py download llama3
 ```
 
 ### Chat
@@ -73,7 +74,7 @@ For more information run `python torchchat.py generate --help`
 
 **Examples**
 ```
-python torchchat.py generate llama2 --device=cpu --dtype=fp16
+python torchchat.py generate llama3 --device=cpu --dtype=fp16 --tiktoken
 ```
 
 ### Export
@@ -93,7 +94,8 @@ Run a chatbot in your browser that’s supported by the model you specify in the
 **Examples**
 
 ```
-python torchchat.py browser --device cpu --checkpoint-path ${MODEL_PATH} --temperature 0 --num-samples 10
+
+python torchchat.py browser stories15M --device cpu --temperature 0 --num-samples 10
 ```
 
 *Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
@@ -108,22 +110,19 @@ For more information run `python torchchat.py eval --help`
 **Examples**
 Eager mode:
 ```
-python torchchat.py eval --checkpoint-path ${MODEL_PATH} -d fp32 --limit 5
+python torchchat.py eval stories15M -d fp32 --limit 5
 ```
 
 To test the perplexity for lowered or quantized model, pass it in the same way you would to generate:
 
 ```
-python torchchat.py eval --pte-path stories15m.pte --params-table <params.json> --tokenizer-path <tokenizer.model> --limit 5
+python torchchat.py eval stories15M --pte-path stories15M.pte --limit 5
 ```
 ## Models
 These are the supported models
 | Model | Mobile Friendly | Notes |
 |------------------|---|---------------------|
-|[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
-|[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
-|[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
-|[openlm-research/open_llama_7b](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅||
 |[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|✅||
 |[meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|||
 |[meta-llama/Llama-2-70b-chat-hf](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf)|||
@@ -132,7 +131,10 @@ These are the supported models
 |[mistralai/Mistral-7B-v0.1](https://huggingface.co/mistralai/Mistral-7B-v0.1)|✅||
 |[mistralai/Mistral-7B-Instruct-v0.1](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1)|✅||
 |[mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)|✅||
-|[meta-llama/Llama3](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅||
+|[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[openlm-research/open_llama_7b](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
 
 See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
 
@@ -157,16 +159,14 @@ AOT compiles models into machine code before execution, enhancing performance an
 **Examples**
 The following example uses the Stories15M model.
 ```
-TODO: Update after the CLI gets fixed. Use real paths so user can copy paste
-
 # Compile
-python torchchat export --checkpoint-path ${MODEL_PATH} --device {cuda,cpu} --output-dso-path ${MODEL_OUT}/${MODEL_NAME}.so
+python torchchat.py export stories15M --device cpu --output-dso-path stories15M.so
 
 # Execute
-python torchchat generate --device {cuda,cpu} --dso-path ${MODEL_OUT}/${MODEL_NAME}.so --prompt "Hello my name is"
+python torchchat.py generate --device cpu --dso-path stories15M.so --prompt "Hello my name is"
 ```
 
-NOTE: The exported model will be large. We suggest you quantize the model, explained further down, before deploying the model for use.
+NOTE: The exported model will be large. We suggest you quantize the model, explained further down, before deploying the model on device.
 
 ### ExecuTorch
 ExecuTorch enables you to optimize your model for execution on a mobile or embedded device

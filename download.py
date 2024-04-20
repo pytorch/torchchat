@@ -23,7 +23,7 @@ def _download_and_convert_hf_snapshot(
     from huggingface_hub import snapshot_download
 
     # Download and store the HF model artifacts.
-    print(f"Downloading {model} from HuggingFace...")
+    print(f"Downloading {model} from Hugging Face...")
     try:
         snapshot_download(
             model,
