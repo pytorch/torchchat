@@ -125,7 +125,8 @@ if __name__ == "__main__":
             else:
                 i += 1
 
-        args_plus_chat = ['"{}"'.format(s) for s in sys.argv[2:]] + ["\"--chat\""]
+        # Construct arguments for the flask app minus 'browser' command plus '--chat'
+        args_plus_chat = ['"{}"'.format(s) for s in sys.argv[1:] if s != "browser"] + ['"--chat"']
         formatted_args = ", ".join(args_plus_chat)
         command = ["flask", "--app", "chat_in_browser:create_app(" + formatted_args + ")", "run", "--port", f"{port}"]
         subprocess.run(command)
