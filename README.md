@@ -109,14 +109,13 @@ For more information run `python torchchat.py eval --help`
 **Examples**
 Eager mode:
 ```
-# Eval example for Mac with some parameters
-python -m torchchat.py eval --device cuda --checkpoint-path ${MODEL_PATH} -d fp32 --limit 5
+python torchchat.py eval --checkpoint-path ${MODEL_PATH} -d fp32 --limit 5
 ```
 
-To test the perplexity for lowered or quantized model, pass it in the same way you would to generate.py:
+To test the perplexity for lowered or quantized model, pass it in the same way you would to generate:
 
 ```
-python3 -m torchchat.py eval --pte <pte> -p <params.json> -t <tokenizer.model> --limit 5
+python torchchat.py eval --pte-path stories15m.pte --params-table <params.json> --tokenizer-path <tokenizer.model> --limit 5
 ```
 ## Models
 These are the supported models
