@@ -273,6 +273,7 @@ def generate(
     max_seq_length = (
         max_seq_length + speculate_k + 1 if is_speculative else max_seq_length
     )
+    model = model.to(device=device)
     with torch.device(device):
         model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
         if is_speculative and draft_model is not model:
@@ -402,7 +403,7 @@ def _main(
     tokenizer = _initialize_tokenizer(tokenizer_args)
 
     builder_args.setup_caches = False
-    model = _initialize_model(builder_args, quantize)
+    model = _initialize_model(builder_args, quantize, tokenizer)
     validate_args(model, tokenizer_args)
 
     # will add a version of _initialize_model in future
