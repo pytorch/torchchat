@@ -728,6 +728,7 @@ jobs:
           echo "Intalling pip packages"
           pip install -r requirements.txt
 
+          export CMAKE_OSX_DEPLOYMENT_TARGET=12.0
           export TORCHCHAT_ROOT=${PWD}
           export ENABLE_ET_PYBIND=false
           ./scripts/install_et.sh $ENABLE_ET_PYBIND
