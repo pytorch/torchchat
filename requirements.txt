@@ -30,3 +30,6 @@ zstd
 
 # Browser mode
 flask
+
+# HQQ quantizer
+hqq
