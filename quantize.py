@@ -384,6 +384,7 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
         self,
         mod,
         device,
+        tokenizer = None,
         *,
         node_type: str = "*",
         bitwidth: Optional[int] = None,
@@ -552,6 +553,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
         self,
         mod,
         device,
+        tokenizer = None,
         *,
         bitwidth: int = 8,
         groupsize: Optional[int] = None,
@@ -806,7 +808,7 @@ def replace_linear_int4(
 
 class WeightOnlyInt4QuantHandler(QuantHandler):
     def __init__(
-        self, mod, device, *, groupsize=128, inner_k_tiles=8, padding_allowed=True
+            self, mod, device, tokenizer=None, *, groupsize=128, inner_k_tiles=8, padding_allowed=True
     ):
         self.mod = mod
         self.device = device
@@ -1120,8 +1122,8 @@ class GPTQQuantHandler(QuantHandler):
 class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
     def __init__(self,
         mod,
-        tokenizer,
         device,
+        tokenizer,
         *,
         groupsize=128,
         inner_k_tiles=8,
@@ -1213,7 +1215,7 @@ class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
 
 
 class WeightOnlyInt4HqqQuantHandler:
-    def __init__(self, mod, device, *, groupsize):
+    def __init__(self, mod, device, tokenizer = None, *, groupsize):
         self.mod = mod
         self.device = device
         self.groupsize = groupsize
@@ -1238,7 +1240,7 @@ class WeightOnlyInt4HqqQuantHandler:
         # we use Int4 packaged in an int8 for now, packing to follow
         # return WeightOnlyInt4QuantHandler(self.mod, self.groupsize).create_quantized_state_dict()
         return WeightOnlyInt8QuantHandler(
-            self.mod, self.device, bitwidth=4, groupsize=self.groupsize
+            self.mod, self.device, tokenizer=None, bitwidth=4, groupsize=self.groupsize
         ).create_quantized_state_dict()
 
     def convert_for_runtime(self):
@@ -1246,7 +1248,7 @@ class WeightOnlyInt4HqqQuantHandler:
         # ALSO: all code must work for CPU, CUDA, MPS
         # return WeightOnlyInt4GPTQQuantHandler(self.mod, self.groupsize).convert_for_runtime()
         return WeightOnlyInt4GPTQQuantHandler(
-            self.mod, self.device, bitwidth=4, groupsize=self.groupsize
+            self.mod, self.device, tokenizer=None, bitwidth=4, groupsize=self.groupsize
         ).convert_for_runtime()
 
     def quantized_model(self) -> nn.Module:
