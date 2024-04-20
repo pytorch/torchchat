@@ -6,6 +6,8 @@
 import json
 from dataclasses import dataclass
 from typing import Dict, Optional
+from pathlib import Path
+import os
 
 import torch
 import torch.nn as nn
@@ -20,6 +22,8 @@ def find_multiple(n: int, k: int) -> int:
         return n
     return n + k - (n % k)
 
+config_dir = f"{str(Path(__file__).parent)}/known_model_params"
+config_path = Path(config_dir)
 
 @dataclass
 class ModelArgs:
@@ -71,20 +75,20 @@ class ModelArgs:
     @classmethod
     def from_table(cls, name: str):
         print(f"name {name}")
-        config_path = Path(f"{__file__}/known_model_params/{name}.json")
-        if config_path.is_file():
-            return self.from_params(config_path)
+        json_path = Path(f"{config_dir}/{name}.json")
+        if json_path.is_file():
+            return ModelArgs.from_params(json_path)
         else:
-            config_dir = f"{__file__}/known_model_params""
+            config_dir = f"{__file__}/known_model_params"
             known_model_params = [config.replace(".json", "") for config in os.listdir(config_dir)]
             raise RuntimeError(f"unknown table index {name} for transformer config, must be from {known_model_params}")
 
     @classmethod
     def from_name(cls, name: str):
         print(f"name {name}")
-        config_dir = f"{__file__}/known_model_params""
-        if Path(f"{config_dir}/{name}.json").is_file():
-            return self.from_params(config_path)
+        json_path=f"{config_dir}/{name}.json"
+        if Path(json_path).is_file():
+            return ModelArgs.from_params(json_path)
 
         known_model_params = [config.replace(".json", "") for config in os.listdir(config_dir)]
 
@@ -92,9 +96,8 @@ class ModelArgs:
         # fuzzy search
         config = [
             config
-            for config in in known_model_params
+            for config in known_model_params
             if config.replace in str(name).upper() or config in str(name)
-            )
         ]
 
         # We may have two or more configs matched (e.g. "7B" and "Mistral-7B"). Find the best config match,
@@ -109,7 +112,7 @@ class ModelArgs:
                 f"Unknown model directory name {name}. Must be one of {known_model_params}."
             )
 
-        return self.from_params(f"{config_dir}/{config[0]}.json")
+        return ModelArgs.from_params(f"{config_dir}/{config[0]}.json")
 
 
 
