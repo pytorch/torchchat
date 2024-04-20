@@ -117,7 +117,7 @@ jobs:
       matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
       fail-fast: false
     with:
-      runner: linux.g5.12xlarge.nvidia.gpu
+      runner: ${{ matrix.runner }}
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
       script: |

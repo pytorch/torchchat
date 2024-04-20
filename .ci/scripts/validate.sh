@@ -25,7 +25,15 @@ function generate_compiled_model_output() {
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
 
-    for DTYPE in bfloat16 float16 float32; do
+    if [[ $CHECKPOINT_PATH != *"stories"* && $TARGET_DEVICE == "cuda" ]]; then
+        DTYPES="bfloat16"
+        EXCLUDE_INT8_QUANT=true
+    else
+        DTYPES="float32 bfloat16 float16"
+        EXCLUDE_INT8_QUANT=false
+    fi
+
+    for DTYPE in $DTYPES; do
         echo ""############### Run inference with torch.compile for dtype $DTYPE "###############"
         echo ""
         echo "******************************************"
@@ -66,21 +74,23 @@ function generate_compiled_model_output() {
         python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
         cat "$MODEL_DIR/output_compiled"
 
-        echo "******************************************"
-        echo "******* INT8 channel-wise quantized ******"
-        echo "******************************************"
-        python3 -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
-        cat "$MODEL_DIR/output_eager"
-        python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-        cat "$MODEL_DIR/output_compiled"
+        if [ "$EXCLUDE_INT8_QUANT" = false ]; then
+            echo "******************************************"
+            echo "******* INT8 channel-wise quantized ******"
+            echo "******************************************"
+            python3 -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
+            cat "$MODEL_DIR/output_eager"
+            python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
+            cat "$MODEL_DIR/output_compiled"
 
-        echo "******************************************"
-        echo "******** INT8 group-wise quantized *******"
-        echo "******************************************"
-        python3 -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
-        cat "$MODEL_DIR/output_eager"
-        python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-        cat "$MODEL_DIR/output_compiled"
+            echo "******************************************"
+            echo "******** INT8 group-wise quantized *******"
+            echo "******************************************"
+            python3 -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
+            cat "$MODEL_DIR/output_eager"
+            python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
+            cat "$MODEL_DIR/output_compiled"
+        fi
 
         echo "******************************************"
         echo "******** INT4 group-wise quantized *******"
@@ -98,7 +108,15 @@ function generate_aoti_model_output() {
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
 
-    for DTYPE in bfloat16 float16 float32; do
+    if [[ $CHECKPOINT_PATH != *"stories"* && $TARGET_DEVICE == "cuda" ]]; then
+        DTYPES="bfloat16"
+        EXCLUDE_INT8_QUANT=true
+    else
+        DTYPES="float32 bfloat16 float16"
+        EXCLUDE_INT8_QUANT=false
+    fi
+
+    for DTYPE in $DTYPES; do
         echo ""############### Run inference with AOT Inductor  for dtype $DTYPE "###############"
         echo ""
         echo "******************************************"
@@ -136,19 +154,21 @@ function generate_aoti_model_output() {
         python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
         cat "$MODEL_DIR/output_aoti"
 
-        echo "******************************************"
-        echo "******* INT8 channel-wise quantized ******"
-        echo "******************************************"
-        python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-        python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-        cat "$MODEL_DIR/output_aoti"
+        if [ "$EXCLUDE_INT8_QUANT" = false ]; then
+            echo "******************************************"
+            echo "******* INT8 channel-wise quantized ******"
+            echo "******************************************"
+            python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+            python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
+            cat "$MODEL_DIR/output_aoti"
 
-        echo "******************************************"
-        echo "******** INT8 group-wise quantized *******"
-        echo "******************************************"
-        python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-        python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-        cat "$MODEL_DIR/output_aoti"
+            echo "******************************************"
+            echo "******** INT8 group-wise quantized *******"
+            echo "******************************************"
+            python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+            python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
+            cat "$MODEL_DIR/output_aoti"
+        fi
 
         echo "******************************************"
         echo "******** INT4 group-wise quantized *******"
