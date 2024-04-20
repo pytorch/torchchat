@@ -13,6 +13,8 @@ from typing import Dict, Optional, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchao.quantization.quant_api as quant_api
+    
 
 
 
@@ -103,13 +105,11 @@ class QuantHandler:
 ###          QuantHandler wrapper for a8w4dq from torchao             ###
 
 class Int8DynActInt4WeightQuantizer(QuantHandler):
-    from torchao.quantization.quant_api import Int8DynActInt4WeightQuantizer as aoInt8DynActInt4WeightQuantizer
-    
     def __init__(self, mod, device = "cpu", tokenizer = None, **kwargs):
         self.mod = mod
         self.device = device
         self.tokenizer = tokenizer
-        self.quantizer = aoInt8DynActInt4WeightQuantizer(**kwargs)
+        self.quantizer = quant_api.Int8DynActInt4WeightQuantizer(**kwargs)
             
     def create_quantized_state_dict(self) -> Dict:  # "StateDict"
         pass
