@@ -57,11 +57,11 @@ jobs:
           echo "**********************************************"
           echo "******** INT4 HQQ group-wise quantized *******"
           echo "**********************************************"
-          python generate.py --dtype ${DTYPE} --device cuda --quant '{"linear:hqq" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+          python generate.py --dtype ${DTYPE} --device cuda --quant '{"linear:hqq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
           cat ./output_eager
-          python generate.py --dtype ${DTYPE} --device cuda --compile --quant '{"linear:hqq" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
+          python generate.py --dtype ${DTYPE} --device cuda --compile --quant '{"linear:hqq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
           cat ./output_compiled
-          python export.py --dtype ${DTYPE} --device cuda --quant '{"linear:hqq" : {"group_size": 32}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+          python export.py --dtype ${DTYPE} --device cuda --quant '{"linear:hqq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
           python generate.py --dtype ${DTYPE} --device cuda --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
           cat ./output_aoti
 

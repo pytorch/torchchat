@@ -1228,7 +1228,7 @@ class WeightOnlyInt4HqqQuantHandler:
                             *Quantizer.quantize(
                                 child.weight,
                                 nbits=4,
-                                groupsize=self.groupsize,
+                                group_size=self.groupsize,
                                 axis=1,
                             )
                         )
