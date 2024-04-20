@@ -214,10 +214,10 @@ def add_arguments(parser):
         help="Verbose output",
     )
     parser.add_argument(
-        "--quantize",
-        type=str,
-        default="{ }",
-        help="Quantization options",
+        "--quantize", type=str, default="{ }", help=(
+            'Quantization options. pass in as {"<mode>" : {"<argname1>" : <argval1>, "<argname2>" : <argval2>,...},} '+
+            'modes are: embedding, linear:int8, linear:int4, linear:int4-gptq, linear:int4-hqq, linear:a8w4dq, precision.'
+        )
     )
     parser.add_argument(
         "--params-table",
@@ -235,7 +235,7 @@ def add_arguments(parser):
         "--tasks",
         nargs="+",
         type=str,
-        default=["hellaswag"],
+        default=["wikitext"],
         help="List of lm-eluther tasks to evaluate. Usage: --tasks task1 task2",
     )
     parser.add_argument(

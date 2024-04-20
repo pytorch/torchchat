@@ -28,8 +28,6 @@ from cli import (
 from download import download_and_convert, is_model_downloaded
 from generate import encode_tokens, model_forward
 
-from quantize import set_precision
-
 torch._dynamo.config.automatic_dynamic_shapes = True
 torch._inductor.config.triton.unique_kernel_names = True
 torch._inductor.config.epilogue_fusion = False
@@ -109,7 +107,7 @@ class GPTFastEvalWrapper(eval_wrapper):
         max_seq_length: Optional[int] = None,
         device = "cpu"
     ):
-        super().__init__()
+        super().__init__(device=device)
         self._model = model
         self._tokenizer = tokenizer
         self._device = torch.device(device)
@@ -191,7 +189,7 @@ def eval(
         eval_results (dict): A dictionary of evaluation results for the specified task(s).
     """
     if tasks is None:
-        tasks = ["hellaswag"]
+        tasks = ["wikitext"]
 
     model_eval_wrapper = GPTFastEvalWrapper(
         model,
@@ -240,9 +238,11 @@ def main(args) -> None:
     device = args.device
     tasks = args.tasks
     limit = args.limit
+    compile = args.compile
     max_seq_length = args.max_seq_length
 
     print(f"Using device={device}")
+    from quantize import set_precision
     set_precision(builder_args.precision)
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
@@ -250,6 +250,7 @@ def main(args) -> None:
     model = _initialize_model(
         builder_args,
         quantize,
+        tokenizer,
     )
     validate_args(model, tokenizer_args)
 
@@ -265,7 +266,7 @@ def main(args) -> None:
 
     t1 = time.time()
     result = eval(
-        model,
+        model.to(device),
         tokenizer,
         tasks,
         limit,
