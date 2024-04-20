@@ -30,10 +30,10 @@ def create_app(*args):
             output += line.decode('utf-8').strip() + "\n"
         return render_template('chat.html', convo="Hello! What is your prompt?", disable_input=disable_input)
 
-    @app.route('/chat', methods=['POST'])
+    @app.route('/chat', methods=['GET', 'POST'])
     def chat():
         # Retrieve the HTTP POST request parameter value from 'request.form' dictionary
-        _prompt = request.form.get('prompt')
+        _prompt = request.form.get('prompt', '')
         proc.stdin.write((_prompt + "\n").encode('utf-8'))
         proc.stdin.flush()
 
