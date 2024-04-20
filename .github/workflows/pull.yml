@@ -734,7 +734,7 @@ jobs:
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           # python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
           # python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
-	  xcodebuild -alltargets -sdk macosx10.14
+          xcodebuild -alltargets -sdk macosx10.14
           cmake -S ./runner-et -B et-build/cmake-out -G Ninja
           cmake --build ./et-build/cmake-out
       - name: Download checkpoints
