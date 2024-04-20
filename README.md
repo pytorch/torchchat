@@ -93,7 +93,6 @@ Run a chatbot in your browser that’s supported by the model you specify in the
 **Examples**
 
 ```
-# Run torchchat with --browser
 python torchchat.py browser --device cpu --checkpoint-path ${MODEL_PATH} --temperature 0 --num-samples 10
 ```
 
