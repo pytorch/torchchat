@@ -107,11 +107,12 @@ class GPTFastEvalWrapper(eval_wrapper):
         model: Transformer,
         tokenizer,
         max_seq_length: Optional[int] = None,
+        device = "cpu"
     ):
         super().__init__()
         self._model = model
         self._tokenizer = tokenizer
-        self._device = torch.device("cuda")
+        self._device = torch.device(device)
         self._max_seq_length = 2048 if max_seq_length is None else max_seq_length
 
     @property
@@ -174,6 +175,7 @@ def eval(
     tasks: Optional[list] = None,
     limit: Optional[int] = None,
     max_seq_length: Optional[int] = None,
+    device: str = "cpu"
 ) -> dict:
     """
     Evaluates a language model on a specified task using the lm-evaluation-harness library.
@@ -195,6 +197,7 @@ def eval(
         model,
         tokenizer,
         max_seq_length,
+        device=device
     )
 
     try:
@@ -267,6 +270,7 @@ def main(args) -> None:
         tasks,
         limit,
         max_seq_length,
+        device=builder_args.device,
     )
     print(f"Time to run eval: {time.time() - t1:.02f} seconds.")
     if builder_args.dso_path:
