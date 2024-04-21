@@ -11,5 +11,7 @@ Once you can run the app on you device,
 3 - select the tokenizer and model with the `(...)` control (bottom left of screen, to the left of the text entrybox)
 
 
-Detailed step by step in conjunction with ET iOS build, to run on
+Detailed step by step in conjunction with ExecuTorch iOS build, to run on
 simulator for iOS.
+
+<A HREF=https://github.com/pytorch/executorch/blob/main/docs/source/_static/img/llama_ios_app.png>torchchat on iOS</A>
