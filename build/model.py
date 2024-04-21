@@ -4,25 +4,21 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 import json
-from dataclasses import dataclass
-from typing import Dict, Optional
-from pathlib import Path
 import os
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Dict, Optional
 
 import torch
 import torch.nn as nn
 
-from quantize import get_precision
 from torch import Tensor
 from torch.nn import functional as F
 
-
-def find_multiple(n: int, k: int) -> int:
-    if n % k == 0:
-        return n
-    return n + k - (n % k)
+from build.utils import find_multiple, get_precision
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
+
 
 @dataclass
 class ModelArgs:
@@ -77,17 +73,23 @@ class ModelArgs:
         if json_path.is_file():
             return ModelArgs.from_params(json_path)
         else:
-            known_model_params = [config.replace(".json", "") for config in os.listdir(config_path)]
-            raise RuntimeError(f"unknown table index {name} for transformer config, must be from {known_model_params}")
+            known_model_params = [
+                config.replace(".json", "") for config in os.listdir(config_path)
+            ]
+            raise RuntimeError(
+                f"unknown table index {name} for transformer config, must be from {known_model_params}"
+            )
 
     @classmethod
     def from_name(cls, name: str):
         print(f"name {name}")
-        json_path=config_path / f"{name}.json"
+        json_path = config_path / f"{name}.json"
         if Path(json_path).is_file():
             return ModelArgs.from_params(json_path)
 
-        known_model_params = [config.replace(".json", "") for config in os.listdir(config_path)]
+        known_model_params = [
+            config.replace(".json", "") for config in os.listdir(config_path)
+        ]
 
         print(f"known configs: {known_model_params}")
         # Fuzzy search by name (e.g. "7B" and "Mistral-7B")
@@ -97,8 +99,9 @@ class ModelArgs:
             if config in str(name).upper() or config in str(name)
         ]
 
-        # We may have two or more configs matched (e.g. "7B" and "Mistral-7B"). Find the best config match,
-        # take longer name (as it have more symbols matched)
+        # We may have two or more configs matched (e.g., "7B" and
+        # "Mistral-7B"). Find the best config match:  take longer
+        # name (as it have more symbols matched)
         if len(config) > 1:
             config.sort(key=len, reverse=True)
             assert len(config[0]) != len(
@@ -113,7 +116,14 @@ class ModelArgs:
 
 
 class KVCache(nn.Module):
-    def __init__(self, max_batch_size, max_seq_length, n_heads, head_dim, dtype=None):
+    def __init__(
+        self,
+        max_batch_size,
+        max_seq_length,
+        n_heads,
+        head_dim,
+        dtype=None,
+    ):
         super().__init__()
         if not dtype:
             dtype = get_precision()
