@@ -12,8 +12,10 @@ import torch
 # CPU is always available and also exportable to ExecuTorch
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
+
 def check_args(args, name: str) -> None:
     pass
+
 
 def add_arguments_for_chat(parser):
     # Only chat specific options should be here
@@ -24,10 +26,7 @@ def add_arguments_for_browser(parser):
     # Only browser specific options should be here
     _add_arguments_common(parser)
     parser.add_argument(
-        "--port",
-        type=int,
-        default=5000,
-        help="Port for the web server in browser mode"
+        "--port", type=int, default=5000, help="Port for the web server in browser mode"
     )
     _add_arguments_common(parser)
 
@@ -122,10 +121,7 @@ def add_arguments(parser):
         help="Top-k for sampling",
     )
     parser.add_argument(
-        "--temperature",
-        type=float,
-        default=0.8,
-        help="Temperature for sampling"
+        "--temperature", type=float, default=0.8, help="Temperature for sampling"
     )
     parser.add_argument(
         "--compile",
@@ -204,20 +200,25 @@ def add_arguments(parser):
         help="Use the specified ExecuTorch .pte model file",
     )
     parser.add_argument(
-        "-d", "--dtype",
+        "-d",
+        "--dtype",
         default="float32",
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
     parser.add_argument(
-        "-v", "--verbose",
+        "-v",
+        "--verbose",
         action="store_true",
         help="Verbose output",
     )
     parser.add_argument(
-        "--quantize", type=str, default="{ }", help=(
-            'Quantization options. pass in as {"<mode>" : {"<argname1>" : <argval1>, "<argname2>" : <argval2>,...},} '+
-            'modes are: embedding, linear:int8, linear:int4, linear:int4-gptq, linear:int4-hqq, linear:a8w4dq, precision.'
-        )
+        "--quantize",
+        type=str,
+        default="{ }",
+        help=(
+            'Quantization options. pass in as {"<mode>" : {"<argname1>" : <argval1>, "<argname2>" : <argval2>,...},} '
+            + "modes are: embedding, linear:int8, linear:int4, linear:int4-gptq, linear:int4-hqq, linear:a8w4dq, precision."
+        ),
     )
     parser.add_argument(
         "--params-table",
