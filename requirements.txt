@@ -1,7 +1,6 @@
 # Requires python >=3.10
 
 # PyTorch ecosystem
-torch
 torchao
 executorch
 
