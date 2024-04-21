@@ -82,8 +82,9 @@ def download_and_convert(
 def is_model_downloaded(model: str, models_dir: Path) -> bool:
     model_config = resolve_model_config(model)
 
+    # Check if the model directory exists and is not empty.
     model_dir = models_dir / model_config.name
-    return os.path.isdir(model_dir)
+    return os.path.isdir(model_dir) and os.listdir(model_dir)
 
 
 def main(args):
