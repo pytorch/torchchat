@@ -217,3 +217,11 @@ Install [ExecuTorch](https://pytorch.org/executorch/stable/getting-started-setup
 Read the [iOS documentation](docs/iOS.md) for more details on iOS.
 
 Read the [Android documentation](docs/Android.md) for more details on Android.
+
+## Acknowledgements
+Thank you to the [community](docs/ACKNOWLEDGEMENTS.md) for all the awesome libraries and tools
+you've built around local LLM inference.
+
+## License
+Torchchat is released under the [BSD 3 license](LICENSE). However you may have other legal obligations
+that govern your use of content, such as the terms of service for third-party models.
