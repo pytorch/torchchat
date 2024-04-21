@@ -46,7 +46,7 @@ python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, 
 
 ```
 
-Then, export as follows with Executorch:
+Then, export as follows with ExecuTorch:
 ```
 python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
 ```
@@ -127,7 +127,7 @@ We can do this in eager mode (optionally with torch.compile), we use the linear:
 python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
 ```
 
-Then, export as follows using Executorch for mobile backends:
+Then, export as follows using ExecuTorch for mobile backends:
 
 ```
 python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte
@@ -157,7 +157,7 @@ We can do this in eager mode (optionally with torch.compile), we use the linear:
 ```
 python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
 ```
-Then, export as follows using Executorch:
+Then, export as follows using ExecuTorch:
 
 ```
 python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte

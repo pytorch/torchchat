@@ -2,7 +2,7 @@
 
 Check out the [tutorial on how to build an Android app running your
 PyTorch models with
-Executorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html),
+ExecuTorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html),
 and give your torchat models a spin.
 
 ![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png "Android app running Llama model")

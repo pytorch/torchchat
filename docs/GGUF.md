@@ -27,7 +27,7 @@ export GGUF_PTE_PATH=/tmp/gguf_model.pte
 python torchchat.py generate --gguf-path ${GGUF_MODEL_PATH} --tokenizer-path ${GGUF_TOKENIZER_PATH} --temperature 0 --prompt "In a faraway land" --max-new-tokens 20
 ```
 
-### Executorch export + generate
+### ExecuTorch export + generate
 ```
 # Convert the model for use
 python torchchat.py export --gguf-path ${GGUF_MODEL_PATH} --output-pte-path ${GGUF_PTE_PATH}
