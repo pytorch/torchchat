@@ -1299,16 +1299,14 @@ class WeightOnlyInt4HqqQuantHandler:
                             *Quantizer.quantize(
                                 child.weight,
                                 nbits=4,
-                                groupsize=self.groupsize,
+                                group_size=self.groupsize,
                                 axis=1,
                             )
                         )
                     )
 
-        # we use Int4 packaged in an int8 for now, packing to follow
-        # return WeightOnlyInt4QuantHandler(self.mod, self.groupsize).create_quantized_state_dict()
-        return WeightOnlyInt8QuantHandler(
-            self.mod, self.device, tokenizer=None, bitwidth=4, groupsize=self.groupsize
+        return WeightOnlyInt4QuantHandler(
+            self.mod, self.device, groupsize=self.groupsize
         ).create_quantized_state_dict()
 
     def convert_for_runtime(self):
@@ -1316,7 +1314,7 @@ class WeightOnlyInt4HqqQuantHandler:
         # ALSO: all code must work for CPU, CUDA, MPS
         # return WeightOnlyInt4GPTQQuantHandler(self.mod, self.groupsize).convert_for_runtime()
         return WeightOnlyInt4GPTQQuantHandler(
-            self.mod, self.device, tokenizer=None, bitwidth=4, groupsize=self.groupsize
+            self.mod, self.device, tokenizer=None, groupsize=self.groupsize
         ).convert_for_runtime()
 
     def quantized_model(self) -> nn.Module:
@@ -1325,8 +1323,6 @@ class WeightOnlyInt4HqqQuantHandler:
         self.mod.load_state_dict(model_updated_state_dict)
         return self.mod
 
-
-##################################################################
 
 ##########################################################################
 ###                  process quantization dictionary                   ###
