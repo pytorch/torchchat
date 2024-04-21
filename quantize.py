@@ -552,17 +552,16 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
         *,
         bitwidth: int = 8,
         groupsize: Optional[int] = None,
-        packed=False,
+        packed=True,
     ):
+        # when quantization dictionary comes from JSON, packed is a string
         if isinstance(packed, str):
-            packed = packed == "True"
+            packed = packed.lower() != "false"
         self.model_ = model
         self.device = device
         self.groupsize = groupsize
         self.bitwidth = bitwidth
         self.packed = packed
-        if (bitwidth != 4) and packed:
-            raise RuntimeError("pack only works with bitsize 4")
 
     @torch.no_grad()
     def create_quantized_state_dict(self, packed=False) -> Dict:
