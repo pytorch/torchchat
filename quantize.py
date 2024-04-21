@@ -4,6 +4,8 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
+from __future__ import annotations
+
 import json
 from functools import reduce
 from math import gcd
@@ -12,7 +14,7 @@ from typing import Dict, Optional, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import torchao.quantization.quant_api as quant_api
 
 
 ##########################################################################
@@ -49,11 +51,8 @@ name_to_dtype_dict = {
     "bfloat16": torch.bfloat16,
 }
 
-##########################################################################
-###                  process quantization dictionary                   ###
 
-
-def quantize_model(model: nn.Module, device, quantize_options, tokenizer = None):
+def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
     """
     Quantize the specified model using the quantizers described by
     a quantization dict of the form:
@@ -69,53 +68,77 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer = None)
         quantize_options = json.loads(quantize_options)
 
     for quantizer, q_kwargs in quantize_options.items():
-        if quantizer == "embedding":
-            model = EmbeddingOnlyInt8QuantHandler(
-                model, device, **q_kwargs
-            ).quantized_model()
-        elif linears_quantized:
-            assert 0 == 1, "can only specify one linear quantizer"
-        elif quantizer == "linear:int8":
-            linears_quantized = True
-            model = WeightOnlyInt8QuantHandler(
-                model, device, **q_kwargs
-            ).quantized_model()
-        elif quantizer == "linear:int4":
-            linears_quantized = True
-            model = WeightOnlyInt4QuantHandler(
-                model, device, **q_kwargs
-            ).quantized_model()
-        elif quantizer == "linear:a8w4dq":
-            linears_quantized = True
-            from torchao.quantization.quant_api import Int8DynActInt4WeightQuantizer
-            # Note that Int8DynActInt4WeightQuantizer takes precision as
-            # arg, which is used to determine the precision/dtype of the output
-            # That is, if dtype=fp32 than this dynamically quantized linear will
-            # return output tensor with fp32 dtype.
-            # Ideally we make this dynamic such that the output dtype is determined
-            # based on the input dtype, instead of having to instantiate quantizer
-            # that picks the output dtype.
-            # Since this require change in torchao, we leave the current state as is
-            # and use the default precision for Int8DynActInt4WeightQuantizer
-            # which is fp32.
-            assert 'groupsize' in list(q_kwargs.keys()), f"a8w4dq quantization option must specify groupsize. Specified options {q_kwargs}"
-            model = Int8DynActInt4WeightQuantizer(groupsize=q_kwargs['groupsize']
-            ).quantize(model)
-        elif quantizer == "linear:int4-gptq":
-            assert tokenizer is not None, "tokenizer required for linear:int4-gptq quantization"
-            linears_quantized = True
-            model = WeightOnlyInt4GPTQQuantHandler(
-                model, tokenizer, device, **q_kwargs
-            ).quantized_model()
-        elif quantizer == "linear:hqq":
-            linears_quantized = True
-            model = WeightOnlyInt4HqqQuantHandler(
-                model, device, **q_kwargs
-            ).quantized_model()
-        elif quantizer == "precision":
-            model.to(**q_kwargs)
-        else:
-            assert 0 == 1, f"quantizer {quantizer} not supported"
+        if not quantizer in quantizer_class_dict:
+            raise RuntimeError(f"unknown quantizer {quantizer} specified")
+
+        model = quantizer_class_dict[quantizer](
+            model, device, tokenizer, **q_kwargs
+        ).quantized_model()
+
+
+#########################################################################
+###                QuantHandler API definition                        ###
+###               (unify with torchao in future)                      ###
+
+
+class QuantHandler:
+    def __init__(self, mod, device="cpu", tokenizer=None):
+        self.mod = mod
+        self.device = device
+        self.tokenizer = tokenizer
+
+    def create_quantized_state_dict(self) -> Dict:  # "StateDict"
+        pass
+
+    def convert_for_runtime(self) -> nn.Module:
+        pass
+
+    def quantized_model(self) -> nn.Module:
+        model_updated_state_dict = self.create_quantized_state_dict()
+        self.convert_for_runtime()
+        self.mod.load_state_dict(model_updated_state_dict)
+        return self.mod
+
+
+#########################################################################
+###          QuantHandler wrapper for a8w4dq from torchao             ###
+
+
+class Int8DynActInt4WeightQuantizer(QuantHandler):
+    def __init__(self, mod, device="cpu", tokenizer=None, **kwargs):
+        self.mod = mod
+        self.device = device
+        self.tokenizer = tokenizer
+        self.quantizer = quant_api.Int8DynActInt4WeightQuantizer(**kwargs)
+
+    def create_quantized_state_dict(self) -> Dict:  # "StateDict"
+        pass
+
+    def convert_for_runtime(self) -> nn.Module:
+        pass
+
+    def quantized_model(self) -> nn.Module:
+        return self.quantizer.quantize(self.mod)
+
+
+#########################################################################
+###          QuantHandler wrapper for a8w4dq from torchao             ###
+
+
+class PrecisionHandler(QuantHandler):
+    def __init__(self, mod, device="cpu", tokenizer=None, **kwargs):
+        self.mod = mod
+        self.device = device
+        self.tokenizer = tokenizer
+
+    def create_quantized_state_dict(self) -> Dict:  # "StateDict"
+        pass
+
+    def convert_for_runtime(self) -> nn.Module:
+        pass
+
+    def quantized_model(self) -> nn.Module:
+        return self.model.to(device=device, **kwargs)
 
 
 #########################################################################
@@ -324,27 +347,6 @@ def group_dequantize_tensor(w_int32, scales_and_zeros, n_bit=4, groupsize=128):
 
 
 #########################################################################
-###                QuantHandler API definition                        ###
-
-
-class QuantHandler:
-    def __init__(self, mod):
-        self.mod = mod
-
-    def create_quantized_state_dict(self) -> Dict:  # "StateDict"
-        pass
-
-    def convert_for_runtime(self) -> nn.Module:
-        pass
-
-    def quantized_model(self) -> nn.Module:
-        model_updated_state_dict = self.create_quantized_state_dict()
-        self.convert_for_runtime()
-        self.mod.load_state_dict(model_updated_state_dict)
-        return self.mod
-
-
-#########################################################################
 #####          Weight-only int8 per-channel quantized code         ######
 
 
@@ -352,7 +354,7 @@ def replace_linear_weight_only_int8_per_channel(
     module, device, node_type, groupsize=None
 ):
     if groupsize is not None and groupsize != 0:
-        pass  # groupsize = 2 ** groupsize
+        pass
 
     for name, child in module.named_children():
         # print(f"name: {name}")
@@ -383,6 +385,7 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
         self,
         mod,
         device,
+        tokenizer=None,
         *,
         node_type: str = "*",
         bitwidth: Optional[int] = None,
@@ -501,8 +504,8 @@ class WeightOnlyInt8Linear(torch.nn.Module):
         scales = scales.view(scales.shape[0], -1)
         no_groups = scales.shape[1]
 
-        # need a formulation / custom op for good performance on both eager, CUDA compiled, CPU compiled and ET exported
-        # maybe use IR-based rewriting?
+        # need a formulation / custom op for good performance
+        # on eager, CUDA compiled, CPU compiled and ET exported
 
         # for now, we special-case channel-wise, because we know how to make that fast (but does not work for groupwise)
         if scales.shape[1] == 1:
@@ -551,6 +554,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
         self,
         mod,
         device,
+        tokenizer=None,
         *,
         bitwidth: int = 8,
         groupsize: Optional[int] = None,
@@ -581,7 +585,6 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 
         for fqn, mod in self.mod.named_modules():
             if isinstance(mod, nn.Embedding):
-                # print("****")
                 # print(f"Embedding identified: {fqn, mod}")
                 # print(f"weights size: {mod.weight.size()}")
                 # print(f"quantize {fqn}...")
@@ -805,7 +808,14 @@ def replace_linear_int4(
 
 class WeightOnlyInt4QuantHandler(QuantHandler):
     def __init__(
-        self, mod, device, *, groupsize=128, inner_k_tiles=8, padding_allowed=True
+        self,
+        mod,
+        device,
+        tokenizer=None,
+        *,
+        groupsize=128,
+        inner_k_tiles=8,
+        padding_allowed=True,
     ):
         self.mod = mod
         self.device = device
@@ -894,9 +904,7 @@ class WeightOnlyInt4Linear(torch.nn.Module):
         inner_k_tiles: int = 8,
     ) -> None:
         super().__init__()
-        self.padding = not _check_linear_int4_k(
-            in_features, groupsize, inner_k_tiles
-        )
+        self.padding = not _check_linear_int4_k(in_features, groupsize, inner_k_tiles)
         if self.padding:
             from build.model import find_multiple
 
@@ -926,7 +934,6 @@ class WeightOnlyInt4Linear(torch.nn.Module):
                 device=device,
             ),
         )
-        # MKG: torch.float
         self.register_buffer(
             "scales_and_zeros",
             torch.empty(
@@ -937,8 +944,6 @@ class WeightOnlyInt4Linear(torch.nn.Module):
         )
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
-        # MKG torch.float
-        # input = input.to(torch.float)
         if self.padding:
             import torch.nn.functional as F
 
@@ -951,7 +956,8 @@ class WeightOnlyInt4Linear(torch.nn.Module):
 #########################################################################
 #####                           GPTQ                                #####
 
-def _check_linear_int4_k(k, groupsize = 1, inner_k_tiles = 1):
+
+def _check_linear_int4_k(k, groupsize=1, inner_k_tiles=1):
     return k % groupsize == 0 and k % (inner_k_tiles * 16) == 0
 
 
@@ -1037,6 +1043,7 @@ class GPTQQuantHandler(QuantHandler):
         device,
     ) -> "MultiInput":
         from GPTQ import InputRecorder
+
         input_recorder = InputRecorder(
             model,
             tokenizer,
@@ -1047,14 +1054,17 @@ class GPTQQuantHandler(QuantHandler):
 
         try:
             import lm_eval
+
             lm_eval.tasks.initialize_tasks()
         except:
             pass
         from eval import get_task_dict
+
         task_dict = get_task_dict(calibration_tasks)
         print("Obtaining GPTQ calibration inputs on: ", calibration_tasks)
 
         from eval import evaluate
+
         evaluate(
             input_recorder,
             task_dict,
@@ -1093,6 +1103,7 @@ class GPTQQuantHandler(QuantHandler):
         )
         print("Tracing model for GPTQ")
         from GPTQ import GenericGPTQRunner
+
         GPTQ_runner = GenericGPTQRunner(
             self.mod,
             inputs,
@@ -1117,10 +1128,11 @@ class GPTQQuantHandler(QuantHandler):
 
 
 class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
-    def __init__(self,
+    def __init__(
+        self,
         mod,
-        tokenizer,
         device,
+        tokenizer,
         *,
         groupsize=128,
         inner_k_tiles=8,
@@ -1133,14 +1145,15 @@ class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
         pad_calibration_inputs=False,
     ):
         from build.model import find_multiple
+
         self.mod = mod
-        self.tokenizer=tokenizer
+        self.tokenizer = tokenizer
         self.device = device
         self.groupsize = groupsize
         self.inner_k_tiles = inner_k_tiles
         self.padding_allowed = padding_allowed
         self.blocksize = blocksize
-        self.percdamp=percdamp
+        self.percdamp = percdamp
         self.calibration_limit = calibration_limit
         self.calibration_tasks = calibration_tasks
         self.calibration_seq_length = calibration_seq_length
@@ -1186,7 +1199,11 @@ class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
 
     def convert_for_runtime(self):
         replace_linear_int4(
-            self.mod, self.device, self.groupsize, self.inner_k_tiles, self.padding_allowed
+            self.mod,
+            self.device,
+            self.groupsize,
+            self.inner_k_tiles,
+            self.padding_allowed,
         )
         return self.mod
 
@@ -1212,7 +1229,7 @@ class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
 
 
 class WeightOnlyInt4HqqQuantHandler:
-    def __init__(self, mod, device, *, groupsize):
+    def __init__(self, mod, device, tokenizer=None, *, groupsize):
         self.mod = mod
         self.device = device
         self.groupsize = groupsize
@@ -1237,7 +1254,7 @@ class WeightOnlyInt4HqqQuantHandler:
         # we use Int4 packaged in an int8 for now, packing to follow
         # return WeightOnlyInt4QuantHandler(self.mod, self.groupsize).create_quantized_state_dict()
         return WeightOnlyInt8QuantHandler(
-            self.mod, self.device, bitwidth=4, groupsize=self.groupsize
+            self.mod, self.device, tokenizer=None, bitwidth=4, groupsize=self.groupsize
         ).create_quantized_state_dict()
 
     def convert_for_runtime(self):
@@ -1245,7 +1262,7 @@ class WeightOnlyInt4HqqQuantHandler:
         # ALSO: all code must work for CPU, CUDA, MPS
         # return WeightOnlyInt4GPTQQuantHandler(self.mod, self.groupsize).convert_for_runtime()
         return WeightOnlyInt4GPTQQuantHandler(
-            self.mod, self.device, bitwidth=4, groupsize=self.groupsize
+            self.mod, self.device, tokenizer=None, bitwidth=4, groupsize=self.groupsize
         ).convert_for_runtime()
 
     def quantized_model(self) -> nn.Module:
@@ -1256,3 +1273,17 @@ class WeightOnlyInt4HqqQuantHandler:
 
 
 ##################################################################
+
+##########################################################################
+###                  process quantization dictionary                   ###
+
+# Map each quantizer configuration to a class implementing that quantizer
+quantizer_class_dict = {
+    "embedding": EmbeddingOnlyInt8QuantHandler,
+    "linear:int8": WeightOnlyInt8QuantHandler,
+    "linear:int4": WeightOnlyInt4QuantHandler,
+    "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
+    "linear:int4-gptq": WeightOnlyInt4GPTQQuantHandler,
+    "linear:hqq": WeightOnlyInt4HqqQuantHandler,
+    "precision": PrecisionHandler,
+}

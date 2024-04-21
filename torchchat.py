@@ -21,7 +21,7 @@ from cli import (
     check_args,
 )
 
-default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
+default_device = "cpu"
 
 
 if __name__ == "__main__":
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     i = 1
     while i < len(sys.argv):
         if sys.argv[i].startswith("-"):
-            flag_args += sys.argv[i:i+2]
+            flag_args += sys.argv[i : i + 2]
             i += 2
         else:
             positional_args.append(sys.argv[i])
@@ -102,6 +102,7 @@ if __name__ == "__main__":
         args.chat = True
         check_args(args, "chat")
         from generate import main as generate_main
+
         generate_main(args)
     elif args.command == "browser":
         # enable "chat" and "gui" when entering "browser"
@@ -115,35 +116,49 @@ if __name__ == "__main__":
         i = 2
         while i < len(sys.argv):
             # Check if the current argument is '--port'
-            if sys.argv[i] == '--port':
+            if sys.argv[i] == "--port":
                 # Check if there's a value immediately following '--port'
                 if i + 1 < len(sys.argv):
                     # Extract the value and remove '--port' and the value from sys.argv
                     port = sys.argv[i + 1]
-                    del sys.argv[i:i+2]  # Delete '--port' and the value
+                    del sys.argv[i : i + 2]  # Delete '--port' and the value
                     break  # Exit loop since port is found
             else:
                 i += 1
 
-        # Construct arguments for the flask app minus 'browser' command plus '--chat'
-        args_plus_chat = ['"{}"'.format(s) for s in sys.argv[1:] if s != "browser"] + ['"--chat"']
+        # Construct arguments for the flask app minus 'browser' command
+        # plus '--chat'
+        args_plus_chat = ['"{}"'.format(s) for s in sys.argv[1:] if s != "browser"] + [
+            '"--chat"'
+        ]
         formatted_args = ", ".join(args_plus_chat)
-        command = ["flask", "--app", "chat_in_browser:create_app(" + formatted_args + ")", "run", "--port", f"{port}"]
+        command = [
+            "flask",
+            "--app",
+            "chat_in_browser:create_app(" + formatted_args + ")",
+            "run",
+            "--port",
+            f"{port}",
+        ]
         subprocess.run(command)
     elif args.command == "download":
         check_args(args, "download")
         from download import main as download_main
+
         download_main(args)
     elif args.command == "generate":
         check_args(args, "generate")
         from generate import main as generate_main
+
         generate_main(args)
     elif args.command == "eval":
         from eval import main as eval_main
+
         eval_main(args)
     elif args.command == "export":
         check_args(args, "export")
         from export import main as export_main
+
         export_main(args)
     else:
         parser.print_help()

@@ -147,7 +147,9 @@ class TokenizerArgs:
             tokenizer_path = args.tokenizer_path
         elif args.model:  # Using a named, well-known model
             model_config = resolve_model_config(args.model)
-            tokenizer_path = Path(args.model_directory) / model_config.name / "tokenizer.model"
+            tokenizer_path = (
+                Path(args.model_directory) / model_config.name / "tokenizer.model"
+            )
         elif args.checkpoint_path:
             tokenizer_path = args.checkpoint_path.parent / "tokenizer.model"
         elif hasattr(args, "checkpoint_dir") and args.checkpoint_dir:
@@ -297,7 +299,7 @@ def _load_model(builder_args):
 def _initialize_model(
     builder_args,
     quantize,
-    tokenizer = None,
+    tokenizer=None,
 ):
     print("Loading model ...")
     t0 = time.time()
@@ -364,8 +366,10 @@ def _initialize_model(
 
     return model
 
+
 def tokenizer_setting_to_name(tiktoken: bool = False) -> str:
     return "TikToken" if tiktoken else "SentencePiece"
+
 
 def validate_args(model: Transformer, tokenizer_args: TokenizerArgs):
     use_tiktoken = model.config.use_tiktoken
@@ -374,7 +378,10 @@ def validate_args(model: Transformer, tokenizer_args: TokenizerArgs):
     if use_tiktoken is None:
         model.config.use_tiktoken = is_tiktoken
     elif use_tiktoken != is_tiktoken:
-        raise RuntimeError(f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}")
+        raise RuntimeError(
+            f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}"
+        )
+
 
 def resolve_model_name(model: str) -> str:
     # If the provided model name is an alias, retrieve the full path.

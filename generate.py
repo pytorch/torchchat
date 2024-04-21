@@ -21,17 +21,12 @@ from build.builder import (
     _initialize_model,
     _initialize_tokenizer,
     _load_model,
-    validate_args,
     BuilderArgs,
     TokenizerArgs,
+    validate_args,
 )
 from build.model import Transformer
-from cli import (
-    add_arguments,
-    add_arguments_for_generate,
-    arg_init,
-    check_args,
-)
+from cli import add_arguments, add_arguments_for_generate, arg_init, check_args
 from download import download_and_convert, is_model_downloaded
 from quantize import set_precision
 
@@ -108,7 +103,9 @@ def logits_to_probs(logits, temperature: float = 1.0, top_k: Optional[int] = Non
     return probs
 
 
-def sample(logits, need_probs: bool, temperature: float = 1.0,top_k: Optional[int] = None):
+def sample(
+    logits, need_probs: bool, temperature: float = 1.0, top_k: Optional[int] = None
+):
     if temperature == 0 and not need_probs:
         _, idx_next = torch.topk(logits, k=1, dim=-1)
         idx_next = idx_next.squeeze(dim=(0, 1))
@@ -144,7 +141,11 @@ def prefill(
 
 
 def decode_one_token(
-    model: Transformer, x: torch.Tensor, input_pos: torch.Tensor, need_probs: bool, **sampling_kwargs
+    model: Transformer,
+    x: torch.Tensor,
+    input_pos: torch.Tensor,
+    need_probs: bool,
+    **sampling_kwargs,
 ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
     # input_pos: [B, 1]
     assert input_pos.shape[-1] == 1
@@ -316,7 +317,7 @@ def generate(
             input_pos,
             max_new_tokens - 1,
             callback=callback,
-            need_probs = False,
+            need_probs=False,
             **sampling_kwargs,
         )
         seq[T + 1 :] = torch.cat(generated_tokens)

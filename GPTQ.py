@@ -14,8 +14,8 @@ from torch.utils._pytree import tree_flatten, tree_unflatten
 aten = torch.ops.aten
 
 from eval import (
+    GPTFastEvalWrapper,
     setup_cache_padded_seq_input_pos_max_seq_length_for_prefill,
-    GPTFastEvalWrapper
 )
 
 
@@ -63,7 +63,6 @@ class InputRecorder(GPTFastEvalWrapper):
                     "Did not find embeddings in model.transformer.wte, disabling padding"
                 )
                 self.pad_calibration_inputs = False
-
 
     def add_input(self, args):
         if self.inputs is None:
@@ -114,7 +113,6 @@ class InputRecorder(GPTFastEvalWrapper):
         )
 
 
-
 class MultiInput:
     def __init__(self, inputs):
         self.values = list(inputs)
@@ -127,7 +125,9 @@ class MultiInput:
         return MultiInput(self.values[slice])
 
     def cuda(self):
-        self.values = [val.cuda() if isinstance(val, torch.Tensor) else val for val in self.values]
+        self.values = [
+            val.cuda() if isinstance(val, torch.Tensor) else val for val in self.values
+        ]
 
 
 class GenericGPTQRunner(fx.Interpreter):
@@ -236,7 +236,14 @@ class GenericGPTQRunner(fx.Interpreter):
             )
             transposed_args = list(
                 zip(
-                    *[x.values if isinstance(x, MultiInput) else [x] * multi_input_count for x in flat_args]
+                    *[
+                        (
+                            x.values
+                            if isinstance(x, MultiInput)
+                            else [x] * multi_input_count
+                        )
+                        for x in flat_args
+                    ]
                 )
             )
         else:
@@ -245,8 +252,8 @@ class GenericGPTQRunner(fx.Interpreter):
 
         # check whether we apply GPTQ to this module
         quantize_linear = (
-            (target == aten.linear.default) # if its a linear
-            and id(args[1]) in self.id_to_name # and if we know the layer name
+            (target == aten.linear.default)  # if its a linear
+            and id(args[1]) in self.id_to_name  # and if we know the layer name
             and not skip_quant  # and if we weren't told to skip quantization
             # and if the skip_layer_func doesn't say we should skip
             and not (self.skip_layer_func is not None and self.skip_layer_func(args[1]))
@@ -334,11 +341,14 @@ class GenericGPTQRunner(fx.Interpreter):
                     target, (args[0][:2], DQ2, *args[2:]), kwargs, skip_quant=True
                 )
 
-                print("SQNR for output without GPTQ (should be less than above)",
-                    torch.cat([
+                print(
+                    "SQNR for output without GPTQ (should be less than above)",
+                    torch.cat(
+                        [
                             SQNR(old.cpu(), old_q.cpu()).unsqueeze(0)
                             for (old, old_q) in zip(old_out.values, old_q_out.values)
-                    ]).mean(),
+                        ]
+                    ).mean(),
                 )
             return new_out
 

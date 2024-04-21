@@ -23,7 +23,6 @@ def find_multiple(n: int, k: int) -> int:
     return n + k - (n % k)
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
-# config_path = Path(config_dir)
 
 @dataclass
 class ModelArgs:
@@ -42,7 +41,7 @@ class ModelArgs:
     multiple_of: int = 256
     ffn_dim_multiplier: Optional[int] = None
     use_tiktoken: Optional[bool] = None
-    
+
     def __post_init__(self):
         if self.n_local_heads == -1:
             self.n_local_heads = self.n_heads
@@ -58,9 +57,8 @@ class ModelArgs:
             self.hidden_dim = find_multiple(hidden_dim, multiple_of)
         self.head_dim = self.dim // self.n_heads
         if isinstance(self.use_tiktoken, str):
-            self.use_tiktoken = (self.use_tiktoken == "True")
+            self.use_tiktoken = self.use_tiktoken == "True"
 
-            
     @classmethod
     def from_params(cls, params_path):
         replace = [("rope_theta", "rope_base"), ("n_kv_heads", "n_local_heads")]
@@ -117,7 +115,6 @@ class ModelArgs:
 
 class KVCache(nn.Module):
     def __init__(self, max_batch_size, max_seq_length, n_heads, head_dim, dtype=None):
-        # torch.float): # bfloat16    ):
         super().__init__()
         if not dtype:
             dtype = get_precision()
@@ -179,11 +176,6 @@ class Transformer(nn.Module):
         self.register_buffer("causal_mask", causal_mask, persistent=True)
 
     def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
-        # print ("*")
-        # print (f"* shape idx: {idx.shape}")
-        # print (f"* shape pos: {input_pos.shape}")
-        # print("@")
-
         assert self.freqs_cis is not None, "Caches must be initialized first"
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
@@ -193,7 +185,7 @@ class Transformer(nn.Module):
             x = layer(x, input_pos, freqs_cis, mask)
         x = self.norm(x)
         logits = self.output(x)
-        # print(f"******** logits shape: {logits.shape}")
+        # print(f"logits shape: {logits.shape}")
         return logits
 
     @classmethod
@@ -359,7 +351,6 @@ class RMSNorm(nn.Module):
         return output * self.weight
 
 
-# transpsoed first two arguments to align with model in ET
 def precompute_freqs_cis(
     n_elem: int, seq_len: int, base: int = 10000, dtype=None
 ) -> Tensor:
@@ -372,7 +363,7 @@ def precompute_freqs_cis(
     freqs = torch.outer(t, freqs)
     freqs_cis = torch.polar(torch.ones_like(freqs), freqs)
     cache = torch.stack([freqs_cis.real, freqs_cis.imag], dim=-1)
-    return cache.to(dtype=dtype)  # bfloat16)
+    return cache.to(dtype=dtype)
 
 
 def apply_rotary_emb(x: Tensor, freqs_cis: Tensor) -> Tensor:
