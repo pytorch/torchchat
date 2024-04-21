@@ -1,9 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>torchchat</title>
-  </head>
+<head>
+  <meta charset="utf-8">
+  <title>torchchat</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<div class="logo-container">
+  <!--
+  <img src="{{ url_for('static', filename='https://upload.wikimedia.org/wikipedia/commons/1/10/PyTorch_logo_icon.svg') }}" alt="PyTorch Logo" class="logo">
+  -->
+  <img src="https://upload.wikimedia.org/wikipedia/commons/1/10/PyTorch_logo_icon.svg" alt="PyTorch Logo" class="logo">
+  <h1 class="chat-title">torchchat</h1>
+</div>
   <body>
     <pre>{{ convo }}</pre>
     <form action="chat" method="post">
