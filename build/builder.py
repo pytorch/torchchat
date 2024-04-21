@@ -14,6 +14,7 @@ from typing import Any, Dict, Optional, Union
 import torch
 import torch._dynamo.config
 import torch._inductor.config
+
 from config.model_config import resolve_model_config
 from quantize import name_to_dtype, quantize_model
 
@@ -76,6 +77,7 @@ class BuilderArgs:
             checkpoint_dir = args.checkpoint_dir
 
         checkpoint_path = args.checkpoint_path
+        params_table = args.params_table
         if args.model:  # Using a named, well-known model
             model_config = resolve_model_config(args.model)
 
@@ -84,6 +86,9 @@ class BuilderArgs:
                 / model_config.name
                 / model_config.checkpoint_file
             )
+            # The transformers config is keyed on the last section
+            # of the name/path.
+            params_table = model_config.transformer_params_key or model_config.name.split("/")[-1]
 
         is_chat_model = False
         if args.is_chat_model:
@@ -108,7 +113,7 @@ class BuilderArgs:
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
             params_path=args.params_path,
-            params_table=args.params_table,
+            params_table=params_table,
             gguf_path=args.gguf_path,
             gguf_kwargs=None,
             dso_path=args.dso_path,
@@ -147,9 +152,8 @@ class TokenizerArgs:
             tokenizer_path = args.tokenizer_path
         elif args.model:  # Using a named, well-known model
             model_config = resolve_model_config(args.model)
-            tokenizer_path = (
-                Path(args.model_directory) / model_config.name / "tokenizer.model"
-            )
+            tokenizer_path = Path(args.model_directory) / model_config.name / model_config.tokenizer_file
+
         elif args.checkpoint_path:
             tokenizer_path = args.checkpoint_path.parent / "tokenizer.model"
         elif hasattr(args, "checkpoint_dir") and args.checkpoint_dir:
@@ -234,7 +238,7 @@ def _load_model_default(builder_args):
         if builder_args.params_path:
             model = Transformer.from_params(builder_args.params_path)
         elif builder_args.params_table:
-            model = Transformer.from_table(builder_args.params_path)
+            model = Transformer.from_table(builder_args.params_table)
         else:
             model = Transformer.from_name(builder_args.checkpoint_path.parent.name)
 

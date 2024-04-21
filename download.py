@@ -9,24 +9,28 @@ from pathlib import Path
 from typing import Optional, Sequence
 
 from build.convert_hf_checkpoint import convert_hf_checkpoint
-from config.model_config import ModelDistributionChannel, resolve_model_config
+from config.model_config import (
+    ModelConfig,
+    ModelDistributionChannel,
+    resolve_model_config,
+)
 
 from requests.exceptions import HTTPError
 
 
-def _download_and_convert_hf_snapshot(
-    model: str, models_dir: Path, hf_token: Optional[str]
+def _download_hf_snapshot(
+    model_config: ModelConfig, models_dir: Path, hf_token: Optional[str]
 ):
-    model_dir = models_dir / model
+    model_dir = models_dir / model_config.name
     os.makedirs(model_dir, exist_ok=True)
 
     from huggingface_hub import snapshot_download
 
     # Download and store the HF model artifacts.
-    print(f"Downloading {model} from Hugging Face...")
+    print(f"Downloading {model_config.name} from HuggingFace...")
     try:
         snapshot_download(
-            model,
+            model_config.distribution_path,
             local_dir=model_dir,
             local_dir_use_symlinks=False,
             token=hf_token,
@@ -34,24 +38,25 @@ def _download_and_convert_hf_snapshot(
         )
     except HTTPError as e:
         if e.response.status_code == 401:
+            os.rmdir(model_dir)
             raise RuntimeError(
                 "Access denied. Run huggingface-cli login to authenticate."
             )
-            os.rmdir(model_dir)
         else:
             raise e
 
+    
     # Convert the model to the torchchat format.
-    print(f"Converting {model} to torchchat format...")
-    convert_hf_checkpoint(model_dir=model_dir, model_name=model, remove_bin_files=True)
+    print(f"Converting {model_config.name} to torchchat format...")
+    convert_hf_checkpoint(model_dir=model_dir, model_name=model_config.name, remove_bin_files=True)
 
 
 def _download_direct(
-    model: str,
+    model_config: ModelConfig,
     urls: Sequence[str],
     models_dir: Path,
 ):
-    model_dir = models_dir / model
+    model_dir = models_dir / model_config.name
     os.makedirs(model_dir, exist_ok=True)
 
     for url in urls:
@@ -70,9 +75,9 @@ def download_and_convert(
         model_config.distribution_channel
         == ModelDistributionChannel.HuggingFaceSnapshot
     ):
-        _download_and_convert_hf_snapshot(model_config.name, models_dir, hf_token)
+        _download_hf_snapshot(model_config, models_dir, hf_token)
     elif model_config.distribution_channel == ModelDistributionChannel.DirectDownload:
-        _download_direct(model_config.name, model_config.distribution_path, models_dir)
+        _download_direct(model_config, model_config.distribution_path, models_dir)
     else:
         raise RuntimeError(
             f"Unknown distribution channel {model_config.distribution_channel}."
