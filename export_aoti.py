@@ -20,8 +20,6 @@ def export_model(model: nn.Module, device, output_path, args=None):
         torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
     )
 
-    print(f"len(input)={len(input)}")
-
     seq = Dim("seq", min=1, max=max_seq_length)
     # Specify that the first dimension of each input is that batch size
     dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}

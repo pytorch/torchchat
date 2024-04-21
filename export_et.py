@@ -55,11 +55,6 @@ def materialze_broadcast_of_rope_freq_cis(
 
 def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
 
-    # applied wrapper already in export.
-    # export_model = model_wrapper(model, device=device)
-    export_model = model
-    print(export_model)
-
     input = (
         torch.tensor([[1]], dtype=torch.long, device=device),
         torch.tensor([0], dtype=torch.long, device=device),
@@ -70,13 +65,13 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     target_precision = get_precision()
     dynamic_shapes = None
 
-    # need to use kv sdpa?
+    # TODO: need to use kv sdpa?
     edge_config = EdgeCompileConfig(
         _check_ir_validity=False,
         _skip_type_promotion=bool(target_precision == torch.float16),
     )
 
-    if target_precision == torch.float16:  # or args.quantization_mode=="int4":
+    if target_precision == torch.float16:
         if state_dict_dtype != torch.float16:
             print("model.to torch.float16")
             model = model.to(dtype=torch.float16)
@@ -88,13 +83,11 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     else:
         raise ValueError(f"Unsupported dtype for ET export: {target_precision}")
 
-    replace_attention_with_custom_sdpa_attention(export_model)
+    replace_attention_with_custom_sdpa_attention(model)
     with torch.nn.attention.sdpa_kernel(
         [torch.nn.attention.SDPBackend.MATH]
     ), torch.no_grad():
-        m = capture_pre_autograd_graph(
-            export_model, input, dynamic_shapes=dynamic_shapes
-        )
+        m = capture_pre_autograd_graph(model, input, dynamic_shapes=dynamic_shapes)
 
         edge_manager = export_to_edge(
             m,

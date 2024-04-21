@@ -302,6 +302,9 @@ def _initialize_model(
         is_pte = builder_args.pte_path is not None
         assert not (is_dso and is_pte)
         assert builder_args.gguf_kwargs is None
+        # TODO: make GGUF load independent of backend
+        # currently not working because AVX int_mm broken
+        #   (no unpack available)
         _set_gguf_kwargs(builder_args, is_et=is_pte, context="generate")
 
     model_ = _load_model(builder_args)
@@ -309,8 +312,6 @@ def _initialize_model(
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
     if builder_args.dso_path:
-        # make sure user did not try to set dtype
-        # assert model_dtype == "float32", f"dtype setting not valid for a DSO model. Specify dtype during export."
         assert (
             quantize is None or quantize == "{ }"
         ), "quantize not valid for exported DSO model. Specify quantization during export."
@@ -328,8 +329,6 @@ def _initialize_model(
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {builder_args.dso_path}")
     elif builder_args.pte_path:
-        # make sure user did not try to set dtype
-        # assert model_dtype == "float32", f"dtype setting not valid for a DSO model. Specify dtype during export."
         assert (
             quantize is None or quantize == "{ }"
         ), "quantize not valid for exported PTE model. Specify quantization during export."

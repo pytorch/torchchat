@@ -6,16 +6,9 @@
 
 from __future__ import annotations
 
-import json
 import logging
-from functools import reduce
-from math import gcd
-from typing import Dict, Optional, Tuple
 
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torchao.quantization.quant_api as quant_api
 
 
 ##########################################################################
