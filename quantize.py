@@ -1279,7 +1279,7 @@ class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
 
 
 ##################################################################
-###                           WIP: HQQ                         ###
+###                             HQQ                            ###
 
 
 class WeightOnlyInt4HqqQuantHandler:
