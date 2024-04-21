@@ -57,7 +57,9 @@ def convert_hf_checkpoint(
             print("Done.")
             return
         else:
-            raise RuntimeError(f"Could not find {model_map_json} or {consolidated_pth} plus {tokenizer_pth}")
+            raise RuntimeError(
+                f"Could not find {model_map_json} or {consolidated_pth} plus {tokenizer_pth}"
+            )
 
     with open(model_map_json) as json_map:
         bin_index = json.load(json_map)
