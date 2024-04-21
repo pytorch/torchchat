@@ -1,17 +1,18 @@
-# Easy to Use LLM Runner for PC, Mobile and Embedded Devices
-Torchchat is an easy to use library for leveraging LLMs on edge devices including mobile phones and desktops.
+# Chat with LLMs Everywhere
+Torchchat is an easy-to-use library for running large language models (LLMs) on edge devices including mobile phones and desktops.
 
 ## Highlights
-- Command line interaction with popular LLMs such as Llama2, Llama3, Stories, Mistral and more
-  - Supporting both GGUF fp32/16 and the HF Format
-- Supports popular hardware/OS
+- Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
+  - Supporting both GGUF fp32/16 and the Hugging Face checkpoint format
+- PyTorch-native execution with performance
+- Supports popular hardware and OS
   - Linux (x86)
   - Mac OS (M1/M2/M3)
-  - Android (devices that handle XNNPACK)
-  - iOS 17+ (iPhone 13 pro+)
-- Multiple Data Types including: float32, float16, bfloat16
-- Multiple Quantization Schemes
-- Multiple Execution Modes including: Eager, AOTI and ExecuTorch
+  - Android (Devices that support XNNPACK)
+  - iOS 17+ (iPhone 13 Pro+)
+- Multiple data types including: float32, float16, bfloat16
+- Multiple quantization schemes
+- Multiple execution modes including: Eager, Compile, AOT Inductor (AOTI) and ExecuTorch
 
 ## Quick Start
 ### Initialize the Environment
@@ -27,7 +28,7 @@ git clone https://github.com/pytorch/torchchat.git
 cd torchchat
 pip install -r requirements.txt
 
-# ensure everything installed correctly. If this command works you'll see a welcome message and some details
+# ensure everything installed correctly
 python torchchat.py --help
 
 ```
@@ -51,18 +52,18 @@ To install `huggingface-cli`, run `pip install huggingface-cli`. After installin
 HuggingFace.
 
 ```
-python torchchat.py download llama2
+python torchchat.py download llama3
 ```
 
 ### Chat
 Designed for interactive and conversational use.
-In chat mode, the LLM engages in a back-and-forth dialogue with the user. It responds to queries, participates in discussions, provides explanations, and can adapt to the flow of conversation. This mode is typically what you see in applications aimed at simulating conversational partners or providing customer support.
+In chat mode, the LLM engages in a back-and-forth dialogue with the user. It responds to queries, participates in discussions, provides explanations, and can adapt to the flow of conversation.
 
 For more information run `python torchchat.py chat --help`
 
 **Examples**
 ```
-# Chat with some parameters
+python torchchat.py chat llama3 --tiktoken
 ```
 
 ### Generate
@@ -73,18 +74,24 @@ For more information run `python torchchat.py generate --help`
 
 **Examples**
 ```
-python torchchat.py generate llama2 --device=cpu --dtype=fp16
+python torchchat.py generate llama3 --dtype=fp16 --tiktoken
 ```
 
 ### Export
-Compiles a model for different use cases
+Compiles a model and saves it to run later.
 
 For more information run `python torchchat.py export --help`
 
 **Examples**
 
+AOT Inductor:
 ```
-python torchchat.py export stories15M --output-pte-path=stories15m.pte
+python torchchat.py export stories15M --output-dso-path stories15M.so
+```
+
+ExecuTorch:
+```
+python torchchat.py export stories15M --output-pte-path stories15M.pte
 ```
 
 ### Browser
@@ -93,7 +100,7 @@ Run a chatbot in your browser that’s supported by the model you specify in the
 **Examples**
 
 ```
-python torchchat.py browser --device cpu --checkpoint-path ${MODEL_PATH} --temperature 0 --num-samples 10
+python torchchat.py browser stories15M --temperature 0 --num-samples 10
 ```
 
 *Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
@@ -101,29 +108,28 @@ python torchchat.py browser --device cpu --checkpoint-path ${MODEL_PATH} --tempe
 Enter some text in the input box, then hit the enter key or click the “SEND” button. After 1 second or 2, the text you entered together with the generated text will be displayed. Repeat to have a conversation.
 
 ### Eval
-Uses lm_eval library to evaluate model accuracy on a variety of tasks. Defaults to wikitext and can be manually controlled using the tasks and limit args.l
+Uses lm_eval library to evaluate model accuracy on a variety of tasks. Defaults to wikitext and can be manually controlled using the tasks and limit args.
 
 For more information run `python torchchat.py eval --help`
 
 **Examples**
+
 Eager mode:
 ```
-python torchchat.py eval --checkpoint-path ${MODEL_PATH} -d fp32 --limit 5
+python torchchat.py eval stories15M -d fp32 --limit 5
 ```
 
 To test the perplexity for lowered or quantized model, pass it in the same way you would to generate:
 
 ```
-python torchchat.py eval --pte-path stories15m.pte --params-table <params.json> --tokenizer-path <tokenizer.model> --limit 5
+python torchchat.py eval stories15M --pte-path stories15M.pte --limit 5
 ```
+
 ## Models
 These are the supported models
 | Model | Mobile Friendly | Notes |
 |------------------|---|---------------------|
-|[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
-|[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
-|[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
-|[openlm-research/open_llama_7b](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅||
 |[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|✅||
 |[meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|||
 |[meta-llama/Llama-2-70b-chat-hf](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf)|||
@@ -132,52 +138,64 @@ These are the supported models
 |[mistralai/Mistral-7B-v0.1](https://huggingface.co/mistralai/Mistral-7B-v0.1)|✅||
 |[mistralai/Mistral-7B-Instruct-v0.1](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1)|✅||
 |[mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)|✅||
-|[meta-llama/Llama3](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅||
+|[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[openlm-research/open_llama_7b](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
 
 See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
 
 **Examples**
+
 ```
-#Llama3
+# Llama 3 8B Instruct
+python torchchat.py chat llama3 --tiktoken
 ```
 
 ```
-#Stories
+# Stories 15M
+python torchchat.py chat stories15M
 ```
 
 ```
-#CodeLama
+# CodeLama 7B for Python
+python torchchat.py chat codellama
 ```
 
 ## Desktop Execution
 
-### AOTI (AOT Inductor ) - PC Specific
-AOT compiles models into machine code before execution, enhancing performance and predictability. It's particularly beneficial for frequently used models or those requiring quick start times. AOTI also increases security by not exposing the model at runtime. However, it may lead to larger binary sizes and lacks the runtime optimization flexibility
+### AOTI (AOT Inductor)
+AOT compiles models into machine code before execution, enhancing performance and predictability. It's particularly beneficial for frequently used models or those requiring quick start times. However, it may lead to larger binary sizes and lacks the runtime flexibility of eager mode.
 
 **Examples**
 The following example uses the Stories15M model.
 ```
-TODO: Update after the CLI gets fixed. Use real paths so user can copy paste
-
 # Compile
-python torchchat export --checkpoint-path ${MODEL_PATH} --device {cuda,cpu} --output-dso-path ${MODEL_OUT}/${MODEL_NAME}.so
+python torchchat.py export stories15M --output-dso-path stories15M.so
 
 # Execute
-python torchchat generate --device {cuda,cpu} --dso-path ${MODEL_OUT}/${MODEL_NAME}.so --prompt "Hello my name is"
+python torchchat.py generate --dso-path stories15M.so --prompt "Hello my name is"
 ```
 
-NOTE: The exported model will be large. We suggest you quantize the model, explained further down, before deploying the model for use.
+NOTE: The exported model will be large. We suggest you quantize the model, explained further down, before deploying the model on device.
 
 ### ExecuTorch
-ExecuTorch enables you to optimize your model for execution on a mobile or embedded device
+ExecuTorch enables you to optimize your model for execution on a mobile or embedded device, but can also be used on desktop for testing.
 
-If you want to deploy and execute a model within your iOS app <do this>
-If you want to deploy and execute a model within your Android app <do this>
-If you want to deploy and execute a model within your edge device <do this>
-If you want to experiment with our sample apps. Check out our iOS and Android sample apps.
+**Examples**
+The following example uses the Stories15M model.
+```
+# Compile
+python torchchat.py export stories15M --output-pte-path stories15M.pte
+
+# Execute
+python torchchat.py generate --device cpu --pte-path stories15M.pte --prompt "Hello my name is"
+```
+
+See below under Mobile Execution if you want to deploy and execute a model in your iOS or Android app.
 
 ## Quantization
-Quantization focuses on reducing the precision of model parameters and computations from floating-point to lower-bit integers, such as 8-bit integers. This approach aims to minimize memory requirements, accelerate inference speeds, and decrease power consumption, making models more feasible for deployment on edge devices with limited computational resources. While quantization can potentially degrade the model's performance, the methods supported by torchchat are designed to mitigate this effect, maintaining a balance between efficiency and accuracy.
+Quantization focuses on reducing the precision of model parameters and computations from floating-point to lower-bit integers, such as 8-bit and 4-bit integers. This approach aims to minimize memory requirements, accelerate inference speeds, and decrease power consumption, making models more feasible for deployment on edge devices with limited computational resources. While quantization can potentially degrade the model's performance, the methods supported by torchchat are designed to mitigate this effect, maintaining a balance between efficiency and accuracy.
 
 TODO:
 - Brief rundown on supported quant modes and torchchat.py flags (emphasis on brief).
@@ -185,13 +203,15 @@ TODO:
 - One line that shows the performance difference between the base model and the 4bit
 - Link to Quantization.md.
 
-Read the [Quantization documention](docs/quantization.md) for more details.
+Read the [quantization documention](docs/quantization.md) for more details.
 
 ## Mobile Execution
 **Prerequisites**
 
-Install [ExecuTorch](https://pytorch.org/executorch/stable/getting-started-setup.html)
+ExecuTorch lets you run your model on a mobile or embedded device. The exported ExecuTorch .pte model file plus runtime is all you need.
 
-[iOS Details](docs/iOS.md)
+Install [ExecuTorch](https://pytorch.org/executorch/stable/getting-started-setup.html) to get started.
 
-[Android Details](docs/Android.md)
+Read the [iOS documentation](docs/iOS.md) for more details on iOS.
+
+Read the [Android documentation](docs/Android.md) for more details on Android.

@@ -9,10 +9,7 @@ from pathlib import Path
 from typing import Optional, Sequence
 
 from build.convert_hf_checkpoint import convert_hf_checkpoint
-from config.model_config import (
-    ModelDistributionChannel,
-    resolve_model_config,
-)
+from config.model_config import ModelDistributionChannel, resolve_model_config
 
 from requests.exceptions import HTTPError
 
@@ -26,7 +23,7 @@ def _download_and_convert_hf_snapshot(
     from huggingface_hub import snapshot_download
 
     # Download and store the HF model artifacts.
-    print(f"Downloading {model} from HuggingFace...")
+    print(f"Downloading {model} from Hugging Face...")
     try:
         snapshot_download(
             model,
@@ -85,8 +82,9 @@ def download_and_convert(
 def is_model_downloaded(model: str, models_dir: Path) -> bool:
     model_config = resolve_model_config(model)
 
+    # Check if the model directory exists and is not empty.
     model_dir = models_dir / model_config.name
-    return os.path.isdir(model_dir)
+    return os.path.isdir(model_dir) and os.listdir(model_dir)
 
 
 def main(args):

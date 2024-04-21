@@ -1,11 +1,21 @@
 {
+    "meta-llama/Meta-Llama-3-8B-Instruct": {
+        "aliases": ["llama3", "llama3-8b"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/Meta-Llama-3-8B-Instruct"
+    },
     "meta-llama/Llama-2-7b-chat-hf": {
         "aliases": ["llama2", "llama2-7b"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Llama-2-7b-chat-hf"
     },
+    "meta-llama/CodeLlama-7b-Python-hf": {
+        "aliases": ["codellama", "codellama-7b"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/CodeLlama-7b-Python-hf"
+    },
     "mistralai/Mistral-7B-Instruct-v0.2": {
-        "aliases": ["mistral-7b-instruct"],
+        "aliases": ["mistral-7b", "mistral-7b-instruct"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "mistralai/Mistral-7B-Instruct-v0.2"
     },
