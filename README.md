@@ -26,7 +26,7 @@ source .venv/torchchat/bin/activate
 # get the code and dependencies
 git clone https://github.com/pytorch/torchchat.git
 cd torchchat
-pip install -r requirements.txt
+bash ./install_requirements.sh
 
 # ensure everything installed correctly
 python torchchat.py --help
