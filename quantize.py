@@ -5,7 +5,6 @@
 # LICENSE file in the root directory of this source tree.
 
 from __future__ import annotations
-
 import json
 from functools import reduce
 from math import gcd
@@ -140,10 +139,72 @@ class PrecisionHandler(QuantHandler):
     def quantized_model(self) -> nn.Module:
         return self.model.to(device=device, **kwargs)
 
+            
+#########################################################################
+###                QuantHandler API definition                        ###
+###               (unify with torchao in future)                      ###
+
+class QuantHandler:
+    def __init__(self, mod, device = "cpu", tokenizer = None):
+        self.mod = mod
+        self.device = device
+        self.tokenizer = tokenizer
+
+    def create_quantized_state_dict(self) -> Dict:  # "StateDict"
+        pass
+
+    def convert_for_runtime(self) -> nn.Module:
+        pass
+
+    def quantized_model(self) -> nn.Module:
+        model_updated_state_dict = self.create_quantized_state_dict()
+        self.convert_for_runtime()
+        self.mod.load_state_dict(model_updated_state_dict)
+        return self.mod
+    
+
+#########################################################################
+###          QuantHandler wrapper for a8w4dq from torchao             ###
+
+class Int8DynActInt4WeightQuantizer(QuantHandler):
+    from torchao.quantization.quant_api import Int8DynActInt4WeightQuantizer as aoInt8DynActInt4WeightQuantizer
+    
+    def __init__(self, mod, device = "cpu", tokenizer = None, **kwargs):
+        self.mod = mod
+        self.device = device
+        self.tokenizer = tokenizer
+        self.quantizer = aoInt8DynActInt4WeightQuantizer(**kwargs)
+            
+    def create_quantized_state_dict(self) -> Dict:  # "StateDict"
+        pass
+
+    def convert_for_runtime(self) -> nn.Module:
+        pass
+
+    def quantized_model(self) -> nn.Module:
+        return self.quantizer.quantize(self.model)
+
+#########################################################################
+###          QuantHandler wrapper for a8w4dq from torchao             ###
+
+class PrecisionHandler(QuantHandler):
+    def __init__(self, mod, device = "cpu", tokenizer = None, **kwargs):
+        self.mod = mod
+        self.device = device
+        self.tokenizer = tokenizer
+            
+    def create_quantized_state_dict(self) -> Dict:  # "StateDict"
+        pass
+
+    def convert_for_runtime(self) -> nn.Module:
+        pass
+
+    def quantized_model(self) -> nn.Module:
+        return self.model.to(device=device, **kwargs)
+
 
 #########################################################################
 #####                     Quantization Primitives                  ######
-
 
 def dynamically_quantize_per_channel(
     x,
@@ -354,7 +415,7 @@ def replace_linear_weight_only_int8_per_channel(
     module, device, node_type, groupsize=None
 ):
     if groupsize is not None and groupsize != 0:
-        pass
+        pass 
 
     for name, child in module.named_children():
         # print(f"name: {name}")
@@ -808,14 +869,7 @@ def replace_linear_int4(
 
 class WeightOnlyInt4QuantHandler(QuantHandler):
     def __init__(
-        self,
-        mod,
-        device,
-        tokenizer=None,
-        *,
-        groupsize=128,
-        inner_k_tiles=8,
-        padding_allowed=True,
+            self, mod, device, tokenizer=None, *, groupsize=128, inner_k_tiles=8, padding_allowed=True
     ):
         self.mod = mod
         self.device = device
