@@ -734,9 +734,9 @@ jobs:
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
           python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
-	  # should be simply ignored on Linux, so not conditionalizing
-	  setenv CMAKE_OSX_DEPLOYMENT_TARGET=12.0
-	  setenv MACOSX_TARGET_PLATFORM=12.0
+          # should be simply ignored on Linux, so not conditionalizing
+          setenv CMAKE_OSX_DEPLOYMENT_TARGET=12.0
+          setenv MACOSX_TARGET_PLATFORM=12.0
           cmake -S ./runner-et -B et-build/cmake-out -G Ninja
           cmake --build ./et-build/cmake-out
       - name: Download checkpoints
@@ -787,9 +787,9 @@ jobs:
           pip install -r requirements.txt
           pip list
 
-	  # should be simply ignored on Linux, so not conditionalizing
-	  setenv CMAKE_OSX_DEPLOYMENT_TARGET=12.0
-	  setenv MACOSX_TARGET_PLATFORM=12.0
+          # should be simply ignored on Linux, so not conditionalizing
+          setenv CMAKE_OSX_DEPLOYMENT_TARGET=12.0
+          setenv MACOSX_TARGET_PLATFORM=12.0
           cd ${TORCHCHAT_ROOT}/runner-aoti
           cmake -Bbuild -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'`
           cmake --build build
