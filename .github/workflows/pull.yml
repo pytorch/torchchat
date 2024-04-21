@@ -737,8 +737,8 @@ jobs:
           # should be simply ignored on Linux, so not conditionalizing
           export CMAKE_OSX_DEPLOYMENT_TARGET=12.0
           export MACOSX_TARGET_PLATFORM=12.0
-          cmake -S ./runner-et -B et-build/cmake-out -G Ninja
-          cmake --build ./et-build/cmake-out
+          CMAKE_OSX_DEPLOYMENT_TARGET=12.0 MACOSX_TARGET_PLATFORM=12.0 cmake -S ./runner-et -B et-build/cmake-out -G Ninja
+          CMAKE_OSX_DEPLOYMENT_TARGET=12.0 MACOSX_TARGET_PLATFORM=12.0 cmake --build ./et-build/cmake-out
       - name: Download checkpoints
         run: |
           mkdir -p checkpoints/stories15M
@@ -791,8 +791,8 @@ jobs:
           export CMAKE_OSX_DEPLOYMENT_TARGET=12.0
           export MACOSX_TARGET_PLATFORM=12.0
           cd ${TORCHCHAT_ROOT}/runner-aoti
-          cmake -Bbuild -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'`
-          cmake --build build
+          CMAKE_OSX_DEPLOYMENT_TARGET=12.0 MACOSX_TARGET_PLATFORM=12.0 cmake -Bbuild -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'`
+          CMAKE_OSX_DEPLOYMENT_TARGET=12.0 MACOSX_TARGET_PLATFORM=12.0 cmake --build build
           cd ..
       - name: Download checkpoint
         run: |
