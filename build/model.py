@@ -112,7 +112,6 @@ class ModelArgs:
         return ModelArgs.from_params(config_path / f"{config[0]}.json")
 
 
-
 class KVCache(nn.Module):
     def __init__(self, max_batch_size, max_seq_length, n_heads, head_dim, dtype=None):
         super().__init__()
