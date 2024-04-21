@@ -216,8 +216,18 @@ def add_arguments(parser):
         type=str,
         default="{ }",
         help=(
-            'Quantization options. pass in as {"<mode>" : {"<argname1>" : <argval1>, "<argname2>" : <argval2>,...},} '
-            + "modes are: embedding, linear:int8, linear:int4, linear:int4-gptq, linear:int4-hqq, linear:a8w4dq, precision."
+            'Quantization options. pass in as \'{"<mode>" : {"<argname1>" : <argval1>, "<argname2>" : <argval2>,...},}\' '
+            + "modes are: embedding, linear:int8, linear:int4, linear:gptq, linear:hqq, linear:a8w4dq, precision."
+        ),
+    )
+    parser.add_argument(
+        "--draft-quantize",
+        type=str,
+        default="{ }",
+        help=(
+            "Quantization options. Same format as quantize, "
+            + "or 'quantize' to indicate same options specified by "
+            + "--quantize to main model. Applied to draft model."
         ),
     )
     parser.add_argument(

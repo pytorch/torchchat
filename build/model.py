@@ -123,19 +123,13 @@ class KVCache(nn.Module):
         n_heads,
         head_dim,
         dtype=None,
-        device="cpu",
     ):
         super().__init__()
-        device = torch.device(device)
         if not dtype:
             dtype = get_precision()
         cache_shape = (max_batch_size, n_heads, max_seq_length, head_dim)
-        self.register_buffer(
-            "k_cache", torch.zeros(cache_shape, dtype=dtype, device=device)
-        )
-        self.register_buffer(
-            "v_cache", torch.zeros(cache_shape, dtype=dtype, device=device)
-        )
+        self.register_buffer("k_cache", torch.zeros(cache_shape, dtype=dtype))
+        self.register_buffer("v_cache", torch.zeros(cache_shape, dtype=dtype))
 
     def update(self, input_pos, k_val, v_val):
         # input_pos: [S], k_val: [B, H, S, D]

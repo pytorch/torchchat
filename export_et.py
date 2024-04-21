@@ -7,6 +7,7 @@
 
 import torch
 from build.model import Transformer
+from build.utils import get_precision
 
 from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
     XnnpackDynamicallyQuantizedPartitioner,
@@ -19,16 +20,9 @@ from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
 from executorch.exir.passes.quant_fusion_pass import QuantFusionPass
 from executorch.exir.passes.sym_shape_eval_pass import ConstraintBasedSymShapeEvalPass
-
-# from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
-#    XnnpackDynamicallyQuantizedPartitioner,
-# )
 from executorch_portable_utils import export_to_edge
 from export_et_util import replace_attention_with_custom_sdpa_attention
-
-from quantize import get_precision
 from torch._export import capture_pre_autograd_graph
-from build.utils impport device_sync, canonical_path
 
 default_device = "cpu"
 

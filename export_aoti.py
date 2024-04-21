@@ -7,8 +7,6 @@
 
 import torch
 import torch.nn as nn
-from build.utils import device_sync
-
 from torch.export import Dim
 
 default_device = "cpu"
@@ -16,8 +14,6 @@ default_device = "cpu"
 
 def export_model(model: nn.Module, device, output_path, args=None):
     max_seq_length = 350
-    #    with torch.device(device):
-    #        model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
 
     input = (
         torch.tensor([[1, 9038, 2501, 263, 931]], dtype=torch.int, device=device),

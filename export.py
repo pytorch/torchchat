@@ -17,12 +17,11 @@ from build.builder import (
     BuilderArgs,
     TokenizerArgs,
 )
-from build.utils import device_sync
+
+from build.utils import set_precision
 from cli import add_arguments, add_arguments_for_export, arg_init, check_args
 from download import download_and_convert, is_model_downloaded
 from export_aoti import export_model as export_model_aoti
-
-from quantize import set_precision
 
 try:
     executorch_export_available = True

@@ -14,14 +14,15 @@ from typing import Any, Dict, Optional, Union
 import torch
 import torch._dynamo.config
 import torch._inductor.config
+
 from config.model_config import resolve_model_config
-from quantize import name_to_dtype, quantize_model
+from quantize import quantize_model
 
 from sentencepiece import SentencePieceProcessor
 from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
 from build.model import Transformer
-from build.utils import device_sync
+from build.utils import device_sync, name_to_dtype
 
 
 @dataclass
@@ -70,7 +71,6 @@ class BuilderArgs:
 
     @classmethod
     def from_args(cls, args):  # -> BuilderArgs:
-
         # Handle disabled checkpoint_dir option
         checkpoint_dir = None
         if hasattr(args, "checkpoint_dir"):
