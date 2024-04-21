@@ -10,9 +10,16 @@
   (both ideas and code) from his repo.  You can never go wrong by
   following Andrej's work.
 
-* Bert Maher and his [llama2.so](https://github.com/bertmaher/llama2.so),
-  which built on Andrej's llama2.c and closed the loop on Llama models with
-  AOTInductor.
+* Michael Gschwind, Bert Maher, Scott Wolchok, Bin Bao, Chen Yang,
+  Huamin Li and Mu-Chu Li who built the first version of nanogpt (`DSOGPT`)
+  with AOT Inductor proving that AOTI can be used to build efficient
+  LLMs, and DSOs are a viable distribution format for models.
+  [nanoGPT](https://github.com/karpathy/nanoGPT).
+
+* Bert Maher and his
+  [llama2.so](https://github.com/bertmaher/llama2.so), which built on
+  Andrej's llama2.c and on DSOGPT to close the loop on Llama models
+  with AOTInductor.
 
 * Christian Puhrsch, Horace He, Joe Isaacson and many more for their
   many contributions in Accelerating GenAI models in the *"Anything,
@@ -20,9 +27,6 @@
   Fast!](https://github.com/pytorch-labs/gpt-fast), which we have
   directly adopted (both ideas and code) from his repo.
 
-* Bert Maher, Scott Wolchok, Bin Bao, Chen Yang, Huamin Li and Mu-Chu
-  Li for great collaborations in building AOTInductor for CPU including
-  for [nanoGPT](https://github.com/karpathy/nanoGPT).
-
 * Mobius Labs as the authors of the HQQ quantization algorithms
   included in this distribution.
+
