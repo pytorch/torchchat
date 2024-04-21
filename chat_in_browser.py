@@ -1,11 +1,12 @@
-# -*- coding: UTF-8 -*-
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
+
 import subprocess
-import sys
 
-from cli import add_arguments_for_generate, arg_init, check_args
 from flask import Flask, render_template, request
-from generate import main as generate_main
-
 
 convo = ""
 disable_input = False
@@ -14,11 +15,9 @@ disable_input = False
 def create_app(*args):
     app = Flask(__name__)
 
-    import subprocess
-
     # create a new process and set up pipes for communication
     proc = subprocess.Popen(
-        ["python", "generate.py", *args], stdin=subprocess.PIPE, stdout=subprocess.PIPE
+        ["python3", "generate.py", *args], stdin=subprocess.PIPE, stdout=subprocess.PIPE
     )
 
     @app.route("/")

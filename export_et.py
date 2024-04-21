@@ -7,6 +7,7 @@
 
 import torch
 from build.model import Transformer
+from build.utils import get_precision
 
 from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
     XnnpackDynamicallyQuantizedPartitioner,
@@ -19,28 +20,11 @@ from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
 from executorch.exir.passes.quant_fusion_pass import QuantFusionPass
 from executorch.exir.passes.sym_shape_eval_pass import ConstraintBasedSymShapeEvalPass
-
-# from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
-#    XnnpackDynamicallyQuantizedPartitioner,
-# )
 from executorch_portable_utils import export_to_edge
 from export_et_util import replace_attention_with_custom_sdpa_attention
-
-from quantize import get_precision
 from torch._export import capture_pre_autograd_graph
 
-
-# CPU is always available and also exportable to ExecuTorch
-default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
-
-
-def device_sync(device):
-    if "cuda" in device:
-        torch.cuda.synchronize(device)
-    elif ("cpu" in device) or ("mps" in device):
-        pass
-    else:
-        print(f"device={device} is not yet suppported")
+default_device = "cpu"
 
 
 def materialze_broadcast_of_rope_freq_cis(
@@ -69,16 +53,7 @@ def materialze_broadcast_of_rope_freq_cis(
     return module
 
 
-def canonical_path(path):
-    return path
-
-
 def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
-
-    # applied wrapper already in export.
-    # export_model = model_wrapper(model, device=device)
-    export_model = model
-    print(export_model)
 
     input = (
         torch.tensor([[1]], dtype=torch.long, device=device),
@@ -90,13 +65,13 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     target_precision = get_precision()
     dynamic_shapes = None
 
-    # need to use kv sdpa?
+    # TODO: need to use kv sdpa?
     edge_config = EdgeCompileConfig(
         _check_ir_validity=False,
         _skip_type_promotion=bool(target_precision == torch.float16),
     )
 
-    if target_precision == torch.float16:  # or args.quantization_mode=="int4":
+    if target_precision == torch.float16:
         if state_dict_dtype != torch.float16:
             print("model.to torch.float16")
             model = model.to(dtype=torch.float16)
@@ -108,13 +83,11 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     else:
         raise ValueError(f"Unsupported dtype for ET export: {target_precision}")
 
-    replace_attention_with_custom_sdpa_attention(export_model)
+    replace_attention_with_custom_sdpa_attention(model)
     with torch.nn.attention.sdpa_kernel(
         [torch.nn.attention.SDPBackend.MATH]
     ), torch.no_grad():
-        m = capture_pre_autograd_graph(
-            export_model, input, dynamic_shapes=dynamic_shapes
-        )
+        m = capture_pre_autograd_graph(model, input, dynamic_shapes=dynamic_shapes)
 
         edge_manager = export_to_edge(
             m,

@@ -1,6 +1,8 @@
-# Taken from llama code and lightly modified
 # Copyright (c) Meta Platforms, Inc. and affiliates.
-# This software may be used and distributed according to the terms of the Llama 2 Community License Agreement.
+
+# Taken from llama code and lightly modified
+# This software may be used and distributed according to the
+# terms of the Llama 2 Community License Agreement.
 
 import argparse
 import os

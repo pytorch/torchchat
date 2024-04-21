@@ -16,12 +16,13 @@ import torch._dynamo.config
 import torch._inductor.config
 
 from config.model_config import resolve_model_config
-from quantize import name_to_dtype, quantize_model
+from quantize import quantize_model
 
 from sentencepiece import SentencePieceProcessor
 from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
 from build.model import Transformer
+from build.utils import device_sync, name_to_dtype
 
 
 @dataclass
@@ -70,7 +71,6 @@ class BuilderArgs:
 
     @classmethod
     def from_args(cls, args):  # -> BuilderArgs:
-
         # Handle disabled checkpoint_dir option
         checkpoint_dir = None
         if hasattr(args, "checkpoint_dir"):
@@ -182,15 +182,6 @@ def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
         return TiktokenTokenizer(model_path=str(tokenizer_args.tokenizer_path))
     else:
         raise RuntimeError("must specify a valid tokenizer in TokenizerArgs")
-
-
-def device_sync(device):
-    if "cuda" in device:
-        torch.cuda.synchronize(device)
-    elif ("cpu" in device) or ("mps" in device):
-        pass
-    else:
-        print(f"device={ device } is not yet suppported")
 
 
 torch._inductor.config.coordinate_descent_tuning = True
@@ -314,6 +305,9 @@ def _initialize_model(
         is_pte = builder_args.pte_path is not None
         assert not (is_dso and is_pte)
         assert builder_args.gguf_kwargs is None
+        # TODO: make GGUF load independent of backend
+        # currently not working because AVX int_mm broken
+        #   (no unpack available)
         _set_gguf_kwargs(builder_args, is_et=is_pte, context="generate")
 
     model_ = _load_model(builder_args)
@@ -321,8 +315,6 @@ def _initialize_model(
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
     if builder_args.dso_path:
-        # make sure user did not try to set dtype
-        # assert model_dtype == "float32", f"dtype setting not valid for a DSO model. Specify dtype during export."
         assert (
             quantize is None or quantize == "{ }"
         ), "quantize not valid for exported DSO model. Specify quantization during export."
@@ -340,8 +332,6 @@ def _initialize_model(
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {builder_args.dso_path}")
     elif builder_args.pte_path:
-        # make sure user did not try to set dtype
-        # assert model_dtype == "float32", f"dtype setting not valid for a DSO model. Specify dtype during export."
         assert (
             quantize is None or quantize == "{ }"
         ), "quantize not valid for exported PTE model. Specify quantization during export."

@@ -20,15 +20,14 @@ import torch._inductor.config
 from build.builder import (
     _initialize_model,
     _initialize_tokenizer,
-    _load_model,
     BuilderArgs,
     TokenizerArgs,
     validate_args,
 )
 from build.model import Transformer
+from build.utils import device_sync, set_precision
 from cli import add_arguments, add_arguments_for_generate, arg_init, check_args
 from download import download_and_convert, is_model_downloaded
-from quantize import set_precision
 
 logger = logging.getLogger(__name__)
 
@@ -64,15 +63,6 @@ class GeneratorArgs:
             compile_prefill=args.compile_prefill,
             speculate_k=args.speculate_k,
         )
-
-
-def device_sync(device):
-    if "cuda" in device:
-        torch.cuda.synchronize(device)
-    elif ("cpu" in device) or ("mps" in device):
-        pass
-    else:
-        logging.error(f"device={ device } is not yet suppported")
 
 
 torch._inductor.config.coordinate_descent_tuning = True
@@ -369,8 +359,11 @@ def _main(
     compile_prefill: bool = False,
     profile: Optional[Path] = None,
     quantize=None,
+    draft_quantize=None,
 ) -> None:
-    """Generates text samples based on a pre-trained Transformer model and tokenizer."""
+    """
+    Generates text samples based on a pre-trained Transformer model and tokenizer.
+    """
 
     # global print
     #    from tp import maybe_init_dist
@@ -410,10 +403,10 @@ def _main(
     # will add a version of _initialize_model in future
     # (need additional args)
     if is_speculative:
-        speculative_builder_args = builder_args
-
-        draft_model = _load_model(
+        draft_model = _initialize_model(
             speculative_builder_args,
+            quantize if draft_quantize == "quantize" else draft_quantize,
+            tokenizer,
         )
     else:
         draft_model = None
@@ -571,6 +564,7 @@ def main(args):
         args.compile_prefill,
         args.profile,
         args.quantize,
+        args.draft_quantize,
     )
 
 

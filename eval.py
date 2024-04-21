@@ -20,6 +20,7 @@ from build.builder import (
 )
 
 from build.model import Transformer
+from build.utils import set_precision
 from cli import add_arguments, add_arguments_for_eval, arg_init
 from download import download_and_convert, is_model_downloaded
 from generate import encode_tokens, model_forward
@@ -235,8 +236,6 @@ def main(args) -> None:
     max_seq_length = args.max_seq_length
 
     print(f"Using device={device}")
-    from quantize import set_precision
-
     set_precision(builder_args.precision)
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
