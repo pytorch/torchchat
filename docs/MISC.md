@@ -173,7 +173,7 @@ We use several variables in this example, which may be set as a preparatory step
   by replacing the modelname with the name of the tokenizer model which is expected to be named `tokenizer.model`.
 
 * `MODEL_OUT` is a location for outputs from export for server/desktop and/or mobile/edge execution.  We store exported
-  artifacts here, with extensions .pte for Executorch models, .so for AOT Inductor generated models, and .bin for tokenizers
+  artifacts here, with extensions .pte for ExecuTorch models, .so for AOT Inductor generated models, and .bin for tokenizers
   prepared for use with the C++ tokenizers user by `runner-aoti` and `runner-et`.
 
 You can set these variables as follows for the exemplary model15M model from Andrej Karpathy's tinyllamas model family:
@@ -184,9 +184,9 @@ MODEL_PATH=${MODEL_OUT}/stories15M.pt
 MODEL_OUT=~/torchchat-exports
 ```
 
-When we export models with AOT Inductor for servers and desktops, and Executorch for mobile and edge devices,
+When we export models with AOT Inductor for servers and desktops, and ExecuTorch for mobile and edge devices,
 we will save them in the specified directory (`${MODEL_OUT}` in our example below) as a DSO under the name `${MODEL_NAME}.so` (for AOTI-generated dynamic libraries),
-or as Executorch model under the name `${MODEL_NAME}.pte` (for Executorch-generated mobile/edge models).
+or as ExecuTorch model under the name `${MODEL_NAME}.pte` (for Executorch-generated mobile/edge models).
 
 We use `[ optional input ]` to indicate optional inputs, and `[ choice 1 | choice 2 | ... ]` to indicate a choice
 
@@ -271,7 +271,7 @@ quantization to achieve this, as described below.
 We export the model with the export.py script.  Running this script requires you first install executorch with pybindings, see [here](#setting-up-executorch-and-runner-et).
 At present, when exporting a model, the export command always uses the
 xnnpack delegate to export.  (Future versions of torchchat will support additional
-delegates such as Vulkan, CoreML, MPS, HTP in addition to Xnnpack as they are released for Executorch.)
+delegates such as Vulkan, CoreML, MPS, HTP in addition to Xnnpack as they are released for ExecuTorch.)
 
 ### Running the model
 
@@ -284,7 +284,7 @@ python generate.py --checkpoint-path ${MODEL_PATH} --pte ${MODEL_OUT}/model.pte 
 You can also run the model with the runner-et.  See below under "Standalone Execution".
 
 While we have shown the export and execution of a small model to a mobile/edge
-device supported by Executorch, most models need to be compressed to
+device supported by ExecuTorch, most models need to be compressed to
 fit in the target device's memory. We use quantization to achieve this.
 
 
@@ -458,7 +458,7 @@ groupsize set to 0 which uses channelwise quantization:
 python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
 ```
 
-Then, export as follows using Executorch for mobile backends:
+Then, export as follows using ExecuTorch for mobile backends:
 ```
 python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte
 ```
@@ -486,7 +486,7 @@ We can do this in eager mode (optionally with `torch.compile`), we use the `line
 python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
 ```
 
-Then, export as follows using Executorch:
+Then, export as follows using ExecuTorch:
 ```
 python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte
 ```
@@ -607,7 +607,7 @@ After this is done, you can run runner-et with
 ```
 
 While we have shown the export and execution of a small model to a mobile/edge
-device supported by Executorch, most models need to be compressed to
+device supported by ExecuTorch, most models need to be compressed to
 fit in the target device's memory. We use quantization to achieve this.
 
 
@@ -630,7 +630,7 @@ To run your pte model, use the following command (assuming you already generated
 
 ### Android
 
-Check out the [tutorial on how to build an Android app running your PyTorch models with Executorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html), and give your torchchat models a spin.
+Check out the [tutorial on how to build an Android app running your PyTorch models with ExecuTorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html), and give your torchchat models a spin.
 
 ![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png "Android app running Llama model")
 
