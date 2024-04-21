@@ -92,11 +92,11 @@ class ModelArgs:
         known_model_params = [config.replace(".json", "") for config in os.listdir(config_path)]
 
         print(f"known configs: {known_model_params}")
-        # fuzzy search
+        # Fuzzy search by name (e.g. "7B" and "Mistral-7B")
         config = [
             config
             for config in known_model_params
-            if config.replace in str(name).upper() or config in str(name)
+            if config in str(name).upper() or config in str(name)
         ]
 
         # We may have two or more configs matched (e.g. "7B" and "Mistral-7B"). Find the best config match,
