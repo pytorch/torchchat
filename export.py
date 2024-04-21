@@ -17,6 +17,7 @@ from build.builder import (
     BuilderArgs,
     TokenizerArgs,
 )
+from build.utils import device_sync
 from cli import add_arguments, add_arguments_for_export, arg_init, check_args
 from download import download_and_convert, is_model_downloaded
 from export_aoti import export_model as export_model_aoti
@@ -31,16 +32,7 @@ except Exception as e:
     executorch_export_available = False
 
 
-default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
-
-
-def device_sync(device):
-    if "cuda" in device:
-        torch.cuda.synchronize(device)
-    elif ("cpu" in device) or ("mps" in device):
-        pass
-    else:
-        print(f"device={device} is not yet suppported")
+default_device = "cpu"
 
 
 def main(args):

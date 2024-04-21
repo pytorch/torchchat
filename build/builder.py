@@ -21,6 +21,7 @@ from sentencepiece import SentencePieceProcessor
 from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
 from build.model import Transformer
+from build.utils import device_sync
 
 
 @dataclass
@@ -178,15 +179,6 @@ def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
         return TiktokenTokenizer(model_path=str(tokenizer_args.tokenizer_path))
     else:
         raise RuntimeError("must specify a valid tokenizer in TokenizerArgs")
-
-
-def device_sync(device):
-    if "cuda" in device:
-        torch.cuda.synchronize(device)
-    elif ("cpu" in device) or ("mps" in device):
-        pass
-    else:
-        print(f"device={ device } is not yet suppported")
 
 
 torch._inductor.config.coordinate_descent_tuning = True

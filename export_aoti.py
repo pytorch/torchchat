@@ -7,20 +7,11 @@
 
 import torch
 import torch.nn as nn
+from build.utils import device_sync
 
 from torch.export import Dim
 
-# CPU is always available and also exportable to ExecuTorch
-default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
-
-
-def device_sync(device):
-    if "cuda" in device:
-        torch.cuda.synchronize(device)
-    elif ("cpu" in device) or ("mps" in device):
-        pass
-    else:
-        print(f"device={device} is not yet suppported")
+default_device = "cpu"
 
 
 def export_model(model: nn.Module, device, output_path, args=None):

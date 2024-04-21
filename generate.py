@@ -26,6 +26,7 @@ from build.builder import (
     validate_args,
 )
 from build.model import Transformer
+from build.utils import device_sync
 from cli import add_arguments, add_arguments_for_generate, arg_init, check_args
 from download import download_and_convert, is_model_downloaded
 from quantize import set_precision
@@ -64,15 +65,6 @@ class GeneratorArgs:
             compile_prefill=args.compile_prefill,
             speculate_k=args.speculate_k,
         )
-
-
-def device_sync(device):
-    if "cuda" in device:
-        torch.cuda.synchronize(device)
-    elif ("cpu" in device) or ("mps" in device):
-        pass
-    else:
-        logging.error(f"device={ device } is not yet suppported")
 
 
 torch._inductor.config.coordinate_descent_tuning = True

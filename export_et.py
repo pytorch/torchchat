@@ -28,19 +28,9 @@ from export_et_util import replace_attention_with_custom_sdpa_attention
 
 from quantize import get_precision
 from torch._export import capture_pre_autograd_graph
+from build.utils impport device_sync, canonical_path
 
-
-# CPU is always available and also exportable to ExecuTorch
-default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
-
-
-def device_sync(device):
-    if "cuda" in device:
-        torch.cuda.synchronize(device)
-    elif ("cpu" in device) or ("mps" in device):
-        pass
-    else:
-        print(f"device={device} is not yet suppported")
+default_device = "cpu"
 
 
 def materialze_broadcast_of_rope_freq_cis(
@@ -67,10 +57,6 @@ def materialze_broadcast_of_rope_freq_cis(
     module.freqs_sin = module.freqs_sin.view(dim0, 1, dim1)
     module.freqs_sin = module.freqs_sin.expand(dim0, num_heads, dim1).contiguous()
     return module
-
-
-def canonical_path(path):
-    return path
 
 
 def export_model(model, device, output_path, args=None) -> str:  # noqa: C901

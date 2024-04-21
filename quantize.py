@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 from __future__ import annotations
+
 import json
 from functools import reduce
 from math import gcd
@@ -14,41 +15,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchao.quantization.quant_api as quant_api
+from build.utils import find_multiple, get_precision
 
 
-##########################################################################
-###               dtype name to torch.dtype mapping                    ###
-
-precision = torch.float
-
-
-def set_precision(dtype):
-    global precision
-    precision = dtype
-
-
-def get_precision():
-    global precision
-    return precision
-
-
-def name_to_dtype(name):
-    if name in name_to_dtype_dict:
-        return name_to_dtype_dict[name]
-    else:
-        raise RuntimeError(f"unsupported dtype name {name} specified")
-
-
-name_to_dtype_dict = {
-    "fp32": torch.float,
-    "fp16": torch.float16,
-    "bf16": torch.bfloat16,
-    "float": torch.float,
-    "half": torch.float16,
-    "float32": torch.float,
-    "float16": torch.float16,
-    "bfloat16": torch.bfloat16,
-}
+#########################################################################
+###                  torchchat quantization API                       ###
 
 
 def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
@@ -56,7 +27,7 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
     Quantize the specified model using the quantizers described by
     a quantization dict of the form:
     {
-        'embedding':   {'bitwidth': 8, 'groupsize': 8 },
+        'embedding':   {'bitwidth': 8, 'groupsize': 8},
         'linear:int8': {'bitwidth': 8, 'groupsize': 8},
         'precision':   {'dtype': torch.float16},
     }
@@ -139,13 +110,14 @@ class PrecisionHandler(QuantHandler):
     def quantized_model(self) -> nn.Module:
         return self.model.to(device=device, **kwargs)
 
-            
+
 #########################################################################
 ###                QuantHandler API definition                        ###
 ###               (unify with torchao in future)                      ###
 
+
 class QuantHandler:
-    def __init__(self, mod, device = "cpu", tokenizer = None):
+    def __init__(self, mod, device="cpu", tokenizer=None):
         self.mod = mod
         self.device = device
         self.tokenizer = tokenizer
@@ -161,20 +133,23 @@ class QuantHandler:
         self.convert_for_runtime()
         self.mod.load_state_dict(model_updated_state_dict)
         return self.mod
-    
+
 
 #########################################################################
 ###          QuantHandler wrapper for a8w4dq from torchao             ###
 
+
 class Int8DynActInt4WeightQuantizer(QuantHandler):
-    from torchao.quantization.quant_api import Int8DynActInt4WeightQuantizer as aoInt8DynActInt4WeightQuantizer
-    
-    def __init__(self, mod, device = "cpu", tokenizer = None, **kwargs):
+    from torchao.quantization.quant_api import (
+        Int8DynActInt4WeightQuantizer as aoInt8DynActInt4WeightQuantizer,
+    )
+
+    def __init__(self, mod, device="cpu", tokenizer=None, **kwargs):
         self.mod = mod
         self.device = device
         self.tokenizer = tokenizer
         self.quantizer = aoInt8DynActInt4WeightQuantizer(**kwargs)
-            
+
     def create_quantized_state_dict(self) -> Dict:  # "StateDict"
         pass
 
@@ -184,15 +159,17 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
     def quantized_model(self) -> nn.Module:
         return self.quantizer.quantize(self.model)
 
+
 #########################################################################
 ###          QuantHandler wrapper for a8w4dq from torchao             ###
 
+
 class PrecisionHandler(QuantHandler):
-    def __init__(self, mod, device = "cpu", tokenizer = None, **kwargs):
+    def __init__(self, mod, device="cpu", tokenizer=None, **kwargs):
         self.mod = mod
         self.device = device
         self.tokenizer = tokenizer
-            
+
     def create_quantized_state_dict(self) -> Dict:  # "StateDict"
         pass
 
@@ -205,6 +182,7 @@ class PrecisionHandler(QuantHandler):
 
 #########################################################################
 #####                     Quantization Primitives                  ######
+
 
 def dynamically_quantize_per_channel(
     x,
@@ -415,7 +393,7 @@ def replace_linear_weight_only_int8_per_channel(
     module, device, node_type, groupsize=None
 ):
     if groupsize is not None and groupsize != 0:
-        pass 
+        pass
 
     for name, child in module.named_children():
         # print(f"name: {name}")
@@ -806,8 +784,6 @@ def _int4_prepare_int4_weight_and_scales_and_zeros(
 
 
 def _int4_calc_padded_size(k, groupsize=1, innner_k_tiles=1):
-    from build.model import find_multiple
-
     return find_multiple(k, 1024)
 
 
@@ -869,7 +845,14 @@ def replace_linear_int4(
 
 class WeightOnlyInt4QuantHandler(QuantHandler):
     def __init__(
-            self, mod, device, tokenizer=None, *, groupsize=128, inner_k_tiles=8, padding_allowed=True
+        self,
+        mod,
+        device,
+        tokenizer=None,
+        *,
+        groupsize=128,
+        inner_k_tiles=8,
+        padding_allowed=True,
     ):
         self.mod = mod
         self.device = device
