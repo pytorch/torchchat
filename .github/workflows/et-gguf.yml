@@ -36,19 +36,10 @@ jobs:
           pip install zstd
           pip install -r requirements.txt
 
-          echo "Executorch: cloning"
-          mkdir etorch
-          cd etorch
-          git clone https://github.com/pytorch/executorch.git
-          cd executorch
-          echo "Inside: ${PWD}"
-
-          echo "Executorch: submodule update"
-          git submodule sync
-          git submodule update --init
-
-          echo "Executorch: installing python interface"
-          ./install_requirements.sh --pybind xnnpack
+          echo "Install Executorch"
+          export TORCHCHAT_ROOT=${PWD}
+          export ENABLE_ET_PYBIND=true
+          bash ./scripts/install_et.sh $ENABLE_ET_PYBIND
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
           cd ../..
