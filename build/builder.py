@@ -88,7 +88,9 @@ class BuilderArgs:
             )
             # The transformers config is keyed on the last section
             # of the name/path.
-            params_table = model_config.transformer_params_key or model_config.name.split("/")[-1]
+            params_table = (
+                model_config.transformer_params_key or model_config.name.split("/")[-1]
+            )
 
         is_chat_model = False
         if args.is_chat_model:
@@ -143,6 +145,21 @@ class TokenizerArgs:
     is_sentencepiece: bool = True
     is_tiktoken: bool = False
 
+    def validate_model(
+        self,
+        model: Transformer,
+        model_description: str = "model",
+    ):
+        use_tiktoken = model.config.use_tiktoken
+        is_tiktoken = self.is_tiktoken
+
+        if use_tiktoken is None:
+            model.config.use_tiktoken = is_tiktoken
+        elif use_tiktoken != is_tiktoken:
+            raise RuntimeError(
+                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)} for {model_description}"
+            )
+
     @classmethod
     def from_args(cls, args):  # -> TokenizerArgs:
         is_sentencepiece = True
@@ -152,7 +169,11 @@ class TokenizerArgs:
             tokenizer_path = args.tokenizer_path
         elif args.model:  # Using a named, well-known model
             model_config = resolve_model_config(args.model)
-            tokenizer_path = Path(args.model_directory) / model_config.name / model_config.tokenizer_file
+            tokenizer_path = (
+                Path(args.model_directory)
+                / model_config.name
+                / model_config.tokenizer_file
+            )
 
         elif args.checkpoint_path:
             tokenizer_path = args.checkpoint_path.parent / "tokenizer.model"
@@ -363,18 +384,6 @@ def _initialize_model(
 
 def tokenizer_setting_to_name(tiktoken: bool = False) -> str:
     return "TikToken" if tiktoken else "SentencePiece"
-
-
-def validate_args(model: Transformer, tokenizer_args: TokenizerArgs):
-    use_tiktoken = model.config.use_tiktoken
-    is_tiktoken = tokenizer_args.is_tiktoken
-
-    if use_tiktoken is None:
-        model.config.use_tiktoken = is_tiktoken
-    elif use_tiktoken != is_tiktoken:
-        raise RuntimeError(
-            f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}"
-        )
 
 
 def resolve_model_name(model: str) -> str:

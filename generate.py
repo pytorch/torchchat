@@ -22,7 +22,6 @@ from build.builder import (
     _initialize_tokenizer,
     BuilderArgs,
     TokenizerArgs,
-    validate_args,
 )
 from build.model import Transformer
 from build.utils import device_sync, set_precision
@@ -47,6 +46,29 @@ class GeneratorArgs:
     compile: bool = False
     compile_prefill: bool = False
     speculate_k: int = 5
+    sequential_prefill: bool = True
+
+    def __post_init__(self):
+        if self.compile_prefill and self.sequential_prefill:
+            raise RuntimeError("prefill compilation requires parallel prefill")
+
+    def validate_model(self, model: Transformer, model_description: str = "model"):
+        reason = ""
+        model_type = ""
+        if not self.sequential_prefill:
+            reason = "parallel prefill"
+        if self.prefill_compile:
+            reason = "model compilation for prefill"
+        if self.compile:
+            reason = "model compilation"
+        if model.config.dso_path:
+            model_type = "DSO"
+        if model.config.pte_path:
+            model_type = "PTE"
+        if model_type and reason:
+            raise RuntimeError(
+                f"cannot perform {reason} because a {model_type} {model_description} is used"
+            )
 
     @classmethod
     def from_args(cls, args):  # -> GeneratorArgs:
@@ -62,6 +84,7 @@ class GeneratorArgs:
             compile=args.compile,
             compile_prefill=args.compile_prefill,
             speculate_k=args.speculate_k,
+            parallel_prefill=not args.parallel_prefill,
         )
 
 
@@ -116,7 +139,6 @@ def prefill(
     logging.debug(f"x: {x}, input_pos: {input_pos}")
     width = x.size(1)
     assert input_pos.size(0) == width
-    sequential_prefill = True
 
     if sequential_prefill:
         for i in range(width):
@@ -244,6 +266,7 @@ def generate(
     chat_mode: bool,
     draft_model: Transformer,
     speculate_k: Optional[int] = 8,
+    sequential_prefill=True,
     callback=lambda x: x,
     **sampling_kwargs,
 ) -> torch.Tensor:
@@ -276,9 +299,21 @@ def generate(
     seq = empty
     input_pos = torch.arange(0, T, device=device, dtype=torch.int)
 
-    next_token = prefill(model, prompt.view(1, -1), input_pos, **sampling_kwargs)
+    next_token = prefill(
+        model,
+        prompt.view(1, -1),
+        input_pos,
+        sequential_prefill=sequential_prefill,
+        **sampling_kwargs,
+    )
     if is_speculative:
-        prefill(draft_model, prompt.view(1, -1), input_pos, **sampling_kwargs)
+        prefill(
+            draft_model,
+            prompt.view(1, -1),
+            input_pos,
+            sequential_prefill=sequential_prefill,
+            **sampling_kwargs,
+        )
     seq[T] = next_token
 
     input_pos = torch.tensor([T], device=device, dtype=torch.int)
@@ -355,8 +390,6 @@ def _main(
     speculative_builder_args: BuilderArgs,
     tokenizer_args: TokenizerArgs,
     generator_args: GeneratorArgs,
-    compile: bool = True,
-    compile_prefill: bool = False,
     profile: Optional[Path] = None,
     quantize=None,
     draft_quantize=None,
@@ -398,7 +431,6 @@ def _main(
 
     builder_args.setup_caches = False
     model = _initialize_model(builder_args, quantize, tokenizer)
-    validate_args(model, tokenizer_args)
 
     # will add a version of _initialize_model in future
     # (need additional args)
@@ -410,6 +442,11 @@ def _main(
         )
     else:
         draft_model = None
+
+    tokenizer_args.validate(model)
+    tokenizer_args.validate(draft_model, "draft model")
+    generator_args.validate(model)
+    generator_args.validate(draft_model, "draft model")
 
     encoded = encode_tokens(
         tokenizer, generator_args.prompt, bos=True, device=builder_args.device
@@ -423,7 +460,7 @@ def _main(
             for p in itertools.chain(model.parameters(), model.buffers())
         ]
     )
-    if compile:
+    if generator_args.compile:
         if (
             is_speculative and builder_args.use_tp
         ):  # and ("cuda" in builder_args.device):
@@ -443,14 +480,14 @@ def _main(
         )
 
         # Uncomment to squeeze more perf out of prefill
-        if compile_prefill:
+        if generator_args.compile_prefill:
             prefill = torch.compile(prefill, fullgraph=True, dynamic=True)
 
     aggregate_metrics = {
         "tokens_per_sec": [],
         "accept_counts": [],
     }
-    start = -1 if compile else 0
+    start = -1 if generator_args.compile else 0
 
     for i in range(start, generator_args.num_samples):
         device_sync(device=builder_args.device)
@@ -506,6 +543,7 @@ def _main(
                 callback=callback,
                 temperature=generator_args.temperature,
                 top_k=generator_args.top_k,
+                sequential_prefill=generator_args.sequential_prefill,
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
         if i == -1:

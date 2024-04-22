@@ -42,10 +42,11 @@ def _download_hf_snapshot(
         else:
             raise e
 
-    
     # Convert the model to the torchchat format.
     print(f"Converting {model_config.name} to torchchat format...")
-    convert_hf_checkpoint(model_dir=artifact_dir, model_name=model_config.name, remove_bin_files=True)
+    convert_hf_checkpoint(
+        model_dir=artifact_dir, model_name=model_config.name, remove_bin_files=True
+    )
 
 
 def _download_direct(
@@ -79,13 +80,15 @@ def download_and_convert(
             == ModelDistributionChannel.HuggingFaceSnapshot
         ):
             _download_hf_snapshot(model_config, temp_dir, hf_token)
-        elif model_config.distribution_channel == ModelDistributionChannel.DirectDownload:
+        elif (
+            model_config.distribution_channel == ModelDistributionChannel.DirectDownload
+        ):
             _download_direct(model_config, temp_dir)
         else:
             raise RuntimeError(
                 f"Unknown distribution channel {model_config.distribution_channel}."
             )
-        
+
         # Move from the temporary directory to the intended location,
         # overwriting if necessary.
         if os.path.isdir(model_dir):
