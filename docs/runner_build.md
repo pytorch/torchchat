@@ -9,10 +9,26 @@ cmake -S ./runner-aoti -B ./runner-aoti/cmake-out -G Ninja -DCMAKE_PREFIX_PATH=`
 cmake --build ./runner-aoti/cmake-out
 ```
 
-After running these, the runner-aoti binary is located at ./runner-aoti/cmake-out/run.  It can be run as follows:
+After running these, the runner-aoti binary is located at ./runner-aoti/cmake-out/run.
+
+Let us try using it with an example.
+We first download stories15M and export it to AOTI.
 
 ```
-./runner-aoti/cmake-out/run ${AOTI_SO_PATH} -z ${TOKENIZER_DOT_BIN_PATH} -i ${PROMPT}
+python torchchat.py download stories15M
+python torchchat.py export --output-dso-path ./model.dso
+```
+
+We also need a tokenizer.bin file for the stories15M model:
+
+```
+wget ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+```
+
+We can now execute the runner with:
+
+```
+./runner-aoti/cmake-out/run ./model.dso -z ./tokenizer.bin -i "Once upon a time"
 ```
 
 ## Building and running runner-et
@@ -27,8 +43,24 @@ cmake -S ./runner-et -B ./runner-et/cmake-out -G Ninja
 cmake --build ./runner-et/cmake-out
 ```
 
-After running these, the runner-et binary is located at ./runner-et/cmake-out/runner-et.  It can be run as follows:
+After running these, the runner-et binary is located at ./runner-et/cmake-out/runner-et.
+
+Let us try using it with an example.
+We first download stories15M and export it to ExecuTorch.
 
 ```
-./runner-et/cmake-out/runner_et ${ET_PTE_PATH} -z ${TOKENIZER_DOT_BIN_PATH} -i ${PROMPT}
+python torchchat.py download stories15M
+python torchchat.py export stories15M --output-pte-path ./model.pte
+```
+
+We also need a tokenizer.bin file for the stories15M model:
+
+```
+wget ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+```
+
+We can now execute the runner with:
+
+```
+./runner-et/cmake-out/runner_et ./model.pte -z ./tokenizer.bin -i "Once upon a time"
 ```
