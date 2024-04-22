@@ -18,7 +18,7 @@ from build.builder import (
     TokenizerArgs,
 )
 
-from build.utils import set_precision
+from build.utils import set_backend, set_precision, use_aoti_backend, use_et_backend
 from cli import add_arguments, add_arguments_for_export, arg_init, check_args
 from download import download_and_convert, is_model_downloaded
 from export_aoti import export_model as export_model_aoti
@@ -35,22 +35,24 @@ default_device = "cpu"
 
 
 def main(args):
+    # THIS BELONGS INTO CLI
     # If a named model was provided and not downloaded, download it.
-    if args.model and not is_model_downloaded(args.model, args.model_directory):
-        download_and_convert(args.model, args.model_directory, args.hf_token)
+    # if args.model and not is_model_downloaded(args.model, args.model_directory):
+    #    download_and_convert(args.model, args.model_directory, args.hf_token)
 
     builder_args = BuilderArgs.from_args(args)
     quantize = args.quantize
 
     print(f"Using device={builder_args.device}")
     set_precision(builder_args.precision)
+    set_backend(builder_args)
 
     builder_args.dso_path = None
     builder_args.pte_path = None
     builder_args.setup_caches = True
 
-    output_pte_path = args.output_pte_path
-    output_dso_path = args.output_dso_path
+    output_pte_path = builder_args.output_pte_path
+    output_dso_path = builder_args.output_dso_path
 
     # TODO: clean this up
     # This mess is because ET does not support _weight_int4pack_mm right now

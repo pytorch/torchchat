@@ -12,7 +12,48 @@ import torch
 
 
 ##########################################################################
-###               dtype name to torch.dtype mapping                    ###
+###     set and get target backend is aoti or et for this model        ###
+
+active_builder_args = None
+
+
+def set_backend(builder_args: "BuilderArgs"):
+    global active_builder_args
+    active_builder_args = builder_args
+
+
+def use_aoti_backend() -> bool:
+    global active_builder_args
+
+    # eager == aoti, which is when backend has not been explicitly set
+    if not active_builder_args:
+        return True
+
+    if active_builder_args.output_pte_path and active_builder_args.output_dso_path:
+        raise RuntimeError(
+            "code generation needs to choose different implementations for DSO and PTE path.  Please only use one export option, and call export twice if necessary!"
+        )
+
+    return bool(active_builder_args.output_dso_path)
+
+
+def use_et_backend() -> bool:
+    global active_builder_args
+
+    # eager == aoti, which is when backend has not been explicitly set
+    if not active_builder_args:
+        return False
+
+    if active_builder_args.output_pte_path and active_builder_args.output_dso_path:
+        raise RuntimeError(
+            "code generation needs to choose different implementations for DSO and PTE path.  Please only use one export option, and call export twice if necessary!"
+        )
+
+    return bool(active_builder_args.output_pte_path)
+
+
+##########################################################################
+###          set and get target precision for this model               ###
 
 precision = torch.float32
 
@@ -27,6 +68,8 @@ def get_precision():
     return precision
 
 
+##########################################################################
+###               dtype name to torch.dtype mapping                    ###
 def name_to_dtype(name):
     if name in name_to_dtype_dict:
         return name_to_dtype_dict[name]

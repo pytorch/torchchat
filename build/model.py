@@ -15,7 +15,7 @@ import torch.nn as nn
 from torch import Tensor
 from torch.nn import functional as F
 
-from build.utils import find_multiple, get_precision
+from build.utils import find_multiple, get_precision, use_aoti_backend
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
@@ -213,7 +213,9 @@ class Transformer(nn.Module):
     def from_gguf(cls, gguf_path: str, **kwargs):
         from build.gguf_loader import load_model_and_state_dict
 
-        model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
+        model, state_dict = load_model_and_state_dict(
+            gguf_path, load_as_quantized=use_aoti_backend()
+        )
         if state_dict != {}:
             model.load_state_dict(state_dict, assign=True)
         return model

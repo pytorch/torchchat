@@ -76,6 +76,7 @@ class QuantHandler:
 class Int8DynActInt4WeightQuantizer(QuantHandler):
     def __init__(self, model: nn.Module, device="cpu", tokenizer=None, **kwargs):
         import torchao.quantization.quant_api as quant_api
+
         self.model_ = model
         self.device = device
         self.tokenizer = tokenizer
