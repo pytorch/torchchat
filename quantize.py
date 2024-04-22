@@ -7,10 +7,9 @@
 from __future__ import annotations
 
 import json
-
-# from functools import reduce
-# from math import gcd
-from typing import Dict, Optional
+from functools import reduce
+from math import gcd
+from typing import Dict, Optional, Tuple
 
 import torch
 import torch.nn as nn

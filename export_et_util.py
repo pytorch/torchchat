@@ -1,7 +1,6 @@
 import torch
 from build.model import apply_rotary_emb, Attention
-
-# from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache
+from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache
 from torch import nn
 
 
