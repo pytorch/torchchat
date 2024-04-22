@@ -19,8 +19,8 @@ You can generate models (for both export and generate, with eager, torch.compile
 
 TODO: These need to be commands that can be copy paste
 ```
-python generate.py --dtype [bf16 | fp16 | fp32] ...
-python export.py --dtype [bf16 | fp16 | fp32] ...
+python3 generate.py --dtype [bf16 | fp16 | fp32] ...
+python3 export.py --dtype [bf16 | fp16 | fp32] ...
 ```
 
 Unlike gpt-fast which uses bfloat16 as default, torchchat uses float32 as the default. As a consequence you will have to set to --dtype bf16 or --dtype fp16 on server / desktop for best performance.
@@ -42,37 +42,37 @@ We can do this in eager mode (optionally with torch.compile), we use the embeddi
 
 TODO: Write this so that someone can copy paste
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
+python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
 
 ```
 
 Then, export as follows with ExecuTorch:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --prompt "Hello my name is"
+python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --prompt "Hello my name is"
 ```
 
 *Groupwise quantization:*
 We can do this in eager mode (optionally with torch.compile), we use the embedding quantizer by specifying the group size:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
+python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
 
 ```
 Then, export as follows:
 
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "groupsize": 8} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 8, "groupsize": 8} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
 
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
+python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
 ```
 
 ## 4-Bit Embedding Quantization (channelwise & groupwise)
@@ -82,35 +82,35 @@ Quantizing embedding tables with int4 provides even higher compression of embedd
 We can do this in eager mode (optionally with torch.compile), we use the embedding quantizer with groupsize set to 0 which uses channelwise quantization:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 4, "groupsize": 0}}' --device cpu
+python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 4, "groupsize": 0}}' --device cpu
 ```
 
 Then, export as follows:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 4, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 4, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
 
 ```
-python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --prompt "Hello my name is"
+python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --prompt "Hello my name is"
 ```
 
 *Groupwise quantization:*
 We can do this in eager mode (optionally with torch.compile), we use the embedding quantizer by specifying the group size:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8}}' --device cpu
+python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8}}' --device cpu
 ```
 
 Then, export as follows:
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 4, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"embedding": {"bitwidth": 4, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
+python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
 ```
 
 ## 8-Bit Integer Linear Quantization (linear operator, channel-wise and groupwise)
@@ -124,58 +124,58 @@ The simplest way to quantize embedding tables is with int8 groupwise quantizatio
 We can do this in eager mode (optionally with torch.compile), we use the linear:int8 quantizer with groupsize set to 0 which uses channelwise quantization:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
+python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
 ```
 
 Then, export as follows using ExecuTorch for mobile backends:
 
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte
 ```
 
 Now you can run your model with the same command as before:
 
 ```
-python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --checkpoint-path ${MODEL_PATH}  --prompt "Hello my name is"
+python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --checkpoint-path ${MODEL_PATH}  --prompt "Hello my name is"
 ```
 
 Or, export as follows for server/desktop deployments:
 
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.so
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.so
 ```
 
 Now you can run your model with the same command as before:
 
 ```
-python generate.py --dso-path ${MODEL_OUT}/${MODEL_NAME}_int8.so --checkpoint-path ${MODEL_PATH}  --prompt "Hello my name is"
+python3 generate.py --dso-path ${MODEL_OUT}/${MODEL_NAME}_int8.so --checkpoint-path ${MODEL_PATH}  --prompt "Hello my name is"
 ```
 
 *Groupwise quantization:*
 We can do this in eager mode (optionally with torch.compile), we use the linear:int8 quantizer by specifying the group size:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
+python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
 ```
 Then, export as follows using ExecuTorch:
 
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte
 ```
 
 **Now you can run your model with the same command as before:**
 
 ```
-python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte --checkpoint-path ${MODEL_PATH} --prompt "Hello my name is"
+python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte --checkpoint-path ${MODEL_PATH} --prompt "Hello my name is"
 ```
 *Or, export*
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.so
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.so
 ```
 
 Now you can run your model with the same command as before:
 ```
-python generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.so --checkpoint-path ${MODEL_PATH} -d fp32 --prompt "Hello my name is"
+python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.so --checkpoint-path ${MODEL_PATH} -d fp32 --prompt "Hello my name is"
 ```
 
 Please note that group-wise quantization works functionally, but has not been optimized for CUDA and CPU targets where the best performnance requires a group-wise quantized mixed dtype linear operator.
@@ -187,16 +187,16 @@ To compress your model even more, 4-bit integer quantization may be used. To ach
 We can do this in eager mode (optionally with torch.compile), we use the linear:int8 quantizer by specifying the group size:
 
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int4" : {"groupsize": 32}}' --device [ cpu | cuda | mps ]
+python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int4" : {"groupsize": 32}}' --device [ cpu | cuda | mps ]
 ```
 
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int4': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:int4': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]
 ```
 Now you can run your model with the same command as before:
 
 ```
-python generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]  --prompt "Hello my name is"
+python3 generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]  --prompt "Hello my name is"
 ```
 
 ## 4-Bit Integer Linear Quantization  (a8w4dq)
@@ -204,13 +204,13 @@ To compress your model even more, 4-bit integer quantization may be used. To ach
 
 **TODO (Digant): a8w4dq eager mode support [#335](https://github.com/pytorch/torchchat/issues/335) **
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:a8w4dq': {'groupsize' : 7} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso... ]
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:a8w4dq': {'groupsize' : 7} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso... ]
 ```
 
 Now you can run your model with the same command as before:
 
 ```
-python generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_a8w4dq.pte | ...dso...]  --prompt "Hello my name is"
+python3 generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_a8w4dq.pte | ...dso...]  --prompt "Hello my name is"
 ```
 
 ## 4-bit Integer Linear Quantization with GPTQ (gptq)
@@ -220,16 +220,16 @@ Compression offers smaller memory footprints (to fit on memory-constrained accel
 
 We can use GPTQ with eager execution, optionally in conjunction with torch.compile:
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int4" : {"groupsize": 32}}' --device [ cpu | cuda | mps ]
+python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:int4" : {"groupsize": 32}}' --device [ cpu | cuda | mps ]
 ```
 
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:gptq': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ] 
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:gptq': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ] 
 ```
 Now you can run your model with the same command as before:
 
 ```
-python generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso...]  --prompt "Hello my name is"
+python3 generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso...]  --prompt "Hello my name is"
 ```
 
 ## 4-bit Integer Linear Quantization with HQQ (hqq)
@@ -240,16 +240,16 @@ Compression offers smaller memory footprints (to fit on memory-constrained accel
 
 We can use HQQ with eager execution, optionally in conjunction with torch.compile:
 ```
-python generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:hqq" : {"groupsize": 32}}' --device [ cpu | cuda | mps ]
+python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quant '{"linear:hqq" : {"groupsize": 32}}' --device [ cpu | cuda | mps ]
 ```
 
 ```
-python export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:hqq': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_hqq.pte | ...dso... ] 
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:hqq': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_hqq.pte | ...dso... ] 
 ```
 Now you can run your model with the same command as before:
 
 ```
-python generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_hqq.pte | ...dso...]  --prompt "Hello my name is"
+python3 generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_hqq.pte | ...dso...]  --prompt "Hello my name is"
 
 
 ## Adding additional quantization schemes
