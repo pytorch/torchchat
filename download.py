@@ -16,13 +16,13 @@ from config.model_config import (
     resolve_model_config,
 )
 
-from requests.exceptions import HTTPError
 
 
 def _download_hf_snapshot(
     model_config: ModelConfig, artifact_dir: Path, hf_token: Optional[str]
 ):
     from huggingface_hub import snapshot_download
+    from requests.exceptions import HTTPError
 
     # Download and store the HF model artifacts.
     print(f"Downloading {model_config.name} from HuggingFace...")
