@@ -318,7 +318,25 @@ def _initialize_model(
     builder_args,
     quantize,
     tokenizer=None,
+    is_et=None,
 ):
+    # Infer is_et from dso_path or pte_path if is_et is not explicitly provided
+    if is_et is None:
+        is_dso = builder_args.dso_path is not None
+        is_pte = builder_args.pte_path is not None
+        assert is_dso or is_pte
+        assert not (is_dso and is_pte)
+
+        is_et = is_pte
+
+    # Assert is_et is consistent with dso_path or pte_path, if provided
+    is_dso = builder_args.dso_path is not None
+    is_pte = builder_args.pte_path is not None
+    assert not (is_dso and is_pte)
+
+    assert not (is_pte and not is_et)
+    assert not (is_dso and is_et)
+
     print("Loading model ...")
     t0 = time.time()
 
@@ -370,7 +388,7 @@ def _initialize_model(
         if quantize:
             t0q = time.time()
             print(f"Quantizing the model with: {quantize}")
-            quantize_model(model, builder_args.device, quantize, tokenizer)
+            quantize_model(model, builder_args.device, quantize, tokenizer, is_et)
             device_sync(device=builder_args.device)
             print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
 

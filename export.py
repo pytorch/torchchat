@@ -52,39 +52,31 @@ def main(args):
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
 
-    # TODO: clean this up
-    # This mess is because ET does not support _weight_int4pack_mm right now
-    if not builder_args.gguf_path:
-        # tokenizer needed for quantization so get that here,
-        try:
-            tokenizer_args = TokenizerArgs.from_args(args)
-            tokenizer = _initialize_tokenizer(tokenizer_args)
-        except:
-            tokenizer = None
+    try:
+        tokenizer_args = TokenizerArgs.from_args(args)
+        tokenizer = _initialize_tokenizer(tokenizer_args)
+    except:
+        tokenizer = None
 
-        model = _initialize_model(
+    if output_pte_path:
+        _set_gguf_kwargs(builder_args, is_et=True, context="export")
+        model_to_pte = _initialize_model(
             builder_args,
             quantize,
             tokenizer,
+            is_et=True,
         )
-        model_to_pte = model
-        model_to_dso = model
-    else:
-        if output_pte_path:
-            _set_gguf_kwargs(builder_args, is_et=True, context="export")
-            model_to_pte = _initialize_model(
-                builder_args,
-                quantize,
-            )
-            _unset_gguf_kwargs(builder_args)
+        _unset_gguf_kwargs(builder_args)
 
-        if output_dso_path:
-            _set_gguf_kwargs(builder_args, is_et=False, context="export")
-            model_to_dso = _initialize_model(
-                builder_args,
-                quantize,
-            )
-            _unset_gguf_kwargs(builder_args)
+    if output_dso_path:
+        _set_gguf_kwargs(builder_args, is_et=False, context="export")
+        model_to_dso = _initialize_model(
+            builder_args,
+            quantize,
+            tokenizer,
+            is_et=False,
+        )
+        _unset_gguf_kwargs(builder_args)
 
     with torch.no_grad():
         if output_pte_path:

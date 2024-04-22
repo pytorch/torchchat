@@ -22,7 +22,7 @@ from build.utils import find_multiple, get_precision
 ###                  torchchat quantization API                       ###
 
 
-def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
+def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None, is_et=False):
     """
     Quantize the specified model using the quantizers described by
     a quantization dict of the form:
@@ -37,6 +37,9 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
         quantize_options = json.loads(quantize_options)
 
     for quantizer, q_kwargs in quantize_options.items():
+        q_kwargs["is_et"] = is_et
+
+
         if quantizer not in quantizer_class_dict:
             raise RuntimeError(f"unknown quantizer {quantizer} specified")
 
@@ -520,7 +523,7 @@ class WeightOnlyInt8Linear(torch.nn.Module):
 
 
 def replace_embedding_weight_only_grouped_int8_per_channel(
-    module, device, bitwidth: int = 8, groupsize: Optional[int] = None, packed=False
+    module, device, bitwidth: int = 8, groupsize: Optional[int] = None, packed=False, is_et=False
 ):
     for name, child in module.named_children():
         # print(f"name: {name}")
@@ -536,11 +539,12 @@ def replace_embedding_weight_only_grouped_int8_per_channel(
                     embedding_dim=child.weight.shape[1],
                     groupsize=groupsize,
                     packed=packed,
+                    is_et=is_et,
                 ),
             )
         else:
             replace_embedding_weight_only_grouped_int8_per_channel(
-                child, device, bitwidth, groupsize, packed
+                child, device, bitwidth, groupsize, packed, is_et
             )
 
 
@@ -554,6 +558,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
         bitwidth: int = 8,
         groupsize: Optional[int] = None,
         packed=True,
+        is_et=False,
     ):
         # when quantization dictionary comes from JSON, packed is a string
         if isinstance(packed, str):
@@ -563,6 +568,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
         self.groupsize = groupsize
         self.bitwidth = bitwidth
         self.packed = packed
+        self.is_et = is_et
 
     @torch.no_grad()
     def create_quantized_state_dict(self, packed=False) -> Dict:
@@ -619,7 +625,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 
     def convert_for_runtime(self) -> nn.Module:
         replace_embedding_weight_only_grouped_int8_per_channel(
-            self.model_, self.device, self.bitwidth, self.groupsize, self.packed
+            self.model_, self.device, self.bitwidth, self.groupsize, self.packed, self.is_et
         )
         return self.model_
 
@@ -639,6 +645,7 @@ class QuantizedGroupEmbedding(torch.nn.Module):
         groupsize: Optional[int] = None,
         dtype=torch.half,
         packed=False,
+        is_et=False,
     ) -> None:
         super().__init__()
         if groupsize is None or groupsize == 0:
@@ -646,6 +653,7 @@ class QuantizedGroupEmbedding(torch.nn.Module):
         self.groupsize = groupsize
         self.dtype = dtype
         self.packed = packed
+        self.is_et = is_et
         if not packed:
             self.register_buffer(
                 "weight",
@@ -675,10 +683,19 @@ class QuantizedGroupEmbedding(torch.nn.Module):
 
     @torch.no_grad()
     def forward(self, indices: torch.Tensor) -> torch.Tensor:
-        if False:  # Used for Executorch
-            return torch.ops.llama_quantized.embedding_byte.dtype(
-                self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
-            )
+
+        # et-path
+        if self.is_et:
+            if not self.packed:  # 8bit
+                return torch.ops.quantized_decomposed.embedding_byte.dtype(
+                    self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
+                )
+            else:  # 4bit packed
+                return torch.ops.quantized_decomposed.embedding_4bit.dtype(
+                    self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
+                )
+
+        # non-et path
 
         # result_weights = self.weight.index_select(0, indices.view(-1))
         # result_scales = self.scales.index_select(0, indices.view(-1))
