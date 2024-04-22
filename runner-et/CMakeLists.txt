@@ -64,12 +64,12 @@ target_link_options_shared_lib(cpuinfo)
 if(ANDROID OR APPLE)
   target_link_options_shared_lib(executorch)
 endif()
-target_link_libraries(runner_et PRIVATE
+target_link_libraries(run PRIVATE
 "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch/${CMAKE_OUT_DIR}/examples/models/llama2/custom_ops/libcustom_ops.a>")
 
 # This one is needed for cpuinfo where it uses android specific log lib
 if(ANDROID)
-  target_link_libraries(runner_et PRIVATE log)
+  target_link_libraries(run PRIVATE log)
 endif()
 
 # Adding target_link_options_shared_lib as commented out below leads to this:
