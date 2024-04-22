@@ -53,6 +53,8 @@ class GeneratorArgs:
             raise RuntimeError("prefill compilation requires parallel prefill")
 
     def validate_model(self, model: Transformer, model_description: str = "model"):
+        if model is None:
+            return
         reason = ""
         model_type = ""
         if not self.sequential_prefill:
