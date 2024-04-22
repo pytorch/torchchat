@@ -86,7 +86,7 @@ class GeneratorArgs:
             compile=args.compile,
             compile_prefill=args.compile_prefill,
             speculate_k=args.speculate_k,
-            parallel_prefill=not args.parallel_prefill,
+            sequential_prefill=not args.parallel_prefill,
         )
 
 
