@@ -16,7 +16,6 @@ from build.builder import (
     _initialize_tokenizer,
     BuilderArgs,
     TokenizerArgs,
-    validate_args,
 )
 
 from build.model import Transformer
@@ -245,7 +244,7 @@ def main(args) -> None:
         quantize,
         tokenizer,
     )
-    validate_args(model, tokenizer_args)
+    tokenizer_args.validate_model(model)
 
     if compile:
         assert not (
