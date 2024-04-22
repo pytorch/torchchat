@@ -15,7 +15,6 @@ from typing import Dict, Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torchao.quantization.quant_api as quant_api
 from build.utils import find_multiple, get_precision
 
 
@@ -76,6 +75,7 @@ class QuantHandler:
 
 class Int8DynActInt4WeightQuantizer(QuantHandler):
     def __init__(self, model: nn.Module, device="cpu", tokenizer=None, **kwargs):
+        import torchao.quantization.quant_api as quant_api
         self.model_ = model
         self.device = device
         self.tokenizer = tokenizer
