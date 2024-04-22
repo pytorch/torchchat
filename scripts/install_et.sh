@@ -31,11 +31,6 @@ install_executorch() {
   git submodule sync
   git submodule update --init
 
-  echo "Applying fixes"
-  cp ${TORCHCHAT_ROOT}/scripts/fixes_et/module.cpp ${TORCHCHAT_ROOT}/et-build/src/executorch/extension/module/module.cpp # ET uses non-standard C++ that does not compile in GCC
-  cp ${TORCHCHAT_ROOT}/scripts/fixes_et/managed_tensor.h ${TORCHCHAT_ROOT}/et-build/src/executorch/extension/runner_util/managed_tensor.h # ET is missing headers for vector/memory.  This causes downstream issues when building runner-et.
-
-  echo "Building and installing python libraries"
   echo "Building and installing python libraries"
   if [ "${ENABLE_ET_PYBIND}" = false ]; then
       echo "Not installing pybind"
