@@ -131,7 +131,7 @@ def add_arguments(parser):
     parser.add_argument(
         "--compile-prefill",
         action="store_true",
-        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times. (Required --parallel-prefill)",
+        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times. (Requires `--parallel-prefill`)",
     )
     parser.add_argument(
         "--parallel-prefill",
