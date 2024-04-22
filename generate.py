@@ -392,9 +392,9 @@ def _main(
     speculative_builder_args: BuilderArgs,
     tokenizer_args: TokenizerArgs,
     generator_args: GeneratorArgs,
-    profile: Optional[Path] = None,
-    quantize=None,
-    draft_quantize=None,
+    profile: Optional[Path], 
+    quantize,
+    draft_quantize,
 ) -> None:
     """
     Generates text samples based on a pre-trained Transformer model and tokenizer.
@@ -600,8 +600,6 @@ def main(args):
         speculative_builder_args,
         tokenizer_args,
         generator_args,
-        args.compile,
-        args.compile_prefill,
         args.profile,
         args.quantize,
         args.draft_quantize,
