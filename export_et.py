@@ -97,7 +97,6 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
             edge_compile_config=edge_config,
         )
     edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
-    edge_manager = edge_manager.to_backend(XnnpackPartitioner())
     export_program = edge_manager.to_executorch(
         ExecutorchBackendConfig(
             extract_constant_segment=True,
