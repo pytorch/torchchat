@@ -16,17 +16,19 @@ Torchchat is an easy-to-use library for running large language models (LLMs) on 
 
 ## Quick Start
 ### Initialize the Environment
-The following steps requires you have [python 3.10](https://www.python.org/downloads/release/python-3100/) and [virtualenv](https://virtualenv.pypa.io/en/latest/installation.html) installed
+The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
 ```
-# set up a virtual environment
-python3 -m virtualenv .venv/torchchat
-source .venv/torchchat/bin/activate
-
-# get the code and dependencies
+# get the code
 git clone https://github.com/pytorch/torchchat.git
 cd torchchat
-bash ./install_requirements.sh
+
+# set up a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# instal dependencies
+./install_requirements.sh
 
 # ensure everything installed correctly
 python3 torchchat.py --help
