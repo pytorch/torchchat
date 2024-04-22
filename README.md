@@ -28,7 +28,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 
 # instal dependencies
-pip install -r requirements.txt
+./install_requirements.sh
 
 # ensure everything installed correctly
 python torchchat.py --help
