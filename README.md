@@ -15,7 +15,7 @@ Torchchat is an easy to use library for leveraging LLMs on edge devices includin
 
 ## Quick Start
 ### Initialize the Environment
-The following steps requires you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) and [virtualenv](https://virtualenv.pypa.io/en/latest/installation.html) installed
+The following steps requires you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) and [virtualenv](https://virtualenv.pypa.io/en/latest/installation.html) installed.
 
 ```
 # set up a virtual environment
@@ -44,7 +44,7 @@ Read on to learn how to use the full power of torchchat.
 For the full details on all commands and parameters run `python torchchat.py --help`
 
 ### Download
-For supported models, torchchat can download model weights. Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace
+For supported models, you can customize torchchat on which model weights to download. Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace
 account and install `huggingface-cli`.
 
 To install `huggingface-cli`, run `pip install huggingface-cli`. After installing, create a user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens). Run `huggingface-cli login`, which will prompt for the newly created token. Once this is done, torchchat will be able to download model artifacts from
@@ -77,7 +77,7 @@ python torchchat.py generate llama2 --device=cpu --dtype=fp16
 ```
 
 ### Export
-Compiles a model for different use cases
+Compiles a model for different use cases.
 
 For more information run `python torchchat.py export --help`
 
@@ -88,7 +88,7 @@ python torchchat.py export stories15M --output-pte-path=stories15m.pte
 ```
 
 ### Browser
-Run a chatbot in your browser that’s supported by the model you specify in the command
+Run a chatbot in your browser that’s supported by the model you specify in the command.
 
 **Examples**
 
@@ -99,10 +99,10 @@ python torchchat.py browser --device cpu --checkpoint-path ${MODEL_PATH} --tempe
 
 *Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
 
-Enter some text in the input box, then hit the enter key or click the “SEND” button. After 1 second or 2, the text you entered together with the generated text will be displayed. Repeat to have a conversation.
+Enter some text in the input box, then hit the enter key or click the “SEND” button. After a second or two, the text you entered together with the generated text will be displayed. Repeat to have a conversation.
 
 ### Eval
-Uses lm_eval library to evaluate model accuracy on a variety of tasks. Defaults to wikitext and can be manually controlled using the tasks and limit args.l
+Uses lm_eval library to evaluate model accuracy on a variety of tasks. Defaults to wikitext and can be manually controlled using the tasks and limit args.
 
 For more information run `python torchchat.py eval --help`
 
@@ -113,13 +113,13 @@ Eager mode:
 python -m torchchat.py eval --device cuda --checkpoint-path ${MODEL_PATH} -d fp32 --limit 5
 ```
 
-To test the perplexity for lowered or quantized model, pass it in the same way you would to generate.py:
+To test the perplexity for a lowered or quantized model, pass it in the same way you would to generate.py:
 
 ```
 python3 -m torchchat.py eval --pte <pte> -p <params.json> -t <tokenizer.model> --limit 5
 ```
 ## Models
-These are the supported models
+The following models are the supported by torchchat:
 | Model | Mobile Friendly | Notes |
 |------------------|---|---------------------|
 |[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
@@ -171,11 +171,14 @@ python torchchat generate --device {cuda,cpu} --dso-path ${MODEL_OUT}/${MODEL_NA
 NOTE: The exported model will be large. We suggest you quantize the model, explained further down, before deploying the model for use.
 
 ### ExecuTorch
-ExecuTorch enables you to optimize your model for execution on a mobile or embedded device
+ExecuTorch enables you to optimize your model for execution on a mobile or embedded device.
 
-If you want to deploy and execute a model within your iOS app <do this>
-If you want to deploy and execute a model within your Android app <do this>
-If you want to deploy and execute a model within your edge device <do this>
+If you want to deploy and execute a model within your iOS app ### TODO #### <do this>
+
+If you want to deploy and execute a model within your Android app ### TODO #### <do this>
+
+If you want to deploy and execute a model within your edge device ### TODO #### <do this>
+  
 If you want to experiment with our sample apps. Check out our iOS and Android sample apps.
 
 ## Quantization
