@@ -742,13 +742,15 @@ jobs:
       - name: Run inference
         run: |
           python torchchat.py download stories15M
+          wget ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+
           export PROMPT="Once upon a time in a land far away"
 
           python torchchat.py generate stories15M --temperature 0 --prompt "${PROMPT}"  > ./output_eager
           cat ./output_eager
 
           python torchchat.py export stories15M --output-pte-path ./model.pte
-          ./runner-et/cmake-out/run ./model.pte -t 0 -i "${PROMPT}" > ./output_et
+          ./runner-et/cmake-out/run ./model.pte -z ./tokenizer.bin -t 0 -i "${PROMPT}" > ./output_et
           cat ./output_et
 
           echo "Tests complete."

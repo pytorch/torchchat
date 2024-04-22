@@ -36,7 +36,8 @@ python torchchat.py export stories15M --output-dso-path ./model.so
 We can now execute the runner with:
 
 ```
-./runner-aoti/cmake-out/run ./model.so -i "Once upon a time"
+wget ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+./runner-aoti/cmake-out/run ./model.so -z ./tokenizer.bin -i "Once upon a time"
 ```
 
 ## Building and running runner-et
@@ -64,5 +65,6 @@ python torchchat.py export stories15M --output-pte-path ./model.pte
 We can now execute the runner with:
 
 ```
-./runner-et/cmake-out/run ./model.pte -i "Once upon a time"
+wget ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+./runner-et/cmake-out/run ./model.pte -z ./tokenizer.bin -i "Once upon a time"
 ```
