@@ -7,3 +7,4 @@ __pycache__/
 *.so
 
 .model-artifacts/
+.venv
