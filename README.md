@@ -16,7 +16,7 @@ Torchchat is an easy-to-use library for running large language models (LLMs) on 
 
 ## Quick Start
 ### Initialize the Environment
-The following steps requires you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed
+The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
 ```
 # get the code
@@ -31,20 +31,20 @@ source .venv/bin/activate
 ./install_requirements.sh
 
 # ensure everything installed correctly
-python torchchat.py --help
+python3 torchchat.py --help
 
 ```
 
 ### Generating Text
 
 ```
-python torchchat.py generate stories15M
+python3 torchchat.py generate stories15M
 ```
 That’s all there is to it!
 Read on to learn how to use the full power of torchchat.
 
 ## Customization
-For the full details on all commands and parameters run `python torchchat.py --help`
+For the full details on all commands and parameters run `python3 torchchat.py --help`
 
 ### Download
 For supported models, torchchat can download model weights. Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace
@@ -54,46 +54,46 @@ To install `huggingface-cli`, run `pip install huggingface-cli`. After installin
 HuggingFace.
 
 ```
-python torchchat.py download llama3
+python3 torchchat.py download llama3
 ```
 
 ### Chat
 Designed for interactive and conversational use.
 In chat mode, the LLM engages in a back-and-forth dialogue with the user. It responds to queries, participates in discussions, provides explanations, and can adapt to the flow of conversation.
 
-For more information run `python torchchat.py chat --help`
+For more information run `python3 torchchat.py chat --help`
 
 **Examples**
 ```
-python torchchat.py chat llama3 --tiktoken
+python3 torchchat.py chat llama3 --tiktoken
 ```
 
 ### Generate
 Aimed at producing content based on specific prompts or instructions.
 In generate mode, the LLM focuses on creating text based on a detailed prompt or instruction. This mode is often used for generating written content like articles, stories, reports, or even creative writing like poetry.
 
-For more information run `python torchchat.py generate --help`
+For more information run `python3 torchchat.py generate --help`
 
 **Examples**
 ```
-python torchchat.py generate llama3 --dtype=fp16 --tiktoken
+python3 torchchat.py generate llama3 --dtype=fp16 --tiktoken
 ```
 
 ### Export
 Compiles a model and saves it to run later.
 
-For more information run `python torchchat.py export --help`
+For more information run `python3 torchchat.py export --help`
 
 **Examples**
 
 AOT Inductor:
 ```
-python torchchat.py export stories15M --output-dso-path stories15M.so
+python3 torchchat.py export stories15M --output-dso-path stories15M.so
 ```
 
 ExecuTorch:
 ```
-python torchchat.py export stories15M --output-pte-path stories15M.pte
+python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 ```
 
 ### Browser
@@ -102,7 +102,7 @@ Run a chatbot in your browser that’s supported by the model you specify in the
 **Examples**
 
 ```
-python torchchat.py browser stories15M --temperature 0 --num-samples 10
+python3 torchchat.py browser stories15M --temperature 0 --num-samples 10
 ```
 
 *Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
@@ -112,19 +112,19 @@ Enter some text in the input box, then hit the enter key or click the “SEND”
 ### Eval
 Uses lm_eval library to evaluate model accuracy on a variety of tasks. Defaults to wikitext and can be manually controlled using the tasks and limit args.
 
-For more information run `python torchchat.py eval --help`
+For more information run `python3 torchchat.py eval --help`
 
 **Examples**
 
 Eager mode:
 ```
-python torchchat.py eval stories15M -d fp32 --limit 5
+python3 torchchat.py eval stories15M -d fp32 --limit 5
 ```
 
 To test the perplexity for lowered or quantized model, pass it in the same way you would to generate:
 
 ```
-python torchchat.py eval stories15M --pte-path stories15M.pte --limit 5
+python3 torchchat.py eval stories15M --pte-path stories15M.pte --limit 5
 ```
 
 ## Models
@@ -153,17 +153,17 @@ See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
 
 ```
 # Llama 3 8B Instruct
-python torchchat.py chat llama3 --tiktoken
+python3 torchchat.py chat llama3 --tiktoken
 ```
 
 ```
 # Stories 15M
-python torchchat.py chat stories15M
+python3 torchchat.py chat stories15M
 ```
 
 ```
 # CodeLama 7B for Python
-python torchchat.py chat codellama
+python3 torchchat.py chat codellama
 ```
 
 ## Desktop Execution
@@ -175,10 +175,10 @@ AOT compiles models into machine code before execution, enhancing performance an
 The following example uses the Stories15M model.
 ```
 # Compile
-python torchchat.py export stories15M --output-dso-path stories15M.so
+python3 torchchat.py export stories15M --output-dso-path stories15M.so
 
 # Execute
-python torchchat.py generate --dso-path stories15M.so --prompt "Hello my name is"
+python3 torchchat.py generate --dso-path stories15M.so --prompt "Hello my name is"
 ```
 
 NOTE: The exported model will be large. We suggest you quantize the model, explained further down, before deploying the model on device.
@@ -190,10 +190,10 @@ ExecuTorch enables you to optimize your model for execution on a mobile or embed
 The following example uses the Stories15M model.
 ```
 # Compile
-python torchchat.py export stories15M --output-pte-path stories15M.pte
+python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 
 # Execute
-python torchchat.py generate --device cpu --pte-path stories15M.pte --prompt "Hello my name is"
+python3 torchchat.py generate --device cpu --pte-path stories15M.pte --prompt "Hello my name is"
 ```
 
 See below under Mobile Execution if you want to deploy and execute a model in your iOS or Android app.
