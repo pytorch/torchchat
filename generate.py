@@ -445,10 +445,10 @@ def _main(
     else:
         draft_model = None
 
-    tokenizer_args.validate(model)
-    tokenizer_args.validate(draft_model, "draft model")
-    generator_args.validate(model)
-    generator_args.validate(draft_model, "draft model")
+    tokenizer_args.validate_model(model)
+    tokenizer_args.validate_model(draft_model, "draft model")
+    generator_args.validate_model(model)
+    generator_args.validate_model(draft_model, "draft model")
 
     encoded = encode_tokens(
         tokenizer, generator_args.prompt, bos=True, device=builder_args.device
