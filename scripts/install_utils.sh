@@ -36,9 +36,6 @@ clone_executorch() {
   git submodule sync
   git submodule update --init
 
-  echo "Applying fixes"
-  cp ${TORCHCHAT_ROOT}/scripts/fixes_et/module.cpp ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch/extension/module/module.cpp # ET uses non-standard C++ that does not compile in GCC
-  cp ${TORCHCHAT_ROOT}/scripts/fixes_et/managed_tensor.h ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch/extension/runner_util/managed_tensor.h # ET is missing headers for vector/memory.  This causes downstream issues when building runner-et.
   popd
 }
 
