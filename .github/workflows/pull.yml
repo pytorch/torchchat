@@ -748,7 +748,7 @@ jobs:
           cat ./output_eager
 
           python torchchat.py export stories15M --output-pte-path ./model.pte
-          ./runner-et/cmake-out/run ./model.pte -t 0 -i {PROMPT}" > ./output_et
+          ./runner-et/cmake-out/run ./model.pte -t 0 -i "${PROMPT}" > ./output_et
           cat ./output_et
 
           echo "Tests complete."
