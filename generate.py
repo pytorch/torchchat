@@ -52,20 +52,20 @@ class GeneratorArgs:
         if self.compile_prefill and self.sequential_prefill:
             raise RuntimeError("prefill compilation requires parallel prefill")
 
-    def validate_model(self, model: Transformer, model_description: str = "model"):
-        if model is None:
-            return
+    def validate_build(
+        self, builder_args: BuilderArgs, model_description: str = "model"
+    ):
         reason = ""
         model_type = ""
         if not self.sequential_prefill:
             reason = "parallel prefill"
-        if self.prefill_compile:
+        if self.compile_prefill:
             reason = "model compilation for prefill"
         if self.compile:
             reason = "model compilation"
-        if model.config.dso_path:
+        if builder_args.dso_path:
             model_type = "DSO"
-        if model.config.pte_path:
+        if builder_args.pte_path:
             model_type = "PTE"
         if model_type and reason:
             raise RuntimeError(
@@ -447,8 +447,8 @@ def _main(
 
     tokenizer_args.validate_model(model)
     tokenizer_args.validate_model(draft_model, "draft model")
-    generator_args.validate_model(model)
-    generator_args.validate_model(draft_model, "draft model")
+    generator_args.validate_build(builder_args)
+    generator_args.validate_build(speculative_builder_args, "draft model")
 
     encoded = encode_tokens(
         tokenizer, generator_args.prompt, bos=True, device=builder_args.device
