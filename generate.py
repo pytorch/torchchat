@@ -392,7 +392,7 @@ def _main(
     speculative_builder_args: BuilderArgs,
     tokenizer_args: TokenizerArgs,
     generator_args: GeneratorArgs,
-    profile: Optional[Path], 
+    profile: Optional[Path],
     quantize,
     draft_quantize,
 ) -> None:

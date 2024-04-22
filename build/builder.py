@@ -152,7 +152,7 @@ class TokenizerArgs:
     ):
         if model is None:
             return
-        
+
         use_tiktoken = model.config.use_tiktoken
         is_tiktoken = self.is_tiktoken
 
