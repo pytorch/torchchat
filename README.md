@@ -1,5 +1,5 @@
 # Chat with LLMs Everywhere
-Torchchat is an easy-to-use library for running large language models (LLMs) on edge devices including mobile phones and desktops.
+Torchchat is a small codebase to showcase running large language models (LLMs) within Python OR within your own (C/C++) application on mobile (iOS/Android), desktop and servers.
 
 ## Highlights
 - Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
@@ -12,10 +12,10 @@ Torchchat is an easy-to-use library for running large language models (LLMs) on 
   - iOS 17+ (iPhone 13 Pro+)
 - Multiple data types including: float32, float16, bfloat16
 - Multiple quantization schemes
-- Multiple execution modes including: Eager, Compile, AOT Inductor (AOTI) and ExecuTorch
+- Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
-## Quick Start
-### Initialize the Environment
+## Installation
+
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
 ```
@@ -32,30 +32,63 @@ source .venv/bin/activate
 
 # ensure everything installed correctly
 python3 torchchat.py --help
-
 ```
 
-### Generating Text
+### Download Weights
+Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace
+account.
 
-```
-python3 torchchat.py generate stories15M
-```
-That’s all there is to it!
-Read on to learn how to use the full power of torchchat.
+Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens).
+Run `huggingface-cli login`, which will prompt for the newly created token.  
 
-## Customization
-For the full details on all commands and parameters run `python3 torchchat.py --help`
-
-### Download
-For supported models, torchchat can download model weights. Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace
-account and install `huggingface-cli`.
-
-To install `huggingface-cli`, run `pip install huggingface-cli`. After installing, create a user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens). Run `huggingface-cli login`, which will prompt for the newly created token. Once this is done, torchchat will be able to download model artifacts from
+Once this is done, torchchat will be able to download model artifacts from
 HuggingFace.
 
 ```
 python3 torchchat.py download llama3
 ```
+
+## What can you do with torchchat?
+
+* Run models via PyTorch / Python:
+  * [Chat](#chat)
+  * [Generate](#generate)
+  * [Run via Browser](#browser)
+* [Quantizing your model (suggested for mobile)](#quantization)
+* Export and run models in native environments (C++, your own app, mobile, etc.)
+  * [Exporting for desktop/servers via AOTInductor](#export-server)
+  * [Running exported .so file via your own C++ application](#run-server)
+     * in Chat mode
+     * in Generate mode
+  * [Exporting for mobile via ExecuTorch](#export-executorch)
+     * in Chat mode
+     * in Generate mode
+  * [Running exported executorch file on iOS or Android](#run-mobile)
+
+## Models
+These are the supported models
+| Model | Mobile Friendly | Notes |
+|------------------|---|---------------------|
+|[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅||
+|[meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅||
+|[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|✅||
+|[meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|||
+|[meta-llama/Llama-2-70b-chat-hf](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf)|||
+|[meta-llama/Llama-2-7b-hf](https://huggingface.co/meta-llama/Llama-2-7b-hf)|✅||
+|[meta-llama/CodeLlama-7b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-7b-Python-hf)|✅||
+|[meta-llama/CodeLlama-34b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-34b-Python-hf)|✅||
+|[mistralai/Mistral-7B-v0.1](https://huggingface.co/mistralai/Mistral-7B-v0.1)|✅||
+|[mistralai/Mistral-7B-Instruct-v0.1](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1)|✅||
+|[mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)|✅||
+|[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[openlm-research/open_llama_7b](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+
+See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
+
+
+## Running via PyTorch / Python
 
 ### Chat
 Designed for interactive and conversational use.
@@ -79,19 +112,25 @@ For more information run `python3 torchchat.py generate --help`
 python3 torchchat.py generate llama3 --dtype=fp16 --tiktoken
 ```
 
-### Export
+## Exporting your model
 Compiles a model and saves it to run later.
 
 For more information run `python3 torchchat.py export --help`
 
-**Examples**
+### Exporting for Desktop / Server-side via AOT Inductor
 
-AOT Inductor:
 ```
 python3 torchchat.py export stories15M --output-dso-path stories15M.so
 ```
 
-ExecuTorch:
+This produces a `.so` file, also called a Dynamic Shared Object. This `.so` can be linked into your own C++ program.
+
+### Running the exported `.so` via your own C++ application
+
+[TBF]
+
+### Exporting for Mobile via ExecuTorch
+
 ```
 python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 ```
