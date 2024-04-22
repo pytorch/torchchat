@@ -27,7 +27,7 @@ cd torchchat
 python3 -m venv .venv
 source .venv/bin/activate
 
-# instal dependencies
+# install dependencies
 ./install_requirements.sh
 
 # ensure everything installed correctly
