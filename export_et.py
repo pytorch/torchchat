@@ -83,7 +83,8 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     else:
         raise ValueError(f"Unsupported dtype for ET export: {target_precision}")
 
-    replace_attention_with_custom_sdpa_attention(model)
+    # TODO: we can bring with pack when dynamo error P1220158146 is resolved
+    # replace_attention_with_custom_sdpa_attention(model)
     with torch.nn.attention.sdpa_kernel(
         [torch.nn.attention.SDPBackend.MATH]
     ), torch.no_grad():

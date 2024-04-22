@@ -185,6 +185,7 @@ NOTE: The exported model will be large. We suggest you quantize the model, expla
 
 ### ExecuTorch
 ExecuTorch enables you to optimize your model for execution on a mobile or embedded device, but can also be used on desktop for testing.
+Before running ExecuTorch commands, you must first set-up ExecuTorch in torchchat, see [Set-up Executorch](docs/executorch_setup.md).
 
 **Examples**
 The following example uses the Stories15M model.
