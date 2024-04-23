@@ -30,7 +30,7 @@ Support for FP16 and BF16 is limited in many embedded processors.  Additional ex
 
 Next, we'll show you how to optimize your model for mobile execution (for ET) or get the most from your server or desktop hardware (with AOTI). The basic model build for mobile surfaces two issues: Models quickly run out of memory and execution can be slow. In this section, we show you how to fit your models in the limited memory of a mobile device, and optimize execution speed -- both using quantization. This is the torchchat repo after all!
 For high-performance devices such as GPUs, quantization provides a way to reduce the memory bandwidth required to and take advantage of the massive compute capabilities provided by today's server-based accelerators such as GPUs. In addition to reducing the memory bandwidth required to compute a result faster by avoiding stalls, quantization allows accelerators (which usually have a limited amount of memory) to store and process larger models than they would otherwise be able to.
-We can specify quantization parameters with the --quantizeize option. The quantize option takes a JSON/dictionary with quantizers and quantization options.
+We can specify quantization parameters with the --quantize option. The quantize option takes a JSON/dictionary with quantizers and quantization options.
 generate and export (for both ET and AOTI) can both accept quantization options. We only show a subset of the combinations to avoid combinatorial explosion.
 
 ## Quantization API
@@ -282,6 +282,6 @@ We invite contributors to submit established quantization schemes, with accuracy
 - Explain GPTQ, RTN quantization approaches, examples
 - Show general form of –quantize parameter
 - Describe how to choose a quantization scheme. Which factors should they take into account? Concrete recommendations for use cases, esp. mobile.
-- Quantization reference, describe options for –quant parameter
+- Quantization reference, describe options for --quantize parameter
 - Show a table with performance/accuracy metrics
 - Quantization support matrix? torchat Quantization Support Matrix
