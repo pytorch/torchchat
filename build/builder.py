@@ -251,7 +251,7 @@ def _unset_gguf_kwargs(builder_args):
     builder_args.gguf_kwargs = None
 
 
-def _load_model_gguf(builder_args):
+def _load_model_gguf(builder_args, only_config=False):
     assert builder_args.gguf_path
     if builder_args.gguf_kwargs is None:
         kwargs = {}
@@ -261,7 +261,7 @@ def _load_model_gguf(builder_args):
     return model
 
 
-def _load_model_default(builder_args):
+def _load_model_default(builder_args, only_config=False):
     assert not builder_args.gguf_path
 
     with torch.device("meta"):
@@ -314,7 +314,7 @@ def _load_model_default(builder_args):
     return model
 
 
-def _load_model(builder_args):
+def _load_model(builder_args, only_config=False):
     if builder_args.gguf_path:
         model = _load_model_gguf(builder_args)
     else:
@@ -336,7 +336,6 @@ def _initialize_model(
     tokenizer=None,
 ):
     print("Loading model ...")
-    t0 = time.time()
 
     if builder_args.gguf_path and (builder_args.dso_path or builder_args.pte_path):
         print("Setting gguf_kwargs for generate.")
@@ -349,16 +348,17 @@ def _initialize_model(
         #   (no unpack available)
         _set_gguf_kwargs(builder_args, is_et=is_pte, context="generate")
 
-    model_ = _load_model(builder_args)
-    device_sync(device=builder_args.device)
-    print(f"Time to load model: {time.time() - t0:.02f} seconds")
-
     if builder_args.dso_path:
         assert (
             quantize is None or quantize == "{ }"
         ), "quantize not valid for exported DSO model. Specify quantization during export."
+
+        t0 = time.time()
+        model = _load_model(builder_args, only_config=True)
+        device_sync(device=builder_args.device)
+        print(f"Time to load model: {time.time() - t0:.02f} seconds")
+
         try:
-            model = model_
             # Replace model forward with the AOT-compiled forward
             # This is a hacky way to quickly demo AOTI's capability.
             # model is still a Python object, and any mutation to its
@@ -374,14 +374,23 @@ def _initialize_model(
         assert (
             quantize is None or quantize == "{ }"
         ), "quantize not valid for exported PTE model. Specify quantization during export."
+
+        t0 = time.time()
+        model = _load_model(builder_args, only_config=True)
+        device_sync(device=builder_args.device)
+        print(f"Time to load model: {time.time() - t0:.02f} seconds")
+
         try:
             from build.model_et import PTEModel
 
-            model = PTEModel(model_.config, builder_args.pte_path)
+            model = PTEModel(model.config, builder_args.pte_path)
         except Exception:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
     else:
-        model = model_
+        t0 = time.time()
+        model = _load_model(builder_args)
+        device_sync(device=builder_args.device)
+        print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
         if quantize:
             t0q = time.time()
