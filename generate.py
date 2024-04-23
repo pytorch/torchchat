@@ -174,10 +174,12 @@ def decode_n_tokens(
     num_new_tokens: int,
     need_probs: bool,
     callback=lambda _: _,
+    eos_token_id: int = 2,
     **sampling_kwargs,
 ):
     new_tokens, new_probs = [], []
-    for _ in range(num_new_tokens):
+    encountered_eos = False
+    for i in range(num_new_tokens - 1): # -1 to save space to run an EoS if dont generate it naturally
         # Actually better for Inductor to codegen attention here
         with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]):
             next_token, next_prob = decode_one_token(
@@ -189,6 +191,17 @@ def decode_n_tokens(
             if need_probs:
                 new_probs.append(next_prob.clone())
             cur_token = next_token.view(1, -1)
+            # encountered eos
+            if (next_token.item() == eos_token_id):
+                encountered_eos = True
+                _, _ = decode_one_token(model, cur_token, input_pos, need_probs, **sampling_kwargs)
+                input_pos += 1
+                break
+    if not encountered_eos:
+        eos_token = torch.tensor([eos_token_id], dtype=cur_token.dtype, device=cur_token.device)
+        new_tokens.append(eos_token.clone())
+        _, _ = decode_one_token(model, cur_token, input_pos, need_probs, **sampling_kwargs)
+        input_pos += 1
 
     return new_tokens, new_probs
 
@@ -266,40 +279,40 @@ def generate(
     max_new_tokens: int,
     *,
     chat_mode: bool,
+    start_pos: int = 0,
     draft_model: Transformer,
     speculate_k: Optional[int] = 8,
     sequential_prefill=True,
     callback=lambda x: x,
+    tokenizer=None,
+    max_seq_length: int,
     **sampling_kwargs,
 ) -> torch.Tensor:
     """
     Takes a conditioning sequence (prompt) as input and continues to generate as many tokens as requested.
     """
-
     is_speculative = draft_model is not None
+    device, dtype = prompt.device, prompt.dtype
+
+    print("max_seq_length ", max_seq_length)
     # create an empty tensor of the expected final shape and fill in the current tokens
     T = prompt.size(0)
+    max_new_tokens = min(max_new_tokens, max_seq_length - start_pos - T)
+    print("max_new_tokens ", max_new_tokens)
     T_new = T + max_new_tokens
-    if chat_mode:
-        max_seq_length = 350
-    else:
-        max_seq_length = min(T_new, model.config.block_size)
-
-    device, dtype = prompt.device, prompt.dtype
-    max_seq_length = (
-        max_seq_length + speculate_k + 1 if is_speculative else max_seq_length
-    )
-    model = model.to(device=device)
-    with torch.device(device):
-        model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
-        if is_speculative and draft_model is not model:
-            draft_model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+    # set up caches only if first inference
+    if start_pos == 0:
+        model = model.to(device=device)
+        with torch.device(device):
+            model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+            if is_speculative and draft_model is not model:
+                draft_model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
 
     # create an empty tensor of the expected final shape and fill in the current tokens
     empty = torch.empty(T_new, dtype=dtype, device=device)
     empty[:T] = prompt
     seq = empty
-    input_pos = torch.arange(0, T, device=device, dtype=torch.int)
+    input_pos = torch.arange(start_pos, T + start_pos, device=device, dtype=torch.int)
 
     next_token = prefill(
         model,
@@ -318,12 +331,13 @@ def generate(
         )
     seq[T] = next_token
 
-    input_pos = torch.tensor([T], device=device, dtype=torch.int)
-    accept_counts = [0] * (speculate_k + 1)
+    num_tokens_generated = 0
+    input_pos = torch.tensor([start_pos + T], device=device, dtype=torch.int)
+    accept_counts = [0] * (speculate_k + 1) # creates array of [0, 0, 0, ...] that is speculate_k + 1 long
 
     if is_speculative:
         input_pos = input_pos.item()  # for speculative decoding easier to keep on host
-        while input_pos < T_new - 1:
+        while input_pos < max_new_tokens - 1:
             cur_token = next_token.view(())
 
             next_tokens = speculative_decode(
@@ -345,9 +359,11 @@ def generate(
             max_new_tokens - 1,
             callback=callback,
             need_probs=False,
+            eos_token_id = tokenizer.eos_id() if tokenizer else 2
             **sampling_kwargs,
         )
-        seq[T + 1 :] = torch.cat(generated_tokens)
+        seq[T + 1 : T + 1 + len(generated_tokens)] = torch.cat(generated_tokens)
+        seq = seq[:T + 1 + len(generated_tokens)] # If we dont generate all the way to max_new_tokens slice off the extra space we allocated.
 
     generate_stats = {"accept_counts": accept_counts}
     return seq, generate_stats
@@ -485,21 +501,45 @@ def _main(
         if generator_args.compile_prefill:
             prefill = torch.compile(prefill, fullgraph=True, dynamic=True)
 
+    # Set up our max_seq_length
+    if generator_args.chat_mode:
+        max_seq_length = 2048
+        print(f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye")
+
+    else:
+        max_seq_length = min(encoded.size(0) + generator_args.max_new_tokens, model.config.block_size)
+
+
+    max_seq_length = (
+        max_seq_length + speculate_k + 1 if draft_model is not None else max_seq_length
+    )
+
     aggregate_metrics = {
         "tokens_per_sec": [],
         "accept_counts": [],
     }
     start = -1 if generator_args.compile else 0
+    start_pos = 0
 
-    for i in range(start, generator_args.num_samples):
+    # arbitrarily large number as chat mode goes until max_seq length or user exits
+    num_samples = generator_args.num_samples if not generator_args.chat_mode else 100000
+    i = -1  # long loop and Im scared someone will add a continue in it, so start at -1 and increment at the start
+    while (i < num_samples):
+        i += 1
         device_sync(device=builder_args.device)
         if i >= 0 and generator_args.chat_mode:
             prompt = input("What is your prompt? \n")
+            if (prompt == "/bye"):
+                print("Exiting Chat.\n")
+                break
             if builder_args.is_chat_model:
                 prompt = f"{B_INST} {prompt.strip()} {E_INST}"
             encoded = encode_tokens(
                 tokenizer, prompt, bos=True, device=builder_args.device
             )
+            if (encoded.size(0) + start_pos > max_seq_length):
+                print("This prompt would take us past the max_seq_length. Ending Conversation.")
+                break
 
         if generator_args.chat_mode and i >= 0:
             buffer = []
@@ -514,6 +554,7 @@ def _main(
                 buffer.append(tokenizer.decode([period_id] + x.tolist())[1:])
                 if x.item() == tokenizer.eos_id():
                     done_generating = True
+                    print("DONE GENERATING")
                 if len(buffer) == 4 or done_generating:
                     print("".join(buffer), end="", flush=True)
                     buffer.clear()
@@ -546,8 +587,12 @@ def _main(
                 temperature=generator_args.temperature,
                 top_k=generator_args.top_k,
                 sequential_prefill=generator_args.sequential_prefill,
+                start_pos=start_pos,
+                tokenizer=tokenizer,
+                max_seq_length=max_seq_length,
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
+            start_pos += y.size(0)
         if i == -1:
             logging.info(f"Compilation time: {time.perf_counter() - t0:.2f} seconds")
             continue
@@ -560,7 +605,8 @@ def _main(
         t = time.perf_counter() - t0
 
         if not generator_args.chat_mode:
-            print(tokenizer.decode(y.tolist()))
+            new_context = tokenizer.decode(y.tolist())
+            print(new_context)
         else:
             print()
         tokens_generated = y.size(0) - prompt_length
@@ -570,6 +616,11 @@ def _main(
             f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_sec:.02f} tokens/sec"
         )
         logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
+
+        if (start_pos >= max_seq_length):
+            print("Max Sequence Length Reached. Ending Conversation.")
+            break
+
     print("==========")
     if is_speculative:
         counts_aggregated = [sum(i) for i in zip(*aggregate_metrics["accept_counts"])]
