@@ -143,7 +143,7 @@ jobs:
           huggingface-cli)
             (
               set +x
-              HF_TOKEN="${HF_TOKEN_PERIODIC}" bash .ci/scripts/download_llama.sh
+              HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" bash .ci/scripts/download_llama.sh
             )
             ;;
         esac
