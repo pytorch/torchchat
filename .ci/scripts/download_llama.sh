@@ -29,9 +29,9 @@ normalize_llama_checkpoint() {
 	local repo_name=$1
 	local local_dir="checkpoints/$(basename "${repo_name}")"
 	mkdir -p "${local_dir}"
-	mv "${local_dir}"/original/* "${local_dir}"
+	mv "${local_dir}"/original/* "${local_dir}/"
 	mv "${local_dir}/consolidated.00.pth" "${local_dir}/model.pth"
-	rmdir "${local_dir/original/}"
+	rmdir -f "${local_dir/original/}"
 }
 
 # install huggingface-cli if not already installed
