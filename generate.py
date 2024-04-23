@@ -294,11 +294,9 @@ def generate(
     is_speculative = draft_model is not None
     device, dtype = prompt.device, prompt.dtype
 
-    print("max_seq_length ", max_seq_length)
     # create an empty tensor of the expected final shape and fill in the current tokens
     T = prompt.size(0)
     max_new_tokens = min(max_new_tokens, max_seq_length - start_pos - T)
-    print("max_new_tokens ", max_new_tokens)
     T_new = T + max_new_tokens
     # set up caches only if first inference
     if start_pos == 0:
@@ -554,7 +552,6 @@ def _main(
                 buffer.append(tokenizer.decode([period_id] + x.tolist())[1:])
                 if x.item() == tokenizer.eos_id():
                     done_generating = True
-                    print("DONE GENERATING")
                 if len(buffer) == 4 or done_generating:
                     print("".join(buffer), end="", flush=True)
                     buffer.clear()
@@ -605,8 +602,7 @@ def _main(
         t = time.perf_counter() - t0
 
         if not generator_args.chat_mode:
-            new_context = tokenizer.decode(y.tolist())
-            print(new_context)
+            print(tokenizer.decode(y.tolist()))
         else:
             print()
         tokens_generated = y.size(0) - prompt_length
