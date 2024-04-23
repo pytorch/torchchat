@@ -15,7 +15,7 @@ from typing import Dict, Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from build.utils import find_multiple, get_precision
+from build.utils import find_multiple, get_precision, use_et_backend
 
 
 #########################################################################
@@ -76,6 +76,7 @@ class QuantHandler:
 class Int8DynActInt4WeightQuantizer(QuantHandler):
     def __init__(self, model: nn.Module, device="cpu", tokenizer=None, **kwargs):
         import torchao.quantization.quant_api as quant_api
+
         self.model_ = model
         self.device = device
         self.tokenizer = tokenizer
@@ -89,30 +90,6 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
 
     def quantized_model(self) -> nn.Module:
         return self.quantizer.quantize(self.model_)
-
-
-#########################################################################
-###                QuantHandler API definition                        ###
-###               (unify with torchao in future)                      ###
-
-
-class QuantHandler:
-    def __init__(self, model: nn.Module, device="cpu", tokenizer=None):
-        self.model_ = model
-        self.device = device
-        self.tokenizer = tokenizer
-
-    def create_quantized_state_dict(self) -> Dict:  # "StateDict"
-        pass
-
-    def convert_for_runtime(self) -> nn.Module:
-        pass
-
-    def quantized_model(self) -> nn.Module:
-        model_updated_state_dict = self.create_quantized_state_dict()
-        self.convert_for_runtime()
-        self.model_.load_state_dict(model_updated_state_dict)
-        return self.model_
 
 
 #########################################################################
@@ -646,6 +623,12 @@ class QuantizedGroupEmbedding(torch.nn.Module):
         self.groupsize = groupsize
         self.dtype = dtype
         self.packed = packed
+
+        if use_et_backend():
+            self.forward = self.et_forward
+        else:
+            self.forward = self.aoti_forward
+
         if not packed:
             self.register_buffer(
                 "weight",
@@ -674,12 +657,18 @@ class QuantizedGroupEmbedding(torch.nn.Module):
             )
 
     @torch.no_grad()
-    def forward(self, indices: torch.Tensor) -> torch.Tensor:
-        if False:  # Used for Executorch
-            return torch.ops.llama_quantized.embedding_byte.dtype(
+    def et_forward(self, indices: torch.Tensor) -> torch.Tensor:
+        if self.packed:
+            return torch.ops.quantized_decomposed.embedding_byte.dtype(
+                self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
+            )
+        else:
+            return torch.ops.quantized_decomposed.embedding_4bit.dtype(
                 self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
             )
 
+    @torch.no_grad()
+    def aoti_forward(self, indices: torch.Tensor) -> torch.Tensor:
         # result_weights = self.weight.index_select(0, indices.view(-1))
         # result_scales = self.scales.index_select(0, indices.view(-1))
 
@@ -688,7 +677,7 @@ class QuantizedGroupEmbedding(torch.nn.Module):
             weight_odd = self.weight.remainder(16)
             weight_unpacked = torch.stack((weight_even, weight_odd), dim=-1)
             weight = weight_unpacked.view(self.weight.shape[0], -1)
-            weight = weight.view(torch.int8).add(-8)
+            weight = weight.to(torch.int8).add(-8)
         else:
             weight = self.weight
 

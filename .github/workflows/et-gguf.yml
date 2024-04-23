@@ -85,8 +85,6 @@ jobs:
 
       - name: Run inference
         run: |
-          export GGUF_PATH=ggufs/stories15M/stories15M.pt
-          export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
           python export.py --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python generate.py --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
