@@ -17,16 +17,22 @@ ENDIF()
 
 MESSAGE(STATUS "Using ET BUILD DIR: --[${ET_BUILD_DIR}]--")
 
+IF(DEFINED ENV{TORCHCHAT_ROOT})
+    set(TORCHCHAT_ROOT $ENV{TORCHCHAT_ROOT})
+ELSE()
+    set(TORCHCHAT_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/..)
+ENDIF()
+
 project(Torchchat)
 
 include(CMakePrintHelpers)
-include(Utils.cmake)
-set(TORCHCHAT_ROOT $ENV{TORCHCHAT_ROOT})
+include(runner/Utils.cmake)
+
 cmake_print_variables(TORCHCHAT_ROOT)
 
 MESSAGE(STATUS "Looking for excutorch in ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/cmake/ExecuTorch")
 set(executorch_DIR ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/cmake/ExecuTorch)
-find_package(executorch CONFIG REQUIRED PATHS ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/cmake/ExecuTorch)
+find_package(executorch CONFIG REQUIRED PATHS ${executorch_DIR})
 MESSAGE(STATUS "Found executorch cmake config.")
 
 set(_common_include_directories ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src)
@@ -34,11 +40,13 @@ set(_common_include_directories ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src)
 cmake_print_variables(_common_include_directories)
 
 target_include_directories(executorch INTERFACE ${_common_include_directories}) # Ideally ExecuTorch installation process would do this
-add_executable(run run.cpp ${TORCHCHAT_ROOT}/runner/bpe_tokenizer.cpp)
-target_include_directories(run PRIVATE ${TORCHCHAT_ROOT}/runner)
+add_executable(et_run runner/run.cpp)
+
+target_compile_options(et_run PUBLIC -D__ET__MODEL -D_GLIBCXX_USE_CXX11_ABI=1)
+
 # Link ET runtime + extensions
 target_link_libraries(
-  run PRIVATE
+  et_run PRIVATE
         executorch
         extension_module
         ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch/${CMAKE_OUT_DIR}/extension/data_loader/libextension_data_loader.a # This one does not get installed by ExecuTorch
@@ -64,12 +72,12 @@ target_link_options_shared_lib(xnnpack_backend)
 if(ANDROID OR APPLE)
   target_link_options_shared_lib(executorch)
 endif()
-target_link_libraries(run PRIVATE
+target_link_libraries(et_run PRIVATE
 "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch/${CMAKE_OUT_DIR}/examples/models/llama2/custom_ops/libcustom_ops.a>")
 
 # This one is needed for cpuinfo where it uses android specific log lib
 if(ANDROID)
-  target_link_libraries(run PRIVATE log)
+  target_link_libraries(et_run PRIVATE log)
 endif()
 
 # Adding target_link_options_shared_lib as commented out below leads to this:

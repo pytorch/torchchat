@@ -1,5 +1,4 @@
 /* Inference for Llama-2 Transformer model in pure C++ */
-
 #include <ctype.h>
 #include <math.h>
 #include <stdint.h>
@@ -674,9 +673,23 @@ int main(int argc, char* argv[]) {
   build_transformer(&transformer, checkpoint_path, vocab_size, steps);
 
   // build the Tokenizer via the tokenizer .bin file
-  Tokenizer* tokenizer =
-      new BPETokenizer(transformer.config.vocab_size, /*bos*/ 1, /*eos*/ 2);
-  tokenizer->load(tokenizer_path);
+  Tokenizer* tokenizer = nullptr;
+
+  // Try to load using Tiktoken, if exception then switch to another tokenizer
+  try {
+    tokenizer =
+        new Tiktoken(transformer.config.vocab_size, /*bos*/ 1, /*eos*/ 2);
+    tokenizer->load(tokenizer_path);
+  } catch (const std::invalid_argument&) {
+    fprintf(
+        stderr,
+        "Failed to load %s into a Tiktoken tokenizer. Trying sentencepiece tokenizer..\n",
+        tokenizer_path);
+    delete tokenizer;
+    tokenizer =
+        new BPETokenizer(transformer.config.vocab_size, /*bos*/ 1, /*eos*/ 2);
+    tokenizer->load(tokenizer_path);
+  }
 
   // build the Sampler
   Sampler sampler;
