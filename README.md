@@ -41,7 +41,7 @@ Most models use HuggingFace as the distribution channel, so you will need to cre
 account.
 
 Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens).
-Run `huggingface-cli login`, which will prompt for the newly created token.  
+Run `huggingface-cli login`, which will prompt for the newly created token.
 
 Once this is done, torchchat will be able to download model artifacts from
 HuggingFace.
@@ -132,6 +132,8 @@ This produces a `.so` file, also called a Dynamic Shared Object. This `.so` can 
 [TBF]
 
 ### Exporting for Mobile via ExecuTorch
+
+Before exporting to an ExecuTorch pte file with the command below, you must first [set-up ExecuTorch](docs/executorch_setup.md) inside torchchat.
 
 ```
 python3 torchchat.py export stories15M --output-pte-path stories15M.pte
