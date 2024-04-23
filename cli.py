@@ -113,11 +113,6 @@ def add_arguments(parser):
         help="Initialize torch seed",
     )
     parser.add_argument(
-        "--tiktoken",
-        action="store_true",
-        help="Whether to use tiktoken tokenizer",
-    )
-    parser.add_argument(
         "--num-samples",
         type=int,
         default=1,

@@ -147,9 +147,7 @@ class TokenizerArgs:
         try:
             from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
-            self.t = TiktokenTokenizer(
-                model_path=str(self.tokenizer_path)
-            )
+            self.t = TiktokenTokenizer(model_path=str(self.tokenizer_path))
             self.is_tiktoken = True
             self.is_sentencepiece = False
             return
@@ -159,9 +157,7 @@ class TokenizerArgs:
         try:
             from sentencepiece import SentencePieceProcessor
 
-            self.t = SentencePieceProcessor(
-                model_file=str(self.tokenizer_path)
-            )
+            self.t = SentencePieceProcessor(model_file=str(self.tokenizer_path))
             self.is_tiktoken = False
             self.is_sentencepiece = True
             return
@@ -172,7 +168,6 @@ class TokenizerArgs:
         self.is_sentencepiece = False
         self.t = None
         return
-
 
     def validate_model(
         self,
@@ -186,7 +181,7 @@ class TokenizerArgs:
 
         if condition:
             raise RuntimeError(
-                "test"  # f"model-specified tokenizer ({tokenizer_setting_to_name(model.config.use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(self.is_tiktoken)} for {model_description}"
+                f"model-specified tokenizer ({tokenizer_setting_to_name(model.config.use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(self.is_tiktoken)} for {model_description}"
             )
 
         return
@@ -223,7 +218,7 @@ class TokenizerArgs:
             t=None,
         )
 
-    
+
 def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
     return tokenizer_args.t
 
