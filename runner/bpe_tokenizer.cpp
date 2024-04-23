@@ -36,45 +36,21 @@ BPETokenizer::BPETokenizer(
  */
 void BPETokenizer::load(const std::string& tokenizer_path) {
   if (initialized_) {
-    fprintf(stderr, "Tokenizer already initialized.");
+    fprintf(stderr, "Tokenizer already initialized.\n");
     return;
   }
   // read in the file
   FILE* file = fopen(tokenizer_path.c_str(), "rb");
   if (!file) {
-    fprintf(stderr, "couldn't load %s", tokenizer_path.c_str());
+    fprintf(stderr, "couldn't load %s\n", tokenizer_path.c_str());
     exit(EXIT_FAILURE);
   }
-  int32_t metadata[2];
-  for (int i = 0; i < 2; i++) {
-    if (fread(metadata + i, sizeof(int32_t), 1, file) != 1) {
-      fprintf(
-          stderr,
-          "Failed to read the metadata at position %d, the tokenizer file is not valid!",
-          i);
-      exit(EXIT_FAILURE);
-    }
-  }
-
-  // now we have two vocab_sizes one from the model and another from the
-  // tokenizer file.
-  int32_t tokenizer_vocab_size = metadata[0];
-  if (tokenizer_vocab_size < vocab_size_) {
+  if (fread(&max_token_length_, sizeof(int32_t), 1, file) != 1) {
     fprintf(
         stderr,
-        "The tokenizer vocab size %d is smaller than the model vocab size %d, will add padding tokens.",
-        tokenizer_vocab_size,
-        vocab_size_);
-  } else if (tokenizer_vocab_size > vocab_size_) {
-    fprintf(
-        stderr,
-        "The tokenizer vocab size %d is larger than the model vocab size %d.",
-        tokenizer_vocab_size,
-        vocab_size_);
+        "Failed to read the max token length, the tokenizer file is not valid!\n");
+    exit(EXIT_FAILURE);
   }
-
-  max_token_length_ = metadata[1];
-
   // allocate space for the vocabulary
   vocab_ = std::make_unique<char*[]>(vocab_size_);
   vocab_scores_ = std::make_unique<float[]>(vocab_size_);
@@ -92,7 +68,7 @@ void BPETokenizer::load(const std::string& tokenizer_path) {
     }
     int32_t len;
     if (fread(&len, sizeof(int32_t), 1, file) != 1) {
-      fprintf(stderr, "Failed to read the length of the word at index %d", i);
+      fprintf(stderr, "Failed to read the length of the word at index %d\n", i);
       exit(EXIT_FAILURE);
     }
     vocab_[i] = new char[len + 1];
@@ -133,7 +109,7 @@ BPETokenizer::~BPETokenizer() {
  */
 std::string BPETokenizer::decode(uint64_t prev_token, uint64_t token) {
   if (!initialized_) {
-    fprintf(stderr, "Tokenizer not initialized");
+    fprintf(stderr, "Tokenizer not initialized\n");
     exit(EXIT_FAILURE);
   }
   const char* piece = vocab_[token];
@@ -175,14 +151,14 @@ str_lookup(const char* str, TokenIndex* sorted_vocab, int32_t vocab_size) {
 std::vector<uint64_t>
 BPETokenizer::encode(const std::string& text, int8_t bos, int8_t eos) {
   if (!initialized_) {
-    fprintf(stderr, "Tokenizer not initialized");
+    fprintf(stderr, "Tokenizer not initialized\n");
     exit(EXIT_FAILURE);
   }
   // encode the string text (input) into an upper-bound preallocated tokens[]
   // array bos != 0 means prepend the BOS token (=1), eos != 0 means append the
   // EOS token (=2)
   if (text.empty()) {
-    fprintf(stderr, "cannot encode empty text");
+    fprintf(stderr, "cannot encode empty text\n");
     exit(EXIT_FAILURE);
   }
 
@@ -201,7 +177,7 @@ BPETokenizer::encode(const std::string& text, int8_t bos, int8_t eos) {
       tokens.push_back(bos_tok_);
     }
   } else {
-    fprintf(stderr, "bos %d should be >= 0", bos);
+    fprintf(stderr, "bos %d should be >= 0\n", bos);
     exit(EXIT_FAILURE);
   }
 
@@ -309,7 +285,7 @@ BPETokenizer::encode(const std::string& text, int8_t bos, int8_t eos) {
       tokens.push_back(eos_tok_);
     }
   } else {
-    fprintf(stderr, "eos %d should be >= 0", eos);
+    fprintf(stderr, "eos %d should be >= 0\n", eos);
     exit(EXIT_FAILURE);
   }
 
