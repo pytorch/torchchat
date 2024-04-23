@@ -45,14 +45,14 @@ def main(args):
 
     print(f"Using device={builder_args.device}")
     set_precision(builder_args.precision)
-    set_backend(builder_args)
+    set_backend(dso=args.output_dso_path, pte=args.output_pte_path)
 
     builder_args.dso_path = None
     builder_args.pte_path = None
     builder_args.setup_caches = True
 
-    output_pte_path = builder_args.output_pte_path
-    output_dso_path = builder_args.output_dso_path
+    output_pte_path = args.output_pte_path
+    output_dso_path = args.output_dso_path
 
     # TODO: clean this up
     # This mess is because ET does not support _weight_int4pack_mm right now

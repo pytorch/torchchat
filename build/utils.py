@@ -14,42 +14,47 @@ import torch
 ##########################################################################
 ###     set and get target backend is aoti or et for this model        ###
 
-active_builder_args = None
+active_builder_args_dso = None
+active_builder_args_pte = None
 
 
-def set_backend(builder_args: "BuilderArgs"):
-    global active_builder_args
-    active_builder_args = builder_args
+def set_backend(dso, pte)
+    global active_builder_args_dso
+    global active_builder_args_pte
+    active_builder_args_dso = dso 
+    active_builder_args_pte = pte
 
 
 def use_aoti_backend() -> bool:
-    global active_builder_args
+    global active_builder_args_dso
+    global active_builder_args_pte
 
     # eager == aoti, which is when backend has not been explicitly set
-    if not active_builder_args:
+    if (not active_builder_args_dso) and not (active_builder_args_pte)::
         return True
 
-    if active_builder_args.output_pte_path and active_builder_args.output_dso_path:
+    if active_builder_args_pte and active_builder_args_dso:
         raise RuntimeError(
             "code generation needs to choose different implementations for DSO and PTE path.  Please only use one export option, and call export twice if necessary!"
         )
 
-    return bool(active_builder_args.output_dso_path)
+    return bool(active_builder_args_dso)
 
 
 def use_et_backend() -> bool:
-    global active_builder_args
+    global active_builder_args_dso
+    global active_builder_args_pte
 
     # eager == aoti, which is when backend has not been explicitly set
-    if not active_builder_args:
+    if not (active_builder_args_pte or active_builder_args_dso):
         return False
 
-    if active_builder_args.output_pte_path and active_builder_args.output_dso_path:
+    if active_builder_args_pte and active_builder_args_dso:
         raise RuntimeError(
             "code generation needs to choose different implementations for DSO and PTE path.  Please only use one export option, and call export twice if necessary!"
         )
 
-    return bool(active_builder_args.output_pte_path)
+    return bool(active_builder_args_pte)
 
 
 ##########################################################################
