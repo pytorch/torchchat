@@ -113,6 +113,7 @@ jobs:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     name: test-gpu (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
+    environment: HF_PERIODIC 
     secrets: inherit
     strategy:
       matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
