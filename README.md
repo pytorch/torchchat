@@ -3,7 +3,7 @@ Torchchat is a small codebase to showcase running large language models (LLMs) w
 
 ## Highlights
 - Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
-  - Supporting both GGUF fp32/16 and the Hugging Face checkpoint format
+  - Supporting [some GGUF files](docs/GGUF.md) and the Hugging Face checkpoint format
 - PyTorch-native execution with performance
 - Supports popular hardware and OS
   - Linux (x86)
@@ -41,7 +41,7 @@ Most models use HuggingFace as the distribution channel, so you will need to cre
 account.
 
 Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens).
-Run `huggingface-cli login`, which will prompt for the newly created token.  
+Run `huggingface-cli login`, which will prompt for the newly created token.
 
 Once this is done, torchchat will be able to download model artifacts from
 HuggingFace.
