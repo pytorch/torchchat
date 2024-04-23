@@ -158,11 +158,20 @@ def decode_one_token(
     x: torch.Tensor,
     input_pos: torch.Tensor,
     need_probs: bool,
+    use_flash_attention: bool = True,
     **sampling_kwargs,
 ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
     # input_pos: [B, 1]
     assert input_pos.shape[-1] == 1
-    logits = model(x, input_pos)
+    SDPBackend = torch.nn.attention.SDPBackend
+    # Actually better for Inductor to codegen attention here
+    backends = (
+        [SDPBackend.MATH, SDPBackend.FLASH_ATTENTION]
+        if use_flash_attention
+        else [SDPBackend.MATH]
+    )
+    with torch.nn.attention.sdpa_kernel(backends):
+        logits = model(x, input_pos)
     return sample(logits, need_probs=need_probs, **sampling_kwargs)
 
 
@@ -177,17 +186,15 @@ def decode_n_tokens(
 ):
     new_tokens, new_probs = [], []
     for _ in range(num_new_tokens):
-        # Actually better for Inductor to codegen attention here
-        with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]):
-            next_token, next_prob = decode_one_token(
-                model, cur_token, input_pos, need_probs=need_probs, **sampling_kwargs
-            )
-            input_pos += 1
-            new_tokens.append(next_token.clone())
-            callback(new_tokens[-1])
-            if need_probs:
-                new_probs.append(next_prob.clone())
-            cur_token = next_token.view(1, -1)
+        next_token, next_prob = decode_one_token(
+            model, cur_token, input_pos, need_probs=need_probs, **sampling_kwargs
+        )
+        input_pos += 1
+        new_tokens.append(next_token.clone())
+        callback(new_tokens[-1])
+        if need_probs:
+            new_probs.append(next_prob.clone())
+        cur_token = next_token.view(1, -1)
 
     return new_tokens, new_probs
 
@@ -477,7 +484,11 @@ def _main(
 
         global decode_one_token, prefill
         decode_one_token = torch.compile(
-            decode_one_token, mode="reduce-overhead", fullgraph=True
+            lambda *args, **kwargs: decode_one_token(
+                use_flash_attention=False, *args, **kwargs
+            ),
+            mode="reduce-overhead",
+            fullgraph=True,
         )
 
         # Uncomment to squeeze more perf out of prefill
