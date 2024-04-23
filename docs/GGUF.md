@@ -32,16 +32,16 @@ export GGUF_PTE_PATH=/tmp/gguf_model.pte
 ### Eager generate
 We can generate text in eager mode as we did before, but we now pass a GGUF file path.
 ```
-python torchchat.py generate --gguf-path ${GGUF_MODEL_PATH} --tokenizer-path ${GGUF_TOKENIZER_PATH} --temperature 0 --prompt "Once upon a time" --max-new-tokens 15
+python3 torchchat.py generate --gguf-path ${GGUF_MODEL_PATH} --tokenizer-path ${GGUF_TOKENIZER_PATH} --temperature 0 --prompt "Once upon a time" --max-new-tokens 15
 ```
 
 ### AOTI export + generate
 ```
 # Convert the model for use
-python torchchat.py export --gguf-path ${GGUF_MODEL_PATH} --output-dso-path ${GGUF_SO_PATH}
+python3 torchchat.py export --gguf-path ${GGUF_MODEL_PATH} --output-dso-path ${GGUF_SO_PATH}
 
 # Generate using the PTE model that was created by the export command
-python torchchat.py generate --gguf-path ${GGUF_MODEL_PATH} --dso-path ${GGUF_SO_PATH} --tokenizer-path ${GGUF_TOKENIZER_PATH} --temperature 0 --prompt "Once upon a time" --max-new-tokens 15
+python3 torchchat.py generate --gguf-path ${GGUF_MODEL_PATH} --dso-path ${GGUF_SO_PATH} --tokenizer-path ${GGUF_TOKENIZER_PATH} --temperature 0 --prompt "Once upon a time" --max-new-tokens 15
 
 ```
 
@@ -50,8 +50,8 @@ python torchchat.py generate --gguf-path ${GGUF_MODEL_PATH} --dso-path ${GGUF_SO
 Before running this example, you must first [Set-up ExecuTorch](executorch_setup.md).
 ```
 # Convert the model for use
-python torchchat.py export --gguf-path ${GGUF_MODEL_PATH} --output-pte-path ${GGUF_PTE_PATH}
+python3 torchchat.py export --gguf-path ${GGUF_MODEL_PATH} --output-pte-path ${GGUF_PTE_PATH}
 
 # Generate using the PTE model that was created by the export command
-python torchchat.py generate --gguf-path ${GGUF_MODEL_PATH} --pte-path ${GGUF_PTE_PATH} --tokenizer-path ${GGUF_TOKENIZER_PATH} --temperature 0 --prompt "Once upon a time" --max-new-tokens 15
+python3 torchchat.py generate --gguf-path ${GGUF_MODEL_PATH} --pte-path ${GGUF_PTE_PATH} --tokenizer-path ${GGUF_TOKENIZER_PATH} --temperature 0 --prompt "Once upon a time" --max-new-tokens 15
 ```
