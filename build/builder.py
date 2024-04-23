@@ -139,30 +139,33 @@ class BuilderArgs:
 @dataclass
 class TokenizerArgs:
     tokenizer_path: Optional[Union[Path, str]] = None
-    is_sentencepiece: bool = True
+    is_sentencepiece: bool = False
     is_tiktoken: bool = False
+    t: Optional[Any] = None
+
+    def __post_init__(self):
+        __initialize_tokenizer(self)
 
     def validate_model(
         self,
         model: Transformer,
         model_description: str = "model",
-    ):
+    ) -> None:
         if model is None:
             return
 
-        use_tiktoken = model.config.use_tiktoken
-        is_tiktoken = self.is_tiktoken
+        condition = False  # not (self.is_tiktoken == model.config.use_tiktoken) or not  (self.is_sentencepiece == not model.config.use_tiktoken)
 
-        if use_tiktoken is None:
-            model.config.use_tiktoken = is_tiktoken
-        elif use_tiktoken != is_tiktoken:
+        if condition:
             raise RuntimeError(
-                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)} for {model_description}"
+                "test"  # f"model-specified tokenizer ({tokenizer_setting_to_name(model.config.use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(self.is_tiktoken)} for {model_description}"
             )
+
+        return
 
     @classmethod
     def from_args(cls, args):  # -> TokenizerArgs:
-        is_sentencepiece = True
+        is_sentencepiece = False
         is_tiktoken = False
 
         if args.tokenizer_path:
@@ -185,28 +188,47 @@ class TokenizerArgs:
         if not tokenizer_path.is_file():
             raise RuntimeError(f"did not find tokenizer at {tokenizer_path}")
 
-        if args.tiktoken:
-            is_sentencepiece = False
-            is_tiktoken = True
-
         return cls(
             tokenizer_path=tokenizer_path,
             is_sentencepiece=is_sentencepiece,
             is_tiktoken=is_tiktoken,
+            t=None,
         )
 
 
-def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
-    if tokenizer_args.is_sentencepiece:
-        from sentencepiece import SentencePieceProcessor
-
-        return SentencePieceProcessor(model_file=str(tokenizer_args.tokenizer_path))
-    elif tokenizer_args.is_tiktoken:
+def __initialize_tokenizer(tokenizer_args: TokenizerArgs):
+    try:
         from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
-        return TiktokenTokenizer(model_path=str(tokenizer_args.tokenizer_path))
-    else:
-        raise RuntimeError("must specify a valid tokenizer in TokenizerArgs")
+        tokenizer_args.t = TiktokenTokenizer(
+            model_path=str(tokenizer_args.tokenizer_path)
+        )
+        tokenizer_args.is_tiktoken = True
+        tokenizer_args.is_sentencepiece = False
+        return
+    except:
+        pass
+
+    try:
+        from sentencepiece import SentencePieceProcessor
+
+        tokenizer_args.t = SentencePieceProcessor(
+            model_file=str(tokenizer_args.tokenizer_path)
+        )
+        tokenizer_args.is_tiktoken = False
+        tokenizer_args.is_sentencepiece = True
+        return
+    except:
+        pass
+
+    tokenizer_args.is_tiktoken = False
+    tokenizer_args.is_sentencepiece = False
+    tokenizer_args.t = None
+    return
+
+
+def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
+    return tokenizer_args.t
 
 
 torch._inductor.config.coordinate_descent_tuning = True
