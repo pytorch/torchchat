@@ -18,7 +18,7 @@ active_builder_args_dso = None
 active_builder_args_pte = None
 
 
-def set_backend(dso, pte)
+def set_backend(dso, pte):
     global active_builder_args_dso
     global active_builder_args_pte
     active_builder_args_dso = dso 
