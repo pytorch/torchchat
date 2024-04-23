@@ -660,7 +660,7 @@ class QuantizedGroupEmbedding(torch.nn.Module):
 
     @torch.no_grad()
     def et_forward(self, indices: torch.Tensor) -> torch.Tensor:
-        if self.bitwidth == 4:
+        if self.bitwidth == 8:
             return torch.ops.quantized_decomposed.embedding_byte.dtype(
                 self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
             )
