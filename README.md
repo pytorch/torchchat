@@ -112,7 +112,6 @@ Designed for interactive graphical conversations using the familiar web browser 
 
 Quantization is the process of converting a model into a more memory-efficient representation.  Quantization is particularly important for accelerators -- to take advantage of the available memory bandwidth, and fit in the often limited high-speed memory in accelerators – and mobile devices – to fit in the typically very limited memory of mobile devices.
 
-
 Depending on the model and the target device, different quantization recipes may be applied.  Torchchat contains two example configurations to optimize performance for GPU-based systems `config/data/cuda.json` , and mobile systems `config/data/mobile.json`.  The GPU configuration is targeted towards optimizing for memory bandwidth which is a scarce resource in powerful GPUs (and to a less degree, memory footprint to fit large models into a device's memory).  The mobile configuration is targeted towards optimizing for memory fotoprint because in many devices, a single application is limited to as little as GB or less of memory.
 
 You can use the quantization recipes in conjunction with any of the `chat`, `generate` and `browser` commands to test their impact and accelerate model execution. You will apply these recipes to the export comamnds below, to optimize the exported models.  To adapt these recipes or wrote your own, please refer to the [quantization overview](docs/quantization.md).
