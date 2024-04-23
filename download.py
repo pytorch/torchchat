@@ -17,7 +17,6 @@ from config.model_config import (
 )
 
 
-
 def _download_hf_snapshot(
     model_config: ModelConfig, artifact_dir: Path, hf_token: Optional[str]
 ):
