@@ -19,19 +19,9 @@ download_checkpoint() {
 	mkdir -p "${local_dir}"
 	huggingface-cli download \
 		"${repo_name}" \
+		--quiet \
 		--include "${include}" \
 		--local-dir "${local_dir}"
-}
-
-normalize_llama_checkpoint() {
-	# normalizes the checkpoint file into something that the rest of
-	# the testing scripts understand
-	local repo_name=$1
-	local local_dir="checkpoints/$(basename "${repo_name}")"
-	mkdir -p "${local_dir}"
-	mv "${local_dir}"/original/* "${local_dir}/"
-	mv "${local_dir}/consolidated.00.pth" "${local_dir}/model.pth"
-	rm -rf "${local_dir}"/original/
 }
 
 # install huggingface-cli if not already installed
@@ -42,4 +32,3 @@ fi
 # TODO: Eventually you could extend this to download different models
 # taking in some arguments similar to .ci/scripts/wget_checkpoint.sh
 download_checkpoint "meta-llama/Meta-Llama-3-8B" "original/*"
-normalize_llama_checkpoint "meta-llama/Meta-Llama-3-8B"

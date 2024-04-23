@@ -147,7 +147,6 @@ jobs:
             )
             ;;
         esac
-        bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
         echo "::endgroup::"
 
         echo "::group::Convert checkpoint"
