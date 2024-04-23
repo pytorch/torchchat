@@ -31,7 +31,7 @@ normalize_llama_checkpoint() {
 	mkdir -p "${local_dir}"
 	mv "${local_dir}"/original/* "${local_dir}/"
 	mv "${local_dir}/consolidated.00.pth" "${local_dir}/model.pth"
-	rmdir -f "${local_dir/original/}"
+	rm -rf "${local_dir}"/original/
 }
 
 # install huggingface-cli if not already installed
