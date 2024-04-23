@@ -736,26 +736,9 @@ install them from source.
 List dependencies for these backends
 
 ### Setting up ExecuTorch and runner-et
-Set up ExecuTorch by following the instructions [here](https://pytorch.org/executorch/stable/getting-started-setup.html#setting-up-executorch).
-For convenience, we provide a script that does this for you.
+To set-up ExecuTorch, see the instructions [here](executorch_setup.md).
 
-From the torchchat root directory, run the following
-```
-export TORCHCHAT_ROOT=${PWD}
-./scripts/install_et.sh
-```
-
-This will create a build directory, git clone ExecuTorch to ./build/src, applies some patches to the ExecuTorch source code, install the ExecuTorch python libraries with pip, and install the required ExecuTorch C++ libraries to ./build/install.  This will take a while to complete.
-
-After ExecuTorch is installed, you can build runner-et from the torchchat root directory with the following
-
-```
-export TORCHCHAT_ROOT=${PWD}
-cmake -S ./runner-et -B build/cmake-out -G Ninja
-cmake --build ./build/cmake-out
-```
-
-The built executable is located at ./build/cmake-out/runner-et.
+To build and insall the runners, see instructions [here](runner_build.md).
 
 ### Tiktoken instructions & instructions for running llama3 without a python environment
 
