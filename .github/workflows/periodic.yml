@@ -113,10 +113,12 @@ jobs:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     name: test-gpu (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
+    secrets: inherit
     strategy:
       matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
       fail-fast: false
     with:
+      secrets-env: "HF_TOKEN_PERIODIC"
       runner: ${{ matrix.runner }}
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
@@ -134,6 +136,10 @@ jobs:
 
         echo "::group::Download checkpoint"
         export REPO_NAME=${{ matrix.repo_name }}
+        case "${{ matrix.install_method }}" in
+          wget) bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }} ;;
+          huggingface-cli) bash .ci/scripts/download_llama.sh ;;
+        esac
         bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
         echo "::endgroup::"
 
