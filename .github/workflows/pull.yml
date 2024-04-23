@@ -313,6 +313,43 @@ jobs:
           cat ${PWD}/output_et
 
           echo "Tests complete."
+
+  test-tinystories-linear-emb-quant-executorch:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.4xlarge
+      script: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+          echo "Intalling pip packages"
+          pip install -r requirements.txt
+
+          export TORCHCHAT_ROOT=${PWD}
+          export ENABLE_ET_PYBIND=false
+          ./scripts/install_et.sh $ENABLE_ET_PYBIND
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
+          python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
+          cmake -S ./runner-et -B ./runner-et/cmake-out -G Ninja
+          cmake --build ./runner-et/cmake-out
+
+          python torchchat.py download stories15M
+          wget -O ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+
+          export PRMT="Once upon a time in a land far away"
+
+          # python torchchat.py export stories15M --output-pte-path ./model.pte
+          python torchchat.py export stories15M --quant '{"linear:a8w4dq" : {"groupsize": 32}, "embedding" : {"bitwidth": 8, "groupsize": 0}}' --output-pte-path ./model.pte
+
+          # we limit # of tokens because embedding quant has made this path slower
+          ./runner-et/cmake-out/run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}" -n 50 > ./output_et
+          cat ./output_et
+
+          echo "Tests complete."
+
   torchchat-command-load-test:
     strategy:
       matrix:
