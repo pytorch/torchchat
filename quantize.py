@@ -677,7 +677,7 @@ class QuantizedGroupEmbedding(torch.nn.Module):
             weight_odd = self.weight.remainder(16)
             weight_unpacked = torch.stack((weight_even, weight_odd), dim=-1)
             weight = weight_unpacked.view(self.weight.shape[0], -1)
-            weight = weight.view(torch.int8).add(-8)
+            weight = weight.to(torch.int8).add(-8)
         else:
             weight = self.weight
 
