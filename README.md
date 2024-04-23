@@ -14,7 +14,9 @@ Torchchat is a small codebase to showcase running large language models (LLMs) w
 - Multiple quantization schemes
 - Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
+
 ## Installation
+
 
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
@@ -136,7 +138,7 @@ python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 ```
 
 ### Browser
-Run a chatbot in your browser that’s supported by the model you specify in the command
+Run a chatbot in your browser that’s supported by the model you specify in the command.
 
 **Examples**
 
@@ -146,7 +148,7 @@ python3 torchchat.py browser stories15M --temperature 0 --num-samples 10
 
 *Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
 
-Enter some text in the input box, then hit the enter key or click the “SEND” button. After 1 second or 2, the text you entered together with the generated text will be displayed. Repeat to have a conversation.
+Enter some text in the input box, then hit the enter key or click the “SEND” button. After a second or two, the text you entered together with the generated text will be displayed. Repeat to have a conversation.
 
 ### Eval
 Uses lm_eval library to evaluate model accuracy on a variety of tasks. Defaults to wikitext and can be manually controlled using the tasks and limit args.
@@ -160,14 +162,14 @@ Eager mode:
 python3 torchchat.py eval stories15M -d fp32 --limit 5
 ```
 
-To test the perplexity for lowered or quantized model, pass it in the same way you would to generate:
+To test the perplexity for a lowered or quantized model, pass it in the same way you would to generate:
 
 ```
 python3 torchchat.py eval stories15M --pte-path stories15M.pte --limit 5
 ```
 
 ## Models
-These are the supported models
+The following models are the supported by torchchat:
 | Model | Mobile Friendly | Notes |
 |------------------|---|---------------------|
 |[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅||
@@ -223,6 +225,7 @@ python3 torchchat.py generate --dso-path stories15M.so --prompt "Hello my name i
 NOTE: The exported model will be large. We suggest you quantize the model, explained further down, before deploying the model on device.
 
 ### ExecuTorch
+
 ExecuTorch enables you to optimize your model for execution on a mobile or embedded device, but can also be used on desktop for testing.
 Before running ExecuTorch commands, you must first set-up ExecuTorch in torchchat, see [Set-up Executorch](docs/executorch_setup.md).
 
@@ -237,6 +240,7 @@ python3 torchchat.py generate --device cpu --pte-path stories15M.pte --prompt "H
 ```
 
 See below under Mobile Execution if you want to deploy and execute a model in your iOS or Android app.
+
 
 ## Quantization
 Quantization focuses on reducing the precision of model parameters and computations from floating-point to lower-bit integers, such as 8-bit and 4-bit integers. This approach aims to minimize memory requirements, accelerate inference speeds, and decrease power consumption, making models more feasible for deployment on edge devices with limited computational resources. While quantization can potentially degrade the model's performance, the methods supported by torchchat are designed to mitigate this effect, maintaining a balance between efficiency and accuracy.
