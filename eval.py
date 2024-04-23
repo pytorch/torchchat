@@ -14,17 +14,14 @@ import torch._inductor.config
 from build.builder import (
     _initialize_model,
     _initialize_tokenizer,
-    validate_args,
     BuilderArgs,
     TokenizerArgs,
 )
 
 from build.model import Transformer
-from cli import add_arguments_for_eval, arg_init
-from download import download_and_convert, is_model_downloaded
+from build.utils import set_precision
+from cli import add_arguments, add_arguments_for_eval, arg_init
 from generate import encode_tokens, model_forward
-
-from quantize import set_precision
 
 torch._dynamo.config.automatic_dynamic_shapes = True
 torch._inductor.config.triton.unique_kernel_names = True
@@ -103,11 +100,12 @@ class GPTFastEvalWrapper(eval_wrapper):
         model: Transformer,
         tokenizer,
         max_seq_length: Optional[int] = None,
+        device="cpu",
     ):
-        super().__init__()
+        super().__init__(device=device)
         self._model = model
         self._tokenizer = tokenizer
-        self._device = torch.device("cuda")
+        self._device = torch.device(device)
         self._max_seq_length = 2048 if max_seq_length is None else max_seq_length
 
     @property
@@ -170,6 +168,7 @@ def eval(
     tasks: Optional[list] = None,
     limit: Optional[int] = None,
     max_seq_length: Optional[int] = None,
+    device: str = "cpu",
 ) -> dict:
     """
     Evaluates a language model on a specified task using the lm-evaluation-harness library.
@@ -185,12 +184,10 @@ def eval(
         eval_results (dict): A dictionary of evaluation results for the specified task(s).
     """
     if tasks is None:
-        tasks = ["hellaswag"]
+        tasks = ["wikitext"]
 
     model_eval_wrapper = GPTFastEvalWrapper(
-        model,
-        tokenizer,
-        max_seq_length,
+        model, tokenizer, max_seq_length, device=device
     )
 
     try:
@@ -223,16 +220,13 @@ def main(args) -> None:
 
     """
 
-    # If a named model was provided and not downloaded, download it.
-    if args.model and not is_model_downloaded(args.model, args.model_directory):
-        download_and_convert(args.model, args.model_directory, args.hf_token)
-
     builder_args = BuilderArgs.from_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
     quantize = args.quantize
     device = args.device
     tasks = args.tasks
     limit = args.limit
+    compile = args.compile
     max_seq_length = args.max_seq_length
 
     print(f"Using device={device}")
@@ -243,8 +237,9 @@ def main(args) -> None:
     model = _initialize_model(
         builder_args,
         quantize,
+        tokenizer,
     )
-    validate_args(model, tokenizer_args)
+    tokenizer_args.validate_model(model)
 
     if compile:
         assert not (
@@ -258,11 +253,12 @@ def main(args) -> None:
 
     t1 = time.time()
     result = eval(
-        model,
+        model.to(device),
         tokenizer,
         tasks,
         limit,
         max_seq_length,
+        device=builder_args.device,
     )
     print(f"Time to run eval: {time.time() - t1:.02f} seconds.")
     if builder_args.dso_path:
@@ -281,7 +277,8 @@ def main(args) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Export specific CLI.")
+    parser = argparse.ArgumentParser(description="torchchat eval CLI")
+    add_arguments(parser)
     add_arguments_for_eval(parser)
     args = parser.parse_args()
     args = arg_init(args)

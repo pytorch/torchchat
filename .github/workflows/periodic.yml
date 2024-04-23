@@ -117,7 +117,7 @@ jobs:
       matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
       fail-fast: false
     with:
-      runner: linux.g5.12xlarge.nvidia.gpu
+      runner: ${{ matrix.runner }}
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
       script: |
@@ -144,4 +144,6 @@ jobs:
         echo "::group::Run inference"
         bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "compile"
         bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti"
+        echo "::group::Run eval"
+        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "eval"
         echo "::endgroup::"

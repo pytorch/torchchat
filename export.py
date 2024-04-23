@@ -11,15 +11,16 @@ import torch
 
 from build.builder import (
     _initialize_model,
+    _initialize_tokenizer,
     _set_gguf_kwargs,
     _unset_gguf_kwargs,
     BuilderArgs,
+    TokenizerArgs,
 )
-from cli import add_arguments_for_export, arg_init, check_args
-from download import download_and_convert, is_model_downloaded
-from export_aoti import export_model as export_model_aoti
 
-from quantize import set_precision
+from build.utils import set_backend, set_precision, use_aoti_backend, use_et_backend
+from cli import add_arguments, add_arguments_for_export, arg_init, check_args
+from export_aoti import export_model as export_model_aoti
 
 try:
     executorch_export_available = True
@@ -29,28 +30,16 @@ except Exception as e:
     executorch_export_available = False
 
 
-default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
-
-
-def device_sync(device):
-    if "cuda" in device:
-        torch.cuda.synchronize(device)
-    elif ("cpu" in device) or ("mps" in device):
-        pass
-    else:
-        print(f"device={device} is not yet suppported")
+default_device = "cpu"
 
 
 def main(args):
-    # If a named model was provided and not downloaded, download it.
-    if args.model and not is_model_downloaded(args.model, args.model_directory):
-        download_and_convert(args.model, args.model_directory, args.hf_token)
-
     builder_args = BuilderArgs.from_args(args)
     quantize = args.quantize
 
     print(f"Using device={builder_args.device}")
     set_precision(builder_args.precision)
+    set_backend(dso=args.output_dso_path, pte=args.output_pte_path)
 
     builder_args.dso_path = None
     builder_args.pte_path = None
@@ -62,9 +51,17 @@ def main(args):
     # TODO: clean this up
     # This mess is because ET does not support _weight_int4pack_mm right now
     if not builder_args.gguf_path:
+        # tokenizer needed for quantization so get that here,
+        try:
+            tokenizer_args = TokenizerArgs.from_args(args)
+            tokenizer = _initialize_tokenizer(tokenizer_args)
+        except:
+            tokenizer = None
+
         model = _initialize_model(
             builder_args,
             quantize,
+            tokenizer,
         )
         model_to_pte = model
         model_to_dso = model
@@ -90,13 +87,13 @@ def main(args):
             output_pte_path = str(os.path.abspath(output_pte_path))
             print(f">{output_pte_path}<")
             if executorch_export_available:
-                print(f"Exporting model using Executorch to {output_pte_path}")
+                print(f"Exporting model using ExecuTorch to {output_pte_path}")
                 export_model_et(
                     model_to_pte, builder_args.device, args.output_pte_path, args
                 )
             else:
                 print(
-                    "Export with executorch requested but Executorch could not be loaded"
+                    "Export with executorch requested but ExecuTorch could not be loaded"
                 )
                 print(executorch_exception)
         if output_dso_path:
@@ -106,7 +103,8 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Export specific CLI.")
+    parser = argparse.ArgumentParser(description="torchchat export CLI")
+    add_arguments(parser)
     add_arguments_for_export(parser)
     args = parser.parse_args()
     check_args(args, "export")

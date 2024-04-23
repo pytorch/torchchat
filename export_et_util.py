@@ -1,7 +1,9 @@
-from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache
-from build.model import Attention, apply_rotary_emb
-from torch import nn
 import torch
+from build.model import apply_rotary_emb, Attention
+
+# from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache
+from torch import nn
+
 
 class CustomKVCache(nn.Module):
     def __init__(self, max_batch_size, max_seq_length, n_heads, head_dim, dtype):
@@ -35,16 +37,20 @@ class CustomSDPAAttention(nn.Module):
 
         self.wo = attention.wo
 
-        max_batch_size, n_heads, max_seq_length, head_dim = attention.kv_cache.k_cache.shape
+        max_batch_size, n_heads, max_seq_length, head_dim = (
+            attention.kv_cache.k_cache.shape
+        )
         cache_dtype = attention.kv_cache.k_cache.dtype
-        self.kv_cache = CustomKVCache(max_batch_size, max_seq_length, n_heads, head_dim, cache_dtype)
+        self.kv_cache = CustomKVCache(
+            max_batch_size, max_seq_length, n_heads, head_dim, cache_dtype
+        )
 
         self.n_heads = attention.n_heads
         self.head_dim = attention.head_dim
         self.n_local_heads = attention.n_local_heads
         self.dim = attention.dim
 
-    def forward(self, x, freqs_cis, mask, input_pos = None):
+    def forward(self, x, freqs_cis, mask, input_pos=None):
         bsz, seqlen, _ = x.shape
 
         q = self.wq(x)
@@ -74,6 +80,8 @@ class CustomSDPAAttention(nn.Module):
 
 
 def replace_attention_with_custom_sdpa_attention(module: nn.Module):
+    from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache  # noqa
+
     for name, child in module.named_children():
         if isinstance(child, Attention):
             setattr(module, name, CustomSDPAAttention(child))

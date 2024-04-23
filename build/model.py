@@ -4,21 +4,20 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 import json
+import os
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict, Optional
 
 import torch
 import torch.nn as nn
 
-from quantize import get_precision
 from torch import Tensor
 from torch.nn import functional as F
 
+from build.utils import find_multiple, get_precision, use_aoti_backend
 
-def find_multiple(n: int, k: int) -> int:
-    if n % k == 0:
-        return n
-    return n + k - (n % k)
+config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
 
 @dataclass
@@ -37,8 +36,8 @@ class ModelArgs:
     norm_eps: float = 1e-5
     multiple_of: int = 256
     ffn_dim_multiplier: Optional[int] = None
-    use_tiktoken: bool = False
-    
+    use_tiktoken: Optional[bool] = None
+
     def __post_init__(self):
         if self.n_local_heads == -1:
             self.n_local_heads = self.n_heads
@@ -54,9 +53,8 @@ class ModelArgs:
             self.hidden_dim = find_multiple(hidden_dim, multiple_of)
         self.head_dim = self.dim // self.n_heads
         if isinstance(self.use_tiktoken, str):
-            self.use_tiktoken = (self.use_tiktoken == "True")
+            self.use_tiktoken = self.use_tiktoken == "True"
 
-            
     @classmethod
     def from_params(cls, params_path):
         replace = [("rope_theta", "rope_base"), ("n_kv_heads", "n_local_heads")]
@@ -71,25 +69,39 @@ class ModelArgs:
     @classmethod
     def from_table(cls, name: str):
         print(f"name {name}")
-        if name in transformer_configs:
-            return cls(**transformer_configs[name])
+        json_path = config_path / f"{name}.json"
+        if json_path.is_file():
+            return ModelArgs.from_params(json_path)
         else:
-            raise RuntimeError(f"unknown table index {name} for transformer_configs")
+            known_model_params = [
+                config.replace(".json", "") for config in os.listdir(config_path)
+            ]
+            raise RuntimeError(
+                f"unknown table index {name} for transformer config, must be from {known_model_params}"
+            )
 
     @classmethod
     def from_name(cls, name: str):
         print(f"name {name}")
-        if name in transformer_configs:
-            return cls(**transformer_configs[name])
-        # fuzzy search
+        json_path = config_path / f"{name}.json"
+        if Path(json_path).is_file():
+            return ModelArgs.from_params(json_path)
+
+        known_model_params = [
+            config.replace(".json", "") for config in os.listdir(config_path)
+        ]
+
+        print(f"known configs: {known_model_params}")
+        # Fuzzy search by name (e.g. "7B" and "Mistral-7B")
         config = [
             config
-            for config in transformer_configs
+            for config in known_model_params
             if config in str(name).upper() or config in str(name)
         ]
 
-        # We may have two or more configs matched (e.g. "7B" and "Mistral-7B"). Find the best config match,
-        # take longer name (as it have more symbols matched)
+        # We may have two or more configs matched (e.g., "7B" and
+        # "Mistral-7B"). Find the best config match:  take longer
+        # name (as it have more symbols matched)
         if len(config) > 1:
             config.sort(key=len, reverse=True)
             assert len(config[0]) != len(
@@ -97,66 +109,21 @@ class ModelArgs:
             ), name  # make sure only one 'best' match
         elif len(config) == 0:
             raise ValueError(
-                f"Unknown model directory name {name}. Must be one of {list(transformer_configs.keys())}."
+                f"Unknown model directory name {name}. Must be one of {known_model_params}."
             )
 
-        return cls(**transformer_configs[config[0]])
-
-
-transformer_configs = {
-    "CodeLlama-7b-Python-hf": {
-        "block_size": 16384,
-        "vocab_size": 32000,
-        "n_layers": 32,
-        "dim": 4096,
-        "rope_base": 1000000,
-    },
-    "7B": {"n_layers": 32, "n_heads": 32, "dim": 4096},
-    "13B": {"n_layers": 40, "n_heads": 40, "dim": 5120},
-    "30B": {"n_layers": 60, "n_heads": 52, "dim": 6656},
-    "34B": {
-        "n_layers": 48,
-        "n_heads": 64,
-        "dim": 8192,
-        "vocab_size": 32000,
-        "n_local_heads": 8,
-        "hidden_dim": 22016,
-        "rope_base": 1000000,
-    },  # CodeLlama-34B-Python-hf
-    "70B": {
-        "n_layers": 80,
-        "n_heads": 64,
-        "dim": 8192,
-        "n_local_heads": 8,
-        "hidden_dim": 28672,
-    },
-    "Meta-Llama-3-8B": {
-        "dim": 4096,
-        "ffn_dim_multiplier": 1.3,
-        "multiple_of": 1024,
-        "n_heads": 32,
-        "n_local_heads": 8,  # n_kv_heads
-        "n_layers": 32,
-        "rope_base": 500000.0,  # rope_theta
-        "vocab_size": 128256,
-        "use_tiktoken": True,
-    },
-    "Mistral-7B": {
-        "n_layers": 32,
-        "n_heads": 32,
-        "n_local_heads": 8,
-        "dim": 4096,
-        "hidden_dim": 14336,
-        "vocab_size": 32000,
-    },
-    "stories15M": {"n_layers": 6, "n_heads": 6, "dim": 288},
-    "stories110M": {"n_layers": 12, "n_heads": 12, "dim": 768},
-}
+        return ModelArgs.from_params(config_path / f"{config[0]}.json")
 
 
 class KVCache(nn.Module):
-    def __init__(self, max_batch_size, max_seq_length, n_heads, head_dim, dtype=None):
-        # torch.float): # bfloat16    ):
+    def __init__(
+        self,
+        max_batch_size,
+        max_seq_length,
+        n_heads,
+        head_dim,
+        dtype=None,
+    ):
         super().__init__()
         if not dtype:
             dtype = get_precision()
@@ -168,10 +135,8 @@ class KVCache(nn.Module):
         # input_pos: [S], k_val: [B, H, S, D]
         assert input_pos.shape[0] == k_val.shape[2]
 
-        k_out = self.k_cache
-        v_out = self.v_cache
-        k_out[:, :, input_pos] = k_val
-        v_out[:, :, input_pos] = v_val
+        k_out = torch.ops.aten.index_put_(self.k_cache, [None, None, input_pos], k_val)
+        v_out = torch.ops.aten.index_put_(self.v_cache, [None, None, input_pos], v_val)
 
         return k_out, v_out
 
@@ -220,11 +185,6 @@ class Transformer(nn.Module):
         self.register_buffer("causal_mask", causal_mask, persistent=True)
 
     def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
-        # print ("*")
-        # print (f"* shape idx: {idx.shape}")
-        # print (f"* shape pos: {input_pos.shape}")
-        # print("@")
-
         assert self.freqs_cis is not None, "Caches must be initialized first"
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
@@ -234,7 +194,7 @@ class Transformer(nn.Module):
             x = layer(x, input_pos, freqs_cis, mask)
         x = self.norm(x)
         logits = self.output(x)
-        # print(f"******** logits shape: {logits.shape}")
+        # print(f"logits shape: {logits.shape}")
         return logits
 
     @classmethod
@@ -400,7 +360,6 @@ class RMSNorm(nn.Module):
         return output * self.weight
 
 
-# transpsoed first two arguments to align with model in ET
 def precompute_freqs_cis(
     n_elem: int, seq_len: int, base: int = 10000, dtype=None
 ) -> Tensor:
@@ -413,7 +372,7 @@ def precompute_freqs_cis(
     freqs = torch.outer(t, freqs)
     freqs_cis = torch.polar(torch.ones_like(freqs), freqs)
     cache = torch.stack([freqs_cis.real, freqs_cis.imag], dim=-1)
-    return cache.to(dtype=dtype)  # bfloat16)
+    return cache.to(dtype=dtype)
 
 
 def apply_rotary_emb(x: Tensor, freqs_cis: Tensor) -> Tensor:

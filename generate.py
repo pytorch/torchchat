@@ -20,15 +20,12 @@ import torch._inductor.config
 from build.builder import (
     _initialize_model,
     _initialize_tokenizer,
-    _load_model,
-    validate_args,
     BuilderArgs,
     TokenizerArgs,
 )
 from build.model import Transformer
-from cli import add_arguments_for_generate, arg_init, check_args
-from download import download_and_convert, is_model_downloaded
-from quantize import set_precision
+from build.utils import device_sync, set_precision
+from cli import add_arguments, add_arguments_for_generate, arg_init, check_args
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +45,31 @@ class GeneratorArgs:
     compile: bool = False
     compile_prefill: bool = False
     speculate_k: int = 5
+    sequential_prefill: bool = True
+
+    def __post_init__(self):
+        if self.compile_prefill and self.sequential_prefill:
+            raise RuntimeError("prefill compilation requires parallel prefill")
+
+    def validate_build(
+        self, builder_args: BuilderArgs, model_description: str = "model"
+    ):
+        reason = ""
+        model_type = ""
+        if not self.sequential_prefill:
+            reason = "parallel prefill"
+        if self.compile_prefill:
+            reason = "model compilation for prefill"
+        if self.compile:
+            reason = "model compilation"
+        if builder_args.dso_path:
+            model_type = "DSO"
+        if builder_args.pte_path:
+            model_type = "PTE"
+        if model_type and reason:
+            raise RuntimeError(
+                f"cannot perform {reason} because a {model_type} {model_description} is used"
+            )
 
     @classmethod
     def from_args(cls, args):  # -> GeneratorArgs:
@@ -63,16 +85,8 @@ class GeneratorArgs:
             compile=args.compile,
             compile_prefill=args.compile_prefill,
             speculate_k=args.speculate_k,
+            sequential_prefill=not args.parallel_prefill,
         )
-
-
-def device_sync(device):
-    if "cuda" in device:
-        torch.cuda.synchronize(device)
-    elif ("cpu" in device) or ("mps" in device):
-        pass
-    else:
-        logging.error(f"device={ device } is not yet suppported")
 
 
 torch._inductor.config.coordinate_descent_tuning = True
@@ -103,7 +117,9 @@ def logits_to_probs(logits, temperature: float = 1.0, top_k: Optional[int] = Non
     return probs
 
 
-def sample(logits, need_probs: bool, temperature: float = 1.0,top_k: Optional[int] = None):
+def sample(
+    logits, need_probs: bool, temperature: float = 1.0, top_k: Optional[int] = None
+):
     if temperature == 0 and not need_probs:
         _, idx_next = torch.topk(logits, k=1, dim=-1)
         idx_next = idx_next.squeeze(dim=(0, 1))
@@ -124,7 +140,6 @@ def prefill(
     logging.debug(f"x: {x}, input_pos: {input_pos}")
     width = x.size(1)
     assert input_pos.size(0) == width
-    sequential_prefill = True
 
     if sequential_prefill:
         for i in range(width):
@@ -139,7 +154,11 @@ def prefill(
 
 
 def decode_one_token(
-    model: Transformer, x: torch.Tensor, input_pos: torch.Tensor, need_probs: bool, **sampling_kwargs
+    model: Transformer,
+    x: torch.Tensor,
+    input_pos: torch.Tensor,
+    need_probs: bool,
+    **sampling_kwargs,
 ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
     # input_pos: [B, 1]
     assert input_pos.shape[-1] == 1
@@ -248,6 +267,7 @@ def generate(
     chat_mode: bool,
     draft_model: Transformer,
     speculate_k: Optional[int] = 8,
+    sequential_prefill=True,
     callback=lambda x: x,
     **sampling_kwargs,
 ) -> torch.Tensor:
@@ -268,6 +288,7 @@ def generate(
     max_seq_length = (
         max_seq_length + speculate_k + 1 if is_speculative else max_seq_length
     )
+    model = model.to(device=device)
     with torch.device(device):
         model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
         if is_speculative and draft_model is not model:
@@ -279,9 +300,21 @@ def generate(
     seq = empty
     input_pos = torch.arange(0, T, device=device, dtype=torch.int)
 
-    next_token = prefill(model, prompt.view(1, -1), input_pos, **sampling_kwargs)
+    next_token = prefill(
+        model,
+        prompt.view(1, -1),
+        input_pos,
+        sequential_prefill=sequential_prefill,
+        **sampling_kwargs,
+    )
     if is_speculative:
-        prefill(draft_model, prompt.view(1, -1), input_pos, **sampling_kwargs)
+        prefill(
+            draft_model,
+            prompt.view(1, -1),
+            input_pos,
+            sequential_prefill=sequential_prefill,
+            **sampling_kwargs,
+        )
     seq[T] = next_token
 
     input_pos = torch.tensor([T], device=device, dtype=torch.int)
@@ -310,7 +343,7 @@ def generate(
             input_pos,
             max_new_tokens - 1,
             callback=callback,
-            need_probs = False,
+            need_probs=False,
             **sampling_kwargs,
         )
         seq[T + 1 :] = torch.cat(generated_tokens)
@@ -358,12 +391,13 @@ def _main(
     speculative_builder_args: BuilderArgs,
     tokenizer_args: TokenizerArgs,
     generator_args: GeneratorArgs,
-    compile: bool = True,
-    compile_prefill: bool = False,
-    profile: Optional[Path] = None,
-    quantize=None,
+    profile: Optional[Path],
+    quantize,
+    draft_quantize,
 ) -> None:
-    """Generates text samples based on a pre-trained Transformer model and tokenizer."""
+    """
+    Generates text samples based on a pre-trained Transformer model and tokenizer.
+    """
 
     # global print
     #    from tp import maybe_init_dist
@@ -397,19 +431,23 @@ def _main(
     tokenizer = _initialize_tokenizer(tokenizer_args)
 
     builder_args.setup_caches = False
-    model = _initialize_model(builder_args, quantize)
-    validate_args(model, tokenizer_args)
+    model = _initialize_model(builder_args, quantize, tokenizer)
 
     # will add a version of _initialize_model in future
     # (need additional args)
     if is_speculative:
-        speculative_builder_args = builder_args
-
-        draft_model = _load_model(
+        draft_model = _initialize_model(
             speculative_builder_args,
+            quantize if draft_quantize == "quantize" else draft_quantize,
+            tokenizer,
         )
     else:
         draft_model = None
+
+    tokenizer_args.validate_model(model)
+    tokenizer_args.validate_model(draft_model, "draft model")
+    generator_args.validate_build(builder_args)
+    generator_args.validate_build(speculative_builder_args, "draft model")
 
     encoded = encode_tokens(
         tokenizer, generator_args.prompt, bos=True, device=builder_args.device
@@ -423,7 +461,7 @@ def _main(
             for p in itertools.chain(model.parameters(), model.buffers())
         ]
     )
-    if compile:
+    if generator_args.compile:
         if (
             is_speculative and builder_args.use_tp
         ):  # and ("cuda" in builder_args.device):
@@ -443,14 +481,14 @@ def _main(
         )
 
         # Uncomment to squeeze more perf out of prefill
-        if compile_prefill:
+        if generator_args.compile_prefill:
             prefill = torch.compile(prefill, fullgraph=True, dynamic=True)
 
     aggregate_metrics = {
         "tokens_per_sec": [],
         "accept_counts": [],
     }
-    start = -1 if compile else 0
+    start = -1 if generator_args.compile else 0
 
     for i in range(start, generator_args.num_samples):
         device_sync(device=builder_args.device)
@@ -506,6 +544,7 @@ def _main(
                 callback=callback,
                 temperature=generator_args.temperature,
                 top_k=generator_args.top_k,
+                sequential_prefill=generator_args.sequential_prefill,
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
         if i == -1:
@@ -546,10 +585,6 @@ def _main(
 
 
 def main(args):
-    # If a named model was provided and not downloaded, download it.
-    if args.model and not is_model_downloaded(args.model, args.model_directory):
-        download_and_convert(args.model, args.model_directory, args.hf_token)
-
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
@@ -560,15 +595,15 @@ def main(args):
         speculative_builder_args,
         tokenizer_args,
         generator_args,
-        args.compile,
-        args.compile_prefill,
         args.profile,
         args.quantize,
+        args.draft_quantize,
     )
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate specific CLI.")
+    parser = argparse.ArgumentParser(description="torchchat generate CLI")
+    add_arguments(parser)
     add_arguments_for_generate(parser)
     args = parser.parse_args()
     check_args(args, "generate")

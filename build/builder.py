@@ -14,13 +14,12 @@ from typing import Any, Dict, Optional, Union
 import torch
 import torch._dynamo.config
 import torch._inductor.config
-from config.model_config import resolve_model_config
-from quantize import name_to_dtype, quantize_model
 
-from sentencepiece import SentencePieceProcessor
-from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
+from config.model_config import resolve_model_config
+from quantize import quantize_model
 
 from build.model import Transformer
+from build.utils import device_sync, name_to_dtype
 
 
 @dataclass
@@ -69,13 +68,13 @@ class BuilderArgs:
 
     @classmethod
     def from_args(cls, args):  # -> BuilderArgs:
-
         # Handle disabled checkpoint_dir option
         checkpoint_dir = None
         if hasattr(args, "checkpoint_dir"):
             checkpoint_dir = args.checkpoint_dir
 
         checkpoint_path = args.checkpoint_path
+        params_table = args.params_table
         if args.model:  # Using a named, well-known model
             model_config = resolve_model_config(args.model)
 
@@ -83,6 +82,11 @@ class BuilderArgs:
                 Path(args.model_directory)
                 / model_config.name
                 / model_config.checkpoint_file
+            )
+            # The transformers config is keyed on the last section
+            # of the name/path.
+            params_table = (
+                model_config.transformer_params_key or model_config.name.split("/")[-1]
             )
 
         is_chat_model = False
@@ -96,18 +100,19 @@ class BuilderArgs:
                 args.pte_path,
                 args.gguf_path,
             ]:
-                path = str(path)
-                if path.endswith("/"):
-                    path = path[:-1]
-                path_basename = os.path.basename(path)
-                if "chat" in path_basename:
-                    is_chat_model = True
+                if path is not None:
+                    path = str(path)
+                    if path.endswith("/"):
+                        path = path[:-1]
+                    path_basename = os.path.basename(path)
+                    if "chat" in path_basename:
+                        is_chat_model = True
 
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
             params_path=args.params_path,
-            params_table=args.params_table,
+            params_table=params_table,
             gguf_path=args.gguf_path,
             gguf_kwargs=None,
             dso_path=args.dso_path,
@@ -137,6 +142,24 @@ class TokenizerArgs:
     is_sentencepiece: bool = True
     is_tiktoken: bool = False
 
+    def validate_model(
+        self,
+        model: Transformer,
+        model_description: str = "model",
+    ):
+        if model is None:
+            return
+
+        use_tiktoken = model.config.use_tiktoken
+        is_tiktoken = self.is_tiktoken
+
+        if use_tiktoken is None:
+            model.config.use_tiktoken = is_tiktoken
+        elif use_tiktoken != is_tiktoken:
+            raise RuntimeError(
+                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)} for {model_description}"
+            )
+
     @classmethod
     def from_args(cls, args):  # -> TokenizerArgs:
         is_sentencepiece = True
@@ -146,7 +169,12 @@ class TokenizerArgs:
             tokenizer_path = args.tokenizer_path
         elif args.model:  # Using a named, well-known model
             model_config = resolve_model_config(args.model)
-            tokenizer_path = Path(args.model_directory) / model_config.name / "tokenizer.model"
+            tokenizer_path = (
+                Path(args.model_directory)
+                / model_config.name
+                / model_config.tokenizer_file
+            )
+
         elif args.checkpoint_path:
             tokenizer_path = args.checkpoint_path.parent / "tokenizer.model"
         elif hasattr(args, "checkpoint_dir") and args.checkpoint_dir:
@@ -170,20 +198,15 @@ class TokenizerArgs:
 
 def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
     if tokenizer_args.is_sentencepiece:
+        from sentencepiece import SentencePieceProcessor
+
         return SentencePieceProcessor(model_file=str(tokenizer_args.tokenizer_path))
     elif tokenizer_args.is_tiktoken:
+        from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
+
         return TiktokenTokenizer(model_path=str(tokenizer_args.tokenizer_path))
     else:
         raise RuntimeError("must specify a valid tokenizer in TokenizerArgs")
-
-
-def device_sync(device):
-    if "cuda" in device:
-        torch.cuda.synchronize(device)
-    elif ("cpu" in device) or ("mps" in device):
-        pass
-    else:
-        print(f"device={ device } is not yet suppported")
 
 
 torch._inductor.config.coordinate_descent_tuning = True
@@ -231,7 +254,7 @@ def _load_model_default(builder_args):
         if builder_args.params_path:
             model = Transformer.from_params(builder_args.params_path)
         elif builder_args.params_table:
-            model = Transformer.from_table(builder_args.params_path)
+            model = Transformer.from_table(builder_args.params_table)
         else:
             model = Transformer.from_name(builder_args.checkpoint_path.parent.name)
 
@@ -296,6 +319,7 @@ def _load_model(builder_args):
 def _initialize_model(
     builder_args,
     quantize,
+    tokenizer=None,
 ):
     print("Loading model ...")
     t0 = time.time()
@@ -306,6 +330,9 @@ def _initialize_model(
         is_pte = builder_args.pte_path is not None
         assert not (is_dso and is_pte)
         assert builder_args.gguf_kwargs is None
+        # TODO: make GGUF load independent of backend
+        # currently not working because AVX int_mm broken
+        #   (no unpack available)
         _set_gguf_kwargs(builder_args, is_et=is_pte, context="generate")
 
     model_ = _load_model(builder_args)
@@ -313,8 +340,6 @@ def _initialize_model(
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
     if builder_args.dso_path:
-        # make sure user did not try to set dtype
-        # assert model_dtype == "float32", f"dtype setting not valid for a DSO model. Specify dtype during export."
         assert (
             quantize is None or quantize == "{ }"
         ), "quantize not valid for exported DSO model. Specify quantization during export."
@@ -332,8 +357,6 @@ def _initialize_model(
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {builder_args.dso_path}")
     elif builder_args.pte_path:
-        # make sure user did not try to set dtype
-        # assert model_dtype == "float32", f"dtype setting not valid for a DSO model. Specify dtype during export."
         assert (
             quantize is None or quantize == "{ }"
         ), "quantize not valid for exported PTE model. Specify quantization during export."
@@ -348,7 +371,8 @@ def _initialize_model(
 
         if quantize:
             t0q = time.time()
-            quantize_model(model, builder_args.device, quantize)
+            print(f"Quantizing the model with: {quantize}")
+            quantize_model(model, builder_args.device, quantize, tokenizer)
             device_sync(device=builder_args.device)
             print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
 
@@ -361,14 +385,10 @@ def _initialize_model(
 
     return model
 
+
 def tokenizer_setting_to_name(tiktoken: bool = False) -> str:
     return "TikToken" if tiktoken else "SentencePiece"
 
-def validate_args(model: Transformer, tokenizer_args: TokenizerArgs):
-    use_tiktoken = model.config.use_tiktoken
-    is_tiktoken = tokenizer_args.is_tiktoken
-    if use_tiktoken != is_tiktoken:
-        raise RuntimeError(f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}")
 
 def resolve_model_name(model: str) -> str:
     # If the provided model name is an alias, retrieve the full path.

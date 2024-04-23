@@ -44,6 +44,8 @@ class ModelConfig:
         default=ModelDistributionChannel.HuggingFaceSnapshot
     )
     checkpoint_file: str = field(default="model.pth")
+    tokenizer_file: str = field(default="tokenizer.model")
+    transformer_params_key: str = field(default=None)
 
 
 # Keys are stored in lowercase.
