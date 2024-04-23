@@ -2,6 +2,8 @@
 
 set -xeou pipefail
 
+shopt -s globstar
+
 install_huggingface_cli() {
 	pip install -U "huggingface_hub[cli]"
 }
@@ -27,7 +29,7 @@ normalize_llama_checkpoint() {
 	local repo_name=$1
 	local local_dir="checkpoints/$(basename "${repo_name}")"
 	mkdir -p "${local_dir}"
-	mv "${local_dir}/original/*" "${local_dir}"
+	mv "${local_dir}"/original/* "${local_dir}"
 	mv "${local_dir}/consolidated.00.pth" "${local_dir}/model.pth"
 	rmdir "${local_dir/original/}"
 }
