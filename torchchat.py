@@ -128,7 +128,7 @@ if __name__ == "__main__":
 
         # Construct arguments for the flask app minus 'browser' command
         # plus '--chat'
-        args_plus_chat = ['"{}"'.format(s) for s in sys.argv[1:] if s != "browser"] + [
+        args_plus_chat = ["'{}'".format(s) for s in sys.argv[1:] if s != "browser"] + [
             '"--chat"'
         ]
         formatted_args = ", ".join(args_plus_chat)
