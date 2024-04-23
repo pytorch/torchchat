@@ -10,7 +10,7 @@ If an unsupported type is encountered while parsing a GGUF file, an exception is
 We now go over an example of using GGUF files in the torchchat flow.
 
 ### Download resources
-First download a GGUF model and tokenizer.  In this example, we use a Q4_0 GGUF file.  (Note that Q4_0 is only the dominant tensor type in the file, but the file also contains GGUF tensors of type Q6_K, F16, and F32.)
+First download a GGUF model and tokenizer.  In this example, we use a Q4_0 GGUF file.  (Note that Q4_0 is only the dominant tensor type in the file, but the file also contains GGUF tensors of types Q6_K, F16, and F32.)
 
 ```
 # Download resources
