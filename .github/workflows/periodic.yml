@@ -137,8 +137,15 @@ jobs:
         echo "::group::Download checkpoint"
         export REPO_NAME=${{ matrix.repo_name }}
         case "${{ matrix.install_method }}" in
-          wget) bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }} ;;
-          huggingface-cli) bash .ci/scripts/download_llama.sh ;;
+          wget) 
+            bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }} 
+            ;;
+          huggingface-cli) 
+            (
+              set +x
+              HF_TOKEN="${HF_TOKEN_PERIODIC}" bash .ci/scripts/download_llama.sh 
+            )
+            ;;
         esac
         bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
         echo "::endgroup::"
