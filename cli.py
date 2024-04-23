@@ -7,10 +7,10 @@
 import json
 from pathlib import Path
 
+import torch
+
 from build.utils import allowable_dtype_names, allowable_params_table
 from download import download_and_convert, is_model_downloaded
-
-import torch
 
 # CPU is always available and also exportable to ExecuTorch
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -223,7 +223,7 @@ def add_arguments(parser):
         "-d",
         "--dtype",
         default="float32",
-        choices = allowable_dtype_names(),
+        choices=allowable_dtype_names(),
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
     parser.add_argument(
