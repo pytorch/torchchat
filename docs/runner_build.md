@@ -19,7 +19,7 @@ Options:
 To build runner-aoti, run the following commands *from the torchchat root directory*
 
 ```
-cmake -S ./runner-aoti -B ./runner-aoti/cmake-out -G Ninja -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'`
+cmake -S ./runner-aoti -B ./runner-aoti/cmake-out -G Ninja -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'`
 cmake --build ./runner-aoti/cmake-out
 ```
 
@@ -29,8 +29,8 @@ Let us try using it with an example.
 We first download stories15M and export it to AOTI.
 
 ```
-python torchchat.py download stories15M
-python torchchat.py export stories15M --output-dso-path ./model.so
+python3 torchchat.py download stories15M
+python3 torchchat.py export stories15M --output-dso-path ./model.so
 ```
 
 We can now execute the runner with:
@@ -41,7 +41,7 @@ wget -O ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenize
 ```
 
 ## Building and running runner-et
-Before building runner-et, you must first set-up ExecuTorch by following [Set-up Executorch](executorch_setup.md).
+Before building runner-et, you must first setup ExecuTorch by following [setup ExecuTorch steps](executorch_setup.md).
 
 
 To build runner-et, run the following commands *from the torchchat root directory*
@@ -58,8 +58,8 @@ Let us try using it with an example.
 We first download stories15M and export it to ExecuTorch.
 
 ```
-python torchchat.py download stories15M
-python torchchat.py export stories15M --output-pte-path ./model.pte
+python3 torchchat.py download stories15M
+python3 torchchat.py export stories15M --output-pte-path ./model.pte
 ```
 
 We can now execute the runner with:
