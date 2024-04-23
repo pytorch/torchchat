@@ -48,36 +48,50 @@ def main(args):
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
 
+    # tokenizer needed for quantization so get that here,
+    try:
+        tokenizer_args = TokenizerArgs.from_args(args)
+    except:
+        tokenizer_args = None
+
+    # This is heroic, but still confusing to the user
+    # because they think they are in fect exporting the
+    # same model when they's not. In set_backend we just
+    # throw an exception if the user asks for both, but
+    # we need to know which one.
+    model_to_pte = None
+    model_to_dso = None
+
     # TODO: clean this up
     # This mess is because ET does not support _weight_int4pack_mm right now
     if not builder_args.gguf_path:
-        # tokenizer needed for quantization so get that here,
-        try:
-            tokenizer_args = TokenizerArgs.from_args(args)
-            tokenizer = _initialize_tokenizer(tokenizer_args)
-        except:
-            tokenizer = None
-
-        model = _initialize_model(
+        model, tokenizer = _initialize_model(
             builder_args,
+            tokenizer_args,
             quantize,
-            tokenizer,
         )
+
         model_to_pte = model
         model_to_dso = model
     else:
+        # for now, we simply don't suport GPTQ for GGUF
         if output_pte_path:
+            print(
+                "Warning: may not be able to represent quantized models, dequantizing when necessary"
+            )
             _set_gguf_kwargs(builder_args, is_et=True, context="export")
-            model_to_pte = _initialize_model(
+            model_to_pte, tokenizer = _initialize_model(
                 builder_args,
+                tokenizer_args,
                 quantize,
             )
             _unset_gguf_kwargs(builder_args)
 
         if output_dso_path:
             _set_gguf_kwargs(builder_args, is_et=False, context="export")
-            model_to_dso = _initialize_model(
+            model_to_dso, tokenizer = _initialize_model(
                 builder_args,
+                tokenizer_args,
                 quantize,
             )
             _unset_gguf_kwargs(builder_args)
@@ -85,7 +99,7 @@ def main(args):
     with torch.no_grad():
         if output_pte_path:
             output_pte_path = str(os.path.abspath(output_pte_path))
-            print(f">{output_pte_path}<")
+            # print(f">{output_pte_path}<")
             if executorch_export_available:
                 print(f"Exporting model using ExecuTorch to {output_pte_path}")
                 export_model_et(

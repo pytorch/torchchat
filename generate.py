@@ -428,24 +428,28 @@ def _main(
         )
         # raise RuntimeError("You need to use --is-chat-model to indicate model has chat support.")
 
-    tokenizer = _initialize_tokenizer(tokenizer_args)
-
     builder_args.setup_caches = False
-    model = _initialize_model(builder_args, quantize, tokenizer)
+    model, tokenizer = _initialize_model(
+        builder_args,
+        tokenizer_args,
+        quantize,
+    )
+    tokenizer_args.update_from_model(model)
 
     # will add a version of _initialize_model in future
     # (need additional args)
     if is_speculative:
-        draft_model = _initialize_model(
+        draft_model, _ = _initialize_model(
             speculative_builder_args,
+            tokenizer_args,
             quantize if draft_quantize == "quantize" else draft_quantize,
             tokenizer,
         )
     else:
         draft_model = None
 
-    tokenizer_args.validate_model(model)
-    tokenizer_args.validate_model(draft_model, "draft model")
+    # tokenizer_args.validate_model(model)
+    # tokenizer_args.validate_model(draft_model, "draft model")
     generator_args.validate_build(builder_args)
     generator_args.validate_build(speculative_builder_args, "draft model")
 

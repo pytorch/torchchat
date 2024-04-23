@@ -232,14 +232,12 @@ def main(args) -> None:
     print(f"Using device={device}")
     set_precision(builder_args.precision)
 
-    tokenizer = _initialize_tokenizer(tokenizer_args)
     builder_args.setup_caches = False
-    model = _initialize_model(
+    model, tokenizer = _initialize_model(
         builder_args,
+        tokenizer_args,
         quantize,
-        tokenizer,
     )
-    tokenizer_args.validate_model(model)
 
     if compile:
         assert not (
