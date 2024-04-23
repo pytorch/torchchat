@@ -794,6 +794,8 @@ jobs:
           popd
       - name: Run inference
         run: |
+          set -eou pipefail
+
           export MODEL_DIR=${PWD}/checkpoints/stories15M
           export PROMPT="Once upon a time in a land far away"
 
