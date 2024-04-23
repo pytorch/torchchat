@@ -7,14 +7,14 @@
 from __future__ import annotations
 
 import json
-from functools import reduce
-from math import gcd
-from typing import Dict, Optional, Tuple
+
+# from functools import reduce
+# from math import gcd
+from typing import Dict, Optional
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torchao.quantization.quant_api as quant_api
 from build.utils import find_multiple, get_precision
 
 
@@ -75,6 +75,7 @@ class QuantHandler:
 
 class Int8DynActInt4WeightQuantizer(QuantHandler):
     def __init__(self, model: nn.Module, device="cpu", tokenizer=None, **kwargs):
+        import torchao.quantization.quant_api as quant_api
         self.model_ = model
         self.device = device
         self.tokenizer = tokenizer
@@ -687,7 +688,7 @@ class QuantizedGroupEmbedding(torch.nn.Module):
             weight_odd = self.weight.remainder(16)
             weight_unpacked = torch.stack((weight_even, weight_odd), dim=-1)
             weight = weight_unpacked.view(self.weight.shape[0], -1)
-            weight = weight.view(torch.int8).add(-8)
+            weight = weight.to(torch.int8).add(-8)
         else:
             weight = self.weight
 

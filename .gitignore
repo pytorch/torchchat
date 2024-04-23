@@ -7,3 +7,12 @@ __pycache__/
 *.so
 
 .model-artifacts/
+.venv
+
+# Build directories
+et-build/*
+runner-et/cmake-out/*
+runner-aoti/cmake-out/*
+
+# pte files
+*.pte

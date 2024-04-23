@@ -734,28 +734,24 @@ jobs:
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
           python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
-          cmake -S ./runner-et -B et-build/cmake-out -G Ninja
-          cmake --build ./et-build/cmake-out
+          cmake -S ./runner-et -B ./runner-et/cmake-out -G Ninja
+          cmake --build ./runner-et/cmake-out
       - name: Download checkpoints
         run: |
-          mkdir -p checkpoints/stories15M
-          pushd checkpoints/stories15M
-          wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
-          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
-          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
-          popd
+
       - name: Run inference
         run: |
-          export MODEL_DIR=${PWD}/checkpoints/stories15M
-          export PROMPT="Once upon a time in a land far away"
+          python torchchat.py download stories15M
+          wget -O ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
 
-          python torchchat.py generate --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}"  > ${PWD}/output_eager
-          cat ${PWD}/output_eager
+          export PRMT="Once upon a time in a land far away"
 
-          python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-pte-path ${PWD}/stories15M.pte
+          python torchchat.py generate stories15M --temperature 0 --prompt "${PRMT}"  > ./output_eager
+          cat ./output_eager
 
-          ./et-build/cmake-out/runner_et ${PWD}/stories15M.pte -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}" > ${PWD}/output_et
-          cat ${PWD}/output_et
+          python torchchat.py export stories15M --output-pte-path ./model.pte
+          ./runner-et/cmake-out/run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}" > ./output_et
+          cat ./output_et
 
           echo "Tests complete."
   runner-aoti:

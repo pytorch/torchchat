@@ -7,6 +7,8 @@
 import json
 from pathlib import Path
 
+from build.utils import allowable_dtype_names, allowable_params_table
+
 import torch
 
 # CPU is always available and also exportable to ExecuTorch
@@ -131,7 +133,12 @@ def add_arguments(parser):
     parser.add_argument(
         "--compile-prefill",
         action="store_true",
-        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times.",
+        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times. (Requires `--parallel-prefill`)",
+    )
+    parser.add_argument(
+        "--parallel-prefill",
+        action="store_true",
+        help="Whether to perform prefill in parallel, or one token at a time. Improves prefill perf. DSO and PTE models presently do not support parallel prefill.",
     )
     parser.add_argument(
         "--profile",
@@ -203,6 +210,7 @@ def add_arguments(parser):
         "-d",
         "--dtype",
         default="float32",
+        choices = allowable_dtype_names(),
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
     parser.add_argument(
@@ -234,13 +242,15 @@ def add_arguments(parser):
         "--params-table",
         type=str,
         default=None,
+        choices=allowable_params_table(),
         help="Parameter table to use",
     )
     parser.add_argument(
         "--device",
         type=str,
         default=default_device,
-        help="Hardware device to use. Options: cpu, gpu, mps",
+        choices=["cpu", "cuda", "mps"],
+        help="Hardware device to use. Options: cpu, cuda, mps",
     )
     parser.add_argument(
         "--tasks",

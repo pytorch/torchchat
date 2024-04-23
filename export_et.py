@@ -83,7 +83,8 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
     else:
         raise ValueError(f"Unsupported dtype for ET export: {target_precision}")
 
-    replace_attention_with_custom_sdpa_attention(model)
+    # TODO: we can bring with pack when dynamo error P1220158146 is resolved
+    # replace_attention_with_custom_sdpa_attention(model)
     with torch.nn.attention.sdpa_kernel(
         [torch.nn.attention.SDPBackend.MATH]
     ), torch.no_grad():
@@ -96,7 +97,6 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
             edge_compile_config=edge_config,
         )
     edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
-    edge_manager = edge_manager.to_backend(XnnpackPartitioner())
     export_program = edge_manager.to_executorch(
         ExecutorchBackendConfig(
             extract_constant_segment=True,

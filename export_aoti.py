@@ -24,6 +24,7 @@ def export_model(model: nn.Module, device, output_path, args=None):
     # Specify that the first dimension of each input is that batch size
     dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
 
+    model.to(device)
     so = torch._export.aot_compile(
         model,
         args=input,

@@ -1,5 +1,5 @@
 # Chat with LLMs Everywhere
-Torchchat is an easy-to-use library for running large language models (LLMs) on edge devices including mobile phones and desktops.
+Torchchat is a small codebase to showcase running large language models (LLMs) within Python OR within your own (C/C++) application on mobile (iOS/Android), desktop and servers.
 
 ## Highlights
 - Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
@@ -12,86 +12,127 @@ Torchchat is an easy-to-use library for running large language models (LLMs) on 
   - iOS 17+ (iPhone 13 Pro+)
 - Multiple data types including: float32, float16, bfloat16
 - Multiple quantization schemes
-- Multiple execution modes including: Eager, Compile, AOT Inductor (AOTI) and ExecuTorch
+- Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
-## Quick Start
-### Initialize the Environment
-The following steps requires you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) and [virtualenv](https://virtualenv.pypa.io/en/latest/installation.html) installed
+## Installation
+
+The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
 ```
-# set up a virtual environment
-python3 -m virtualenv .venv/torchchat
-source .venv/torchchat/bin/activate
-
-# get the code and dependencies
+# get the code
 git clone https://github.com/pytorch/torchchat.git
 cd torchchat
-pip install -r requirements.txt
+
+# set up a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# install dependencies
+./install_requirements.sh
 
 # ensure everything installed correctly
-python torchchat.py --help
-
+python3 torchchat.py --help
 ```
 
-### Generating Text
+### Download Weights
+Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace
+account.
 
-```
-python torchchat.py generate stories15M
-```
-That’s all there is to it!
-Read on to learn how to use the full power of torchchat.
+Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens).
+Run `huggingface-cli login`, which will prompt for the newly created token.  
 
-## Customization
-For the full details on all commands and parameters run `python torchchat.py --help`
-
-### Download
-For supported models, torchchat can download model weights. Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace
-account and install `huggingface-cli`.
-
-To install `huggingface-cli`, run `pip install huggingface-cli`. After installing, create a user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens). Run `huggingface-cli login`, which will prompt for the newly created token. Once this is done, torchchat will be able to download model artifacts from
+Once this is done, torchchat will be able to download model artifacts from
 HuggingFace.
 
 ```
-python torchchat.py download llama3
+python3 torchchat.py download llama3
 ```
+
+## What can you do with torchchat?
+
+* Run models via PyTorch / Python:
+  * [Chat](#chat)
+  * [Generate](#generate)
+  * [Run via Browser](#browser)
+* [Quantizing your model (suggested for mobile)](#quantization)
+* Export and run models in native environments (C++, your own app, mobile, etc.)
+  * [Exporting for desktop/servers via AOTInductor](#export-server)
+  * [Running exported .so file via your own C++ application](#run-server)
+     * in Chat mode
+     * in Generate mode
+  * [Exporting for mobile via ExecuTorch](#export-executorch)
+     * in Chat mode
+     * in Generate mode
+  * [Running exported executorch file on iOS or Android](#run-mobile)
+
+## Models
+These are the supported models
+| Model | Mobile Friendly | Notes |
+|------------------|---|---------------------|
+|[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅||
+|[meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅||
+|[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|✅||
+|[meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|||
+|[meta-llama/Llama-2-70b-chat-hf](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf)|||
+|[meta-llama/Llama-2-7b-hf](https://huggingface.co/meta-llama/Llama-2-7b-hf)|✅||
+|[meta-llama/CodeLlama-7b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-7b-Python-hf)|✅||
+|[meta-llama/CodeLlama-34b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-34b-Python-hf)|✅||
+|[mistralai/Mistral-7B-v0.1](https://huggingface.co/mistralai/Mistral-7B-v0.1)|✅||
+|[mistralai/Mistral-7B-Instruct-v0.1](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1)|✅||
+|[mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)|✅||
+|[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+|[openlm-research/open_llama_7b](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+
+See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
+
+
+## Running via PyTorch / Python
 
 ### Chat
 Designed for interactive and conversational use.
 In chat mode, the LLM engages in a back-and-forth dialogue with the user. It responds to queries, participates in discussions, provides explanations, and can adapt to the flow of conversation.
 
-For more information run `python torchchat.py chat --help`
+For more information run `python3 torchchat.py chat --help`
 
 **Examples**
 ```
-python torchchat.py chat llama3 --tiktoken
+python3 torchchat.py chat llama3 --tiktoken
 ```
 
 ### Generate
 Aimed at producing content based on specific prompts or instructions.
 In generate mode, the LLM focuses on creating text based on a detailed prompt or instruction. This mode is often used for generating written content like articles, stories, reports, or even creative writing like poetry.
 
-For more information run `python torchchat.py generate --help`
+For more information run `python3 torchchat.py generate --help`
 
 **Examples**
 ```
-python torchchat.py generate llama3 --dtype=fp16 --tiktoken
+python3 torchchat.py generate llama3 --dtype=fp16 --tiktoken
 ```
 
-### Export
+## Exporting your model
 Compiles a model and saves it to run later.
 
-For more information run `python torchchat.py export --help`
+For more information run `python3 torchchat.py export --help`
 
-**Examples**
+### Exporting for Desktop / Server-side via AOT Inductor
 
-AOT Inductor:
 ```
-python torchchat.py export stories15M --output-dso-path stories15M.so
+python3 torchchat.py export stories15M --output-dso-path stories15M.so
 ```
 
-ExecuTorch:
+This produces a `.so` file, also called a Dynamic Shared Object. This `.so` can be linked into your own C++ program.
+
+### Running the exported `.so` via your own C++ application
+
+[TBF]
+
+### Exporting for Mobile via ExecuTorch
+
 ```
-python torchchat.py export stories15M --output-pte-path stories15M.pte
+python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 ```
 
 ### Browser
@@ -100,7 +141,7 @@ Run a chatbot in your browser that’s supported by the model you specify in the
 **Examples**
 
 ```
-python torchchat.py browser stories15M --temperature 0 --num-samples 10
+python3 torchchat.py browser stories15M --temperature 0 --num-samples 10
 ```
 
 *Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
@@ -110,19 +151,19 @@ Enter some text in the input box, then hit the enter key or click the “SEND”
 ### Eval
 Uses lm_eval library to evaluate model accuracy on a variety of tasks. Defaults to wikitext and can be manually controlled using the tasks and limit args.
 
-For more information run `python torchchat.py eval --help`
+For more information run `python3 torchchat.py eval --help`
 
 **Examples**
 
 Eager mode:
 ```
-python torchchat.py eval stories15M -d fp32 --limit 5
+python3 torchchat.py eval stories15M -d fp32 --limit 5
 ```
 
 To test the perplexity for lowered or quantized model, pass it in the same way you would to generate:
 
 ```
-python torchchat.py eval stories15M --pte-path stories15M.pte --limit 5
+python3 torchchat.py eval stories15M --pte-path stories15M.pte --limit 5
 ```
 
 ## Models
@@ -151,17 +192,17 @@ See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
 
 ```
 # Llama 3 8B Instruct
-python torchchat.py chat llama3 --tiktoken
+python3 torchchat.py chat llama3 --tiktoken
 ```
 
 ```
 # Stories 15M
-python torchchat.py chat stories15M
+python3 torchchat.py chat stories15M
 ```
 
 ```
 # CodeLama 7B for Python
-python torchchat.py chat codellama
+python3 torchchat.py chat codellama
 ```
 
 ## Desktop Execution
@@ -173,25 +214,26 @@ AOT compiles models into machine code before execution, enhancing performance an
 The following example uses the Stories15M model.
 ```
 # Compile
-python torchchat.py export stories15M --output-dso-path stories15M.so
+python3 torchchat.py export stories15M --output-dso-path stories15M.so
 
 # Execute
-python torchchat.py generate --dso-path stories15M.so --prompt "Hello my name is"
+python3 torchchat.py generate --dso-path stories15M.so --prompt "Hello my name is"
 ```
 
 NOTE: The exported model will be large. We suggest you quantize the model, explained further down, before deploying the model on device.
 
 ### ExecuTorch
 ExecuTorch enables you to optimize your model for execution on a mobile or embedded device, but can also be used on desktop for testing.
+Before running ExecuTorch commands, you must first set-up ExecuTorch in torchchat, see [Set-up Executorch](docs/executorch_setup.md).
 
 **Examples**
 The following example uses the Stories15M model.
 ```
 # Compile
-python torchchat.py export stories15M --output-pte-path stories15M.pte
+python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 
 # Execute
-python torchchat.py generate --device cpu --pte-path stories15M.pte --prompt "Hello my name is"
+python3 torchchat.py generate --device cpu --pte-path stories15M.pte --prompt "Hello my name is"
 ```
 
 See below under Mobile Execution if you want to deploy and execute a model in your iOS or Android app.
