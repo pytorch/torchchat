@@ -20,7 +20,6 @@ from build.builder import (
 
 from build.utils import set_backend, set_precision, use_aoti_backend, use_et_backend
 from cli import add_arguments, add_arguments_for_export, arg_init, check_args
-from download import download_and_convert, is_model_downloaded
 from export_aoti import export_model as export_model_aoti
 
 try:
@@ -35,11 +34,6 @@ default_device = "cpu"
 
 
 def main(args):
-    # THIS BELONGS INTO CLI
-    # If a named model was provided and not downloaded, download it.
-    # if args.model and not is_model_downloaded(args.model, args.model_directory):
-    #    download_and_convert(args.model, args.model_directory, args.hf_token)
-
     builder_args = BuilderArgs.from_args(args)
     quantize = args.quantize
 

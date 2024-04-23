@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 from build.utils import allowable_dtype_names, allowable_params_table
+from download import download_and_convert, is_model_downloaded
 
 import torch
 
@@ -17,6 +18,18 @@ default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def check_args(args, name: str) -> None:
     pass
+
+
+# Handle CLI arguments that are common to a majority of subcommands.
+def handle_common_args(args) -> None:
+    # Handle model download. Skip this for download, since it has slightly
+    # different semantics.
+    if (
+        args.command != "download"
+        and args.model
+        and not is_model_downloaded(args.model, args.model_directory)
+    ):
+        download_and_convert(args.model, args.model_directory, args.hf_token)
 
 
 def add_arguments_for_chat(parser):
