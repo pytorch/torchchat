@@ -31,6 +31,7 @@ from download import download_and_convert, is_model_downloaded
 logger = logging.getLogger(__name__)
 
 B_INST, E_INST = "[INST]", "[/INST]"
+B_SYS, E_SYS = "<<SYS>>", "<</SYS>>"
 
 
 @dataclass
@@ -374,8 +375,6 @@ def encode_tokens(tokenizer, string, bos=True, device="cpu"):
     return torch.tensor(tokens, dtype=torch.int, device=device)
 
 
-B_INST, E_INST = "[INST]", "[/INST]"
-
 
 def get_device_info(name: str) -> str:
     import platform
@@ -499,11 +498,14 @@ def _main(
         if generator_args.compile_prefill:
             prefill = torch.compile(prefill, fullgraph=True, dynamic=True)
 
+    system_prompt=None
     # Set up our max_seq_length
     if generator_args.chat_mode:
         max_seq_length = 2048
         print(f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye")
-
+        get_system_prompt = input("Do you want to enter a system prompt? Enter y for yes and anything else for no. \n")
+        if (get_system_prompt == "y" or get_system_prompt == "Y"):
+            system_prompt = input("What is your system prompt? \n")
     else:
         max_seq_length = min(encoded.size(0) + generator_args.max_new_tokens, model.config.block_size)
 
@@ -519,6 +521,7 @@ def _main(
     start = -1 if generator_args.compile else 0
     start_pos = 0
 
+
     # arbitrarily large number as chat mode goes until max_seq length or user exits
     num_samples = generator_args.num_samples if not generator_args.chat_mode else 100000
     i = -1  # long loop and Im scared someone will add a continue in it, so start at -1 and increment at the start
@@ -531,7 +534,11 @@ def _main(
                 print("Exiting Chat.\n")
                 break
             if builder_args.is_chat_model:
-                prompt = f"{B_INST} {prompt.strip()} {E_INST}"
+                if system_prompt is not None:
+                    prompt = f"{B_INST} {B_SYS}\n{system_promp.strip()}\n{E_SYS}\n\n{prompt.strip} {E_INST}"
+                    system_prompt = None # can only provide system prompt on first interaction
+                else:
+                    prompt = f"{B_INST} {prompt.strip()} {E_INST}"
             encoded = encode_tokens(
                 tokenizer, prompt, bos=True, device=builder_args.device
             )
