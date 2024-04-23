@@ -1,15 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>torchchat</title>
-  </head>
-  <body>
-    <pre>{{ convo }}</pre>
+<head>
+  <meta charset="utf-8">
+  <title>torchchat</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+  <div class="main-content">
+    {{ convo | safe }}
     <form action="chat" method="post">
       <label for="username">Prompt: </label>
-      <input type="text" {{ 'disabled' if disable_input else '' }} id="prompt" name="prompt"><br>
+      <input type="text" id="prompt" name="prompt"><br>
       <input type="submit" value="SEND">
     </form>
-  </body>
-</html>
+  </div>
+<div class="logo-container">
+  <!--
+  <img src="{{ url_for('static', filename='https://upload.wikimedia.org/wikipedia/commons/1/10/PyTorch_logo_icon.svg') }}" alt="PyTorch Logo" class="logo">
+  -->
+  <img src="https://upload.wikimedia.org/wikipedia/commons/1/10/PyTorch_logo_icon.svg" alt="PyTorch Logo" class="logo">
+  <h1 class="chat-title">torchchat</h1>
+</div>
+
+</body>
+
