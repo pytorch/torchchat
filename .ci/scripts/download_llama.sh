@@ -14,7 +14,7 @@ download_checkpoint() {
 	local repo_name=$1
 	local include=$2
 	# basically just removes the org in <org>/<repo>
-	local local_dir="checkpoints/$(basename "${repo_name}")"
+	local local_dir="checkpoints/${repo_name}"
 
 	mkdir -p "${local_dir}"
 	huggingface-cli download \
