@@ -1,9 +1,23 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Helvetica Neue", Arial, sans-serif;
   background-color: #f5f5f5;
   color: #333;
   margin: 0;
   padding: 0;
+}
+
+.main-content {
+  width: 66%;
+  padding: 20px;
+  float: left; /* Add this line */
+}
+
+.main-content h1 {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.8em; /* Adjust as needed */
+  color: rgba(208, 0, 0, 0.5); /* Semi-transparent PyTorch red */
+  margin-left: 20px; /* Align with the left side of the text box */
+  margin-bottom: 2pt; /* Adjust as needed */
 }
 
 pre {
@@ -14,6 +28,7 @@ pre {
   margin: 20px;
   font-size: 16px;
   line-height: 1.6;
+  overflow: auto;
 }
 
 form {
@@ -59,11 +74,23 @@ input[type="submit"]:hover {
   text-align: center;
   padding: 20px;
 }
+
 .logo {
   width: 100%;
   max-width: 300px; /* Adjust as needed */
 }
+
 .chat-title {
   color: #D00000; /* PyTorch red */
   font-size: 3em; /* Adjust as needed */
+}
+
+p {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 15px; /* Rounded edges */
+  padding: 10px;
+  margin: 20px;
+  color: #D00000; /* PyTorch red */
 }
