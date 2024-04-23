@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eou pipefail
+set -xeou pipefail
 
 install_huggingface_cli() {
 	pip install -U "huggingface_hub[cli]"

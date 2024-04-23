@@ -113,7 +113,6 @@ jobs:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     name: test-gpu (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
-    environment: HF_PERIODIC 
     secrets: inherit
     strategy:
       matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
@@ -136,15 +135,15 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Download checkpoint"
-        export REPO_NAME=${{ matrix.repo_name }}
+        export REPO_NAME="${{ matrix.repo_name }}"
         case "${{ matrix.install_method }}" in
-          wget) 
-            bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }} 
+          wget)
+            bash .ci/scripts/wget_checkpoint.sh "${REPO_NAME}" "${{ matrix.resources }}"
             ;;
-          huggingface-cli) 
+          huggingface-cli)
             (
               set +x
-              HF_TOKEN="${HF_TOKEN_PERIODIC}" bash .ci/scripts/download_llama.sh 
+              HF_TOKEN="${HF_TOKEN_PERIODIC}" bash .ci/scripts/download_llama.sh
             )
             ;;
         esac
