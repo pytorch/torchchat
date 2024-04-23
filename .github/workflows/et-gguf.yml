@@ -86,6 +86,10 @@ jobs:
       - name: Run inference
         run: |
           export MODEL_DIR=/tmp
+          export GGUF_PATH=${PWD}/gguf_files/llama-2-7b.Q4_0.gguf
+          export TOKENIZER_PATH=${PWD}/gguf_files/tokenizer.model
+          export MODEL_NAME=llama-2-7b_Q4_0_gguf
+
           python export.py --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python generate.py --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
           cat ./output_et
