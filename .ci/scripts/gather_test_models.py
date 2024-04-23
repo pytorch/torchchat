@@ -23,7 +23,7 @@ MODEL_REPOS = {
 
 JOB_RUNNERS = {
     "cpu": {
-        "32-core-ubuntu": "x86_64",
+        "linux.4xlarge": "x86_64",
         # "macos-12": "x86_64", # not working for complie and ExecuTorch yet
         "macos-14": "aarch64",
     },
