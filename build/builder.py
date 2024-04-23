@@ -144,7 +144,35 @@ class TokenizerArgs:
     t: Optional[Any] = None
 
     def __post_init__(self):
-        __initialize_tokenizer(self)
+        try:
+            from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
+
+            self.t = TiktokenTokenizer(
+                model_path=str(self.tokenizer_path)
+            )
+            self.is_tiktoken = True
+            self.is_sentencepiece = False
+            return
+        except:
+            pass
+
+        try:
+            from sentencepiece import SentencePieceProcessor
+
+            self.t = SentencePieceProcessor(
+                model_file=str(self.tokenizer_path)
+            )
+            self.is_tiktoken = False
+            self.is_sentencepiece = True
+            return
+        except:
+            pass
+
+        self.is_tiktoken = False
+        self.is_sentencepiece = False
+        self.t = None
+        return
+
 
     def validate_model(
         self,
@@ -195,38 +223,7 @@ class TokenizerArgs:
             t=None,
         )
 
-
-def __initialize_tokenizer(tokenizer_args: TokenizerArgs):
-    try:
-        from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
-
-        tokenizer_args.t = TiktokenTokenizer(
-            model_path=str(tokenizer_args.tokenizer_path)
-        )
-        tokenizer_args.is_tiktoken = True
-        tokenizer_args.is_sentencepiece = False
-        return
-    except:
-        pass
-
-    try:
-        from sentencepiece import SentencePieceProcessor
-
-        tokenizer_args.t = SentencePieceProcessor(
-            model_file=str(tokenizer_args.tokenizer_path)
-        )
-        tokenizer_args.is_tiktoken = False
-        tokenizer_args.is_sentencepiece = True
-        return
-    except:
-        pass
-
-    tokenizer_args.is_tiktoken = False
-    tokenizer_args.is_sentencepiece = False
-    tokenizer_args.t = None
-    return
-
-
+    
 def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
     return tokenizer_args.t
 
