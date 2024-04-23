@@ -102,7 +102,6 @@ def download_and_convert(
         # overwriting if necessary.
         if os.path.isdir(model_dir):
             shutil.rmtree(model_dir)
-        os.makedirs(model_dir, exist_ok=True)
         shutil.move(temp_dir, model_dir)
 
     finally:
