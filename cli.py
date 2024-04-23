@@ -245,7 +245,7 @@ def add_arguments(parser):
         "--device",
         type=str,
         default=default_device,
-        help="Hardware device to use. Options: cpu, gpu, mps",
+        help="Hardware device to use. Options: cpu, cuda, mps",
     )
     parser.add_argument(
         "--tasks",
