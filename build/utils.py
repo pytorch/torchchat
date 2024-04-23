@@ -33,6 +33,8 @@ def name_to_dtype(name):
     else:
         raise RuntimeError(f"unsupported dtype name {name} specified")
 
+def allowable_dtype_names() -> List[str]:
+    return name_to_dtype_dict.keys()
 
 name_to_dtype_dict = {
     "fp32": torch.float,
@@ -44,6 +46,18 @@ name_to_dtype_dict = {
     "float16": torch.float16,
     "bfloat16": torch.bfloat16,
 }
+
+
+#########################################################################
+###         general model build utility functions for CLI             ###
+
+def allowable_params_table() -> List[dtr]:
+    config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
+    known_model_params = [
+        config.replace(".json", "") for config in os.listdir(config_path)
+    ]
+    return known_model_params
+
 
 #########################################################################
 ###             general model build utility functions                 ###

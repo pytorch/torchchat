@@ -7,6 +7,8 @@
 import json
 from pathlib import Path
 
+from build.utils import allowable_dtype_names, allowable_params_table
+
 import torch
 
 # CPU is always available and also exportable to ExecuTorch
@@ -208,6 +210,7 @@ def add_arguments(parser):
         "-d",
         "--dtype",
         default="float32",
+        choices = allowable_dtype_names(),
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
     parser.add_argument(
@@ -239,13 +242,15 @@ def add_arguments(parser):
         "--params-table",
         type=str,
         default=None,
+        choices=allowable_params_table(),
         help="Parameter table to use",
     )
     parser.add_argument(
         "--device",
         type=str,
         default=default_device,
-        help="Hardware device to use. Options: cpu, gpu, mps",
+        choices=["cpu", "cuda", "mps"],
+        help="Hardware device to use. Options: cpu, cuda, mps",
     )
     parser.add_argument(
         "--tasks",
