@@ -30,7 +30,7 @@ def use_aoti_backend() -> bool:
     global active_builder_args_pte
 
     # eager == aoti, which is when backend has not been explicitly set
-    if (not active_builder_args_dso) and not (active_builder_args_pte)::
+    if (not active_builder_args_dso) and not (active_builder_args_pte):
         return True
 
     if active_builder_args_pte and active_builder_args_dso:
