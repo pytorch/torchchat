@@ -34,8 +34,8 @@ set(_common_include_directories ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src)
 cmake_print_variables(_common_include_directories)
 
 target_include_directories(executorch INTERFACE ${_common_include_directories}) # Ideally ExecuTorch installation process would do this
-add_executable(run run.cpp)
-
+add_executable(run run.cpp ${TORCHCHAT_ROOT}/runner/bpe_tokenizer.cpp)
+target_include_directories(run PRIVATE ${TORCHCHAT_ROOT}/runner)
 # Link ET runtime + extensions
 target_link_libraries(
   run PRIVATE
@@ -55,9 +55,6 @@ target_link_libraries(
 )
 target_link_options_shared_lib(optimized_native_cpu_ops_lib)
 target_link_options_shared_lib(xnnpack_backend)
-target_link_options_shared_lib(XNNPACK)
-target_link_options_shared_lib(pthreadpool)
-target_link_options_shared_lib(cpuinfo)
 # Not clear why linking executorch as whole-archive outside android/apple is leading
 # to double registration. Most likely because of linkage issues.
 # Will figure this out later. Until then use this.
