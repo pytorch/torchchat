@@ -61,7 +61,7 @@ def parse_args() -> Any:
     return parser.parse_args()
 
 
-def model_should_run_on_event(model: str, event: str) -> bool:
+def model_should_run_on_event(model: str, event: str, backend: str) -> bool:
     """
     A helper function to decide whether a model should be tested on an event (pull_request/push)
     We put higher priority and fast models to pull request and rest to push.
@@ -71,7 +71,11 @@ def model_should_run_on_event(model: str, event: str) -> bool:
     elif event == "push":
         return model in []
     elif event == "periodic":
-        return model in ["openlm-research/open_llama_7b", "huggingface-cli/meta-llama/Meta-Llama-3-8B"]
+        # test llama3 on gpu only, see description in https://github.com/pytorch/torchchat/pull/399 for reasoning
+        if backend == "gpu":
+            return model in ["openlm-research/open_llama_7b", "huggingface-cli/meta-llama/Meta-Llama-3-8B"]
+        else:
+            return model in ["openlm-research/open_llama_7b"]
     else:
         return False
 
@@ -106,7 +110,7 @@ def export_models_for_ci() -> dict[str, dict]:
         MODEL_REPOS.keys(),
         JOB_RUNNERS[backend].items(),
     ):
-        if not model_should_run_on_event(repo_name, event):
+        if not model_should_run_on_event(repo_name, event, backend):
             continue
 
         # This is mostly temporary to get this finished quickly while
