@@ -43,17 +43,20 @@ target_link_libraries(
         extension_module
         ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch/${CMAKE_OUT_DIR}/extension/data_loader/libextension_data_loader.a # This one does not get installed by ExecuTorch
         optimized_kernels
+        quantized_kernels
         portable_kernels
         cpublas
         eigen_blas
         # The libraries below need to be whole-archived linked
         optimized_native_cpu_ops_lib
+        quantized_ops_lib
         xnnpack_backend
         XNNPACK
         pthreadpool
         cpuinfo
 )
 target_link_options_shared_lib(optimized_native_cpu_ops_lib)
+target_link_options_shared_lib(quantized_ops_lib)
 target_link_options_shared_lib(xnnpack_backend)
 # Not clear why linking executorch as whole-archive outside android/apple is leading
 # to double registration. Most likely because of linkage issues.
