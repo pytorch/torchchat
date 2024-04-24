@@ -17,6 +17,8 @@ from cli import (
     add_arguments_for_eval,
     add_arguments_for_export,
     add_arguments_for_generate,
+    add_arguments_for_list,
+    add_arguments_for_remove,
     arg_init,
     check_args,
 )
@@ -75,6 +77,18 @@ if __name__ == "__main__":
         help="Export a model for AOT Inductor or ExecuTorch",
     )
     add_arguments_for_export(parser_export)
+
+    parser_list = subparsers.add_parser(
+        "list",
+        help="List supported models",
+    )
+    add_arguments_for_list(parser_list)
+
+    parser_remove = subparsers.add_parser(
+        "remove",
+        help="Remove downloaded model artifacts",
+    )
+    add_arguments_for_remove(parser_remove)
 
     # Move all flags to the front of sys.argv since we don't
     # want to use the subparser syntax
@@ -143,7 +157,7 @@ if __name__ == "__main__":
         subprocess.run(command)
     elif args.command == "download":
         check_args(args, "download")
-        from download import main as download_main
+        from download import download_main
 
         download_main(args)
     elif args.command == "generate":
@@ -160,5 +174,15 @@ if __name__ == "__main__":
         from export import main as export_main
 
         export_main(args)
+    elif args.command == "list":
+        check_args(args, "list")
+        from download import list_main
+
+        list_main(args)
+    elif args.command == "remove":
+        check_args(args, "remove")
+        from download import remove_main
+
+        remove_main(args)
     else:
         parser.print_help()

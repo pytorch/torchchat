@@ -364,7 +364,10 @@ jobs:
       - name: Test download
         run: |
 
+          python torchchat.py list
+          python torchchat.py download stories15m
           python torchchat.py generate stories15M
+          python torchchat.py remove stories15m
 
   test-tinystories-eager:
     strategy:
