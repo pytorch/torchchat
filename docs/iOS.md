@@ -3,12 +3,29 @@
 Check out the [tutorial](https://pytorch.org/executorch/main/llm/llama-demo-ios.html) on how to build the iOS demo app running your
 PyTorch models with [ExecuTorch](https://github.com/pytorch/executorch).
 
-Once you can run the app on you device:
-1. connect the device to you Mac,
-2. copy the model and tokenizer.bin to the iOS Llama app
-3. select the tokenizer and model with the `(...)` control (bottom left of screen, to the left of the text entrybox)
+```
+git clone https://github.com/pytorch/executorch.git
 
-Feel free to copy over the [`LLaMARunner`](https://github.com/pytorch/executorch/tree/main/examples/demo-apps/apple_ios/LLaMA/LLaMARunner/LLaMARunner/Exported) component from the demo app with its C++ [dependencies](https://github.com/pytorch/executorch/tree/main/examples/models/llama2) to your project and give it a spin.
+cd executorch
+
+git submodule update --init
+
+open examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj
+```
+
+Then click the Play button in Xcode to launch the app in Simulator.
+
+To run on a device, given that you already have it set up for development, you'll need to have a provisioning profile with the [`increased-memory-limit`](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_developer_kernel_increased-memory-limit) entitlement. Just change the app's bundle identifier to whatever matches your provisioning profile with the aforementioned capability enabled.
+
+After the app launched successfully, copy an exported ExecuTorch model (`.pte`) and tokenizer (`.bin`) files to the iLLaMA folder.
+
+For the Simulator, just drap&drop both files onto the Simulator window and save at `On My iPhone > iLLaMA` folder.
+
+For a device, open it in a separate Finder window, navigate to the Files tab, drag&drop both files to the iLLaMA folder and wait till the copying finishes.
+
+Now, follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem and issue a prompt.
+
+Feel free to reuse the [`LLaMARunner`](https://github.com/pytorch/executorch/tree/main/examples/demo-apps/apple_ios/LLaMA/LLaMARunner/LLaMARunner/Exported) component from the demo app with its C++ [dependencies](https://github.com/pytorch/executorch/tree/main/examples/models/llama2) to your project and give it a spin.
 
 Click the image below to see it in action!
 
