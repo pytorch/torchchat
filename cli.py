@@ -36,10 +36,6 @@ def add_arguments_for_chat(parser):
 def add_arguments_for_browser(parser):
     # Only browser specific options should be here
     _add_arguments_common(parser)
-    parser.add_argument(
-        "--port", type=int, default=5000, help="Port for the web server in browser mode"
-    )
-    _add_arguments_common(parser)
 
 
 def add_arguments_for_download(parser):
@@ -293,6 +289,12 @@ def add_arguments(parser):
         type=Path,
         default=".model-artifacts",
         help="The directory to store downloaded model artifacts",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=5000,
+        help="Port for the web server in browser mode",
     )
 
 
