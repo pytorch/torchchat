@@ -11,7 +11,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 import torch
 import torch._dynamo.config
@@ -31,6 +31,36 @@ logger = logging.getLogger(__name__)
 
 B_INST, E_INST = "[INST]", "[/INST]"
 B_SYS, E_SYS = "<<SYS>>", "<</SYS>>"
+
+class ChatFormat:
+    def __init__(self, tokenizer):
+        self.tokenizer = tokenizer
+
+    def encode_header(self, message) -> List[int]:
+        tokens = []
+        tokens.append(self.tokenizer.special_tokens["<|start_header_id|>"])
+        tokens.extend(self.tokenizer.encode(message["role"], bos=False, eos=False))
+        tokens.append(self.tokenizer.special_tokens["<|end_header_id|>"])
+        tokens.extend(self.tokenizer.encode("\n\n", bos=False, eos=False))
+        return tokens
+
+    def encode_message(self, message) -> List[int]:
+        tokens = self.encode_header(message)
+        tokens.extend(
+            self.tokenizer.encode(message["content"].strip(), bos=False, eos=False)
+        )
+        tokens.append(self.tokenizer.special_tokens["<|eot_id|>"])
+        return tokens
+
+    def encode_dialog_prompt(self, dialog) -> List[int]:
+        tokens = []
+        tokens.append(self.tokenizer.special_tokens["<|begin_of_text|>"])
+        for message in dialog:
+            tokens.extend(self.encode_message(message))
+        # Add the start of an assistant message for the model to complete.
+        tokens.extend(self.encode_header({"role": "assistant", "content": ""}))
+        return tokens
+
 
 
 @dataclass
@@ -175,6 +205,7 @@ def decode_n_tokens(
     need_probs: bool,
     callback=lambda _: _,
     eos_token_id: int = 2,
+    eot_id: Optional[int] = None,
     **sampling_kwargs,
 ):
     new_tokens, new_probs = [], []
@@ -183,7 +214,7 @@ def decode_n_tokens(
         # Actually better for Inductor to codegen attention here
         with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]):
             next_token, next_prob = decode_one_token(
-                model, cur_token, input_pos, need_probs=need_probs, **sampling_kwargs
+                model, cur_token.clone(), input_pos, need_probs=need_probs, **sampling_kwargs
             )
             input_pos += 1
             new_tokens.append(next_token.clone())
@@ -192,13 +223,13 @@ def decode_n_tokens(
                 new_probs.append(next_prob.clone())
             cur_token = next_token.view(1, -1)
             # encountered eos
-            if (next_token.item() == eos_token_id):
+            if (next_token.item() == eos_token_id or (eot_id is not None and next_token.item() == eot_id)):
                 encountered_eos = True
                 _, _ = decode_one_token(model, cur_token, input_pos, need_probs, **sampling_kwargs)
                 input_pos += 1
                 break
     if not encountered_eos:
-        eos_token = torch.tensor([eos_token_id], dtype=cur_token.dtype, device=cur_token.device)
+        eos_token = torch.tensor([eos_token_id if eot_id is None else eot_id], dtype=cur_token.dtype, device=cur_token.device)
         new_tokens.append(eos_token.clone())
         _, _ = decode_one_token(model, cur_token, input_pos, need_probs, **sampling_kwargs)
         input_pos += 1
@@ -309,11 +340,6 @@ def generate(
 
     # create an empty tensor of the expected final shape and fill in the current tokens
     empty = torch.empty(T_new, dtype=dtype, device=device)
-    print("start_pos ", start_pos)
-    print("max seq ", max_seq_length)
-    print("Max new ", max_new_tokens)
-    print("SIZE ", empty[:T].size())
-    print("SIZE ", prompt.size())
     empty[:T] = prompt
     seq = empty
     input_pos = torch.arange(start_pos, T + start_pos, device=device, dtype=torch.int)
@@ -363,7 +389,8 @@ def generate(
             max_new_tokens - 1,
             callback=callback,
             need_probs=False,
-            eos_token_id = tokenizer.eos_id() if tokenizer else 2
+            eos_token_id = tokenizer.eos_id() if tokenizer else 2,
+            eot_id = tokenizer.special_tokens["<|eot_id|>"] if is_llama3_model else None,
             **sampling_kwargs,
         )
         seq[T + 1 : T + 1 + len(generated_tokens)] = torch.cat(generated_tokens)
@@ -511,6 +538,8 @@ def _main(
         get_system_prompt = input("Do you want to enter a system prompt? Enter y for yes and anything else for no. \n")
         if (get_system_prompt == "y" or get_system_prompt == "Y"):
             system_prompt = input("What is your system prompt? \n")
+        if builder_args.is_llama3_model:
+            chat_formatter = ChatFormat(tokenizer)
     else:
         max_seq_length = min(encoded.size(0) + generator_args.max_new_tokens, model.config.block_size)
 
@@ -538,15 +567,24 @@ def _main(
             if (prompt == "/bye"):
                 print("Exiting Chat.\n")
                 break
-            if builder_args.is_chat_model:
+            if not builder_args.is_llama3_model:
                 if system_prompt is not None:
                     prompt = f"{B_INST} {B_SYS}\n{system_promp.strip()}\n{E_SYS}\n\n{prompt.strip} {E_INST}"
                     system_prompt = None # can only provide system prompt on first interaction
                 else:
                     prompt = f"{B_INST} {prompt.strip()} {E_INST}"
-            encoded = encode_tokens(
-                tokenizer, prompt, bos=True, device=builder_args.device
-            )
+                encoded = encode_tokens(
+                    tokenizer, prompt, bos=True, device=builder_args.device
+                )
+            else:
+                if system_prompt is not None:
+                    encoded = chat_formatter.encode_dialog_prompt([{"role" : "system", "content" : system_prompt}, {"role" : "user", "content" : prompt}])
+                elif(i == 0):
+                    encoded = chat_formatter.encode_dialog_prompt([{"role" : "user", "content" : prompt}])
+                else:
+                    encoded = chat_formatter.encode_message({"role" : "user", "content" : prompt})
+                    encoded.extend(chat_formatter.encode_header({"role": "assistant", "content": ""}))
+                encoded = torch.tensor(encoded, dtype=torch.int, device=builder_args.device)
             if (encoded.size(0) + start_pos > max_seq_length):
                 print("This prompt would take us past the max_seq_length. Ending Conversation.")
                 break
@@ -561,7 +599,7 @@ def _main(
             ):
                 if done_generating:
                     return
-                buffer.append(tokenizer.decode([period_id] + x.tolist())[1:])
+                buffer.append(tokenizer.decode([period_id] + x.tolist())[1:]) # I think this results in the first output token being dropped from the display which is wrong.
                 if x.item() == tokenizer.eos_id():
                     done_generating = True
                 if len(buffer) == 4 or done_generating:
