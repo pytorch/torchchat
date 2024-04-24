@@ -19,11 +19,15 @@ Options:
 To build runner-aoti, run the following commands *from the torchchat root directory*
 
 ```
-cmake -S ./runner-aoti -B ./runner-aoti/cmake-out -G Ninja -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'`
-cmake --build ./runner-aoti/cmake-out
+# Pull submodules (re2, abseil) for Tiktoken
+git submodule sync
+git submodule update --init
+
+cmake -S . -B ./cmake-out -G Ninja -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'`
+cmake --build ./cmake-out --target et_run
 ```
 
-After running these, the runner-aoti binary is located at ./runner-aoti/cmake-out/run.
+After running these, the runner-aoti binary is located at ./cmake-out/aoti_run.
 
 Let us try using it with an example.
 We first download stories15M and export it to AOTI.
@@ -37,7 +41,7 @@ We can now execute the runner with:
 
 ```
 wget -O ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
-./runner-aoti/cmake-out/run ./model.so -z ./tokenizer.bin -i "Once upon a time"
+./cmake-out/aoti_run ./model.so -z ./tokenizer.bin -i "Once upon a time"
 ```
 
 ## Building and running runner-et
@@ -47,12 +51,16 @@ Before building runner-et, you must first setup ExecuTorch by following [setup E
 To build runner-et, run the following commands *from the torchchat root directory*
 
 ```
+# Pull submodules (re2, abseil) for Tiktoken
+git submodule sync
+git submodule update --init
+
 export TORCHCHAT_ROOT=${PWD}
-cmake -S ./runner-et -B ./runner-et/cmake-out -G Ninja
-cmake --build ./runner-et/cmake-out
+cmake -S . -B ./cmake-out -G Ninja
+cmake --build ./cmake-out --target et_run
 ```
 
-After running these, the runner-et binary is located at ./runner-et/cmake-out/run.
+After running these, the runner-et binary is located at ./cmake-out/et_run.
 
 Let us try using it with an example.
 We first download stories15M and export it to ExecuTorch.
@@ -66,5 +74,5 @@ We can now execute the runner with:
 
 ```
 wget -O ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
-./runner-et/cmake-out/run ./model.pte -z ./tokenizer.bin -i "Once upon a time"
+./cmake-out/et_run ./model.pte -z ./tokenizer.bin -i "Once upon a time"
 ```
