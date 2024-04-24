@@ -78,7 +78,8 @@ def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
         max_seq_length = min(T_new, model.config.block_size)
 
     device, dtype = prompt.device, prompt.dtype
-    # create an empty tensor of the expected final shape and fill in the current tokens
+    # create an empty tensor of the expected final shape and
+    # fill in the current tokens
     empty = torch.empty(T_new, dtype=dtype, device=device)
     empty[:T] = prompt
     seq = empty

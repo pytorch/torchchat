@@ -132,15 +132,17 @@ class MultiInput:
 
 class GenericGPTQRunner(fx.Interpreter):
     """
-    This is a generic GPTQ runner that takes an existing model and applies GPTQ.
-    It uses torch._dynamo.export to obtain a graph of the model and then hooks
-    into function calls and when it detects a linear, it applies GPTQ to the weight
-    given the calibration of inputs passed in at initialization. It puts the results
-    into the state_dict so that the quantized model weights/qparams can be loaded
-    directly into the model.
+    This is a generic GPTQ runner that takes an existing model and
+    applies GPTQ.  It uses torch._dynamo.export to obtain a graph of
+    the model and then hooks into function calls and when it detects a
+    linear, it applies GPTQ to the weight given the calibration of
+    inputs passed in at initialization. It puts the results into the
+    state_dict so that the quantized model weights/qparams can be
+    loaded directly into the model.
 
     This class is expected to work in concert with a GPTQSimpleQuantizer
     class to define the specific type of quantization being done.
+
     """
 
     def __init__(
@@ -206,7 +208,7 @@ class GenericGPTQRunner(fx.Interpreter):
             self.gptq_done
         ), "need to run GPTQRunner before you can get_quantized_state_dict"
         quantized_state_dict = self.new_state_dict
-        # Don't want to store/load the kv_cache so remove it from the state_dict
+
         del_list = []
         for param_fqn in quantized_state_dict:
             if "kv_cache" in param_fqn:
@@ -224,7 +226,8 @@ class GenericGPTQRunner(fx.Interpreter):
 
         # flatten args and kwargs together
         flat_args, spec = tree_flatten((args, kwargs))
-        # move all single tensors to cuda, will move MultiInputs to cuda one at a time
+        # move all single tensors to cuda, will move MultiInputs
+        # to cuda one at a time
         flat_args = tensors_to_cuda(flat_args)
 
         has_multi_input = MultiInput in [type(x) for x in flat_args]
@@ -421,8 +424,9 @@ class GenericGPTQRunner(fx.Interpreter):
         if all_qparams == []:
             all_qparams.append(cur_qparams)
 
-        # convert a list of qparams objects into a single one. enerally by
-        # concatenating a bunch of n,1 scale/zeros tensors into a n,num_groups tensor
+        # convert a list of qparams objects into a single
+        # one. generally by concatenating a bunch of n,1 scale/zeros
+        # tensors into a n,num_groups tensor
         all_qparams = self.combine_qparams_list_func(all_qparams)
         Q = self.quantize_func(DQ, all_qparams)
         return Q, DQ.to(orig_dtype), all_qparams
