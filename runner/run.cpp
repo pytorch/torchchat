@@ -396,7 +396,7 @@ void generate(
   }
 
   // encode the (string) prompt into tokens sequence
-  std::string prompt_str(prompt);
+  std::string prompt_str = prompt;
   std::vector<uint64_t> prompt_tokens = tokenizer->encode(prompt_str, 1, 0);
   int num_prompt_tokens = prompt_tokens.size();
   if (num_prompt_tokens < 1) {
