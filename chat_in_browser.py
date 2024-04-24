@@ -58,8 +58,8 @@ def create_app(*args):
         global convo
 
         if _prompt:
-            convo += "Your prompt:\n" + _prompt + "\n\n"
-            convo += "My response:\n" + output + "\n\n"
+            convo += "<H1>Your prompt</H1>\n<p> " + _prompt + " </p>\n\n"
+            convo += "<H1>My response</H1>\n<p> " + output + " </p>\n\n"
 
         return render_template("chat.html", convo=convo, disable_input=disable_input)
 

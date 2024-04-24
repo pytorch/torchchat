@@ -80,6 +80,8 @@ class CustomSDPAAttention(nn.Module):
 
 
 def replace_attention_with_custom_sdpa_attention(module: nn.Module):
+    from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache  # noqa
+
     for name, child in module.named_children():
         if isinstance(child, Attention):
             setattr(module, name, CustomSDPAAttention(child))
