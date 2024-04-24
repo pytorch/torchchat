@@ -94,7 +94,7 @@ class BuilderArgs:
             is_chat_model = True
         else:
             for path in [
-                args.checkpoint_path,
+                checkpoint_path,
                 checkpoint_dir,
                 args.dso_path,
                 args.pte_path,
@@ -104,8 +104,11 @@ class BuilderArgs:
                     path = str(path)
                     if path.endswith("/"):
                         path = path[:-1]
-                    path_basename = os.path.basename(path)
-                    if "chat" in path_basename:
+                    if os.path.isfile(path):
+                        path = os.path.dirname(path)
+
+                    path_basename = os.path.basename(path).lower()
+                    if "chat" in path_basename or "instruct" in path_basename:
                         is_chat_model = True
 
         return cls(
@@ -222,7 +225,7 @@ class TokenizerArgs:
             t=None,
         )
 
-    
+
 def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
     return tokenizer_args.t
 
