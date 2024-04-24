@@ -66,9 +66,10 @@ def download_and_convert(
     model_config = resolve_model_config(model)
     model_dir = models_dir / model_config.name
 
-    # Download into a temporary directory. We'll move to the final location once
-    # the download and conversion is complete. This allows recovery in the event
-    # that the download or conversion fails unexpectedly.
+    # Download into a temporary directory. We'll move to the final
+    # location once the download and conversion is complete. This
+    # allows recovery in the event that the download or conversion
+    # fails unexpectedly.
     temp_dir = models_dir / "downloads" / model_config.name
     if os.path.isdir(temp_dir):
         shutil.rmtree(temp_dir)

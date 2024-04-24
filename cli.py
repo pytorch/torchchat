@@ -12,8 +12,7 @@ import torch
 from build.utils import allowable_dtype_names, allowable_params_table
 from download import download_and_convert, is_model_downloaded
 
-# CPU is always available and also exportable to ExecuTorch
-default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
+default_device = "cpu"
 
 
 # Handle CLI arguments that are common to a majority of subcommands.
