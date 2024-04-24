@@ -1,9 +1,9 @@
 # Chat with LLMs Everywhere
-Torchchat is a small codebase to showcase running large language models (LLMs) within Python OR within your own (C/C++) application on mobile (iOS/Android), desktop and servers.
+Torchchat is a compact codebase to showcase the capability of running large language models (LLMs) seamlessly across diverse platforms. With Torchchat, you could run LLMs from with Python, your own (C/C++) application on mobile (iOS/Android), desktop or servers.
 
 ## Highlights
 - Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
-  - Supporting [some GGUF files](docs/GGUF.md) and the Hugging Face checkpoint format
+  - Supports [common GGUF formats](docs/GGUF.md) and the Hugging Face checkpoint format
 - PyTorch-native execution with performance
 - Supports popular hardware and OS
   - Linux (x86)
@@ -60,14 +60,14 @@ with `python3 torchchat.py remove llama3`.
   * [Run via Browser](#browser)
 * [Quantizing your model (suggested for mobile)](#quantizing-your-model-suggested-for-mobile)
 * Export and run models in native environments (C++, your own app, mobile, etc.)
-  * [Exporting for desktop/servers via AOTInductor](#export-server)
-  * [Running exported .so file via your own C++ application](#run-server)
+  * [Export for desktop/servers via AOTInductor](#export-server)
+  * [Run exported .so file via your own C++ application](#run-server)
      * in Chat mode
      * in Generate mode
-  * [Exporting for mobile via ExecuTorch](#export-executorch)
+  * [Export for mobile via ExecuTorch](#export-executorch)
      * in Chat mode
      * in Generate mode
-  * [Running exported executorch file on iOS or Android](#run-mobile)
+  * [Run exported ExecuTorch file on iOS or Android](#run-mobile)
 
 
 ## Running via PyTorch / Python
@@ -234,7 +234,7 @@ python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 python3 torchchat.py generate --device cpu --pte-path stories15M.pte --prompt "Hello my name is"
 ```
 
-See below under Mobile Execution if you want to deploy and execute a model in your iOS or Android app.
+See below under [Mobile Execution](#run-mobile) if you want to deploy and execute a model in your iOS or Android app.
 
 
 ## Quantization
@@ -258,6 +258,37 @@ Install [ExecuTorch](https://pytorch.org/executorch/stable/getting-started-setup
 Read the [iOS documentation](docs/iOS.md) for more details on iOS.
 
 Read the [Android documentation](docs/Android.md) for more details on Android.
+
+## Fine-tuned models from torchtune
+
+torchchat supports running inference with models fine-tuned using [torchtune](https://github.com/pytorch/torchtune). To do so, we first need to convert the checkpoints into a format supported by torchchat.
+
+Below is a simple workflow to run inference on a fine-tuned Llama3 model. For more details on how to fine-tune Llama3, see the instructions [here](https://github.com/pytorch/torchtune?tab=readme-ov-file#llama3)
+
+```bash
+# install torchtune
+pip install torchtune
+
+# download the llama3 model
+tune download meta-llama/Meta-Llama-3-8B \
+    --output-dir ./Meta-Llama-3-8B \
+    --hf-token <ACCESS TOKEN>
+
+# Run LoRA fine-tuning on a single device. This assumes the config points to <checkpoint_dir> above
+tune run lora_finetune_single_device --config llama3/8B_lora_single_device
+
+# convert the fine-tuned checkpoint to a format compatible with torchchat
+python3 build/convert_torchtune_checkpoint.py \
+  --checkpoint-dir ./Meta-Llama-3-8B \
+  --checkpoint-files meta_model_0.pt \
+  --model-name llama3_8B \
+  --checkpoint-format meta
+
+# run inference on a single GPU
+python3 torchchat.py generate \
+  --checkpoint-path ./Meta-Llama-3-8B/model.pth \
+  --device cuda
+```
 
 ## Acknowledgements
 Thank you to the [community](docs/ACKNOWLEDGEMENTS.md) for all the awesome libraries and tools

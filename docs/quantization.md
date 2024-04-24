@@ -284,4 +284,4 @@ We invite contributors to submit established quantization schemes, with accuracy
 - Describe how to choose a quantization scheme. Which factors should they take into account? Concrete recommendations for use cases, esp. mobile.
 - Quantization reference, describe options for --quantize parameter
 - Show a table with performance/accuracy metrics
-- Quantization support matrix? torchat Quantization Support Matrix
+- Quantization support matrix? torchchat Quantization Support Matrix
