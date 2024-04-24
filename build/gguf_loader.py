@@ -19,7 +19,7 @@ from gguf import GGUFValueType
 from quantize import pack_scales_and_zeros, WeightOnlyInt4Linear
 
 from build.gguf_util import Q4_0, to_float
-from .model import ModelArgs, Transformer
+from build.model import ModelArgs, Transformer
 
 logger: logging.Logger = logging.getLogger(__name__)
 
