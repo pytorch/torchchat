@@ -360,6 +360,7 @@ def generate(
             **sampling_kwargs,
         )
     seq[T] = next_token
+    callback(next_token.clone().view(-1))
 
     num_tokens_generated = 0
     input_pos = torch.tensor([start_pos + T], device=device, dtype=torch.int)
@@ -609,6 +610,9 @@ def _main(
                 buffer.append(tokenizer.decode([period_id] + x.tolist())[1:]) # I think this results in the first output token being dropped from the display which is wrong.
                 if x.item() == tokenizer.eos_id():
                     done_generating = True
+                if (is_llama3_model and x.item() == tokenizer.special_tokens["<|eot_id|>"]):
+                    done_generating = True
+                    buffer = buffer[:-1] # drop the eot_id from the output buffer
                 if len(buffer) == 4 or done_generating:
                     print("".join(buffer), end="", flush=True)
                     buffer.clear()
