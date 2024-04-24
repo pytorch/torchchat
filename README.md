@@ -146,10 +146,10 @@ Run a chatbot in your browser that’s supported by the model you specify in the
 **Examples**
 
 ```
-python3 torchchat.py browser stories15M --temperature 0 --num-samples 10
+python3 torchchat.py browser stories15M --temperature 0 --num-samples 100
 ```
 
-*Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
+*Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it. If port 5000 has already been taken, run the command again with `--port`, e.g. `--port 5001`.
 
 Enter some text in the input box, then hit the enter key or click the “SEND” button. After a second or two, the text you entered together with the generated text will be displayed. Repeat to have a conversation.
 
