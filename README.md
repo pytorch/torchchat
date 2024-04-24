@@ -68,24 +68,33 @@ python3 torchchat.py download llama3
   * [Running exported executorch file on iOS or Android](#run-mobile)
 
 ## Models
-These are the supported models
-| Model | Mobile Friendly | Notes |
-|------------------|---|---------------------|
-|[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅||
-|[meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅||
-|[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|✅||
-|[meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|||
-|[meta-llama/Llama-2-70b-chat-hf](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf)|||
-|[meta-llama/Llama-2-7b-hf](https://huggingface.co/meta-llama/Llama-2-7b-hf)|✅||
-|[meta-llama/CodeLlama-7b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-7b-Python-hf)|✅||
-|[meta-llama/CodeLlama-34b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-34b-Python-hf)|✅||
-|[mistralai/Mistral-7B-v0.1](https://huggingface.co/mistralai/Mistral-7B-v0.1)|✅||
-|[mistralai/Mistral-7B-Instruct-v0.1](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1)|✅||
-|[mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)|✅||
-|[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
-|[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
-|[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
-|[openlm-research/open_llama_7b](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
+
+The following models have been tested on torchchat and support downloading weights from HuggingFace with a HuggingFace account (see [Download Weights](#download-weights)).
+
+| Model | Alias | Mobile Friendly | Notes |
+|------------------|-------|---|---------------------|
+|[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|llama3|✅||
+|[meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|llama3-base|✅||
+|[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|llama2|✅||
+|[meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|llama2-13b-chat|||
+|[meta-llama/Llama-2-70b-chat-hf](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf)|llama2-70b-chat|||
+|[meta-llama/Llama-2-7b-hf](https://huggingface.co/meta-llama/Llama-2-7b-hf)|llama2-base|✅||
+|[meta-llama/CodeLlama-7b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-7b-Python-hf)|codellama-7b|✅||
+|[meta-llama/CodeLlama-34b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-34b-Python-hf)|codellama-34b|✅||
+|[mistralai/Mistral-7B-v0.1](https://huggingface.co/mistralai/Mistral-7B-v0.1)|mistral-7b|✅||
+|[mistralai/Mistral-7B-Instruct-v0.1](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1)|mistral-7b-instruct-v1|✅||
+|[mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)|mistral-7b-instruct-v2|✅||
+|[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|stories15M|✅||
+|[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|stories42M|✅||
+|[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|stories110M|✅||
+|[openlm-research/open_llama_7b](https://huggingface.co/openlm-research/open_llama_7b/tree/main)|open-llama-7b|✅||
+
+Supported models can be used for chat, generation, and export by passing the full name or alias:
+```
+python3 torchchat.py chat llama3
+```
+
+Run `python3 torchchat.py list` to view the list of supported models from the command line, as well as see which models are locally downloaded.
 
 See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
 

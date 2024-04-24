@@ -39,8 +39,25 @@
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/CodeLlama-7b-Python-hf"
     },
+    "meta-llama/CodeLlama-34b-Python-hf": {
+        "aliases": ["codellama-34b"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/CodeLlama-34b-Python-hf"
+    },
+    "mistralai/Mistral-7B-v0.1": {
+        "aliases": ["mistral-7b"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "mistralai/Mistral-7B-v0.1",
+        "transformer_params_key": "Mistral-7B"
+    },
+    "mistralai/Mistral-7B-Instruct-v0.1": {
+        "aliases": ["mistral-7b-instruct-v1"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "mistralai/Mistral-7B-Instruct-v0.1",
+        "transformer_params_key": "Mistral-7B"
+    },
     "mistralai/Mistral-7B-Instruct-v0.2": {
-        "aliases": ["mistral", "mistral-7b", "mistral-7b-instruct"],
+        "aliases": ["mistral-7b-instruct-v2"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "mistralai/Mistral-7B-Instruct-v0.2",
         "transformer_params_key": "Mistral-7B"
@@ -51,7 +68,8 @@
         "distribution_path": "openlm-research/open_llama_7b",
         "transformer_params_key": "7B"
     },
-    "stories15M": {
+    "tinyllamas/stories15M": {
+        "aliases": ["stories15M"],
         "distribution_channel": "DirectDownload",
         "distribution_path": [
             "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt",
@@ -59,7 +77,8 @@
         ],
         "checkpoint_file": "stories15M.pt"
     },
-    "stories42M": {
+    "tinyllamas/stories42M": {
+        "aliases": ["stories42M"],
         "distribution_channel": "DirectDownload",
         "distribution_path": [
             "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories42M.pt",
@@ -67,7 +86,8 @@
         ],
         "checkpoint_file": "stories42M.pt"
     },
-    "stories110M": {
+    "tinyllamas/stories110M": {
+        "aliases": ["stories110M"],
         "distribution_channel": "DirectDownload",
         "distribution_path": [
             "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.pt",
