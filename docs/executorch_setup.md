@@ -1,4 +1,4 @@
-# Set-up executorch
+# Set-up ExecuTorch
 
 Before running any commands in torchchat that require ExecuTorch, you must first install ExecuTorch.
 
