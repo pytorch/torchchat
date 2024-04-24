@@ -214,7 +214,7 @@ python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello,
 ```
 
 ```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize "{'linear:int4': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"linear:int4": {"groupsize" : 32} }' [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]
 ```
 Now you can run your model with the same command as before:
 
@@ -227,7 +227,7 @@ To compress your model even more, 4-bit integer quantization may be used. To ach
 
 **TODO (Digant): a8w4dq eager mode support [#335](https://github.com/pytorch/torchchat/issues/335) **
 ```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize "{'linear:a8w4dq': {'groupsize' : 7} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso... ]
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"linear:a8w4dq": {"groupsize" : 8} }' [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso... ]
 ```
 
 Now you can run your model with the same command as before:
@@ -237,7 +237,7 @@ python3 generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_a8w4dq.pte | ...dso.
 ```
 
 ## 4-bit Integer Linear Quantization with GPTQ (gptq)
-Compression offers smaller memory footprints (to fit on memory-constrained accelerators and mobile/edge devices) and reduced memory bandwidth (for better performance), but often at the  price of quality degradation.  GPTQ 4-bit integer quantization may be used to reduce the quality impact. To achieve good accuracy, we recommend the use of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale. 
+Compression offers smaller memory footprints (to fit on memory-constrained accelerators and mobile/edge devices) and reduced memory bandwidth (for better performance), but often at the  price of quality degradation.  GPTQ 4-bit integer quantization may be used to reduce the quality impact. To achieve good accuracy, we recommend the use of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.
 
 **TODO (Jerry): GPTQ quantization documentation [#336](https://github.com/pytorch/torchchat/issues/336) **
 
@@ -247,7 +247,7 @@ python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello,
 ```
 
 ```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize "{'linear:gptq': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ] 
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"linear:gptq": {"groupsize" : 32} }' [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ]
 ```
 Now you can run your model with the same command as before:
 
@@ -257,7 +257,7 @@ python3 generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso...
 
 ## 4-bit Integer Linear Quantization with HQQ (hqq)
 
-Compression offers smaller memory footprints (to fit on memory-constrained accelerators and mobile/edge devices) and reduced memory bandwidth (for better performance), but often at the  price of quality degradation.  GPTQ 4-bit integer quantization may be used to reduce the quality impact, but at the cost of significant additional computation time. HQQ Quantization balances performance, accuracy, and runtime, we recommend the use of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale. 
+Compression offers smaller memory footprints (to fit on memory-constrained accelerators and mobile/edge devices) and reduced memory bandwidth (for better performance), but often at the  price of quality degradation.  GPTQ 4-bit integer quantization may be used to reduce the quality impact, but at the cost of significant additional computation time. HQQ Quantization balances performance, accuracy, and runtime, we recommend the use of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.
 
 **TODO (Zhengxu): HQQ quantization documentation [#337](https://github.com/pytorch/torchchat/issues/336) **
 
@@ -267,7 +267,7 @@ python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello,
 ```
 
 ```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize "{'linear:hqq': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_hqq.pte | ...dso... ] 
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"linear:hqq": {"groupsize" : 32} }' [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_hqq.pte | ...dso... ]
 ```
 Now you can run your model with the same command as before:
 
@@ -284,4 +284,4 @@ We invite contributors to submit established quantization schemes, with accuracy
 - Describe how to choose a quantization scheme. Which factors should they take into account? Concrete recommendations for use cases, esp. mobile.
 - Quantization reference, describe options for --quantize parameter
 - Show a table with performance/accuracy metrics
-- Quantization support matrix? torchat Quantization Support Matrix
+- Quantization support matrix? torchchat Quantization Support Matrix

@@ -96,7 +96,7 @@ class BuilderArgs:
             is_chat_model = True
         else:
             for path in [
-                args.checkpoint_path,
+                checkpoint_path,
                 checkpoint_dir,
                 args.dso_path,
                 args.pte_path,
@@ -106,8 +106,11 @@ class BuilderArgs:
                     path = str(path)
                     if path.endswith("/"):
                         path = path[:-1]
-                    path_basename = os.path.basename(path)
-                    if "chat" in path_basename:
+                    if os.path.isfile(path):
+                        path = os.path.dirname(path)
+
+                    path_basename = os.path.basename(path).lower()
+                    if "chat" in path_basename or "instruct" in path_basename:
                         is_chat_model = True
 
         return cls(
@@ -150,9 +153,7 @@ class TokenizerArgs:
         try:
             from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
-            self.t = TiktokenTokenizer(
-                model_path=str(self.tokenizer_path)
-            )
+            self.t = TiktokenTokenizer(model_path=str(self.tokenizer_path))
             self.is_tiktoken = True
             self.is_sentencepiece = False
             return
@@ -162,9 +163,7 @@ class TokenizerArgs:
         try:
             from sentencepiece import SentencePieceProcessor
 
-            self.t = SentencePieceProcessor(
-                model_file=str(self.tokenizer_path)
-            )
+            self.t = SentencePieceProcessor(model_file=str(self.tokenizer_path))
             self.is_tiktoken = False
             self.is_sentencepiece = True
             return
@@ -418,11 +417,3 @@ def _initialize_model(
 
 def tokenizer_setting_to_name(tiktoken: bool = False) -> str:
     return "TikToken" if tiktoken else "SentencePiece"
-
-
-def resolve_model_name(model: str) -> str:
-    # If the provided model name is an alias, retrieve the full path.
-    if model in model_aliases:
-        return model_aliases[model]
-    else:
-        return model

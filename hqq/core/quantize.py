@@ -1,13 +1,15 @@
 # Written by Dr. Hicham Badri @Mobius Labs GmbH - 2023
 #####################################################
-import torch
-from torch import uint8, int32, float16, nn, Tensor
 import copy
 from enum import Enum
 
-from .utils import is_divisible
-from .optimize import optimize_weights_proximal
+import torch
+from torch import float16, int32, nn, Tensor, uint8
+
 from .bitpack import BitPack
+from .optimize import optimize_weights_proximal
+
+from .utils import is_divisible
 
 
 # Main HQQ Quantizer

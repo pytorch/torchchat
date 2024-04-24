@@ -16,16 +16,12 @@ from download import download_and_convert, is_model_downloaded
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
-def check_args(args, name: str) -> None:
-    pass
-
-
 # Handle CLI arguments that are common to a majority of subcommands.
-def handle_common_args(args) -> None:
+def check_args(args, name: str) -> None:
     # Handle model download. Skip this for download, since it has slightly
     # different semantics.
     if (
-        args.command != "download"
+        name not in ["download", "list", "remove"]
         and args.model
         and not is_model_downloaded(args.model, args.model_directory)
     ):
@@ -39,10 +35,6 @@ def add_arguments_for_chat(parser):
 
 def add_arguments_for_browser(parser):
     # Only browser specific options should be here
-    _add_arguments_common(parser)
-    parser.add_argument(
-        "--port", type=int, default=5000, help="Port for the web server in browser mode"
-    )
     _add_arguments_common(parser)
 
 
@@ -63,6 +55,16 @@ def add_arguments_for_eval(parser):
 
 def add_arguments_for_export(parser):
     # Only export specific options should be here
+    _add_arguments_common(parser)
+
+
+def add_arguments_for_list(parser):
+    # Only list specific options should be here
+    _add_arguments_common(parser)
+
+
+def add_arguments_for_remove(parser):
+    # Only remove specific options should be here
     _add_arguments_common(parser)
 
 
@@ -290,6 +292,12 @@ def add_arguments(parser):
         type=Path,
         default=".model-artifacts",
         help="The directory to store downloaded model artifacts",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=5000,
+        help="Port for the web server in browser mode",
     )
 
 
