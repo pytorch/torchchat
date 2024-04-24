@@ -488,8 +488,8 @@ void chat(
     const char* cli_system_prompt,
     int steps) {
   // special tokens
-  const int SOS_TOKEN = 1;
-  const int EOS_TOKEN = 2; // token ends the assistant turn
+  const int SOS_TOKEN = tokenizer->bos_id();
+  const int EOS_TOKEN = tokenizer->eos_id(); // token ends the assistant turn
 
 
 
