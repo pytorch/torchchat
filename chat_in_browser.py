@@ -38,7 +38,8 @@ def create_app(*args):
 
     @app.route("/chat", methods=["GET", "POST"])
     def chat():
-        # Retrieve the HTTP POST request parameter value from 'request.form' dictionary
+        # Retrieve the HTTP POST request parameter value from
+        # 'request.form' dictionary
         _prompt = request.form.get("prompt", "")
         proc.stdin.write((_prompt + "\n").encode("utf-8"))
         proc.stdin.flush()

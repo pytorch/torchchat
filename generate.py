@@ -103,7 +103,7 @@ class GeneratorArgs:
             )
 
     @classmethod
-    def from_args(cls, args):  # -> GeneratorArgs:
+    def from_args(cls, args):
         return cls(
             prompt=args.prompt,
             encoded_prompt=None,
@@ -326,7 +326,8 @@ def generate(
     is_speculative = draft_model is not None
     device, dtype = prompt.device, prompt.dtype
 
-    # create an empty tensor of the expected final shape and fill in the current tokens
+    # create an empty tensor of the expected final shape and
+    # fill in the current tokens
     T = prompt.size(0)
     max_new_tokens = min(max_new_tokens, max_seq_length - start_pos - T)
     T_new = T + max_new_tokens
@@ -338,7 +339,8 @@ def generate(
             if is_speculative and draft_model is not model:
                 draft_model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
 
-    # create an empty tensor of the expected final shape and fill in the current tokens
+    # create an empty tensor of the expected final shape and
+    # fill in the current tokens
     empty = torch.empty(T_new, dtype=dtype, device=device)
     empty[:T] = prompt
     seq = empty
@@ -461,8 +463,6 @@ def _main(
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
     if generator_args.chat_mode and not builder_args.is_chat_model:
-        # This is not a log message, it's a dangerous condition message
-        # that we must ensure is displayed
         print(
             """
 *******************************************************
@@ -486,8 +486,6 @@ def _main(
     builder_args.setup_caches = False
     model = _initialize_model(builder_args, quantize, tokenizer)
 
-    # will add a version of _initialize_model in future
-    # (need additional args)
     if is_speculative:
         draft_model = _initialize_model(
             speculative_builder_args,
@@ -533,7 +531,6 @@ def _main(
             decode_one_token, mode="reduce-overhead", fullgraph=True
         )
 
-        # Uncomment to squeeze more perf out of prefill
         if generator_args.compile_prefill:
             prefill = torch.compile(prefill, fullgraph=True, dynamic=True)
 
