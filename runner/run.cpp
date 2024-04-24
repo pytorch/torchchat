@@ -490,12 +490,17 @@ void chat(
   // special tokens
   const int SOS_TOKEN = tokenizer->bos_tok(); // token starts the assistant turn
   const int EOS_TOKEN = tokenizer->eos_tok(); // token ends the assistant turn
+  const int SYSTEM_PROMPT_SIZE = 512;
+  const int USER_PROMPT_SIZE = 512;
+  const int RENDERED_PROMPT_SIZE = SYSTEM_PROMPT_SIZE + USER_PROMPT_SIZE + 128; // This is big enough to hold the expanded template
+
+
 
   // buffers for reading the system prompt and user prompt from stdin
   // you'll notice they are soomewhat haphazardly and unsafely set atm
-  char system_prompt[512];
-  char user_prompt[512];
-  char rendered_prompt[1152];
+  char system_prompt[SYSTEM_PROMPT_SIZE];
+  char user_prompt[USER_PROMPT_SIZE];
+  char rendered_prompt[RENDERED_PROMPT_SIZE];
   int num_prompt_tokens = 0;
   std::vector<uint64_t> prompt_tokens;
   int user_idx;
@@ -533,14 +538,14 @@ void chat(
       }
       // render user/system prompts into the Llama 2 Chat schema
       if (pos == 0 && system_prompt[0] != '\0') {
-        char system_template[] = "<s>[INST] <<SYS>>\n%s\n<</SYS>>\n\n%s [/INST]";
+        const char system_template[] = "<s>[INST] <<SYS>>\n%s\n<</SYS>>\n\n%s [/INST]";
         snprintf(
-            rendered_prompt, 1151, system_template, system_prompt, user_prompt);
+            rendered_prompt, RENDERED_PROMPT_SIZE-1, system_template, system_prompt, user_prompt);
       } else {
         // Assistant should produce </s>, so we do not include it in template
         // "</s><s>[INST] %s [/INST]" for subsequent user inputs.
-        char user_template[] = "<s>[INST] %s [/INST]";
-        snprintf(rendered_prompt, 1151, user_template, user_prompt);
+        const char user_template[] = "<s>[INST] %s [/INST]";
+        snprintf(rendered_prompt, RENDERED_PROMPT_SIZE-1, user_template, user_prompt);
       }
 
       // encode the rendered prompt into tokens
