@@ -11,7 +11,6 @@ from build.utils import get_precision
 
 from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
     XnnpackDynamicallyQuantizedPartitioner,
-    XnnpackPartitioner,
 )
 
 # TODO: change back to executorch.examples.portable.utils

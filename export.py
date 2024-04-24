@@ -18,7 +18,7 @@ from build.builder import (
     TokenizerArgs,
 )
 
-from build.utils import set_backend, set_precision, use_aoti_backend, use_et_backend
+from build.utils import set_backend, set_precision
 from cli import add_arguments, add_arguments_for_export, arg_init, check_args
 from export_aoti import export_model as export_model_aoti
 

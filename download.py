@@ -7,7 +7,7 @@ import os
 import shutil
 import urllib.request
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Optional
 
 from build.convert_hf_checkpoint import convert_hf_checkpoint
 from config.model_config import (
