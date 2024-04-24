@@ -1,9 +1,9 @@
 # Chat with LLMs Everywhere
-Torchchat is a small codebase to showcase running large language models (LLMs) within Python OR within your own (C/C++) application on mobile (iOS/Android), desktop and servers.
+Torchchat is a compact codebase to showcase the capability of running large language models (LLMs) seamlessly across diverse platforms. With Torchchat, you could run LLMs from with Python, your own (C/C++) application on mobile (iOS/Android), desktop or servers.
 
 ## Highlights
 - Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
-  - Supporting [some GGUF files](docs/GGUF.md) and the Hugging Face checkpoint format
+  - Supports [common GGUF formats](docs/GGUF.md) and the Hugging Face checkpoint format
 - PyTorch-native execution with performance
 - Supports popular hardware and OS
   - Linux (x86)
@@ -59,16 +59,16 @@ with `python3 torchchat.py remove llama3`.
   * [Chat](#chat)
   * [Generate](#generate)
   * [Run via Browser](#browser)
-* [Quantizing your model (suggested for mobile)](#quantization)
+* [Quantize your models (suggested for mobile)](#quantization)
 * Export and run models in native environments (C++, your own app, mobile, etc.)
-  * [Exporting for desktop/servers via AOTInductor](#export-server)
-  * [Running exported .so file via your own C++ application](#run-server)
+  * [Export for desktop/servers via AOTInductor](#export-server)
+  * [Run exported .so file via your own C++ application](#run-server)
      * in Chat mode
      * in Generate mode
-  * [Exporting for mobile via ExecuTorch](#export-executorch)
+  * [Export for mobile via ExecuTorch](#export-executorch)
      * in Chat mode
      * in Generate mode
-  * [Running exported executorch file on iOS or Android](#run-mobile)
+  * [Run exported ExecuTorch file on iOS or Android](#run-mobile)
 
 ## Models
 These are the supported models
@@ -242,7 +242,7 @@ python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 python3 torchchat.py generate --device cpu --pte-path stories15M.pte --prompt "Hello my name is"
 ```
 
-See below under Mobile Execution if you want to deploy and execute a model in your iOS or Android app.
+See below under [Mobile Execution](#run-mobile) if you want to deploy and execute a model in your iOS or Android app.
 
 
 ## Quantization
