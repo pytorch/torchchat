@@ -599,6 +599,7 @@ def _main(
                 start_pos=start_pos,
                 tokenizer=tokenizer,
                 max_seq_length=max_seq_length,
+                is_llama3_model=builder_args.is_llama3_model,
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
             start_pos += y.size(0)

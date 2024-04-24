@@ -37,6 +37,7 @@ class BuilderArgs:
     setup_caches: bool = False
     use_tp: bool = False
     is_chat_model: bool = False
+    is_llama3_model: bool = False
 
     def __post_init__(self):
         if not (
@@ -90,6 +91,7 @@ class BuilderArgs:
             )
 
         is_chat_model = False
+        is_llama3_model = args.is_llama3_model
         if args.is_chat_model:
             is_chat_model = True
         else:
@@ -122,6 +124,7 @@ class BuilderArgs:
             setup_caches=(args.output_dso_path or args.output_pte_path),
             use_tp=False,
             is_chat_model=is_chat_model,
+            is_llama3_model=is_llama3_model,
         )
 
     @classmethod
@@ -321,7 +324,6 @@ def _initialize_model(
 ):
     print("Loading model ...")
     t0 = time.time()
-
     if builder_args.gguf_path and (builder_args.dso_path or builder_args.pte_path):
         print("Setting gguf_kwargs for generate.")
         is_dso = builder_args.dso_path is not None
