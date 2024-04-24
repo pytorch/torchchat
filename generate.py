@@ -309,6 +309,11 @@ def generate(
 
     # create an empty tensor of the expected final shape and fill in the current tokens
     empty = torch.empty(T_new, dtype=dtype, device=device)
+    print("start_pos ", start_pos)
+    print("max seq ", max_seq_length)
+    print("Max new ", max_new_tokens)
+    print("SIZE ", empty[:T].size())
+    print("SIZE ", prompt.size())
     empty[:T] = prompt
     seq = empty
     input_pos = torch.arange(start_pos, T + start_pos, device=device, dtype=torch.int)
