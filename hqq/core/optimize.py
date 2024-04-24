@@ -1,8 +1,8 @@
 # Written by Dr. Hicham Badri @Mobius Labs GmbH - 2023
 #####################################################
+import numpy as np
 import torch
 from torch import Tensor
-import numpy as np
 
 
 # re-estimate the scale based on the inverse median
