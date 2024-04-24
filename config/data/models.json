@@ -39,6 +39,23 @@
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/CodeLlama-7b-Python-hf"
     },
+    "meta-llama/CodeLlama-34b-Python-hf": {
+        "aliases": ["codellama-34b"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/CodeLlama-34b-Python-hf"
+    },
+    "mistralai/Mistral-7B-v0.1": {
+        "aliases": ["mistral-7b-v01-base"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "mistralai/Mistral-7B-Instruct-v0.1",
+        "transformer_params_key": "Mistral-7B"
+    },
+    "mistralai/Mistral-7B-Instruct-v0.1": {
+        "aliases": ["mistral-7b-v01-instruct"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "mistralai/Mistral-7B-Instruct-v0.1",
+        "transformer_params_key": "Mistral-7B"
+    },
     "mistralai/Mistral-7B-Instruct-v0.2": {
         "aliases": ["mistral", "mistral-7b", "mistral-7b-instruct"],
         "distribution_channel": "HuggingFaceSnapshot",

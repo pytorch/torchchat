@@ -10,6 +10,7 @@ __pycache__/
 .venv
 
 # Build directories
+build/android/*
 et-build/*
 runner-et/cmake-out/*
 runner-aoti/cmake-out/*
