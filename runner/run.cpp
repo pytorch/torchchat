@@ -488,10 +488,8 @@ void chat(
     const char* cli_system_prompt,
     int steps) {
   // special tokens
-  const int SOS_TOKEN = tokenizer->bos_id();
-  const int EOS_TOKEN = tokenizer->eos_id(); // token ends the assistant turn
-
-
+  const int SOS_TOKEN = tokenizer->bos_tok(); // token starts the assistant turn
+  const int EOS_TOKEN = tokenizer->eos_tok(); // token ends the assistant turn
 
   // buffers for reading the system prompt and user prompt from stdin
   // you'll notice they are soomewhat haphazardly and unsafely set atm
