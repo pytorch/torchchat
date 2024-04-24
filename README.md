@@ -3,7 +3,7 @@ Torchchat is a small codebase to showcase running large language models (LLMs) w
 
 ## Highlights
 - Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
-  - Supporting both GGUF fp32/16 and the Hugging Face checkpoint format
+  - Supporting [some GGUF files](docs/GGUF.md) and the Hugging Face checkpoint format
 - PyTorch-native execution with performance
 - Supports popular hardware and OS
   - Linux (x86)
@@ -41,7 +41,7 @@ Most models use HuggingFace as the distribution channel, so you will need to cre
 account.
 
 Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens).
-Run `huggingface-cli login`, which will prompt for the newly created token.  
+Run `huggingface-cli login`, which will prompt for the newly created token.
 
 Once this is done, torchchat will be able to download model artifacts from
 HuggingFace.
@@ -49,6 +49,9 @@ HuggingFace.
 ```
 python3 torchchat.py download llama3
 ```
+
+View available models with `python3 torchchat.py list`. You can also remove downloaded models
+with `python3 torchchat.py remove llama3`.
 
 ## What can you do with torchchat?
 
@@ -100,7 +103,7 @@ For more information run `python3 torchchat.py chat --help`
 
 **Examples**
 ```
-python3 torchchat.py chat llama3 --tiktoken
+python3 torchchat.py chat llama3
 ```
 
 ### Generate
@@ -111,7 +114,7 @@ For more information run `python3 torchchat.py generate --help`
 
 **Examples**
 ```
-python3 torchchat.py generate llama3 --dtype=fp16 --tiktoken
+python3 torchchat.py generate llama3 --dtype=fp16
 ```
 
 ## Exporting your model
@@ -143,10 +146,10 @@ Run a chatbot in your browser that’s supported by the model you specify in the
 **Examples**
 
 ```
-python3 torchchat.py browser stories15M --temperature 0 --num-samples 10
+python3 torchchat.py browser stories15M --temperature 0 --num-samples 100
 ```
 
-*Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
+*Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it. If port 5000 has already been taken, run the command again with `--port`, e.g. `--port 5001`.
 
 Enter some text in the input box, then hit the enter key or click the “SEND” button. After a second or two, the text you entered together with the generated text will be displayed. Repeat to have a conversation.
 
@@ -194,7 +197,7 @@ See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
 
 ```
 # Llama 3 8B Instruct
-python3 torchchat.py chat llama3 --tiktoken
+python3 torchchat.py chat llama3
 ```
 
 ```
@@ -263,6 +266,37 @@ Install [ExecuTorch](https://pytorch.org/executorch/stable/getting-started-setup
 Read the [iOS documentation](docs/iOS.md) for more details on iOS.
 
 Read the [Android documentation](docs/Android.md) for more details on Android.
+
+## Fine-tuned models from torchtune
+
+torchchat supports running inference with models fine-tuned using [torchtune](https://github.com/pytorch/torchtune). To do so, we first need to convert the checkpoints into a format supported by torchchat.
+
+Below is a simple workflow to run inference on a fine-tuned Llama3 model. For more details on how to fine-tune Llama3, see the instructions [here](https://github.com/pytorch/torchtune?tab=readme-ov-file#llama3)
+
+```bash
+# install torchtune
+pip install torchtune
+
+# download the llama3 model
+tune download meta-llama/Meta-Llama-3-8B \
+    --output-dir ./Meta-Llama-3-8B \
+    --hf-token <ACCESS TOKEN>
+
+# Run LoRA fine-tuning on a single device. This assumes the config points to <checkpoint_dir> above
+tune run lora_finetune_single_device --config llama3/8B_lora_single_device
+
+# convert the fine-tuned checkpoint to a format compatible with torchchat
+python3 build/convert_torchtune_checkpoint.py \
+  --checkpoint-dir ./Meta-Llama-3-8B \
+  --checkpoint-files meta_model_0.pt \
+  --model-name llama3_8B \
+  --checkpoint-format meta
+
+# run inference on a single GPU
+python3 torchchat.py generate \
+  --checkpoint-path ./Meta-Llama-3-8B/model.pth \
+  --device cuda
+```
 
 ## Acknowledgements
 Thank you to the [community](docs/ACKNOWLEDGEMENTS.md) for all the awesome libraries and tools

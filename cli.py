@@ -7,25 +7,21 @@
 import json
 from pathlib import Path
 
+import torch
+
 from build.utils import allowable_dtype_names, allowable_params_table
 from download import download_and_convert, is_model_downloaded
-
-import torch
 
 # CPU is always available and also exportable to ExecuTorch
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
-def check_args(args, name: str) -> None:
-    pass
-
-
 # Handle CLI arguments that are common to a majority of subcommands.
-def handle_common_args(args) -> None:
+def check_args(args, name: str) -> None:
     # Handle model download. Skip this for download, since it has slightly
     # different semantics.
     if (
-        args.command != "download"
+        name not in ["download", "list", "remove"]
         and args.model
         and not is_model_downloaded(args.model, args.model_directory)
     ):
@@ -39,10 +35,6 @@ def add_arguments_for_chat(parser):
 
 def add_arguments_for_browser(parser):
     # Only browser specific options should be here
-    _add_arguments_common(parser)
-    parser.add_argument(
-        "--port", type=int, default=5000, help="Port for the web server in browser mode"
-    )
     _add_arguments_common(parser)
 
 
@@ -65,6 +57,13 @@ def add_arguments_for_export(parser):
     # Only export specific options should be here
     _add_arguments_common(parser)
 
+def add_arguments_for_list(parser):
+    # Only list specific options should be here
+    _add_arguments_common(parser)
+
+def add_arguments_for_remove(parser):
+    # Only remove specific options should be here
+    _add_arguments_common(parser)
 
 def _add_arguments_common(parser):
     # Model specification. TODO Simplify this.
@@ -111,11 +110,6 @@ def add_arguments(parser):
         type=int,
         default=None,
         help="Initialize torch seed",
-    )
-    parser.add_argument(
-        "--tiktoken",
-        action="store_true",
-        help="Whether to use tiktoken tokenizer",
     )
     parser.add_argument(
         "--num-samples",
@@ -223,7 +217,7 @@ def add_arguments(parser):
         "-d",
         "--dtype",
         default="float32",
-        choices = allowable_dtype_names(),
+        choices=allowable_dtype_names(),
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
     parser.add_argument(
@@ -295,6 +289,12 @@ def add_arguments(parser):
         type=Path,
         default=".model-artifacts",
         help="The directory to store downloaded model artifacts",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=5000,
+        help="Port for the web server in browser mode",
     )
 
 

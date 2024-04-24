@@ -15,7 +15,7 @@ from typing import Dict, Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from build.utils import find_multiple, get_precision
+from build.utils import find_multiple, get_precision, use_et_backend
 
 
 #########################################################################
@@ -90,30 +90,6 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
 
     def quantized_model(self) -> nn.Module:
         return self.quantizer.quantize(self.model_)
-
-
-#########################################################################
-###                QuantHandler API definition                        ###
-###               (unify with torchao in future)                      ###
-
-
-class QuantHandler:
-    def __init__(self, model: nn.Module, device="cpu", tokenizer=None):
-        self.model_ = model
-        self.device = device
-        self.tokenizer = tokenizer
-
-    def create_quantized_state_dict(self) -> Dict:  # "StateDict"
-        pass
-
-    def convert_for_runtime(self) -> nn.Module:
-        pass
-
-    def quantized_model(self) -> nn.Module:
-        model_updated_state_dict = self.create_quantized_state_dict()
-        self.convert_for_runtime()
-        self.model_.load_state_dict(model_updated_state_dict)
-        return self.model_
 
 
 #########################################################################
@@ -521,7 +497,7 @@ class WeightOnlyInt8Linear(torch.nn.Module):
 
 
 def replace_embedding_weight_only_grouped_int8_per_channel(
-    module, device, bitwidth: int = 8, groupsize: Optional[int] = None, packed=False
+    module, device, bitwidth: int, groupsize: Optional[int]
 ):
     for name, child in module.named_children():
         # print(f"name: {name}")
@@ -535,13 +511,13 @@ def replace_embedding_weight_only_grouped_int8_per_channel(
                     device=device,
                     vocab_size=child.weight.shape[0],
                     embedding_dim=child.weight.shape[1],
+                    bitwidth=bitwidth,
                     groupsize=groupsize,
-                    packed=packed,
                 ),
             )
         else:
             replace_embedding_weight_only_grouped_int8_per_channel(
-                child, device, bitwidth, groupsize, packed
+                child, device, bitwidth, groupsize
             )
 
 
@@ -554,19 +530,15 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
         *,
         bitwidth: int = 8,
         groupsize: Optional[int] = None,
-        packed=True,
+        packed=True,  # we always pack bitwidth 4 now
     ):
-        # when quantization dictionary comes from JSON, packed is a string
-        if isinstance(packed, str):
-            packed = packed.lower() != "false"
         self.model_ = model
         self.device = device
         self.groupsize = groupsize
         self.bitwidth = bitwidth
-        self.packed = packed
 
     @torch.no_grad()
-    def create_quantized_state_dict(self, packed=False) -> Dict:
+    def create_quantized_state_dict(self) -> Dict:
         cur_state_dict = self.model_.state_dict()
 
         if self.bitwidth == 4:
@@ -596,7 +568,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
                     scales_dtype=mod.weight.dtype,
                 )
 
-                if packed:
+                if self.bitwidth == 4:
                     if weight.shape[-1] % 2 != 0:
                         raise RuntimeError("automatic padding not implemented yet")
 
@@ -620,12 +592,12 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 
     def convert_for_runtime(self) -> nn.Module:
         replace_embedding_weight_only_grouped_int8_per_channel(
-            self.model_, self.device, self.bitwidth, self.groupsize, self.packed
+            self.model_, self.device, self.bitwidth, self.groupsize
         )
         return self.model_
 
     def quantized_model(self) -> nn.Module:
-        model_updated_state_dict = self.create_quantized_state_dict(self.packed)
+        model_updated_state_dict = self.create_quantized_state_dict()
         self.convert_for_runtime()
         self.model_.load_state_dict(model_updated_state_dict)
         return self.model_
@@ -637,30 +609,42 @@ class QuantizedGroupEmbedding(torch.nn.Module):
         device,
         vocab_size: int,
         embedding_dim: int,
+        bitwidth: int,
         groupsize: Optional[int] = None,
+        *,
         dtype=torch.half,
-        packed=False,
     ) -> None:
         super().__init__()
         if groupsize is None or groupsize == 0:
             groupsize = embedding_dim
         self.groupsize = groupsize
         self.dtype = dtype
-        self.packed = packed
-        if not packed:
+        self.bitwidth = bitwidth
+
+        if use_et_backend():
+            self.forward = self.et_forward
+        else:
+            self.forward = self.aoti_forward
+
+        if bitwidth == 8:
             self.register_buffer(
                 "weight",
                 torch.empty(
                     (vocab_size, embedding_dim), dtype=torch.int8, device=device
                 ),
             )
-        else:  # packed
+        elif bitwidth == 4:  # packed
             self.register_buffer(
                 "weight",
                 torch.empty(
                     (vocab_size, embedding_dim // 2), dtype=torch.uint8, device=device
                 ),
             )
+        else:
+            raise RuntimeError(
+                f"QUantized embedding does not support bitwidth={bitwidth}"
+            )
+
         groups_per_row = (embedding_dim + groupsize - 1) // groupsize
         if groups_per_row > 1:
             self.register_buffer(
@@ -675,16 +659,22 @@ class QuantizedGroupEmbedding(torch.nn.Module):
             )
 
     @torch.no_grad()
-    def forward(self, indices: torch.Tensor) -> torch.Tensor:
-        if False:  # Used for Executorch
-            return torch.ops.llama_quantized.embedding_byte.dtype(
+    def et_forward(self, indices: torch.Tensor) -> torch.Tensor:
+        if self.bitwidth == 8:
+            return torch.ops.quantized_decomposed.embedding_byte.dtype(
+                self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
+            )
+        else:
+            return torch.ops.quantized_decomposed.embedding_4bit.dtype(
                 self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
             )
 
+    @torch.no_grad()
+    def aoti_forward(self, indices: torch.Tensor) -> torch.Tensor:
         # result_weights = self.weight.index_select(0, indices.view(-1))
         # result_scales = self.scales.index_select(0, indices.view(-1))
 
-        if self.packed:
+        if self.bitwidth == 4:
             weight_even = self.weight.div(16, rounding_mode="trunc")
             weight_odd = self.weight.remainder(16)
             weight_unpacked = torch.stack((weight_even, weight_odd), dim=-1)

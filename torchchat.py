@@ -17,9 +17,10 @@ from cli import (
     add_arguments_for_eval,
     add_arguments_for_export,
     add_arguments_for_generate,
+    add_arguments_for_list,
+    add_arguments_for_remove,
     arg_init,
     check_args,
-    handle_common_args,
 )
 
 default_device = "cpu"
@@ -77,6 +78,18 @@ if __name__ == "__main__":
     )
     add_arguments_for_export(parser_export)
 
+    parser_list = subparsers.add_parser(
+        "list",
+        help="List supported models",
+    )
+    add_arguments_for_list(parser_list)
+
+    parser_remove = subparsers.add_parser(
+        "remove",
+        help="Remove downloaded model artifacts",
+    )
+    add_arguments_for_remove(parser_remove)
+
     # Move all flags to the front of sys.argv since we don't
     # want to use the subparser syntax
     flag_args = []
@@ -98,8 +111,6 @@ if __name__ == "__main__":
         format="%(message)s", level=logging.DEBUG if args.verbose else logging.INFO
     )
 
-    handle_common_args(args)
-
     if args.command == "chat":
         # enable "chat"
         args.chat = True
@@ -114,18 +125,15 @@ if __name__ == "__main__":
         check_args(args, "browser")
 
         # Look for port from cmd args. Default to 5000 if not found.
-        # The port args will be passed directly to the Flask app.
         port = 5000
         i = 2
         while i < len(sys.argv):
-            # Check if the current argument is '--port'
             if sys.argv[i] == "--port":
-                # Check if there's a value immediately following '--port'
                 if i + 1 < len(sys.argv):
                     # Extract the value and remove '--port' and the value from sys.argv
                     port = sys.argv[i + 1]
-                    del sys.argv[i : i + 2]  # Delete '--port' and the value
-                    break  # Exit loop since port is found
+                    del sys.argv[i : i + 2]
+                    break
             else:
                 i += 1
 
@@ -146,7 +154,7 @@ if __name__ == "__main__":
         subprocess.run(command)
     elif args.command == "download":
         check_args(args, "download")
-        from download import main as download_main
+        from download import download_main
 
         download_main(args)
     elif args.command == "generate":
@@ -163,5 +171,15 @@ if __name__ == "__main__":
         from export import main as export_main
 
         export_main(args)
+    elif args.command == "list":
+        check_args(args, "list")
+        from download import list_main
+
+        list_main(args)
+    elif args.command == "remove":
+        check_args(args, "remove")
+        from download import remove_main
+
+        remove_main(args)
     else:
         parser.print_help()

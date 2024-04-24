@@ -5,10 +5,11 @@
 # LICENSE file in the root directory of this source tree.
 
 from __future__ import annotations
-from typing import List
-from pathlib import Path
-import os
+
 import logging
+import os
+from pathlib import Path
+from typing import List
 
 import torch
 
@@ -23,7 +24,7 @@ active_builder_args_pte = None
 def set_backend(dso, pte):
     global active_builder_args_dso
     global active_builder_args_pte
-    active_builder_args_dso = dso 
+    active_builder_args_dso = dso
     active_builder_args_pte = pte
 
 
@@ -83,8 +84,10 @@ def name_to_dtype(name):
     else:
         raise RuntimeError(f"unsupported dtype name {name} specified")
 
+
 def allowable_dtype_names() -> List[str]:
     return name_to_dtype_dict.keys()
+
 
 name_to_dtype_dict = {
     "fp32": torch.float,
@@ -101,7 +104,8 @@ name_to_dtype_dict = {
 #########################################################################
 ###         general model build utility functions for CLI             ###
 
-def allowable_params_table() -> List[dtr]:
+
+def allowable_params_table() -> List[str]:
     config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
     known_model_params = [
         config.replace(".json", "") for config in os.listdir(config_path)

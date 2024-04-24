@@ -31,10 +31,10 @@ export CMAKE_OUT_DIR="cmake-out-android"
 #
 
 build_runner_et() {
-  rm -rf build/cmake-out-android
+  rm -rf cmake-out-android
   echo "ET BUILD DIR IS ${ET_BUILD_DIR}"
-  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-23 -S ./runner-et -B build/cmake-out-android -G Ninja
-  cmake --build build/cmake-out-android/ -j16 --config Release
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-23 -S . -B cmake-out-android -G Ninja
+  cmake --build cmake-out-android/ -j16 --config Release --target et_run
 }
 
 find_cmake_prefix_path
