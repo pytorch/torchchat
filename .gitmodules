@@ -1,0 +1,6 @@
+[submodule "tokenizer/third-party/abseil-cpp"]
+	path = tokenizer/third-party/abseil-cpp
+	url = https://github.com/abseil/abseil-cpp.git
+[submodule "tokenizer/third-party/re2"]
+	path = tokenizer/third-party/re2
+	url = https://github.com/google/re2.git
