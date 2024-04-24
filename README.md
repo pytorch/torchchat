@@ -20,7 +20,7 @@ Torchchat is a compact codebase to showcase the capability of running large lang
 
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
-```
+```bash
 # get the code
 git clone https://github.com/pytorch/torchchat.git
 cd torchchat
@@ -37,8 +37,7 @@ python3 torchchat.py --help
 ```
 
 ### Download Weights
-Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace
-account.
+Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace account.
 
 Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens).
 Run `huggingface-cli login`, which will prompt for the newly created token.
@@ -59,7 +58,7 @@ with `python3 torchchat.py remove llama3`.
   * [Chat](#chat)
   * [Generate](#generate)
   * [Run via Browser](#browser)
-* [Quantize your models (suggested for mobile)](#quantization)
+* [Quantizing your model (suggested for mobile)](#quantizing-your-model-suggested-for-mobile)
 * Export and run models in native environments (C++, your own app, mobile, etc.)
   * [Export for desktop/servers via AOTInductor](#export-server)
   * [Run exported .so file via your own C++ application](#run-server)
@@ -70,28 +69,6 @@ with `python3 torchchat.py remove llama3`.
      * in Generate mode
   * [Run exported ExecuTorch file on iOS or Android](#run-mobile)
 
-## Models
-These are the supported models
-| Model | Mobile Friendly | Notes |
-|------------------|---|---------------------|
-|[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅||
-|[meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅||
-|[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|✅||
-|[meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|||
-|[meta-llama/Llama-2-70b-chat-hf](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf)|||
-|[meta-llama/Llama-2-7b-hf](https://huggingface.co/meta-llama/Llama-2-7b-hf)|✅||
-|[meta-llama/CodeLlama-7b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-7b-Python-hf)|✅||
-|[meta-llama/CodeLlama-34b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-34b-Python-hf)|✅||
-|[mistralai/Mistral-7B-v0.1](https://huggingface.co/mistralai/Mistral-7B-v0.1)|✅||
-|[mistralai/Mistral-7B-Instruct-v0.1](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1)|✅||
-|[mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)|✅||
-|[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
-|[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
-|[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
-|[openlm-research/open_llama_7b](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
-
-See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
-
 
 ## Running via PyTorch / Python
 
@@ -99,23 +76,37 @@ See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
 Designed for interactive and conversational use.
 In chat mode, the LLM engages in a back-and-forth dialogue with the user. It responds to queries, participates in discussions, provides explanations, and can adapt to the flow of conversation.
 
-For more information run `python3 torchchat.py chat --help`
-
 **Examples**
-```
+```bash
 python3 torchchat.py chat llama3
 ```
+
+For more information run `python3 torchchat.py chat --help`
 
 ### Generate
 Aimed at producing content based on specific prompts or instructions.
 In generate mode, the LLM focuses on creating text based on a detailed prompt or instruction. This mode is often used for generating written content like articles, stories, reports, or even creative writing like poetry.
 
-For more information run `python3 torchchat.py generate --help`
 
 **Examples**
+```bash
+python3 torchchat.py generate llama3
 ```
-python3 torchchat.py generate llama3 --dtype=fp16
-```
+
+For more information run `python3 torchchat.py generate --help`
+
+### Browser
+
+Designed for interactive graphical conversations using the familiar web browser GUI.  The browser command provides a GUI-based experience to engage with the LLM in a back-and-forth dialogue with the user. It responds to queries, participates in discussions, provides explanations, and can adapt to the flow of conversation.
+
+## Quantizing your model (suggested for mobile)
+
+Quantization is the process of converting a model into a more memory-efficient representation.  Quantization is particularly important for accelerators -- to take advantage of the available memory bandwidth, and fit in the often limited high-speed memory in accelerators – and mobile devices – to fit in the typically very limited memory of mobile devices. 
+
+With quantization, 32-bit floating numbers can be represented with as few as 8 or even 4 bits, and a scale shared by a group of these weights.  This transformation is lossy and modifies the behavior of models.  While research is being conducted on how to efficiently quantize large language models for use in mobile devices, this transformation invariable results in both quality loss and a reduced amount of control over the output of the models, leading to an increased risk of undesirable responses, hallucinations and stuttering.  
+
+In effect an a developer quantizing a model, has much control and even more responsibility to quantize a model to quantify and reduce these effects.
+
 
 ## Exporting your model
 Compiles a model and saves it to run later.
@@ -146,10 +137,10 @@ Run a chatbot in your browser that’s supported by the model you specify in the
 **Examples**
 
 ```
-python3 torchchat.py browser stories15M --temperature 0 --num-samples 100
+python3 torchchat.py browser stories15M --temperature 0 --num-samples 10
 ```
 
-*Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it. If port 5000 has already been taken, run the command again with `--port`, e.g. `--port 5001`.
+*Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
 
 Enter some text in the input box, then hit the enter key or click the “SEND” button. After a second or two, the text you entered together with the generated text will be displayed. Repeat to have a conversation.
 
@@ -171,8 +162,9 @@ To test the perplexity for a lowered or quantized model, pass it in the same way
 python3 torchchat.py eval stories15M --pte-path stories15M.pte --limit 5
 ```
 
+
 ## Models
-The following models are the supported by torchchat:
+The following models are supported by torchchat:
 | Model | Mobile Friendly | Notes |
 |------------------|---|---------------------|
 |[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅||
@@ -191,7 +183,7 @@ The following models are the supported by torchchat:
 |[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
 |[openlm-research/open_llama_7b](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅||
 
-See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
+Torchchat also supports loading of many models in the GGUF format. See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
 
 **Examples**
 
@@ -305,3 +297,4 @@ you've built around local LLM inference.
 ## License
 Torchchat is released under the [BSD 3 license](LICENSE). However you may have other legal obligations
 that govern your use of content, such as the terms of service for third-party models.
+![image](https://github.com/pytorch/torchchat/assets/61328285/1cfccb53-c025-43d7-8475-94b34cf92339)
