@@ -752,7 +752,7 @@ jobs:
           cat ./output_eager
 
           python torchchat.py export stories15M --output-pte-path ./model.pte
-          ./cmake-out/runner/et_run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}" > ./output_et
+          ./runner/cmake-out/et_run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}" > ./output_et
           cat ./output_et
 
           echo "Tests complete."
