@@ -7,13 +7,13 @@ import os
 import shutil
 import urllib.request
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Optional
 
 from build.convert_hf_checkpoint import convert_hf_checkpoint
 from config.model_config import (
+    load_model_configs,
     ModelConfig,
     ModelDistributionChannel,
-    load_model_configs,
     resolve_model_config,
 )
 
@@ -129,16 +129,14 @@ def list_main(args) -> None:
 
         name_col.append(name)
         aliases_col.append(", ".join(config.aliases))
-        installed_col.append('Yes' if is_downloaded else "")
+        installed_col.append("Yes" if is_downloaded else "")
 
-    cols = {
-        "Model": name_col,
-        "Aliases": aliases_col,
-        "Downloaded": installed_col
-    }
+    cols = {"Model": name_col, "Aliases": aliases_col, "Downloaded": installed_col}
 
     # Find the length of the longest value in each column.
-    col_widths = {key:max(*[len(s) for s in vals], len(key)) + 1 for (key,vals) in cols.items()}
+    col_widths = {
+        key: max(*[len(s) for s in vals], len(key)) + 1 for (key, vals) in cols.items()
+    }
 
     # Display header.
     print()

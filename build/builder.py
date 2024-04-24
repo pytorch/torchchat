@@ -150,9 +150,7 @@ class TokenizerArgs:
         try:
             from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
-            self.t = TiktokenTokenizer(
-                model_path=str(self.tokenizer_path)
-            )
+            self.t = TiktokenTokenizer(model_path=str(self.tokenizer_path))
             self.is_tiktoken = True
             self.is_sentencepiece = False
             return
@@ -162,9 +160,7 @@ class TokenizerArgs:
         try:
             from sentencepiece import SentencePieceProcessor
 
-            self.t = SentencePieceProcessor(
-                model_file=str(self.tokenizer_path)
-            )
+            self.t = SentencePieceProcessor(model_file=str(self.tokenizer_path))
             self.is_tiktoken = False
             self.is_sentencepiece = True
             return
