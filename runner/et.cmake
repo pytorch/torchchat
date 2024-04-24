@@ -32,7 +32,7 @@ cmake_print_variables(TORCHCHAT_ROOT)
 
 MESSAGE(STATUS "Looking for excutorch in ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/cmake/ExecuTorch")
 set(executorch_DIR ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/cmake/ExecuTorch)
-find_package(executorch CONFIG REQUIRED PATHS ${executorch_DIR})
+find_package(executorch CONFIG PATHS ${executorch_DIR})
 MESSAGE(STATUS "Found executorch cmake config.")
 
 set(_common_include_directories ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src)
