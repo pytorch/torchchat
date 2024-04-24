@@ -16,16 +16,12 @@ from download import download_and_convert, is_model_downloaded
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
-def check_args(args, name: str) -> None:
-    pass
-
-
 # Handle CLI arguments that are common to a majority of subcommands.
-def handle_common_args(args) -> None:
+def check_args(args, name: str) -> None:
     # Handle model download. Skip this for download, since it has slightly
     # different semantics.
     if (
-        args.command != "download"
+        name != "download"
         and args.model
         and not is_model_downloaded(args.model, args.model_directory)
     ):
