@@ -8,12 +8,14 @@ ENDIF()
 
 find_package(CUDA)
 
-find_package(Torch REQUIRED)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${TORCH_CXX_FLAGS} -fpermissive")
+find_package(Torch)
+if(Torch_FOUND)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${TORCH_CXX_FLAGS} -fpermissive")
 
-add_executable(aoti_run runner/run.cpp)
+    add_executable(aoti_run runner/run.cpp)
 
-target_compile_options(aoti_run PUBLIC -D__AOTI_MODEL__)
-target_include_directories(aoti_run PRIVATE ${TORCHCHAT_ROOT}/runner)
-target_link_libraries(aoti_run "${TORCH_LIBRARIES}" m)
-set_property(TARGET aoti_run PROPERTY CXX_STANDARD 17)
+    target_compile_options(aoti_run PUBLIC -D__AOTI_MODEL__)
+    target_include_directories(aoti_run PRIVATE ${TORCHCHAT_ROOT}/runner)
+    target_link_libraries(aoti_run "${TORCH_LIBRARIES}" m)
+    set_property(TARGET aoti_run PROPERTY CXX_STANDARD 17)
+endif()
