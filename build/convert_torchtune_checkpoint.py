@@ -4,10 +4,10 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+import logging
 import os
 import re
 import sys
-import logging
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -46,7 +46,7 @@ def from_hf(
     merged_result: Dict[str, torch.Tensor],
     num_heads: int = 32,
     num_kv_heads: int = 32,
-    dim: int = 4096
+    dim: int = 4096,
 ) -> Dict[str, torch.Tensor]:
     """
     Utility function which converts the given state_dict from the HF format
@@ -56,7 +56,7 @@ def from_hf(
     """
 
     def permute(w, n_heads):
-        head_dim = dim  // n_heads
+        head_dim = dim // n_heads
         return (
             w.view(n_heads, 2, head_dim // 2, dim)
             .transpose(1, 2)
@@ -114,7 +114,7 @@ def convert_torchtune_checkpoint(
             raise RuntimeError(f"{checkpoint_dir / file} is not a file")
 
     # If the model is already in meta format, simply rename it
-    if checkpoint_format == 'meta':
+    if checkpoint_format == "meta":
         if len(checkpoint_files) > 1:
             raise RuntimeError("Multiple meta format checkpoint files not supported")
 
@@ -127,21 +127,25 @@ def convert_torchtune_checkpoint(
         os.rename(checkpoint_path, Path.joinpath(checkpoint_dir, "model.pth"))
 
     # If the model is in HF format, merge all of the checkpoints and then convert
-    elif checkpoint_format == 'hf':
+    elif checkpoint_format == "hf":
         merged_result = {}
         for file in checkpoint_files:
             state_dict = torch.load(
-                Path.joinpath(checkpoint_dir, file), map_location="cpu", mmap=True, weights_only=True
+                Path.joinpath(checkpoint_dir, file),
+                map_location="cpu",
+                mmap=True,
+                weights_only=True,
             )
             merged_result.update(state_dict)
 
         model_config = MODEL_CONFIGS[model_name]
         final_result = from_hf(merged_result, **model_config)
 
-        print(f"Saving checkpoint to {checkpoint_dir / 'model.pth'}. This may take a while.")
+        print(
+            f"Saving checkpoint to {checkpoint_dir / 'model.pth'}. This may take a while."
+        )
         torch.save(final_result, Path.joinpath(checkpoint_dir, "model.pth"))
         print("Done.")
-
 
 
 if __name__ == "__main__":
@@ -155,19 +159,19 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--checkpoint-files",
-        nargs='+',
+        nargs="+",
         required=True,
     )
     parser.add_argument(
         "--checkpoint-format",
         type=str,
         required=True,
-        choices=['meta', 'hf'],
+        choices=["meta", "hf"],
     )
     parser.add_argument(
         "--model-name",
         type=str,
-        choices=['llama2_7B', 'llama3_8B'],
+        choices=["llama2_7B", "llama3_8B"],
     )
 
     args = parser.parse_args()
