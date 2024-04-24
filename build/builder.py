@@ -418,11 +418,3 @@ def _initialize_model(
 
 def tokenizer_setting_to_name(tiktoken: bool = False) -> str:
     return "TikToken" if tiktoken else "SentencePiece"
-
-
-def resolve_model_name(model: str) -> str:
-    # If the provided model name is an alias, retrieve the full path.
-    if model in model_aliases:
-        return model_aliases[model]
-    else:
-        return model
