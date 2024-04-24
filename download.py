@@ -13,6 +13,7 @@ from build.convert_hf_checkpoint import convert_hf_checkpoint
 from config.model_config import (
     ModelConfig,
     ModelDistributionChannel,
+    load_model_configs,
     resolve_model_config,
 )
 
@@ -107,5 +108,70 @@ def is_model_downloaded(model: str, models_dir: Path) -> bool:
     return os.path.isdir(model_dir) and os.listdir(model_dir)
 
 
-def main(args):
+# Subcommand to list available models.
+def list_main(args) -> None:
+    # TODO It would be nice to have argparse validate this. However, we have
+    # model as an optional named parameter for all subcommands, so we'd
+    # probably need to move it to be registered per-command.
+    if args.model:
+        print("Usage: torchchat.py list")
+        return
+
+    model_configs = load_model_configs()
+
+    # Build the table in-memory so that we can align the text nicely.
+    name_col = []
+    aliases_col = []
+    installed_col = []
+
+    for name, config in model_configs.items():
+        is_downloaded = is_model_downloaded(name, args.model_directory)
+
+        name_col.append(name)
+        aliases_col.append(", ".join(config.aliases))
+        installed_col.append('Yes' if is_downloaded else "")
+
+    cols = {
+        "Model": name_col,
+        "Aliases": aliases_col,
+        "Downloaded": installed_col
+    }
+
+    # Find the length of the longest value in each column.
+    col_widths = {key:max(*[len(s) for s in vals], len(key)) + 1 for (key,vals) in cols.items()}
+
+    # Display header.
+    print()
+    print(*[val.ljust(width) for (val, width) in col_widths.items()])
+    print(*["-" * width for width in col_widths.values()])
+
+    for i in range(len(name_col)):
+        row = [col[i] for col in cols.values()]
+        print(*[val.ljust(width) for (val, width) in zip(row, col_widths.values())])
+    print()
+
+
+# Subcommand to remove downloaded model artifacts.
+def remove_main(args) -> None:
+    # TODO It would be nice to have argparse validate this. However, we have
+    # model as an optional named parameter for all subcommands, so we'd
+    # probably need to move it to be registered per-command.
+    if not args.model:
+        print("Usage: torchchat.py remove <model-or-alias>")
+        return
+
+    model_config = resolve_model_config(args.model)
+    model_dir = args.model_directory / model_config.name
+
+    if not os.path.isdir(model_dir):
+        print(f"Model {args.model} has no downloaded artifacts.")
+        return
+
+    print(f"Removing downloaded model artifacts for {args.model}...")
+    shutil.rmtree(model_dir)
+    print("Done.")
+
+
+# Subcommand to download model artifacts.
+def download_main(args) -> None:
     download_and_convert(args.model, args.model_directory, args.hf_token)
