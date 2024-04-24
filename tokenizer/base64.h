@@ -55,14 +55,14 @@ constexpr uint32_t DECODE_TABLE[] = {
     255};
 
 inline void validate(uint32_t v) {
-  if(v == 255) {
+  if (v == 255) {
     fprintf(stderr, "invalid char");
     exit(EXIT_FAILURE);
   }
 }
 
 inline void decode(const std::string_view& input, std::string& output) {
-  if(input.size() != 4) {
+  if (input.size() != 4) {
     fprintf(stderr, "input length must be 4, got %zu", input.size());
     exit(EXIT_FAILURE);
   }
@@ -97,7 +97,7 @@ inline void decode(const std::string_view& input, std::string& output) {
 inline void decode_1_padding(
     const std::string_view& input,
     std::string& output) {
-  if(input.size() != 3) {
+  if (input.size() != 3) {
     fprintf(stderr, "input length must be 3, got %zu", input.size());
     exit(EXIT_FAILURE);
   }
@@ -146,17 +146,19 @@ inline void decode_2_padding(
 } // namespace detail
 
 inline std::string decode(const std::string_view& input) {
-  if(input.empty()) {
+  if (input.empty()) {
     fprintf(stderr, "empty input");
     exit(EXIT_FAILURE);
   }
 
   // Faster than `input.size() % 4`.
-  if((input.size() & 3) != 0 || input.size() < 4) {
-    fprintf(stderr, "input length must be larger than 4 and is multiple of 4, got %zu", input.size());
+  if ((input.size() & 3) != 0 || input.size() < 4) {
+    fprintf(
+        stderr,
+        "input length must be larger than 4 and is multiple of 4, got %zu",
+        input.size());
     exit(EXIT_FAILURE);
   }
-
 
   std::string output;
   output.reserve(input.size() / 4 * 3);
