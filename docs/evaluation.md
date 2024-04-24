@@ -4,13 +4,6 @@ Evaluation Features
 
 Torchchat provides evaluation functionality for your language model on a variety of tasks using the [lm-evaluation-harness](https://github.com/facebookresearch/lm_eval) library.
 
-Installation
-------------
-
-To use the evaluation features, you need to install the `lm_eval` library first. You can do this by running the following command:
-```bash
-pip install lm_eval
-```
 Usage
 -----
 
@@ -29,9 +22,9 @@ Running an exported model
 python3 torchchat.py eval --pte-path stories15M.pte
 ```
 
-Running multiple tasks:
+Running multiple tasks and calling eval.py directly:
 ```
-python3 eval.py stories15M --tasks wikitext hellaswag
+python3 eval.py --pte-path stories15M.pte --tasks wikitext hellaswag
 ```
 
 For more information and a list of tasks/metrics see [lm-evaluation-harness](https://github.com/facebookresearch/lm_eval).
