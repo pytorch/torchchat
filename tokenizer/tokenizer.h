@@ -9,6 +9,7 @@
 // A simple Tokenizer interface.
 #pragma once
 
+#include <re2/re2.h>
 #include <cctype>
 #include <cstdint>
 #include <cstdio>
@@ -17,10 +18,7 @@
 #include <functional>
 #include <memory>
 #include <optional>
-#if defined(EXECUTORCH_USE_TIKTOKEN)
-#include <re2/re2.h>
 #include <regex>
-#endif
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -90,16 +88,13 @@ class BPETokenizer : public Tokenizer {
 // ----------------------- Tiktoken -----------------------
 // Used by OpenAI, adapted from https://github.com/sewenew/tokenizer
 
-#if defined(EXECUTORCH_USE_TIKTOKEN)
-
 using Encoder = std::unordered_map<std::string, uint64_t>;
 using Decoder = std::unordered_map<uint64_t, std::string>;
 using Re2UPtr = std::unique_ptr<re2::RE2>;
 
 class Tiktoken : public Tokenizer {
  public:
-  explicit Tiktoken(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok)
-      : Tokenizer(vocab_size, bos_tok, eos_tok){};
+  explicit Tiktoken(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok);
   ~Tiktoken(){};
 
   void load(const std::string& tokenizer_path);
@@ -157,4 +152,3 @@ class Tiktoken : public Tokenizer {
   Re2UPtr _regex;
   Re2UPtr _special_token_regex;
 };
-#endif
