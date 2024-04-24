@@ -9,12 +9,27 @@ from pathlib import Path
 
 import torch
 
+from build.utils import allowable_dtype_names, allowable_params_table
+from download import download_and_convert, is_model_downloaded
+
 # CPU is always available and also exportable to ExecuTorch
 default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 def check_args(args, name: str) -> None:
     pass
+
+
+# Handle CLI arguments that are common to a majority of subcommands.
+def handle_common_args(args) -> None:
+    # Handle model download. Skip this for download, since it has slightly
+    # different semantics.
+    if (
+        args.command != "download"
+        and args.model
+        and not is_model_downloaded(args.model, args.model_directory)
+    ):
+        download_and_convert(args.model, args.model_directory, args.hf_token)
 
 
 def add_arguments_for_chat(parser):
@@ -101,11 +116,6 @@ def add_arguments(parser):
         type=int,
         default=None,
         help="Initialize torch seed",
-    )
-    parser.add_argument(
-        "--tiktoken",
-        action="store_true",
-        help="Whether to use tiktoken tokenizer",
     )
     parser.add_argument(
         "--num-samples",
@@ -213,6 +223,7 @@ def add_arguments(parser):
         "-d",
         "--dtype",
         default="float32",
+        choices=allowable_dtype_names(),
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
     )
     parser.add_argument(
@@ -244,13 +255,15 @@ def add_arguments(parser):
         "--params-table",
         type=str,
         default=None,
+        choices=allowable_params_table(),
         help="Parameter table to use",
     )
     parser.add_argument(
         "--device",
         type=str,
         default=default_device,
-        help="Hardware device to use. Options: cpu, gpu, mps",
+        choices=["cpu", "cuda", "mps"],
+        help="Hardware device to use. Options: cpu, cuda, mps",
     )
     parser.add_argument(
         "--tasks",

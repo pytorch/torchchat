@@ -19,6 +19,7 @@ from cli import (
     add_arguments_for_generate,
     arg_init,
     check_args,
+    handle_common_args,
 )
 
 default_device = "cpu"
@@ -97,6 +98,8 @@ if __name__ == "__main__":
         format="%(message)s", level=logging.DEBUG if args.verbose else logging.INFO
     )
 
+    handle_common_args(args)
+
     if args.command == "chat":
         # enable "chat"
         args.chat = True
@@ -128,7 +131,7 @@ if __name__ == "__main__":
 
         # Construct arguments for the flask app minus 'browser' command
         # plus '--chat'
-        args_plus_chat = ['"{}"'.format(s) for s in sys.argv[1:] if s != "browser"] + [
+        args_plus_chat = ["'{}'".format(s) for s in sys.argv[1:] if s != "browser"] + [
             '"--chat"'
         ]
         formatted_args = ", ".join(args_plus_chat)

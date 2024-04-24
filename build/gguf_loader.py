@@ -15,11 +15,9 @@ import gguf
 
 import torch
 
-wd = Path(__file__).parent.resolve()
-sys.path.append(str(wd))
 
 from gguf import GGUFValueType
-from model import ModelArgs, Transformer
+from .model import ModelArgs, Transformer
 from quantize import pack_scales_and_zeros, WeightOnlyInt4Linear
 
 from build.gguf_util import Q4_0, to_float

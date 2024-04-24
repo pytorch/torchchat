@@ -177,15 +177,12 @@ function generate_aoti_model_output() {
         echo "******************************************"
         echo "******** INT4 group-wise quantized *******"
         echo "******************************************"
-        if [ $(uname -s) == "Linux" ]; then
-            echo "Skipping INT4 groupwise quantization because AOTI fails"
-        else
-            python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+        if [ "$TARGET_DEVICE" == "cuda" ]; then
+            python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4-gptq" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
             python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
             cat "$MODEL_DIR/output_aoti"
-
-            if [ "$TARGET_DEVICE" == "cuda" ]; then
-                python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4-gptq" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+            if [ "$DTYPE" != "float16" ]; then
+                python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
                 python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
                 cat "$MODEL_DIR/output_aoti"
             fi
