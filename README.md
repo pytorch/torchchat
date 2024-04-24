@@ -194,7 +194,7 @@ See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
 
 ```
 # Llama 3 8B Instruct
-python3 torchchat.py chat llama3 --tiktoken
+python3 torchchat.py chat llama3 --dtype fp16
 ```
 
 ```

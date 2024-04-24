@@ -107,11 +107,6 @@ def add_arguments(parser):
         help="Indicate that the model was trained to support chat functionality",
     )
     parser.add_argument(
-        "--is-llama3-model",
-        action="store_true",
-        help="Indicate that the model is a llama3 variant",
-    )
-    parser.add_argument(
         "--seed",
         type=int,
         default=None,

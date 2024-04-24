@@ -476,6 +476,12 @@ def _main(
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
 
+    # Right now the assumption is only llama3 uses tiktokenizer and it must use tiktokenizer.
+    # Piggy backing off of this flag then for now to identify llama3 without prompting user.
+    is_llama3_model = tokenizer_args.is_tiktoken
+    if generator_args.chat_mode and is_llama3_model:
+        logging.debug("Llama3 model detected in chat mode. Using updated sentence schemas")
+
     builder_args.setup_caches = False
     model = _initialize_model(builder_args, quantize, tokenizer)
 
@@ -538,7 +544,7 @@ def _main(
         get_system_prompt = input("Do you want to enter a system prompt? Enter y for yes and anything else for no. \n")
         if (get_system_prompt == "y" or get_system_prompt == "Y"):
             system_prompt = input("What is your system prompt? \n")
-        if builder_args.is_llama3_model:
+        if is_llama3_model:
             chat_formatter = ChatFormat(tokenizer)
     else:
         max_seq_length = min(encoded.size(0) + generator_args.max_new_tokens, model.config.block_size)
@@ -567,7 +573,7 @@ def _main(
             if (prompt == "/bye"):
                 print("Exiting Chat.\n")
                 break
-            if not builder_args.is_llama3_model:
+            if not is_llama3_model:
                 if system_prompt is not None:
                     prompt = f"{B_INST} {B_SYS}\n{system_prompt.strip()}\n{E_SYS}\n\n{prompt.strip} {E_INST}"
                     system_prompt = None # can only provide system prompt on first interaction
@@ -638,7 +644,7 @@ def _main(
                 start_pos=start_pos,
                 tokenizer=tokenizer,
                 max_seq_length=max_seq_length,
-                is_llama3_model=builder_args.is_llama3_model,
+                is_llama3_model=is_llama3_model,
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
             start_pos += y.size(0)
