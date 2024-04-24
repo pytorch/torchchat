@@ -186,7 +186,7 @@ class TokenizerArgs:
 
         if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
             raise RuntimeError(
-                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)} for {model_description}"
+                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)}) does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)} for {model_description}"
             )
 
         return
