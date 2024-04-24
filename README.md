@@ -100,7 +100,7 @@ For more information run `python3 torchchat.py chat --help`
 
 **Examples**
 ```
-python3 torchchat.py chat llama3 --tiktoken
+python3 torchchat.py chat llama3
 ```
 
 ### Generate
@@ -111,7 +111,7 @@ For more information run `python3 torchchat.py generate --help`
 
 **Examples**
 ```
-python3 torchchat.py generate llama3 --dtype=fp16 --tiktoken
+python3 torchchat.py generate llama3 --dtype=fp16
 ```
 
 ## Exporting your model
@@ -194,7 +194,7 @@ See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
 
 ```
 # Llama 3 8B Instruct
-python3 torchchat.py chat llama3 --tiktoken
+python3 torchchat.py chat llama3
 ```
 
 ```
