@@ -125,18 +125,15 @@ if __name__ == "__main__":
         check_args(args, "browser")
 
         # Look for port from cmd args. Default to 5000 if not found.
-        # The port args will be passed directly to the Flask app.
         port = 5000
         i = 2
         while i < len(sys.argv):
-            # Check if the current argument is '--port'
             if sys.argv[i] == "--port":
-                # Check if there's a value immediately following '--port'
                 if i + 1 < len(sys.argv):
                     # Extract the value and remove '--port' and the value from sys.argv
                     port = sys.argv[i + 1]
-                    del sys.argv[i : i + 2]  # Delete '--port' and the value
-                    break  # Exit loop since port is found
+                    del sys.argv[i : i + 2]
+                    break
             else:
                 i += 1
 
