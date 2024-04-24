@@ -225,7 +225,7 @@ class TokenizerArgs:
             t=None,
         )
 
-    
+
 def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
     return tokenizer_args.t
 
@@ -343,7 +343,6 @@ def _initialize_model(
     tokenizer=None,
 ):
     print("Loading model ...")
-    t0 = time.time()
 
     if builder_args.gguf_path and (builder_args.dso_path or builder_args.pte_path):
         print("Setting gguf_kwargs for generate.")
