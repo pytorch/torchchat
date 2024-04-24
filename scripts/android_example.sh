@@ -5,7 +5,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-set -eu
+set -eux
 
 cd ${TORCHCHAT_ROOT}
 echo "Inside: $TORCHCHAT_ROOT"
@@ -24,6 +24,10 @@ else
   echo "Unsupported platform $(uname) $(uname -m)"
   exit -1
 fi
+
+LLAMA_JNI_ARM64_URL="https://gha-artifacts.s3.amazonaws.com/pytorch/executorch/8812806770/artifact/arm64-v8a/libexecutorch_llama_jni.so"
+LLAMA_JNI_X86_64_URL="https://gha-artifacts.s3.amazonaws.com/pytorch/executorch/8812806770/artifact/arm64-v8a/libexecutorch_llama_jni.so"
+LLAMA_JAR_URL="https://gha-artifacts.s3.amazonaws.com/pytorch/executorch/8812806770/artifact/executorch.jar"
 
 mkdir -p ${TORCHCHAT_ROOT}/build/android
 
@@ -64,8 +68,6 @@ setup_android_sdk_manager() {
 setup_android_sdk() {
   sdkmanager "platforms;android-34"
   sdkmanager "platform-tools"
-  sdkmanager "emulator"
-  sdkmanager "system-images;android-34;google_apis;${ANDROID_ABI}"
 }
 
 setup_android_ndk() {
@@ -73,21 +75,43 @@ setup_android_ndk() {
   export ANDROID_NDK="$ANDROID_HOME/ndk/25.0.8775105"
 }
 
+download_jar_library() {
+  mkdir -p ${TORCHCHAT_ROOT}/build/android
+  curl "${LLAMA_JAR_URL}" -o ${TORCHCHAT_ROOT}/build/android/executorch.jar
+}
+
+download_jni_library() {
+  mkdir -p ${TORCHCHAT_ROOT}/build/android/arm64-v8a
+  mkdir -p ${TORCHCHAT_ROOT}/build/android/x86_64
+  if [ ! -f ${TORCHCHAT_ROOT}/build/android/arm64-v8a/libexecutorch_llama_jni.so ]; then
+    curl "${LLAMA_JNI_ARM64_URL}" -o ${TORCHCHAT_ROOT}/build/android/arm64-v8a/libexecutorch_llama_jni.so
+  fi
+  if [ ! -f ${TORCHCHAT_ROOT}/build/android/x86_64/libexecutorch_llama_jni.so ]; then
+    curl "${LLAMA_JNI_X86_64_URL}" -o ${TORCHCHAT_ROOT}/build/android/x86_64/libexecutorch_llama_jni.so
+  fi
+}
+
 build_app() {
   pushd build/src/executorch/examples/demo-apps/android/LlamaDemo
-  ./gradlew :app:setup
+  mkdir -p app/src/main/jniLibs/arm64-v8a
+  mkdir -p app/src/main/jniLibs/x86_64
+  cp ${TORCHCHAT_ROOT}/build/android/arm64-v8a/libexecutorch_llama_jni.so app/src/main/jniLibs/arm64-v8a
+  cp ${TORCHCHAT_ROOT}/build/android/x86_64/libexecutorch_llama_jni.so app/src/main/jniLibs/x86_64
   ./gradlew :app:build
   popd
 }
 
 setup_avd() {
+  sdkmanager "emulator"
+  sdkmanager "system-images;android-34;google_apis;${ANDROID_ABI}"
+
   avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
   sdk/emulator/emulator @torchchat &
 }
 
 push_files_to_android() {
   adb wait-for-device
-  adb shell mkdir /data/local/tmp/llama
+  adb shell mkdir -p /data/local/tmp/llama
   adb push stories15M.pte /data/local/tmp/llama
   adb push checkpoints/stories15M/tokenizer.bin /data/local/tmp/llama
   adb install -t build/src/executorch/examples/demo-apps/android/LlamaDemo/app/build/outputs/apk/debug/app-debug.apk
@@ -98,7 +122,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   setup_android_sdk_manager
   setup_android_sdk
   setup_android_ndk
-  build_app
   setup_avd
+  download_jni_library
+  build_app
   push_files_to_android
 fi
