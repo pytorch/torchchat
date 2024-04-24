@@ -50,6 +50,9 @@ HuggingFace.
 python3 torchchat.py download llama3
 ```
 
+View available models with `python3 torchchat.py list`. You can also remove downloaded models
+with `python3 torchchat.py remove llama3`.
+
 ## What can you do with torchchat?
 
 * Run models via PyTorch / Python:

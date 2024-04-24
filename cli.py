@@ -21,7 +21,7 @@ def check_args(args, name: str) -> None:
     # Handle model download. Skip this for download, since it has slightly
     # different semantics.
     if (
-        name != "download"
+        name not in ["download", "list", "remove"]
         and args.model
         and not is_model_downloaded(args.model, args.model_directory)
     ):
@@ -61,6 +61,13 @@ def add_arguments_for_export(parser):
     # Only export specific options should be here
     _add_arguments_common(parser)
 
+def add_arguments_for_list(parser):
+    # Only list specific options should be here
+    _add_arguments_common(parser)
+
+def add_arguments_for_remove(parser):
+    # Only remove specific options should be here
+    _add_arguments_common(parser)
 
 def _add_arguments_common(parser):
     # Model specification. TODO Simplify this.
