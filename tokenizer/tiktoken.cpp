@@ -143,7 +143,7 @@ static std::vector<uint64_t> _byte_pair_merge(
     if (rank) {
       // usize::MAX is a sentinel value and cannot be a valid rank
       if (*rank == _max_size()) {
-        fprintf(stderr, "at %" PRIu64 " rank is too large\n", i);
+        fprintf(stderr, "at %" PRIu32 " rank is too large\n", i);
       }
       parts[i].second = *rank;
     }
