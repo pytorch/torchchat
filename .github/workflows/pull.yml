@@ -736,8 +736,8 @@ jobs:
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
           python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
-          cmake -S ./runner -B ./runner/cmake-out -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'` -G Ninja
-          cmake --build ./runner/cmake-out --target et_run
+          cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'` -G Ninja
+          cmake --build ./cmake-out --target et_run
       - name: Download checkpoints
         run: |
 
@@ -752,7 +752,7 @@ jobs:
           cat ./output_eager
 
           python torchchat.py export stories15M --output-pte-path ./model.pte
-          ./runner/cmake-out/et_run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}" > ./output_et
+          ./cmake-out/et_run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}" > ./output_et
           cat ./output_et
 
           echo "Tests complete."
@@ -784,8 +784,8 @@ jobs:
           pip install -r requirements.txt
           pip list
 
-          cmake -S ./runner -B ./runner/cmake-out -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'` -G Ninja
-          cmake --build ./runner/cmake-out --target aoti_run
+          cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'` -G Ninja
+          cmake --build ./cmake-out --target aoti_run
       - name: Download checkpoint
         run: |
           mkdir -p checkpoints/stories15M
@@ -806,7 +806,7 @@ jobs:
 
           python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-dso-path /tmp/model.so
 
-          ./runner/cmake-out/aoti_run /tmp/model.so -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}" > ${PWD}/output_aoti
+          ./cmake-out/aoti_run /tmp/model.so -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}" > ${PWD}/output_aoti
           cat ${PWD}/output_aoti
 
           echo "Tests complete."
