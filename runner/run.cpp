@@ -487,6 +487,12 @@ void chat(
     const char* cli_user_prompt,
     const char* cli_system_prompt,
     int steps) {
+  // special tokens
+  const int SOS_TOKEN = 1;
+  const int EOS_TOKEN = 2; // token ends the assistant turn
+
+
+
   // buffers for reading the system prompt and user prompt from stdin
   // you'll notice they are soomewhat haphazardly and unsafely set atm
   char system_prompt[512];
@@ -529,13 +535,16 @@ void chat(
       }
       // render user/system prompts into the Llama 2 Chat schema
       if (pos == 0 && system_prompt[0] != '\0') {
-        char system_template[] = "[INST] <<SYS>>\n%s\n<</SYS>>\n\n%s [/INST]";
+        char system_template[] = "<s>[INST] <<SYS>>\n%s\n<</SYS>>\n\n%s [/INST]";
         snprintf(
             rendered_prompt, 1151, system_template, system_prompt, user_prompt);
       } else {
-        char user_template[] = "[INST] %s [/INST]";
+        // Assistant should produce </s>, so we do not include it in template
+        // "</s><s>[INST] %s [/INST]" for subsequent user inputs.
+        char user_template[] = "<s>[INST] %s [/INST]";
         snprintf(rendered_prompt, 1151, user_template, user_prompt);
       }
+
       // encode the rendered prompt into tokens
       prompt_tokens = tokenizer->encode(rendered_prompt, 1, 0);
       num_prompt_tokens = prompt_tokens.size();
@@ -553,26 +562,28 @@ void chat(
       // otherwise use the next token sampled from previous turn
       token = next;
     }
-    // EOS (=2) token ends the Assistant turn
-    if (token == 2) {
+
+    if (token == EOS_TOKEN) {
       user_turn = 1;
+      pos++;
+    } else {
+      // forward the transformer to get logits for the next token
+      float* logits = forward(transformer, token, pos);
+      next = sample(sampler, logits);
+      pos++;
+
+      if (user_idx >= num_prompt_tokens && next != EOS_TOKEN && next != SOS_TOKEN) {
+        // the Assistant is responding, so print its output
+        std::string piece = tokenizer->decode(token, next);
+        safe_printf(piece.c_str()); // same as printf("%s", piece), but skips
+                                    // "unsafe" bytes
+        fflush(stdout);
+      }
+      if (next == EOS_TOKEN) {
+        printf("\n");
+      }
     }
 
-    // forward the transformer to get logits for the next token
-    float* logits = forward(transformer, token, pos);
-    next = sample(sampler, logits);
-    pos++;
-
-    if (user_idx >= num_prompt_tokens && next != 2) {
-      // the Assistant is responding, so print its output
-      std::string piece = tokenizer->decode(token, next);
-      safe_printf(piece.c_str()); // same as printf("%s", piece), but skips
-                                  // "unsafe" bytes
-      fflush(stdout);
-    }
-    if (next == 2) {
-      printf("\n");
-    }
   }
   printf("\n");
 }
