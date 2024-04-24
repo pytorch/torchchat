@@ -34,7 +34,7 @@ if __name__ == "__main__":
         add_help=True,
     )
     # Default command is to print help
-    parser.set_defaults(func=lambda args: self._parser.print_help())
+    parser.set_defaults(func=parser.print_help())
 
     add_arguments(parser)
     subparsers = parser.add_subparsers(
