@@ -12,7 +12,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/../scripts/install_utils.sh"
 if ["${ANDROID_NDK}" == ""]; then
   echo "Please set ANDROID_NDK enviornment variable."
   echo "For example it can be /Users/guest/Desktop/android-ndk-r26."
-  echo "You can download NDK from android website"
+  echo "You can use setup_android_ndk function in scripts/android_example.sh"
+  echo "to set up; or you can download from Android NDK website"
   exit 1
 else
   echo "ANDROID_NDK set to ${ANDROID_NDK}"
