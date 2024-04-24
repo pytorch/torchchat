@@ -189,7 +189,7 @@ Torchchat also supports loading of many models in the GGUF format. See the [docu
 
 ```
 # Llama 3 8B Instruct
-python3 torchchat.py chat llama3
+python3 torchchat.py chat llama3 --dtype fp16
 ```
 
 ```
