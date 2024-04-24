@@ -1,8 +1,9 @@
 # Written by Dr. Hicham Badri @Mobius Labs GmbH - 2023
 #####################################################
-import torch
 import gc
+
 import numpy as np
+import torch
 
 
 def cleanup() -> None:

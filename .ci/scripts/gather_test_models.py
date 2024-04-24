@@ -19,7 +19,6 @@ MODEL_REPOS = {
     "mistralai/Mistral-7B-v0.1": "https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/config.json,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/generation_config.json,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/pytorch_model-00001-of-00002.bin,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/pytorch_model-00002-of-00002.bin,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/pytorch_model.bin.index.json,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/special_tokens_map.json,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/tokenizer.json,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/tokenizer.model,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/tokenizer_config.json",
     "mistralai/Mistral-7B-Instruct-v0.1": "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/config.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/generation_config.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/pytorch_model-00001-of-00002.bin,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/pytorch_model-00002-of-00002.bin,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/pytorch_model.bin.index.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/special_tokens_map.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/tokenizer.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/tokenizer.model,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/tokenizer_config.json",
     "mistralai/Mistral-7B-Instruct-v0.2": "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/config.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/generation_config.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/pytorch_model-00001-of-00003.bin,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/pytorch_model-00002-of-00003.bin,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/pytorch_model-00003-of-00003.bin,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/pytorch_model.bin.index.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/special_tokens_map.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/tokenizer.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/tokenizer.model,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/tokenizer_config.json",
-
     # huggingface-cli prefixed Models will download using the huggingface-cli tool
     # TODO: Convert all of the MODEL_REPOS with a NamedTuple that includes the install_method
     "huggingface-cli/meta-llama/Meta-Llama-3-8B": "",
@@ -73,7 +72,10 @@ def model_should_run_on_event(model: str, event: str, backend: str) -> bool:
     elif event == "periodic":
         # test llama3 on gpu only, see description in https://github.com/pytorch/torchchat/pull/399 for reasoning
         if backend == "gpu":
-            return model in ["openlm-research/open_llama_7b", "huggingface-cli/meta-llama/Meta-Llama-3-8B"]
+            return model in [
+                "openlm-research/open_llama_7b",
+                "huggingface-cli/meta-llama/Meta-Llama-3-8B",
+            ]
         else:
             return model in ["openlm-research/open_llama_7b"]
     else:
