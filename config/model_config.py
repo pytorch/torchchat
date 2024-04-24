@@ -77,6 +77,7 @@ def load_model_configs() -> Dict[str, ModelConfig]:
 
     return model_configs
 
+
 def resolve_model_config(model: str) -> ModelConfig:
     model = model.lower()
     # Lazy load model config from JSON.

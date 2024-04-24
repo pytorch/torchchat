@@ -57,13 +57,16 @@ def add_arguments_for_export(parser):
     # Only export specific options should be here
     _add_arguments_common(parser)
 
+
 def add_arguments_for_list(parser):
     # Only list specific options should be here
     _add_arguments_common(parser)
 
+
 def add_arguments_for_remove(parser):
     # Only remove specific options should be here
     _add_arguments_common(parser)
+
 
 def _add_arguments_common(parser):
     # Model specification. TODO Simplify this.

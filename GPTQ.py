@@ -360,7 +360,7 @@ class GenericGPTQRunner(fx.Interpreter):
         groupsize = self.groupsize
         orig_dtype = W.dtype
         W = W.detach().float()
-        rows, columns = W.shape[0], W.shape[1]
+        _, columns = W.shape[0], W.shape[1]
         device = W.device
 
         if groupsize == -1:

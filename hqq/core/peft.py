@@ -1,10 +1,9 @@
 # Written by Dr. Hicham Badri @Mobius Labs GmbH - 2023
 #####################################################
-import torch
-from torch import float16, bfloat16, float32
-from torch import Tensor
-from torch import nn
 import numpy as np
+import torch
+from torch import bfloat16, float16, float32, nn, Tensor
+
 from .quantize import HQQLinear, Quantizer
 from .utils import cleanup
 

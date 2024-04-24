@@ -1,9 +1,10 @@
 # Written by Dr. Hicham Badri @Mobius Labs GmbH - 2023
 #####################################################
 
-import torch
-from torch import uint8, int32, Tensor
 import numpy as np
+import torch
+from torch import int32, Tensor, uint8
+
 from .utils import is_divisible
 
 
