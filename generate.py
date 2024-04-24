@@ -287,6 +287,7 @@ def generate(
     callback=lambda x: x,
     tokenizer=None,
     max_seq_length: int,
+    is_llama3_model: bool = False,
     **sampling_kwargs,
 ) -> torch.Tensor:
     """
