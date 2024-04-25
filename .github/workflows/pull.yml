@@ -246,7 +246,7 @@ jobs:
         export REPO_NAME=${{ matrix.repo_name }}
         bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
         echo "::endgroup::"
-      
+
         echo "::group::Convert checkpoint"
         bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
         echo "::endgroup::"

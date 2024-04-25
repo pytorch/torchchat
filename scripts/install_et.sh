@@ -19,6 +19,5 @@ pushd ${TORCHCHAT_ROOT}
 find_cmake_prefix_path
 install_pip_dependencies
 clone_executorch
-install_executorch_python_libs $ENABLE_ET_PYBIND
-install_executorch
+install_executorch_libs $ENABLE_ET_PYBIND
 popd
