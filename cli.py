@@ -301,9 +301,9 @@ def add_arguments(parser):
 
 
 def arg_init(args):
-    if torch.__version__ < "2.4.0":
+    if not (torch.__version__ > "2.3"):
         raise RuntimeError(
-            "torchchat uses the latest PyTorch technology with high-performance kernels only available in PyTorch nightly until the PyTorch 2.4 release"
+            "You are using PyTorch {torch.__version__}. At this time, torchchat uses the latest PyTorch technology with high-performance kernels only available in PyTorch nightly until the PyTorch 2.4 release"
         )
 
     if Path(args.quantize).is_file():
