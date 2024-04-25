@@ -577,7 +577,9 @@ def _main(
         )
 
     max_seq_length = (
-        max_seq_length + speculate_k + 1 if draft_model is not None else max_seq_length
+        max_seq_length + speculative_builder_args.speculate_k + 1
+        if draft_model is not None
+        else max_seq_length
     )
 
     aggregate_metrics = {
