@@ -73,11 +73,10 @@ with `python3 torchchat.py remove llama3`.
   * [Run exported .so file via your own C++ application](#run-server)
      * in Chat mode
      * in Generate mode
-  * [Export for mobile via ExecuTorch](#export-executorch)
+  * [Export for mobile via ExecuTorch](#exporting-for-mobile-via-executorch)
+  * [Run exported ExecuTorch file on iOS or Android](#mobile-execution)
      * in Chat mode
      * in Generate mode
-  * [Run exported ExecuTorch file on iOS or Android](#run-mobile)
-
 
 ## Running via PyTorch / Python
 
@@ -235,6 +234,20 @@ python3 torchchat.py generate --dso-path stories15M.so --prompt "Hello my name i
 
 NOTE: The exported model will be large. We suggest you quantize the model, explained further down, before deploying the model on device.
 
+**Build Native Runner Binary**
+
+We provide an end-to-end C++ [runner](runner/run.cpp) that runs the `*.so` file exported after following the previous [examples](#aoti-aot-inductor) section. To build the runner binary on your Mac or Linux:
+
+```bash
+scripts/build_native.sh aoti
+```
+
+Run:
+
+```bash
+cmake-out/aoti_run model.so -z tokenizer.model -i "Once upon a time"
+```
+
 ### ExecuTorch
 
 ExecuTorch enables you to optimize your model for execution on a mobile or embedded device, but can also be used on desktop for testing.
@@ -250,7 +263,7 @@ python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 python3 torchchat.py generate --device cpu --pte-path stories15M.pte --prompt "Hello my name is"
 ```
 
-See below under [Mobile Execution](#run-mobile) if you want to deploy and execute a model in your iOS or Android app.
+See below under [Mobile Execution](#mobile-execution) if you want to deploy and execute a model in your iOS or Android app.
 
 
 
@@ -264,6 +277,20 @@ Install [ExecuTorch](https://pytorch.org/executorch/stable/getting-started-setup
 Read the [iOS documentation](docs/iOS.md) for more details on iOS.
 
 Read the [Android documentation](docs/Android.md) for more details on Android.
+
+**Build Native Runner Binary**
+
+We provide an end-to-end C++ [runner](runner/run.cpp) that runs the `*.pte` file exported after following the previous [ExecuTorch](#executorch) section. Notice that this binary is for demo purpose, please follow the respective documentations, to see how to build a similar application on iOS and Android. To build the runner binary on your Mac or Linux:
+
+```bash
+scripts/build_native.sh et
+```
+
+Run:
+
+```bash
+cmake-out/et_run model.pte -z tokenizer.model -i "Once upon a time"
+```
 
 ## Fine-tuned models from torchtune
 
