@@ -340,7 +340,7 @@ def _initialize_model(
     quantize,
     tokenizer=None,
 ):
-    print("Loading model ...")
+    print("Loading model...")
 
     if builder_args.gguf_path and (builder_args.dso_path or builder_args.pte_path):
         print("Setting gguf_kwargs for generate.")
