@@ -246,7 +246,7 @@ jobs:
         export REPO_NAME=${{ matrix.repo_name }}
         bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
         echo "::endgroup::"
-      
+
         echo "::group::Convert checkpoint"
         bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
         echo "::endgroup::"
@@ -838,13 +838,11 @@ jobs:
           pip install -r requirements.txt
 
           export TORCHCHAT_ROOT=${PWD}
-          export ENABLE_ET_PYBIND=false
-          ./scripts/install_et.sh $ENABLE_ET_PYBIND
+          bash scripts/build_native.sh et
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
           python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
-          cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'` -G Ninja
-          cmake --build ./cmake-out --target et_run
+
       - name: Download checkpoints
         run: |
 
@@ -891,8 +889,8 @@ jobs:
           pip install -r requirements.txt
           pip list
 
-          cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'` -G Ninja
-          cmake --build ./cmake-out --target aoti_run
+          bash scripts/build_native.sh aoti
+
       - name: Download checkpoint
         run: |
           mkdir -p checkpoints/stories15M
