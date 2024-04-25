@@ -332,7 +332,7 @@ def generate(
     sequential_prefill=True,
     callback=lambda x: x,
     tokenizer=None,
-    max_seq_len: int,
+    max_seq_length: int,
     is_llama3_model: bool = False,
     **sampling_kwargs,
 ) -> torch.Tensor:
@@ -345,15 +345,17 @@ def generate(
     # create an empty tensor of the expected final shape and
     # fill in the current tokens
     T = prompt.size(0)
-    max_new_tokens = min(max_new_tokens, max_seq_len - start_pos - T)
+    max_new_tokens = min(max_new_tokens, max_seq_length - start_pos - T)
     T_new = T + max_new_tokens
     # set up caches only if first inference
     if start_pos == 0:
         model = model.to(device=device)
         with torch.device(device):
-            model.setup_caches(max_batch_size=1, max_seq_len=max_seq_len)
+            model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
             if is_speculative and draft_model is not model:
-                draft_model.setup_caches(max_batch_size=1, max_seq_len=max_seq_len)
+                draft_model.setup_caches(
+                    max_batch_size=1, max_seq_length=max_seq_length
+                )
 
     # create an empty tensor of the expected final shape and
     # fill in the current tokens
@@ -556,11 +558,11 @@ def _main(
             prefill = torch.compile(prefill, fullgraph=True, dynamic=True)
 
     system_prompt = None
-    # Set up our max_seq_len
+    # Set up our max_seq_length
     if generator_args.chat_mode:
-        max_seq_len = model.config.max_seq_len
+        max_seq_length = model.config.max_seq_length
         print(
-            f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_len} tokens is hit or until the user says /bye"
+            f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye"
         )
         get_system_prompt = input(
             "Do you want to enter a system prompt? Enter y for yes and anything else for no. \n"
@@ -570,14 +572,14 @@ def _main(
         if is_llama3_model:
             chat_formatter = ChatFormat(tokenizer)
     else:
-        max_seq_len = min(
+        max_seq_length = min(
             encoded.size(0) + generator_args.max_new_tokens, model.config.block_size
         )
 
-    max_seq_len = (
-        max_seq_len + speculative_builder_args.speculate_k + 1
+    max_seq_length = (
+        max_seq_length + speculative_builder_args.speculate_k + 1
         if draft_model is not None
-        else max_seq_len
+        else max_seq_length
     )
 
     aggregate_metrics = {
@@ -636,9 +638,9 @@ def _main(
                 encoded = torch.tensor(
                     encoded, dtype=torch.int, device=builder_args.device
                 )
-            if encoded.size(0) + start_pos > max_seq_len:
+            if encoded.size(0) + start_pos > max_seq_length:
                 print(
-                    "This prompt would take us past the max_seq_len. Ending Conversation."
+                    "This prompt would take us past the max_seq_length. Ending Conversation."
                 )
                 break
 
@@ -699,7 +701,7 @@ def _main(
                 sequential_prefill=generator_args.sequential_prefill,
                 start_pos=start_pos,
                 tokenizer=tokenizer,
-                max_seq_len=max_seq_len,
+                max_seq_length=max_seq_length,
                 is_llama3_model=is_llama3_model,
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
@@ -727,7 +729,7 @@ def _main(
         )
         logging.debug(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
 
-        if start_pos >= max_seq_len:
+        if start_pos >= max_seq_length:
             print("Max Sequence Length Reached. Ending Conversation.")
             break
 
