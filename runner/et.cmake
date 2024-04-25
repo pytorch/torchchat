@@ -49,27 +49,25 @@ if(executorch_FOUND)
   # Link ET runtime + extensions
   target_link_libraries(
     et_run PRIVATE
-          cpublas
-          cpuinfo
-          eigen_blas
-          executorch
-          extension_data_loader
-          extension_module
-          optimized_kernels
-          portable_kernels
-          pthreadpool
-          quantized_kernels
-          XNNPACK
-          # The libraries below need to be whole-archived linked
-          custom_ops
-          optimized_native_cpu_ops_lib
-          quantized_ops_lib
-          xnnpack_backend
+    executorch
+    extension_module
+    extension_data_loader
+    optimized_kernels
+    quantized_kernels
+    portable_kernels
+    cpublas
+    eigen_blas
+    # The libraries below need to be whole-archived linked
+    optimized_native_cpu_ops_lib
+    quantized_ops_lib
+    xnnpack_backend
+    XNNPACK
+    pthreadpool
+    cpuinfo
   )
   target_link_options_shared_lib(optimized_native_cpu_ops_lib)
   target_link_options_shared_lib(quantized_ops_lib)
   target_link_options_shared_lib(xnnpack_backend)
-  target_link_options_shared_lib(custom_ops)
   # Not clear why linking executorch as whole-archive outside android/apple is leading
   # to double registration. Most likely because of linkage issues.
   # Will figure this out later. Until then use this.
@@ -77,6 +75,8 @@ if(executorch_FOUND)
     target_link_options_shared_lib(executorch)
   endif()
 
+  target_link_libraries(et_run PRIVATE
+  "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/libcustom_ops.a>")
   # This one is needed for cpuinfo where it uses android specific log lib
   if(ANDROID)
     target_link_libraries(et_run PRIVATE log)
