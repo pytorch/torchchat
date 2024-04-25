@@ -41,7 +41,7 @@ class BuilderArgs:
     def __post_init__(self):
         if self.device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
-            
+
         if not (
             (self.checkpoint_path and self.checkpoint_path.is_file())
             or (self.checkpoint_dir and self.checkpoint_dir.is_dir())
@@ -408,10 +408,10 @@ def _initialize_model(
             print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
 
         if builder_args.setup_caches:
-            # TODO: get this from args?
-            max_seq_length = 2048
             with torch.device(builder_args.device):
-                model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+                model.setup_caches(
+                    max_batch_size=1, max_seq_length=model.config.max_seq_length
+                )
 
         model.to(dtype=builder_args.precision)
 

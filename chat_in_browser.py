@@ -20,7 +20,6 @@ def create_app(*args):
         ["python3", "generate.py", *args], stdin=subprocess.PIPE, stdout=subprocess.PIPE
     )
 
-
     @app.route("/")
     def main():
         print("Starting chat session.")
@@ -93,7 +92,7 @@ def create_app(*args):
         # Strip "Model: " from output
         model_prefix = "Model: "
         if output.startswith(model_prefix):
-            output = output[len(model_prefix):]
+            output = output[len(model_prefix) :]
 
         global convo
 
