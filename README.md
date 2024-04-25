@@ -117,10 +117,9 @@ Depending on the model and the target device, different quantization recipes may
 
 You can use the quantization recipes in conjunction with any of the `chat`, `generate` and `browser` commands to test their impact and accelerate model execution. You will apply these recipes to the export comamnds below, to optimize the exported models.  To adapt these recipes or wrote your own, please refer to the [quantization overview](docs/quantization.md).
 
----
-*TO BE REPLACED BY SUITABLE ORDING PROVIDED BY LEGAL*
+*TO BE REPLACED BY SUITABLE ORDING PROVIDED BY LEGAL:*
+
 With quantization, 32-bit floating numbers can be represented with as few as 8 or even 4 bits, and a scale shared by a group of these weights.  This transformation is lossy and modifies the behavior of models.  While research is being conducted on how to efficiently quantize large language models for use in mobile devices, this transformation invariable results in both quality loss and a reduced amount of control over the output of the models, leading to an increased risk of undesirable responses, hallucinations and stuttering.  In effect an a developer quantizing a model, has much control and even more responsibility to quantize a model to quantify and reduce these effects.
----
 
 
 ## Exporting your model
@@ -254,16 +253,6 @@ python3 torchchat.py generate --device cpu --pte-path stories15M.pte --prompt "H
 See below under [Mobile Execution](#run-mobile) if you want to deploy and execute a model in your iOS or Android app.
 
 
-## Quantization
-Quantization focuses on reducing the precision of model parameters and computations from floating-point to lower-bit integers, such as 8-bit and 4-bit integers. This approach aims to minimize memory requirements, accelerate inference speeds, and decrease power consumption, making models more feasible for deployment on edge devices with limited computational resources. While quantization can potentially degrade the model's performance, the methods supported by torchchat are designed to mitigate this effect, maintaining a balance between efficiency and accuracy.
-
-TODO:
-- Brief rundown on supported quant modes and torchchat.py flags (emphasis on brief).
-- Recommendations for quantization modes for 7b local chat, 7b on mobile, etc.
-- One line that shows the performance difference between the base model and the 4bit
-- Link to Quantization.md.
-
-Read the [quantization documention](docs/quantization.md) for more details.
 
 ## Mobile Execution
 **Prerequisites**
