@@ -332,7 +332,7 @@ def generate(
     sequential_prefill=True,
     callback=lambda x: x,
     tokenizer=None,
-    max_seq_length: int,
+    max_seq_len: int,
     is_llama3_model: bool = False,
     **sampling_kwargs,
 ) -> torch.Tensor:
@@ -345,17 +345,15 @@ def generate(
     # create an empty tensor of the expected final shape and
     # fill in the current tokens
     T = prompt.size(0)
-    max_new_tokens = min(max_new_tokens, max_seq_length - start_pos - T)
+    max_new_tokens = min(max_new_tokens, max_seq_len - start_pos - T)
     T_new = T + max_new_tokens
     # set up caches only if first inference
     if start_pos == 0:
         model = model.to(device=device)
         with torch.device(device):
-            model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+            model.setup_caches(max_batch_size=1, max_seq_len=max_seq_len)
             if is_speculative and draft_model is not model:
-                draft_model.setup_caches(
-                    max_batch_size=1, max_seq_length=max_seq_length
-                )
+                draft_model.setup_caches(max_batch_size=1, max_seq_len=max_seq_len)
 
     # create an empty tensor of the expected final shape and
     # fill in the current tokens
@@ -558,7 +556,7 @@ def _main(
             prefill = torch.compile(prefill, fullgraph=True, dynamic=True)
 
     system_prompt = None
-    # Set up our max_seq_length
+    # Set up our max_seq_len
     if generator_args.chat_mode:
         max_seq_len = model.config.max_seq_len
         print(
