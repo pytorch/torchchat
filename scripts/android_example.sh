@@ -25,9 +25,9 @@ else
   exit -1
 fi
 
-LLAMA_JNI_ARM64_URL="https://gha-artifacts.s3.amazonaws.com/pytorch/executorch/8812806770/artifact/arm64-v8a/libexecutorch_llama_jni.so"
-LLAMA_JNI_X86_64_URL="https://gha-artifacts.s3.amazonaws.com/pytorch/executorch/8812806770/artifact/arm64-v8a/libexecutorch_llama_jni.so"
-LLAMA_JAR_URL="https://gha-artifacts.s3.amazonaws.com/pytorch/executorch/8812806770/artifact/executorch.jar"
+LLAMA_JNI_ARM64_URL="https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/arm64-v8a/libexecutorch_llama_jni.so"
+LLAMA_JNI_X86_64_URL="https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/x86_64/libexecutorch_llama_jni.so"
+LLAMA_JAR_URL="https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch.jar"
 
 mkdir -p ${TORCHCHAT_ROOT}/build/android
 
