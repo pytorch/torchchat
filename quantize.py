@@ -359,7 +359,11 @@ def linear_forward_int8(x, weight, scales):
 
     # for now, we special-case channel-wise, because we know how to make that fast (but does not work for groupwise)
     if n_groups == 1:
-        if torch.compiler.is_compiling() or x.device.type != "cpu":
+        if (
+            torch.compiler.is_compiling()
+            or x.device.type != "cpu"
+            or torch.__version__ < "2.4"
+        ):
             return F.linear(x, weight.to(dtype=x.dtype)) * scales
         # Use int8pack_mm for CPU eager
         return torch.ops.aten._weight_int8pack_mm(
