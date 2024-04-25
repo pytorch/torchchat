@@ -28,7 +28,7 @@ torch._inductor.config.triton.unique_kernel_names = True
 torch._inductor.config.epilogue_fusion = False
 torch._inductor.config.triton.cudagraphs = True
 torch._dynamo.config.cache_size_limit = 100000
-
+import time
 
 try:
     import lm_eval
@@ -109,6 +109,7 @@ class GPTFastEvalWrapper(eval_wrapper):
         self._tokenizer = tokenizer
         self._device = torch.device(device)
         self._max_seq_length = 2048 if max_seq_length is None else max_seq_length
+        self.times = []
 
     @property
     def eot_token_id(self):
@@ -156,7 +157,9 @@ class GPTFastEvalWrapper(eval_wrapper):
             )
         )
         x = seq.index_select(0, input_pos).view(1, -1)
+        start = time.time()
         logits = model_forward(self._model, x, input_pos)
+        self.times.append(time.time() - start)
         return logits
 
     def _model_generate(self, context, max_length, eos_token_id):
@@ -207,6 +210,7 @@ def eval(
         task_dict,
         limit=limit,
     )
+    eval_results["times"] = model_eval_wrapper.times
     return eval_results
 
 
@@ -262,7 +266,14 @@ def main(args) -> None:
         max_seq_length,
         device=builder_args.device,
     )
-    print(f"Time to run eval: {time.time() - t1:.02f} seconds.")
+    print(f"Time to run eval: {time.time() - t1:.02f}s.")
+    times = torch.tensor(result["times"])
+    print(
+        f"Time in model.forward: {times.sum():.02f}s, over {times.numel()} model evaluations"
+    )
+    print(
+        f"forward run time stats - Median: {times.median():.02f}s Min: {times.min():.02f}s Max: {times.max():.02f}s"
+    )
     if builder_args.dso_path:
         print(f"For model {builder_args.dso_path}")
     elif builder_args.pte_path:
@@ -275,7 +286,10 @@ def main(args) -> None:
         raise RuntimeError("Well That's Fine. How did we get here")
 
     for task, res in result["results"].items():
-        print(f"{task}: {res}")
+        print(f"{task}:")
+        for metric, val in res.items():
+            if val != "N/A":
+                print(f" {metric}: {val if isinstance(val, str) else f'{val:0.4f}'}")
 
 
 if __name__ == "__main__":

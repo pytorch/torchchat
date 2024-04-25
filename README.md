@@ -73,11 +73,10 @@ with `python3 torchchat.py remove llama3`.
   * [Run exported .so file via your own C++ application](#run-server)
      * in Chat mode
      * in Generate mode
-  * [Export for mobile via ExecuTorch](#export-executorch)
+  * [Export for mobile via ExecuTorch](#exporting-for-mobile-via-executorch)
+  * [Run exported ExecuTorch file on iOS or Android](#mobile-execution)
      * in Chat mode
      * in Generate mode
-  * [Run exported ExecuTorch file on iOS or Android](#run-mobile)
-
 
 ## Running via PyTorch / Python
 
@@ -117,10 +116,9 @@ Depending on the model and the target device, different quantization recipes may
 
 You can use the quantization recipes in conjunction with any of the `chat`, `generate` and `browser` commands to test their impact and accelerate model execution. You will apply these recipes to the export comamnds below, to optimize the exported models.  To adapt these recipes or wrote your own, please refer to the [quantization overview](docs/quantization.md).
 
----
-*TO BE REPLACED BY SUITABLE ORDING PROVIDED BY LEGAL*
+*TO BE REPLACED BY SUITABLE ORDING PROVIDED BY LEGAL:*
+
 With quantization, 32-bit floating numbers can be represented with as few as 8 or even 4 bits, and a scale shared by a group of these weights.  This transformation is lossy and modifies the behavior of models.  While research is being conducted on how to efficiently quantize large language models for use in mobile devices, this transformation invariable results in both quality loss and a reduced amount of control over the output of the models, leading to an increased risk of undesirable responses, hallucinations and stuttering.  In effect an a developer quantizing a model, has much control and even more responsibility to quantize a model to quantify and reduce these effects.
----
 
 
 ## Exporting your model
@@ -236,6 +234,20 @@ python3 torchchat.py generate --dso-path stories15M.so --prompt "Hello my name i
 
 NOTE: The exported model will be large. We suggest you quantize the model, explained further down, before deploying the model on device.
 
+**Build Native Runner Binary**
+
+We provide an end-to-end C++ [runner](runner/run.cpp) that runs the `*.so` file exported after following the previous [examples](#aoti-aot-inductor) section. To build the runner binary on your Mac or Linux:
+
+```bash
+scripts/build_native.sh aoti
+```
+
+Run:
+
+```bash
+cmake-out/aoti_run model.so -z tokenizer.model -i "Once upon a time"
+```
+
 ### ExecuTorch
 
 ExecuTorch enables you to optimize your model for execution on a mobile or embedded device, but can also be used on desktop for testing.
@@ -251,19 +263,9 @@ python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 python3 torchchat.py generate --device cpu --pte-path stories15M.pte --prompt "Hello my name is"
 ```
 
-See below under [Mobile Execution](#run-mobile) if you want to deploy and execute a model in your iOS or Android app.
+See below under [Mobile Execution](#mobile-execution) if you want to deploy and execute a model in your iOS or Android app.
 
 
-## Quantization
-Quantization focuses on reducing the precision of model parameters and computations from floating-point to lower-bit integers, such as 8-bit and 4-bit integers. This approach aims to minimize memory requirements, accelerate inference speeds, and decrease power consumption, making models more feasible for deployment on edge devices with limited computational resources. While quantization can potentially degrade the model's performance, the methods supported by torchchat are designed to mitigate this effect, maintaining a balance between efficiency and accuracy.
-
-TODO:
-- Brief rundown on supported quant modes and torchchat.py flags (emphasis on brief).
-- Recommendations for quantization modes for 7b local chat, 7b on mobile, etc.
-- One line that shows the performance difference between the base model and the 4bit
-- Link to Quantization.md.
-
-Read the [quantization documention](docs/quantization.md) for more details.
 
 ## Mobile Execution
 **Prerequisites**
@@ -275,6 +277,20 @@ Install [ExecuTorch](https://pytorch.org/executorch/stable/getting-started-setup
 Read the [iOS documentation](docs/iOS.md) for more details on iOS.
 
 Read the [Android documentation](docs/Android.md) for more details on Android.
+
+**Build Native Runner Binary**
+
+We provide an end-to-end C++ [runner](runner/run.cpp) that runs the `*.pte` file exported after following the previous [ExecuTorch](#executorch) section. Notice that this binary is for demo purpose, please follow the respective documentations, to see how to build a similar application on iOS and Android. To build the runner binary on your Mac or Linux:
+
+```bash
+scripts/build_native.sh et
+```
+
+Run:
+
+```bash
+cmake-out/et_run model.pte -z tokenizer.model -i "Once upon a time"
+```
 
 ## Fine-tuned models from torchtune
 

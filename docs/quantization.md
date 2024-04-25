@@ -239,15 +239,13 @@ python3 generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_a8w4dq.pte | ...dso.
 ## 4-bit Integer Linear Quantization with GPTQ (gptq)
 Compression offers smaller memory footprints (to fit on memory-constrained accelerators and mobile/edge devices) and reduced memory bandwidth (for better performance), but often at the  price of quality degradation.  GPTQ 4-bit integer quantization may be used to reduce the quality impact. To achieve good accuracy, we recommend the use of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.
 
-**TODO (Jerry): GPTQ quantization documentation [#336](https://github.com/pytorch/torchchat/issues/336) **
-
 We can use GPTQ with eager execution, optionally in conjunction with torch.compile:
 ```
-python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quantize '{"linear:int4" : {"groupsize": 32}}' --device [ cpu | cuda | mps ]
+python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quantize '{"linear:int4-gptq" : {"groupsize": 32}}' --device [ cpu | cuda | mps ]
 ```
 
 ```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"linear:gptq": {"groupsize" : 32} }' [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ]
+python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"linear:int4-gptq": {"groupsize" : 32} }' [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ]
 ```
 Now you can run your model with the same command as before:
 

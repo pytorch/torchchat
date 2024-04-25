@@ -38,7 +38,7 @@ class ModelArgs:
     ffn_dim_multiplier: Optional[int] = None
     use_tiktoken: bool = False
     max_seq_length: int = 350
-    max_buffer_size: int = 2048
+    max_buffer_size: int = 8192
 
     def __post_init__(self):
         if self.n_local_heads == -1:
