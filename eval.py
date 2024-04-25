@@ -56,6 +56,7 @@ def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
     prompt: torch.Tensor,
     max_new_tokens: int,
     max_seq_length: Optional[int] = None,
+    max_buffer_size: Optional[int] = 8192,
 ):
     """
     Sets up model cache and does some bookkeeping calculations for prompt, input_pos and max_seq_length
@@ -86,7 +87,7 @@ def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
     input_pos = torch.arange(0, T, device=device)
 
     with torch.device(device):
-        model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+        model.setup_caches(max_batch_size=1, max_buffer_size=max_buffer_size)
 
     return seq, input_pos, max_seq_length
 

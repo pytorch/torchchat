@@ -333,6 +333,7 @@ def generate(
     callback=lambda x: x,
     tokenizer=None,
     max_seq_length: int,
+    max_buffer_size: int = 8192,
     is_llama3_model: bool = False,
     **sampling_kwargs,
 ) -> torch.Tensor:
@@ -351,7 +352,7 @@ def generate(
     if start_pos == 0:
         model = model.to(device=device)
         with torch.device(device):
-            model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+            model.setup_caches(max_batch_size=1, max_buffer_size=max_buffer_size)
             if is_speculative and draft_model is not model:
                 draft_model.setup_caches(
                     max_batch_size=1, max_seq_length=max_seq_length
@@ -702,6 +703,7 @@ def _main(
                 start_pos=start_pos,
                 tokenizer=tokenizer,
                 max_seq_length=max_seq_length,
+                max_buffer_size=8192,
                 is_llama3_model=is_llama3_model,
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])

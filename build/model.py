@@ -37,7 +37,8 @@ class ModelArgs:
     multiple_of: int = 256
     ffn_dim_multiplier: Optional[int] = None
     use_tiktoken: bool = False
-    max_seq_length: int = 8192
+    max_seq_length: int = 350
+    max_buffer_size: int = 2048
 
     def __post_init__(self):
         if self.n_local_heads == -1:
@@ -155,21 +156,21 @@ class Transformer(nn.Module):
         # self.freqs_cis: Optional[Tensor] = None
         # self.mask_cache: Optional[Tensor] = None
         self.max_batch_size = -1
-        self.max_seq_length = -1
+        self.max_buffer_size = -1
 
-    def setup_caches(self, max_batch_size, max_seq_length):
+    def setup_caches(self, max_batch_size, max_buffer_size):
         if (
-            self.max_seq_length >= max_seq_length
+            self.max_buffer_size >= max_buffer_size
             and self.max_batch_size >= max_batch_size
         ):
             return
         head_dim = self.config.dim // self.config.n_heads
-        max_seq_length = find_multiple(max_seq_length, 8)
-        self.max_seq_length = max_seq_length
+        max_seq_length = find_multiple(max_buffer_size, 8)
+        self.max_buffer_size = max_buffer_size
         self.max_batch_size = max_batch_size
         for b in self.layers:
             b.attention.kv_cache = KVCache(
-                max_batch_size, max_seq_length, self.config.n_local_heads, head_dim
+                max_batch_size, max_buffer_size, self.config.n_local_heads, head_dim
             )
 
         freqs_cis = precompute_freqs_cis(
@@ -179,7 +180,7 @@ class Transformer(nn.Module):
         )
         self.register_buffer("freqs_cis", freqs_cis, persistent=True)
         causal_mask = torch.tril(
-            torch.ones(self.max_seq_length, self.max_seq_length, dtype=torch.bool)
+            torch.ones(self.max_buffer_size, self.max_buffer_size, dtype=torch.bool)
         )
         self.register_buffer("causal_mask", causal_mask, persistent=True)
 
