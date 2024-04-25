@@ -405,7 +405,8 @@ def _initialize_model(
             print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
 
         if builder_args.setup_caches:
-            max_seq_length = 350
+            # TODO: get this from args?
+            max_seq_length = 2048
             with torch.device(builder_args.device):
                 model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
 
