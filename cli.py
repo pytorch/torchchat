@@ -305,6 +305,9 @@ def arg_init(args):
         with open(args.quantize, "r") as f:
             args.quantize = json.loads(f.read())
 
+    # if we specify dtype in quantization recipe, replicate it as args.dtype
+    args.dtype = args.quantize.get("precision", "{ }").get("dtype", args.dtype)
+
     if args.seed:
         torch.manual_seed(args.seed)
     return args
