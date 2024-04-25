@@ -15,7 +15,7 @@ from typing import Dict, Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from build.utils import find_multiple, get_precision, use_et_backend
+from build.utils import find_multiple, get_precision, name_to_dtype, use_et_backend
 
 
 #########################################################################
@@ -97,11 +97,14 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
 
 
 class PrecisionHandler(QuantHandler):
-    def __init__(self, model: nn.Module, device="cpu", tokenizer=None, **kwargs):
+    def __init__(self, model: nn.Module, device="cpu", tokenizer=None, *, dtype):
         self.model_ = model
         self.device = device
         self.tokenizer = tokenizer
-        self.kwargs = kwargs
+
+        if isinstance(dtype, str):
+            dtype = name_to_dtype(dtype)
+        self.dtype = dtype
 
     def create_quantized_state_dict(self) -> Dict:  # "StateDict"
         pass
@@ -110,7 +113,7 @@ class PrecisionHandler(QuantHandler):
         pass
 
     def quantized_model(self) -> nn.Module:
-        return self.model_.to(device=self.device, **self.kwargs)
+        return self.model_.to(device=self.device, dtype=self.dtype)
 
 
 #########################################################################
