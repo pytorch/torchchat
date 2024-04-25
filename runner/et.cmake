@@ -15,24 +15,27 @@ ELSE()
   set(CMAKE_OUT_DIR "cmake-out")
 ENDIF()
 
-MESSAGE(STATUS "Using ET BUILD DIR: --[${ET_BUILD_DIR}]--")
-
 IF(DEFINED ENV{TORCHCHAT_ROOT})
     set(TORCHCHAT_ROOT $ENV{TORCHCHAT_ROOT})
 ELSE()
-    set(TORCHCHAT_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/..)
+    set(TORCHCHAT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 ENDIF()
 
 project(Torchchat)
+
+IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  SET(CMAKE_INSTALL_PREFIX ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install CACHE PATH "Setting it to a default value" FORCE)
+ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 include(CMakePrintHelpers)
 include(runner/Utils.cmake)
 
 cmake_print_variables(TORCHCHAT_ROOT)
 
-MESSAGE(STATUS "Looking for excutorch in ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/cmake/ExecuTorch")
-set(executorch_DIR ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/cmake/ExecuTorch)
-find_package(executorch CONFIG PATHS ${executorch_DIR})
+MESSAGE(STATUS "Looking for excutorch in ${CMAKE_INSTALL_PREFIX}")
+
+find_package(executorch CONFIG HINTS ${CMAKE_INSTALL_PREFIX})
+
 if(executorch_FOUND)
   set(_common_include_directories ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src)
 
@@ -46,21 +49,21 @@ if(executorch_FOUND)
   # Link ET runtime + extensions
   target_link_libraries(
     et_run PRIVATE
-          executorch
-          extension_module
-          ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch/${CMAKE_OUT_DIR}/extension/data_loader/libextension_data_loader.a # This one does not get installed by ExecuTorch
-          optimized_kernels
-          quantized_kernels
-          portable_kernels
-          cpublas
-          eigen_blas
-          # The libraries below need to be whole-archived linked
-          optimized_native_cpu_ops_lib
-          quantized_ops_lib
-          xnnpack_backend
-          XNNPACK
-          pthreadpool
-          cpuinfo
+    executorch
+    extension_module
+    extension_data_loader
+    optimized_kernels
+    quantized_kernels
+    portable_kernels
+    cpublas
+    eigen_blas
+    # The libraries below need to be whole-archived linked
+    optimized_native_cpu_ops_lib
+    quantized_ops_lib
+    xnnpack_backend
+    XNNPACK
+    pthreadpool
+    cpuinfo
   )
   target_link_options_shared_lib(optimized_native_cpu_ops_lib)
   target_link_options_shared_lib(quantized_ops_lib)
@@ -73,8 +76,7 @@ if(executorch_FOUND)
   endif()
 
   target_link_libraries(et_run PRIVATE
-  "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch/${CMAKE_OUT_DIR}/examples/models/llama2/custom_ops/libcustom_ops.a>")
-
+  "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/libcustom_ops.a>")
   # This one is needed for cpuinfo where it uses android specific log lib
   if(ANDROID)
     target_link_libraries(et_run PRIVATE log)

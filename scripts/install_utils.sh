@@ -9,11 +9,7 @@ set -ex pipefail
 
 install_pip_dependencies() {
   echo "Intalling common pip packages"
-
-  pip3 install wheel
-  pip3 install "cmake>=3.19"
-  pip3 install ninja
-  pip3 install zstd
+  pip3 install wheel "cmake>=3.19" ninja zstd
   pushd ${TORCHCHAT_ROOT}
   pip3 install -r ./requirements.txt
   popd
@@ -60,6 +56,15 @@ install_executorch_python_libs() {
   popd
 }
 
+COMMON_CMAKE_ARGS="\
+    -DCMAKE_BUILD_TYPE=Release \
+    -DEXECUTORCH_ENABLE_LOGGING=ON \
+    -DEXECUTORCH_LOG_LEVEL=Info \
+    -DEXECUTORCH_BUILD_OPTIMIZED=ON \
+    -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON \
+    -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON \
+    -DEXECUTORCH_BUILD_QUANTIZED=ON"
+
 install_executorch() {
   # AOT lib has to be build for model export
   # So by default it is built, and you can explicitly opt-out
@@ -96,20 +101,25 @@ install_executorch() {
   echo "Inside: ${PWD}"
   rm -rf ${CMAKE_OUT_DIR}
   mkdir ${CMAKE_OUT_DIR}
-  cmake -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DEXECUTORCH_ENABLE_LOGGING=ON \
-        -DEXECUTORCH_LOG_LEVEL=Info \
+  cmake ${COMMON_CMAKE_ARGS} \
+        -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
         -DEXECUTORCH_BUILD_CUSTOM_OPS_AOT=${EXECUTORCH_BUILD_CUSTOM_OPS_AOT_VAR} \
         -DEXECUTORCH_BUILD_CUSTOM=${EXECUTORCH_BUILD_CUSTOM_VAR} \
-        -DEXECUTORCH_BUILD_OPTIMIZED=ON \
-        -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON \
-        -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON \
         -DEXECUTORCH_BUILD_XNNPACK=ON \
-        -DEXECUTORCH_BUILD_QUANTIZED=ON \
         ${CROSS_COMPILE_ARGS} \
         -S . -B ${CMAKE_OUT_DIR} -G Ninja
   cmake --build ${CMAKE_OUT_DIR}
   cmake --install ${CMAKE_OUT_DIR} --prefix ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install
   popd
+}
+
+install_executorch_libs() {
+  # Install executorch python and C++ libs
+  export CMAKE_ARGS="\
+    ${COMMON_CMAKE_ARGS} \
+    -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
+    -DCMAKE_INSTALL_PREFIX=${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install"
+  export CMAKE_BUILD_ARGS="--target install"
+
+  install_executorch_python_libs $1
 }
