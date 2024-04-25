@@ -357,9 +357,9 @@ def _initialize_model(
         _set_gguf_kwargs(builder_args, is_et=is_pte, context="generate")
 
     if builder_args.dso_path:
-        assert (
-            quantize is None or quantize == "{ }"
-        ), "quantize not valid for exported DSO model. Specify quantization during export."
+        # assert (
+        #     quantize is None or quantize == "{ }"
+        # ), "quantize not valid for exported DSO model. Specify quantization during export."
 
         t0 = time.time()
         model = _load_model(builder_args, only_config=True)
@@ -379,9 +379,9 @@ def _initialize_model(
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {builder_args.dso_path}")
     elif builder_args.pte_path:
-        assert (
-            quantize is None or quantize == "{ }"
-        ), "quantize not valid for exported PTE model. Specify quantization during export."
+        # assert (
+        #     quantize is None or quantize == "{ }"
+        # ), "quantize not valid for exported PTE model. Specify quantization during export."
 
         t0 = time.time()
         model = _load_model(builder_args, only_config=True)
