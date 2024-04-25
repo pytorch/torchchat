@@ -560,9 +560,9 @@ def _main(
     system_prompt = None
     # Set up our max_seq_length
     if generator_args.chat_mode:
-        max_seq_length = 2048
+        max_seq_len = model.config.max_seq_len
         print(
-            f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye"
+            f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_len} tokens is hit or until the user says /bye"
         )
         get_system_prompt = input(
             "Do you want to enter a system prompt? Enter y for yes and anything else for no. \n"
@@ -572,14 +572,14 @@ def _main(
         if is_llama3_model:
             chat_formatter = ChatFormat(tokenizer)
     else:
-        max_seq_length = min(
+        max_seq_len = min(
             encoded.size(0) + generator_args.max_new_tokens, model.config.block_size
         )
 
-    max_seq_length = (
-        max_seq_length + speculative_builder_args.speculate_k + 1
+    max_seq_len = (
+        max_seq_len + speculative_builder_args.speculate_k + 1
         if draft_model is not None
-        else max_seq_length
+        else max_seq_len
     )
 
     aggregate_metrics = {
@@ -598,12 +598,12 @@ def _main(
         i += 1
         device_sync(device=builder_args.device)
         if i >= 0 and generator_args.chat_mode:
-            prompt = input("What is your prompt? \n")
+            prompt = input("User: ")
             if prompt == "/bye":
                 print("Exiting Chat.\n")
                 break
             if not is_llama3_model:
-                if system_prompt is not None:
+                if system_prompt:
                     prompt = f"{B_INST} {B_SYS}\n{system_prompt.strip()}\n{E_SYS}\n\n{prompt.strip} {E_INST}"
                     system_prompt = (
                         None  # can only provide system prompt on first interaction
@@ -638,13 +638,15 @@ def _main(
                 encoded = torch.tensor(
                     encoded, dtype=torch.int, device=builder_args.device
                 )
-            if encoded.size(0) + start_pos > max_seq_length:
+            if encoded.size(0) + start_pos > max_seq_len:
                 print(
-                    "This prompt would take us past the max_seq_length. Ending Conversation."
+                    "This prompt would take us past the max_seq_len. Ending Conversation."
                 )
                 break
 
         if generator_args.chat_mode and i >= 0:
+            print("Model: ", end="")
+
             buffer = []
             period_id = tokenizer.encode(".")[0]
             done_generating = False
@@ -699,7 +701,7 @@ def _main(
                 sequential_prefill=generator_args.sequential_prefill,
                 start_pos=start_pos,
                 tokenizer=tokenizer,
-                max_seq_length=max_seq_length,
+                max_seq_len=max_seq_len,
                 is_llama3_model=is_llama3_model,
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
@@ -722,12 +724,12 @@ def _main(
         tokens_generated = y.size(0) - prompt_length
         tokens_sec = tokens_generated / t
         aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-        logging.info(
+        logging.debug(
             f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_sec:.02f} tokens/sec"
         )
-        logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
+        logging.debug(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
 
-        if start_pos >= max_seq_length:
+        if start_pos >= max_seq_len:
             print("Max Sequence Length Reached. Ending Conversation.")
             break
 

@@ -355,6 +355,35 @@ def replace_linear_weight_only_int8_per_channel(
             )
 
 
+def linear_forward_int8(x, weight, scales):
+    n_groups = scales.numel() // scales.shape[0]
+    # need a formulation / custom op for good performance
+    # on eager, CUDA compiled, CPU compiled and ET exported
+
+    # for now, we special-case channel-wise, because we know how to make that fast (but does not work for groupwise)
+    if n_groups == 1:
+        if (
+            torch.compiler.is_compiling()
+            or x.device.type != "cpu"
+            or torch.__version__ < "2.4"
+        ):
+            return F.linear(x, weight.to(dtype=x.dtype)) * scales
+        # Use int8pack_mm for CPU eager
+        return torch.ops.aten._weight_int8pack_mm(
+            x.reshape(-1, x.shape[-1]),
+            weight,
+            scales,
+        ).reshape(x.shape[:-1] + (weight.shape[0],))
+
+    return F.linear(
+        x,
+        (
+            weight.to(dtype=x.dtype).view(weight.shape[0], n_groups, -1)
+            * scales.view(weight.shape[0], n_groups, -1)
+        ).view(weight.shape[0], -1),
+    )
+
+
 class WeightOnlyInt8QuantHandler(QuantHandler):
     def __init__(
         self,
@@ -474,25 +503,7 @@ class WeightOnlyInt8Linear(torch.nn.Module):
             )
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
-        scales = self.scales
-        weight = self.weight
-        scales = scales.view(scales.shape[0], -1)
-        no_groups = scales.shape[1]
-
-        # need a formulation / custom op for good performance
-        # on eager, CUDA compiled, CPU compiled and ET exported
-
-        # for now, we special-case channel-wise, because we know how to make that fast (but does not work for groupwise)
-        if scales.shape[1] == 1:
-            return F.linear(input, weight.to(dtype=input.dtype)) * self.scales
-        else:
-            return F.linear(
-                input,
-                (
-                    weight.to(dtype=input.dtype).view(weight.shape[0], no_groups, -1)
-                    * scales.view(weight.shape[0], no_groups, -1)
-                ).view(weight.shape[0], -1),
-            )
+        return linear_forward_int8(input, self.weight, self.scales)
 
 
 #########################################################################

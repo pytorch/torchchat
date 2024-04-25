@@ -216,8 +216,8 @@ function eval_model() {
         python -W ignore eval.py --compile --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
         cat "$MODEL_DIR/eval"
         # extract perplexity number and compare with a constant
-        local REF_PERPLEXITY=100000
-        PERPLEXITY=cat "$MODEL_DIR/eval" | tail -n 1 log | awk -F '[, ]' '{print $4}'
+        export REF_PERPLEXITY=100000
+        export PERPLEXITY=cat "$MODEL_DIR/eval" | tail -n 1 log | awk -F '[, ]' '{print $4}'
         # == 1 meaning the check succeeded
         if [ "$(echo "$PERPLEXITY >= $REF_PERPLEXITY" | bc)" == 1]; then
             echo "perplexity checking failed for non-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE"
@@ -229,17 +229,64 @@ function eval_model() {
         echo "******** INT4 group-wise quantized *******"
         echo "******************************************"
 
-        QUANT_OPTIONS='{"linear:int4" : {"groupsize": 32}}'
-        python -W ignore eval.py --compile --dtype ${DTYPE} --quant $QUANT_OPTIONS --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
+        export QUANT_OPTIONS='{"linear:int4" : {"groupsize": 32}}'
+        python -W ignore eval.py --compile --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
         cat "$MODEL_DIR/eval"
-        local REF_PERPLEXITY=100000
-        PERPLEXITY=cat "$MODEL_DIR/eval" | tail -n 1 log | awk -F '[, ]' '{print $4}'
+        export REF_PERPLEXITY=100000
+        export PERPLEXITY=cat "$MODEL_DIR/eval" | tail -n 1 log | awk -F '[, ]' '{print $4}'
         # == 1 meaning the check succeeded
         if [ "$(echo "$PERPLEXITY >= $REF_PERPLEXITY" | bc)" == 1]; then
             echo "perplexity checking failed for int4-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE $QUANT_OPTIONS"
         else
             echo "perplexity checking succeeded for int4-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE $QUANT_OPTIONS"
         fi;
+
+    done
+}
+
+function eval_model_sanity_check() {
+    local CHECKPOINT_PATH="$1"
+    local TARGET_DEVICE="${2:-cpu}"
+    local MODEL_DIR="${CHECKPOINT_PATH%/*}"
+    local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
+
+    for DTYPE in float32 bfloat16 float16; do
+        echo ""############### Run eval with torch.compile for dtype $DTYPE "###############"
+        echo ""
+        echo "******************************************"
+        echo "************** non-quantized *************"
+        echo "******************************************"
+        python -W ignore eval.py --compile --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval" || exit 1
+        cat "$MODEL_DIR/eval"
+
+        echo "******************************************"
+        echo "******** INT4 group-wise quantized *******"
+        echo "******************************************"
+
+        export QUANT_OPTIONS='{"linear:int4" : {"groupsize": 32}}'
+        python -W ignore eval.py --compile --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval" || exit 1
+        cat "$MODEL_DIR/eval"
+
+        echo "**************************************************"
+        echo "******** INT4 group-wise quantized (eager) *******"
+        echo "**************************************************"
+
+        if [ "$TARGET_DEVICE" == "cuda" ] && [ "$DTYPE" != "float16" ]; then
+            python -W ignore eval.py --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval_eager" || exit 1
+            cat "$MODEL_DIR/eval_eager"
+        fi;
+
+
+        # there is some issues with AOTI cpu and cuda, need to fix and enable the test for cuda as well
+        echo "*************************************************"
+        echo "******** INT4 group-wise quantized (AOTI) *******"
+        echo "*************************************************"
+        if [ "$DTYPE" != "float16" ]; then
+            python3 -W ignore export.py --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+            python3 -W ignore eval.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/output_eval_aoti" || exit 1
+            cat "$MODEL_DIR/output_eval_aoti"
+        fi;
+
     done
 }
 
@@ -263,6 +310,10 @@ function run_eval(){
     eval_model "$CHECKPOINT_PATH" "$TARGET_DEVICE" || exit 1
 }
 
+function run_eval_sanity_check(){
+    eval_model_sanity_check "$CHECKPOINT_PATH" "$TARGET_DEVICE" || exit 1
+}
+
 CHECKPOINT_PATH="$1"
 TARGET_DEVICE="${2:-cpu}"
 PROMPT="Hello, my name is"
@@ -283,6 +334,9 @@ if [ "$#" -gt 2 ]; then
                 ;;
             "eval")
                 run_eval || exit 1
+                ;;
+            "eval_sanity_check")
+                run_eval_sanity_check || exit 1
                 ;;
             *)
                 echo "Unknown argument: $arg" >&2

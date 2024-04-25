@@ -69,7 +69,6 @@ class ModelArgs:
 
     @classmethod
     def from_table(cls, name: str):
-        print(f"name {name}")
         json_path = config_path / f"{name}.json"
         if json_path.is_file():
             return ModelArgs.from_params(json_path)
@@ -83,7 +82,6 @@ class ModelArgs:
 
     @classmethod
     def from_name(cls, name: str):
-        print(f"name {name}")
         json_path = config_path / f"{name}.json"
         if Path(json_path).is_file():
             return ModelArgs.from_params(json_path)

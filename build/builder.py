@@ -32,13 +32,16 @@ class BuilderArgs:
     gguf_kwargs: Optional[Dict[str, Any]] = None
     dso_path: Optional[Union[Path, str]] = None
     pte_path: Optional[Union[Path, str]] = None
-    device: str = "cpu"
+    device: Optional[str] = None
     precision: torch.dtype = torch.float32
     setup_caches: bool = False
     use_tp: bool = False
     is_chat_model: bool = False
 
     def __post_init__(self):
+        if self.device is None:
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+
         if not (
             (self.checkpoint_path and self.checkpoint_path.is_file())
             or (self.checkpoint_dir and self.checkpoint_dir.is_dir())
@@ -340,7 +343,7 @@ def _initialize_model(
     quantize,
     tokenizer=None,
 ):
-    print("Loading model ...")
+    print("Loading model...")
 
     if builder_args.gguf_path and (builder_args.dso_path or builder_args.pte_path):
         print("Setting gguf_kwargs for generate.")
