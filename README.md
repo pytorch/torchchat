@@ -52,6 +52,13 @@ python3 torchchat.py download llama3
 View available models with `python3 torchchat.py list`. You can also remove downloaded models
 with `python3 torchchat.py remove llama3`.
 
+### Common Issues
+
+* **CERTIFICATE_VERIFY_FAILED**:
+  Run `pip install --upgrade certifi`.
+* **Access to model is restricted and you are not in the authorized list. Visit \[link\] to ask for access**:
+  Some models require an additional step to access. Follow the link to fill out the request form on HuggingFace.
+
 ## What can you do with torchchat?
 
 * Run models via PyTorch / Python:
@@ -106,7 +113,7 @@ Quantization is the process of converting a model into a more memory-efficient r
 
 Depending on the model and the target device, different quantization recipes may be applied.  Torchchat contains two example configurations to optimize performance for GPU-based systems `config/data/cuda.json` , and mobile systems `config/data/mobile.json`.  The GPU configuration is targeted towards optimizing for memory bandwidth which is a scarce resource in powerful GPUs (and to a less degree, memory footprint to fit large models into a device's memory).  The mobile configuration is targeted towards optimizing for memory fotoprint because in many devices, a single application is limited to as little as GB or less of memory.
 
-You can use the quantization recipes in conjunction with any of the `chat`, `generate` and `browser` commands to test their impact and accelerate model execution. You will apply these recipes to the export comamnds below, to optimize the exported models.  To adapt these recipes or wrote your own, please refer to the [quantization overview](docs/quantization.md). 
+You can use the quantization recipes in conjunction with any of the `chat`, `generate` and `browser` commands to test their impact and accelerate model execution. You will apply these recipes to the export comamnds below, to optimize the exported models.  To adapt these recipes or wrote your own, please refer to the [quantization overview](docs/quantization.md).
 
 ---
 *TO BE REPLACED BY SUITABLE ORDING PROVIDED BY LEGAL*

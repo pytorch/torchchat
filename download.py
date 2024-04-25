@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 import os
 import shutil
+import sys
 import urllib.request
 from pathlib import Path
 from typing import Optional
@@ -35,10 +36,20 @@ def _download_hf_snapshot(
             ignore_patterns="*safetensors*",
         )
     except HTTPError as e:
-        if e.response.status_code == 401:
-            raise RuntimeError(
-                "Access denied. Run huggingface-cli login to authenticate."
+        if e.response.status_code == 401: # Missing HuggingFace CLI login.
+            print(
+                "Access denied. Create a HuggingFace account and run 'pip3 install huggingface_hub' and 'huggingface-cli login' to authenticate.",
+                file=sys.stderr
             )
+            exit(1)
+        elif e.response.status_code == 403: # No access to the specific model.
+            # The error message includes a link to request access to the given model. This prints nicely and does not include
+            # a traceback.
+            print(
+                str(e),
+                file=sys.stderr
+            )
+            exit(1)
         else:
             raise e
 
