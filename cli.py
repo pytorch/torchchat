@@ -301,6 +301,11 @@ def add_arguments(parser):
 
 
 def arg_init(args):
+    if torch.__version__ < "2.4.0":
+        raise RuntimeError(
+            "torchchat uses the latest PyTorch technology with high-performance kernels only available in PyTorch nightly until the PyTorch 2.4 release"
+        )
+
     if Path(args.quantize).is_file():
         with open(args.quantize, "r") as f:
             args.quantize = json.loads(f.read())
