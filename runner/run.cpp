@@ -485,6 +485,46 @@ void read_stdin(const char* guide, char* buffer, size_t bufsize) {
 // python reference and that seemed ok, but this was not thoroughly tested and
 // is not safely implemented, it's more a proof of concept atm.
 
+void get_initial_prompt(const char* cli_system_prompt, const char* cli_user_prompt, char* rendered_prompt, int rendered_prompt_size) {
+  char system_prompt_buffer[512];
+  char user_prompt_buffer[512];
+
+  if (cli_system_prompt != NULL) {
+    strcpy(system_prompt_buffer, cli_system_prompt);
+  } else {
+    read_stdin("Enter system prompt (optional): ", system_prompt_buffer, sizeof(system_prompt_buffer));
+  }
+
+  if (cli_user_prompt != NULL) {
+    strcpy(user_prompt_buffer, cli_user_prompt);
+  } else {
+    read_stdin("User: ", user_prompt_buffer, sizeof(user_prompt_buffer));
+  }
+
+  // Render for Llama 2
+  if (system_prompt_buffer[0] != '\0') {
+    const char system_template[] = "[INST] <<SYS>>\n%s\n<</SYS>>\n\n%s [/INST]";
+    snprintf(rendered_prompt, rendered_prompt_size-1, system_template, system_prompt_buffer, user_prompt_buffer);
+  } else {
+    const char user_template[] = "[INST] %s [/INST]";
+    snprintf(rendered_prompt, rendered_prompt_size-1, user_template, user_prompt_buffer);
+  }
+
+  // TODO: add render logic for Llama 3
+}
+
+void get_next_user_prompt(char* rendered_prompt, int rendered_prompt_size) {
+  char user_prompt_buffer[512];
+  const char user_template[] = "[INST] %s [/INST]";
+  read_stdin("User: ", user_prompt_buffer, sizeof(user_prompt_buffer));
+
+  // Render for Llama 2
+  snprintf(rendered_prompt, rendered_prompt_size-1, user_template, user_prompt_buffer);
+
+  // TODO: add render logic for Llama 3
+}
+
+
 void chat(
     Transformer* transformer,
     Tokenizer* tokenizer,
@@ -493,7 +533,6 @@ void chat(
     const char* cli_system_prompt,
     int steps) {
   // special tokens
-  const int SOS_TOKEN = tokenizer->bos_tok(); // token starts the assistant turn
   const int EOS_TOKEN = tokenizer->eos_tok(); // token ends the assistant turn
   const int SYSTEM_PROMPT_SIZE = 512;
   const int USER_PROMPT_SIZE = 512;
@@ -503,8 +542,6 @@ void chat(
 
   // buffers for reading the system prompt and user prompt from stdin
   // you'll notice they are soomewhat haphazardly and unsafely set atm
-  char system_prompt[SYSTEM_PROMPT_SIZE];
-  char user_prompt[USER_PROMPT_SIZE];
   char rendered_prompt[RENDERED_PROMPT_SIZE];
   int num_prompt_tokens = 0;
   std::vector<uint64_t> prompt_tokens;
@@ -522,37 +559,9 @@ void chat(
     if (user_turn) {
       // get the (optional) system prompt at position 0
       if (pos == 0) {
-        // at position 0, the user can also contribute a system prompt
-        if (cli_system_prompt == NULL) {
-          // system prompt was not passed in, attempt to get it from stdin
-          read_stdin(
-              "Enter system prompt (optional): ",
-              system_prompt,
-              sizeof(system_prompt));
-        } else {
-          // system prompt was passed in, use it
-          strcpy(system_prompt, cli_system_prompt);
-        }
-      }
-      // get the user prompt
-      if (pos == 0 && cli_user_prompt != NULL) {
-        // user prompt for position 0 was passed in, use it
-        strcpy(user_prompt, cli_user_prompt);
+        get_initial_prompt(cli_system_prompt, cli_user_prompt, rendered_prompt, RENDERED_PROMPT_SIZE);
       } else {
-        // otherwise get user prompt from stdin
-        read_stdin("User: ", user_prompt, sizeof(user_prompt));
-      }
-      // render user/system prompts into the Llama 2 Chat schema
-      if (pos == 0 && system_prompt[0] != '\0') {
-        // We do not add <s> because that is added by tokenizer->encode(x, 1, 0)
-        const char system_template[] = "[INST] <<SYS>>\n%s\n<</SYS>>\n\n%s [/INST]";
-        snprintf(
-            rendered_prompt, RENDERED_PROMPT_SIZE-1, system_template, system_prompt, user_prompt);
-      } else {
-        // Assistant should produce </s>, so we do not include it in template
-        // We do not add <s> because that is added by tokenizer->encode(x, 1, 0)
-        const char user_template[] = "[INST] %s [/INST]";
-        snprintf(rendered_prompt, RENDERED_PROMPT_SIZE-1, user_template, user_prompt);
+        get_next_user_prompt(rendered_prompt, RENDERED_PROMPT_SIZE);
       }
 
       // encode the rendered prompt into tokens
