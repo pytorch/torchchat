@@ -304,9 +304,11 @@ def arg_init(args):
     if Path(args.quantize).is_file():
         with open(args.quantize, "r") as f:
             args.quantize = json.loads(f.read())
+    else:
+        args.quantize = json.loads(args.quantize)
 
     # if we specify dtype in quantization recipe, replicate it as args.dtype
-    args.dtype = args.quantize.get("precision", "{ }").get("dtype", args.dtype)
+    args.dtype = args.quantize.get("precision", {}).get("dtype", args.dtype)
 
     if args.seed:
         torch.manual_seed(args.seed)
