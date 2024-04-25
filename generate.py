@@ -539,9 +539,7 @@ def _main(
     if generator_args.chat_mode:
         max_seq_length = 2048
         print(f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye")
-        get_system_prompt = input("Do you want to enter a system prompt? Enter y for yes and anything else for no. \n")
-        if (get_system_prompt == "y" or get_system_prompt == "Y"):
-            system_prompt = input("What is your system prompt? \n")
+        system_prompt = input("System Prompt [Optional]: ")
         if is_llama3_model:
             chat_formatter = ChatFormat(tokenizer)
     else:
@@ -567,12 +565,12 @@ def _main(
         i += 1
         device_sync(device=builder_args.device)
         if i >= 0 and generator_args.chat_mode:
-            prompt = input("What is your prompt? \n")
+            prompt = input("User: ")
             if (prompt == "/bye"):
                 print("Exiting Chat.\n")
                 break
             if not is_llama3_model:
-                if system_prompt is not None:
+                if system_prompt:
                     prompt = f"{B_INST} {B_SYS}\n{system_prompt.strip()}\n{E_SYS}\n\n{prompt.strip} {E_INST}"
                     system_prompt = None # can only provide system prompt on first interaction
                 else:
@@ -581,7 +579,7 @@ def _main(
                     tokenizer, prompt, bos=True, device=builder_args.device
                 )
             else:
-                if system_prompt is not None:
+                if system_prompt:
                     encoded = chat_formatter.encode_dialog_prompt([{"role" : "system", "content" : system_prompt}, {"role" : "user", "content" : prompt}])
                     system_prompt = None
                 elif(i == 0):
@@ -595,6 +593,8 @@ def _main(
                 break
 
         if generator_args.chat_mode and i >= 0:
+            print("Model: ", end="")
+
             buffer = []
             period_id = tokenizer.encode(".")[0]
             done_generating = False
@@ -667,10 +667,10 @@ def _main(
         tokens_generated = y.size(0) - prompt_length
         tokens_sec = tokens_generated / t
         aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-        logging.info(
+        logging.debug(
             f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_sec:.02f} tokens/sec"
         )
-        logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
+        logging.debug(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
 
         if (start_pos >= max_seq_length):
             print("Max Sequence Length Reached. Ending Conversation.")
