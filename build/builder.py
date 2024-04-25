@@ -410,7 +410,7 @@ def _initialize_model(
         if builder_args.setup_caches:
             with torch.device(builder_args.device):
                 model.setup_caches(
-                    max_batch_size=1, max_seq_length=model.config.max_buffer_size
+                    max_batch_size=1, max_buffer_size=model.config.max_buffer_size
                 )
 
         model.to(dtype=builder_args.precision)
