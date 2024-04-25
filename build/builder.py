@@ -407,7 +407,7 @@ def _initialize_model(
         if builder_args.setup_caches:
             max_seq_length = 350
             with torch.device(builder_args.device):
-                model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+                model.setup_caches(max_batch_size=1, mamodel.config.max_seq_lenax_seq_length)
 
         model.to(dtype=builder_args.precision)
 

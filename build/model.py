@@ -37,6 +37,7 @@ class ModelArgs:
     multiple_of: int = 256
     ffn_dim_multiplier: Optional[int] = None
     use_tiktoken: bool = False
+    max_seq_len: int = 8192
 
     def __post_init__(self):
         if self.n_local_heads == -1:
