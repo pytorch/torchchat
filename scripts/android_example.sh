@@ -36,6 +36,10 @@ LLAMA_JAR_SHASUM="fb9ee00d028ef23a48cb8958638a5010ba849ccf"
 mkdir -p ${TORCHCHAT_ROOT}/build/android
 
 setup_java() {
+  if [ -x $(command -v javac ) ] && [[ $(javac -version | cut -d' ' -f2 | cut -d'.' -f1) -ge 17 ]]; then
+    echo "Java 17 is set up"
+    return
+  fi
   pushd ${TORCHCHAT_ROOT}/build/android
   echo "Download Java 17"
   curl "${JAVA_URL}" -o jdk-17.0.10.tar.gz
@@ -54,6 +58,10 @@ setup_java() {
 }
 
 setup_android_sdk_manager() {
+  if [ -x $(command -v sdkmanager ) ]; then
+    echo "Android sdkmanager is set up"
+    return
+  fi
   pushd ${TORCHCHAT_ROOT}/build/android
   mkdir -p sdk/cmdline-tools/latest
 
@@ -64,8 +72,6 @@ setup_android_sdk_manager() {
   unzip commandlinetools.zip
   mv cmdline-tools/* sdk/cmdline-tools/latest
   export PATH="$(realpath sdk/cmdline-tools/latest/bin):$PATH"
-  export ANDROID_HOME="$(realpath ./sdk)"
-  export ANDROID_SDK_ROOT="$ANDROID_HOME"
   popd
 }
 
@@ -94,6 +100,9 @@ download_jni_library() {
 }
 
 make_executorch_aar() {
+  if [ -f ${TORCHCHAT_ROOT}/build/android/executorch.aar ]; then
+    return
+  fi
   pushd ${TORCHCHAT_ROOT}/build/android
   echo \<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" \
    package=\"org.pytorch.executorch\"\> \
@@ -114,9 +123,13 @@ build_app() {
 setup_avd() {
   sdkmanager "emulator"
   sdkmanager "system-images;android-34;google_apis;${ANDROID_ABI}"
+  if ! avdmanager list avd | grep -q "torchchat"; then
+    avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
+  fi
+}
 
-  avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
-  sdk/emulator/emulator @torchchat &
+start_avd() {
+  sdk/emulator/emulator @torchchat > /dev/null 2>&1 &
 }
 
 push_files_to_android() {
@@ -124,17 +137,18 @@ push_files_to_android() {
   adb shell mkdir -p /data/local/tmp/llama
   adb push stories15M.pte /data/local/tmp/llama
   adb push checkpoints/stories15M/tokenizer.bin /data/local/tmp/llama
-  adb install -t build/src/executorch/examples/demo-apps/android/LlamaDemo/app/build/outputs/apk/debug/app-debug.apk
+  adb install -t android/Torchchat/app/build/outputs/apk/debug/app-debug.apk
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   setup_java
   setup_android_sdk_manager
   setup_android_sdk
-  setup_avd
   download_jni_library
   download_jar_library
   make_executorch_aar
   build_app
+  setup_avd
+  start_avd
   push_files_to_android
 fi
