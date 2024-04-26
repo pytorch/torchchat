@@ -10,7 +10,7 @@ Torchchat is a compact codebase to showcase the capability of running large lang
   - Mac OS (M1/M2/M3)
   - Android (Devices that support XNNPACK)
   - iOS 17+ (iPhone 13 Pro+)
-- Multiple data types including: float32, float16, bfloat16
+- Multiple data types including: float32, float16, bfloat16, select GGUF data types
 - Multiple quantization schemes
 - Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
