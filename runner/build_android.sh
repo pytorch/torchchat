@@ -34,14 +34,4 @@ build_runner_et() {
   cmake --build cmake-out-android/ -j16 --config Release --target et_run
 }
 
-find_cmake_prefix_path
-install_pip_dependencies
-clone_executorch
-export ENABLE_ET_PYBIND=false
-install_executorch_python_libs $ENABLE_ET_PYBIND
-
-export CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake
-export ANDROID_ABI=arm64-v8a
-export ANDROID_PLATFORM=android-23
-install_executorch
 build_runner_et

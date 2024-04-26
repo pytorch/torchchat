@@ -35,6 +35,12 @@ cmake_print_variables(TORCHCHAT_ROOT)
 MESSAGE(STATUS "Looking for excutorch in ${CMAKE_INSTALL_PREFIX}")
 
 find_package(executorch CONFIG HINTS ${CMAKE_INSTALL_PREFIX})
+# For some reason on android cmake is looking for executorch_DIR to be set
+# to find executorch
+if (ANDROID)
+  set(executorch_DIR ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/cmake/ExecuTorch)
+  find_package(executorch CONFIG REQUIRED PATHS ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/cmake/ExecuTorch)
+endif()
 
 if(executorch_FOUND)
   set(_common_include_directories ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src)
@@ -97,4 +103,6 @@ if(executorch_FOUND)
   # This works on mac, but appears to run into issues on linux
   # It is needed to solve:
   # E 00:00:00.055965 executorch:method.cpp:536] Missing operator: [8] llama::sdpa_with_kv_cache.out
+else()
+  MESSAGE(FATAL_ERROR "Executorch package not found")
 endif()
