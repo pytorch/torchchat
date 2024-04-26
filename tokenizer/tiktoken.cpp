@@ -331,9 +331,6 @@ std::pair<std::vector<uint64_t>, uint64_t> Tiktoken::_encode_with_special_token(
 
 Tiktoken::Tiktoken(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok)
     : Tokenizer(vocab_size, bos_tok, eos_tok) {
-  _regex = _create_regex(_pattern);
-
-  _special_token_regex = _build_special_token_regex(_special_token_encoder);
 }
 
 void Tiktoken::load(const std::string& path) {
@@ -342,6 +339,10 @@ void Tiktoken::load(const std::string& path) {
 
   _decoder = _build_decoder(_encoder);
   _special_token_decoder = _build_decoder(_special_token_encoder);
+
+
+  _regex = _create_regex(_pattern);
+  _special_token_regex = _build_special_token_regex(_special_token_encoder);
 
   initialized_ = true;
 }

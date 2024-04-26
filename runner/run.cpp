@@ -1,4 +1,5 @@
 /* Inference for Llama-2 Transformer model in pure C++ */
+#include <cstdlib>
 #include <ctype.h>
 #include <iterator>
 #include <math.h>
@@ -486,15 +487,38 @@ void read_stdin(const char* guide, char* buffer, size_t bufsize) {
 // python reference and that seemed ok, but this was not thoroughly tested and
 // is not safely implemented, it's more a proof of concept atm.
 
+enum class ModelType {
+    unknown,
+    llama2,
+    llama3,
+};
+
+ModelType get_model_type(Tokenizer* tokenizer) {
+  if (BPETokenizer* t = dynamic_cast<BPETokenizer*>(tokenizer)) {
+    return ModelType::llama2;
+  } else if (Tiktoken* t = dynamic_cast<Tiktoken*>(tokenizer)) {
+    return ModelType::llama3;
+  } else {
+    return ModelType::unknown;
+  }
+}
+
 uint64_t get_eot_token(Tokenizer* tokenizer) {
-  // llama2 uses EOS as EOT token
-  uint64_t eot = tokenizer->eos_tok();
 
-  // TODO: llama3 tokenizer is not pattern matching the special tokens
-  // auto tokens = tokenizer->encode("<|eot_id|>", 0, 0);
-  // uint64_t eot = tokens[0];
+  ModelType model_type = get_model_type(tokenizer);
 
-  return eot;
+  if (model_type == ModelType::llama2) {
+    // llama2 uses EOS as EOT token
+    return tokenizer->eos_tok();
+  }
+
+  if (model_type == ModelType::llama3) {
+    auto tokens = tokenizer->encode("<|eot_id|>", 0, 0);
+    return tokens[0];
+  }
+
+  fprintf(stderr, "No chat template implemnation for model type %d", model_type);
+  exit(EXIT_FAILURE);
 }
 
 std::vector<uint64_t> get_initial_prompt_tokens(const char* cli_system_prompt, const char* cli_user_prompt, Tokenizer* tokenizer) {
@@ -514,32 +538,37 @@ std::vector<uint64_t> get_initial_prompt_tokens(const char* cli_system_prompt, c
     read_stdin("User: ", user_prompt, sizeof(user_prompt));
   }
 
-  // Render for llama2 chat
-  if (system_prompt[0] != '\0') {
-    const char prompt_template[] = "[INST] <<SYS>>\n%s\n<</SYS>>\n\n%s [/INST]";
-    snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, system_prompt, user_prompt);
-  } else {
-    const char prompt_template[] = "[INST] %s [/INST]";
-    snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, user_prompt);
+   ModelType model_type = get_model_type(tokenizer);
+
+   // Render for llama2 chat
+  if (model_type == ModelType::llama2) {
+    if (system_prompt[0] != '\0') {
+      const char prompt_template[] = "[INST] <<SYS>>\n%s\n<</SYS>>\n\n%s [/INST]";
+      snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, system_prompt, user_prompt);
+    } else {
+      const char prompt_template[] = "[INST] %s [/INST]";
+      snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, user_prompt);
+    }
+
+    // We need to add BOS token here and not in template because llama2 tokenizer
+    // does not pattern match special tokens
+    return tokenizer->encode(rendered_prompt, 1, 0);
   }
 
-  // We need to add BOS token here and not in template because llama2 tokenizer
-  // does not pattern match special tokens
-  std::vector<uint64_t> tokens = tokenizer->encode(rendered_prompt, 1, 0);
+  // Render for llama3 chat
+  if (model_type == ModelType::llama3) {
+    if (system_prompt[0] != '\0') {
+      const char prompt_template[] =  "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>user<|end_header_id|>%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
+      snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, system_prompt, user_prompt);
+    } else {
+      const char prompt_template[] = "<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
+      snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, user_prompt);
+    }
+    return tokenizer->encode(rendered_prompt, 0, 0);
+  }
 
-
-  // TODO: llama3 tokenizer is not pattern matching the special tokens
-  // // Render for llama3 chat
-  // if (system_prompt[0] != '\0') {
-  //   const char prompt_template[] =  "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>user<|end_header_id|>%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
-  //   snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, system_prompt, user_prompt);
-  // } else {
-  //   const char prompt_template[] = "<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
-  //   snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, user_prompt);
-  // }
-  // std::vector<uint64_t> tokens = tokenizer->encode(rendered_prompt, 0, 0);
-
-  return tokens;
+  fprintf(stderr, "No chat template implemnation for model type %d", model_type);
+  exit(EXIT_FAILURE);
 }
 
 std::vector<uint64_t> get_next_user_prompt_tokens(Tokenizer* tokenizer) {
@@ -548,22 +577,28 @@ std::vector<uint64_t> get_next_user_prompt_tokens(Tokenizer* tokenizer) {
 
   read_stdin("User: ", user_prompt, sizeof(user_prompt));
 
+  ModelType model_type = get_model_type(tokenizer);
+
   // Render for llama2 chat
-  const char prompt_template[] = "[INST] %s [/INST]";
-  snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, user_prompt);
+  if (model_type == ModelType::llama2) {
+    const char prompt_template[] = "[INST] %s [/INST]";
+    snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, user_prompt);
 
-  // We need to add BOS token here and not in template because llama2 tokenizer
-  // does not pattern match special tokens
-  std::vector<uint64_t> tokens = tokenizer->encode(rendered_prompt, /*bos*/1, /*eos*/0);
+    // We need to add BOS token here and not in template because llama2 tokenizer
+    // does not pattern match special tokens
+    return tokenizer->encode(rendered_prompt, /*bos*/1, /*eos*/0);
+  }
 
 
-  // TODO: llama3 tokenizer is not pattern matching the special tokens
-  // // Render for llama3 chat
-  // const char prompt_template[] = "<|start_header_id|>user<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
-  // snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, user_prompt);
-  // std::vector<uint64_t> tokens = tokenizer->encode(rendered_prompt, 0, 0);
+  // Render for llama3 chat
+  if (model_type == ModelType::llama3) {
+    const char prompt_template[] = "<|start_header_id|>user<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
+    snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, user_prompt);
+    return tokenizer->encode(rendered_prompt, 0, 0);
+  }
 
-  return tokens;
+  fprintf(stderr, "No chat template implemnation for model type %d", model_type);
+  exit(EXIT_FAILURE);
 }
 
 
