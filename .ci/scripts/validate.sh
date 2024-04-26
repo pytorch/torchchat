@@ -321,7 +321,6 @@ function run_eval_sanity_check(){
 CHECKPOINT_PATH="$1"
 TARGET_DEVICE="${2:-cpu}"
 PROMPT="Hello, my name is"
-DTYPES="${4:-default}"
 
 if [ "$#" -gt 2 ]; then
     # Additional arguments provided
@@ -331,6 +330,19 @@ if [ "$#" -gt 2 ]; then
                 run_compile || exit 1
                 ;;
             "aoti")
+                DTYPES="default"
+                run_aoti || exit 1
+                ;;
+            "aoti-bfloat16")
+                DTYPES="bfloat16"
+                run_aoti || exit 1
+                ;;
+            "aoti-float16")
+                DTYPES="float16"
+                run_aoti || exit 1
+                ;;
+            "aoti-float32")
+                DTYPES="float32"
                 run_aoti || exit 1
                 ;;
             "executorch")
