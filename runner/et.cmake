@@ -104,4 +104,6 @@ if(executorch_FOUND)
   # This works on mac, but appears to run into issues on linux
   # It is needed to solve:
   # E 00:00:00.055965 executorch:method.cpp:536] Missing operator: [8] llama::sdpa_with_kv_cache.out
+else()
+  MESSAGE(WARNING "ExecuTorch package not found")
 endif()
