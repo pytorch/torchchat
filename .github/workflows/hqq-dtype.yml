@@ -25,9 +25,9 @@ jobs:
 
         echo "::group::Download checkpoints"
         # Install requirements
-        pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip install -r requirements.txt
-        pip list
+        pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip3 install -r requirements.txt
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
