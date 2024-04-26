@@ -157,7 +157,7 @@ float* forward(Transformer* transformer, int token, int pos) {
   torch::Tensor pos_tensor = torch::from_blob(pos_buffer, {1}, torch::kLong);
   std::vector<torch::Tensor> inputs{token_tensor, pos_tensor};
 
-  torch::Tensor result = transformer->runner->run(inputs)[0];
+  torch::Tensor result = transformer->runner->run(inputs)[0].to(torch::dtype(torch::kFloat32));
   auto logits = result[0].data_ptr();
 
 #else // __ET_MODEL__
