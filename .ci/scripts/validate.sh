@@ -321,10 +321,9 @@ function run_eval_sanity_check(){
 CHECKPOINT_PATH="$1"
 TARGET_DEVICE="${2:-cpu}"
 PROMPT="Hello, my name is"
+DTYPES="${4:-default}"
 
-DTYPES="${3:-default}"
-
-if [ "$#" -gt 3 ]; then
+if [ "$#" -gt 2 ]; then
     # Additional arguments provided
     for arg in "${@:3}"; do
         case "$arg" in
