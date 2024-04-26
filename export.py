@@ -19,7 +19,7 @@ from build.builder import (
 )
 
 from build.utils import set_backend, set_precision
-from cli import add_arguments, add_arguments_for_export, arg_init, check_args
+from cli import add_arguments_for_export, arg_init, check_args
 from export_aoti import export_model as export_model_aoti
 
 try:
@@ -104,7 +104,6 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="torchchat export CLI")
-    add_arguments(parser)
     add_arguments_for_export(parser)
     args = parser.parse_args()
     check_args(args, "export")
