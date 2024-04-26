@@ -14,6 +14,8 @@ Torchchat is a compact codebase to showcase the capability of running large lang
 - Multiple quantization schemes
 - Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
+*Disclaimer:*  The TorchChat Repository Content is provided without any guarantees about performance or compatibility. In particular, TorchChat makes available model architectures written in Python for PyTorch that may not perform in the same manner or meet the same standards as the original versions of those models. When using the TorchChat Repository Content, including any model architectures, you are solely responsible for determining the appropriateness of using or redistributing the TorchChat Repository Content and assume any risks associated with your use of the TorchChat Repository Content or any models, outputs, or results, both alone and in combination with any other technologies. Additionally, you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models, weights, data, or other technologies, and you are solely responsible for complying with all such obligations.
+
 
 ## Installation
 
@@ -140,9 +142,8 @@ python3 torchchat.py chat llama3 --quantize config/data/qconfig_gpu.json
 ```
 To adapt these recipes or wrote your own, please refer to the [quantization overview](docs/quantization.md).
 
-*TO BE REPLACED BY SUITABLE ORDING PROVIDED BY LEGAL:*
 
-With quantization, 32-bit floating numbers can be represented with as few as 8 or even 4 bits, and a scale shared by a group of these weights.  This transformation is lossy and modifies the behavior of models.  While research is being conducted on how to efficiently quantize large language models for use in mobile devices, this transformation invariable results in both quality loss and a reduced amount of control over the output of the models, leading to an increased risk of undesirable responses, hallucinations and stuttering.  In effect an a developer quantizing a model, has much control and even more responsibility to quantize a model to quantify and reduce these effects.
+With quantization, 32-bit floating numbers can be represented with as few as 8 or even 4 bits, and a scale shared by a group of these weights.  This transformation is lossy and modifies the behavior of models.  While research is being conducted on how to efficiently quantize large language models for use in mobile devices, this transformation invariably results in both quality loss and a reduced amount of control over the output of the models, leading to an increased risk of undesirable responses, hallucination and stuttering.  In effect, a developer quantizing a model has much control and a concomitant responsibility to understand and reduce these effects.
 
 ## Desktop Execution
 
