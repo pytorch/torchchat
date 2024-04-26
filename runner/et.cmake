@@ -48,10 +48,25 @@ if(executorch_FOUND)
 
   cmake_print_variables(_common_include_directories)
 
-  target_include_directories(executorch INTERFACE ${_common_include_directories}) # Ideally ExecuTorch installation process would do this
-  add_executable(et_run runner/run.cpp)
+  set(_srcs runner/run.cpp)
+  set(_common_compile_options -D__ET__MODEL -D_GLIBCXX_USE_CXX11_ABI=1)
+  if(ET_USE_ADPATIVE_THREADS)
+    list(APPEND _common_compile_options -DET_USE_ADPATIVE_THREADS)
 
-  target_compile_options(et_run PUBLIC -D__ET__MODEL -D_GLIBCXX_USE_CXX11_ABI=1)
+    set(EXECUTORCH_SRC_ROOT ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch)
+    set(XNNPACK_ROOT ${EXECUTORCH_SRC_ROOT}/backends/xnnpack)
+    list(APPEND _srcs ${XNNPACK_ROOT}/threadpool/cpuinfo_utils.cpp)
+    list(APPEND _common_include_directories
+         ${XNNPACK_ROOT}/third-party/cpuinfo/include)
+
+    list(APPEND _common_include_directories
+         ${XNNPACK_ROOT}/third-party/pthreadpool/include)
+  endif()
+
+  target_include_directories(executorch INTERFACE ${_common_include_directories}) # Ideally ExecuTorch installation process would do this
+  add_executable(et_run ${_srcs})
+
+  target_compile_options(et_run PUBLIC ${_common_compile_options})
 
   # Link ET runtime + extensions
   target_link_libraries(
