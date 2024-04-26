@@ -10,7 +10,6 @@ import subprocess
 import sys
 
 from cli import (
-    add_arguments,
     add_arguments_for_browser,
     add_arguments_for_chat,
     add_arguments_for_download,
@@ -30,17 +29,14 @@ if __name__ == "__main__":
     # Initialize the top-level parser
     parser = argparse.ArgumentParser(
         prog="torchchat",
-        description="Welcome to the torchchat CLI!",
         add_help=True,
     )
-    # Default command is to print help
-    parser.set_defaults(func=parser.print_help())
 
-    add_arguments(parser)
     subparsers = parser.add_subparsers(
         dest="command",
         help="The specific command to run",
     )
+    subparsers.required = True
 
     parser_chat = subparsers.add_parser(
         "chat",
@@ -89,20 +85,6 @@ if __name__ == "__main__":
         help="Remove downloaded model artifacts",
     )
     add_arguments_for_remove(parser_remove)
-
-    # Move all flags to the front of sys.argv since we don't
-    # want to use the subparser syntax
-    flag_args = []
-    positional_args = []
-    i = 1
-    while i < len(sys.argv):
-        if sys.argv[i].startswith("-"):
-            flag_args += sys.argv[i : i + 2]
-            i += 2
-        else:
-            positional_args.append(sys.argv[i])
-            i += 1
-    sys.argv = sys.argv[:1] + flag_args + positional_args
 
     # Now parse the arguments
     args = parser.parse_args()
