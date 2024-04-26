@@ -1,5 +1,6 @@
 /* Inference for Llama-2 Transformer model in pure C++ */
 #include <ctype.h>
+#include <iterator>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -485,43 +486,84 @@ void read_stdin(const char* guide, char* buffer, size_t bufsize) {
 // python reference and that seemed ok, but this was not thoroughly tested and
 // is not safely implemented, it's more a proof of concept atm.
 
-void get_initial_prompt(const char* cli_system_prompt, const char* cli_user_prompt, char* rendered_prompt, int rendered_prompt_size) {
-  char system_prompt_buffer[512];
-  char user_prompt_buffer[512];
+uint64_t get_eot_token(Tokenizer* tokenizer) {
+  // llama2 uses EOS as EOT token
+  uint64_t eot = tokenizer->eos_tok();
+
+  // TODO: llama3 tokenizer is not pattern matching the special tokens
+  // auto tokens = tokenizer->encode("<|eot_id|>", 0, 0);
+  // uint64_t eot = tokens[0];
+
+  return eot;
+}
+
+std::vector<uint64_t> get_initial_prompt_tokens(const char* cli_system_prompt, const char* cli_user_prompt, Tokenizer* tokenizer) {
+  char system_prompt[512];
+  char user_prompt[512];
+  char rendered_prompt[512*4]; // TODO: choose better
 
   if (cli_system_prompt != NULL) {
-    strcpy(system_prompt_buffer, cli_system_prompt);
+    strcpy(system_prompt, cli_system_prompt);
   } else {
-    read_stdin("Enter system prompt (optional): ", system_prompt_buffer, sizeof(system_prompt_buffer));
+    read_stdin("Enter system prompt (optional): ", system_prompt, sizeof(system_prompt));
   }
 
   if (cli_user_prompt != NULL) {
-    strcpy(user_prompt_buffer, cli_user_prompt);
+    strcpy(user_prompt, cli_user_prompt);
   } else {
-    read_stdin("User: ", user_prompt_buffer, sizeof(user_prompt_buffer));
+    read_stdin("User: ", user_prompt, sizeof(user_prompt));
   }
 
-  // Render for Llama 2
-  if (system_prompt_buffer[0] != '\0') {
-    const char system_template[] = "[INST] <<SYS>>\n%s\n<</SYS>>\n\n%s [/INST]";
-    snprintf(rendered_prompt, rendered_prompt_size-1, system_template, system_prompt_buffer, user_prompt_buffer);
+  // Render for llama2 chat
+  if (system_prompt[0] != '\0') {
+    const char prompt_template[] = "[INST] <<SYS>>\n%s\n<</SYS>>\n\n%s [/INST]";
+    snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, system_prompt, user_prompt);
   } else {
-    const char user_template[] = "[INST] %s [/INST]";
-    snprintf(rendered_prompt, rendered_prompt_size-1, user_template, user_prompt_buffer);
+    const char prompt_template[] = "[INST] %s [/INST]";
+    snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, user_prompt);
   }
 
-  // TODO: add render logic for Llama 3
+  // We need to add BOS token here and not in template because llama2 tokenizer
+  // does not pattern match special tokens
+  std::vector<uint64_t> tokens = tokenizer->encode(rendered_prompt, 1, 0);
+
+
+  // TODO: llama3 tokenizer is not pattern matching the special tokens
+  // // Render for llama3 chat
+  // if (system_prompt[0] != '\0') {
+  //   const char prompt_template[] =  "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>user<|end_header_id|>%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
+  //   snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, system_prompt, user_prompt);
+  // } else {
+  //   const char prompt_template[] = "<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
+  //   snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, user_prompt);
+  // }
+  // std::vector<uint64_t> tokens = tokenizer->encode(rendered_prompt, 0, 0);
+
+  return tokens;
 }
 
-void get_next_user_prompt(char* rendered_prompt, int rendered_prompt_size) {
-  char user_prompt_buffer[512];
-  const char user_template[] = "[INST] %s [/INST]";
-  read_stdin("User: ", user_prompt_buffer, sizeof(user_prompt_buffer));
+std::vector<uint64_t> get_next_user_prompt_tokens(Tokenizer* tokenizer) {
+  char user_prompt[512];
+  char rendered_prompt[512*4]; // Choose better
 
-  // Render for Llama 2
-  snprintf(rendered_prompt, rendered_prompt_size-1, user_template, user_prompt_buffer);
+  read_stdin("User: ", user_prompt, sizeof(user_prompt));
 
-  // TODO: add render logic for Llama 3
+  // Render for llama2 chat
+  const char prompt_template[] = "[INST] %s [/INST]";
+  snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, user_prompt);
+
+  // We need to add BOS token here and not in template because llama2 tokenizer
+  // does not pattern match special tokens
+  std::vector<uint64_t> tokens = tokenizer->encode(rendered_prompt, /*bos*/1, /*eos*/0);
+
+
+  // TODO: llama3 tokenizer is not pattern matching the special tokens
+  // // Render for llama3 chat
+  // const char prompt_template[] = "<|start_header_id|>user<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
+  // snprintf(rendered_prompt, sizeof(rendered_prompt)-1, prompt_template, user_prompt);
+  // std::vector<uint64_t> tokens = tokenizer->encode(rendered_prompt, 0, 0);
+
+  return tokens;
 }
 
 
@@ -532,17 +574,8 @@ void chat(
     const char* cli_user_prompt,
     const char* cli_system_prompt,
     int steps) {
-  // special tokens
-  const int EOS_TOKEN = tokenizer->eos_tok(); // token ends the assistant turn
-  const int SYSTEM_PROMPT_SIZE = 512;
-  const int USER_PROMPT_SIZE = 512;
-  const int RENDERED_PROMPT_SIZE = SYSTEM_PROMPT_SIZE + USER_PROMPT_SIZE + 128; // This is big enough to hold the expanded template
 
-
-
-  // buffers for reading the system prompt and user prompt from stdin
-  // you'll notice they are soomewhat haphazardly and unsafely set atm
-  char rendered_prompt[RENDERED_PROMPT_SIZE];
+  const uint64_t EOT_TOKEN = get_eot_token(tokenizer);
   int num_prompt_tokens = 0;
   std::vector<uint64_t> prompt_tokens;
   int user_idx;
@@ -559,13 +592,10 @@ void chat(
     if (user_turn) {
       // get the (optional) system prompt at position 0
       if (pos == 0) {
-        get_initial_prompt(cli_system_prompt, cli_user_prompt, rendered_prompt, RENDERED_PROMPT_SIZE);
+        prompt_tokens = get_initial_prompt_tokens(cli_system_prompt, cli_user_prompt, tokenizer);
       } else {
-        get_next_user_prompt(rendered_prompt, RENDERED_PROMPT_SIZE);
+        prompt_tokens = get_next_user_prompt_tokens(tokenizer);
       }
-
-      // encode the rendered prompt into tokens
-      prompt_tokens = tokenizer->encode(rendered_prompt, 1, 0);
       num_prompt_tokens = prompt_tokens.size();
 
       user_idx = 0; // reset the user index
@@ -588,18 +618,18 @@ void chat(
     next = sample(sampler, logits);
 
 
-    if (token == EOS_TOKEN) {
+    if (token == EOT_TOKEN) {
       user_turn = 1;
     }
 
-    if (user_idx >= num_prompt_tokens && token != EOS_TOKEN && next != EOS_TOKEN) {
+    if (user_idx >= num_prompt_tokens && token != EOT_TOKEN && next != EOT_TOKEN) {
       std::string piece = tokenizer->decode(token, next);
       safe_printf(piece.c_str()); // same as printf("%s", piece), but skips
                                   // "unsafe" bytes
       fflush(stdout);
     }
 
-    if (next == EOS_TOKEN) {
+    if (next == EOT_TOKEN) {
       printf("\n");
     }
     pos++;
