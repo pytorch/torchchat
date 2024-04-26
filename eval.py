@@ -158,7 +158,7 @@ class GPTFastEvalWrapper(eval_wrapper):
         x = seq.index_select(0, input_pos).view(1, -1)
         start = time.time()
         logits = model_forward(self._model, x, input_pos)
-        self.times.append(time.time()-start)
+        self.times.append(time.time() - start)
         return logits
 
     def _model_generate(self, context, max_length, eos_token_id):
@@ -266,9 +266,13 @@ def main(args) -> None:
         device=builder_args.device,
     )
     print(f"Time to run eval: {time.time() - t1:.02f}s.")
-    times=torch.tensor(result["times"])
-    print(f"Time in model.forward: {times.sum():.02f}s, over {times.numel()} model evaluations")
-    print(f"forward run time stats - Median: {times.median():.02f}s Min: {times.min():.02f}s Max: {times.max():.02f}s")
+    times = torch.tensor(result["times"])
+    print(
+        f"Time in model.forward: {times.sum():.02f}s, over {times.numel()} model evaluations"
+    )
+    print(
+        f"forward run time stats - Median: {times.median():.02f}s Min: {times.min():.02f}s Max: {times.max():.02f}s"
+    )
     if builder_args.dso_path:
         print(f"For model {builder_args.dso_path}")
     elif builder_args.pte_path:
