@@ -77,6 +77,8 @@ with `python3 torchchat.py remove llama3`.
   * [Run exported ExecuTorch file on iOS or Android](#mobile-execution)
      * in Chat mode
      * in Generate mode
+  * Fine-tuned models from torchtune
+  
 
 ## Running via PyTorch / Python
 
@@ -85,8 +87,15 @@ Designed for interactive and conversational use.
 In chat mode, the LLM engages in a back-and-forth dialogue with the user. It responds to queries, participates in discussions, provides explanations, and can adapt to the flow of conversation.
 
 **Examples**
+
 ```bash
-python3 torchchat.py chat llama3
+# Llama 3 8B Instruct
+python3 torchchat.py chat llama3 
+```
+
+```
+# CodeLama 7B for Python
+python3 torchchat.py chat codellama
 ```
 
 For more information run `python3 torchchat.py chat --help`
@@ -107,6 +116,18 @@ For more information run `python3 torchchat.py generate --help`
 
 Designed for interactive graphical conversations using the familiar web browser GUI.  The browser command provides a GUI-based experience to engage with the LLM in a back-and-forth dialogue with the user. It responds to queries, participates in discussions, provides explanations, and can adapt to the flow of conversation.
 
+**Examples**
+
+```
+python3 torchchat.py browser llama3 --temperature 0 --num-samples 10
+```
+
+*Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
+
+Enter some text in the input box, then hit the enter key or click the “SEND” button. After a second or two, the text you entered together with the generated text will be displayed. Repeat to have a conversation.
+
+
+
 ## Quantizing your model (suggested for mobile)
 
 Quantization is the process of converting a model into a more memory-efficient representation.  Quantization is particularly important for accelerators -- to take advantage of the available memory bandwidth, and fit in the often limited high-speed memory in accelerators – and mobile devices – to fit in the typically very limited memory of mobile devices.
@@ -122,105 +143,6 @@ To adapt these recipes or wrote your own, please refer to the [quantization over
 *TO BE REPLACED BY SUITABLE ORDING PROVIDED BY LEGAL:*
 
 With quantization, 32-bit floating numbers can be represented with as few as 8 or even 4 bits, and a scale shared by a group of these weights.  This transformation is lossy and modifies the behavior of models.  While research is being conducted on how to efficiently quantize large language models for use in mobile devices, this transformation invariable results in both quality loss and a reduced amount of control over the output of the models, leading to an increased risk of undesirable responses, hallucinations and stuttering.  In effect an a developer quantizing a model, has much control and even more responsibility to quantize a model to quantify and reduce these effects.
-
-
-## Exporting your model
-Compiles a model and saves it to run later.
-
-For more information run `python3 torchchat.py export --help`
-
-### Exporting for Desktop / Server-side via AOT Inductor
-
-```
-python3 torchchat.py export stories15M --output-dso-path stories15M.so
-```
-
-This produces a `.so` file, also called a Dynamic Shared Object. This `.so` can be linked into your own C++ program.
-
-### Running the exported `.so` via your own C++ application
-
-[TBF]
-
-### Exporting for Mobile via ExecuTorch
-
-Before exporting to an ExecuTorch pte file with the command below, you must first [set-up ExecuTorch](docs/executorch_setup.md) inside torchchat.
-
-```
-python3 torchchat.py export stories15M --output-pte-path stories15M.pte
-```
-
-### Browser
-Run a chatbot in your browser that’s supported by the model you specify in the command.
-
-**Examples**
-
-```
-python3 torchchat.py browser stories15M --temperature 0 --num-samples 10
-```
-
-*Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
-
-Enter some text in the input box, then hit the enter key or click the “SEND” button. After a second or two, the text you entered together with the generated text will be displayed. Repeat to have a conversation.
-
-### Eval
-Uses lm_eval library to evaluate model accuracy on a variety of tasks. Defaults to wikitext and can be manually controlled using the tasks and limit args.
-
-For more information run `python3 torchchat.py eval --help`
-
-**Examples**
-
-Eager mode:
-```
-python3 torchchat.py eval stories15M -d fp32 --limit 5
-```
-
-To test the perplexity for a lowered or quantized model, pass it in the same way you would to generate:
-
-```
-python3 torchchat.py eval stories15M --pte-path stories15M.pte --limit 5
-```
-
-
-## Models
-
-The following models are supported by torchchat and have associated aliases. Other models, including GGUF format, can be run by specifying a URL directly.
-
-| Model | Mobile Friendly | Notes |
-|------------------|---|---------------------|
-|[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3`.|
-|[meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅|Best for `generate`. Alias to `llama3-base`.|
-|[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|✅|Tuned for `chat`. Alias to `llama2`.|
-|[meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-13b-chat-hf)||Tuned for `chat`. Alias to `llama2-13b-chat`.|
-|[meta-llama/Llama-2-70b-chat-hf](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf)||Tuned for `chat`. Alias to `llama2-70b-chat`.|
-|[meta-llama/Llama-2-7b-hf](https://huggingface.co/meta-llama/Llama-2-7b-hf)|✅|Best for `generate`. Alias to `llama2-base`.|
-|[meta-llama/CodeLlama-7b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-7b-Python-hf)|✅|Tuned for Python and `generate`. Alias to `codellama`.|
-|[meta-llama/CodeLlama-34b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-34b-Python-hf)|✅|Tuned for Python and `generate`. Alias to `codellama-34b`.|
-|[mistralai/Mistral-7B-v0.1](https://huggingface.co/mistralai/Mistral-7B-v0.1)|✅|Best for `generate`. Alias to `mistral-7b-v01-base`.|
-|[mistralai/Mistral-7B-Instruct-v0.1](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1)|✅|Tuned for `chat`. Alias to `mistral-7b-v01-instruct`.|
-|[mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)|✅|Tuned for `chat`. Alias to `mistral`.|
-|[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories15M`.|
-|[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories42M`.|
-|[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories110M`.|
-|[openlm-research/open_llama_7b](https://huggingface.co/openlm-research/open_llama_7b)|✅|Best for `generate`. Alias to `open-llama`.|
-
-Torchchat also supports loading of many models in the GGUF format. See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
-
-**Examples**
-
-```
-# Llama 3 8B Instruct
-python3 torchchat.py chat llama3 --dtype fp16
-```
-
-```
-# Stories 15M
-python3 torchchat.py chat stories15M
-```
-
-```
-# CodeLama 7B for Python
-python3 torchchat.py chat codellama
-```
 
 ## Desktop Execution
 
@@ -295,7 +217,7 @@ scripts/build_native.sh et
 Run:
 
 ```bash
-cmake-out/et_run model.pte -z tokenizer.model -i "Once upon a time"
+cmake-out/et_run llama3.pte -z tokenizer.model -i "Once upon a time"
 ```
 
 ## Fine-tuned models from torchtune
@@ -329,11 +251,91 @@ python3 torchchat.py generate \
   --device cuda
 ```
 
+### Eval
+Uses the lm_eval library to evaluate model accuracy on a variety of tasks. Defaults to wikitext and can be manually controlled using the tasks and limit args.
+
+For more information run `python3 torchchat.py eval --help`
+
+**Examples**
+
+Eager mode:
+```
+python3 torchchat.py eval llama3 -d fp32 --limit 5
+```
+
+To test the perplexity for a lowered or quantized model, pass it in the same way you would to generate:
+
+```
+python3 torchchat.py eval llama3 --pte-path llama3.pte --limit 5
+```
+
+
+
+## Models
+
+The following models are supported by torchchat and have associated aliases. Other models, including GGUF format, can be run by specifying a URL directly.
+
+| Model | Mobile Friendly | Notes |
+|------------------|---|---------------------|
+|[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3`.|
+|[meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅|Best for `generate`. Alias to `llama3-base`.|
+|[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|✅|Tuned for `chat`. Alias to `llama2`.|
+|[meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-13b-chat-hf)||Tuned for `chat`. Alias to `llama2-13b-chat`.|
+|[meta-llama/Llama-2-70b-chat-hf](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf)||Tuned for `chat`. Alias to `llama2-70b-chat`.|
+|[meta-llama/Llama-2-7b-hf](https://huggingface.co/meta-llama/Llama-2-7b-hf)|✅|Best for `generate`. Alias to `llama2-base`.|
+|[meta-llama/CodeLlama-7b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-7b-Python-hf)|✅|Tuned for Python and `generate`. Alias to `codellama`.|
+|[meta-llama/CodeLlama-34b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-34b-Python-hf)|✅|Tuned for Python and `generate`. Alias to `codellama-34b`.|
+|[mistralai/Mistral-7B-v0.1](https://huggingface.co/mistralai/Mistral-7B-v0.1)|✅|Best for `generate`. Alias to `mistral-7b-v01-base`.|
+|[mistralai/Mistral-7B-Instruct-v0.1](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1)|✅|Tuned for `chat`. Alias to `mistral-7b-v01-instruct`.|
+|[mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)|✅|Tuned for `chat`. Alias to `mistral`.|
+|[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories15M`.|
+|[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories42M`.|
+|[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories110M`.|
+|[openlm-research/open_llama_7b](https://huggingface.co/openlm-research/open_llama_7b)|✅|Best for `generate`. Alias to `open-llama`.|
+
+Torchchat also supports loading of many models in the GGUF format. See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
+
+While we describe how to use torchchat using the popular llama3 model, you can perform the example commands with any of these models.
+
+
+
 ## Acknowledgements
 Thank you to the [community](docs/ACKNOWLEDGEMENTS.md) for all the awesome libraries and tools
 you've built around local LLM inference.
 
+* Georgi Gerganov and his [GGML](https://github.com/ggerganov/ggml)
+  project shining a spotlight on community-based enablement and
+  inspiring so many other projects.
+
+* Andrej Karpathy and his
+  [llama2.c](https://github.com/karpathy/llama2.c) project.  So many
+  great (and simple!) ideas in llama2.c that we have directly adopted
+  (both ideas and code) from his repo.  You can never go wrong by
+  following Andrej's work.
+
+* Michael Gschwind, Bert Maher, Scott Wolchok, Bin Bao, Chen Yang,
+  Huamin Li and Mu-Chu Li who built the first version of nanogpt (`DSOGPT`)
+  with AOT Inductor proving that AOTI can be used to build efficient
+  LLMs, and DSOs are a viable distribution format for models.
+  [nanoGPT](https://github.com/karpathy/nanoGPT).
+
+* Bert Maher and his
+  [llama2.so](https://github.com/bertmaher/llama2.so), which built on
+  Andrej's llama2.c and on DSOGPT to close the loop on Llama models
+  with AOTInductor.
+
+* Christian Puhrsch, Horace He, Joe Isaacson and many more for their
+  many contributions in Accelerating GenAI models in the *"Anything,
+  Fast!"* pytorch.org blogs, and, in particular, Horace He for [GPT,
+  Fast!](https://github.com/pytorch-labs/gpt-fast), which we have
+  directly adopted (both ideas and code) from his repo.
+
+* Mobius Labs as the authors of the HQQ quantization algorithms
+  included in this distribution.
+
+
 ## License
-Torchchat is released under the [BSD 3 license](LICENSE). However you may have other legal obligations
+Torchchat is released under the [BSD 3 license](LICENSE). (Additional code in this 
+distribution is covered by the MIT and Apache Open Source licenses.) However you may have other legal obligations
 that govern your use of content, such as the terms of service for third-party models.
 ![image](https://github.com/pytorch/torchchat/assets/61328285/1cfccb53-c025-43d7-8475-94b34cf92339)
