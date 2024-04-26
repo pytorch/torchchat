@@ -143,6 +143,8 @@ This produces a `.so` file, also called a Dynamic Shared Object. This `.so` can 
 
 ### Exporting for Mobile via ExecuTorch
 
+Before exporting to an ExecuTorch pte file with the command below, you must first [set-up ExecuTorch](docs/executorch_setup.md) inside torchchat.
+
 ```
 python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 ```
