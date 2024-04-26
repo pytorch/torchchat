@@ -74,36 +74,39 @@ setup_android_sdk() {
   sdkmanager "platform-tools"
 }
 
-setup_android_ndk() {
-  sdkmanager "ndk;25.0.8775105"
-  export ANDROID_NDK="$ANDROID_HOME/ndk/25.0.8775105"
-}
-
 download_jar_library() {
-  mkdir -p ${TORCHCHAT_ROOT}/build/android
-  curl "${LLAMA_JAR_URL}" -o ${TORCHCHAT_ROOT}/build/android/executorch.jar
-  echo "${LLAMA_JAR_SHASUM}  ${TORCHCHAT_ROOT}/build/android/executorch.jar" | shasum --check --status
+  mkdir -p ${TORCHCHAT_ROOT}/build/android/libs
+  curl "${LLAMA_JAR_URL}" -o ${TORCHCHAT_ROOT}/build/android/libs/executorch.jar
+  echo "${LLAMA_JAR_SHASUM}  ${TORCHCHAT_ROOT}/build/android/libs/executorch.jar" | shasum --check --status
 }
 
 download_jni_library() {
-  mkdir -p ${TORCHCHAT_ROOT}/build/android/arm64-v8a
-  mkdir -p ${TORCHCHAT_ROOT}/build/android/x86_64
-  if [ ! -f ${TORCHCHAT_ROOT}/build/android/arm64-v8a/libexecutorch_llama_jni.so ]; then
-    curl "${LLAMA_JNI_ARM64_URL}" -o ${TORCHCHAT_ROOT}/build/android/arm64-v8a/libexecutorch_llama_jni.so
-    echo "${LLAMA_JNI_ARM64_SHASUM}  ${TORCHCHAT_ROOT}/build/android/arm64-v8a/libexecutorch_llama_jni.so" | shasum --check --status
+  mkdir -p ${TORCHCHAT_ROOT}/build/android/jni/arm64-v8a
+  mkdir -p ${TORCHCHAT_ROOT}/build/android/jni/x86_64
+  if [ ! -f ${TORCHCHAT_ROOT}/build/android/jni/arm64-v8a/libexecutorch_llama_jni.so ]; then
+    curl "${LLAMA_JNI_ARM64_URL}" -o ${TORCHCHAT_ROOT}/build/android/jni/arm64-v8a/libexecutorch_llama_jni.so
+    echo "${LLAMA_JNI_ARM64_SHASUM}  ${TORCHCHAT_ROOT}/build/android/jni/arm64-v8a/libexecutorch_llama_jni.so" | shasum --check --status
   fi
-  if [ ! -f ${TORCHCHAT_ROOT}/build/android/x86_64/libexecutorch_llama_jni.so ]; then
-    curl "${LLAMA_JNI_X86_64_URL}" -o ${TORCHCHAT_ROOT}/build/android/x86_64/libexecutorch_llama_jni.so
-    echo "${LLAMA_JNI_X86_64_SHASUM}  ${TORCHCHAT_ROOT}/build/android/x86_64/libexecutorch_llama_jni.so" | shasum --check --status
+  if [ ! -f ${TORCHCHAT_ROOT}/build/android/jni/x86_64/libexecutorch_llama_jni.so ]; then
+    curl "${LLAMA_JNI_X86_64_URL}" -o ${TORCHCHAT_ROOT}/build/android/jni/x86_64/libexecutorch_llama_jni.so
+    echo "${LLAMA_JNI_X86_64_SHASUM}  ${TORCHCHAT_ROOT}/build/android/jni/x86_64/libexecutorch_llama_jni.so" | shasum --check --status
   fi
 }
 
+make_executorch_aar() {
+  pushd ${TORCHCHAT_ROOT}/build/android
+  echo \<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" \
+   package=\"org.pytorch.executorch\"\> \
+   \<uses-sdk android:minSdkVersion=\"19\" /\> \
+   \</manifest\> > AndroidManifest.xml
+  zip -r executorch.aar libs jni AndroidManifest.xml
+  popd
+}
+
 build_app() {
-  pushd build/src/executorch/examples/demo-apps/android/LlamaDemo
-  mkdir -p app/src/main/jniLibs/arm64-v8a
-  mkdir -p app/src/main/jniLibs/x86_64
-  cp ${TORCHCHAT_ROOT}/build/android/arm64-v8a/libexecutorch_llama_jni.so app/src/main/jniLibs/arm64-v8a
-  cp ${TORCHCHAT_ROOT}/build/android/x86_64/libexecutorch_llama_jni.so app/src/main/jniLibs/x86_64
+  pushd android/Torchchat
+  mkdir -p app/libs
+  cp ${TORCHCHAT_ROOT}/build/android/executorch.aar app/libs
   ./gradlew :app:build
   popd
 }
@@ -128,9 +131,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   setup_java
   setup_android_sdk_manager
   setup_android_sdk
-  setup_android_ndk
   setup_avd
   download_jni_library
+  download_jar_library
+  make_executorch_aar
   build_app
   push_files_to_android
 fi
