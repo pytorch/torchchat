@@ -17,11 +17,13 @@ jobs:
       script: |
         echo "::group::Print machine info"
         uname -a
-        if [ $(uname -s) == Darwin ]; then
-          sysctl machdep.cpu.brand_string
-          sysctl machdep.cpu.core_count
-        fi
         echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
 
         echo "::group::Download checkpoints"
         # Install requirements
