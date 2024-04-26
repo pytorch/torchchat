@@ -10,7 +10,7 @@ torchchat is a compact codebase to showcase the capability of running large lang
   - Mac OS (M1/M2/M3)
   - Android (Devices that support XNNPACK)
   - iOS 17+ (iPhone 13 Pro+)
-- Multiple data types including: float32, float16, bfloat16
+- Multiple data types including: float32, float16, bfloat16, select GGUF data types
 - Multiple quantization schemes
 - Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
@@ -339,4 +339,3 @@ you've built around local LLM inference.
 torchchat is released under the [BSD 3 license](LICENSE). (Additional code in this 
 distribution is covered by the MIT and Apache Open Source licenses.) However you may have other legal obligations
 that govern your use of content, such as the terms of service for third-party models.
-![image](https://github.com/pytorch/torchchat/assets/61328285/1cfccb53-c025-43d7-8475-94b34cf92339)
