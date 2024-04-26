@@ -26,6 +26,11 @@
 #include <executorch/runtime/core/exec_aten/exec_aten.h>
 #include <executorch/runtime/core/exec_aten/util/scalar_type_util.h>
 
+#if defined(ET_USE_ADPATIVE_THREADS)
+#include <executorch/backends/xnnpack/threadpool/cpuinfo_utils.h>
+#include <executorch/backends/xnnpack/threadpool/threadpool.h>
+#endif
+
 using exec_aten::ScalarType;
 using torch::executor::EValue;
 using torch::executor::ManagedTensor;
@@ -633,6 +638,13 @@ int main(int argc, char* argv[]) {
   char* system_prompt =
       NULL; // the (optional) system prompt to use in chat mode
 
+#if defined(ET_USE_ADPATIVE_THREADS)
+  uint32_t num_performant_cores = torch::executorch::cpuinfo::get_num_performant_cores();
+  if (num_performant_cores > 0) {
+    torch::executorch::threadpool::get_threadpool()->_unsafe_reset_threadpool(
+        num_performant_cores);
+  }
+#endif
   // poor man's C argparse so we can override the defaults above from the
   // command line
   if (argc >= 2) {
