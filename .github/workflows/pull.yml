@@ -183,7 +183,7 @@ jobs:
         bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "compile"
         echo "::endgroup::"
 
-  test-gpu-aoti:
+  test-gpu-aoti-bfloat16:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     name: test-gpu-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
@@ -216,7 +216,79 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run inference"
-        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti"
+        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti" "bfloat16"
+        echo "::endgroup::"
+
+  test-gpu-aoti-float32:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    name: test-gpu-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-gpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
+      fail-fast: false
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      script: |
+        echo "::group::Print machine info"
+        nvidia-smi
+        echo "::endgroup::"
+
+        echo "::group::Install required packages"
+        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install -r ./requirements.txt
+        pip list
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoint"
+        export REPO_NAME=${{ matrix.repo_name }}
+        bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
+        echo "::endgroup::"
+
+        echo "::group::Convert checkpoint"
+        bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+        echo "::endgroup::"
+
+        echo "::group::Run inference"
+        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti" "float32"
+        echo "::endgroup::"
+
+  test-gpu-aoti-float16:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    name: test-gpu-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-gpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
+      fail-fast: false
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      script: |
+        echo "::group::Print machine info"
+        nvidia-smi
+        echo "::endgroup::"
+
+        echo "::group::Install required packages"
+        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install -r ./requirements.txt
+        pip list
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoint"
+        export REPO_NAME=${{ matrix.repo_name }}
+        bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
+        echo "::endgroup::"
+
+        echo "::group::Convert checkpoint"
+        bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+        echo "::endgroup::"
+
+        echo "::group::Run inference"
+        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti" "float16"
         echo "::endgroup::"
 
   test-gpu-eval-sanity-check:
@@ -679,7 +751,7 @@ jobs:
 
           echo "Running compiled"
           python3 torchchat.py generate --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --compile
-          
+
           echo "******************************************"
           echo "******* Emb: channel-wise quantized ******"
           echo "******************************************"

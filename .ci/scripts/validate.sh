@@ -25,6 +25,7 @@ function generate_compiled_model_output() {
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
 
+
     if [[ $CHECKPOINT_PATH != *"stories"* && $TARGET_DEVICE == "cuda" ]]; then
         DTYPES="bfloat16"
         EXCLUDE_INT8_QUANT=true
@@ -109,15 +110,18 @@ function generate_compiled_model_output() {
 function generate_aoti_model_output() {
     local CHECKPOINT_PATH="$1"
     local TARGET_DEVICE="${2:-cpu}"
+    local DTYPES="${3-default}"
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
 
-    if [[ $CHECKPOINT_PATH != *"stories"* && $TARGET_DEVICE == "cuda" ]]; then
-        DTYPES="bfloat16"
-        EXCLUDE_INT8_QUANT=true
-    else
-        DTYPES="float32 bfloat16 float16"
-        EXCLUDE_INT8_QUANT=false
+    if [[ DTYPES="default" ]]; then
+        if [[ $CHECKPOINT_PATH != *"stories"* && $TARGET_DEVICE == "cuda" ]]; then
+            DTYPES="bfloat16"
+            EXCLUDE_INT8_QUANT=true
+        else
+            DTYPES="float32 bfloat16 float16"
+            EXCLUDE_INT8_QUANT=false
+        fi
     fi
 
     for DTYPE in $DTYPES; do
@@ -295,7 +299,7 @@ function run_compile() {
 }
 
 function run_aoti() {
-    generate_aoti_model_output "$CHECKPOINT_PATH" "$TARGET_DEVICE" || exit 1
+    generate_aoti_model_output "$CHECKPOINT_PATH" "$TARGET_DEVICE" "$DTYPES" || exit 1
 }
 
 function run_executorch() {
@@ -327,6 +331,7 @@ if [ "$#" -gt 2 ]; then
                 run_compile || exit 1
                 ;;
             "aoti")
+                DTYPES="${4:-default}"
                 run_aoti || exit 1
                 ;;
             "executorch")
