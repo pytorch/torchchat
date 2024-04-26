@@ -20,7 +20,7 @@ from build.builder import (
 
 from build.model import Transformer
 from build.utils import set_precision
-from cli import add_arguments, add_arguments_for_eval, arg_init
+from cli import add_arguments_for_eval, arg_init
 from generate import encode_tokens, model_forward
 
 torch._dynamo.config.automatic_dynamic_shapes = True
@@ -289,7 +289,6 @@ def main(args) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="torchchat eval CLI")
-    add_arguments(parser)
     add_arguments_for_eval(parser)
     args = parser.parse_args()
     args = arg_init(args)

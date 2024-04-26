@@ -80,12 +80,6 @@ def _add_arguments_common(parser):
         help="Model name for well-known models",
     )
 
-
-def add_arguments(parser):
-    # TODO: Refactor this so that only common options are here
-    # and command-specific options are inside individual
-    # add_arguments_for_generate, add_arguments_for_export etc.
-
     parser.add_argument(
         "--chat",
         action="store_true",
@@ -301,10 +295,10 @@ def add_arguments(parser):
 
 
 def arg_init(args):
-    if Path(args.quantize).is_file():
+    if hasattr(args, 'quantize') and Path(args.quantize).is_file():
         with open(args.quantize, "r") as f:
             args.quantize = json.loads(f.read())
 
-    if args.seed:
+    if hasattr(args, 'seed') and args.seed:
         torch.manual_seed(args.seed)
     return args
