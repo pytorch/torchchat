@@ -29,7 +29,7 @@ Due to the larger vocabulary size of llama3, we also recommend quantizing the em
 *** [GPTQ](https://arxiv.org/abs/2210.17323) and [HQQ](https://mobiusml.github.io/hqq_blog/) are two different algorithms to address accuracy loss when using lower bit quantization. Due to HQQ relying on data/calibration free quantization, it tends to take less time to quantize model.
 
 ## Quantization API
-Quantization options are passed in json format either as a config file (see [qconfig_gpu.json](../config/data/qconfig_gpu.json) and [qconfig_mobile.json](../config/data/qconfig_mobile.json)) or a JSON string.
+Quantization options are passed in json format either as a config file (see [cuda.json](../config/data/cuda.json) and [mobile.json](../config/data/mobile.json)) or a JSON string.
 
 The expected JSON format is described below. Refer to the tables above for valid `bitwidth` and `groupsize` values.
 
