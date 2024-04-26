@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 
 import torch
 
@@ -133,10 +133,20 @@ def device_sync(device="cpu"):
 
 
 #########################################################################
-###                   general utilkity functions                      ###
+###                    general utility functions                      ###
 
 
 # in fbcode, we can intercept certain local paths that
 # should be interpreted as part of an XAR package
 def canonical_path(path):
     return path
+
+
+#########################################################################
+###                    general utility functions                      ###
+
+def state_dict_device(d, device = "cpu") -> Dict:
+    for key, weight in d.items():
+        d[key] = weight.to(device=device)
+
+    return d
