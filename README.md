@@ -1,5 +1,5 @@
 # Chat with LLMs Everywhere
-Torchchat is a compact codebase to showcase the capability of running large language models (LLMs) seamlessly across diverse platforms. With Torchchat, you could run LLMs from with Python, your own (C/C++) application on mobile (iOS/Android), desktop or servers.
+torchchat is a compact codebase to showcase the capability of running large language models (LLMs) seamlessly across diverse platforms. With torchchat, you could run LLMs from with Python, your own (C/C++) application on mobile (iOS/Android), desktop or servers.
 
 ## Highlights
 - Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
@@ -14,7 +14,7 @@ Torchchat is a compact codebase to showcase the capability of running large lang
 - Multiple quantization schemes
 - Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
-*Disclaimer:*  The TorchChat Repository Content is provided without any guarantees about performance or compatibility. In particular, TorchChat makes available model architectures written in Python for PyTorch that may not perform in the same manner or meet the same standards as the original versions of those models. When using the TorchChat Repository Content, including any model architectures, you are solely responsible for determining the appropriateness of using or redistributing the TorchChat Repository Content and assume any risks associated with your use of the TorchChat Repository Content or any models, outputs, or results, both alone and in combination with any other technologies. Additionally, you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models, weights, data, or other technologies, and you are solely responsible for complying with all such obligations.
+*Disclaimer:*  The torchchat Repository Content is provided without any guarantees about performance or compatibility. In particular, torchchat makes available model architectures written in Python for PyTorch that may not perform in the same manner or meet the same standards as the original versions of those models. When using the torchchat Repository Content, including any model architectures, you are solely responsible for determining the appropriateness of using or redistributing the torchchat Repository Content and assume any risks associated with your use of the torchchat Repository Content or any models, outputs, or results, both alone and in combination with any other technologies. Additionally, you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models, weights, data, or other technologies, and you are solely responsible for complying with all such obligations.
 
 
 ## Installation
@@ -134,7 +134,7 @@ Enter some text in the input box, then hit the enter key or click the “SEND”
 
 Quantization is the process of converting a model into a more memory-efficient representation.  Quantization is particularly important for accelerators -- to take advantage of the available memory bandwidth, and fit in the often limited high-speed memory in accelerators – and mobile devices – to fit in the typically very limited memory of mobile devices.
 
-Depending on the model and the target device, different quantization recipes may be applied. Torchchat contains two example configurations to optimize performance for GPU-based systems `config/data/qconfig_gpu.json`, and mobile systems `config/data/qconfig_mobile.json`. The GPU configuration is targeted towards optimizing for memory bandwidth which is a scarce resource in powerful GPUs (and to a less degree, memory footprint to fit large models into a device's memory). The mobile configuration is targeted towards optimizing for memory fotoprint because in many devices, a single application is limited to as little as GB or less of memory.
+Depending on the model and the target device, different quantization recipes may be applied. torchchat contains two example configurations to optimize performance for GPU-based systems `config/data/qconfig_gpu.json`, and mobile systems `config/data/qconfig_mobile.json`. The GPU configuration is targeted towards optimizing for memory bandwidth which is a scarce resource in powerful GPUs (and to a less degree, memory footprint to fit large models into a device's memory). The mobile configuration is targeted towards optimizing for memory fotoprint because in many devices, a single application is limited to as little as GB or less of memory.
 
 You can use the quantization recipes in conjunction with any of the `chat`, `generate` and `browser` commands to test their impact and accelerate model execution. You will apply these recipes to the `export` comamnds below, to optimize the exported models. For example:
 ```
@@ -143,7 +143,7 @@ python3 torchchat.py chat llama3 --quantize config/data/qconfig_gpu.json
 To adapt these recipes or wrote your own, please refer to the [quantization overview](docs/quantization.md).
 
 
-With quantization, 32-bit floating numbers can be represented with as few as 8 or even 4 bits, and a scale shared by a group of these weights.  This transformation is lossy and modifies the behavior of models.  While research is being conducted on how to efficiently quantize large language models for use in mobile devices, this transformation invariably results in both quality loss and a reduced amount of control over the output of the models, leading to an increased risk of undesirable responses, hallucination and stuttering.  In effect, a developer quantizing a model has much control and a concomitant responsibility to understand and reduce these effects.
+With quantization, 32-bit floating numbers can be represented with as few as 8 or even 4 bits, and a scale shared by a group of these weights.  This transformation is lossy and modifies the behavior of models.  While research is being conducted on how to efficiently quantize large language models for use in mobile devices, this transformation invariably results in both quality loss and a reduced amount of control over the output of the models, leading to an increased risk of undesirable responses, hallucination and stuttering.  In effect, a developer quantizing a model has a responsibility to understand and reduce these effects.
 
 ## Desktop Execution
 
@@ -294,7 +294,7 @@ The following models are supported by torchchat and have associated aliases. Oth
 |[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories110M`.|
 |[openlm-research/open_llama_7b](https://huggingface.co/openlm-research/open_llama_7b)|✅|Best for `generate`. Alias to `open-llama`.|
 
-Torchchat also supports loading of many models in the GGUF format. See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
+torchchat also supports loading of many models in the GGUF format. See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
 
 While we describe how to use torchchat using the popular llama3 model, you can perform the example commands with any of these models.
 
@@ -336,7 +336,7 @@ you've built around local LLM inference.
 
 
 ## License
-Torchchat is released under the [BSD 3 license](LICENSE). (Additional code in this 
+torchchat is released under the [BSD 3 license](LICENSE). (Additional code in this 
 distribution is covered by the MIT and Apache Open Source licenses.) However you may have other legal obligations
 that govern your use of content, such as the terms of service for third-party models.
 ![image](https://github.com/pytorch/torchchat/assets/61328285/1cfccb53-c025-43d7-8475-94b34cf92339)
