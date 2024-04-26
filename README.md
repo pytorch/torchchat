@@ -80,7 +80,7 @@ with `python3 torchchat.py remove llama3`.
      * in Chat mode
      * in Generate mode
   * Fine-tuned models from torchtune
-  
+
 
 ## Running via PyTorch / Python
 
@@ -92,7 +92,7 @@ In chat mode, the LLM engages in a back-and-forth dialogue with the user. It res
 
 ```bash
 # Llama 3 8B Instruct
-python3 torchchat.py chat llama3 
+python3 torchchat.py chat llama3
 ```
 
 ```
@@ -134,11 +134,11 @@ Enter some text in the input box, then hit the enter key or click the “SEND”
 
 Quantization is the process of converting a model into a more memory-efficient representation.  Quantization is particularly important for accelerators -- to take advantage of the available memory bandwidth, and fit in the often limited high-speed memory in accelerators – and mobile devices – to fit in the typically very limited memory of mobile devices.
 
-Depending on the model and the target device, different quantization recipes may be applied. torchchat contains two example configurations to optimize performance for GPU-based systems `config/data/qconfig_gpu.json`, and mobile systems `config/data/qconfig_mobile.json`. The GPU configuration is targeted towards optimizing for memory bandwidth which is a scarce resource in powerful GPUs (and to a less degree, memory footprint to fit large models into a device's memory). The mobile configuration is targeted towards optimizing for memory fotoprint because in many devices, a single application is limited to as little as GB or less of memory.
+Depending on the model and the target device, different quantization recipes may be applied. torchchat contains two example configurations to optimize performance for GPU-based systems `config/data/cuda.json`, and mobile systems `config/data/mobile.json`. The GPU configuration is targeted towards optimizing for memory bandwidth which is a scarce resource in powerful GPUs (and to a less degree, memory footprint to fit large models into a device's memory). The mobile configuration is targeted towards optimizing for memory fotoprint because in many devices, a single application is limited to as little as GB or less of memory.
 
 You can use the quantization recipes in conjunction with any of the `chat`, `generate` and `browser` commands to test their impact and accelerate model execution. You will apply these recipes to the `export` comamnds below, to optimize the exported models. For example:
 ```
-python3 torchchat.py chat llama3 --quantize config/data/qconfig_gpu.json
+python3 torchchat.py chat llama3 --quantize config/data/cuda.json
 ```
 To adapt these recipes or wrote your own, please refer to the [quantization overview](docs/quantization.md).
 
@@ -157,10 +157,10 @@ The following example uses the Llama3 8B model.
 python3 torchchat.py export llama3 --output-dso-path llama3.so
 
 # Execute
-python3 torchchat.py generate llama3 --quantize config/data/qconfig_gpu.json--dso-path llama3.so --prompt "Hello my name is"
+python3 torchchat.py generate llama3 --quantize config/data/cuda.json--dso-path llama3.so --prompt "Hello my name is"
 ```
 
-NOTE: We use `--quantize config/data/qconfig_gpu.json` to quantize the llama3 model to reduce model size and improve performance for on-device use cases.
+NOTE: We use `--quantize config/data/cuda.json` to quantize the llama3 model to reduce model size and improve performance for on-device use cases.
 
 **Build Native Runner Binary**
 
@@ -185,12 +185,12 @@ Before running ExecuTorch commands, you must first set-up ExecuTorch in torchcha
 The following example uses the Llama3 8B model.
 ```
 # Compile
-python3 torchchat.py export llama3 --quantize config/data/qconfig_mobile.json --output-pte-path llama3.pte
+python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
 
 # Execute
 python3 torchchat.py generate llama3 --device cpu --pte-path llama3.pte --prompt "Hello my name is"
 ```
-NOTE: We use `--quantize config/data/qconfig_mobile.json` to quantize the llama3 model to reduce model size and improve performance for on-device use cases.
+NOTE: We use `--quantize config/data/mobile.json` to quantize the llama3 model to reduce model size and improve performance for on-device use cases.
 
 See below under [Mobile Execution](#mobile-execution) if you want to deploy and execute a model in your iOS or Android app.
 
@@ -336,6 +336,6 @@ you've built around local LLM inference.
 
 
 ## License
-torchchat is released under the [BSD 3 license](LICENSE). (Additional code in this 
+torchchat is released under the [BSD 3 license](LICENSE). (Additional code in this
 distribution is covered by the MIT and Apache Open Source licenses.) However you may have other legal obligations
 that govern your use of content, such as the terms of service for third-party models.
