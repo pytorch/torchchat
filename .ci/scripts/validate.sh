@@ -110,13 +110,13 @@ function generate_compiled_model_output() {
 function generate_aoti_model_output() {
     local CHECKPOINT_PATH="$1"
     local TARGET_DEVICE="${2:-cpu}"
-    local DTYPES="${3}"
+    local DTYPES="${3:-default}"
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
 
     echo "Local DTYPES=$DTYPES"
 
-    if [[ DTYPES == "default" ]]; then
+    if [[ $DTYPES == "default" ]]; then
         if [[ $CHECKPOINT_PATH != *"stories"* && $TARGET_DEVICE == "cuda" ]]; then
             DTYPES="bfloat16"
             EXCLUDE_INT8_QUANT=true
