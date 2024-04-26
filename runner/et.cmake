@@ -27,6 +27,13 @@ IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   SET(CMAKE_INSTALL_PREFIX ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install CACHE PATH "Setting it to a default value" FORCE)
 ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
+# Building for Android. Since Android overwrites CMAKE_FIND_ROOT_PATH normal
+# CMAKE_INSTALL_PREFIX won't work. Redirect CMAKE_FIND_ROOT_PATH to it.
+# This should check any cross compilation but let's do Android for now
+if(ANDROID)
+  set(CMAKE_FIND_ROOT_PATH "${CMAKE_INSTALL_PREFIX}")
+endif()
+
 include(CMakePrintHelpers)
 include(runner/Utils.cmake)
 
@@ -76,7 +83,7 @@ if(executorch_FOUND)
   endif()
 
   target_link_libraries(et_run PRIVATE
-  "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/libcustom_ops.a>")
+  "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libcustom_ops.a>")
   # This one is needed for cpuinfo where it uses android specific log lib
   if(ANDROID)
     target_link_libraries(et_run PRIVATE log)
@@ -97,4 +104,6 @@ if(executorch_FOUND)
   # This works on mac, but appears to run into issues on linux
   # It is needed to solve:
   # E 00:00:00.055965 executorch:method.cpp:536] Missing operator: [8] llama::sdpa_with_kv_cache.out
+else()
+  MESSAGE(WARNING "ExecuTorch package not found")
 endif()
