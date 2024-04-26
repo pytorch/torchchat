@@ -110,9 +110,11 @@ function generate_compiled_model_output() {
 function generate_aoti_model_output() {
     local CHECKPOINT_PATH="$1"
     local TARGET_DEVICE="${2:-cpu}"
-    local DTYPES="${3-default}"
+    local DTYPES="${3}"
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
+
+    echo "Local DTYPES=$DTYPES"
 
     if [[ DTYPES="default" ]]; then
         if [[ $CHECKPOINT_PATH != *"stories"* && $TARGET_DEVICE == "cuda" ]]; then
@@ -299,6 +301,7 @@ function run_compile() {
 }
 
 function run_aoti() {
+    echo "Passing DTYPES=$DTYPES"
     generate_aoti_model_output "$CHECKPOINT_PATH" "$TARGET_DEVICE" "$DTYPES" || exit 1
 }
 
@@ -327,31 +330,39 @@ if [ "$#" -gt 2 ]; then
     for arg in "${@:3}"; do
         case "$arg" in
             "compile")
+                echo "arg:$arg"
                 run_compile || exit 1
                 ;;
             "aoti")
+                echo "arg:$arg"
                 DTYPES="default"
                 run_aoti || exit 1
                 ;;
             "aoti-bfloat16")
+                echo "arg:$arg"
                 DTYPES="bfloat16"
                 run_aoti || exit 1
                 ;;
             "aoti-float16")
+                echo "arg:$arg"
                 DTYPES="float16"
                 run_aoti || exit 1
                 ;;
             "aoti-float32")
+                echo "arg:$arg"
                 DTYPES="float32"
                 run_aoti || exit 1
                 ;;
             "executorch")
+                echo "arg:$arg"
                 run_executorch || exit 1
                 ;;
             "eval")
+                echo "arg:$arg"
                 run_eval || exit 1
                 ;;
             "eval_sanity_check")
+                echo "arg:$arg"
                 run_eval_sanity_check || exit 1
                 ;;
             *)
