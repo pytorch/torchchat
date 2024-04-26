@@ -116,7 +116,7 @@ function generate_aoti_model_output() {
 
     echo "Local DTYPES=$DTYPES"
 
-    if [[ DTYPES="default" ]]; then
+    if [[ DTYPES == "default" ]]; then
         if [[ $CHECKPOINT_PATH != *"stories"* && $TARGET_DEVICE == "cuda" ]]; then
             DTYPES="bfloat16"
             EXCLUDE_INT8_QUANT=true
@@ -125,6 +125,8 @@ function generate_aoti_model_output() {
             EXCLUDE_INT8_QUANT=false
         fi
     fi
+
+    echo "Local after default DTYPES=$DTYPES"
 
     for DTYPE in $DTYPES; do
         echo ""############### Run inference with AOT Inductor  for dtype $DTYPE "###############"
