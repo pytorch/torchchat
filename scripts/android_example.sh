@@ -121,18 +121,21 @@ build_app() {
 }
 
 setup_avd() {
+  if adb devices | grep -q "device$"; then
+    echo "adb device detected, skipping avd setup"
+    return
+  fi
   sdkmanager "emulator"
   sdkmanager "system-images;android-34;google_apis;${ANDROID_ABI}"
   if ! avdmanager list avd | grep -q "torchchat"; then
     avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
   fi
-}
-
-start_avd() {
   sdk/emulator/emulator @torchchat > /dev/null 2>&1 &
 }
 
 push_files_to_android() {
+  echo "If you need to use emulator, please use a separate window and run"
+  echo "sdk/emulator/emulator @torchchat > /dev/null 2>&1 &"
   adb wait-for-device
   adb shell mkdir -p /data/local/tmp/llama
   adb push stories15M.pte /data/local/tmp/llama
@@ -149,6 +152,5 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   make_executorch_aar
   build_app
   setup_avd
-  start_avd
   push_files_to_android
 fi
