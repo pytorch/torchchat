@@ -303,4 +303,3 @@ you've built around local LLM inference.
 ## License
 Torchchat is released under the [BSD 3 license](LICENSE). However you may have other legal obligations
 that govern your use of content, such as the terms of service for third-party models.
-![image](https://github.com/pytorch/torchchat/assets/61328285/1cfccb53-c025-43d7-8475-94b34cf92339)
