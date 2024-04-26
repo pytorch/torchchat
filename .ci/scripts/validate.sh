@@ -322,8 +322,9 @@ CHECKPOINT_PATH="$1"
 TARGET_DEVICE="${2:-cpu}"
 PROMPT="Hello, my name is"
 
+DTYPES="${3:-default}"
 
-if [ "$#" -gt 2 ]; then
+if [ "$#" -gt 3 ]; then
     # Additional arguments provided
     for arg in "${@:3}"; do
         case "$arg" in
@@ -331,7 +332,6 @@ if [ "$#" -gt 2 ]; then
                 run_compile || exit 1
                 ;;
             "aoti")
-                DTYPES="${4:-default}"
                 run_aoti || exit 1
                 ;;
             "executorch")

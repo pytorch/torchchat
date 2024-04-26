@@ -185,7 +185,7 @@ jobs:
 
   test-gpu-aoti-bfloat16:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
-    name: test-gpu-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
+    name: test-gpu-aoti-bfloat16 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
       matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
@@ -221,7 +221,7 @@ jobs:
 
   test-gpu-aoti-float32:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
-    name: test-gpu-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
+    name: test-gpu-aoti-float32 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
       matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
@@ -257,7 +257,7 @@ jobs:
 
   test-gpu-aoti-float16:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
-    name: test-gpu-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
+    name: test-gpu-aoti-float16 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
       matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
