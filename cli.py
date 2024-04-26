@@ -295,10 +295,16 @@ def _add_arguments_common(parser):
 
 
 def arg_init(args):
-    if hasattr(args, 'quantize') and Path(args.quantize).is_file():
+    if hasattr(args, "quantize") and Path(args.quantize).is_file():
         with open(args.quantize, "r") as f:
             args.quantize = json.loads(f.read())
 
-    if hasattr(args, 'seed') and args.seed:
+    if isinstance(args.quantize, str):
+        args.quantize = json.loads(args.quantize)
+
+    # if we specify dtype in quantization recipe, replicate it as args.dtype
+    args.dtype = args.quantize.get("precision", {}).get("dtype", args.dtype)
+
+    if hasattr(args, "seed") and args.seed:
         torch.manual_seed(args.seed)
     return args
