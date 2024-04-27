@@ -773,7 +773,7 @@ int main(int argc, char* argv[]) {
       NULL; // the (optional) system prompt to use in chat mode
 
   int vocab_size = -1;
-  int llama_ver;
+  int llama_ver = 2;
 
 #if defined(ET_USE_ADPATIVE_THREADS)
   uint32_t num_performant_cores = torch::executorch::cpuinfo::get_num_performant_cores();
