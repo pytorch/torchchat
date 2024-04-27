@@ -34,6 +34,8 @@ function generate_compiled_model_output() {
         EXCLUDE_INT8_QUANT=false
     fi
 
+    EXCLUDE_INT8_QUANT=false
+    
     for DTYPE in $DTYPES; do
         echo ""############### Run inference with torch.compile for dtype $DTYPE "###############"
         echo ""
