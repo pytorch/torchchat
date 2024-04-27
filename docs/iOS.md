@@ -3,7 +3,7 @@
 On a Mac set-up [ExecuTorch](executorch_setup.md) and open the LLaMA app project with Xcode:
 
 ```
-open et-buils/src/executorch/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj
+open et-build/src/executorch/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj
 ```
 
 Then click the Play button to launch the app in Simulator.
