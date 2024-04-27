@@ -9,7 +9,7 @@ from pathlib import Path
 
 import torch
 
-from build.utils import allowable_dtype_names, allowable_params_table
+from build.utils import allowable_dtype_names, allowable_params_table, get_device_str
 from download import download_and_convert, is_model_downloaded
 
 default_device = "cpu"
@@ -252,7 +252,7 @@ def _add_arguments_common(parser):
         "--device",
         type=str,
         default=default_device,
-        choices=["cpu", "cuda", "mps"],
+        choices=["fast", "cpu", "cuda", "mps"],
         help="Hardware device to use. Options: cpu, cuda, mps",
     )
     parser.add_argument(
@@ -300,7 +300,7 @@ def arg_init(args):
             "You are using PyTorch {torch.__version__}. At this time, torchchat uses the latest PyTorch technology with high-performance kernels only available in PyTorch nightly until the PyTorch 2.4 release"
         )
 
-    if hasattr(args, 'quantize') and Path(args.quantize).is_file():
+    if hasattr(args, "quantize") and Path(args.quantize).is_file():
         with open(args.quantize, "r") as f:
             args.quantize = json.loads(f.read())
 
@@ -309,6 +309,9 @@ def arg_init(args):
 
     # if we specify dtype in quantization recipe, replicate it as args.dtype
     args.dtype = args.quantize.get("precision", {}).get("dtype", args.dtype)
+    args.device = get_device_str(
+        args.quantize.get("executor", {}).get("accelerator", args.device)
+    )
 
     if hasattr(args, "seed") and args.seed:
         torch.manual_seed(args.seed)
