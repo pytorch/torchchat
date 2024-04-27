@@ -15,7 +15,13 @@ from typing import Dict, Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from build.utils import find_multiple, get_precision, name_to_dtype, use_et_backend, state_dict_device
+from build.utils import (
+    find_multiple,
+    get_precision,
+    name_to_dtype,
+    state_dict_device,
+    use_et_backend,
+)
 
 
 #########################################################################
@@ -114,6 +120,28 @@ class PrecisionHandler(QuantHandler):
 
     def quantized_model(self) -> nn.Module:
         return self.model_.to(device=self.device, dtype=self.dtype)
+
+
+#########################################################################
+###            wrapper for setting device as a QuantHandler           ###
+
+
+class ExecutorHandler(QuantHandler):
+    def __init__(self, model: nn.Module, device="cpu", tokenizer=None, *, accelerator):
+        self.model_ = model
+
+        if isinstance(accelerator, str):
+            device = get_device_str(accelerator)
+        self.device = device
+
+    def create_quantized_state_dict(self) -> Dict:  # "StateDict"
+        pass
+
+    def convert_for_runtime(self) -> nn.Module:
+        pass
+
+    def quantized_model(self) -> nn.Module:
+        return self.model_.to(device=self.device)
 
 
 #########################################################################
@@ -407,8 +435,8 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
     @torch.no_grad()
     def create_quantized_state_dict(self) -> Dict:
         cur_state_dict = state_dict_device(self.model_.state_dict())
-        dict_device = "cpu" # self.device
-                                                     
+        dict_device = "cpu"  # self.device
+
         if self.bitwidth == 4:
             range_min = -8
             range_max = 7
@@ -824,12 +852,11 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
         assert groupsize in [32, 64, 128, 256]
         assert inner_k_tiles in [2, 4, 8]
 
-        
     # @torch.no_grad()
     # def p(self):
     #     cur_state_dict = state_dict_device(self.model_.state_dict())
     #     dict_device = "cpu"  # self.device
-    #     
+    #
     #     for fqn, mod in self.model_.named_modules():
     #         if hasattr(mod, "weight"):
     #             print(f"device={str(mod.weight.data.device)}")
@@ -838,7 +865,7 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
     def create_quantized_state_dict(self):
         cur_state_dict = state_dict_device(self.model_.state_dict())
         dict_device = "cpu"  # self.device
-        
+
         for fqn, mod in self.model_.named_modules():
             if isinstance(mod, torch.nn.Linear):
                 assert not mod.bias
@@ -1282,4 +1309,5 @@ quantizer_class_dict = {
     "linear:int4-gptq": WeightOnlyInt4GPTQQuantHandler,
     "linear:hqq": WeightOnlyInt4HqqQuantHandler,
     "precision": PrecisionHandler,
+    "executor": ExecutorHandler,
 }
