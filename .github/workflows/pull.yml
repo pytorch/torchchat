@@ -183,6 +183,15 @@ jobs:
         bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "compile"
         echo "::endgroup::"
 
+        echo "::group::Run inference with quantize file"
+        if [ $(uname -s) != Darwin ]; then
+          python3 generate.py --quantize config/data/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+        fi
+        
+
+
+        echo "::endgroup::"
+
   test-gpu-aoti:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     name: test-gpu-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
@@ -223,6 +232,13 @@ jobs:
 
         echo "::group::Run inference"
         bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti"
+        echo "::endgroup::"
+
+        echo "::group::Run inference with quantize file"
+        if [ $(uname -s) == Darwin ]; then
+          python3 export.py --output-dso-path /tmp/model.so --quantize config/data/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+             python3 generate.py --dso-path /tmp/model.so --checkpoint "./checkpoints/${REPO_NAME}/model.pth"~
+        fi
         echo "::endgroup::"
 
   test-gpu-eval-sanity-check:
@@ -346,8 +362,19 @@ jobs:
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
+          
+          echo "******************************************"
+          echo "***               vanilla              ***"
+          echo "******************************************"
           python export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+
+          echo "******************************************"
+          echo "*** --quantize config/data/mobile.json ***"
+          echo "******************************************"
+          python export.py --quantize config/data/mobile.json --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+
 
           echo "******************************************"
           echo "******* Emb: channel-wise quantized ******"
