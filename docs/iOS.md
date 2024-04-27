@@ -1,19 +1,12 @@
 # Running LLaMA models on iOS
 
-Check out the [tutorial](https://pytorch.org/executorch/main/llm/llama-demo-ios.html) on how to build the iOS demo app running your
-PyTorch models with [ExecuTorch](https://github.com/pytorch/executorch).
+On a Mac set-up [ExecuTorch](executorch_setup.md) and open the LLaMA app project with Xcode:
 
 ```
-git clone https://github.com/pytorch/executorch.git
-
-cd executorch
-
-git submodule update --init
-
-open examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj
+open et-buils/src/executorch/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj
 ```
 
-Then click the Play button in Xcode to launch the app in Simulator.
+Then click the Play button to launch the app in Simulator.
 
 To run on a device, given that you already have it set up for development, you'll need to have a provisioning profile with the [`increased-memory-limit`](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_developer_kernel_increased-memory-limit) entitlement. Just change the app's bundle identifier to whatever matches your provisioning profile with the aforementioned capability enabled.
 
