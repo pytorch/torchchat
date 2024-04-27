@@ -46,9 +46,9 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          pip list
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
@@ -82,9 +82,9 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          pip list
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
@@ -117,9 +117,9 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          pip list
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
@@ -164,9 +164,9 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip install -r ./requirements.txt
-        pip list
+        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip3 install -r ./requirements.txt
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -183,18 +183,9 @@ jobs:
         bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "compile"
         echo "::endgroup::"
 
-        echo "::group::Run inference with quantize file"
-        if [ $(uname -s) != Darwin ]; then
-          python3 generate.py --quantize config/data/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
-        fi
-        
-
-
-        echo "::endgroup::"
-
-  test-gpu-aoti:
+  test-gpu-aoti-bfloat16:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
-    name: test-gpu-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
+    name: test-gpu-aoti-bfloat16 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
       matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
@@ -204,6 +195,47 @@ jobs:
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
       timeout: 60
+      script: |
+        echo "::group::Print machine info"
+        nvidia-smi
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"        
+
+        echo "::group::Install required packages"
+        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip3 install -r ./requirements.txt
+        pip3 list
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoint"
+        export REPO_NAME=${{ matrix.repo_name }}
+        bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
+        echo "::endgroup::"
+
+        echo "::group::Convert checkpoint"
+        bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+        echo "::endgroup::"
+
+        echo "::group::Run inference"
+        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti-bfloat16"
+        echo "::endgroup::"
+
+  test-gpu-aoti-float32:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    name: test-gpu-aoti-float32 (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-gpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
+      fail-fast: false
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
       script: |
         echo "::group::Print machine info"
         nvidia-smi
@@ -231,7 +263,54 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run inference"
-        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti"
+        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti-float32"
+        echo "::endgroup::"
+
+        echo "::group::Run inference with quantize file"
+        if [ $(uname -s) != Darwin ]; then
+          python3 generate.py --quantize config/data/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+        fi
+        echo "::endgroup::"
+
+  test-gpu-aoti-float16:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    name: test-gpu-aoti-float16 (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-gpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
+      fail-fast: false
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      script: |
+        echo "::group::Print machine info"
+        nvidia-smi
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"        
+
+        echo "::group::Install required packages"
+        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip install -r ./requirements.txt
+        pip list
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoint"
+        export REPO_NAME=${{ matrix.repo_name }}
+        bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
+        echo "::endgroup::"
+
+        echo "::group::Convert checkpoint"
+        bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+        echo "::endgroup::"
+
+        echo "::group::Run inference"
+        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti-float16"
         echo "::endgroup::"
 
         echo "::group::Run inference with quantize file"
@@ -263,9 +342,9 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip install -r ./requirements.txt
-        pip list
+        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip3 install -r ./requirements.txt
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -303,12 +382,12 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          echo "Intalling pip packages"
-          pip install wheel
-          pip install cmake
-          pip install ninja
-          pip install zstd
-          pip install -r requirements.txt
+          echo "Intalling pip3 packages"
+          pip3 install wheel
+          pip3 install cmake
+          pip3 install ninja
+          pip3 install zstd
+          pip3 install -r requirements.txt
 
           echo "Executorch: cloning"
           mkdir etorch
@@ -372,8 +451,8 @@ jobs:
           echo "******************************************"
           echo "*** --quantize config/data/mobile.json ***"
           echo "******************************************"
-          python export.py --quantize config/data/mobile.json --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python export.py --quantize config/data/mobile.json --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
 
           echo "******************************************"
@@ -463,9 +542,9 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          echo "Installing pip packages"
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
+          echo "Installing pip3 packages"
+          pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
       - name: Download Stories files
@@ -504,7 +583,7 @@ jobs:
         set -x
         # NS: Remove previous installation  of torch first
         # as this script does not isntall anything into conda env but rather as system dep
-        pip uninstall -y torch || true
+        pip3 uninstall -y torch || true
         set -eou pipefail
 
         echo "::group::Print machine info"
@@ -515,10 +594,10 @@ jobs:
 
         echo "::group::Install requirements"
         # Install requirements
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
         ls -la
         pwd
-        pip install -r requirements.txt
+        pip3 install -r requirements.txt
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -579,10 +658,10 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          echo "Intalling pip packages"
-          pip install gguf
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
+          echo "Intalling pip3 packages"
+          pip3 install gguf
+          pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
           git clone https://github.com/ggerganov/llama.cpp.git
@@ -613,7 +692,7 @@ jobs:
         set -x
         # NS: Remove previous installation  of torch first
         # as this script does not isntall anything into conda env but rather as system dep
-        pip uninstall -y torch || true
+        pip3 uninstall -y torch || true
 
         set -eou pipefail
 
@@ -625,10 +704,10 @@ jobs:
 
         echo "::group::Install requirements"
         # Install requirements
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
         ls -la
         pwd
-        pip install -r requirements.txt
+        pip3 install -r requirements.txt
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -684,9 +763,9 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          pip install gguf
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
+          pip3 install gguf
+          pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download GGUF
         run: |
@@ -712,7 +791,7 @@ jobs:
 
           echo "Running compiled"
           python3 torchchat.py generate --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --compile
-          
+
           echo "******************************************"
           echo "******* Emb: channel-wise quantized ******"
           echo "******************************************"
@@ -758,8 +837,8 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          echo "Intalling pip packages"
-          pip install -r requirements.txt
+          echo "Intalling pip3 packages"
+          pip3 install -r requirements.txt
 
           export TORCHCHAT_ROOT=${PWD}
           bash scripts/build_native.sh et
@@ -807,9 +886,9 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          pip list
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
+          pip3 list
 
           bash scripts/build_native.sh aoti
 
@@ -848,10 +927,10 @@ jobs:
           fi
           git submodule sync
           git submodule update --init
-          echo "Intalling pip packages"
-          pip install cmake --upgrade
+          echo "Intalling pip3 packages"
+          pip3 install cmake --upgrade
           cmake --version
-          pip install -r requirements.txt
+          pip3 install -r requirements.txt
           export TORCHCHAT_ROOT=${PWD}
           pushd /tmp
           wget https://dl.google.com/android/repository/android-ndk-r26c-linux.zip
