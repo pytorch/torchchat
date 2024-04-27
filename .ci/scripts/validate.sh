@@ -34,8 +34,6 @@ function generate_compiled_model_output() {
         EXCLUDE_INT8_QUANT=false
     fi
 
-    EXCLUDE_INT8_QUANT=false
-    
     for DTYPE in $DTYPES; do
         echo ""############### Run inference with torch.compile for dtype $DTYPE "###############"
         echo ""
@@ -77,7 +75,7 @@ function generate_compiled_model_output() {
         python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8, "packed": "True"}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
         cat "$MODEL_DIR/output_compiled"
 
-        if [ "$EXCLUDE_INT8_QUANT" = false ]; then
+        if [ "${EXCLUDE_INT8_QUANT:-false}" == false ]; then
             echo "******************************************"
             echo "******* INT8 channel-wise quantized ******"
             echo "******************************************"
@@ -168,7 +166,7 @@ function generate_aoti_model_output() {
         python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
         cat "$MODEL_DIR/output_aoti"
 
-        if [ "$EXCLUDE_INT8_QUANT" = false ]; then
+        if [ "${EXCLUDE_INT8_QUANT:-false}" == false ]; then
             echo "******************************************"
             echo "******* INT8 channel-wise quantized ******"
             echo "******************************************"
@@ -310,7 +308,7 @@ function run_aoti() {
 }
 
 function run_executorch() {
-    if [ "$TARGET_DEVICE" = "cpu" ]; then
+    if [ "$TARGET_DEVICE" == "cpu" ]; then
         generate_executorch_model_output "$CHECKPOINT_PATH" "$TARGET_DEVICE" || exit 1
     else
         echo "Skipped: Executorch doesn't run on ${TARGET_DEVICE}"
