@@ -17,6 +17,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from build.utils import (
     find_multiple,
+    get_device_str,
     get_precision,
     name_to_dtype,
     state_dict_device,
@@ -124,6 +125,8 @@ class PrecisionHandler(QuantHandler):
 
 #########################################################################
 ###            wrapper for setting device as a QuantHandler           ###
+###    for onw select device for PyTorch eager and AOTI, in future    ###
+###    also use this for selecting delegate when exporting with ET    ###
 
 
 class ExecutorHandler(QuantHandler):
