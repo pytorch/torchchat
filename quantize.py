@@ -17,6 +17,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from build.utils import (
     find_multiple,
+    get_device_str,
     get_precision,
     name_to_dtype,
     state_dict_device,

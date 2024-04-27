@@ -210,7 +210,7 @@ def decode_n_tokens(
 ):
     new_tokens, new_probs = [], []
     encountered_eos = False
-    for i in range(
+    for _i in range(
         num_new_tokens - 1
     ):  # -1 to save space to run an EoS if dont generate it naturally
         # Actually better for Inductor to codegen attention here
