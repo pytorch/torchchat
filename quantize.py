@@ -15,7 +15,7 @@ from typing import Dict, Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from build.utils import find_multiple, get_precision, name_to_dtype, use_et_backend
+from build.utils import find_multiple, get_precision, name_to_dtype, use_et_backend, state_dict_device
 
 
 #########################################################################
@@ -63,7 +63,7 @@ class QuantHandler:
         pass
 
     def quantized_model(self) -> nn.Module:
-        model_updated_state_dict = self.create_quantized_state_dict()
+        model_updated_state_dict = state_dict_device(self.create_quantized_state_dict())
         self.convert_for_runtime()
         self.model_.load_state_dict(model_updated_state_dict)
         return self.model_
@@ -406,8 +406,9 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
 
     @torch.no_grad()
     def create_quantized_state_dict(self) -> Dict:
-        cur_state_dict = self.model_.state_dict()
-
+        cur_state_dict = state_dict_device(self.model_.state_dict())
+        dict_device = "cpu" # self.device
+                                                     
         if self.bitwidth == 4:
             range_min = -8
             range_max = 7
@@ -446,8 +447,8 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
                         scales_dtype=mod.weight.dtype,
                     )
 
-                    weight = weight.to(device=self.device)
-                    scales = scales.to(device=self.device)
+                    weight = weight.to(device=dict_device)
+                    scales = scales.to(device=dict_device)
                     cur_state_dict[f"{fqn}.weight"] = weight
                     # squeeze makes groupsize=rowsize unidimensional
                     cur_state_dict[f"{fqn}.scales"] = scales.squeeze(dim=-1)
@@ -553,7 +554,8 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 
     @torch.no_grad()
     def create_quantized_state_dict(self) -> Dict:
-        cur_state_dict = self.model_.state_dict()
+        cur_state_dict = state_dict_device(self.model_.state_dict())
+        dict_device = "cpu"  # self.device
 
         if self.bitwidth == 4:
             range_min = -8
@@ -595,8 +597,8 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
                     weight_packed = weight_even + weight_odd
                     weight = weight_packed
 
-                weight = weight.to(device=self.device)
-                scales = scales.to(device=self.device)
+                weight = weight.to(device=dict_device)
+                scales = scales.to(device=dict_device)
                 # Update state dict
                 cur_state_dict[f"{fqn}.weight"] = weight
                 # squeeze makes groupsize=rowsize unidimensional
@@ -822,9 +824,21 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
         assert groupsize in [32, 64, 128, 256]
         assert inner_k_tiles in [2, 4, 8]
 
+        
+    # @torch.no_grad()
+    # def p(self):
+    #     cur_state_dict = state_dict_device(self.model_.state_dict())
+    #     dict_device = "cpu"  # self.device
+    #     
+    #     for fqn, mod in self.model_.named_modules():
+    #         if hasattr(mod, "weight"):
+    #             print(f"device={str(mod.weight.data.device)}")
+
     @torch.no_grad()
     def create_quantized_state_dict(self):
-        cur_state_dict = self.model_.state_dict()
+        cur_state_dict = state_dict_device(self.model_.state_dict())
+        dict_device = "cpu"  # self.device
+        
         for fqn, mod in self.model_.named_modules():
             if isinstance(mod, torch.nn.Linear):
                 assert not mod.bias
@@ -856,8 +870,8 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
                         weight.to(torch.float), self.groupsize, self.inner_k_tiles
                     )
                 )
-                weight_int4pack = weight_int4pack.to(device=self.device)
-                scales_and_zeros = scales_and_zeros.to(device=self.device)
+                weight_int4pack = weight_int4pack.to(device=dict_device)
+                scales_and_zeros = scales_and_zeros.to(device=dict_device)
                 cur_state_dict[f"{fqn}.weight"] = weight_int4pack
                 cur_state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros
 
@@ -877,6 +891,7 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
         model_updated_state_dict = self.create_quantized_state_dict()
         self.convert_for_runtime()
         self.model_.load_state_dict(model_updated_state_dict)
+        # self.p()
         return self.model_
 
 
