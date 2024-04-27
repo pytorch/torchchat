@@ -46,9 +46,9 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          pip list
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
@@ -82,9 +82,9 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          pip list
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
@@ -117,9 +117,9 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          pip list
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
@@ -164,9 +164,9 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip install -r ./requirements.txt
-        pip list
+        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip3 install -r ./requirements.txt
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -206,9 +206,9 @@ jobs:
         echo "::endgroup::"        
 
         echo "::group::Install required packages"
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip install -r ./requirements.txt
-        pip list
+        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip3 install -r ./requirements.txt
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -247,9 +247,9 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip install -r ./requirements.txt
-        pip list
+        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip3 install -r ./requirements.txt
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -287,12 +287,12 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          echo "Intalling pip packages"
-          pip install wheel
-          pip install cmake
-          pip install ninja
-          pip install zstd
-          pip install -r requirements.txt
+          echo "Intalling pip3 packages"
+          pip3 install wheel
+          pip3 install cmake
+          pip3 install ninja
+          pip3 install zstd
+          pip3 install -r requirements.txt
 
           echo "Executorch: cloning"
           mkdir etorch
@@ -436,9 +436,9 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          echo "Installing pip packages"
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
+          echo "Installing pip3 packages"
+          pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
       - name: Download Stories files
@@ -477,7 +477,7 @@ jobs:
         set -x
         # NS: Remove previous installation  of torch first
         # as this script does not isntall anything into conda env but rather as system dep
-        pip uninstall -y torch || true
+        pip3 uninstall -y torch || true
         set -eou pipefail
 
         echo "::group::Print machine info"
@@ -488,10 +488,10 @@ jobs:
 
         echo "::group::Install requirements"
         # Install requirements
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
         ls -la
         pwd
-        pip install -r requirements.txt
+        pip3 install -r requirements.txt
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -552,10 +552,10 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          echo "Intalling pip packages"
-          pip install gguf
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
+          echo "Intalling pip3 packages"
+          pip3 install gguf
+          pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
           git clone https://github.com/ggerganov/llama.cpp.git
@@ -586,7 +586,7 @@ jobs:
         set -x
         # NS: Remove previous installation  of torch first
         # as this script does not isntall anything into conda env but rather as system dep
-        pip uninstall -y torch || true
+        pip3 uninstall -y torch || true
 
         set -eou pipefail
 
@@ -598,10 +598,10 @@ jobs:
 
         echo "::group::Install requirements"
         # Install requirements
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
         ls -la
         pwd
-        pip install -r requirements.txt
+        pip3 install -r requirements.txt
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -657,9 +657,9 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          pip install gguf
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
+          pip3 install gguf
+          pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download GGUF
         run: |
@@ -731,8 +731,8 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          echo "Intalling pip packages"
-          pip install -r requirements.txt
+          echo "Intalling pip3 packages"
+          pip3 install -r requirements.txt
 
           export TORCHCHAT_ROOT=${PWD}
           bash scripts/build_native.sh et
@@ -780,9 +780,9 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          pip list
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
+          pip3 list
 
           bash scripts/build_native.sh aoti
 
@@ -821,10 +821,10 @@ jobs:
           fi
           git submodule sync
           git submodule update --init
-          echo "Intalling pip packages"
-          pip install cmake --upgrade
+          echo "Intalling pip3 packages"
+          pip3 install cmake --upgrade
           cmake --version
-          pip install -r requirements.txt
+          pip3 install -r requirements.txt
           export TORCHCHAT_ROOT=${PWD}
           pushd /tmp
           wget https://dl.google.com/android/repository/android-ndk-r26c-linux.zip
