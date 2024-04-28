@@ -1,8 +1,5 @@
 /* Inference for Llama-2 Transformer model in pure C++ */
-#include <cstdint>
-#include <cstdlib>
 #include <ctype.h>
-#include <iterator>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -10,8 +7,10 @@
 #include <string.h>
 #include <time.h>
 #include <tokenizer.h>
+#include <cstdint>
+#include <cstdlib>
+#include <iterator>
 #include <string>
-
 
 #ifdef DEBUG
 #include <cassert>
@@ -45,6 +44,12 @@ using torch::executor::Result;
 
 // ----------------------------------------------------------------------------
 // Transformer model
+
+enum class ModelType {
+  unknown,
+  llama2,
+  llama3,
+};
 
 typedef struct {
   int vocab_size; // vocabulary size, usually 256 (byte-level)
@@ -167,7 +172,8 @@ float* forward(Transformer* transformer, int token, int pos) {
   torch::Tensor pos_tensor = torch::from_blob(pos_buffer, {1}, torch::kLong);
   std::vector<torch::Tensor> inputs{token_tensor, pos_tensor};
 
-  torch::Tensor result = transformer->runner->run(inputs)[0].to(torch::dtype(torch::kFloat32));
+  torch::Tensor result =
+      transformer->runner->run(inputs)[0].to(torch::dtype(torch::kFloat32));
   auto logits = result[0].data_ptr();
 
 #else // __ET_MODEL__
@@ -362,6 +368,32 @@ int sample(Sampler* sampler, float* logits) {
   return next;
 }
 
+Tokenizer* build_tokenizer(
+    const char* tokenizer_path,
+    ModelType model_type,
+    int vocab_size) {
+  Tokenizer* tokenizer = nullptr;
+  switch (model_type) {
+    case ModelType::llama2:
+      tokenizer = new BPETokenizer(vocab_size, /*bos*/ 1, /*eos*/ 2);
+      tokenizer->load(tokenizer_path);
+      break;
+    case ModelType::llama3:
+      tokenizer = new Tiktoken(vocab_size, /*bos*/ 1, /*eos*/ 2);
+      tokenizer->load(tokenizer_path);
+      break;
+
+    default:
+      fprintf(stderr, "No tokenizer defined for model type %d", model_type);
+      exit(EXIT_FAILURE);
+  }
+  return tokenizer;
+}
+
+void free_tokenizer(Tokenizer* tokenizer) {
+  delete tokenizer;
+}
+
 // ----------------------------------------------------------------------------
 // utilities: time
 
@@ -399,7 +431,8 @@ void generate(
     Tokenizer* tokenizer,
     Sampler* sampler,
     const char* prompt,
-    int steps) {
+    int steps,
+    ModelType model_type) {
   const char* default_prompt = "Once upon a time";
   if (prompt == NULL) {
     prompt = default_prompt;
@@ -490,25 +523,20 @@ void read_stdin(const char* guide, char* buffer, size_t bufsize) {
 // python reference and that seemed ok, but this was not thoroughly tested and
 // is not safely implemented, it's more a proof of concept atm.
 
-enum class ModelType {
-    unknown,
-    llama2,
-    llama3,
-};
-
-ModelType get_model_type(Tokenizer* tokenizer) {
-  if (BPETokenizer* t = dynamic_cast<BPETokenizer*>(tokenizer)) {
-    return ModelType::llama2;
-  } else if (Tiktoken* t = dynamic_cast<Tiktoken*>(tokenizer)) {
-    return ModelType::llama3;
-  } else {
-    return ModelType::unknown;
+ModelType get_model_type(int model_int) {
+  switch (model_int) {
+    case 2:
+      return ModelType::llama2;
+      break;
+    case 3:
+      return ModelType::llama3;
+      break;
+    default:
+      return ModelType::unknown;
   }
 }
 
-uint64_t get_eot_token(Tokenizer* tokenizer) {
-  ModelType model_type = get_model_type(tokenizer);
-
+uint64_t get_eot_token(Tokenizer* tokenizer, ModelType model_type) {
   if (model_type == ModelType::llama2) {
     // llama2 uses EOS as EOT token
     return tokenizer->eos_tok();
@@ -519,19 +547,28 @@ uint64_t get_eot_token(Tokenizer* tokenizer) {
     return tokens[0];
   }
 
-  fprintf(stderr, "No chat template implemnation for model type %d", model_type);
+  fprintf(
+      stderr, "No chat template implemnation for model type %d", model_type);
   exit(EXIT_FAILURE);
 }
 
-std::vector<uint64_t> get_initial_prompt_tokens(const char* cli_system_prompt, const char* cli_user_prompt, Tokenizer* tokenizer) {
+std::vector<uint64_t> get_initial_prompt_tokens(
+    const char* cli_system_prompt,
+    const char* cli_user_prompt,
+    Tokenizer* tokenizer,
+    ModelType model_type) {
   char system_prompt[512];
   char user_prompt[512];
-  char rendered_prompt[512*2 + 200]; // the prompt template is ~170 characters.  We use 200 to be safe.
+  char rendered_prompt[512 * 2 + 200]; // the prompt template is ~170
+                                       // characters.  We use 200 to be safe.
 
   if (cli_system_prompt != NULL) {
     strcpy(system_prompt, cli_system_prompt);
   } else {
-    read_stdin("Enter system prompt (optional): ", system_prompt, sizeof(system_prompt));
+    read_stdin(
+        "Enter system prompt (optional): ",
+        system_prompt,
+        sizeof(system_prompt));
   }
 
   if (cli_user_prompt != NULL) {
@@ -540,111 +577,58 @@ std::vector<uint64_t> get_initial_prompt_tokens(const char* cli_system_prompt, c
     read_stdin("User: ", user_prompt, sizeof(user_prompt));
   }
 
-   ModelType model_type = get_model_type(tokenizer);
-   std::vector<uint64_t> tokens;
+  std::vector<uint64_t> tokens;
 
-   switch (model_type) {
-
+  switch (model_type) {
     case ModelType::llama2:
       if (system_prompt[0] != '\0') {
         snprintf(
-          rendered_prompt,
-          sizeof(rendered_prompt)-1,
-          "[INST] <<SYS>>\n%s\n<</SYS>>\n\n%s [/INST]",
-          system_prompt,
-          user_prompt
-        );
+            rendered_prompt,
+            sizeof(rendered_prompt) - 1,
+            "[INST] <<SYS>>\n%s\n<</SYS>>\n\n%s [/INST]",
+            system_prompt,
+            user_prompt);
       } else {
         // const char prompt_template[] = ;
         snprintf(
-          rendered_prompt,
-          sizeof(rendered_prompt)-1,
-          "[INST] %s [/INST]",
-          user_prompt
-        );
+            rendered_prompt,
+            sizeof(rendered_prompt) - 1,
+            "[INST] %s [/INST]",
+            user_prompt);
       }
 
-      // We need to add BOS token here and not in template because llama2 tokenizer
-      // does not pattern match special tokens
+      // We need to add BOS token here and not in template because llama2
+      // tokenizer does not pattern match special tokens
       tokens = tokenizer->encode(rendered_prompt, 1, 0);
       break;
 
     case ModelType::llama3:
       if (system_prompt[0] != '\0') {
         snprintf(
-          rendered_prompt,
-          sizeof(rendered_prompt)-1,
-          "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
-          system_prompt,
-          user_prompt
-        );
+            rendered_prompt,
+            sizeof(rendered_prompt) - 1,
+            "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
+            system_prompt,
+            user_prompt);
       } else {
         snprintf(
-          rendered_prompt,
-          sizeof(rendered_prompt)-1,
-          "<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
-          user_prompt
-        );
+            rendered_prompt,
+            sizeof(rendered_prompt) - 1,
+            "<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
+            user_prompt);
       }
       tokens = tokenizer->encode(rendered_prompt, 0, 0);
       break;
 
     default:
-      fprintf(stderr, "No chat template implemnation for model type %d", model_type);
-      exit(EXIT_FAILURE);
-    }
-
-    #ifdef DEBUG
-    std::cerr << "Start of rendered prompt:" << std::endl;
-    std::cerr << rendered_prompt;
-    std::cerr << "End of rendered prompt:" << std::endl;
-    std::cerr << "Encoded prompt: ";
-    for (int i = 0; i < tokens.size(); i++) {
-      std::cerr << tokens[i] << ", ";
-    }
-    std::cerr << std::endl << std::flush;
-    #endif
-
-    return tokens;
-}
-
-std::vector<uint64_t> get_next_user_prompt_tokens(Tokenizer* tokenizer) {
-  char user_prompt[512];
-  char rendered_prompt[512 + 150]; // the prompt template is ~100 characters.  We use 150 to be safe.
-
-  read_stdin("User: ", user_prompt, sizeof(user_prompt));
-
-  ModelType model_type = get_model_type(tokenizer);
-  std::vector<uint64_t> tokens;
-
-  switch (model_type) {
-
-    case ModelType::llama2:
-      // const char prompt_template[] = ;
-      snprintf(rendered_prompt, sizeof(rendered_prompt)-1, "[INST] %s [/INST]", user_prompt);
-
-      // We need to add BOS token here and not in template because llama2 tokenizer
-      // does not pattern match special tokens
-      tokens = tokenizer->encode(rendered_prompt, /*bos*/1, /*eos*/0);
-      break;
-
-    case ModelType::llama3:
-      snprintf(
-        rendered_prompt,
-        sizeof(rendered_prompt)-1,
-        "<|start_header_id|>user<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
-        user_prompt
-      );
-      tokens = tokenizer->encode(rendered_prompt, 0, 0);
-      break;
-
-    default:
-      fprintf(stderr, "No chat template implemnation for model type %d", model_type);
+      fprintf(
+          stderr,
+          "No chat template implemnation for model type %d",
+          model_type);
       exit(EXIT_FAILURE);
   }
 
-
-  #ifdef DEBUG
+#ifdef DEBUG
   std::cerr << "Start of rendered prompt:" << std::endl;
   std::cerr << rendered_prompt;
   std::cerr << "End of rendered prompt:" << std::endl;
@@ -653,11 +637,65 @@ std::vector<uint64_t> get_next_user_prompt_tokens(Tokenizer* tokenizer) {
     std::cerr << tokens[i] << ", ";
   }
   std::cerr << std::endl << std::flush;
-  #endif
+#endif
 
   return tokens;
 }
 
+std::vector<uint64_t> get_next_user_prompt_tokens(
+    Tokenizer* tokenizer,
+    ModelType model_type) {
+  char user_prompt[512];
+  char rendered_prompt[512 + 150]; // the prompt template is ~100 characters. We
+                                   // use 150 to be safe.
+
+  read_stdin("User: ", user_prompt, sizeof(user_prompt));
+  std::vector<uint64_t> tokens;
+
+  switch (model_type) {
+    case ModelType::llama2:
+      // const char prompt_template[] = ;
+      snprintf(
+          rendered_prompt,
+          sizeof(rendered_prompt) - 1,
+          "[INST] %s [/INST]",
+          user_prompt);
+
+      // We need to add BOS token here and not in template because llama2
+      // tokenizer does not pattern match special tokens
+      tokens = tokenizer->encode(rendered_prompt, /*bos*/ 1, /*eos*/ 0);
+      break;
+
+    case ModelType::llama3:
+      snprintf(
+          rendered_prompt,
+          sizeof(rendered_prompt) - 1,
+          "<|start_header_id|>user<|end_header_id|>\n\n%s<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
+          user_prompt);
+      tokens = tokenizer->encode(rendered_prompt, 0, 0);
+      break;
+
+    default:
+      fprintf(
+          stderr,
+          "No chat template implemnation for model type %d",
+          model_type);
+      exit(EXIT_FAILURE);
+  }
+
+#ifdef DEBUG
+  std::cerr << "Start of rendered prompt:" << std::endl;
+  std::cerr << rendered_prompt;
+  std::cerr << "End of rendered prompt:" << std::endl;
+  std::cerr << "Encoded prompt: ";
+  for (int i = 0; i < tokens.size(); i++) {
+    std::cerr << tokens[i] << ", ";
+  }
+  std::cerr << std::endl << std::flush;
+#endif
+
+  return tokens;
+}
 
 void chat(
     Transformer* transformer,
@@ -665,9 +703,9 @@ void chat(
     Sampler* sampler,
     const char* cli_user_prompt,
     const char* cli_system_prompt,
-    int steps) {
-
-  const uint64_t EOT_TOKEN = get_eot_token(tokenizer);
+    int steps,
+    ModelType model_type) {
+  const uint64_t EOT_TOKEN = get_eot_token(tokenizer, model_type);
   int num_prompt_tokens = 0;
   std::vector<uint64_t> prompt_tokens;
   int user_idx;
@@ -679,14 +717,14 @@ void chat(
   int prev_token;
   int pos = 0; // position in the sequence
   while (pos < steps) {
-
     // when it is the user's turn to contribute tokens to the dialog...
     if (user_turn) {
       // get the (optional) system prompt at position 0
       if (pos == 0) {
-        prompt_tokens = get_initial_prompt_tokens(cli_system_prompt, cli_user_prompt, tokenizer);
+        prompt_tokens = get_initial_prompt_tokens(
+            cli_system_prompt, cli_user_prompt, tokenizer, model_type);
       } else {
-        prompt_tokens = get_next_user_prompt_tokens(tokenizer);
+        prompt_tokens = get_next_user_prompt_tokens(tokenizer, model_type);
       }
       num_prompt_tokens = prompt_tokens.size();
 
@@ -711,12 +749,12 @@ void chat(
 
     // std::cout << "TOKEN: " << token << " NEXT: " << next << std::endl;
 
-
     if ((user_idx >= num_prompt_tokens) && (token == EOT_TOKEN)) {
       user_turn = 1;
     }
 
-    if (user_idx >= num_prompt_tokens && token != EOT_TOKEN && next != EOT_TOKEN) {
+    if (user_idx >= num_prompt_tokens && token != EOT_TOKEN &&
+        next != EOT_TOKEN) {
       std::string piece = tokenizer->decode(token, next);
       safe_printf(piece.c_str()); // same as printf("%s", piece), but skips
                                   // "unsafe" bytes
@@ -727,7 +765,6 @@ void chat(
       printf("\n");
     }
     pos++;
-
   }
   printf("\n");
 }
@@ -737,29 +774,34 @@ void chat(
 #ifndef TESTING
 
 void error_usage() {
-  fprintf(stderr, "Usage:   run <checkpoint> [options]\n");
-  fprintf(stderr, "Example: run model.bin -n 256 -i \"Once upon a time\"\n");
+  fprintf(stderr, "Usage:   run <checkpoint_path> [options]\n");
+  fprintf(
+      stderr, "Example: run model.{so,pte} -n 256 -i \"Once upon a time\"\n");
   fprintf(stderr, "Options:\n");
   fprintf(stderr, "  -t <float>  temperature in [0,inf], default 1.0\n");
   fprintf(
       stderr,
-      "  -p <float>  p value in top-p (nucleus) sampling in [0,1] default 0.9\n");
+      "  -p <float>  p value in top-p (nucleus) sampling in [0,1], default 0.9\n");
   fprintf(stderr, "  -s <int>    random seed, default time(NULL)\n");
   fprintf(
       stderr,
       "  -n <int>    number of steps to run for, default 256. 0 = max_seq_len\n");
   fprintf(stderr, "  -i <string> input prompt\n");
-  fprintf(stderr, "  -z <string> optional path to custom tokenizer\n");
+  fprintf(stderr, "  -z <string> path to tokenizer\n");
   fprintf(stderr, "  -m <string> mode: generate|chat, default: generate\n");
   fprintf(stderr, "  -y <string> (optional) system prompt in chat mode\n");
-  fprintf(stderr, "  -l <int> (optional) llama version (2 or 3).  Defaults to 2.\n");
+  fprintf(
+      stderr,
+      "  -v <int>    (optional) vocab size, default is model-specific.\n");
+  fprintf(
+      stderr, "  -l <int>    (optional) llama version (2 or 3), default 2.\n");
   exit(EXIT_FAILURE);
 }
 
 int main(int argc, char* argv[]) {
   // default parameters
-  char* checkpoint_path = NULL; // e.g. out/model.bin
-  const char* tokenizer_path = "tokenizer.bin";
+  char* checkpoint_path = NULL;
+  char* tokenizer_path = NULL;
   float temperature =
       1.0f; // 0.0 = greedy deterministic. 1.0 = original. don't set higher
   float topp =
@@ -776,7 +818,8 @@ int main(int argc, char* argv[]) {
   int llama_ver = 2;
 
 #if defined(ET_USE_ADPATIVE_THREADS)
-  uint32_t num_performant_cores = torch::executorch::cpuinfo::get_num_performant_cores();
+  uint32_t num_performant_cores =
+      torch::executorch::cpuinfo::get_num_performant_cores();
   if (num_performant_cores > 0) {
     torch::executorch::threadpool::get_threadpool()->_unsafe_reset_threadpool(
         num_performant_cores);
@@ -820,11 +863,29 @@ int main(int argc, char* argv[]) {
     } else if (argv[i][1] == 'y') {
       system_prompt = argv[i + 1];
     } else if (argv[i][1] == 'l') {
-      llama_ver = atoi(argv[i+1]);
-    }
-    else {
+      llama_ver = atoi(argv[i + 1]);
+    } else {
       error_usage();
     }
+  }
+
+  ModelType model_type = get_model_type(llama_ver);
+  if (model_type == ModelType::unknown) {
+    fprintf(
+        stderr,
+        "Unknown model type passed by -l argument.  Received l=%d.",
+        llama_ver);
+    error_usage();
+  }
+
+  if (checkpoint_path == NULL) {
+    fprintf(stderr, "No checkpoint_path provided.");
+    error_usage();
+  }
+
+  if (tokenizer_path == NULL) {
+    fprintf(stderr, "No tokenizer_path provided.");
+    error_usage();
   }
 
   // parameter validation/overrides
@@ -837,47 +898,44 @@ int main(int argc, char* argv[]) {
   if (steps < 0)
     steps = 0;
 
-
+  // If no tokenizer path provided, get default for model_type
   if (vocab_size == -1) {
-    if (llama_ver == 2) {
-      vocab_size = 32000;
-    } else {
-      vocab_size = 128256;
+    switch (model_type) {
+      case ModelType::llama2:
+        vocab_size = 32000;
+        break;
+      case ModelType::llama3:
+        vocab_size = 128256;
+        break;
+      default:
+        fprintf(
+            stderr,
+            "No vocab_size was provided with -v argument, and there is no default vocab_size for model_type ModelType::%d.",
+            model_type);
+        error_usage();
     }
   }
 
-  // build the Transformer via the model .bin file
   Transformer transformer;
   build_transformer(&transformer, checkpoint_path, vocab_size, steps);
 
-  // build the Tokenizer via the tokenizer .bin file
-  Tokenizer* tokenizer = nullptr;
+  Tokenizer* tokenizer =
+      build_tokenizer(tokenizer_path, model_type, vocab_size);
 
-  switch (llama_ver) {
-    case 2:
-      tokenizer = new BPETokenizer(transformer.config.vocab_size, /*bos*/ 1, /*eos*/ 2);
-      tokenizer->load(tokenizer_path);
-      break;
-    case 3:
-      tokenizer = new Tiktoken(transformer.config.vocab_size, /*bos*/ 1, /*eos*/ 2);
-      tokenizer->load(tokenizer_path);
-      break;
-
-    default:
-      fprintf(stderr, "Cannot load tokenizer for unrecognized llama version %d", llama_ver);
-      exit(EXIT_FAILURE);
-  }
-
-  // build the Sampler
   Sampler sampler;
-  build_sampler(
-      &sampler, transformer.config.vocab_size, temperature, topp, rng_seed);
+  build_sampler(&sampler, vocab_size, temperature, topp, rng_seed);
 
-  // run!
   if (strcmp(mode, "generate") == 0) {
-    generate(&transformer, tokenizer, &sampler, prompt, steps);
+    generate(&transformer, tokenizer, &sampler, prompt, steps, model_type);
   } else if (strcmp(mode, "chat") == 0) {
-    chat(&transformer, tokenizer, &sampler, prompt, system_prompt, steps);
+    chat(
+        &transformer,
+        tokenizer,
+        &sampler,
+        prompt,
+        system_prompt,
+        steps,
+        model_type);
   } else {
     fprintf(stderr, "unknown mode: %s\n", mode);
     error_usage();
@@ -885,7 +943,7 @@ int main(int argc, char* argv[]) {
 
   // memory and file handles cleanup
   free_sampler(&sampler);
-  delete tokenizer;
+  free_tokenizer(tokenizer);
   free_transformer(&transformer);
   return 0;
 }
