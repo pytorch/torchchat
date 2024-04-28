@@ -1,0 +1,96 @@
+name: Run runner-aoti CUDA tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-cuda:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
+
+        echo "::group::Download checkpoints"
+        # Install requirements
+        pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip3 install -r requirements.txt
+        pip3 list
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoints"
+        mkdir -p checkpoints/stories15M
+        pushd checkpoints/stories15M
+        wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+        wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+        popd
+        echo "::endgroup::"
+
+        echo "::group::Run inference"
+        export MODEL_PATH=checkpoints/stories15M/stories15M.pt
+        export MODEL_NAME=stories15M
+        export MODEL_DIR=/tmp
+
+      - name: Install dependencies
+        run: |
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
+          pip3 list
+
+          bash scripts/build_native.sh aoti
+
+      - name: Download checkpoint
+        run: |
+          mkdir -p checkpoints/stories15M
+          pushd checkpoints/stories15M
+          wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+          popd
+      - name: Run inference
+        run: |
+          set -eou pipefail
+
+          
+          export MODEL_DIR=${PWD}/checkpoints/stories15M
+          export PROMPT="Once upon a time in a land far away"
+
+          for DTYPE in bfloat16; do
+            python torchchat.py generate --dtype ${DTYPE} --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}" --device cuda
+
+            python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-dso-path /tmp/model.so
+
+            ./cmake-out/aoti_run /tmp/model.so -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}"
+
+            echo "**********************************************"
+            echo "******** INT4 HQQ group-wise quantized *******"
+            echo "**********************************************"
+            python generate.py --dtype ${DTYPE} --device cuda --quant '{"linear:hqq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
+            cat ./output_eager
+            python generate.py --dtype ${DTYPE} --device cuda --compile --quant '{"linear:hqq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
+            cat ./output_compiled
+            python export.py --dtype ${DTYPE} --device cuda --quant '{"linear:hqq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
+            python generate.py --dtype ${DTYPE} --device cuda --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
+            cat ./output_aoti
+
+          done
+
+          echo "tests complete"
+          echo "******************************************"
+          echo "::endgroup::"
+
