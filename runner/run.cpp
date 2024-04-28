@@ -738,8 +738,6 @@ void chat(
     float* logits = forward(transformer, token, pos);
     next = sample(sampler, logits);
 
-    // std::cout << "TOKEN: " << token << " NEXT: " << next << std::endl;
-
     if ((user_idx >= num_prompt_tokens) && (token == EOT_TOKEN)) {
       user_turn = 1;
     }
