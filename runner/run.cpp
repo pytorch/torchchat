@@ -9,6 +9,7 @@
 #include <tokenizer.h>
 #include <cstdint>
 #include <cstdlib>
+#include <iostream>
 #include <iterator>
 #include <string>
 
@@ -686,6 +687,72 @@ std::vector<uint64_t> get_next_user_prompt_tokens(
   return tokens;
 }
 
+int generate_from_prompt_tokens(
+    Transformer* transformer,
+    Tokenizer* tokenizer,
+    Sampler* sampler,
+    const std::vector<uint64_t>& prompt_tokens,
+    int pos,
+    uint64_t stop_token,
+    int stop_pos) {
+  int next; // will store the next token in the sequence
+  int token; // stores the current token to feed into the transformer
+  bool done_with_prompt; // whether we are done processing prompt
+
+  bool found_stop_token = false; // whether we've found the stop_token after
+                                 // processing prompt_tokens
+  int pos_in_prompt = 0; // position relative to start of prompt
+
+  // If stop_pos == -1, we go until we find stop_token
+  // If stop_pos >= 0, we go until we find stop_token or pos <= stop_pos.
+  while (!found_stop_token && (stop_pos == -1 || pos <= stop_pos)) {
+    if (pos_in_prompt < prompt_tokens.size()) {
+      // force prompt token
+      token = prompt_tokens[pos_in_prompt++];
+    } else {
+      // otherwise use the next token sampled from previous turn
+      token = next;
+    }
+    done_with_prompt = (pos_in_prompt >= prompt_tokens.size());
+
+    // forward the transformer to get logits for the next token
+    float* logits = forward(transformer, token, pos);
+    next = sample(sampler, logits);
+
+    // std::cout << "\npos: " << pos << " token: " << token << " next: " << next
+    // << " done_with_prompt: " << done_with_prompt << " decoded: " <<
+    // tokenizer->decode(token, next) << std::endl << std::flush;
+
+    if (done_with_prompt) {
+      // we terminate on finding the stop_token if we are done processing the
+      // prompt (stop_tokens in the prompt do not terminate the loop)
+      if (token == stop_token) {
+        found_stop_token = true;
+      }
+
+      // We print next in each iteration of the loop, not token
+      // We do not print the predicted token after stop_token
+      // (i.e., we do not print next when token is stop_token)
+      // The stop_token is printed as newline
+      if (next == stop_token) {
+        printf("\n");
+      } else {
+        // Do not print next if prev token was stop_token
+        if (token != stop_token) {
+          std::string piece = tokenizer->decode(token, next);
+          safe_printf(piece.c_str()); // same as printf("%s", piece), but skips
+                                      // "unsafe" bytes
+          fflush(stdout);
+        }
+      }
+    }
+
+    pos++;
+  }
+
+  return pos;
+}
+
 void chat(
     Transformer* transformer,
     Tokenizer* tokenizer,
@@ -694,66 +761,27 @@ void chat(
     const char* cli_system_prompt,
     int steps,
     ModelType model_type) {
-  const uint64_t EOT_TOKEN = get_eot_token(tokenizer, model_type);
-  int num_prompt_tokens = 0;
   std::vector<uint64_t> prompt_tokens;
-  int user_idx;
 
-  // start the main loop
-  int8_t user_turn = 1; // user starts
-  int next; // will store the next token in the sequence
-  int token; // stores the current token to feed into the transformer
-  int prev_token;
-  int pos = 0; // position in the sequence
+  int pos = 0;
   while (pos < steps) {
-    // when it is the user's turn to contribute tokens to the dialog...
-    if (user_turn) {
-      // get the (optional) system prompt at position 0
-      if (pos == 0) {
-        prompt_tokens = get_initial_prompt_tokens(
-            cli_system_prompt, cli_user_prompt, tokenizer, model_type);
-      } else {
-        prompt_tokens = get_next_user_prompt_tokens(tokenizer, model_type);
-      }
-      num_prompt_tokens = prompt_tokens.size();
-
-      user_idx = 0; // reset the user index
-      user_turn = 0;
-      printf("Assistant: ");
-    }
-
-    // determine the token to pass into the transformer next
-    if (user_idx < num_prompt_tokens) {
-      // if we are still processing the input prompt, force the next prompt
-      // token
-      token = prompt_tokens[user_idx++];
+    if (pos == 0) {
+      prompt_tokens = get_initial_prompt_tokens(
+          cli_system_prompt, cli_user_prompt, tokenizer, model_type);
     } else {
-      // otherwise use the next token sampled from previous turn
-      token = next;
+      prompt_tokens = get_next_user_prompt_tokens(tokenizer, model_type);
     }
-
-    // forward the transformer to get logits for the next token
-    float* logits = forward(transformer, token, pos);
-    next = sample(sampler, logits);
-
-    if ((user_idx >= num_prompt_tokens) && (token == EOT_TOKEN)) {
-      user_turn = 1;
-    }
-
-    if (user_idx >= num_prompt_tokens && token != EOT_TOKEN &&
-        next != EOT_TOKEN) {
-      std::string piece = tokenizer->decode(token, next);
-      safe_printf(piece.c_str()); // same as printf("%s", piece), but skips
-                                  // "unsafe" bytes
-      fflush(stdout);
-    }
-
-    if (next == EOT_TOKEN) {
-      printf("\n");
-    }
-    pos++;
+    printf("Assistant: ");
+    pos = generate_from_prompt_tokens(
+        transformer,
+        tokenizer,
+        sampler,
+        prompt_tokens,
+        pos,
+        /*stop_token=*/get_eot_token(tokenizer, model_type),
+        /*stop_pos=*/steps); // We could pass in -1 here if we do not want the
+                             // model to stop mid-reply
   }
-  printf("\n");
 }
 
 // ----------------------------------------------------------------------------
@@ -791,8 +819,8 @@ int main(int argc, char* argv[]) {
   char* tokenizer_path = NULL;
   float temperature =
       1.0f; // 0.0 = greedy deterministic. 1.0 = original. don't set higher
-  float topp =
-      0.9f; // top-p in nucleus sampling. 1.0 = off. 0.9 works well, but slower
+  float topp = 0.9f; // top-p in nucleus sampling. 1.0 = off. 0.9 works well,
+                     // but slower
 
   int steps = 256; // number of steps to run for
   const char* prompt = NULL; // prompt string
