@@ -190,41 +190,6 @@ We use `[ optional input ]` to indicate optional inputs, and `[ choice
 1 | choice 2 | ... ]` to indicate a choice
 
 
-### A note on tokenizers
-
-There are two different formats for tokenizers, and both are used in this repo.
-
-1 - for generate.py and Python bindings, we use the Google
-  sentencepiece Python operator and the TikToken tokenizer (for
-  llama3). This operator consumes a tokenization model in the
-  `tokenizer.model` format.
-
-2 - for C/C++ inference, we use @Andrej Karpathy's C tokenizer
-  function, as well as a C++ TikToken tokenizer (for llama3).  This
-  tokenizer consumes a tokenization model in the 'tokenizer.bin'
-  format.
-
-You can convert a SentencePiece tokenizer.model into tokenizer.bin
-using Andrej's tokenizer.py utility to convert the tokenizer.model to
-tokenizer.bin format:
-
-```
-python3 utils/tokenizer.py --tokenizer-model=${MODEL_DIR}tokenizer.model
-```
-
-We will later disucss how to use this model, as described under *STANDALONE EXECUTION* in a Python-free
-environment:
-```
-runner-{et,aoti}/build/run ${MODEL_OUT}/model.{so,pte} -z ${MODEL_OUT}/tokenizer.bin
-```
-
-### Llama 3 tokenizer
-
-Add option to load tiktoken tokenizer
-```
---tiktoken
-```
-
 ## Generate
 
 Model definition in model.py, generation code in generate.py. The
@@ -246,7 +211,7 @@ which are not available for exported DSO and PTE models.
 
 ## Eval
 
-To be added. For basic eval instructions, please see the introductury
+For an introduction to the model evaluation tool `eval`, please see the introductury
 README.
 
 In addition to running eval on models in eager mode (optionally
@@ -406,38 +371,7 @@ you can, for example, convert a quantized model to f16 format:
 ${GGUF}/quantize --allow-requantize your_quantized_model.gguf fake_unquantized_model.gguf f16
 ```
 
-# Standalone Execution
-
-In addition to running the exported and compiled models for server,
-desktop/laptop and mobile/edge devices by loading them in a PyTorch
-environment under the Python interpreter, these models can also be
-executed directly
-
-## Desktop and Server Execution
-
-This has been tested with Linux and x86 (using CPU ~and GPU~), and
-MacOS and ARM/Apple Silicon.
-
-The runner-* directories show how to integrate AOTI- and ET-exported
-models in a C/C++ application when no Python environment is available.
-Integrate it with your own applications and adapt it to your own
-application and model needs!  Each runner directory comes with a cmake
-build script.  Please refer to this file for detailed build
-instructions, and adapt as appropriate for your system.
-
-Build the runner like this
-```
-cd ./runner-aoti
-cmake -Bbuild -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'`
-cmake --build build
-```
-
-To run, use the following command (assuming you already generated the
-tokenizer.bin tokenizer model):
-
-```
-LD_LIBRARY_PATH=$CONDA_PREFIX/lib ./build/run ../${MODEL_NAME}.so -z ../${MODEL_NAME}.bin
-```
+# Mobile Execution
 
 ## Mobile and Edge Execution Test (x86)
 

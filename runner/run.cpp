@@ -178,17 +178,8 @@ float* forward(Transformer* transformer, int token, int pos) {
 
 #else // __ET_MODEL__
   ManagedTensor pos_managed(pos_buffer, sizeof(int64_t), {1}, ScalarType::Long);
-#ifndef __KV_CACHE__
-  // @lint-ignore CLANGTIDY facebook-hte-LocalUncheckedArrayBounds
-  ManagedTensor tokens_managed(
-      &(s->toks[pos]),
-      /*ignored*/ sizeof(int64_t) * (pos + 1),
-      {1, 1},
-      ScalarType::Long);
-#else // __KV_CACHE__
   ManagedTensor tokens_managed(
       token_buffer, sizeof(int64_t), {1, 1}, ScalarType::Long);
-#endif
   std::vector<EValue> inputs;
   auto tmp1 = EValue(tokens_managed.get_aliasing_tensor());
   auto tmp2 = EValue(pos_managed.get_aliasing_tensor());
