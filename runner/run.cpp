@@ -580,7 +580,6 @@ std::vector<uint64_t> get_initial_prompt_tokens(
             system_prompt,
             user_prompt);
       } else {
-        // const char prompt_template[] = ;
         snprintf(
             rendered_prompt,
             sizeof(rendered_prompt) - 1,
@@ -645,7 +644,6 @@ std::vector<uint64_t> get_next_user_prompt_tokens(
 
   switch (model_type) {
     case ModelType::llama2:
-      // const char prompt_template[] = ;
       snprintf(
           rendered_prompt,
           sizeof(rendered_prompt) - 1,
