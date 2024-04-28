@@ -24,7 +24,7 @@ from build.utils import (
     use_et_backend,
 )
 
-from qops import LinearInt8 as WeightOnlyInt8Linear
+from qops import LinearInt8 as WeightOnlyInt8Linear, QuantizedEmbedding
 
 #########################################################################
 ###                  torchchat quantization API                       ###
@@ -489,9 +489,9 @@ def replace_embedding_weight_only_grouped_int8_per_channel(
             setattr(
                 module,
                 name,
-                QuantizedGroupEmbedding(
+                QuantizedEmbedding(
                     device=device,
-                    vocab_size=child.weight.shape[0],
+                    num_embeddings=child.weight.shape[0],
                     embedding_dim=child.weight.shape[1],
                     bitwidth=bitwidth,
                     groupsize=groupsize,
@@ -584,116 +584,6 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
         self.convert_for_runtime()
         self.model_.load_state_dict(model_updated_state_dict)
         return self.model_
-
-
-class QuantizedGroupEmbedding(torch.nn.Module):
-    def __init__(
-        self,
-        device,
-        vocab_size: int,
-        embedding_dim: int,
-        bitwidth: int,
-        groupsize: Optional[int] = None,
-        *,
-        dtype=torch.half,
-    ) -> None:
-        super().__init__()
-        if groupsize is None or groupsize == 0:
-            groupsize = embedding_dim
-        self.groupsize = groupsize
-        self.dtype = dtype
-        self.bitwidth = bitwidth
-
-        if use_et_backend():
-            self.forward = self.et_forward
-        else:
-            self.forward = self.aoti_forward
-
-        if bitwidth == 8:
-            self.register_buffer(
-                "weight",
-                torch.empty(
-                    (vocab_size, embedding_dim), dtype=torch.int8, device=device
-                ),
-            )
-        elif bitwidth == 4:  # packed
-            self.register_buffer(
-                "weight",
-                torch.empty(
-                    (vocab_size, embedding_dim // 2), dtype=torch.uint8, device=device
-                ),
-            )
-        else:
-            raise RuntimeError(
-                f"QUantized embedding does not support bitwidth={bitwidth}"
-            )
-
-        groups_per_row = (embedding_dim + groupsize - 1) // groupsize
-        if groups_per_row > 1:
-            self.register_buffer(
-                "scales",
-                torch.ones(
-                    (vocab_size, groups_per_row), dtype=torch.float16, device=device
-                ),
-            )
-        else:
-            self.register_buffer(
-                "scales", torch.ones((vocab_size,), dtype=torch.float16, device=device)
-            )
-
-    @torch.no_grad()
-    def et_forward(self, indices: torch.Tensor) -> torch.Tensor:
-        if self.bitwidth == 8:
-            return torch.ops.quantized_decomposed.embedding_byte.dtype(
-                self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
-            )
-        else:
-            return torch.ops.quantized_decomposed.embedding_4bit.dtype(
-                self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
-            )
-
-    @torch.no_grad()
-    def aoti_forward(self, indices: torch.Tensor) -> torch.Tensor:
-        # result_weights = self.weight.index_select(0, indices.view(-1))
-        # result_scales = self.scales.index_select(0, indices.view(-1))
-
-        if self.bitwidth == 4:
-            weight_even = self.weight.div(16, rounding_mode="trunc")
-            weight_odd = self.weight.remainder(16)
-            weight_unpacked = torch.stack((weight_even, weight_odd), dim=-1)
-            weight = weight_unpacked.view(self.weight.shape[0], -1)
-            weight = weight.to(torch.int8).add(-8)
-        else:
-            weight = self.weight
-
-        scales = self.scales.view(weight.shape[0], -1)
-
-        result_weights = F.embedding(indices, weight)
-        result_scales = F.embedding(indices, scales)
-
-        rw_view = result_weights.to(dtype=result_scales.dtype).view(
-            tuple(
-                result_weights.shape[:-1]
-                + (
-                    scales.shape[1],
-                    -1,
-                )
-            )
-        )
-        rs_view = result_scales.view(
-            tuple(result_scales.shape[:-1])
-            + (
-                scales.shape[1],
-                1,
-            )
-        )
-        # print(f"rw_view {rw_view.shape}")
-        # print(f"rs_view {rs_view.shape}")
-
-        r = rw_view * rs_view
-        return r.view(indices.size() + (-1,))
-
-        # r = result_weights.to(dtype=result_scales.dtype).view(list(result_weights.shape[:-1] + (scales.shape[1], -1, )) * result_scales.view(scales.shape[-1] + (scales.shape[1], 1, ))
 
 
 #########################################################################
