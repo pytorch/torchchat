@@ -5,14 +5,16 @@ The runners accept the following CLI arguments:
 
 ```
 Options:
--t <float>  temperature in [0,inf], default 1.0
--p <float>  p value in top-p (nucleus) sampling in [0,1] default 0.9
--s <int>    random seed, default time(NULL)
--n <int>    number of steps to run for, default 256. 0 = max_seq_len
--i <string> input prompt
--z <string> optional path to custom tokenizer
--m <string> mode: generate|chat, default: generate
--y <string> (optional) system prompt in chat mode
+  -t <float>  temperature in [0,inf], default 1.0
+  -p <float>  p value in top-p (nucleus) sampling in [0,1], default 0.9
+  -s <int>    random seed, default time(NULL)
+  -n <int>    number of steps to run for, default 256. 0 = max_seq_len
+  -i <string> input prompt
+  -z <string> path to tokenizer
+  -m <string> mode: generate|chat, default: generate
+  -y <string> (optional) system prompt in chat mode
+  -v <int>    (optional) vocab size, default is model-specific.
+  -l <int>    (optional) llama version (2 or 3), default 2.
 ```
 
 ## Building and running runner-aoti
@@ -24,7 +26,7 @@ git submodule sync
 git submodule update --init
 
 cmake -S . -B ./cmake-out -G Ninja -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'`
-cmake --build ./cmake-out --target et_run
+cmake --build ./cmake-out --target aoti_run
 ```
 
 After running these, the runner-aoti binary is located at ./cmake-out/aoti_run.
@@ -41,8 +43,10 @@ We can now execute the runner with:
 
 ```
 wget -O ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
-./cmake-out/aoti_run ./model.so -z ./tokenizer.bin -i "Once upon a time"
+./cmake-out/aoti_run ./model.so -z ./tokenizer.bin -l 2 -i "Once upon a time"
 ```
+
+The `-l 2` indicates that the model and tokenizer use the llama2 architecture.  If your model is based on llama3, use `-l 3`.
 
 ## Building and running runner-et
 Before building runner-et, you must first setup ExecuTorch by following [setup ExecuTorch steps](executorch_setup.md).
@@ -74,5 +78,7 @@ We can now execute the runner with:
 
 ```
 wget -O ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
-./cmake-out/et_run ./model.pte -z ./tokenizer.bin -i "Once upon a time"
+./cmake-out/et_run ./model.pte -z ./tokenizer.bin -l 2 -i "Once upon a time"
 ```
+
+The `-l 2` indicates that the model and tokenizer use the llama2 architecture.  If your model is based on llama3, use `-l 3`.

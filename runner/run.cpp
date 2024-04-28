@@ -46,9 +46,9 @@ using torch::executor::Result;
 // Transformer model
 
 enum class ModelType {
-  unknown,
-  llama2,
-  llama3,
+  unknown = 0,
+  llama2 = 2,
+  llama3 = 3,
 };
 
 typedef struct {
@@ -105,11 +105,11 @@ void read_checkpoint(char* checkpoint, Config* config) {
 
 void build_transformer(
     Transformer* t,
-    char* checkpoint_path,
+    char* model_path,
     int vocab_size,
     int seq_len) {
-  // read in the Config and the Weights from the checkpoint
-  // read_checkpoint(checkpoint_path, &t->config);
+  // read in the Config and the Weights from the model
+  // read_checkpoint(model_path, &t->config);
   // allocate the RunState buffers
   t->config.vocab_size = vocab_size;
   t->config.seq_len = seq_len;
@@ -117,11 +117,11 @@ void build_transformer(
 
 #ifdef __AOTI_MODEL__
   t->runner = new torch::inductor::AOTIModelContainerRunnerCpu(
-      /* path to model DSO */ checkpoint_path,
+      /* path to model DSO */ model_path,
       /* thread pool size  */ 1);
 #else //__ET_MODEL__
   t->runner = new Module(
-      /* path to PTE model */ checkpoint_path,
+      /* path to PTE model */ model_path,
       /* PTE mmap settings */ Module::MlockConfig::UseMlockIgnoreErrors);
 #endif
 }
@@ -373,10 +373,10 @@ Tokenizer* build_tokenizer(
       tokenizer = new Tiktoken(vocab_size, /*bos*/ 1, /*eos*/ 2);
       tokenizer->load(tokenizer_path);
       break;
-
     default:
-      fprintf(stderr, "No tokenizer defined for model type %d", model_type);
-      exit(EXIT_FAILURE);
+      throw std::runtime_error(
+          "No tokenizer defined for model type" +
+          std::to_string(static_cast<int>(model_type)));
   }
   return tokenizer;
 }
@@ -686,21 +686,21 @@ std::vector<uint64_t> get_next_user_prompt_tokens(
   return tokens;
 }
 
-int generate_from_prompt_tokens(
+unsigned generate_from_prompt_tokens(
     Transformer* transformer,
     Tokenizer* tokenizer,
     Sampler* sampler,
     const std::vector<uint64_t>& prompt_tokens,
-    int pos,
+    unsigned pos,
     uint64_t stop_token,
     int stop_pos) {
-  int next; // will store the next token in the sequence
-  int token; // stores the current token to feed into the transformer
+  uint64_t next; // will store the next token in the sequence
+  uint64_t token; // stores the current token to feed into the transformer
   bool done_with_prompt; // whether we are done processing prompt
 
   bool found_stop_token = false; // whether we've found the stop_token after
                                  // processing prompt_tokens
-  int pos_in_prompt = 0; // position relative to start of prompt
+  unsigned pos_in_prompt = 0; // position relative to start of prompt
 
   // If stop_pos == -1, we go until we find stop_token
   // If stop_pos >= 0, we go until we find stop_token or pos <= stop_pos.
@@ -758,11 +758,14 @@ void chat(
     Sampler* sampler,
     const char* cli_user_prompt,
     const char* cli_system_prompt,
-    int steps,
+    unsigned steps,
     ModelType model_type) {
-  std::vector<uint64_t> prompt_tokens;
+  if (steps == 0) {
+    return;
+  }
 
-  int pos = 0;
+  std::vector<uint64_t> prompt_tokens;
+  unsigned pos = 0;
   while (pos < steps) {
     if (pos == 0) {
       prompt_tokens = get_initial_prompt_tokens(
@@ -778,8 +781,8 @@ void chat(
         prompt_tokens,
         pos,
         /*stop_token=*/get_eot_token(tokenizer, model_type),
-        /*stop_pos=*/steps); // We could pass in -1 here if we do not want the
-                             // model to stop mid-reply
+        /*stop_pos=*/steps - 1); // We could pass in -1 here if we do not want
+                                 // the model to stop mid-reply
   }
 }
 
@@ -788,7 +791,7 @@ void chat(
 #ifndef TESTING
 
 void error_usage() {
-  fprintf(stderr, "Usage:   run <checkpoint_path> [options]\n");
+  fprintf(stderr, "Usage:   run <model_path> [options]\n");
   fprintf(
       stderr, "Example: run model.{so,pte} -n 256 -i \"Once upon a time\"\n");
   fprintf(stderr, "Options:\n");
@@ -814,7 +817,7 @@ void error_usage() {
 
 int main(int argc, char* argv[]) {
   // default parameters
-  char* checkpoint_path = NULL;
+  char* model_path = NULL;
   char* tokenizer_path = NULL;
   float temperature =
       1.0f; // 0.0 = greedy deterministic. 1.0 = original. don't set higher
@@ -842,7 +845,7 @@ int main(int argc, char* argv[]) {
   // poor man's C argparse so we can override the defaults above from the
   // command line
   if (argc >= 2) {
-    checkpoint_path = argv[1];
+    model_path = argv[1];
   } else {
     error_usage();
   }
@@ -892,8 +895,8 @@ int main(int argc, char* argv[]) {
     error_usage();
   }
 
-  if (checkpoint_path == NULL) {
-    fprintf(stderr, "No checkpoint_path provided.");
+  if (model_path == NULL) {
+    fprintf(stderr, "No model_path provided.");
     error_usage();
   }
 
@@ -931,7 +934,7 @@ int main(int argc, char* argv[]) {
   }
 
   Transformer transformer;
-  build_transformer(&transformer, checkpoint_path, vocab_size, steps);
+  build_transformer(&transformer, model_path, vocab_size, steps);
 
   Tokenizer* tokenizer =
       build_tokenizer(tokenizer_path, model_type, vocab_size);
