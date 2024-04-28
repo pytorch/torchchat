@@ -23,6 +23,8 @@
 
 #ifdef __AOTI_MODEL__
 #include <torch/csrc/inductor/aoti_runner/model_container_runner_cpu.h>
+torch::Device cpu_device(torch::kCPU);
+
 #else // __ET_MODEL__
 #include <executorch/extension/module/module.h>
 #include <executorch/extension/runner_util/managed_tensor.h>
@@ -173,7 +175,9 @@ float* forward(Transformer* transformer, int token, int pos) {
   std::vector<torch::Tensor> inputs{token_tensor, pos_tensor};
 
   torch::Tensor result =
-      transformer->runner->run(inputs)[0].to(torch::dtype(torch::kFloat32));
+      transformer->runner->run(inputs)[0]
+          .to(torch::dtype(torch::kFloat32))
+          .to(cpu_device);
   auto logits = result[0].data_ptr();
 
 #else // __ET_MODEL__
