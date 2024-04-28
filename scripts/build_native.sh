@@ -76,4 +76,4 @@ fi
 cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'` -G Ninja
 cmake --build ./cmake-out --target "${TARGET}"_run
 
-printf "Build finished. Please run: \n./cmake-out/${TARGET}_run model.<pte|so> -z tokenizer.model -i <prompt>"
+printf "Build finished. Please run: \n./cmake-out/${TARGET}_run model.<pte|so> -z tokenizer.model -l <llama version (2 or 3)> -i <prompt>"
