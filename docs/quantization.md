@@ -26,7 +26,7 @@ Due to the larger vocabulary size of llama3, we also recommend quantizing the em
 
 **There are many valid group size options, including 512, 1024, etc. Note that smaller groupsize tends to be better for preserving model quality and accuracy, and larger groupsize for further improving performance. Set 0 for channelwise quantization.
 
-*** [GPTQ](https://arxiv.org/abs/2210.17323) and [HQQ](https://mobiusml.github.io/hqq_blog/) are two different algorithms to address accuracy loss when using lower bit quantization. Due to HQQ relying on data/calibration free quantization, it tends to take less time to quantize model.
+*** [GPTQ](https://arxiv.org/abs/2210.17323) and [HQQ](https://mobiusml.github.io/hqq_blog/) are two different algorithms to address accuracy loss when using lower bit quantization. Due to HQQ relying on data/calibration free quantization, it tends to take less time to quantize model. HQQ is currently enabled with axis=1 configuration. HQQ is not installed by default with torchchat. To use HQQ, please use `pip install hqq` before running `torchchat.py`.
 
 ## Quantization API
 Quantization options are passed in json format either as a config file (see [cuda.json](../config/data/cuda.json) and [mobile.json](../config/data/mobile.json)) or a JSON string.
