@@ -379,7 +379,7 @@ Tokenizer* build_tokenizer(
       break;
     default:
       throw std::runtime_error(
-          "No tokenizer defined for model type" +
+          "No tokenizer defined for model type " +
           std::to_string(static_cast<int>(model_type)));
   }
   return tokenizer;
