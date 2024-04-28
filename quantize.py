@@ -24,6 +24,7 @@ from build.utils import (
     use_et_backend,
 )
 
+from qops import LinearInt8 as WeightOnlyInt8Linear
 
 #########################################################################
 ###                  torchchat quantization API                       ###
@@ -377,42 +378,16 @@ def replace_linear_weight_only_int8_per_channel(
                     module,
                     name,
                     WeightOnlyInt8Linear(
-                        device, child.in_features, child.out_features, groupsize
+                        in_features=child.in_features,
+                        out_features=child.out_features,
+                        device=device,
+                        groupsize=groupsize,
                     ),
                 )
         else:
             replace_linear_weight_only_int8_per_channel(
                 child, device, node_type, groupsize
             )
-
-
-def linear_forward_int8(x, weight, scales):
-    n_groups = scales.numel() // scales.shape[0]
-    # need a formulation / custom op for good performance
-    # on eager, CUDA compiled, CPU compiled and ET exported
-
-    # for now, we special-case channel-wise, because we know how to make that fast (but does not work for groupwise)
-    if n_groups == 1:
-        if (
-            torch.compiler.is_compiling()
-            or x.device.type != "cpu"
-            or torch.__version__ < "2.4"
-        ):
-            return F.linear(x, weight.to(dtype=x.dtype)) * scales
-        # Use int8pack_mm for CPU eager
-        return torch.ops.aten._weight_int8pack_mm(
-            x.reshape(-1, x.shape[-1]),
-            weight,
-            scales,
-        ).reshape(x.shape[:-1] + (weight.shape[0],))
-
-    return F.linear(
-        x,
-        (
-            weight.to(dtype=x.dtype).view(weight.shape[0], n_groups, -1)
-            * scales.view(weight.shape[0], n_groups, -1)
-        ).view(weight.shape[0], -1),
-    )
 
 
 class WeightOnlyInt8QuantHandler(QuantHandler):
@@ -497,45 +472,6 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
         self.convert_for_runtime()
         self.model_.load_state_dict(model_updated_state_dict)
         return self.model_
-
-
-class WeightOnlyInt8Linear(torch.nn.Module):
-    __constants__ = ["in_features", "out_features"]
-    in_features: int
-    out_features: int
-    weight: torch.Tensor
-
-    def __init__(
-        self,
-        device,
-        in_features: int,
-        out_features: int,
-        groupsize: Optional[int] = None,
-        bias: bool = True,
-        dtype=None,
-    ) -> None:
-        super().__init__()
-        # print(f"group size: {groupsize}")
-
-        self.in_features = in_features
-        self.out_features = out_features
-        self.register_buffer(
-            "weight",
-            torch.empty((out_features, in_features), dtype=torch.int8, device=device),
-        )
-        dtype = get_precision()
-        if groupsize is None or (groupsize == 0):
-            self.register_buffer(
-                "scales", torch.ones(out_features, dtype=dtype, device=device)
-            )
-        else:
-            groups = (in_features + groupsize - 1) // groupsize
-            self.register_buffer(
-                "scales", torch.ones(out_features, groups, dtype=dtype, device=device)
-            )
-
-    def forward(self, input: torch.Tensor) -> torch.Tensor:
-        return linear_forward_int8(input, self.weight, self.scales)
 
 
 #########################################################################
