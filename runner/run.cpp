@@ -49,22 +49,22 @@ using torch::executor::Result;
 // ----------------------------------------------------------------------------
 // Transformer model
 
-enum class ModelType {
-  unknown = 0,
-  llama2 = 2,
-  llama3 = 3,
+enum ModelType {
+  UNKNOWN_MODEL = 0,
+  LLAMA2_MODEL = 2,
+  LLAMA3_MODEL = 3,
 };
 
 ModelType get_model_type(int model_int) {
   switch (model_int) {
     case 2:
-      return ModelType::llama2;
+      return LLAMA2_MODEL;
       break;
     case 3:
-      return ModelType::llama3;
+      return LLAMA3_MODEL;
       break;
     default:
-      return ModelType::unknown;
+      return UNKNOWN_MODEL;
   }
 }
 
@@ -381,20 +381,19 @@ Tokenizer* build_tokenizer(
     const char* tokenizer_path,
     ModelType model_type,
     int vocab_size) {
-  Tokenizer* tokenizer = nullptr;
+  Tokenizer* tokenizer = NULL;
   switch (model_type) {
-    case ModelType::llama2:
+    case LLAMA2_MODEL:
       tokenizer = new BPETokenizer(vocab_size, /*bos*/ 1, /*eos*/ 2);
       tokenizer->load(tokenizer_path);
       break;
-    case ModelType::llama3:
+    case LLAMA3_MODEL:
       tokenizer = new Tiktoken(vocab_size, /*bos*/ 1, /*eos*/ 2);
       tokenizer->load(tokenizer_path);
       break;
     default:
-      throw std::runtime_error(
-          "No tokenizer defined for model type " +
-          std::to_string(static_cast<int>(model_type)));
+      fprintf(stderr, "No tokenizer defined for model type %d.\n", model_type);
+      exit(EXIT_FAILURE);
   }
   return tokenizer;
 }
@@ -410,7 +409,7 @@ void safe_printf(const char* piece) {
   // piece might be a raw byte token, and we only want to print printable chars
   // or whitespace because some of the other bytes can be various control codes,
   // backspace, etc.
-  if (piece == nullptr) {
+  if (piece == NULL) {
     return;
   }
   if (piece[0] == '\0') {
@@ -539,7 +538,7 @@ void generate(
     int steps,
     ModelType model_type) {
   const char* default_prompt = "Once upon a time";
-  if (prompt == nullptr) {
+  if (prompt == NULL) {
     prompt = default_prompt;
   }
 
@@ -550,11 +549,11 @@ void generate(
   std::vector<uint64_t> prompt_tokens;
   std::vector<uint64_t> stop_tokens;
   switch (model_type) {
-    case ModelType::llama2:
+    case LLAMA2_MODEL:
       prompt_tokens = tokenizer->encode(prompt, 1, 0);
       stop_tokens.push_back(tokenizer->eos_tok());
       break;
-    case ModelType::llama3:
+    case LLAMA3_MODEL:
       prompt_tokens = tokenizer->encode(prompt, 0, 0);
       prompt_tokens.insert(
           prompt_tokens.begin(),
@@ -563,9 +562,8 @@ void generate(
       stop_tokens.push_back(tokenizer->encode("<|eot_id|>", 0, 0)[0]);
       break;
     default:
-      throw std::runtime_error(
-          "Generate does not support model type " +
-          std::to_string(static_cast<int>(model_type)));
+      fprintf(stderr, "Generate does not support model type %d.\n", model_type);
+      exit(EXIT_FAILURE);
   }
 
   generate_from_prompt_tokens(
@@ -583,7 +581,7 @@ void generate(
 void read_stdin(const char* guide, char* buffer, size_t bufsize) {
   // read a line from stdin, up to but not including \n
   printf("%s", guide);
-  if (fgets(buffer, bufsize, stdin) != nullptr) {
+  if (fgets(buffer, bufsize, stdin) != NULL) {
     size_t len = strlen(buffer);
     if (len > 0 && buffer[len - 1] == '\n') {
       buffer[len - 1] = '\0'; // strip newline
@@ -607,7 +605,7 @@ std::vector<uint64_t> get_initial_prompt_tokens(
   char rendered_prompt[512 * 2 + 200]; // the prompt template is ~170
                                        // characters.  We use 200 to be safe.
 
-  if (cli_system_prompt != nullptr) {
+  if (cli_system_prompt != NULL) {
     strcpy(system_prompt, cli_system_prompt);
   } else {
     read_stdin(
@@ -616,7 +614,7 @@ std::vector<uint64_t> get_initial_prompt_tokens(
         sizeof(system_prompt));
   }
 
-  if (cli_user_prompt != nullptr) {
+  if (cli_user_prompt != NULL) {
     strcpy(user_prompt, cli_user_prompt);
   } else {
     read_stdin("User: ", user_prompt, sizeof(user_prompt));
@@ -625,7 +623,7 @@ std::vector<uint64_t> get_initial_prompt_tokens(
   std::vector<uint64_t> tokens;
 
   switch (model_type) {
-    case ModelType::llama2:
+    case LLAMA2_MODEL:
       if (system_prompt[0] != '\0') {
         snprintf(
             rendered_prompt,
@@ -646,7 +644,7 @@ std::vector<uint64_t> get_initial_prompt_tokens(
       tokens = tokenizer->encode(rendered_prompt, 1, 0);
       break;
 
-    case ModelType::llama3:
+    case LLAMA3_MODEL:
       if (system_prompt[0] != '\0') {
         snprintf(
             rendered_prompt,
@@ -665,9 +663,8 @@ std::vector<uint64_t> get_initial_prompt_tokens(
       break;
 
     default:
-      throw std::runtime_error(
-          "Chat does not support model type " +
-          std::to_string(static_cast<int>(model_type)));
+      fprintf(stderr, "Chat does not support model type %d.\n", model_type);
+      exit(EXIT_FAILURE);
   }
 
 #ifdef DEBUG
@@ -695,7 +692,7 @@ std::vector<uint64_t> get_next_user_prompt_tokens(
   std::vector<uint64_t> tokens;
 
   switch (model_type) {
-    case ModelType::llama2:
+    case LLAMA2_MODEL:
       snprintf(
           rendered_prompt,
           sizeof(rendered_prompt) - 1,
@@ -707,7 +704,7 @@ std::vector<uint64_t> get_next_user_prompt_tokens(
       tokens = tokenizer->encode(rendered_prompt, /*bos*/ 1, /*eos*/ 0);
       break;
 
-    case ModelType::llama3:
+    case LLAMA3_MODEL:
       snprintf(
           rendered_prompt,
           sizeof(rendered_prompt) - 1,
@@ -717,9 +714,8 @@ std::vector<uint64_t> get_next_user_prompt_tokens(
       break;
 
     default:
-      throw std::runtime_error(
-          "Chat does not support model type " +
-          std::to_string(static_cast<int>(model_type)));
+      fprintf(stderr, "Chat does not support model type %d.\n", model_type);
+      exit(EXIT_FAILURE);
   }
 
 #ifdef DEBUG
@@ -751,17 +747,16 @@ void chat(
   uint64_t eot_token;
   std::vector<uint64_t> prompt_tokens;
   switch (model_type) {
-    case ModelType::llama2:
+    case LLAMA2_MODEL:
       // llama2 uses EOS as EOT token
       eot_token = tokenizer->eos_tok();
       break;
-    case ModelType::llama3:
+    case LLAMA3_MODEL:
       eot_token = tokenizer->encode("<|eot_id|>", 0, 0)[0];
       break;
     default:
-      throw std::runtime_error(
-          "Chat does not support model type " +
-          std::to_string(static_cast<int>(model_type)));
+      fprintf(stderr, "Chat does not support model type %d.\n", model_type);
+      exit(EXIT_FAILURE);
   }
 
   std::vector<uint64_t> stop_tokens{eot_token};
@@ -801,7 +796,7 @@ void error_usage() {
   fprintf(
       stderr,
       "  -p <float>  p value in top-p (nucleus) sampling in [0,1], default 0.9\n");
-  fprintf(stderr, "  -s <int>    random seed, default time(nullptr)\n");
+  fprintf(stderr, "  -s <int>    random seed, default time(NULL)\n");
   fprintf(
       stderr,
       "  -n <int>    number of steps to run for, default 256. 0 = max_seq_len\n");
@@ -819,19 +814,19 @@ void error_usage() {
 
 int main(int argc, char* argv[]) {
   // default parameters
-  char* model_path = nullptr;
-  char* tokenizer_path = nullptr;
+  char* model_path = NULL;
+  char* tokenizer_path = NULL;
   float temperature =
       1.0f; // 0.0 = greedy deterministic. 1.0 = original. don't set higher
   float topp = 0.9f; // top-p in nucleus sampling. 1.0 = off. 0.9 works well,
                      // but slower
 
   int steps = 256; // number of steps to run for
-  const char* prompt = nullptr; // prompt string
+  const char* prompt = NULL; // prompt string
   unsigned long long rng_seed = 0; // seed rng with time by default
   const char* mode = "generate"; // generate|chat
   char* system_prompt =
-      nullptr; // the (optional) system prompt to use in chat mode
+      NULL; // the (optional) system prompt to use in chat mode
 
   int vocab_size = -1;
   int llama_ver = 2;
@@ -889,7 +884,7 @@ int main(int argc, char* argv[]) {
   }
 
   ModelType model_type = get_model_type(llama_ver);
-  if (model_type == ModelType::unknown) {
+  if (model_type == UNKNOWN_MODEL) {
     fprintf(
         stderr,
         "Unknown model type passed by -l argument.  Received l=%d.",
@@ -897,19 +892,19 @@ int main(int argc, char* argv[]) {
     error_usage();
   }
 
-  if (model_path == nullptr) {
+  if (model_path == NULL) {
     fprintf(stderr, "No model_path provided.");
     error_usage();
   }
 
-  if (tokenizer_path == nullptr) {
+  if (tokenizer_path == NULL) {
     fprintf(stderr, "No tokenizer_path provided.");
     error_usage();
   }
 
   // parameter validation/overrides
   if (rng_seed <= 0)
-    rng_seed = (unsigned int)time(nullptr);
+    rng_seed = (unsigned int)time(NULL);
   if (temperature < 0.0)
     temperature = 0.0;
   if (topp < 0.0 || 1.0 < topp)
@@ -920,16 +915,16 @@ int main(int argc, char* argv[]) {
   // If no tokenizer path provided, get default for model_type
   if (vocab_size == -1) {
     switch (model_type) {
-      case ModelType::llama2:
+      case LLAMA2_MODEL:
         vocab_size = 32000;
         break;
-      case ModelType::llama3:
+      case LLAMA3_MODEL:
         vocab_size = 128256;
         break;
       default:
         fprintf(
             stderr,
-            "No vocab_size was provided with -v argument, and there is no default vocab_size for model_type ModelType::%d.",
+            "No vocab_size was provided with -v argument, and there is no default vocab_size for model_type %d.\n",
             model_type);
         error_usage();
     }
