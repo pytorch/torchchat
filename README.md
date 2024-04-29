@@ -51,8 +51,6 @@ HuggingFace.
 python3 torchchat.py download llama3
 ```
 
-NOTE: This command may prompt you to request access to llama3 via HuggingFace, if you do not already have access. Simply follow the prompts and re-run the command when access is granted.
-
 View available models with `python3 torchchat.py list`. You can also remove downloaded models
 with `python3 torchchat.py remove llama3`.
 
