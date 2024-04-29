@@ -108,7 +108,7 @@ class QuantizedEmbedding(torch.nn.Module):
     ) -> None:
         super().__init__()
         if dtype is None:
-            dtype = torch.half
+            dtype = torch.get_default_dtype()
 
         if groupsize is None or groupsize == 0:
             groupsize = embedding_dim
@@ -146,14 +146,14 @@ class QuantizedEmbedding(torch.nn.Module):
         if groups_per_row > 1:
             self.register_buffer(
                 "scales",
-                torch.ones(
+                torch.empty(
                     (num_embeddings, groups_per_row), dtype=torch.float16, device=device
                 ),
             )
         else:
             self.register_buffer(
                 "scales",
-                torch.ones((num_embeddings,), dtype=torch.float16, device=device),
+                torch.empty((num_embeddings,), dtype=torch.float16, device=device),
             )
 
     @torch.no_grad()
