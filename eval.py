@@ -28,7 +28,6 @@ torch._inductor.config.triton.unique_kernel_names = True
 torch._inductor.config.epilogue_fusion = False
 torch._inductor.config.triton.cudagraphs = True
 torch._dynamo.config.cache_size_limit = 100000
-import time
 
 try:
     import lm_eval
