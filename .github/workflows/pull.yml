@@ -859,7 +859,7 @@ jobs:
           python torchchat.py generate stories15M --temperature 0 --prompt "${PRMT}"
 
 
-          for dtype in fp32, fp16, bf16; do
+          for dtype in fp32 fp16 bf16; do
             echo "Testing export + runner with dtype=$dtype"
             python torchchat.py export stories15M --dtype $dtype --output-pte-path ./model.pte
             ./cmake-out/et_run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}"
@@ -914,7 +914,7 @@ jobs:
           python torchchat.py generate --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}"
 
 
-          for dtype in fp32, fp16, bf16; do
+          for dtype in fp32 fp16 bf16; do
             echo "Running export + runner with dtype=$dtype"
             python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --dtype $dtype --output-dso-path /tmp/model.so
             ./cmake-out/aoti_run /tmp/model.so -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}"
