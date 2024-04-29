@@ -1,6 +1,28 @@
 # Chat with LLMs Everywhere
 torchchat is a compact codebase to showcase the capability of running large language models (LLMs) seamlessly across diverse platforms. With torchchat, you could run LLMs from with Python, your own (C/C++) application on mobile (iOS/Android), desktop or servers.
 
+
+## What can you do with torchchat?
+- Setup the Repo
+- [Download Models](#download-weights)
+- Run models via PyTorch / Python:
+  - [Chat](#chat)
+  - [Generate](#generate)
+  - [Run chat in the Browser](#browser)
+- [Export models for running on desktop/server without python](#export-server)
+- [Run on mobile](#mobile-execution)
+  - [Quantizing your model](#quantizing-your-model-suggested-for-mobile)
+  - Export and run on iOS
+- [Run exported .so file via your own C++ application](#run-server)
+    - in Chat mode
+    - in Generate mode
+- [Export for mobile via ExecuTorch](#exporting-for-mobile-via-executorch)
+- [Run exported ExecuTorch file on iOS or Android](#mobile-execution)
+    - in Chat mode
+    - in Generate mode
+- Fine-tuned models from torchtune
+
+
 ## Highlights
 - Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
   - Supports [common GGUF formats](docs/GGUF.md) and the Hugging Face checkpoint format
@@ -63,51 +85,19 @@ with `python3 torchchat.py remove llama3`.
 * **Access to model is restricted and you are not in the authorized list. Visit \[link\] to ask for access**:
   Some models require an additional step to access. Follow the link to fill out the request form on HuggingFace.
 
-## What can you do with torchchat?
-
-* Run models via PyTorch / Python:
-  * [Chat](#chat)
-  * [Generate](#generate)
-  * [Run via Browser](#browser)
-* [Quantizing your model (suggested for mobile)](#quantizing-your-model-suggested-for-mobile)
-* Export and run models in native environments (C++, your own app, mobile, etc.)
-  * [Export for desktop/servers via AOTInductor](#export-server)
-  * [Run exported .so file via your own C++ application](#run-server)
-     * in Chat mode
-     * in Generate mode
-  * [Export for mobile via ExecuTorch](#exporting-for-mobile-via-executorch)
-  * [Run exported ExecuTorch file on iOS or Android](#mobile-execution)
-     * in Chat mode
-     * in Generate mode
-  * Fine-tuned models from torchtune
-
 
 ## Running via PyTorch / Python
+[Follow the installation steps if you haven't](#installation)
 
 ### Chat
-Designed for interactive and conversational use.
-In chat mode, the LLM engages in a back-and-forth dialogue with the user. It responds to queries, participates in discussions, provides explanations, and can adapt to the flow of conversation.
-
-**Examples**
-
 ```bash
 # Llama 3 8B Instruct
 python3 torchchat.py chat llama3
 ```
 
-```
-# CodeLama 7B for Python
-python3 torchchat.py chat codellama
-```
-
 For more information run `python3 torchchat.py chat --help`
 
 ### Generate
-Aimed at producing content based on specific prompts or instructions.
-In generate mode, the LLM focuses on creating text based on a detailed prompt or instruction. This mode is often used for generating written content like articles, stories, reports, or even creative writing like poetry.
-
-
-**Examples**
 ```bash
 python3 torchchat.py generate llama3
 ```
@@ -115,10 +105,6 @@ python3 torchchat.py generate llama3
 For more information run `python3 torchchat.py generate --help`
 
 ### Browser
-
-Designed for interactive graphical conversations using the familiar web browser GUI.  The browser command provides a GUI-based experience to engage with the LLM in a back-and-forth dialogue with the user. It responds to queries, participates in discussions, provides explanations, and can adapt to the flow of conversation.
-
-**Examples**
 
 ```
 python3 torchchat.py browser llama3 --temperature 0 --num-samples 10
@@ -130,7 +116,67 @@ Enter some text in the input box, then hit the enter key or click the “SEND”
 
 
 
-## Quantizing your model (suggested for mobile)
+## Desktop/Server Execution
+
+### AOTI (AOT Inductor)
+AOT compiles models before execution for faster inference
+
+The following example exports and executes the Llama3 8B Instruct model
+```
+# Compile
+python3 torchchat.py export llama3 --output-dso-path llama3.so
+
+# Execute the exported model using Python
+python3 torchchat.py generate llama3 --quantize config/data/cuda.json --dso-path llama3.so --prompt "Hello my name is"
+```
+
+NOTE: We use `--quantize config/data/cuda.json` to quantize the llama3 model to reduce model size and improve performance for on-device use cases.
+
+### Running native using our C++ Runner
+
+The end-to-end C++ [runner](runner/run.cpp) runs an `*.so` file exported in the previous step.
+
+To build the runner binary on your Mac or Linux:
+```bash
+scripts/build_native.sh aoti
+```
+
+Execute
+```bash
+cmake-out/aoti_run model.so -z tokenizer.model -i "Once upon a time"
+```
+
+## Mobile Execution
+ExecuTorch enables you to optimize your model for execution on a mobile or embedded device, but can also be used on desktop for testing.
+
+### Set Up Executorch
+Before running any commands in torchchat that require ExecuTorch, you must first install ExecuTorch.
+
+To install ExecuTorch, run the following commands *from the torchchat root directory*.
+This will download the ExecuTorch repo to ./et-build/src and install various ExecuTorch libraries to ./et-build/install.
+```
+export TORCHCHAT_ROOT=${PWD}
+export ENABLE_ET_PYBIND=true
+./scripts/install_et.sh $ENABLE_ET_PYBIND
+```
+
+### Export for mobile
+The following example uses the Llama3 8B Instruct model.
+```
+# Export
+python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
+
+# Execute
+python3 torchchat.py generate llama3 --device cpu --pte-path llama3.pte --prompt "Hello my name is"
+```
+NOTE: We use `--quantize config/data/mobile.json` to quantize the llama3 model to reduce model size and improve performance for on-device use cases.
+
+For more details on quantization and what settings to use for your use case visit our [Quanitization documentation](docs/quantization.md) or run `python3 torchchat.py export`
+
+### Deploy and run on iOS
+
+
+### Quantizing your model (suggested for mobile)
 
 Quantization is the process of converting a model into a more memory-efficient representation.  Quantization is particularly important for accelerators -- to take advantage of the available memory bandwidth, and fit in the often limited high-speed memory in accelerators – and mobile devices – to fit in the typically very limited memory of mobile devices.
 
@@ -145,63 +191,8 @@ To adapt these recipes or wrote your own, please refer to the [quantization over
 
 With quantization, 32-bit floating numbers can be represented with as few as 8 or even 4 bits, and a scale shared by a group of these weights.  This transformation is lossy and modifies the behavior of models.  While research is being conducted on how to efficiently quantize large language models for use in mobile devices, this transformation invariably results in both quality loss and a reduced amount of control over the output of the models, leading to an increased risk of undesirable responses, hallucination and stuttering.  In effect, a developer quantizing a model has a responsibility to understand and reduce these effects.
 
-## Desktop Execution
 
-### AOTI (AOT Inductor)
-AOT compiles models into machine code before execution, enhancing performance and predictability. It's particularly beneficial for frequently used models or those requiring quick start times. However, it may lead to larger binary sizes and lacks the runtime flexibility of eager mode.
-
-**Examples**
-The following example uses the Llama3 8B model.
-```
-# Compile
-python3 torchchat.py export llama3 --output-dso-path llama3.so
-
-# Execute
-python3 torchchat.py generate llama3 --quantize config/data/cuda.json--dso-path llama3.so --prompt "Hello my name is"
-```
-
-NOTE: We use `--quantize config/data/cuda.json` to quantize the llama3 model to reduce model size and improve performance for on-device use cases.
-
-**Build Native Runner Binary**
-
-We provide an end-to-end C++ [runner](runner/run.cpp) that runs the `*.so` file exported after following the previous [examples](#aoti-aot-inductor) section. To build the runner binary on your Mac or Linux:
-
-```bash
-scripts/build_native.sh aoti
-```
-
-Run:
-
-```bash
-cmake-out/aoti_run model.so -z tokenizer.model -i "Once upon a time"
-```
-
-### ExecuTorch
-
-ExecuTorch enables you to optimize your model for execution on a mobile or embedded device, but can also be used on desktop for testing.
-Before running ExecuTorch commands, you must first set-up ExecuTorch in torchchat, see [Set-up Executorch](docs/executorch_setup.md).
-
-**Examples**
-The following example uses the Llama3 8B model.
-```
-# Compile
-python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
-
-# Execute
-python3 torchchat.py generate llama3 --device cpu --pte-path llama3.pte --prompt "Hello my name is"
-```
-NOTE: We use `--quantize config/data/mobile.json` to quantize the llama3 model to reduce model size and improve performance for on-device use cases.
-
-See below under [Mobile Execution](#mobile-execution) if you want to deploy and execute a model in your iOS or Android app.
-
-
-
-## Mobile Execution
 **Prerequisites**
-
-ExecuTorch lets you run your model on a mobile or embedded device. The exported ExecuTorch .pte model file plus runtime is all you need.
-
-Install [ExecuTorch](https://pytorch.org/executorch/stable/getting-started-setup.html) to get started.
 
 Read the [iOS documentation](docs/iOS.md) for more details on iOS.
 
