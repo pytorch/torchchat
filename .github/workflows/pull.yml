@@ -95,7 +95,7 @@ jobs:
           bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
           bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "aoti"
 
-  test-cpu-eval-sanity-check:
+  test-cpu-eval-sanity-check-bfloat16:
     name: test-cpu-eval-sanity-check (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-cpu
     strategy:
@@ -129,7 +129,79 @@ jobs:
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           pushd ${TORCHCHAT_ROOT}
           bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
-          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check"
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check-bfloat16"
+
+  test-cpu-eval-sanity-check-float16:
+    name: test-cpu-eval-sanity-check (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Print machine info
+        run: |
+          echo "$(uname -a)"
+      - name: Install dependencies
+        run: |
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Download checkpoints
+        run: |
+          bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
+      - name: Run validation
+        run: |
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          pushd ${TORCHCHAT_ROOT}
+          bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check-float16"
+
+  test-cpu-eval-sanity-check-float32:
+    name: test-cpu-eval-sanity-check (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Print machine info
+        run: |
+          echo "$(uname -a)"
+      - name: Install dependencies
+        run: |
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Download checkpoints
+        run: |
+          bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
+      - name: Run validation
+        run: |
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          pushd ${TORCHCHAT_ROOT}
+          bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check-float32"
 
   gather-models-gpu:
     runs-on: ubuntu-22.04
@@ -203,7 +275,7 @@ jobs:
         echo "::group::Install newer objcopy that supports --set-section-alignment"
         yum install -y  devtoolset-10-binutils
         export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        echo "::endgroup::"        
+        echo "::endgroup::"
 
         echo "::group::Install required packages"
         pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
@@ -244,7 +316,7 @@ jobs:
         echo "::group::Install newer objcopy that supports --set-section-alignment"
         yum install -y  devtoolset-10-binutils
         export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        echo "::endgroup::"        
+        echo "::endgroup::"
 
         echo "::group::Install required packages"
         pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
@@ -291,7 +363,7 @@ jobs:
         echo "::group::Install newer objcopy that supports --set-section-alignment"
         yum install -y  devtoolset-10-binutils
         export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        echo "::endgroup::"        
+        echo "::endgroup::"
 
         echo "::group::Install required packages"
         pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
@@ -441,7 +513,7 @@ jobs:
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
-          
+
           echo "******************************************"
           echo "***               vanilla              ***"
           echo "******************************************"

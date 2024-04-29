@@ -255,10 +255,11 @@ function eval_model() {
 function eval_model_sanity_check() {
     local CHECKPOINT_PATH="$1"
     local TARGET_DEVICE="${2:-cpu}"
+    local DTYPES="$3"
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
 
-    for DTYPE in float32 bfloat16 float16; do
+    for DTYPE in DTYPES; do
         echo ""############### Run eval with torch.compile for dtype $DTYPE "###############"
         echo ""
         echo "******************************************"
@@ -320,7 +321,8 @@ function run_eval(){
 }
 
 function run_eval_sanity_check(){
-    eval_model_sanity_check "$CHECKPOINT_PATH" "$TARGET_DEVICE" || exit 1
+    echo "Passing DTYPES=$DTYPES"
+    eval_model_sanity_check "$CHECKPOINT_PATH" "$TARGET_DEVICE" "$DTYPES" || exit 1
 }
 
 CHECKPOINT_PATH="$1"
@@ -365,6 +367,22 @@ if [ "$#" -gt 2 ]; then
                 ;;
             "eval_sanity_check")
                 echo "arg:$arg"
+                DTYPES="bfloat16 float16 float32"
+                run_eval_sanity_check || exit 1
+                ;;
+            "eval_sanity_check-bfloat16")
+                echo "arg:$arg"
+                DTYPES="bfloat16"
+                run_eval_sanity_check || exit 1
+                ;;
+            "eval_sanity_check-float16")
+                echo "arg:$arg"
+                DTYPES="float16"
+                run_eval_sanity_check || exit 1
+                ;;
+            "eval_sanity_check-float32")
+                echo "arg:$arg"
+                DTYPES="float32"
                 run_eval_sanity_check || exit 1
                 ;;
             *)
