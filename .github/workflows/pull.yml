@@ -203,7 +203,7 @@ jobs:
         echo "::group::Install newer objcopy that supports --set-section-alignment"
         yum install -y  devtoolset-10-binutils
         export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        echo "::endgroup::"        
+        echo "::endgroup::"
 
         echo "::group::Install required packages"
         pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
@@ -244,7 +244,7 @@ jobs:
         echo "::group::Install newer objcopy that supports --set-section-alignment"
         yum install -y  devtoolset-10-binutils
         export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        echo "::endgroup::"        
+        echo "::endgroup::"
 
         echo "::group::Install required packages"
         pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
@@ -291,7 +291,7 @@ jobs:
         echo "::group::Install newer objcopy that supports --set-section-alignment"
         yum install -y  devtoolset-10-binutils
         export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        echo "::endgroup::"        
+        echo "::endgroup::"
 
         echo "::group::Install required packages"
         pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
@@ -441,7 +441,7 @@ jobs:
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
-          
+
           echo "******************************************"
           echo "***               vanilla              ***"
           echo "******************************************"
@@ -858,8 +858,12 @@ jobs:
 
           python torchchat.py generate stories15M --temperature 0 --prompt "${PRMT}"
 
-          python torchchat.py export stories15M --output-pte-path ./model.pte
-          ./cmake-out/et_run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}"
+
+          for dtype in fp32 fp16 bf16; do
+            echo "Testing export + runner with dtype=$dtype"
+            python torchchat.py export stories15M --dtype $dtype --output-pte-path ./model.pte
+            ./cmake-out/et_run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}"
+          done
 
           echo "Tests complete."
   runner-aoti:
@@ -909,9 +913,12 @@ jobs:
 
           python torchchat.py generate --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}"
 
-          python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-dso-path /tmp/model.so
 
-          ./cmake-out/aoti_run /tmp/model.so -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}"
+          for dtype in fp32 fp16 bf16; do
+            echo "Running export + runner with dtype=$dtype"
+            python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --dtype $dtype --output-dso-path /tmp/model.so
+            ./cmake-out/aoti_run /tmp/model.so -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}"
+          done
 
           echo "Tests complete."
 
