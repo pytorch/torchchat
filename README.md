@@ -85,10 +85,7 @@ View available models with:
 python3 torchchat.py list
 ```
 
-You can also remove downloaded models with the remove command:
-```
-python3 torchchat.py remove llama3
-```
+You can also remove downloaded models with the remove command: `python3 torchchat.py remove llama3`
 
 ## Running via PyTorch / Python
 [Follow the installation steps if you haven't](#installation)
