@@ -95,6 +95,13 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
             edge_compile_config=edge_config,
         )
     edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
+    # Delegation visualization APIs: https://pytorch.org/executorch/main/debug-backend-delegate.html
+    # from executorch.exir.backend.utils import get_delegation_info, format_delegated_graph
+    # from tabulate import tabulate
+    # graph_module = edge_manager.exported_program().graph_module
+    # delegation_info = get_delegation_info(graph_module)
+    # print(delegation_info.get_summary())
+    # print(format_delegated_graph(graph_module))
     export_program = edge_manager.to_executorch(
         ExecutorchBackendConfig(
             extract_constant_segment=True,
