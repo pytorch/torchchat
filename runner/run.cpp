@@ -11,7 +11,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iterator>
-#include <stdexcept>
 #include <string>
 
 #ifdef DEBUG
