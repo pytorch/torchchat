@@ -95,7 +95,7 @@ jobs:
           bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
           bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "aoti"
 
-  test-cpu-eval-sanity-check-bfloat16:
+  test-cpu-eval-sanity-check:
     name: test-cpu-eval-sanity-check-bfloat16 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-cpu
     strategy:
