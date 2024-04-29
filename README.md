@@ -282,10 +282,10 @@ While we describe how to use torchchat using the popular llama3 model, you can p
 
 ## Troubleshooting
 
-**CERTIFICATE_VERIFY_FAILED**:
+**CERTIFICATE_VERIFY_FAILED**
 Run `pip install --upgrade certifi`.
 
-**Access to model is restricted and you are not in the authorized list.**
+**Access to model is restricted and you are not in the authorized list**
 Some models require an additional step to access. Follow the link provided in the error to get access.
 
 ## Acknowledgements
