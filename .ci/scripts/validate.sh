@@ -259,7 +259,7 @@ function eval_model_sanity_check() {
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
 
-    for DTYPE in DTYPES; do
+    for DTYPE in $DTYPES; do
         echo ""############### Run eval with torch.compile for dtype $DTYPE "###############"
         echo ""
         echo "******************************************"
