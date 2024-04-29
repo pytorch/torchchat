@@ -21,7 +21,7 @@ torchchat is a compact codebase showcasing the ability to run large language mod
 - [Evaluate a mode](#eval)
 - [Fine-tuned models from torchtune](#fine-tuned-models-from-torchtune)
 - [Supported Models](#models)
-- [Trouble Shooting](#trouble-shooting)
+- [Trouble Shooting](#troubleshooting)
 
 
 ## Highlights
@@ -280,7 +280,7 @@ torchchat also supports loading of many models in the GGUF format. See the [docu
 
 While we describe how to use torchchat using the popular llama3 model, you can perform the example commands with any of these models.
 
-## Trouble Shooting
+## Troubleshooting
 
 **CERTIFICATE_VERIFY_FAILED**:
 Run `pip install --upgrade certifi`.
