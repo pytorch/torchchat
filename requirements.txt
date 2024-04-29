@@ -19,7 +19,7 @@ snakeviz
 sentencepiece
 numpy
 gguf
-lm-eval
+lm-eval==0.4
 blobfile
 
 # Build tools
