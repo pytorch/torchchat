@@ -70,7 +70,7 @@ Generate text | `torchchat --generate` |`generate` | ✅ |
 Evaluate model | `torchchat --eval` | `eval` | 🚧 |
 Export model  | `torchchat --export` | `export` | ✅ |
 Exported model test (dso,pte) | `torchchat --chat` | n/a  | 🚧 |
-exported model test (dso,pte) | `torchchat --generate` |`generate` | ✅ |
+Exported model test (dso,pte) | `torchchat --generate` |`generate` | ✅ |
 Evaluate exported model (dso,pte) | `torchchat --eval` | `eval` | 🚧 |
 Server C++ runtime | n/a | run.cpp model.so | ✅ |
 Server C++ runtime | n/a | run.cpp model.pte | ✅ |
@@ -97,15 +97,15 @@ ExecuTorch-compiled .pte files on iOS, Android and Raspberry Pi 5.
 You can download any LLM model that fits the model.py model
 architecture, provided you have the model weights in llama-format, the
 model parameters and the tokenizer model used by your language model.
-For models not specified not in the list of known configurations, you
+For model parameters not specified in the list of known configurations, you
 can construct the model by initializing the `ModelArgs` dataclass that
 controls model construction from a parameter json using the
 `params-path ${PARAMS_PATH}` containing the appropriate model
-parameters to initialize the ModelArgs for the model. (We use the
+parameters to initialize the `ModelArgs` for the model. (We use the
 model constructor `Transformer.from_params()`).
 
-The parameter file will should be in JSON format specifying thee
-parameters.  You can find the Model Args data class in
+The parameter file should be in JSON format specifying these
+parameters. You can find the `ModelArgs` data class in
 [`model.py`](https://github.com/pytorch/torchchat/blob/main/model.py#L22).
 
 The final way to initialize a torchchat model is from GGUF. You load a
@@ -115,10 +115,6 @@ native torchchat models.
 
 You may also dequantize GGUF models with the GGUF quantize tool, and
 then load and requantize with torchchat native quantization options.
-(Please note that quantizing and dequantizing is a lossy process, and
-you will get the best results by starting with the original
-unquantized model checkpoint, not a previsouly quantized and thend
-equantized model.)
 
 | GGUF Model | Tested | Eager | torch.compile | AOT Inductor | ExecuTorch | Fits on Mobile |
 |-----|--------|-------|-----|-----|-----|-----|
@@ -129,9 +125,8 @@ then load and requantize with torchchat native quantization options.
 
 **Please note that quantizing and dequantizing is a lossy process, and
 you will get the best results by starting with the original
-unquantized model checkpoint, not a previsoul;y quantized and thend
-equantized model.**
-
+unquantized model checkpoint, not a previously quantized and then
+dequantized model.**
 
 ## Chat
 
@@ -150,23 +145,23 @@ preparatory step:
   `checkpoints/${MODEL_NAME}` or any other directory you already use
   to store model information.
 
-* `MODEL_PATH` describes the location of the model. Throughput the
-  description herein, we will assume that MODEL_PATH starts with a
+* `MODEL_PATH` describes the location of the model. Throughout the
+  description herein, we will assume that `MODEL_PATH` starts with a
   subdirectory of the torchchat repo named checkpoints, and that it
-  will contain the actual model. In this case, the MODEL_PATH will
-  thus be of the form ${MODEL_OUT}/model.{pt,pth}.  (Both the
+  will contain the actual model. In this case, the `MODEL_PATH` will
+  thus be of the form `${MODEL_OUT}/model.{pt,pth}`.  (Both the
   extensions `pt` and `pth` are used to describe checkpoints. In
   addition, model may be replaced with the name of the model.)
 
-  The generate.py sequence generator will load the tokenizer from the
-  directory specified by the MODEL_PATH variable, by replacing the
-  modelname with the name of the tokenizer model which is expected to
+  The `generate.py` sequence generator will load the tokenizer from the
+  directory specified by the `MODEL_PATH` variable, by replacing the
+  model name with the name of the tokenizer model which is expected to
   be named `tokenizer.model`.
 
 * `MODEL_OUT` is a location for outputs from export for server/desktop
   and/or mobile/edge execution.  We store exported artifacts here,
-  with extensions .pte for Executorch models, .so for AOT Inductor
-  generated models, and .bin for tokenizers prepared for use with the
+  with extensions `.pte` for Executorch models, `.so` for AOT Inductor
+  generated models, and `.bin` for tokenizers prepared for use with the
   C++ tokenizers user by `runner-aoti` and `runner-et`.
 
 You can set these variables as follows for the exemplary model15M
@@ -180,10 +175,10 @@ MODEL_OUT=~/torchchat-exports
 ```
 
 When we export models with AOT Inductor for servers and desktops, and
-Executorch for mobile and edge devices, we will save them in the
+ExecuTorch for mobile and edge devices, we will save them in the
 specified directory (`${MODEL_OUT}` in our example below) as a DSO
 under the name `${MODEL_NAME}.so` (for AOTI-generated dynamic
-libraries), or as Executorch model under the name `${MODEL_NAME}.pte`
+libraries), or as ExecuTorch model under the name `${MODEL_NAME}.pte`
 (for Executorch-generated mobile/edge models).
 
 We use `[ optional input ]` to indicate optional inputs, and `[ choice
@@ -192,7 +187,7 @@ We use `[ optional input ]` to indicate optional inputs, and `[ choice
 
 ## Generate
 
-Model definition in model.py, generation code in generate.py. The
+Model definition in `model.py`, generation code in `generate.py`. The
 model checkpoint may have extensions `pth` (checkpoint and model
 definition) or `pt` (model checkpoint).  At present, we always use the
 torchchat model for export and import the checkpoint into this model
@@ -204,21 +199,21 @@ python3 generate.py --compile --checkpoint-path ${MODEL_PATH} --prompt "Hello, m
 ```
 
 To squeeze out a little bit more performance, you can also compile the
-prefill with --compile_prefill. This will increase compilation times
-though. The --compile-prefill option requires --parallel-prefill,
+prefill with `--compile_prefill`. This will increase compilation times
+though. The `--compile-prefill` option requires `--parallel-prefill`,
 which are not available for exported DSO and PTE models.
 
 
 ## Eval
 
-For an introduction to the model evaluation tool `eval`, please see the introductury
+For an introduction to the model evaluation tool `eval`, please see the introductory
 README.
 
 In addition to running eval on models in eager mode (optionally
-compiled with `torch.compile()`, you can also load dso and pte models
+compiled with `torch.compile()`), you can also load dso and pte models
 back into the generate.py tool.  This will allow you to run any tests
 and evaluations that you want to run on the exported models without
-requiring changes to your test harnesses and evaluation scripts,
+requiring changes to your test harnesses and evaluation scripts.
 
 
 ## Export
@@ -254,31 +249,42 @@ quantization to achieve this, as described below.
 
 ### ExecuTorch mobile compilation
 
-We export the model with the export.py script.  Running this script
+We export the model with the `export.py` script.  Running this script
 requires you first install executorch with pybindings, see
-[here](#setting-up-executorch-and-runner-et).  At present, when
-exporting a model, the export command always uses the xnnpack delegate
-to export.  (Future versions of torchchat will support additional
-delegates such as Vulkan, CoreML, MPS, HTP in addition to Xnnpack as
-they are released for Executorch.)
+[here](#setting-up-executorch-and-runner-et). At present, when
+exporting a model, the export command always uses the XNNPACK delegate
+to export. (Future versions of torchchat will support additional
+delegates such as Vulkan, CoreML, MPS, HTP in addition to XNNPACK as
+they are released for ExecuTorch.)
 
 ### Running the model
 
 With the model exported, you can now generate text with the executorch
-runtime pybindings.  Feel free to play around with the prompt.
+runtime pybindings. Feel free to play around with the prompt.
 
 ```
 python3 generate.py --checkpoint-path ${MODEL_PATH} --pte ${MODEL_OUT}/model.pte --device cpu --prompt "Once upon a time"
 ```
 
-You can also run the model with the runner-et.  See below under
+You can also run the model with the runner-et. See below under
 "Standalone Execution".
 
 While we have shown the export and execution of a small model to a
-mobile/edge device supported by Executorch, most models need to be
+mobile/edge device supported by ExecuTorch, most models need to be
 compressed to fit in the target device's memory. We use quantization
 to achieve this.
 
+### Visualizing the backend delegate on ExecuTorch export
+
+By default, export will lower to the XNNPACK delegate for improved performance. ExecuTorch export
+provides APIs to visualize what happens after the `to_backend()` call in the lowering process.
+
+- `get_delegation_info()`: provide a summary of the model after the `to_backend()` call, including the total delegated subgraphs, number of delegated nodes and number of non-delegated nodes.
+- `format_delegated_graph`: a formatted str of the whole graph, as well as the subgraph/s consumed by the backend.
+
+See the
+[debug backend delegate documentation](https://pytorch.org/executorch/main/debug-backend-delegate.html)
+for more details.
 
 
 ## Optimizing your model for server, desktop and mobile devices
@@ -295,7 +301,7 @@ To compress models, torchchat offers a variety of strategies:
 * dynamic activation quantization with weight quantization: a8w4dq
 
 In addition, we support GPTQ and HQQ for improving the quality of 4b
-weight-only quantization.  Support for HQQ is a work in progress.
+weight-only quantization. Support for HQQ is a work in progress.
 
 | compression | FP precision |  weight quantization | dynamic activation quantization |
 |--|--|--|--|
@@ -305,11 +311,8 @@ linear operator (asymmetric) | n/a | 4b (group), a6w4dq | a8w4dq (group) |
 linear operator (asymmetric) with GPTQ | n/a | 4b (group) | n/a |
 linear operator (asymmetric) with HQQ | n/a |  work in progress | n/a |
 
-
 ## Model precision (dtype precision setting)
-
-You can generate models (for both export and generate, with eager, torch.compile, AOTI, ET, for all backends - mobile at present will primarily support fp32, with all options)
-specify the precision of the model with 
+On top of quantizing models with quantization schemes mentioned above, models can be converted to lower bit floating point precision to reduce the memory bandwidth requirement and take advantage of higher density compute available. For example, many GPUs and some of the CPUs have good support for bfloat16 and float16. This can be taken advantage of via `--dtype arg` as shown below.
 
 ```
 python3 generate.py --dtype [bf16 | fp16 | fp32] ...
@@ -327,7 +330,7 @@ quantization is available in eager mode as well as during export,
 enabling you to do an early exploration of your quantization setttings
 in eager mode.  However, final accuracy should always be confirmed on
 the actual execution target, since all targets have different build
-processes, compilers, amd kernel implementations with potentially
+processes, compilers, and kernel implementations with potentially
 significant impact on accuracy.
 
 
@@ -341,11 +344,11 @@ into native torchchat models by using the load-gguf option:
 python3 [ export.py | generate.py | ... ] --gguf-path <gguf_filename>
 ```
 
-Ypu may then apply the standard quantization options, e.g., to add
+You may then apply the standard quantization options, e.g., to add
 embedding table quantization as described under quantization. (You
-cannot directly requantize already quantized formats.  However, you
+cannot directly requantize already quantized formats. However, you
 may dequantize them using GGUF tools, and then laod the model into
-torchchat to quantize wqith torchchat's quantization workflow.)
+torchchat to quantize with torchchat's quantization workflow.)
 
 
 ## Loading unsupported GGUF formats in torchchat
@@ -375,23 +378,22 @@ ${GGUF}/quantize --allow-requantize your_quantized_model.gguf fake_unquantized_m
 
 ## Mobile and Edge Execution Test (x86)
 
-You can also run the model with the runner-et.  This requires you
-first build the runner.  See instructions
-[here](#setting-up-executorch-and-runner-et).  After this is done, you
-can run runner-et with
+You can also run the model with the `runner-et`. This requires you
+first build the runner. See instructions
+[here](#setting-up-executorch-and-runner-et). After this is done, you
+can run `runner-et` with
 
 ```
 ./build/cmake-out/runner_et ${MODEL_OUT}/model.pte -z ${MODEL_OUT}/tokenizer.bin -i "Once upon a time in a land far away"
 ```
 
 While we have shown the export and execution of a small model to a
-mobile/edge device supported by Executorch, most models need to be
+mobile/edge device supported by ExecuTorch, most models need to be
 compressed to fit in the target device's memory. We use quantization
 to achieve this.
 
-
 This has been shown to run on x86. with the proper IDE environment,
-you can compile for your specific target.  For a GUI integration in
+you can compile for your specific target. For a GUI integration in
 iOS and Android, please refer to "Running on a mobile/edge system" in
 the section below.
 
@@ -426,12 +428,11 @@ simulator for Android. `scripts/android_example.sh` for running a
 model on an Android simulator (on Mac), and in `docs/Android.md`.
 
 
-
 ### iOS
 
 Open the iOS Llama Xcode project at
 https://github.com/pytorch/executorch/tree/main/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj
-in Xcode and click Run.  You will need to provide a provisioning
+in Xcode and click Run. You will need to provide a provisioning
 profile (similar to what's expected for any iOS dev).
 
 Once you can run the app on you device,
@@ -516,7 +517,6 @@ in a python-free environment with AOT Inductor and ExecuTorch.
 | ARM 32b (up to v7) | any | | ? | ? | ? | ? |
 
 
-
 # Setting up ExecuTorch and runner-et
 
 Set up ExecuTorch by following the instructions [here](https://pytorch.org/executorch/stable/getting-started-setup.html#setting-up-executorch).
@@ -538,7 +538,7 @@ cmake -S ./runner-et -B build/cmake-out -G Ninja
 cmake --build ./build/cmake-out
 ```
 
-The built executable is located at ./build/cmake-out/runner-et.
+The built executable is located at `./build/cmake-out/runner-et`.
 
 
 # Contributing to torchchat
