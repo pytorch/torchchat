@@ -143,7 +143,7 @@ scripts/build_native.sh aoti
 
 Execute
 ```bash
-cmake-out/aoti_run model.so -z tokenizer.model -i "Once upon a time"
+cmake-out/aoti_run model.so -z tokenizer.model -l 3 -i "Once upon a time"
 ```
 
 ## Mobile Execution
@@ -209,7 +209,7 @@ scripts/build_native.sh et
 Run:
 
 ```bash
-cmake-out/et_run llama3.pte -z tokenizer.model -i "Once upon a time"
+cmake-out/et_run llama3.pte -z tokenizer.model -l 3 -i "Once upon a time"
 ```
 
 ## Fine-tuned models from torchtune

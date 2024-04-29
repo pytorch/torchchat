@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 import torch
 
@@ -133,10 +133,46 @@ def device_sync(device="cpu"):
 
 
 #########################################################################
-###                   general utilkity functions                      ###
+###                    general utility functions                      ###
 
 
 # in fbcode, we can intercept certain local paths that
 # should be interpreted as part of an XAR package
 def canonical_path(path):
     return path
+
+
+#########################################################################
+###                move state dict to specified device                ###
+
+
+def state_dict_device(d, device="cpu") -> Dict:
+    for key, weight in d.items():
+        d[key] = weight.to(device=device)
+
+    return d
+
+
+#########################################################################
+###                move state dict to specified device                ###
+
+
+def get_device_str(device) -> str:
+    if isinstance(device, str) and device == "fast":
+        return (
+            "cuda"
+            if torch.cuda.is_available()
+            else "mps" if torch.backends.mps.is_available() else "cpu"
+        )
+    else:
+        return str(device)
+
+
+def get_device(device) -> str:
+    if isinstance(device, str) and device == "fast":
+        device = (
+            "cuda"
+            if torch.cuda.is_available()
+            else "mps" if torch.backends.mps.is_available() else "cpu"
+        )
+    return torch.device(device)
