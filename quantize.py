@@ -595,22 +595,6 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 #####     weight only int4 per channel groupwise quantized code    ######
 
 
-def _int4_prepare_int4_weight_and_scales_and_zeros(
-    weight_bf16, groupsize, inner_k_tiles
-):
-    weight_int32, scales_and_zeros = group_quantize_tensor(
-        weight_bf16, n_bit=4, groupsize=groupsize
-    )
-    weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
-        weight_int32, inner_k_tiles
-    )
-    return weight_int4pack, scales_and_zeros
-
-
-def _int4_calc_padded_size(k, groupsize=1, innner_k_tiles=1):
-    return find_multiple(k, 1024)
-
-
 def replace_linear_int4(
     module,
     device,
@@ -705,7 +689,7 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
                         )
                         continue
                 weight_int4pack, scales_and_zeros = (
-                    _int4_prepare_int4_weight_and_scales_and_zeros(
+                    WeightOnlyInt4Linear._prepare_weight_and_scales_and_zeros(
                         weight.to(torch.float), self.groupsize, self.inner_k_tiles
                     )
                 )
