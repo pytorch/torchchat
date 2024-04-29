@@ -1,5 +1,6 @@
 # Chat with LLMs Everywhere
-torchchat is a compact codebase to showcase the capability of running large language models (LLMs) seamlessly across diverse platforms. With torchchat, you could run LLMs from with Python, your own (C/C++) application on mobile (iOS/Android), desktop or servers.
+torchchat is a compact codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
+
 
 
 ## What can you do with torchchat?
@@ -17,9 +18,10 @@ torchchat is a compact codebase to showcase the capability of running large lang
   - [Export a model for use on mobile](#export-for-mobile)
   - [Deploy and run on iOS](#deploy-and-run-on-ios)
   - [Deploy and run on Android](#deploy-and-run-on-android)
-- [Export for mobile via ExecuTorch](#exporting-for-mobile-via-executorch)
+- [Evaluate a mode](#eval)
 - [Fine-tuned models from torchtune](#fine-tuned-models-from-torchtune)
-
+- [Supported Models](#models)
+- [Trouble Shooting](#trouble-shooting)
 
 
 ## Highlights
@@ -76,14 +78,6 @@ NOTE: This command may prompt you to request access to llama3 via HuggingFace, i
 
 View available models with `python3 torchchat.py list`. You can also remove downloaded models
 with `python3 torchchat.py remove llama3`.
-
-### Common Issues
-
-* **CERTIFICATE_VERIFY_FAILED**:
-  Run `pip install --upgrade certifi`.
-* **Access to model is restricted and you are not in the authorized list. Visit \[link\] to ask for access**:
-  Some models require an additional step to access. Follow the link to fill out the request form on HuggingFace.
-
 
 ## Running via PyTorch / Python
 [Follow the installation steps if you haven't](#installation)
@@ -275,7 +269,13 @@ torchchat also supports loading of many models in the GGUF format. See the [docu
 
 While we describe how to use torchchat using the popular llama3 model, you can perform the example commands with any of these models.
 
+## Trouble Shooting
 
+**CERTIFICATE_VERIFY_FAILED**:
+Run `pip install --upgrade certifi`.
+
+**Access to model is restricted and you are not in the authorized list.**
+Some models require an additional step to access. Follow the link provided in the error to get access.
 
 ## Acknowledgements
 Thank you to the [community](docs/ACKNOWLEDGEMENTS.md) for all the awesome libraries and tools
