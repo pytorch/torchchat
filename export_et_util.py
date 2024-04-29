@@ -67,15 +67,15 @@ class CustomSDPAAttention(nn.Module):
         # KV cache should always be enabled
         assert self.kv_cache is not None
         output = torch.ops.llama.sdpa_with_kv_cache(
-            q,
-            k,
-            v,
+            q.float(),
+            k.float(),
+            v.float(),
             self.kv_cache.k_cache,
             self.kv_cache.v_cache,
             input_pos[-1].item(),
             seqlen,
         )
-        output = output.view(bsz, seqlen, self.dim)
+        output = output.view(bsz, seqlen, self.dim).to(dtype=q.dtype)
         return self.wo(output)
 
 
