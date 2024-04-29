@@ -3,24 +3,23 @@ torchchat is a compact codebase to showcase the capability of running large lang
 
 
 ## What can you do with torchchat?
-- Setup the Repo
+- [Setup the Repo](#installation)
 - [Download Models](#download-weights)
-- Run models via PyTorch / Python:
+- [Run models via PyTorch / Python](#running-via-pytorch--python)
   - [Chat](#chat)
   - [Generate](#generate)
   - [Run chat in the Browser](#browser)
-- [Export models for running on desktop/server without python](#export-server)
+- [Export models for running on desktop/server without python](#desktopserver-execution)
+  - [Use AOT Inductor for faster execution](#aoti-aot-inductor)
+  - [Running in c++ using the runner](#running-native-using-our-c-runner)
 - [Run on mobile](#mobile-execution)
-  - [Quantizing your model](#quantizing-your-model-suggested-for-mobile)
-  - Export and run on iOS
-- [Run exported .so file via your own C++ application](#run-server)
-    - in Chat mode
-    - in Generate mode
+  - [Setup](#set-up-executorch)
+  - [Export a model for use on mobile](#export-for-mobile)
+  - [Deploy and run on iOS](#deploy-and-run-on-ios)
+  - [Deploy and run on Android](#deploy-and-run-on-android)
 - [Export for mobile via ExecuTorch](#exporting-for-mobile-via-executorch)
-- [Run exported ExecuTorch file on iOS or Android](#mobile-execution)
-    - in Chat mode
-    - in Generate mode
-- Fine-tuned models from torchtune
+- [Fine-tuned models from torchtune](#fine-tuned-models-from-torchtune)
+
 
 
 ## Highlights
@@ -192,48 +191,13 @@ For a device, open it in a separate Finder window, navigate to the Files tab, dr
 
 Now, follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem and issue a prompt.
 
-Click the image below to see it in action!
+*Click the image below to see it in action!*
 <a href="https://pytorch.org/executorch/main/_static/img/llama_ios_app.mp4">
   <img src="https://pytorch.org/executorch/main/_static/img/llama_ios_app.png" width="600" alt="iOS app running a LlaMA model">
 </a>
 
 ### Deploy and run on Android
 
-
-### Quantizing your model (suggested for mobile)
-
-Quantization is the process of converting a model into a more memory-efficient representation.  Quantization is particularly important for accelerators -- to take advantage of the available memory bandwidth, and fit in the often limited high-speed memory in accelerators – and mobile devices – to fit in the typically very limited memory of mobile devices.
-
-Depending on the model and the target device, different quantization recipes may be applied. torchchat contains two example configurations to optimize performance for GPU-based systems `config/data/cuda.json`, and mobile systems `config/data/mobile.json`. The GPU configuration is targeted towards optimizing for memory bandwidth which is a scarce resource in powerful GPUs (and to a less degree, memory footprint to fit large models into a device's memory). The mobile configuration is targeted towards optimizing for memory fotoprint because in many devices, a single application is limited to as little as GB or less of memory.
-
-You can use the quantization recipes in conjunction with any of the `chat`, `generate` and `browser` commands to test their impact and accelerate model execution. You will apply these recipes to the `export` comamnds below, to optimize the exported models. For example:
-```
-python3 torchchat.py chat llama3 --quantize config/data/cuda.json
-```
-To adapt these recipes or wrote your own, please refer to the [quantization overview](docs/quantization.md).
-
-
-With quantization, 32-bit floating numbers can be represented with as few as 8 or even 4 bits, and a scale shared by a group of these weights.  This transformation is lossy and modifies the behavior of models.  While research is being conducted on how to efficiently quantize large language models for use in mobile devices, this transformation invariably results in both quality loss and a reduced amount of control over the output of the models, leading to an increased risk of undesirable responses, hallucination and stuttering.  In effect, a developer quantizing a model has a responsibility to understand and reduce these effects.
-
-
-**Prerequisites**
-
-
-Read the [Android documentation](docs/Android.md) for more details on Android.
-
-**Build Native Runner Binary**
-
-We provide an end-to-end C++ [runner](runner/run.cpp) that runs the `*.pte` file exported after following the previous [ExecuTorch](#executorch) section. Notice that this binary is for demo purpose, please follow the respective documentations, to see how to build a similar application on iOS and Android. To build the runner binary on your Mac or Linux:
-
-```bash
-scripts/build_native.sh et
-```
-
-Run:
-
-```bash
-cmake-out/et_run llama3.pte -z tokenizer.model -l 3 -i "Once upon a time"
-```
 
 ## Fine-tuned models from torchtune
 
@@ -287,7 +251,6 @@ python3 torchchat.py eval llama3 --pte-path llama3.pte --limit 5
 
 
 ## Models
-
 The following models are supported by torchchat and have associated aliases. Other models, including GGUF format, can be run by specifying a URL directly.
 
 | Model | Mobile Friendly | Notes |
