@@ -23,8 +23,8 @@ from build.utils import (
     state_dict_device,
     use_et_backend,
 )
-
 from qops import LinearInt8 as WeightOnlyInt8Linear, QuantizedEmbedding
+
 
 #########################################################################
 ###                  torchchat quantization API                       ###
