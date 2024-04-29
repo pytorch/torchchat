@@ -9,6 +9,8 @@ class CustomKVCache(nn.Module):
     def __init__(self, max_batch_size, max_seq_length, n_heads, head_dim, dtype):
         super().__init__()
 
+        dtype = torch.float
+        
         # This is flipped around from what is in build.model's KVCache
         cache_shape = (max_batch_size, max_seq_length, n_heads, head_dim)
         self.register_buffer(
@@ -21,8 +23,8 @@ class CustomKVCache(nn.Module):
     def update(self, input_pos, k_val, v_val):
         k_out = self.k_cache
         v_out = self.v_cache
-        k_out[:, :, input_pos] = k_val
-        v_out[:, :, input_pos] = v_val
+        k_out[:, :, input_pos] = k_val.float()
+        v_out[:, :, input_pos] = v_val.float()
 
         return k_out, v_out
 
@@ -67,15 +69,15 @@ class CustomSDPAAttention(nn.Module):
         # KV cache should always be enabled
         assert self.kv_cache is not None
         output = torch.ops.llama.sdpa_with_kv_cache(
-            q,
-            k,
-            v,
+            q.float(),
+            k.float(),
+            v.float(),
             self.kv_cache.k_cache,
             self.kv_cache.v_cache,
             input_pos[-1].item(),
             seqlen,
         )
-        output = output.view(bsz, seqlen, self.dim)
+        output = output.view(bsz, seqlen, self.dim).to(dtype=q.dtype)
         return self.wo(output)
 
 
