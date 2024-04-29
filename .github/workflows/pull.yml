@@ -129,7 +129,79 @@ jobs:
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           pushd ${TORCHCHAT_ROOT}
           bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
-          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check"
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check-bfloat16"
+
+  test-cpu-eval-sanity-check-float16:
+    name: test-cpu-eval-sanity-check-float16 (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Print machine info
+        run: |
+          echo "$(uname -a)"
+      - name: Install dependencies
+        run: |
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Download checkpoints
+        run: |
+          bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
+      - name: Run validation
+        run: |
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          pushd ${TORCHCHAT_ROOT}
+          bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check-float16"
+
+  test-cpu-eval-sanity-check-float32:
+    name: test-cpu-eval-sanity-check-float32 (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Print machine info
+        run: |
+          echo "$(uname -a)"
+      - name: Install dependencies
+        run: |
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Download checkpoints
+        run: |
+          bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
+      - name: Run validation
+        run: |
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          pushd ${TORCHCHAT_ROOT}
+          bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check-float32"
 
   gather-models-gpu:
     runs-on: ubuntu-22.04
