@@ -37,7 +37,8 @@ torchchat is a compact codebase showcasing the ability to run large language mod
 - Multiple quantization schemes
 - Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
-*Disclaimer:*  The torchchat Repository Content is provided without any guarantees about performance or compatibility. In particular, torchchat makes available model architectures written in Python for PyTorch that may not perform in the same manner or meet the same standards as the original versions of those models. When using the torchchat Repository Content, including any model architectures, you are solely responsible for determining the appropriateness of using or redistributing the torchchat Repository Content and assume any risks associated with your use of the torchchat Repository Content or any models, outputs, or results, both alone and in combination with any other technologies. Additionally, you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models, weights, data, or other technologies, and you are solely responsible for complying with all such obligations.
+### Disclaimer
+The torchchat Repository Content is provided without any guarantees about performance or compatibility. In particular, torchchat makes available model architectures written in Python for PyTorch that may not perform in the same manner or meet the same standards as the original versions of those models. When using the torchchat Repository Content, including any model architectures, you are solely responsible for determining the appropriateness of using or redistributing the torchchat Repository Content and assume any risks associated with your use of the torchchat Repository Content or any models, outputs, or results, both alone and in combination with any other technologies. Additionally, you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models, weights, data, or other technologies, and you are solely responsible for complying with all such obligations.
 
 
 ## Installation
@@ -65,7 +66,10 @@ python3 torchchat.py --help
 Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace account.
 
 Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens).
-Run `huggingface-cli login`, which will prompt for the newly created token.
+Log into huggingface:
+```
+huggingface-cli login
+```
 
 Once this is done, torchchat will be able to download model artifacts from
 HuggingFace.
@@ -74,10 +78,17 @@ HuggingFace.
 python3 torchchat.py download llama3
 ```
 
-NOTE: This command may prompt you to request access to llama3 via HuggingFace, if you do not already have access. Simply follow the prompts and re-run the command when access is granted.
+*NOTE: This command may prompt you to request access to llama3 via HuggingFace, if you do not already have access. Simply follow the prompts and re-run the command when access is granted.*
 
-View available models with `python3 torchchat.py list`. You can also remove downloaded models
-with `python3 torchchat.py remove llama3`.
+View available models with:
+```
+python3 torchchat.py list
+```
+
+You can also remove downloaded models with the remove command:
+```
+python3 torchchat.py remove llama3
+```
 
 ## Running via PyTorch / Python
 [Follow the installation steps if you haven't](#installation)
