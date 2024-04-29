@@ -209,3 +209,100 @@ class QuantizedEmbedding(torch.nn.Module):
         return r.view(indices.size() + (-1,))
 
         # r = result_weights.to(dtype=result_scales.dtype).view(list(result_weights.shape[:-1] + (scales.shape[1], -1, )) * result_scales.view(scales.shape[-1] + (scales.shape[1], 1, ))
+
+
+def linear_int4(input, weight_int4pack, scales_and_zeros, out_features, groupsize):
+    origin_input_size = input.size()
+    input = input.reshape(-1, origin_input_size[-1])
+
+    if "cuda" in str(input.device):
+        c = torch.ops.aten._weight_int4pack_mm(
+            input.to(torch.bfloat16),
+            weight_int4pack,
+            groupsize,
+            scales_and_zeros.to(torch.bfloat16),
+        ).to(
+            input.dtype
+        )  # cast back to input.dtype
+    else:
+        c = torch.ops.aten._weight_int4pack_mm(
+            input,
+            weight_int4pack,
+            groupsize,
+            scales_and_zeros,
+        )
+    new_shape = origin_input_size[:-1] + (out_features,)
+    c = c.reshape(new_shape)
+    return c
+
+
+class LinearInt4(torch.nn.Module):
+    __constants__ = ["in_features", "out_features"]
+    in_features: int
+    out_features: int
+    weight: torch.Tensor
+    scales_and_zeros: torch.Tensor
+
+    def __init__(
+        self,
+        device: str,
+        in_features: int,
+        out_features: int,
+        bias=True,
+        dtype=None,
+        groupsize: int = 128,
+        inner_k_tiles: int = 8,
+    ) -> None:
+        super().__init__()
+        self.padding = not self._check_k(
+            k=in_features,
+            groupsize=groupsize,
+            inner_k_tiles=inner_k_tiles,
+        )
+        if self.padding:
+            self.origin_in_features = in_features
+            in_features = find_multiple(in_features, 1024)
+
+        self.in_features = in_features
+        self.out_features = out_features
+        assert not bias, "require bias=False"
+        self.groupsize = groupsize
+        self.inner_k_tiles = inner_k_tiles
+
+        assert out_features % 8 == 0, "require out_features % 8 == 0"
+        assert (
+            in_features % (inner_k_tiles * 16) == 0
+        ), "require in_features % (innerKTiles * 16) == 0"
+        self.register_buffer(
+            "weight",
+            torch.empty(
+                (
+                    out_features // 8,
+                    in_features // (inner_k_tiles * 16),
+                    32,
+                    inner_k_tiles // 2,
+                ),
+                dtype=torch.int32,
+                device=device,
+            ),
+        )
+        self.register_buffer(
+            "scales_and_zeros",
+            torch.empty(
+                (in_features // groupsize, out_features, 2),
+                dtype=get_precision(),
+                device=device,
+            ),
+        )
+
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        if self.padding:
+            input = F.pad(input, pad=(0, self.in_features - self.origin_in_features))
+        return linear_int4(
+            input, self.weight, self.scales_and_zeros, self.out_features, self.groupsize
+        )
+
+    @classmethod
+    def _check_k(cls, *, k, groupsize=1, inner_k_tiles=1):
+        return k % groupsize == 0 and k % (inner_k_tiles * 16) == 0
+
