@@ -174,6 +174,30 @@ NOTE: We use `--quantize config/data/mobile.json` to quantize the llama3 model t
 For more details on quantization and what settings to use for your use case visit our [Quanitization documentation](docs/quantization.md) or run `python3 torchchat.py export`
 
 ### Deploy and run on iOS
+The following assumes you've completed the steps for [Setting up Executorch](#set-up-executorch) and
+
+Open the xcode project
+```
+open et-build/src/executorch/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj
+```
+Then click the Play button to launch the app in Simulator.
+
+To run on a device, given that you already have it set up for development, you'll need to have a provisioning profile with the [`increased-memory-limit`](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_developer_kernel_increased-memory-limit) entitlement. Just change the app's bundle identifier to whatever matches your provisioning profile with the aforementioned capability enabled.
+
+After the app launched successfully, copy an exported ExecuTorch model (`.pte`) and tokenizer (`.bin`) files to the iLLaMA folder.
+
+For the Simulator, just drap&drop both files onto the Simulator window and save at `On My iPhone > iLLaMA` folder.
+
+For a device, open it in a separate Finder window, navigate to the Files tab, drag&drop both files to the iLLaMA folder and wait till the copying finishes.
+
+Now, follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem and issue a prompt.
+
+Click the image below to see it in action!
+<a href="https://pytorch.org/executorch/main/_static/img/llama_ios_app.mp4">
+  <img src="https://pytorch.org/executorch/main/_static/img/llama_ios_app.png" width="600" alt="iOS app running a LlaMA model">
+</a>
+
+### Deploy and run on Android
 
 
 ### Quantizing your model (suggested for mobile)
@@ -194,7 +218,6 @@ With quantization, 32-bit floating numbers can be represented with as few as 8 o
 
 **Prerequisites**
 
-Read the [iOS documentation](docs/iOS.md) for more details on iOS.
 
 Read the [Android documentation](docs/Android.md) for more details on Android.
 
