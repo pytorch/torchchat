@@ -21,7 +21,7 @@ torchchat is a compact codebase showcasing the ability to run large language mod
 - [Evaluate a mode](#eval)
 - [Fine-tuned models from torchtune](#fine-tuned-models-from-torchtune)
 - [Supported Models](#models)
-- [Trouble Shooting](#troubleshooting)
+- [Troubleshooting](#troubleshooting)
 
 
 ## Highlights
