@@ -5,9 +5,8 @@ Before running any commands in torchchat that require ExecuTorch, you must first
 To install ExecuTorch, run the following commands *from the torchchat root directory*.
 
 ```
-export TORCHCHAT_ROOT=${PWD}
-export ENABLE_ET_PYBIND=true
-./scripts/install_et.sh $ENABLE_ET_PYBIND
+export TORCHCHAT_ROOT=$PWD
+./scripts/install_et.sh
 ```
 
 This will download the ExecuTorch repo to ./et-build/src and install various ExecuTorch libraries to ./et-build/install.
