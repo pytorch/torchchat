@@ -47,6 +47,10 @@ Options:
 To build runner-aoti, run the following commands *from the torchchat root directory*
 
 ```
+# Pull submodules (re2, abseil) for Tiktoken
+git submodule sync
+git submodule update --init
+
 ./scripts/build_native.sh aoti
 ```
 
