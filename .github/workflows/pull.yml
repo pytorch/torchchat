@@ -450,6 +450,7 @@ jobs:
           export TORCHCHAT_ROOT=$PWD
           ./scripts/install_et.sh
 
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
           python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
@@ -591,6 +592,7 @@ jobs:
         run: |
           echo "Installing pip3 packages"
           ./install_requirements.sh
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
       - name: Download Stories files
@@ -643,6 +645,7 @@ jobs:
         ./install_requirements.sh
         ls -la
         pwd
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -706,6 +709,7 @@ jobs:
           echo "Intalling pip3 packages"
           pip3 install gguf
           ./install_requirements.sh
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
           git clone https://github.com/ggerganov/llama.cpp.git
@@ -751,6 +755,7 @@ jobs:
         ./install_requirements.sh
         ls -la
         pwd
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -807,6 +812,7 @@ jobs:
       - name: Install requirements
         run: |
           ./install_requirements.sh
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download GGUF
         run: |
@@ -883,6 +889,7 @@ jobs:
 
           export TORCHCHAT_ROOT=${PWD}
           bash scripts/build_native.sh et
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
           python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
@@ -929,6 +936,7 @@ jobs:
         run: |
           ./install_requirements.sh
           pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
           bash scripts/build_native.sh aoti
 
@@ -968,6 +976,9 @@ jobs:
             sysctl machdep.cpu.core_count
           fi
           ./install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+
           export TORCHCHAT_ROOT=${PWD}
           pushd /tmp
           wget https://dl.google.com/android/repository/android-ndk-r26c-linux.zip
