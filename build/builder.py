@@ -117,6 +117,14 @@ class BuilderArgs:
                     if "chat" in path_basename or "instruct" in path_basename:
                         is_chat_model = True
 
+        if args.output_pte_path and args.dtype.startswith("fast"):
+            if args.dtype == "fast":
+                dtype = torch.float32
+            else:
+                dtype = torch.float16
+        else:
+            dtype = name_to_dtype(args.dtype)
+
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
@@ -127,7 +135,7 @@ class BuilderArgs:
             dso_path=args.dso_path,
             pte_path=args.pte_path,
             device=args.device,
-            precision=name_to_dtype(args.dtype),
+            precision=dtype,
             setup_caches=(args.output_dso_path or args.output_pte_path),
             use_tp=False,
             is_chat_model=is_chat_model,
