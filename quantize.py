@@ -19,11 +19,9 @@ from build.utils import (
     find_multiple,
     get_device_str,
     get_precision,
-    name_to_dtype,
     state_dict_device,
     use_et_backend,
 )
-from qops import LinearInt8 as WeightOnlyInt8Linear, QuantizedEmbedding
 
 from qops import (
     LinearInt4 as WeightOnlyInt4Linear,

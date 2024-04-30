@@ -76,7 +76,7 @@ class GeneratorArgs:
     compile: bool = False
     compile_prefill: bool = False
     speculate_k: int = 5
-    sequential_prefill: bool = True
+    sequential_prefill: bool = False
 
     def __post_init__(self):
         if self.compile_prefill and self.sequential_prefill:
@@ -104,6 +104,8 @@ class GeneratorArgs:
 
     @classmethod
     def from_args(cls, args):
+        sequential_prefill = args.sequential_prefill or bool(dso_path) or bool(pte_path)
+
         return cls(
             prompt=args.prompt,
             encoded_prompt=None,
@@ -116,7 +118,7 @@ class GeneratorArgs:
             compile=args.compile,
             compile_prefill=args.compile_prefill,
             speculate_k=args.speculate_k,
-            sequential_prefill=not args.parallel_prefill,
+            sequential_prefill=sequential_prefill,
         )
 
 

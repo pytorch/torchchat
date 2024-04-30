@@ -136,12 +136,12 @@ def _add_arguments_common(parser):
     parser.add_argument(
         "--compile-prefill",
         action="store_true",
-        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times. (Requires `--parallel-prefill`)",
+        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times.",
     )
     parser.add_argument(
-        "--parallel-prefill",
+        "--sequential-prefill",
         action="store_true",
-        help="Whether to perform prefill in parallel, or one token at a time. Improves prefill perf. DSO and PTE models presently do not support parallel prefill.",
+        help="Whether to perform prefill sequentially. Only used for model debug.",
     )
     parser.add_argument(
         "--profile",

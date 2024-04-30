@@ -305,4 +305,3 @@ class LinearInt4(torch.nn.Module):
     @classmethod
     def _check_k(cls, *, k, groupsize=1, inner_k_tiles=1):
         return k % groupsize == 0 and k % (inner_k_tiles * 16) == 0
-
