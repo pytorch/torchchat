@@ -4,7 +4,7 @@ torchchat is a compact codebase showcasing the ability to run large language mod
 
 
 ## What can you do with torchchat?
-- [Setup the Repo](#installation)
+- [Set up the Repo](#installation)
 - [Download Models](#download-weights)
 - [Run models via PyTorch / Python](#running-via-pytorch--python)
   - [Chat](#chat)
@@ -18,8 +18,8 @@ torchchat is a compact codebase showcasing the ability to run large language mod
   - [Export a model for use on mobile](#export-for-mobile)
   - [Deploy and run on iOS](#deploy-and-run-on-ios)
   - [Deploy and run on Android](#deploy-and-run-on-android)
-- [Evaluate a mode](#eval)
-- [Fine-tuned models from torchtune](#fine-tuned-models-from-torchtune)
+- [Evaluate a model](#eval)
+- [Run fine-tuned models from torchtune](#fine-tuned-models-from-torchtune)
 - [Supported Models](#models)
 - [Troubleshooting](#troubleshooting)
 
@@ -35,14 +35,13 @@ torchchat is a compact codebase showcasing the ability to run large language mod
   - iOS 17+ (iPhone 13 Pro+)
 - Multiple data types including: float32, float16, bfloat16, select GGUF data types
 - Multiple quantization schemes
-- Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
+- Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor, ExecuTorch)
 
 ### Disclaimer
 The torchchat Repository Content is provided without any guarantees about performance or compatibility. In particular, torchchat makes available model architectures written in Python for PyTorch that may not perform in the same manner or meet the same standards as the original versions of those models. When using the torchchat Repository Content, including any model architectures, you are solely responsible for determining the appropriateness of using or redistributing the torchchat Repository Content and assume any risks associated with your use of the torchchat Repository Content or any models, outputs, or results, both alone and in combination with any other technologies. Additionally, you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models, weights, data, or other technologies, and you are solely responsible for complying with all such obligations.
 
 
 ## Installation
-
 
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
@@ -165,7 +164,7 @@ cmake-out/aoti_run model.so -z tokenizer.model -l 3 -i "Once upon a time"
 ## Mobile Execution
 ExecuTorch enables you to optimize your model for execution on a mobile or embedded device, but can also be used on desktop for testing.
 
-### Set Up Executorch
+### Set Up ExecuTorch
 Before running any commands in torchchat that require ExecuTorch, you must first install ExecuTorch.
 
 To install ExecuTorch, run the following commands *from the torchchat root directory*.
@@ -190,9 +189,9 @@ NOTE: We use `--quantize config/data/mobile.json` to quantize the llama3 model t
 For more details on quantization and what settings to use for your use case visit our [Quanitization documentation](docs/quantization.md) or run `python3 torchchat.py export`
 
 ### Deploy and run on iOS
-The following assumes you've completed the steps for [Setting up Executorch](#set-up-executorch) and
+The following assumes you've completed the steps for [Setting up ExecuTorch](#set-up-executorch) and
 
-Open the xcode project
+Open the Xcode project
 ```
 open et-build/src/executorch/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj
 ```
