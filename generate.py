@@ -104,7 +104,9 @@ class GeneratorArgs:
 
     @classmethod
     def from_args(cls, args):
-        sequential_prefill = args.sequential_prefill or bool(dso_path) or bool(pte_path)
+        sequential_prefill = (
+            args.sequential_prefill or bool(args.dso_path) or bool(args.pte_path)
+        )
 
         return cls(
             prompt=args.prompt,
