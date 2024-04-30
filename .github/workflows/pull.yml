@@ -985,5 +985,9 @@ jobs:
           unzip android-ndk-r26c-linux.zip
           popd
           export ANDROID_NDK=/tmp/android-ndk-r26c
+
+          # Pull submodules (re2, abseil) for Tiktoken
+          git submodule sync
+          git submodule update --init
           ./runner/build_android.sh
           echo "Tests complete."
