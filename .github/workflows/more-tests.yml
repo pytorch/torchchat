@@ -1,4 +1,4 @@
-name: Run HQQ tests
+name: Run parallel prefill
 
 on:
   pull_request:
