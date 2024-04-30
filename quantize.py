@@ -596,7 +596,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 #####     weight only int4 per channel groupwise quantized code    ######
 
 
-def _int4_prepare_int4_weight_and_scales_and_zeros(
+def WeightOnlyInt4Linear._prepare_weight_and_scales_and_zeros(
     weight_bf16, groupsize, inner_k_tiles
 ):
     weight_int32, scales_and_zeros = group_quantize_tensor(
@@ -706,7 +706,7 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
                         )
                         continue
                 weight_int4pack, scales_and_zeros = (
-                    _int4_prepare_int4_weight_and_scales_and_zeros(
+                    WeightOnlyInt4Linear._prepare_weight_and_scales_and_zeros(
                         weight.to(torch.float), self.groupsize, self.inner_k_tiles
                     )
                 )
