@@ -62,9 +62,11 @@ fi
 
 source "$TORCHCHAT_ROOT/scripts/install_utils.sh"
 
+git submodule update --init
+git submodule sync
+
 if [[ "$TARGET" == "et" ]]; then
     pushd ${TORCHCHAT_ROOT}
-    git submodule update --init
     find_cmake_prefix_path
     install_pip_dependencies
     clone_executorch
