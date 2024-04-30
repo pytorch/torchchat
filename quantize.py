@@ -23,7 +23,6 @@ from build.utils import (
     state_dict_device,
     use_et_backend,
 )
-from qops import LinearInt8 as WeightOnlyInt8Linear, QuantizedEmbedding
 
 from qops import (
     LinearInt4 as WeightOnlyInt4Linear,
@@ -389,7 +388,7 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
         # dict_device = "cpu"  # self.device
 
         device = self.device
-                             
+
         if self.bitwidth == 4:
             range_min = -8
             range_max = 7
@@ -403,16 +402,16 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
             # print(f"name: {name}")
             if isinstance(child, nn.Linear):
                 if (
-                        (self.node_type == "*")
-                        or (self.node_type == "output" and name == "output")
-                        or (self.node_type == "!output" and name != "output")
+                    (self.node_type == "*")
+                    or (self.node_type == "output" and name == "output")
+                    or (self.node_type == "!output" and name != "output")
                 ):
                     # print(f"{name, child}")
                     input_weight = child.weight.float()
                     # print(f"{name, child}")
                     # print(f"in_features: {child.in_features}")
                     # print(f"out_features: {child.out_features}")
-                
+
                     # print(f"expanded weight shape {input_weight.shape}")
                     weight, scales, _ = dynamically_quantize_per_channel(
                         input_weight,
@@ -420,7 +419,7 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
                         range_max,
                         torch.int8,
                         self.groupsize,
-                        scales_dtype=mod.weight.dtype,
+                        scales_dtype=child.weight.dtype,
                     )
 
                     setattr(
@@ -443,7 +442,6 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
 
     def quantized_model(self) -> nn.Module:
         return self.quantize(self.model_)
-
 
 
 #########################################################################
@@ -560,8 +558,6 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 
 #########################################################################
 #####     weight only int4 per channel groupwise quantized code    ######
-
-
 
 
 def replace_linear_int4(

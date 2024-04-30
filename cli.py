@@ -12,7 +12,7 @@ import torch
 from build.utils import allowable_dtype_names, allowable_params_table, get_device_str
 from download import download_and_convert, is_model_downloaded
 
-default_device = "cpu"
+default_device = "fast"
 
 
 # Handle CLI arguments that are common to a majority of subcommands.
@@ -136,12 +136,12 @@ def _add_arguments_common(parser):
     parser.add_argument(
         "--compile-prefill",
         action="store_true",
-        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times. (Requires `--parallel-prefill`)",
+        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times.",
     )
     parser.add_argument(
-        "--parallel-prefill",
+        "--sequential-prefill",
         action="store_true",
-        help="Whether to perform prefill in parallel, or one token at a time. Improves prefill perf. DSO and PTE models presently do not support parallel prefill.",
+        help="Whether to perform prefill sequentially. Only used for model debug.",
     )
     parser.add_argument(
         "--profile",
@@ -210,11 +210,10 @@ def _add_arguments_common(parser):
         help="Use the specified ExecuTorch .pte model file",
     )
     parser.add_argument(
-        "-d",
         "--dtype",
-        default="float32",
+        default="fast",
         choices=allowable_dtype_names(),
-        help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
+        help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32, fast16, fast",
     )
     parser.add_argument(
         "-v",
