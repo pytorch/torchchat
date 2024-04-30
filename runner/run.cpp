@@ -787,9 +787,11 @@ void chat(
 #ifndef TESTING
 
 void error_usage() {
-  fprintf(stderr, "Usage:   run <model_path> [options]\n");
+  fprintf(stderr, "Usage:   {binary} <model_path> [options]\n");
   fprintf(
-      stderr, "Example: run model.{so,pte} -n 256 -i \"Once upon a time\"\n");
+      stderr, "\tAOTI example: aoti_run llama3_model.so -z tokenizer.model -l 3 -n 256 -i \"Once upon a time\"\n");
+  fprintf(
+      stderr, "\tET example: et_run llama3_model.pte -z tokenizer.model -l 3 -n 256 -i \"Once upon a time\"\n");
   fprintf(stderr, "Options:\n");
   fprintf(stderr, "  -t <float>  temperature in [0,inf], default 1.0\n");
   fprintf(
@@ -807,7 +809,7 @@ void error_usage() {
       stderr,
       "  -v <int>    (optional) vocab size, default is model-specific.\n");
   fprintf(
-      stderr, "  -l <int>    (optional) llama version (2 or 3), default 2.\n");
+      stderr, "  -l <int>    llama version (2 or 3).\n");
   exit(EXIT_FAILURE);
 }
 
@@ -828,7 +830,7 @@ int main(int argc, char* argv[]) {
       NULL; // the (optional) system prompt to use in chat mode
 
   int vocab_size = -1;
-  int llama_ver = 2;
+  int llama_ver = -1;
 
 #if defined(ET_USE_ADPATIVE_THREADS)
   uint32_t num_performant_cores =
@@ -882,11 +884,18 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  if (llama_ver == -1) {
+    fprintf(
+        stderr,
+        "Please specify llama version (2 or 3) with -l argument.\n");
+    error_usage();
+  }
+
   ModelType model_type = get_model_type(llama_ver);
   if (model_type == UNKNOWN_MODEL) {
     fprintf(
         stderr,
-        "Unknown model type passed by -l argument.  Received l=%d.",
+        "Unknown model type passed by -l argument.  Received l=%d.\n",
         llama_ver);
     error_usage();
   }
