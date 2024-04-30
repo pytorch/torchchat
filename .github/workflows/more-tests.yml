@@ -47,14 +47,16 @@ jobs:
         export MODEL_DIR=/tmp
 
         for DTYPE in bfloat16 float16 float32; do
+          # group with different temperatures and prefill
           python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 --parallel-prefill
           python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 --parallel-prefill
           python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0 --parallel-prefill
-	  
+          # group with different temperatures and prefill, and compile
           python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 --parallel-prefill --compile
           python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 --parallel-prefill --compile
           python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0 --parallel-prefill --compile
-
+          # group with different temperatures and prefill, and compile
+          # and prefill compile
           python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 --parallel-prefill --compile --compile-prefill
           python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 --parallel-prefill --compile --compile-prefill
           python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0 --parallel-prefill --compile --compile-prefill
