@@ -117,7 +117,7 @@ Enter some text in the input box, then hit the enter key or click the “SEND”
 ### AOTI (AOT Inductor)
 AOT compiles models before execution for faster inference
 
-The following example exports and executes the Llama3 8B Instruct model
+The following example exports and executes the Llama3 8B Instruct model.  (The first command performs the actual export, the second command loads the exported model into the Python interface to enable users to test the exported model.)
 ```
 # Compile
 python3 torchchat.py export llama3 --output-dso-path llama3.so
@@ -153,11 +153,11 @@ This will download the ExecuTorch repo to ./et-build/src and install various Exe
 ```
 export TORCHCHAT_ROOT=${PWD}
 export ENABLE_ET_PYBIND=true
-./scripts/install_et.sh $ENABLE_ET_PYBIND
+./scripts/install_et.sh --pybind
 ```
 
 ### Export for mobile
-The following example uses the Llama3 8B Instruct model.
+The following example uses the Llama3 8B Instruct model.  (The first command performs the actual export, the second command loads the exported model into the Python interface to enable users to test the exported model.)
 ```
 # Export
 python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
