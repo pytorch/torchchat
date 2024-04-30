@@ -156,13 +156,27 @@ def state_dict_device(d, device="cpu") -> Dict:
 #########################################################################
 ###                move state dict to specified device                ###
 
+def is_mps_available() -> bool:
+    if not torch.backends.mps.is_available():
+        return False
+
+    # out system says mps is available, but it's not on VMs
+    # so let's set up some memry, and see if that work:
+    try:
+        mps_tensor = torch.zero(1024, dtype=torch.float16, device="mps")
+    except:
+        return False
+
+    # MPS, is that you? 
+    return True
+
 
 def get_device_str(device) -> str:
     if isinstance(device, str) and device == "fast":
         return (
             "cuda"
             if torch.cuda.is_available()
-            else "mps" if torch.backends.mps.is_available() else "cpu"
+            else "mps" if is_mps_available() else "cpu"
         )
     else:
         return str(device)
@@ -173,6 +187,6 @@ def get_device(device) -> str:
         device = (
             "cuda"
             if torch.cuda.is_available()
-            else "mps" if torch.backends.mps.is_available() else "cpu"
+            else "mps" if is_mps_available() else "cpu"
         )
     return torch.device(device)
