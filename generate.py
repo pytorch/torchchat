@@ -76,7 +76,7 @@ class GeneratorArgs:
     compile: bool = False
     compile_prefill: bool = False
     speculate_k: int = 5
-    sequential_prefill: bool = True
+    sequential_prefill: bool = False
 
     def __post_init__(self):
         if self.compile_prefill and self.sequential_prefill:
@@ -104,6 +104,10 @@ class GeneratorArgs:
 
     @classmethod
     def from_args(cls, args):
+        sequential_prefill = (
+            args.sequential_prefill or bool(args.dso_path) or bool(args.pte_path)
+        )
+
         return cls(
             prompt=args.prompt,
             encoded_prompt=None,
@@ -116,7 +120,7 @@ class GeneratorArgs:
             compile=args.compile,
             compile_prefill=args.compile_prefill,
             speculate_k=args.speculate_k,
-            sequential_prefill=not args.parallel_prefill,
+            sequential_prefill=sequential_prefill,
         )
 
 
@@ -154,7 +158,7 @@ def sample(
     # if temperature == 0 and not need_probs:
     #     _, idx_next = torch.topk(logits, k=1, dim=-1)
     #     idx_next = idx_next.squeeze(dim=(0, 1))
-    #    return (idx_next, None)
+    #     return (idx_next, None)
     probs = logits_to_probs(logits[0, -1], temperature, top_k)
     idx_next = multinomial_sample_one_no_sync(probs)
     return idx_next, probs
@@ -180,7 +184,9 @@ def prefill(
     else:
         # input_pos: [B, S]
         logits = model(x, input_pos)
+        # print(f"logits {logits.shape}")
 
+    # print(f"x: {x},\n  input_pos: {input_pos}\n")
     return sample(logits, need_probs=False, **sampling_kwargs)[0]
 
 
@@ -194,6 +200,7 @@ def decode_one_token(
     # input_pos: [B, 1]
     assert input_pos.shape[-1] == 1
     logits = model(x, input_pos)
+    # print(f"x: {x},\n  input_pos: {input_pos}\n")
     return sample(logits, need_probs=need_probs, **sampling_kwargs)
 
 
@@ -210,7 +217,7 @@ def decode_n_tokens(
 ):
     new_tokens, new_probs = [], []
     encountered_eos = False
-    for i in range(
+    for _i in range(
         num_new_tokens - 1
     ):  # -1 to save space to run an EoS if dont generate it naturally
         # Actually better for Inductor to codegen attention here
@@ -379,6 +386,7 @@ def generate(
             sequential_prefill=sequential_prefill,
             **sampling_kwargs,
         )
+    # print(f"sizes: {T} {seq[T].shape} {seq.shape} {next_token.shape}")
     seq[T] = next_token
     callback(next_token.clone().view(-1))
 
