@@ -1,8 +1,6 @@
 # Chat with LLMs Everywhere
 torchchat is a compact codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
 
-
-
 ## What can you do with torchchat?
 - [Setup the Repo](#installation)
 - [Download Models](#download-weights)
@@ -37,13 +35,7 @@ torchchat is a compact codebase showcasing the ability to run large language mod
 - Multiple quantization schemes
 - Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
-### Disclaimer
-The torchchat Repository Content is provided without any guarantees about performance or compatibility. In particular, torchchat makes available model architectures written in Python for PyTorch that may not perform in the same manner or meet the same standards as the original versions of those models. When using the torchchat Repository Content, including any model architectures, you are solely responsible for determining the appropriateness of using or redistributing the torchchat Repository Content and assume any risks associated with your use of the torchchat Repository Content or any models, outputs, or results, both alone and in combination with any other technologies. Additionally, you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models, weights, data, or other technologies, and you are solely responsible for complying with all such obligations.
-
-
 ## Installation
-
-
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
 ```bash
@@ -287,6 +279,9 @@ Run `pip install --upgrade certifi`.
 
 **Access to model is restricted and you are not in the authorized list**
 Some models require an additional step to access. Follow the link provided in the error to get access.
+
+### Disclaimer
+The torchchat Repository Content is provided without any guarantees about performance or compatibility. In particular, torchchat makes available model architectures written in Python for PyTorch that may not perform in the same manner or meet the same standards as the original versions of those models. When using the torchchat Repository Content, including any model architectures, you are solely responsible for determining the appropriateness of using or redistributing the torchchat Repository Content and assume any risks associated with your use of the torchchat Repository Content or any models, outputs, or results, both alone and in combination with any other technologies. Additionally, you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models, weights, data, or other technologies, and you are solely responsible for complying with all such obligations.
 
 ## Acknowledgements
 Thank you to the [community](docs/ACKNOWLEDGEMENTS.md) for all the awesome libraries and tools
