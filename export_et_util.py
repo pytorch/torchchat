@@ -10,7 +10,7 @@ class CustomKVCache(nn.Module):
         super().__init__()
 
         dtype = torch.float
-        
+
         # This is flipped around from what is in build.model's KVCache
         cache_shape = (max_batch_size, max_seq_length, n_heads, head_dim)
         self.register_buffer(

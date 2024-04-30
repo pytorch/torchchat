@@ -168,14 +168,14 @@ def prefill(
     sequential_prefill=True,
     **sampling_kwargs,
 ) -> torch.Tensor:
-    logging.debug(f"x: {x}, input_pos: {input_pos}")
+    # logging.debug(f"x: {x}, input_pos: {input_pos}")
     width = x.size(1)
     assert input_pos.size(0) == width
 
     if sequential_prefill:
         for i in range(width):
             x_sliced, ip_sliced = x[:, i].view(-1, 1), input_pos[i].view(-1)
-            logging.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
+            # logging.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
             logits = model(x_sliced, ip_sliced)  # (x[:, i], input_pos[i])
     else:
         # input_pos: [B, S]
