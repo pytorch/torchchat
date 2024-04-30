@@ -172,7 +172,7 @@ def prefill(
     sequential_prefill=True,
     **sampling_kwargs,
 ) -> torch.Tensor:
-    logging.debug(f"x: {x}, input_pos: {input_pos}")
+    # logging.debug(f"x: {x}, input_pos: {input_pos}")
     width = x.size(1)
     assert input_pos.size(0) == width
 
