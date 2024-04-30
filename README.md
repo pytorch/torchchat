@@ -172,8 +172,7 @@ To install ExecuTorch, run the following commands *from the torchchat root direc
 This will download the ExecuTorch repo to ./et-build/src and install various ExecuTorch libraries to ./et-build/install.
 ```
 export TORCHCHAT_ROOT=${PWD}
-export ENABLE_ET_PYBIND=true
-./scripts/install_et.sh $ENABLE_ET_PYBIND
+./scripts/install_et.sh
 ```
 
 ### Export for mobile
