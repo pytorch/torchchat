@@ -681,9 +681,31 @@ def _main(
                 # print(, end='', flush=True)
 
         else:
+            assert not generator_args.chat_mode
+            buffer = [generator_args.prompt]
+            period_id = tokenizer.encode(".")[0]
+            done_generating = False
 
-            def callback(x):
-                return x
+            def callback(
+                x, buffer=buffer, period_id=period_id, done_generating=done_generating
+            ):
+                if done_generating:
+                    return
+                buffer.append(
+                    tokenizer.decode([period_id] + x.tolist())[1:]
+                )  # I think this results in the first output token being dropped from the display which is wrong.
+                if x.item() == tokenizer.eos_id():
+                    done_generating = True
+                if (
+                    is_llama3_model
+                    and x.item() == tokenizer.special_tokens["<|eot_id|>"]
+                ):
+                    done_generating = True
+                    buffer = buffer[:-1]  # drop the eot_id from the output buffer
+                if len(buffer) == 4 or done_generating:
+                    print("".join(buffer), end="", flush=True)
+                    buffer.clear()
+                # print(, end='', flush=True)
 
         t0 = time.perf_counter()
         import contextlib
