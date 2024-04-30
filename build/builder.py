@@ -37,6 +37,7 @@ class BuilderArgs:
     setup_caches: bool = False
     use_tp: bool = False
     is_chat_model: bool = False
+    prefill_possible: bool = False
 
     def __post_init__(self):
         if self.device is None:
@@ -68,6 +69,8 @@ class BuilderArgs:
             print(
                 "Warning: GGUF path ignored because an exported DSO or PTE path specified"
             )
+        if not (self.dso_path) and not (self.pte_path):
+            self.prefill_possible = True
 
     @classmethod
     def from_args(cls, args):  # -> BuilderArgs:
