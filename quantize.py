@@ -111,6 +111,9 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
 
 class PrecisionHandler(QuantHandler):
     def __init__(self, model: nn.Module, device="cpu", tokenizer=None, *, dtype):
+        # We're kidding right? It's imported up there, and now name not found
+        from build.utils import name_to_dtype
+        
         self.model_ = model
         self.device = device
         self.tokenizer = tokenizer
