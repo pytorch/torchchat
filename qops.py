@@ -15,7 +15,7 @@ from build.utils import (
 from torch.nn.parameter import Parameter
 
 
-def linear_int8(input, weight, scales):
+def linear_int8_aoti(input, weight, scales):
     n_groups = scales.numel() // scales.shape[0]
 
     # we special-case channel-wise, because we know how to make that fast
@@ -32,6 +32,37 @@ def linear_int8(input, weight, scales):
             weight,
             scales,
         ).reshape(input.shape[:-1] + (weight.shape[0],))
+
+    return F.linear(
+        input,
+        (
+            weight.to(dtype=input.dtype).view(weight.shape[0], n_groups, -1)
+            * scales.view(weight.shape[0], n_groups, -1)
+        ).view(weight.shape[0], -1),
+    )
+
+
+def linear_int8_et(input, weight, scales):
+    n_groups = scales.numel() // scales.shape[0]
+
+    # we special-case channel-wise, because we know how to make that fast
+    if n_groups == 1:
+        from torchao.quantization.pt2e.representation.rewrite import (
+            _qdq_dynamic_quantized_linear,
+        )
+
+        return _qdq_dynamic_quantized_linear(
+            x_fp32=input.float(),
+            x_quant_min=-128,
+            x_quant_max=127,
+            x_eps=torch.finfo(input.dtype).eps,
+            weight_i8=weight,
+            weight_scale=scales.float(),
+            weight_zero_point=0,
+            weight_quant_min=-128,
+            weight_quant_max=127,
+            bias_fp32=None,
+        ).to(dtype=input.dtype)
 
     return F.linear(
         input,
@@ -68,9 +99,6 @@ class LinearInt8(nn.Module):
         if device is None:
             device = "cpu"
 
-        if device == "einputecutorch":
-            device = "cpu"
-
         assert not bias, "Bias is not supported by LinearInt8"
         self.in_features = in_features
         self.out_features = out_features
@@ -91,8 +119,16 @@ class LinearInt8(nn.Module):
         self.register_buffer("weight", weight.to(device))
         self.register_buffer("scales", scales.to(device))
 
-    def forward(self, input: torch.Tensor) -> torch.Tensor:
-        return linear_int8(input, self.weight, self.scales)
+        if use_et_backend():
+            self.forward = self.et_forward
+        else:
+            self.forward = self.aoti_forward
+
+    def aoti_forward(self, input: torch.Tensor) -> torch.Tensor:
+        return linear_int8_aoti(input, self.weight, self.scales)
+
+    def et_forward(self, input: torch.Tensor) -> torch.Tensor:
+        return linear_int8_et(input, self.weight, self.scales)
 
 
 class QuantizedEmbedding(torch.nn.Module):
