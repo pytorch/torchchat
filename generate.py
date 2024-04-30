@@ -184,9 +184,9 @@ def prefill(
     else:
         # input_pos: [B, S]
         logits = model(x, input_pos)
-        print(f"logits {logits.shape}")
+        # print(f"logits {logits.shape}")
 
-    print(f"x: {x},\n  input_pos: {input_pos}\n")
+    # print(f"x: {x},\n  input_pos: {input_pos}\n")
     return sample(logits, need_probs=False, **sampling_kwargs)[0]
 
 
@@ -200,7 +200,7 @@ def decode_one_token(
     # input_pos: [B, 1]
     assert input_pos.shape[-1] == 1
     logits = model(x, input_pos)
-    print(f"x: {x},\n  input_pos: {input_pos}\n")
+    # print(f"x: {x},\n  input_pos: {input_pos}\n")
     return sample(logits, need_probs=need_probs, **sampling_kwargs)
 
 
@@ -386,7 +386,7 @@ def generate(
             sequential_prefill=sequential_prefill,
             **sampling_kwargs,
         )
-    print(f"sizes: {T} {seq[T].shape} {seq.shape} {next_token.shape}")
+    # print(f"sizes: {T} {seq[T].shape} {seq.shape} {next_token.shape}")
     seq[T] = next_token
     callback(next_token.clone().view(-1))
 
