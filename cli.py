@@ -210,11 +210,10 @@ def _add_arguments_common(parser):
         help="Use the specified ExecuTorch .pte model file",
     )
     parser.add_argument(
-        "-d",
         "--dtype",
-        default="float32",
+        default="fast",
         choices=allowable_dtype_names(),
-        help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
+        help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32, fast16, fast",
     )
     parser.add_argument(
         "-v",
