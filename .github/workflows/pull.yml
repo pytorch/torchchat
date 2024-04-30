@@ -18,7 +18,7 @@ jobs:
           submodules: 'false'
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
       - name: Extract the list of models to run on CPU
         id: gather-models-cpu
         run: |
@@ -40,7 +40,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
       - name: Print machine info
         run: |
           echo "$(uname -a)"
@@ -75,7 +75,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
       - name: Print machine info
         run: |
           echo "$(uname -a)"
@@ -109,7 +109,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
       - name: Print machine info
         run: |
           echo "$(uname -a)"
@@ -144,7 +144,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
       - name: Print machine info
         run: |
           echo "$(uname -a)"
@@ -179,7 +179,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
       - name: Print machine info
         run: |
           echo "$(uname -a)"
@@ -208,7 +208,7 @@ jobs:
           submodules: 'false'
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
       - name: Extract the list of models to run on GPU
         id: gather-models-gpu
         run: |
@@ -434,7 +434,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10
       - name: Print machine info
         run: |
           uname -a
@@ -579,7 +579,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10
       - name: Print machine info
         run: |
           uname -a
@@ -693,7 +693,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10
       - name: Print machine info
         run: |
           uname -a
@@ -796,7 +796,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10
       - name: Print machine info
         run: |
           uname -a
@@ -868,7 +868,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10
       - name: Print machine info
         run: |
           uname -a
@@ -921,7 +921,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
       - name: Print machine info
         run: |
           echo "$(uname -a)"
