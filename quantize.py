@@ -468,12 +468,13 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
         return cur_state_dict
 
     def convert_for_runtime(self) -> nn.Module:
-        replace_linear_weight_only_int8_per_channel(
-            self.model_, self.device, self.node_type, self.groupsize
-        )
+
         return self.model_
 
     def quantized_model(self) -> nn.Module:
+        replace_linear_weight_only_int8_per_channel(
+            self.model_, self.device, self.node_type, self.groupsize
+        )
         model_updated_state_dict = self.create_quantized_state_dict()
         self.convert_for_runtime()
         self.model_.load_state_dict(model_updated_state_dict)
@@ -596,20 +597,6 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 #####     weight only int4 per channel groupwise quantized code    ######
 
 
-def WeightOnlyInt4Linear._prepare_weight_and_scales_and_zeros(
-    weight_bf16, groupsize, inner_k_tiles
-):
-    weight_int32, scales_and_zeros = group_quantize_tensor(
-        weight_bf16, n_bit=4, groupsize=groupsize
-    )
-    weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
-        weight_int32, inner_k_tiles
-    )
-    return weight_int4pack, scales_and_zeros
-
-
-def _int4_calc_padded_size(k, groupsize=1, innner_k_tiles=1):
-    return find_multiple(k, 1024)
 
 
 def replace_linear_int4(
