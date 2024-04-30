@@ -1,0 +1,89 @@
+name: Run parallel prefill
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-cuda:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
+
+        echo "::group::Download checkpoints"
+        # Install requirements
+        pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip3 install -r requirements.txt
+        pip3 list
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoints"
+        mkdir -p checkpoints/stories15M
+        pushd checkpoints/stories15M
+        wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+        wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+        popd
+        echo "::endgroup::"
+
+        echo "::group::Run inference"
+        export MODEL_PATH=checkpoints/stories15M/stories15M.pt
+        export MODEL_NAME=stories15M
+        export MODEL_DIR=/tmp
+
+        for DTYPE in bfloat16 float16 float32; do
+          ###################################################################
+          # group with different temperatures 
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100 
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200 	  
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500 	  
+          ###################################################################
+          # group with different temperatures and prefill, and compile
+          # and prefill compile
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 --compile --compile-prefill
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 --compile --compile-prefill
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0 --compile --compile-prefill
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100 --compile --compile-prefill
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200 --compile --compile-prefill
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500 --compile --compile-prefill
+          ###################################################################
+          # group with different temperatures and sequential prefill
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 --sequential-prefill
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 --sequential-prefill
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0 --sequential-prefill
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100 --sequential-prefill
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200 --sequential-prefill
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500 --sequential-prefill
+          ###################################################################
+          # group with different temperatures and prefill, and compile
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 --sequential-prefill --compile
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 --sequential-prefill --compile
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0 --sequential-prefill --compile
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100 --sequential-prefill --compile
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200 --sequential-prefill --compile
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500 --sequential-prefill --compile
+
+        done
+
+        echo "tests complete"
+        echo "******************************************"
+        echo "::endgroup::"
+

@@ -305,3 +305,21 @@ class LinearInt4(torch.nn.Module):
     @classmethod
     def _check_k(cls, *, k, groupsize=1, inner_k_tiles=1):
         return k % groupsize == 0 and k % (inner_k_tiles * 16) == 0
+
+    @classmethod
+    def _prepare_weight_and_scales_and_zeros(
+        cls, weight_bf16, groupsize, inner_k_tiles
+    ):
+        from quantize import group_quantize_tensor
+
+        weight_int32, scales_and_zeros = group_quantize_tensor(
+            weight_bf16, n_bit=4, groupsize=groupsize
+        )
+        weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
+            weight_int32, inner_k_tiles
+        )
+        return weight_int4pack, scales_and_zeros
+
+    @classmethod
+    def _calc_padded_size(cls, *, k, groupsize=1, innner_k_tiles=1):
+        return find_multiple(k, 1024)
