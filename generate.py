@@ -463,7 +463,7 @@ def get_device_info(name: str) -> str:
         return torch.cuda.get_device_name(0)
     return ""
 
-def _callback(x, buffer, period_id, done_generating):
+def _callback(x, buffer, period_id, done_generating, tokenizer, is_llama3_model):
     if done_generating:
         return
     buffer.append(
@@ -630,7 +630,7 @@ def _main(
                 break
             if not is_llama3_model:
                 if system_prompt:
-                    prompt = f"{B_INST} {B_SYS}\n{system_prompt.strip()}\n{E_SYS}\n\n{prompt.strip} {E_INST}"
+                    prompt = f"{B_INST} {B_SYS}\n{system_prompt.strip()}\n{E_SYS}\n\n{prompt.strip()} {E_INST}"
                     system_prompt = (
                         None  # can only provide system prompt on first interaction
                     )
@@ -678,7 +678,7 @@ def _main(
             done_generating = False
 
             def callback(x):
-                return _callback(x, buffer=buffer, period_id=period_id, done_generating=done_generating)
+                return _callback(x, buffer=buffer, period_id=period_id, done_generating=done_generating, tokenizer=tokenizer, is_llama3_model=is_llama3_model)
 
         else:
             assert not generator_args.chat_mode
@@ -687,7 +687,7 @@ def _main(
             done_generating = False
 
             def callback(x):
-                return _callback(x, buffer=buffer, period_id=period_id, done_generating=done_generating)
+                return _callback(x, buffer=buffer, period_id=period_id, done_generating=done_generating, tokenizer=tokenizer, is_llama3_model=is_llama3_model)
 
         t0 = time.perf_counter()
         import contextlib
