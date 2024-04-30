@@ -155,10 +155,10 @@ def logits_to_probs(logits, temperature: float = 1.0, top_k: Optional[int] = Non
 def sample(
     logits, need_probs: bool, temperature: float = 1.0, top_k: Optional[int] = None
 ):
-    if temperature == 0 and not need_probs:
-        _, idx_next = torch.topk(logits, k=1, dim=-1)
-        idx_next = idx_next.squeeze(dim=(0, 1))
-        return (idx_next, None)
+    # if temperature == 0 and not need_probs:
+    #     _, idx_next = torch.topk(logits, k=1, dim=-1)
+    #     idx_next = idx_next.squeeze(dim=(0, 1))
+    #     return (idx_next, None)
     probs = logits_to_probs(logits[0, -1], temperature, top_k)
     idx_next = multinomial_sample_one_no_sync(probs)
     return idx_next, probs
@@ -184,7 +184,9 @@ def prefill(
     else:
         # input_pos: [B, S]
         logits = model(x, input_pos)
+        print(f"logits {logits.shape}")
 
+    print(f"x: {x},\n  input_pos: {input_pos}\n")
     return sample(logits, need_probs=False, **sampling_kwargs)[0]
 
 
@@ -198,6 +200,7 @@ def decode_one_token(
     # input_pos: [B, 1]
     assert input_pos.shape[-1] == 1
     logits = model(x, input_pos)
+    print(f"x: {x},\n  input_pos: {input_pos}\n")
     return sample(logits, need_probs=need_probs, **sampling_kwargs)
 
 
@@ -383,6 +386,7 @@ def generate(
             sequential_prefill=sequential_prefill,
             **sampling_kwargs,
         )
+    print(f"sizes: {T} {seq[T].shape} {seq.shape} {next_token.shape}")
     seq[T] = next_token
     callback(next_token.clone().view(-1))
 
