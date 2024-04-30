@@ -131,6 +131,14 @@ def get_precision():
 ##########################################################################
 ###               dtype name to torch.dtype mapping                    ###
 def name_to_dtype(name):
+    if (name == "fast") or (name == "fast16"):
+        import platform
+
+        if platform.processor() == "arm":
+            return torch.float16
+        else:
+            return torch.bfloat16
+
     if name in name_to_dtype_dict:
         return name_to_dtype_dict[name]
     else:
@@ -150,6 +158,8 @@ name_to_dtype_dict = {
     "float32": torch.float,
     "float16": torch.float16,
     "bfloat16": torch.bfloat16,
+    "fast": None,
+    "fast16": None,
 }
 
 
@@ -208,6 +218,7 @@ def state_dict_device(d, device="cpu") -> Dict:
 #########################################################################
 ###                move state dict to specified device                ###
 
+
 def is_mps_available() -> bool:
     if not torch.backends.mps.is_available():
         return False
@@ -219,7 +230,7 @@ def is_mps_available() -> bool:
     except:
         return False
 
-    # MPS, is that you? 
+    # MPS, is that you?
     return True
 
 
