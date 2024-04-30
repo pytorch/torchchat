@@ -106,7 +106,7 @@ class LinearInt8(nn.Module):
         assert (weight is None) == bool(
             scales is None
         ), "must specify both weights and scales, or neither"
-        if not weight:
+        if weight is None:
             weight = torch.empty(
                 (out_features, in_features), dtype=torch.int8, device=device
             )
