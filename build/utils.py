@@ -137,7 +137,7 @@ def name_to_dtype(name):
         # MacOS now supports bfloat16
         import platform
         if platform.processor() == "arm":
-            if platform.mac_ver()[0].split('.')[0] < 14:
+            if int(platform.mac_ver()[0].split('.')[0]) < 14:
                 return torch.float16
         return torch.bfloat16
 
