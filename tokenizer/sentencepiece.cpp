@@ -64,7 +64,8 @@ std::string SPTokenizer::decode(uint64_t prev_token, uint64_t token) {
     return "";
   }
 
-  std::string result = absl::StrReplaceAll(_processor.IdToPiece(token), {{kSpaceSymbol, " "}});
+  std::string result =
+      absl::StrReplaceAll(_processor.IdToPiece(token), {{kSpaceSymbol, " "}});
 
   // following BOS token, sentencepiece decoder strips any leading
   // whitespace
