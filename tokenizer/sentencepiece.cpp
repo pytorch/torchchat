@@ -10,6 +10,7 @@
 
 #include <tokenizer.h>
 #include <cinttypes>
+#include <sentencepiece_processor.h>
 
 
 SPTokenizer::SPTokenizer(
@@ -66,7 +67,7 @@ std::string SPTokenizer::decode(uint64_t prev_token, uint64_t token) {
     fprintf(stderr, "couldn't decode %" PRIu64 "\n", token);
     exit(EXIT_FAILURE);
   }
-  return result;
+  return result + " ";
 }
 
 
