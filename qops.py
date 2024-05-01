@@ -20,12 +20,15 @@ def linear_int8_aoti(input, weight, scales):
 
     # we special-case channel-wise, because we know how to make that fast
     if n_groups == 1:
+        scales = scales.view(-1)
         if (
             torch.compiler.is_compiling()
             or input.device.type != "cpu"
             or torch.__version__ < "2.4"
         ):
-            return F.linear(input, weight.to(dtype=input.dtype)) * scales
+            lin = F.linear(input, weight.to(dtype=input.dtype))
+            # print(f"linear shape {lin.shape}, scales shape {scales.shape}")
+            return lin * scales
         # Use int8pack_mm for CPU eager
         return torch.ops.aten._weight_int8pack_mm(
             input.reshape(-1, input.shape[-1]),
@@ -51,6 +54,7 @@ def linear_int8_et(input, weight, scales):
             _qdq_dynamic_quantized_linear,
         )
 
+        scales = scales.view(-1)
         return _qdq_dynamic_quantized_linear(
             x_fp32=input.float(),
             x_quant_min=-128,
