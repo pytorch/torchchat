@@ -30,7 +30,7 @@ fi
 # newer version of torch nightly installed later in this script.
 #
 
-$PIP_EXECUTABLE install -r requirements.txt
+$PIP_EXECUTABLE install -r requirements.txt --extra-index-url "https://download.pytorch.org/whl/nightly/cpu"
 
 # Since torchchat often uses main-branch features of pytorch, only the nightly
 # pip versions will have the required features. The NIGHTLY_VERSION value should
