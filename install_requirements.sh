@@ -42,13 +42,13 @@ $PIP_EXECUTABLE install -r requirements.txt
 NIGHTLY_VERSION=dev20240422
 
 # The pip repository that hosts nightly torch packages. cpu by default.
-TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
-
-# If cuda is available, use "cuda" argument to install the pytorch nightly
+# If cuda is available, based on presence of nvidia-smi, install the pytorch nightly
 # with cuda for faster execution on cuda GPUs.
-if [ "$1" == "cuda" ]
+if [[ -x "$(command -v nvidia-smi)" ]]; 
 then
-TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu121"
+  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu121"
+else
+  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
 fi
 
 
