@@ -22,6 +22,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "sentencepiece_processor.h"
 
 class Tokenizer {
  public:
@@ -58,17 +59,17 @@ class Tokenizer {
   uint64_t bos_tok_, eos_tok_;
 };
 
-// ----------------------- BPETokenizer -----------------------
+// ----------------------- SPTokenizer -----------------------
 // Used by sentencepiece. Adapted from llama2.c.
 struct TokenIndex {
   const char* str;
   int32_t id;
 };
 
-class BPETokenizer : public Tokenizer {
+class SPTokenizer : public Tokenizer {
  public:
-  explicit BPETokenizer(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok);
-  ~BPETokenizer() override;
+  explicit SPTokenizer(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok);
+  ~SPTokenizer() override;
 
   void load(const std::string& tokenizer_path) override;
 
@@ -78,11 +79,7 @@ class BPETokenizer : public Tokenizer {
   std::string decode(uint64_t prev_token, uint64_t token) override;
 
  private:
-  std::unique_ptr<char*[]> vocab_;
-  std::unique_ptr<float[]> vocab_scores_;
-  std::unique_ptr<TokenIndex[]> sorted_vocab_;
-  unsigned int max_token_length_;
-  unsigned char byte_pieces_[512]; // stores all single-byte strings
+  std::unique_ptr<sentencepiece::SentencePieceProcessor> _processor;
 };
 
 // ----------------------- Tiktoken -----------------------
