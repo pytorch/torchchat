@@ -60,14 +60,14 @@ std::string SPTokenizer::decode(uint64_t prev_token, uint64_t token) {
     exit(EXIT_FAILURE);
   }
   (void)prev_token;
-  std::string result;
-  std::vector<int> tokens = {static_cast<int>(token)};
-  const auto status = _processor.Decode(tokens, &result);
-  if (!status.ok()) {
-    fprintf(stderr, "couldn't decode %" PRIu64 "\n", token);
-    exit(EXIT_FAILURE);
+  std::string result = _processor.IdToPiece(token);
+
+  // following BOS token, sentencepiece decoder strips any leading
+  // whitespace
+  if (prev_token == bos_tok_ && result[0] == ' ') {
+    result.erase(0);
   }
-  return result + " ";
+  return result;
 }
 
 
