@@ -791,7 +791,7 @@ void error_usage() {
   fprintf(
       stderr, "\tAOTI example: aoti_run llama3_model.so -z tokenizer.model -l 3 -n 256 -i \"Once upon a time\"\n");
   fprintf(
-      stderr, "\tET example: et_run llama3_model.pte -z tokenizer.model -l 3 -n 256 -i \"Once upon a time\"\n");
+      stderr, "\tET example: et_run llama3_model.pte -z tokenizer.model -l 3 -n 256 -i \"Once upon a time\"\n\n");
   fprintf(stderr, "Options:\n");
   fprintf(stderr, "  -t <float>  temperature in [0,inf], default 1.0\n");
   fprintf(
