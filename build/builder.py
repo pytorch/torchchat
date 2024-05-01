@@ -194,13 +194,16 @@ class TokenizerArgs:
         if model is None:
             return
 
+        if self.is_tiktoken == self.is_sentencepiece:
+            raise RuntimeError("no tokenizer was found")
+
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
         use_tiktoken = model.config.use_tiktoken
 
         if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
             raise RuntimeError(
-                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)}) does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken), is_sentencepiece}) for {model_description}"
+                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)}) does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}) for {model_description}"
             )
 
         return
