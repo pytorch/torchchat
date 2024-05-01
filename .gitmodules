@@ -4,3 +4,6 @@
 [submodule "tokenizer/third-party/re2"]
 	path = tokenizer/third-party/re2
 	url = https://github.com/google/re2.git
+[submodule "tokenizer/third-party/sentencepiece"]
+	path = tokenizer/third-party/sentencepiece
+	url = https://github.com/google/sentencepiece.git

@@ -3,7 +3,7 @@
 # PyTorch ecosystem
 torch>2.3
 torchao
-# executorch
+# executorch==0.1.2
 
 # Hugging Face download
 huggingface_hub

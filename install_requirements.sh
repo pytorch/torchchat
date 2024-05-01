@@ -44,13 +44,8 @@ NIGHTLY_VERSION=dev20240422
 # The pip repository that hosts nightly torch packages. cpu by default.
 TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
 
-# If cuda is available, use "cuda" argument to install the pytorch nightly
-# with cuda for faster execution on cuda GPUs.
-if [ "$1" == "cuda" ]
-then
-TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu121"
-fi
-
+# If cuda is available, use the pytorch nightly with cuda for faster execution on cuda GPUs.
+test -f /usr/bin/nvidia-smi && TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu121"
 
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
