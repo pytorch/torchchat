@@ -22,13 +22,12 @@ function find_cmake_prefix_path() {
 
 clone_executorch() {
   echo "Cloning executorch to ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src"
-  echo "Using executorch commit ${EXECUTORCH_COMMIT}"
   rm -rf ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}
   mkdir -p ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
   pushd ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
   git clone https://github.com/pytorch/executorch.git
   cd executorch
-  git checkout ${EXECUTORCH_COMMIT}
+  git checkout "viable/strict"
   echo "Install executorch: submodule update"
   git submodule sync
   git submodule update --init

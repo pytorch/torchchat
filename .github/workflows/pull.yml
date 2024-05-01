@@ -445,6 +445,7 @@ jobs:
       - name: Install requirements
         run: |
           if [[ "$(uname -m)" == "arm64" ]]; then
+            echo "Setting DEVELOPER_DIR=/Applications/Xcode_15.3.app/Contents/Developer"
             DEVELOPER_DIR=/Applications/Xcode_15.3.app/Contents/Developer
           fi
 
@@ -888,8 +889,8 @@ jobs:
           fi
       - name: Install requirements
         run: |
-
           if [[ "$(uname -m)" == "arm64" ]]; then
+            echo "Setting DEVELOPER_DIR=/Applications/Xcode_15.3.app/Contents/Developer"
             DEVELOPER_DIR=/Applications/Xcode_15.3.app/Contents/Developer
           fi
 
