@@ -93,7 +93,9 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
         self.model_ = model
         self.device = device
         self.tokenizer = tokenizer
-        self.quantizer = quant_api.Int8DynActInt4WeightQuantizer(**kwargs)
+        self.quantizer = quant_api.Int8DynActInt4WeightQuantizer(
+            **kwargs, precision=get_precision(), scales_precision=get_precision()
+        )
 
     def create_quantized_state_dict(self) -> Dict:  # "StateDict"
         pass
