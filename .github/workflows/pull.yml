@@ -631,7 +631,7 @@ jobs:
   test-mps:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-m1-stable
+      runner: macos-m1-stable  # neeps MPS, was macos-m1-stable
       script: |
         set -x
         # NS: Remove previous installation  of torch first
@@ -740,7 +740,7 @@ jobs:
   test-mps-dtype:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-m1-stable
+      runner: macos-m1-stable  # needs MPS, was macos-m1-stable
       script: |
         set -x
         # NS: Remove previous installation  of torch first
@@ -918,7 +918,13 @@ jobs:
 
           python torchchat.py export stories15M --output-pte-path ./model.pte
           ./cmake-out/et_run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}"
-
+          
+            for dtype in fp32 fp16; do   # bf16 needs to be supported
+              echo "Testing export + runner with dtype=$dtype"
+              python torchchat.py export stories15M --dtype $dtype --output-pte-path ./model.pte
+                  ./cmake-out/et_run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}"
+            done
+  
           echo "Tests complete."
   runner-aoti:
     name: test-runner-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
