@@ -444,6 +444,10 @@ jobs:
           fi
       - name: Install requirements
         run: |
+          if [[ "$(uname -m)" == "arm64" ]]; then
+            DEVELOPER_DIR=/Applications/Xcode_15.3.app/Contents/Developer
+          fi
+
           echo "Intalling pip3 packages"
           ./install_requirements.sh
 
@@ -884,6 +888,11 @@ jobs:
           fi
       - name: Install requirements
         run: |
+
+          if [[ "$(uname -m)" == "arm64" ]]; then
+            DEVELOPER_DIR=/Applications/Xcode_15.3.app/Contents/Developer
+          fi
+
           echo "Intalling pip3 packages"
           ./install_requirements.sh
 
