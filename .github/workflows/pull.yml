@@ -626,7 +626,7 @@ jobs:
   test-mps:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-14-xlarge  # neeps MPS, was macos-m1-stable
+      runner: macos-m1-stable  # neeps MPS, was macos-m1-stable
       script: |
         set -x
         # NS: Remove previous installation  of torch first
@@ -735,7 +735,7 @@ jobs:
   test-mps-dtype:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-14-xlarge  # needs MPS, was macos-m1-stable
+      runner: macos-m1-stable  # needs MPS, was macos-m1-stable
       script: |
         set -x
         # NS: Remove previous installation  of torch first
