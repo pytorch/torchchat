@@ -79,7 +79,7 @@ class SPTokenizer : public Tokenizer {
   std::string decode(uint64_t prev_token, uint64_t token) override;
 
  private:
-  sentencepiece::SentencePieceProcessor _processor;
+  std::unique_ptr<sentencepiece::SentencePieceProcessor> _processor;
 };
 
 // ----------------------- Tiktoken -----------------------

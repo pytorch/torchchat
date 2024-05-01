@@ -17,7 +17,8 @@
 const char kSpaceSymbol[] = "\xe2\x96\x81";
 
 SPTokenizer::SPTokenizer(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok)
-    : Tokenizer(vocab_size, bos_tok, eos_tok) {}
+    : Tokenizer(vocab_size, bos_tok, eos_tok),
+      _processor(std::make_unique<sentencepiece::SentencePieceProcessor>()) {}
 
 /**
  * @brief Load the tokenizer from a file. The tokenizer file contains the
@@ -35,7 +36,7 @@ void SPTokenizer::load(const std::string& tokenizer_path) {
     return;
   }
   // read in the file
-  const auto status = _processor.Load(tokenizer_path);
+  const auto status = _processor->Load(tokenizer_path);
   if (!status.ok()) {
     fprintf(stderr, "couldn't load %s\n", tokenizer_path.c_str());
     exit(EXIT_FAILURE);
@@ -60,12 +61,12 @@ std::string SPTokenizer::decode(uint64_t prev_token, uint64_t token) {
     exit(EXIT_FAILURE);
   }
   // get rid of the control ids <s> and </s>
-  if (_processor.IsControl(token)) {
+  if (_processor->IsControl(token)) {
     return "";
   }
 
   std::string result =
-      absl::StrReplaceAll(_processor.IdToPiece(token), {{kSpaceSymbol, " "}});
+      absl::StrReplaceAll(_processor->IdToPiece(token), {{kSpaceSymbol, " "}});
 
   // following BOS token, sentencepiece decoder strips any leading
   // whitespace
@@ -91,7 +92,7 @@ SPTokenizer::encode(const std::string& text, int8_t bos, int8_t eos) {
     exit(EXIT_FAILURE);
   }
   std::vector<int> res;
-  auto status = _processor.Encode(text, &res);
+  auto status = _processor->Encode(text, &res);
   if (!status.ok()) {
     fprintf(stderr, "couldn't encode %s\n", text.c_str());
     exit(EXIT_FAILURE);
