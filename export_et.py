@@ -70,7 +70,7 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
         _skip_type_promotion=bool(target_precision == torch.float16),
     )
 
-    if target_precision == torch.float16:
+    if target_precision == torch.float16 or target_precision == torch.bfloat16:
         if state_dict_dtype != torch.float16:
             print("model.to torch.float16")
             model = model.to(dtype=torch.float16)

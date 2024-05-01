@@ -93,7 +93,9 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
         self.model_ = model
         self.device = device
         self.tokenizer = tokenizer
-        self.quantizer = quant_api.Int8DynActInt4WeightQuantizer(**kwargs)
+        self.quantizer = quant_api.Int8DynActInt4WeightQuantizer(
+            **kwargs, precision=get_precision(), scales_precision=get_precision()
+        )
 
     def create_quantized_state_dict(self) -> Dict:  # "StateDict"
         pass
@@ -362,39 +364,6 @@ def group_dequantize_tensor(w_int32, scales_and_zeros, n_bit=4, groupsize=128):
 #####          Weight-only int8 per-channel quantized code         ######
 
 
-def replace_linear_weight_only_int8_per_channel(
-    module, device, node_type, groupsize=None
-):
-    if groupsize is not None and groupsize != 0:
-        pass
-
-    for name, child in module.named_children():
-        # print(f"name: {name}")
-        if isinstance(child, nn.Linear):
-            if (
-                (node_type == "*")
-                or (node_type == "output" and name == "output")
-                or (node_type == "!output" and name != "output")
-            ):
-                # print(f"{name, child}")
-                # print(f"in_features: {child.in_features}")
-                # print(f"out_features: {child.out_features}")
-                setattr(
-                    module,
-                    name,
-                    WeightOnlyInt8Linear(
-                        in_features=child.in_features,
-                        out_features=child.out_features,
-                        device=device,
-                        groupsize=groupsize,
-                    ),
-                )
-        else:
-            replace_linear_weight_only_int8_per_channel(
-                child, device, node_type, groupsize
-            )
-
-
 class WeightOnlyInt8QuantHandler(QuantHandler):
     def __init__(
         self,
@@ -416,9 +385,11 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
             self.bitwidth = bitwidth
 
     @torch.no_grad()
-    def create_quantized_state_dict(self) -> Dict:
-        cur_state_dict = state_dict_device(self.model_.state_dict())
-        dict_device = "cpu"  # self.device
+    def quantize(self, module):
+        # cur_state_dict = state_dict_device(self.model_.state_dict())
+        # dict_device = "cpu"  # self.device
+
+        device = self.device
 
         if self.bitwidth == 4:
             range_min = -8
@@ -429,24 +400,19 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
         else:
             raise ValueError(f"Unsupported bitwidth {self.bitwidth}")
 
-        for fqn, mod in self.model_.named_modules():
-            # print(f"maybe? quantize {fqn}...{type(mod)}")
-            if isinstance(mod, torch.nn.Linear):
-                # print(f"candidate {fqn}, nodetype {self.node_type}")
+        for name, child in module.named_children():
+            # print(f"name: {name}")
+            if isinstance(child, nn.Linear):
                 if (
                     (self.node_type == "*")
-                    or (self.node_type == "output" and fqn in ["output", "final_proj"])
-                    or (
-                        self.node_type == "!output"
-                        and fqn not in ["output", "final_proj"]
-                    )
+                    or (self.node_type == "output" and name == "output")
+                    or (self.node_type == "!output" and name != "output")
                 ):
-                    # print(
-                    #     f"quantize {self.node_type} {fqn, mod} with groupsize {self.groupsize}, bitwidth {self.bitwidth}"
-                    # )
-
-                    # print(f"initial weight shape {mod.weight.shape}")
-                    input_weight = mod.weight.float()
+                    # print(f"{name, child}")
+                    input_weight = child.weight.float()
+                    # print(f"{name, child}")
+                    # print(f"in_features: {child.in_features}")
+                    # print(f"out_features: {child.out_features}")
 
                     # print(f"expanded weight shape {input_weight.shape}")
                     weight, scales, _ = dynamically_quantize_per_channel(
@@ -455,28 +421,29 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
                         range_max,
                         torch.int8,
                         self.groupsize,
-                        scales_dtype=mod.weight.dtype,
+                        scales_dtype=child.weight.dtype,
                     )
 
-                    weight = weight.to(device=dict_device)
-                    scales = scales.to(device=dict_device)
-                    cur_state_dict[f"{fqn}.weight"] = weight
-                    # squeeze makes groupsize=rowsize unidimensional
-                    cur_state_dict[f"{fqn}.scales"] = scales.squeeze(dim=-1)
+                    setattr(
+                        module,
+                        name,
+                        WeightOnlyInt8Linear(
+                            in_features=child.in_features,
+                            out_features=child.out_features,
+                            device=self.device,
+                            # update variables from quantization
+                            weight=weight,
+                            scales=scales,
+                            groupsize=self.groupsize,
+                        ),
+                    )
+                else:
+                    self.quantize(module)
 
-        return cur_state_dict
-
-    def convert_for_runtime(self) -> nn.Module:
-        replace_linear_weight_only_int8_per_channel(
-            self.model_, self.device, self.node_type, self.groupsize
-        )
-        return self.model_
+        return module
 
     def quantized_model(self) -> nn.Module:
-        model_updated_state_dict = self.create_quantized_state_dict()
-        self.convert_for_runtime()
-        self.model_.load_state_dict(model_updated_state_dict)
-        return self.model_
+        return self.quantize(self.model_)
 
 
 #########################################################################
