@@ -1,9 +1,9 @@
 # Requires python >=3.10
 
 # PyTorch ecosystem
-torch
+#torch==2.4.0.dev20240422
 torchao
-executorch
+# executorch==0.1.2
 
 # Hugging Face download
 huggingface_hub
