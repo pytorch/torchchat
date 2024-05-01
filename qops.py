@@ -66,6 +66,12 @@ def linear_int8_et(input, weight, scales):
     # we special-case channel-wise, because we know how to make that fast
     if n_groups == 1:
         scales = scales.view(-1)
+
+        if True:
+            lin = F.linear(input, weight.to(dtype=input.dtype))
+            # print(f"linear shape {lin.shape}, scales shape {scales.shape}")
+            return lin * scales
+
         return _qdq_dynamic_quantized_linear(
             x_fp32=input.float(),
             x_quant_min=-128,
