@@ -435,6 +435,11 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.10.11
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
       - name: Print machine info
         run: |
           uname -a
@@ -864,7 +869,7 @@ jobs:
   runner-et:
     strategy:
       matrix:
-        runner: [macos-14-xlarge, 8-core-ubuntu]
+        runner: [16-core-ubuntu, macos-14-xlarge]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -875,6 +880,11 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.10.11
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
       - name: Print machine info
         run: |
           uname -a
