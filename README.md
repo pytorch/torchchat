@@ -56,18 +56,11 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-After the virtual environment is activated, dependencies can be installed. torchchat depends on pytorch. By default, torch nightly with cpu will be installed.
+After the virtual environment is activated, dependencies can be installed.
 
 ```bash
 # install dependencies
 ./install_requirements.sh
-```
-
-If CUDA GPUs are available, the argument of "cuda" can be added to accelerate the execution.
-
-```bash
-# install dependencies
-./install_requirements.sh cuda
 ```
 
 Installations can be tested by
