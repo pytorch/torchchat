@@ -62,16 +62,15 @@ fi
 
 source "$TORCHCHAT_ROOT/scripts/install_utils.sh"
 
-pushd ${TORCHCHAT_ROOT}
-git submodule update --init
-git submodule sync
 if [[ "$TARGET" == "et" ]]; then
+    pushd ${TORCHCHAT_ROOT}
+    git submodule update --init
     find_cmake_prefix_path
     install_pip_dependencies
     clone_executorch
     install_executorch_libs false
+    popd
 fi
-popd
 
 # CMake commands
 cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'` -G Ninja

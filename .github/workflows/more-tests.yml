@@ -27,7 +27,8 @@ jobs:
 
         echo "::group::Download checkpoints"
         # Install requirements
-        ./install_requirements.sh cuda
+        pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip3 install -r requirements.txt
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -47,13 +48,13 @@ jobs:
 
         for DTYPE in bfloat16 float16 float32; do
           ###################################################################
-          # group with different temperatures
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9
+          # group with different temperatures 
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 
           python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100 
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200 	  
+          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500 	  
           ###################################################################
           # group with different temperatures and prefill, and compile
           # and prefill compile
@@ -85,3 +86,4 @@ jobs:
         echo "tests complete"
         echo "******************************************"
         echo "::endgroup::"
+

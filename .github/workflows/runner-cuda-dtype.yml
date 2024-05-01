@@ -27,8 +27,8 @@ jobs:
 
         echo "::group::Download checkpoints"
         # Install requirements
-
-        ./install_requirements.sh cuda
+        pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121
+        pip3 install -r requirements.txt
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -48,9 +48,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          ./install_requirements.sh
+          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip3 install -r requirements.txt
           pip3 list
-          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+
           bash scripts/build_native.sh aoti
 
       - name: Download checkpoint
@@ -65,7 +66,7 @@ jobs:
         run: |
           set -eou pipefail
 
-
+          
           export MODEL_DIR=${PWD}/checkpoints/stories15M
           export PROMPT="Once upon a time in a land far away"
 
@@ -92,3 +93,4 @@ jobs:
           echo "tests complete"
           echo "******************************************"
           echo "::endgroup::"
+
