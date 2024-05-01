@@ -1,7 +1,7 @@
 # Requires python >=3.10
 
 # PyTorch ecosystem
-torch==2.4.0.dev20240422
+#torch==2.4.0.dev20240422
 torchao
 # executorch==0.1.2
 
