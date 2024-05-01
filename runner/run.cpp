@@ -383,11 +383,11 @@ Tokenizer* build_tokenizer(
   Tokenizer* tokenizer = NULL;
   switch (model_type) {
     case LLAMA2_MODEL:
-      tokenizer = new BPETokenizer(vocab_size, /*bos*/ 1, /*eos*/ 2);
+      tokenizer = new SPTokenizer(vocab_size, /*bos*/ 1, /*eos*/ 2);
       tokenizer->load(tokenizer_path);
       break;
     case LLAMA3_MODEL:
-      tokenizer = new Tiktoken(vocab_size, /*bos*/ 1, /*eos*/ 2);
+      tokenizer = new Tiktoken(vocab_size, /*bos*/ 128000, /*eos*/ 128001);
       tokenizer->load(tokenizer_path);
       break;
     default:
@@ -553,10 +553,7 @@ void generate(
       stop_tokens.push_back(tokenizer->eos_tok());
       break;
     case LLAMA3_MODEL:
-      prompt_tokens = tokenizer->encode(prompt, 0, 0);
-      prompt_tokens.insert(
-          prompt_tokens.begin(),
-          tokenizer->encode("<|begin_of_text|>", 0, 0)[0]);
+      prompt_tokens = tokenizer->encode(prompt, 1, 0);
       stop_tokens.push_back(tokenizer->encode("<|end_of_text|>", 0, 0)[0]);
       stop_tokens.push_back(tokenizer->encode("<|eot_id|>", 0, 0)[0]);
       break;

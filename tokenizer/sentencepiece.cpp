@@ -1,0 +1,107 @@
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+// sentencepiece tokenizer
+
+#include <tokenizer.h>
+#include <cinttypes>
+
+
+SPTokenizer::SPTokenizer(
+    int32_t vocab_size,
+    uint64_t bos_tok,
+    uint64_t eos_tok)
+    : Tokenizer(vocab_size, bos_tok, eos_tok) {}
+
+/**
+ * @brief Load the tokenizer from a file. The tokenizer file contains the
+ * vocabulary and scores. The format is: the first integer is the maximum
+ * token length, followed by a list of (word_len, word) pairs. Here we
+ * are reading all the vocabulary into memory and keep it sorted for fast
+ * lookup.
+ *
+ * @param tokenizer_path The path to the tokenizer file.
+ * @return void
+ */
+void SPTokenizer::load(const std::string& tokenizer_path) {
+  if (initialized_) {
+    fprintf(stderr, "Tokenizer already initialized.\n");
+    return;
+  }
+  // read in the file
+  const auto status = _processor.Load(tokenizer_path);
+  if (!status.ok()) {
+    fprintf(stderr, "couldn't load %s\n", tokenizer_path.c_str());
+    exit(EXIT_FAILURE);
+  }
+
+  initialized_ = true;
+}
+
+SPTokenizer::~SPTokenizer() {}
+
+/**
+ * @brief Decode a token into string.
+ *
+ * @param prev_token The previous token.
+ * @param token The current token.
+ * @return std::string A pointer to the string representation of the
+ * token.
+ */
+std::string SPTokenizer::decode(uint64_t prev_token, uint64_t token) {
+  if (!initialized_) {
+    fprintf(stderr, "Tokenizer not initialized\n");
+    exit(EXIT_FAILURE);
+  }
+  (void)prev_token;
+  std::string result;
+  std::vector<int> tokens = {static_cast<int>(token)};
+  const auto status = _processor.Decode(tokens, &result);
+  if (!status.ok()) {
+    fprintf(stderr, "couldn't decode %" PRIu64 "\n", token);
+    exit(EXIT_FAILURE);
+  }
+  return result;
+}
+
+
+/**
+ * @brief Encode a string into a sequence of tokens.
+ *
+ * @param text The string to be encoded.
+ * @param bos The number of BOS to prepend to the token list.
+ * @param eos The number of EOS to append to the token list.
+ * @return std::vector<uint64_t>
+ */
+std::vector<uint64_t>
+SPTokenizer::encode(const std::string& text, int8_t bos, int8_t eos) {
+  if (!initialized_) {
+    fprintf(stderr, "Tokenizer not initialized\n");
+    exit(EXIT_FAILURE);
+  }
+  std::vector<int> res;
+  auto status = _processor.Encode(text, &res);
+  if (!status.ok()) {
+    fprintf(stderr, "couldn't encode %s\n", text.c_str());
+    exit(EXIT_FAILURE);
+  }
+
+  std::vector<uint64_t> tokens;
+  for (auto i = 0; i < bos; ++i) {
+    tokens.push_back(bos_tok_);
+  }
+
+  for (auto i = 0; i < res.size(); ++i) {
+    tokens.push_back(res[i]);
+  }
+
+  for (auto i = 0; i < eos; ++i) {
+    tokens.push_back(eos_tok_);
+  }
+  return tokens;
+}
