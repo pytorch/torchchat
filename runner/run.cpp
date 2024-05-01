@@ -503,9 +503,11 @@ unsigned generate_from_prompt_tokens(
         printf("\n");
       } else {
         std::string piece = tokenizer->decode(token, next);
-        safe_printf(piece.c_str()); // same as printf("%s", piece), but skips
+        if (!piece.empty() && piece.length() != 0) {
+          safe_printf(piece.c_str()); // same as printf("%s", piece), but skips
                                     // "unsafe" bytes
-        fflush(stdout);
+          fflush(stdout);
+        }
       }
     }
 
