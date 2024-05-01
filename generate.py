@@ -729,10 +729,8 @@ def _main(
         device_sync(device=builder_args.device)
         t = time.perf_counter() - t0
 
-        if not generator_args.chat_mode:
-            print(tokenizer.decode(y.tolist()))
-        else:
-            print()
+        print()
+
         tokens_generated = y.size(0) - prompt_length
         tokens_sec = tokens_generated / t
         aggregate_metrics["tokens_per_sec"].append(tokens_sec)
