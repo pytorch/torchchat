@@ -8,15 +8,13 @@
 
 // sentencepiece tokenizer
 
+#include <sentencepiece_processor.h>
 #include <tokenizer.h>
 #include <cinttypes>
-#include <sentencepiece_processor.h>
+#include <string>
+#include "absl/strings/str_replace.h"
 
-
-SPTokenizer::SPTokenizer(
-    int32_t vocab_size,
-    uint64_t bos_tok,
-    uint64_t eos_tok)
+SPTokenizer::SPTokenizer(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok)
     : Tokenizer(vocab_size, bos_tok, eos_tok) {}
 
 /**
@@ -59,17 +57,23 @@ std::string SPTokenizer::decode(uint64_t prev_token, uint64_t token) {
     fprintf(stderr, "Tokenizer not initialized\n");
     exit(EXIT_FAILURE);
   }
-  (void)prev_token;
+  // get rid of the control ids <s> and </s>
+  if (_processor.IsControl(token)) {
+    return std::string{};
+  }
+
   std::string result = _processor.IdToPiece(token);
+
+  result = absl::StrReplaceAll(result, {{"_", " "}});
 
   // following BOS token, sentencepiece decoder strips any leading
   // whitespace
   if (prev_token == bos_tok_ && result[0] == ' ') {
     result.erase(0);
   }
+
   return result;
 }
-
 
 /**
  * @brief Encode a string into a sequence of tokens.
