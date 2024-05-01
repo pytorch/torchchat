@@ -56,3 +56,6 @@ REQUIREMENTS_TO_INSTALL=(
 # versions on the provided URL if they aren't available on the default URL.
 $PIP_EXECUTABLE install --extra-index-url "${TORCH_NIGHTLY_URL}" \
     "${REQUIREMENTS_TO_INSTALL[@]}"
+
+
+export EXECUTORCH_COMMIT=f0f4db877dd649c4e8ce951a4ccc3827841e9ad3

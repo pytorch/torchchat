@@ -11,7 +11,7 @@ install_pip_dependencies() {
   echo "Intalling common pip packages"
   pip3 install wheel "cmake>=3.19" ninja zstd
   pushd ${TORCHCHAT_ROOT}
-  pip3 install -r ./requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cu121
+  pip3 install -r ./requirements.txt
   popd
 }
 
@@ -22,12 +22,13 @@ function find_cmake_prefix_path() {
 
 clone_executorch() {
   echo "Cloning executorch to ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src"
+  echo "Using executorch commit ${EXECUTORCH_COMMIT}"
   rm -rf ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}
   mkdir -p ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
   pushd ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
   git clone https://github.com/pytorch/executorch.git
   cd executorch
-  git checkout f0f4db877dd649c4e8ce951a4ccc3827841e9ad3
+  git checkout ${EXECUTORCH_COMMIT}
   echo "Install executorch: submodule update"
   git submodule sync
   git submodule update --init
