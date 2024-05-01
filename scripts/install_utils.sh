@@ -27,7 +27,7 @@ clone_executorch() {
   pushd ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
   git clone https://github.com/pytorch/executorch.git
   cd executorch
-  git checkout main
+  git checkout f0f4db877dd649c4e8ce951a4ccc3827841e9ad3
   echo "Install executorch: submodule update"
   git submodule sync
   git submodule update --init
