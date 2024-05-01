@@ -14,6 +14,8 @@
 #include <string>
 #include "absl/strings/str_replace.h"
 
+const char kSpaceSymbol[] = "\xe2\x96\x81";
+
 SPTokenizer::SPTokenizer(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok)
     : Tokenizer(vocab_size, bos_tok, eos_tok) {}
 
@@ -59,17 +61,15 @@ std::string SPTokenizer::decode(uint64_t prev_token, uint64_t token) {
   }
   // get rid of the control ids <s> and </s>
   if (_processor.IsControl(token)) {
-    return std::string{};
+    return "";
   }
 
-  std::string result = _processor.IdToPiece(token);
-
-  result = absl::StrReplaceAll(result, {{"_", " "}});
+  std::string result = absl::StrReplaceAll(_processor.IdToPiece(token), {{kSpaceSymbol, " "}});
 
   // following BOS token, sentencepiece decoder strips any leading
   // whitespace
   if (prev_token == bos_tok_ && result[0] == ' ') {
-    result.erase(0);
+    result = result.substr(1);
   }
 
   return result;
