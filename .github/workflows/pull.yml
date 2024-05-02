@@ -909,8 +909,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}
 
-      - name: Install ET (cache hit)
-      - if: ${{ steps.install-et.outputs.cache-hit == 'true' }}
+      - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
+        continue-on-error: true
+        run: |
+          echo "Intalling ExecuTorch"
+          export TORCHCHAT_ROOT=${PWD}
+          bash scripts/install_et.sh
+
+      - name: Install ET pip
         run: |
           echo "ET build directory"
           ls et-build | cat
@@ -918,14 +924,6 @@ jobs:
           pushd et-build/src/executorch
           pip install .
           popd
-
-      - name: Install ET (cache miss)
-      - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
-        continue-on-error: true
-        run: |
-          echo "Intalling ExecuTorch"
-          export TORCHCHAT_ROOT=${PWD}
-          bash scripts/install_et.sh
 
       - name: Install runner
           # Pull submodules (re2, abseil) for Tiktoken
