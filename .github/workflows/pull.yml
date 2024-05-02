@@ -898,26 +898,16 @@ jobs:
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
-      - name: install-et
+      - name: Install ET (cache hit)
         id: install-et
         uses: actions/cache@v3
         env:
           cache-name: cache-et-build
         with:
           path: ./et-build
-          export ET_HASH=$(git ls-remote https://github.com/pytorch/executorch.git viable/strict | awk '{ print $1 }')
           key: ${{ runner.os }}-${{ env.cache-name }}
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}
-
-      - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
-        continue-on-error: true
-        run: |
-          echo "Intalling ExecuTorch"
-          export TORCHCHAT_ROOT=${PWD}
-          bash scripts/install_et.sh
-
-      - name: Run pip install et
         run: |
           echo "ET build directory"
           ls et-build | cat
@@ -926,6 +916,15 @@ jobs:
           pip install .
           popd
 
+      - name: Install ET (cache miss)
+      - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
+        continue-on-error: true
+        run: |
+          echo "Intalling ExecuTorch"
+          export TORCHCHAT_ROOT=${PWD}
+          bash scripts/install_et.sh
+
+      - name: Install runner
           # Pull submodules (re2, abseil) for Tiktoken
           git submodule sync
           git submodule update --init
