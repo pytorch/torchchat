@@ -80,8 +80,8 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
             print("model.to torch.float32")
             model = model.to(dtype=torch.float32)
     elif target_precision == torch.bfloat16:
-            print("model.to torch.bfloat16")
-            model = model.to(dtype=torch.bfloat16)
+        print("model.to torch.bfloat16")
+        model = model.to(dtype=torch.bfloat16)
     else:
         raise ValueError(f"Unsupported dtype for ET export: {target_precision}")
 
