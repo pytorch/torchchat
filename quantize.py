@@ -659,6 +659,18 @@ def replace_linear_int4(
                 groupsize=groupsize,
                 inner_k_tiles=inner_k_tiles,
             ):
+                setattr(
+                    module,
+                    name,
+                    WeightOnlyInt4Linear(
+                        child.in_features,
+                        child.out_features,
+                        bias=False,
+                        device=device,
+                        groupsize=groupsize,
+                        inner_k_tiles=inner_k_tiles,
+                    ),
+                )
         else:
             replace_linear_int4(
                 child, device, groupsize, inner_k_tiles, padding_allowed
