@@ -134,12 +134,13 @@ def get_precision():
 
 def name_to_dtype(name):
     if (name == "fast") or (name == "fast16"):
+        # MacOS now supports bfloat16
         import platform
 
         if platform.processor() == "arm":
-            return torch.float16
-        else:
-            return torch.bfloat16
+            if int(platform.mac_ver()[0].split(".")[0]) < 14:
+                return torch.float16
+        return torch.bfloat16
 
     if name in name_to_dtype_dict:
         return name_to_dtype_dict[name]
