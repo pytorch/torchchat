@@ -54,11 +54,7 @@ cd torchchat
 # set up a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-```
 
-After the virtual environment is activated, dependencies can be installed.
-
-```
 # install dependencies
 ./install_requirements.sh
 ```
