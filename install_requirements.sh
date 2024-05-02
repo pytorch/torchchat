@@ -30,7 +30,7 @@ fi
 # newer version of torch nightly installed later in this script.
 #
 
-$PIP_EXECUTABLE install -r requirements.txt
+$PIP_EXECUTABLE install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cu121
 
 # Since torchchat often uses main-branch features of pytorch, only the nightly
 # pip versions will have the required features. The NIGHTLY_VERSION value should
@@ -41,8 +41,15 @@ $PIP_EXECUTABLE install -r requirements.txt
 # package versions.
 NIGHTLY_VERSION=dev20240422
 
-# The pip repository that hosts nightly torch packages.
-TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
+# The pip repository that hosts nightly torch packages. cpu by default.
+# If cuda is available, based on presence of nvidia-smi, install the pytorch nightly
+# with cuda for faster execution on cuda GPUs.
+if [[ -x "$(command -v nvidia-smi)" ]]; 
+then
+  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu121"
+else
+  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
+fi
 
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(

@@ -329,11 +329,7 @@ std::pair<std::vector<uint64_t>, uint64_t> Tiktoken::_encode_with_special_token(
 // -------------------------private method end-------------------------------
 // -------------------------public method start-------------------------------
 
-Tiktoken::Tiktoken(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok)
-    : Tokenizer(vocab_size, bos_tok, eos_tok) {
-  // _regex = _create_regex(_pattern);
-  // _special_token_regex = _build_special_token_regex(_special_token_encoder);
-}
+Tiktoken::Tiktoken() : Tokenizer() {}
 
 void Tiktoken::load(const std::string& path) {
   _encoder = _load_encoder(path);
@@ -345,6 +341,10 @@ void Tiktoken::load(const std::string& path) {
   _regex = _create_regex(_pattern);
   _special_token_regex = _build_special_token_regex(_special_token_encoder);
 
+  // initialize vocab_size, bos_tok, eos_tok
+  vocab_size_ = _encoder.size() + _special_token_encoder.size();
+  bos_tok_ = _encoder.size(); // hardcoded (see _get_special_tokens)
+  eos_tok_ = _encoder.size() + 1; // hardcoded (see _get_special_tokens)
   initialized_ = true;
 }
 

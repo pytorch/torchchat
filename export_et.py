@@ -70,7 +70,7 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
         _skip_type_promotion=bool(target_precision == torch.float16),
     )
 
-    if target_precision == torch.float16:
+    if target_precision == torch.float16 or target_precision == torch.bfloat16:
         if state_dict_dtype != torch.float16:
             print("model.to torch.float16")
             model = model.to(dtype=torch.float16)
@@ -79,6 +79,9 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
         if state_dict_dtype != torch.float32:
             print("model.to torch.float32")
             model = model.to(dtype=torch.float32)
+    elif target_precision == torch.bfloat16:
+        print("model.to torch.bfloat16")
+        model = model.to(dtype=torch.bfloat16)
     else:
         raise ValueError(f"Unsupported dtype for ET export: {target_precision}")
 
@@ -95,6 +98,13 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
             edge_compile_config=edge_config,
         )
     edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
+    # Delegation visualization APIs: https://pytorch.org/executorch/main/debug-backend-delegate.html
+    # from executorch.exir.backend.utils import get_delegation_info, format_delegated_graph
+    # from tabulate import tabulate
+    # graph_module = edge_manager.exported_program().graph_module
+    # delegation_info = get_delegation_info(graph_module)
+    # print(delegation_info.get_summary())
+    # print(format_delegated_graph(graph_module))
     export_program = edge_manager.to_executorch(
         ExecutorchBackendConfig(
             extract_constant_segment=True,

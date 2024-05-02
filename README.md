@@ -1,5 +1,7 @@
 # Chat with LLMs Everywhere
-torchchat is a compact codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
+
+torchchat is a small codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
+
 
 ## What can you do with torchchat?
 - [Setup the Repo](#installation)
@@ -49,7 +51,11 @@ source .venv/bin/activate
 
 # install dependencies
 ./install_requirements.sh
+```
 
+Installations can be tested by
+
+```bash
 # ensure everything installed correctly
 python3 torchchat.py --help
 ```
@@ -77,10 +83,12 @@ View available models with:
 python3 torchchat.py list
 ```
 
+
 You can also remove downloaded models with the remove command:
 ```
 python3 torchchat.py remove llama3
 ```
+
 
 ## Running via PyTorch / Python
 [Follow the installation steps if you haven't](#installation)
@@ -118,11 +126,13 @@ Enter some text in the input box, then hit the enter key or click the “SEND”
 AOT compiles models before execution for faster inference
 
 The following example exports and executes the Llama3 8B Instruct model.  (The first command performs the actual export, the second command loads the exported model into the Python interface to enable users to test the exported model.)
+
 ```
 # Compile
 python3 torchchat.py export llama3 --output-dso-path exportedModels/llama3.so
 
 # Execute the exported model using Python
+
 python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --prompt "Hello my name is"
 ```
 NOTE: If you're machine has cuda add this flag for performance `--quantize config/data/cuda.json`
@@ -149,13 +159,15 @@ Before running any commands in torchchat that require ExecuTorch, you must first
 
 To install ExecuTorch, run the following commands *from the torchchat root directory*.
 This will download the ExecuTorch repo to ./et-build/src and install various ExecuTorch libraries to ./et-build/install.
+
 ```
-export TORCHCHAT_ROOT=${PWD}
+export TORCHCHAT_ROOT=$PWD
 ./scripts/install_et.sh
 ```
 
 ### Export for mobile
-The following example uses the Llama3 8B Instruct model.  (The first command performs the actual export, the second command loads the exported model into the Python interface to enable users to test the exported model.)
+The following example uses the Llama3 8B Instruct model.
+
 ```
 # Export
 python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
@@ -190,6 +202,7 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
 <a href="https://pytorch.org/executorch/main/_static/img/llama_ios_app.mp4">
   <img src="https://pytorch.org/executorch/main/_static/img/llama_ios_app.png" width="600" alt="iOS app running a LlaMA model">
 </a>
+
 
 ### Deploy and run on Android
 
@@ -243,6 +256,7 @@ While we describe how to use torchchat using the popular llama3 model, you can p
 
 ## Troubleshooting
 
+
 **CERTIFICATE_VERIFY_FAILED**
 Run `pip install --upgrade certifi`.
 
@@ -251,6 +265,7 @@ Some models require an additional step to access. Follow the link provided in th
 
 ### Disclaimer
 The torchchat Repository Content is provided without any guarantees about performance or compatibility. In particular, torchchat makes available model architectures written in Python for PyTorch that may not perform in the same manner or meet the same standards as the original versions of those models. When using the torchchat Repository Content, including any model architectures, you are solely responsible for determining the appropriateness of using or redistributing the torchchat Repository Content and assume any risks associated with your use of the torchchat Repository Content or any models, outputs, or results, both alone and in combination with any other technologies. Additionally, you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models, weights, data, or other technologies, and you are solely responsible for complying with all such obligations.
+
 
 ## Acknowledgements
 Thank you to the [community](docs/ACKNOWLEDGEMENTS.md) for all the awesome libraries and tools
