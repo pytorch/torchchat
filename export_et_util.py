@@ -66,7 +66,7 @@ class CustomSDPAAttention(nn.Module):
         q = apply_rotary_emb(q, freqs_cis).to(dtype=torch.float)
         k = apply_rotary_emb(k, freqs_cis).to(dtype=torch.float)
         v = v.to(dtype=torch.float)
-        
+
         # KV cache should always be enabled
         assert self.kv_cache is not None
         output = torch.ops.llama.sdpa_with_kv_cache(
