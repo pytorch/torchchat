@@ -180,57 +180,53 @@ class QuantizedEmbedding(torch.nn.Module):
         *,
         bitwidth: int,
         groupsize: Optional[int] = None,
+        weight: Optional[torch.Tensor]=None,
+        scales: Optional[torch.Tensor]=None,
     ) -> None:
         super().__init__()
         if dtype is None:
-            dtype = torch.half
-
+            dtype = get_precision()
         if groupsize is None or groupsize == 0:
             groupsize = embedding_dim
         self.groupsize = groupsize
         self.dtype = dtype
         self.bitwidth = bitwidth
 
+        assert (weight is None) == bool(
+            scales is None
+        ), "must specify both weights and scales, or neither"
+
+        if bitwidth not in [4, 8]:
+            raise RuntimeError(
+                f"QUantized embedding does not support bitwidth={bitwidth}"
+            )
+
+        if weight is None:
+            groups_per_row = (embedding_dim + groupsize - 1) // groupsize
+            weight = torch.empty(
+                (num_embeddings, (embedding_dim * bitwidth) // 8,)
+                dtype=torch.int8,
+                device=device
+            )        
+            scales = torch.empty(
+                (num_embeddings, groups_per_row), dtype=dtype, device=device
+            ).squeeze(dim=-1)
+
+        self.register_buffer(
+            "weight",
+            weight,
+        )
+        self.register_buffer(
+            "scales",
+            scales,
+        )   
+
         if use_et_backend():
             self.forward = self.et_forward
         else:
             self.forward = self.aoti_forward
 
-        if bitwidth == 8:
-            self.register_buffer(
-                "weight",
-                torch.empty(
-                    (num_embeddings, embedding_dim), dtype=torch.int8, device=device
-                ),
-            )
-        elif bitwidth == 4:  # packed
-            self.register_buffer(
-                "weight",
-                torch.empty(
-                    (num_embeddings, embedding_dim // 2),
-                    dtype=torch.uint8,
-                    device=device,
-                ),
-            )
-        else:
-            raise RuntimeError(
-                f"QUantized embedding does not support bitwidth={bitwidth}"
-            )
-
-        groups_per_row = (embedding_dim + groupsize - 1) // groupsize
-        if groups_per_row > 1:
-            self.register_buffer(
-                "scales",
-                torch.ones(
-                    (num_embeddings, groups_per_row), dtype=torch.float16, device=device
-                ),
-            )
-        else:
-            self.register_buffer(
-                "scales",
-                torch.ones((num_embeddings,), dtype=torch.float16, device=device),
-            )
-
+            
     @torch.no_grad()
     def et_forward(self, indices: torch.Tensor) -> torch.Tensor:
         if self.bitwidth == 8:
