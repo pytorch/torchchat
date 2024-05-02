@@ -1,5 +1,5 @@
 # Chat with LLMs Everywhere
-torchchat is a compact codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
+torchchat is a small codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
 
 
 
@@ -54,7 +54,11 @@ cd torchchat
 # set up a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
+```
 
+After the virtual environment is activated, dependencies can be installed.
+
+```
 # install dependencies
 ./install_requirements.sh
 ```
@@ -160,9 +164,8 @@ Before running any commands in torchchat that require ExecuTorch, you must first
 To install ExecuTorch, run the following commands *from the torchchat root directory*.
 This will download the ExecuTorch repo to ./et-build/src and install various ExecuTorch libraries to ./et-build/install.
 ```
-export TORCHCHAT_ROOT=${PWD}
-export ENABLE_ET_PYBIND=true
-./scripts/install_et.sh $ENABLE_ET_PYBIND
+export TORCHCHAT_ROOT=$PWD
+./scripts/install_et.sh
 ```
 
 ### Export for mobile

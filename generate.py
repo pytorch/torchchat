@@ -463,6 +463,7 @@ def get_device_info(name: str) -> str:
         return torch.cuda.get_device_name(0)
     return ""
 
+
 def _callback(x, buffer, period_id, done_generating, tokenizer, is_llama3_model):
     if done_generating:
         return
@@ -471,16 +472,14 @@ def _callback(x, buffer, period_id, done_generating, tokenizer, is_llama3_model)
     )  # I think this results in the first output token being dropped from the display which is wrong.
     if x.item() == tokenizer.eos_id():
         done_generating = True
-    if (
-        is_llama3_model
-        and x.item() == tokenizer.special_tokens["<|eot_id|>"]
-    ):
+    if is_llama3_model and x.item() == tokenizer.special_tokens["<|eot_id|>"]:
         done_generating = True
         buffer = buffer[:-1]  # drop the eot_id from the output buffer
     if len(buffer) == 4 or done_generating:
         print("".join(buffer), end="", flush=True)
         buffer.clear()
     # print(, end='', flush=True)
+
 
 def _main(
     builder_args: BuilderArgs,
@@ -678,7 +677,14 @@ def _main(
             done_generating = False
 
             def callback(x):
-                return _callback(x, buffer=buffer, period_id=period_id, done_generating=done_generating, tokenizer=tokenizer, is_llama3_model=is_llama3_model)
+                return _callback(
+                    x,
+                    buffer=buffer,
+                    period_id=period_id,
+                    done_generating=done_generating,
+                    tokenizer=tokenizer,
+                    is_llama3_model=is_llama3_model,
+                )
 
         else:
             assert not generator_args.chat_mode
@@ -687,7 +693,14 @@ def _main(
             done_generating = False
 
             def callback(x):
-                return _callback(x, buffer=buffer, period_id=period_id, done_generating=done_generating, tokenizer=tokenizer, is_llama3_model=is_llama3_model)
+                return _callback(
+                    x,
+                    buffer=buffer,
+                    period_id=period_id,
+                    done_generating=done_generating,
+                    tokenizer=tokenizer,
+                    is_llama3_model=is_llama3_model,
+                )
 
         t0 = time.perf_counter()
         import contextlib
@@ -729,10 +742,8 @@ def _main(
         device_sync(device=builder_args.device)
         t = time.perf_counter() - t0
 
-        if not generator_args.chat_mode:
-            print(tokenizer.decode(y.tolist()))
-        else:
-            print()
+        print()
+
         tokens_generated = y.size(0) - prompt_length
         tokens_sec = tokens_generated / t
         aggregate_metrics["tokens_per_sec"].append(tokens_sec)

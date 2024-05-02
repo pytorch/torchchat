@@ -435,6 +435,11 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.10.11
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
       - name: Print machine info
         run: |
           uname -a
@@ -626,7 +631,7 @@ jobs:
   test-mps:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-m1-stable
+      runner: macos-m1-stable  # neeps MPS, was macos-m1-stable
       script: |
         set -x
         # NS: Remove previous installation  of torch first
@@ -735,7 +740,7 @@ jobs:
   test-mps-dtype:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-m1-stable
+      runner: macos-m1-stable  # needs MPS, was macos-m1-stable
       script: |
         set -x
         # NS: Remove previous installation  of torch first
@@ -864,7 +869,7 @@ jobs:
   runner-et:
     strategy:
       matrix:
-        runner: [macos-14-xlarge, 8-core-ubuntu]
+        runner: [16-core-ubuntu, macos-14-xlarge]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -875,6 +880,11 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.10.11
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
       - name: Print machine info
         run: |
           uname -a
@@ -908,7 +918,13 @@ jobs:
 
           python torchchat.py export stories15M --output-pte-path ./model.pte
           ./cmake-out/et_run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}"
-
+          
+            for dtype in fp32 fp16; do   # bf16 needs to be supported
+              echo "Testing export + runner with dtype=$dtype"
+              python torchchat.py export stories15M --dtype $dtype --output-pte-path ./model.pte
+                  ./cmake-out/et_run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}"
+            done
+  
           echo "Tests complete."
   runner-aoti:
     name: test-runner-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
