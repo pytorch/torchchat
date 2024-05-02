@@ -1,5 +1,5 @@
 # Chat with LLMs Everywhere
-torchchat is a compact codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
+torchchat is a small codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
 
 
 
@@ -54,11 +54,7 @@ cd torchchat
 # set up a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-```
 
-After the virtual environment is activated, dependencies can be installed.
-
-```bash
 # install dependencies
 ./install_requirements.sh
 ```
