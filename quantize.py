@@ -438,7 +438,7 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
                         ),
                     )
                 else:
-                    self.quantize(module)
+                    self.quantize(child)
 
         return module
 
@@ -533,7 +533,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
                     ),
                 )
             else:
-                self.quantize(module)
+                self.quantize(child)
 
         return module
 
