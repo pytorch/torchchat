@@ -917,11 +917,11 @@ jobs:
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
           python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
 
+      - name: Run inference
+        run: |
           echo "ET build directory"
           ls et-build | cat
 
-      - name: Run inference
-        run: |
           python torchchat.py download stories15M
           wget -O ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
 
