@@ -916,15 +916,9 @@ jobs:
       - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
         continue-on-error: true
         run: |
-          echo "Intalling pip3 packages"
-          ./install_requirements.sh
-
+          echo "Intalling ExecuTorch"
           export TORCHCHAT_ROOT=${PWD}
           bash scripts/build_native.sh et
-          pip3 list
-          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
-          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
-          python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
 
       - name: Run inference
         run: |
