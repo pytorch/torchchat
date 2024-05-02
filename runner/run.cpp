@@ -192,7 +192,6 @@ float* forward(Transformer* transformer, int token, int pos) {
                              .to(torch::dtype(torch::kFloat32))
                              .to(cpu_device);
   auto logits = result[0].data_ptr();
-
 #else // __ET_MODEL__
   ManagedTensor pos_managed(pos_buffer, sizeof(int64_t), {1}, ScalarType::Long);
   ManagedTensor tokens_managed(
@@ -376,19 +375,18 @@ int sample(Sampler* sampler, float* logits) {
   return next;
 }
 
-Tokenizer* build_tokenizer(
-    const char* tokenizer_path,
-    ModelType model_type,
-    int vocab_size) {
+Tokenizer* build_tokenizer(const char* tokenizer_path, ModelType model_type) {
   Tokenizer* tokenizer = NULL;
   switch (model_type) {
     case LLAMA2_MODEL:
-      fprintf(stderr, "Loading Llama2 tokenizer: %s\n", tokenizer_path);
-      tokenizer = new SPTokenizer(vocab_size, /*bos*/ 1, /*eos*/ 2);
+      fprintf(stderr, "NOCOMMIT Instantiate Llama2 tokenizer.\n");
+      tokenizer = new SPTokenizer();
+      fprintf(stderr, "NOCOMMIT Loading tokenizer model: %s\n", tokenizer_path);
       tokenizer->load(tokenizer_path);
+      fprintf(stderr, "NOCOMMIT Finished loading tokenizer model.\n");
       break;
     case LLAMA3_MODEL:
-      tokenizer = new Tiktoken(vocab_size, /*bos*/ 128000, /*eos*/ 128001);
+      tokenizer = new Tiktoken();
       tokenizer->load(tokenizer_path);
       break;
     default:
@@ -396,10 +394,6 @@ Tokenizer* build_tokenizer(
       exit(EXIT_FAILURE);
   }
   return tokenizer;
-}
-
-void free_tokenizer(Tokenizer* tokenizer) {
-  delete tokenizer;
 }
 
 // ----------------------------------------------------------------------------
@@ -465,6 +459,7 @@ unsigned generate_from_prompt_tokens(
   // If stop_pos == -1, we go until we find stop_token
   // If stop_pos >= 0, we go until we find stop_token or pos <= stop_pos.
   while (!found_stop_token && (stop_pos == -1 || pos <= stop_pos)) {
+    fprintf(stderr, "NOCOMMIT in while loop. pos %d", pos);
     // Get token and next
     if (pos_in_prompt < prompt_tokens.size()) {
       // Token comes from prompt
@@ -500,15 +495,15 @@ unsigned generate_from_prompt_tokens(
       bool next_is_stop =
           std::find(stop_tokens.begin(), stop_tokens.end(), next) !=
           stop_tokens.end();
+      fprintf(stderr, "\tNOCOMMIT next_is_stop %d, token %d", next_is_stop, next);
       if (next_is_stop) {
         printf("\n");
       } else {
         std::string piece = tokenizer->decode(token, next);
-        if (!piece.empty() && piece.length() != 0) {
-          safe_printf(piece.c_str()); // same as printf("%s", piece), but skips
-                                      // "unsafe" bytes
-          fflush(stdout);
-        }
+        fprintf(stderr, "\tNOCOMMIT %s\n", piece.c_str());
+        safe_printf(piece.c_str()); // same as printf("%s", piece), but skips
+                                    // "unsafe" bytes
+        fflush(stdout);
       }
     }
 
@@ -518,6 +513,7 @@ unsigned generate_from_prompt_tokens(
     }
     pos++;
   }
+  fprintf(stderr, "NOCOMMIT out of while loop. pos %d\n", pos);
 
   // report achieved tok/s (pos-1 because the timer starts after first
   // iteration)
@@ -911,35 +907,23 @@ int main(int argc, char* argv[]) {
   if (steps < 0)
     steps = 0;
 
+  Tokenizer* tokenizer = build_tokenizer(tokenizer_path, model_type);
+
   // If no tokenizer path provided, get default for model_type
   if (vocab_size == -1) {
-    switch (model_type) {
-      case LLAMA2_MODEL:
-        vocab_size = 32000;
-        break;
-      case LLAMA3_MODEL:
-        vocab_size = 128256;
-        break;
-      default:
-        fprintf(
-            stderr,
-            "No vocab_size was provided with -v argument, and there is no default vocab_size for model_type %d.\n",
-            model_type);
-        error_usage();
-    }
+    vocab_size = tokenizer->vocab_size();
   }
 
   Transformer transformer;
   build_transformer(&transformer, model_path, vocab_size, steps);
 
-  Tokenizer* tokenizer =
-      build_tokenizer(tokenizer_path, model_type, vocab_size);
-
   Sampler sampler;
   build_sampler(&sampler, vocab_size, temperature, topp, rng_seed);
 
   if (strcmp(mode, "generate") == 0) {
+    fprintf(stderr, "NOCOMMIT start to generate with prompt: %s.\n", prompt);
     generate(&transformer, tokenizer, &sampler, prompt, steps, model_type);
+    fprintf(stderr, "NOCOMMIT finish generating with prompt: %s.\n", prompt);
   } else if (strcmp(mode, "chat") == 0) {
     chat(
         &transformer,
@@ -956,7 +940,7 @@ int main(int argc, char* argv[]) {
 
   // memory and file handles cleanup
   free_sampler(&sampler);
-  free_tokenizer(tokenizer);
+  delete tokenizer;
   free_transformer(&transformer);
   return 0;
 }

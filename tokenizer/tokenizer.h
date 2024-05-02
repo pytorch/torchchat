@@ -26,11 +26,7 @@
 
 class Tokenizer {
  public:
-  explicit Tokenizer(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok)
-      : initialized_(false),
-        vocab_size_(vocab_size),
-        bos_tok_(bos_tok),
-        eos_tok_(eos_tok) {}
+  explicit Tokenizer() {}
   virtual ~Tokenizer() {}
 
   virtual void load(const std::string& tokenizer_path) = 0;
@@ -55,7 +51,7 @@ class Tokenizer {
 
  protected:
   bool initialized_;
-  const int32_t vocab_size_;
+  int32_t vocab_size_;
   uint64_t bos_tok_, eos_tok_;
 };
 
@@ -68,7 +64,7 @@ struct TokenIndex {
 
 class SPTokenizer : public Tokenizer {
  public:
-  explicit SPTokenizer(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok);
+  explicit SPTokenizer();
   ~SPTokenizer() override;
 
   void load(const std::string& tokenizer_path) override;
@@ -91,7 +87,7 @@ using Re2UPtr = std::unique_ptr<re2::RE2>;
 
 class Tiktoken : public Tokenizer {
  public:
-  explicit Tiktoken(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok);
+  explicit Tiktoken();
   ~Tiktoken(){};
 
   void load(const std::string& tokenizer_path);

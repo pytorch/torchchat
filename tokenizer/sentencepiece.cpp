@@ -16,8 +16,8 @@
 
 const char kSpaceSymbol[] = "\xe2\x96\x81";
 
-SPTokenizer::SPTokenizer(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok)
-    : Tokenizer(vocab_size, bos_tok, eos_tok),
+SPTokenizer::SPTokenizer()
+    : Tokenizer(),
       _processor(std::make_unique<sentencepiece::SentencePieceProcessor>()) {}
 
 /**
@@ -41,7 +41,10 @@ void SPTokenizer::load(const std::string& tokenizer_path) {
     fprintf(stderr, "couldn't load %s\n", tokenizer_path.c_str());
     exit(EXIT_FAILURE);
   }
-
+  // load vocab_size, bos_tok, eos_tok
+  vocab_size_ = _processor->GetPieceSize();
+  bos_tok_ = _processor->bos_id();
+  eos_tok_ = _processor->eos_id();
   initialized_ = true;
 }
 
@@ -62,7 +65,7 @@ std::string SPTokenizer::decode(uint64_t prev_token, uint64_t token) {
   }
   // get rid of the control ids <s> and </s>
   if (_processor->IsControl(token)) {
-    return "";
+    return " ";
   }
 
   std::string result =
@@ -94,8 +97,11 @@ SPTokenizer::encode(const std::string& text, int8_t bos, int8_t eos) {
     fprintf(stderr, "Tokenizer not initialized\n");
     exit(EXIT_FAILURE);
   }
+  // workaround a weird issue that text doesn't have correct size()
+  std::string input(text.c_str());
+  // should we reserve memory?
   std::vector<int> res;
-  auto status = _processor->Encode(text, &res);
+  auto status = _processor->Encode(input, &res);
   if (!status.ok()) {
     fprintf(stderr, "couldn't encode %s\n", text.c_str());
     exit(EXIT_FAILURE);
