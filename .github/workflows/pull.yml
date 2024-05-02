@@ -898,7 +898,7 @@ jobs:
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
-      - name: Install ET (cache)
+      - name: Install ET
         id: install-et
         uses: actions/cache@v3
         env:
