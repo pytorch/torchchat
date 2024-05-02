@@ -904,8 +904,8 @@ jobs:
         env:
           cache-name: cache-et-build
         with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ./et-build
+          export ET_HASH=$(git ls-remote https://github.com/pytorch/executorch.git viable/strict | awk '{ print $1 }')
           key: ${{ runner.os }}-${{ env.cache-name }}
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}
