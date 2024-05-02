@@ -124,10 +124,10 @@ class KVCache(nn.Module):
         dtype=None,
     ):
         super().__init__()
-        print(f"dtype on entry {dtype}")
+        # print(f"dtype on entry {dtype}")
         if not dtype:
             dtype = get_precision()
-        print(f"dtype on get_prec {dtype}")
+        # print(f"dtype on get_prec {dtype}")
         cache_shape = (max_batch_size, n_heads, max_seq_length, head_dim)
         self.register_buffer("k_cache", torch.zeros(cache_shape, dtype=dtype))
         self.register_buffer("v_cache", torch.zeros(cache_shape, dtype=dtype))
