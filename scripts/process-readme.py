@@ -1,4 +1,3 @@
-
 import sys
 
 def print_between_triple_backticks(filename, predicate):
