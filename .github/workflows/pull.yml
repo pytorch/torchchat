@@ -926,6 +926,7 @@ jobs:
           popd
 
       - name: Install runner
+        run: |
           # Pull submodules (re2, abseil) for Tiktoken
           git submodule sync
           git submodule update --init
