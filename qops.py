@@ -12,26 +12,97 @@ from build.utils import (
     state_dict_device,
     use_et_backend,
 )
-from torch.nn.parameter import Parameter
+
+# from torch.nn.parameter import Parameter
 
 
-def linear_int8(input, weight, scales):
+def linear_int8_aoti(input, weight, scales):
     n_groups = scales.numel() // scales.shape[0]
 
     # we special-case channel-wise, because we know how to make that fast
     if n_groups == 1:
+        scales = scales.view(-1)
         if (
             torch.compiler.is_compiling()
             or input.device.type != "cpu"
             or torch.__version__ < "2.4"
         ):
-            return F.linear(input, weight.to(dtype=input.dtype)) * scales
+            lin = F.linear(input, weight.to(dtype=input.dtype))
+            # print(f"linear shape {lin.shape}, scales shape {scales.shape}")
+            return lin * scales
         # Use int8pack_mm for CPU eager
         return torch.ops.aten._weight_int8pack_mm(
             input.reshape(-1, input.shape[-1]),
             weight,
             scales,
         ).reshape(input.shape[:-1] + (weight.shape[0],))
+
+    return F.linear(
+        input,
+        (
+            weight.to(dtype=input.dtype).view(weight.shape[0], n_groups, -1)
+            * scales.view(weight.shape[0], n_groups, -1)
+        ).view(weight.shape[0], -1),
+    )
+
+
+def _qdq_dynamic_quantized_linear(
+    x_fp32,
+    x_quant_min,
+    x_quant_max,
+    x_eps,
+    weight_i8,
+    weight_scale,
+    weight_zero_point,
+    weight_quant_min,
+    weight_quant_max,
+    bias_fp32,
+):
+    x_scale, x_zero_point = torch.ops.quantized_decomposed.choose_qparams(
+        x_fp32, x_quant_min, x_quant_max, x_eps, torch.int8
+    )
+    x_i8 = torch.ops.quantized_decomposed.quantize_per_tensor(
+        x_fp32, x_scale, x_zero_point, x_quant_min, x_quant_max, torch.int8
+    )
+    x_fp32 = torch.ops.quantized_decomposed.dequantize_per_tensor(
+        x_i8, x_scale, x_zero_point, x_quant_min, x_quant_max, torch.int8
+    )
+    weight_fp32 = torch.ops.quantized_decomposed.dequantize_per_tensor(
+        weight_i8,
+        weight_scale,
+        weight_zero_point,
+        weight_quant_min,
+        weight_quant_max,
+        torch.int8,
+    )
+    out_fp32 = torch.ops.aten.linear.default(x_fp32, weight_fp32, bias_fp32)
+    return out_fp32
+
+
+def linear_int8_et(input, weight, scales):
+    n_groups = scales.numel() // scales.shape[0]
+
+    # we special-case channel-wise, because we know how to make that fast
+    if n_groups == 1:
+        scales = scales.view(-1)
+
+        if True:
+            lin = F.linear(input, weight.to(dtype=input.dtype))
+            # print(f"linear shape {lin.shape}, scales shape {scales.shape}")
+            return lin * scales
+
+        return _qdq_dynamic_quantized_linear(
+            x_fp32=input.float(),
+            x_quant_min=-128,
+            x_quant_max=127,
+            x_eps=torch.finfo(input.dtype).eps,
+            weight_i8=weight,
+            weight_scale=scales.float(),
+            weight_zero_point=0,
+            weight_quant_min=-128,
+            weight_quant_max=127,
+            bias_fp32=None,
+        ).to(dtype=input.dtype)
 
     return F.linear(
         input,
@@ -68,19 +139,18 @@ class LinearInt8(nn.Module):
         if device is None:
             device = "cpu"
 
-        if device == "einputecutorch":
-            device = "cpu"
-
         assert not bias, "Bias is not supported by LinearInt8"
         self.in_features = in_features
         self.out_features = out_features
 
-        assert bool(weight) == bool(
-            scales
+        assert (weight is None) == bool(
+            scales is None
         ), "must specify both weights and scales, or neither"
-        if not weight:
+        if weight is None:
             weight = torch.empty(
-                (out_features, in_features), dtype=torch.int8, device=device
+                (out_features, in_features),
+                dtype=torch.int8,
+                device=device,
             )
             if groupsize is None or (groupsize == 0):
                 scales = torch.empty(out_features, dtype=dtype, device=device)
@@ -91,8 +161,16 @@ class LinearInt8(nn.Module):
         self.register_buffer("weight", weight.to(device))
         self.register_buffer("scales", scales.to(device))
 
-    def forward(self, input: torch.Tensor) -> torch.Tensor:
-        return linear_int8(input, self.weight, self.scales)
+        if use_et_backend():
+            self.forward = self.et_forward
+        else:
+            self.forward = self.aoti_forward
+
+    def aoti_forward(self, input: torch.Tensor) -> torch.Tensor:
+        return linear_int8_aoti(input, self.weight, self.scales)
+
+    def et_forward(self, input: torch.Tensor) -> torch.Tensor:
+        return linear_int8_et(input, self.weight, self.scales)
 
 
 class QuantizedEmbedding(torch.nn.Module):
@@ -105,56 +183,57 @@ class QuantizedEmbedding(torch.nn.Module):
         *,
         bitwidth: int,
         groupsize: Optional[int] = None,
+        weight: Optional[torch.Tensor] = None,
+        scales: Optional[torch.Tensor] = None,
     ) -> None:
         super().__init__()
         if dtype is None:
-            dtype = torch.get_default_dtype()
-
+            dtype = get_precision()
         if groupsize is None or groupsize == 0:
             groupsize = embedding_dim
         self.groupsize = groupsize
         self.dtype = dtype
         self.bitwidth = bitwidth
 
+        assert (weight is None) == bool(
+            scales is None
+        ), "must specify both weights and scales, or neither"
+
+        if bitwidth not in [4, 8]:
+            raise RuntimeError(
+                f"QUantized embedding does not support bitwidth={bitwidth}"
+            )
+
+        if weight is None:
+            groups_per_row = (embedding_dim + groupsize - 1) // groupsize
+            weight = torch.empty(
+                (
+                    num_embeddings,
+                    (embedding_dim * bitwidth) // 8,
+                ),
+                dtype=torch.int8,
+                device=device,
+            )
+            scales = torch.empty(
+                (num_embeddings, groups_per_row),
+                dtype=dtype,
+                device=device,
+            ).squeeze(dim=-1)
+
+        self.register_buffer(
+            "weight",
+            weight,
+        )
+        self.register_buffer(
+            "scales",
+            scales,
+        )
+
         if use_et_backend():
             self.forward = self.et_forward
         else:
             self.forward = self.aoti_forward
 
-        if bitwidth == 8:
-            self.register_buffer(
-                "weight",
-                torch.empty(
-                    (num_embeddings, embedding_dim), dtype=torch.int8, device=device
-                ),
-            )
-        elif bitwidth == 4:  # packed
-            self.register_buffer(
-                "weight",
-                torch.empty(
-                    (num_embeddings, embedding_dim // 2),
-                    dtype=torch.uint8,
-                    device=device,
-                ),
-            )
-        else:
-            raise RuntimeError(
-                f"QUantized embedding does not support bitwidth={bitwidth}"
-            )
-
-        groups_per_row = (embedding_dim + groupsize - 1) // groupsize
-        if groups_per_row > 1:
-            self.register_buffer(
-                "scales",
-                torch.empty(
-                    (num_embeddings, groups_per_row), dtype=torch.float16, device=device
-                ),
-            )
-        else:
-            self.register_buffer(
-                "scales",
-                torch.empty((num_embeddings,), dtype=torch.float16, device=device),
-            )
 
     @torch.no_grad()
     def et_forward(self, indices: torch.Tensor) -> torch.Tensor:
@@ -245,13 +324,16 @@ class LinearInt4(torch.nn.Module):
 
     def __init__(
         self,
-        device: str,
         in_features: int,
         out_features: int,
         bias=True,
+        device=None,
         dtype=None,
+        *,
         groupsize: int = 128,
         inner_k_tiles: int = 8,
+        weight: Optional[torch.Tensor] = None,
+        scales_and_zeros: Optional[torch.Tensor] = None,
     ) -> None:
         super().__init__()
         self.padding = not self._check_k(
@@ -273,9 +355,12 @@ class LinearInt4(torch.nn.Module):
         assert (
             in_features % (inner_k_tiles * 16) == 0
         ), "require in_features % (innerKTiles * 16) == 0"
-        self.register_buffer(
-            "weight",
-            torch.empty(
+        assert (weight is None) == bool(
+            scales_and_zeros is None
+        ), "must specify both weights and scales_and_zeros, or neither"
+
+        if weight is None:
+            weight = torch.empty(
                 (
                     out_features // 8,
                     in_features // (inner_k_tiles * 16),
@@ -284,15 +369,20 @@ class LinearInt4(torch.nn.Module):
                 ),
                 dtype=torch.int32,
                 device=device,
-            ),
-        )
-        self.register_buffer(
-            "scales_and_zeros",
-            torch.empty(
+            )
+            scales_and_zeros = torch.empty(
                 (in_features // groupsize, out_features, 2),
                 dtype=get_precision(),
                 device=device,
-            ),
+            )
+
+        self.register_buffer(
+            "weight",
+            weight,
+        )
+        self.register_buffer(
+            "scales_and_zeros",
+            scales_and_zeros,
         )
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
@@ -306,3 +396,20 @@ class LinearInt4(torch.nn.Module):
     def _check_k(cls, *, k, groupsize=1, inner_k_tiles=1):
         return k % groupsize == 0 and k % (inner_k_tiles * 16) == 0
 
+    @classmethod
+    def _prepare_weight_and_scales_and_zeros(
+        cls, weight_bf16, groupsize, inner_k_tiles
+    ):
+        from quantize import group_quantize_tensor
+
+        weight_int32, scales_and_zeros = group_quantize_tensor(
+            weight_bf16, n_bit=4, groupsize=groupsize
+        )
+        weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
+            weight_int32, inner_k_tiles
+        )
+        return weight_int4pack, scales_and_zeros
+
+    @classmethod
+    def _calc_padded_size(cls, *, k, groupsize=1, innner_k_tiles=1):
+        return find_multiple(k, 1024)

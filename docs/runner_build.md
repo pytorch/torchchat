@@ -47,12 +47,7 @@ Options:
 To build runner-aoti, run the following commands *from the torchchat root directory*
 
 ```
-# Pull submodules (re2, abseil) for Tiktoken
-git submodule sync
-git submodule update --init
-
-cmake -S . -B ./cmake-out -G Ninja -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'`
-cmake --build ./cmake-out --target aoti_run
+./scripts/build_native.sh aoti
 ```
 
 After running these, the runner-aoti binary is located at ./cmake-out/aoti_run.
@@ -79,6 +74,12 @@ Before building runner-et, you must first setup ExecuTorch by following [setup E
 
 
 To build runner-et, run the following commands *from the torchchat root directory*
+
+```
+./scripts/build_native.sh et
+```
+
+Note: the above script will wipe ./et-build if present and re-install ExecuTorch to ./et-build, which can take a while.  If you already installed ExecuTorch, running the commands below will build the runner, without re-installing ExecuTorch from source:
 
 ```
 # Pull submodules (re2, abseil) for Tiktoken
