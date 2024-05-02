@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import json
+
 # from functools import reduce
 # from math import gcd
 from typing import Dict, Optional
@@ -525,7 +526,6 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
                         num_embeddings=child.weight.shape[0],
                         embedding_dim=child.weight.shape[1],
                         device=self.device,
-                        *,
                         bitwidth=self.bitwidth,
                         groupsize=self.groupsize,
                         weight=weight,
@@ -539,6 +539,7 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 
     def quantized_model(self) -> nn.Module:
         return self.quantize(self.model_)
+
 
 #########################################################################
 #####     weight only int4 per channel groupwise quantized code    ######
