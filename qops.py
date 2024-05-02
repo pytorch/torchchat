@@ -147,7 +147,7 @@ class LinearInt8(nn.Module):
         ), "must specify both weights and scales, or neither"
         if weight is None:
             weight = torch.empty(
-                (out_features, in_features), dtype=torch.int8, device=device
+                (out_features, in_features), dtype=torch.int8, device=device,
             )
             if groupsize is None or (groupsize == 0):
                 scales = torch.empty(out_features, dtype=dtype, device=device)
@@ -204,12 +204,12 @@ class QuantizedEmbedding(torch.nn.Module):
         if weight is None:
             groups_per_row = (embedding_dim + groupsize - 1) // groupsize
             weight = torch.empty(
-                (num_embeddings, (embedding_dim * bitwidth) // 8,)
+                (num_embeddings, (embedding_dim * bitwidth) // 8,),
                 dtype=torch.int8,
                 device=device
             )        
             scales = torch.empty(
-                (num_embeddings, groups_per_row), dtype=dtype, device=device
+                (num_embeddings, groups_per_row), dtype=dtype, device=device,
             ).squeeze(dim=-1)
 
         self.register_buffer(

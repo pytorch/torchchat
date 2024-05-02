@@ -449,18 +449,6 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
 #####                   embedding table quantization               ######
 
 
-def replace_embedding_weight_only_grouped_int8_per_channel(
-    module, device, bitwidth: int, groupsize: Optional[int]
-):
-    for name, child in module.named_children():
-        # print(f"name: {name}")
-        if isinstance(child, nn.Embedding):
-        else:
-            replace_embedding_weight_only_grouped_int8_per_channel(
-                child, device, bitwidth, groupsize
-            )
-
-
 class EmbeddingOnlyInt8QuantHandler(QuantHandler):
     def __init__(
         self,
