@@ -323,13 +323,16 @@ class LinearInt4(torch.nn.Module):
 
     def __init__(
         self,
-        device: str,
         in_features: int,
         out_features: int,
         bias=True,
+        device=None,
         dtype=None,
+        *,
         groupsize: int = 128,
         inner_k_tiles: int = 8,
+        weight: Optional[torch.Tensor] = None,
+        scales_and_zeros: Optional[torch.Tensor] = None,
     ) -> None:
         super().__init__()
         self.padding = not self._check_k(
@@ -351,9 +354,12 @@ class LinearInt4(torch.nn.Module):
         assert (
             in_features % (inner_k_tiles * 16) == 0
         ), "require in_features % (innerKTiles * 16) == 0"
-        self.register_buffer(
-            "weight",
-            torch.empty(
+        assert (weight is None) == bool(
+            scales_and_zeros is None
+        ), "must specify both weights and scales_and_zeros, or neither"
+
+        if weight is None:
+            weight = torch.empty(
                 (
                     out_features // 8,
                     in_features // (inner_k_tiles * 16),
@@ -362,15 +368,20 @@ class LinearInt4(torch.nn.Module):
                 ),
                 dtype=torch.int32,
                 device=device,
-            ),
-        )
-        self.register_buffer(
-            "scales_and_zeros",
-            torch.empty(
+            )
+            scales_and_zeros = torch.empty(
                 (in_features // groupsize, out_features, 2),
                 dtype=get_precision(),
                 device=device,
-            ),
+            )
+
+        self.register_buffer(
+            "weight",
+            weight,
+        )
+        self.register_buffer(
+            "scales_and_zeros",
+            scales_and_zeros,
         )
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
