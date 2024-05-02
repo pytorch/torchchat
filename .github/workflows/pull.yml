@@ -918,11 +918,17 @@ jobs:
           export TORCHCHAT_ROOT=${PWD}
           bash scripts/build_native.sh et
 
-      - name: Run inference
+      - name: Run pip install et
         run: |
           echo "ET build directory"
           ls et-build | cat
 
+          pushd et-build/src/executorch
+          pip install .
+          popd
+
+      - name: Run inference
+        run: |
           python torchchat.py download stories15M
           wget -O ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
 
