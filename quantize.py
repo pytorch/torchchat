@@ -438,7 +438,7 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
                         ),
                     )
                 else:
-                    self.quantize(module)
+                    self.quantize(child)
 
         return module
 
@@ -448,31 +448,6 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
 
 #########################################################################
 #####                   embedding table quantization               ######
-
-
-def replace_embedding_weight_only_grouped_int8_per_channel(
-    module, device, bitwidth: int, groupsize: Optional[int]
-):
-    for name, child in module.named_children():
-        # print(f"name: {name}")
-        if isinstance(child, nn.Embedding):
-            # print(f"{name, child}")
-            # print(f"weights size: {child.weight.size()}")
-            setattr(
-                module,
-                name,
-                QuantizedEmbedding(
-                    device=device,
-                    num_embeddings=child.weight.shape[0],
-                    embedding_dim=child.weight.shape[1],
-                    bitwidth=bitwidth,
-                    groupsize=groupsize,
-                ),
-            )
-        else:
-            replace_embedding_weight_only_grouped_int8_per_channel(
-                child, device, bitwidth, groupsize
-            )
 
 
 class EmbeddingOnlyInt8QuantHandler(QuantHandler):
@@ -492,9 +467,11 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
         self.bitwidth = bitwidth
 
     @torch.no_grad()
-    def create_quantized_state_dict(self) -> Dict:
-        cur_state_dict = state_dict_device(self.model_.state_dict())
-        dict_device = "cpu"  # self.device
+    def quantize(self, module):
+        # cur_state_dict = state_dict_device(self.model_.state_dict())
+        # dict_device = "cpu"  # self.device
+
+        device = self.device
 
         if self.bitwidth == 4:
             range_min = -8
@@ -505,22 +482,23 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
         else:
             raise ValueError(f"Unsupported bitwidth {self.bitwidth}")
 
-        for fqn, mod in self.model_.named_modules():
-            if isinstance(mod, nn.Embedding):
+        for name, child in module.named_children():
+            # print(f"name: {name}")
+            if isinstance(child, nn.Embedding):
                 # print(f"Embedding identified: {fqn, mod}")
-                # print(f"weights size: {mod.weight.size()}")
+                # print(f"weights size: {child.weight.size()}")
                 # print(f"quantize {fqn}...")
 
                 # print(
                 #     f"quantize {fqn, mod} with groupsize {self.groupsize}, bitwidth {self.bitwidth}"
                 # )
                 weight, scales, _ = dynamically_quantize_per_channel(
-                    mod.weight.float(),
+                    child.weight.float(),
                     range_min,
                     range_max,
                     torch.int8,
                     self.groupsize,
-                    scales_dtype=mod.weight.dtype,
+                    scales_dtype=child.weight.dtype,
                 )
 
                 if self.bitwidth == 4:
@@ -536,26 +514,31 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
                     weight_packed = weight_even + weight_odd
                     weight = weight_packed
 
-                weight = weight.to(device=dict_device)
-                scales = scales.to(device=dict_device)
-                # Update state dict
-                cur_state_dict[f"{fqn}.weight"] = weight
-                # squeeze makes groupsize=rowsize unidimensional
-                cur_state_dict[f"{fqn}.scales"] = scales.squeeze(dim=-1)
+                weight = weight
+                scales = scales.squeeze(dim=-1)
 
-        return cur_state_dict
+                # print(f"{name, child}")
+                # print(f"weights size: {child.weight.size()}")
+                setattr(
+                    module,
+                    name,
+                    QuantizedEmbedding(
+                        num_embeddings=child.weight.shape[0],
+                        embedding_dim=child.weight.shape[1],
+                        device=self.device,
+                        bitwidth=self.bitwidth,
+                        groupsize=self.groupsize,
+                        weight=weight,
+                        scales=scales,
+                    ),
+                )
+            else:
+                self.quantize(child)
 
-    def convert_for_runtime(self) -> nn.Module:
-        replace_embedding_weight_only_grouped_int8_per_channel(
-            self.model_, self.device, self.bitwidth, self.groupsize
-        )
-        return self.model_
+        return module
 
     def quantized_model(self) -> nn.Module:
-        model_updated_state_dict = self.create_quantized_state_dict()
-        self.convert_for_runtime()
-        self.model_.load_state_dict(model_updated_state_dict)
-        return self.model_
+        return self.quantize(self.model_)
 
 
 #########################################################################
