@@ -926,8 +926,6 @@ jobs:
 
           echo "Tests complete."
   runner-aoti:
-    name: test-runner-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
-    needs: gather-models-cpu
     strategy:
       matrix:
         runner: [16-core-ubuntu, macos-14-xlarge]

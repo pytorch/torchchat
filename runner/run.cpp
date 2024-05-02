@@ -383,6 +383,7 @@ Tokenizer* build_tokenizer(
   Tokenizer* tokenizer = NULL;
   switch (model_type) {
     case LLAMA2_MODEL:
+      fprintf(stderr, "Loading Llama2 tokenizer: %s\n", tokenizer_path);
       tokenizer = new SPTokenizer(vocab_size, /*bos*/ 1, /*eos*/ 2);
       tokenizer->load(tokenizer_path);
       break;
