@@ -450,7 +450,7 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
 #####                   embedding table quantization               ######
 
 
-class EmbeddingOnlyInt8QuantHandler(QuantHandler):
+class EmbeddingOnlyQuantHandler(QuantHandler):
     def __init__(
         self,
         model: nn.Module,
@@ -545,6 +545,106 @@ class EmbeddingOnlyInt8QuantHandler(QuantHandler):
 #####     weight only int4 per channel groupwise quantized code    ######
 
 
+class NewWeightOnlyInt4QuantHandler(QuantHandler):
+    def __init__(
+        self,
+        model: nn.Module,
+        device,
+        *,
+        tokenizer=None,
+        groupsize=128,
+        inner_k_tiles=8,
+        padding_allowed=True,
+        weight: Optional[torch.Tensor] = None,
+        scales_and_zeros: Optional[torch.Tensor] = None,
+    ):
+        self.model_ = model
+        self.device = device
+        self.groupsize = groupsize
+        self.inner_k_tiles = inner_k_tiles
+        self.padding_allowed = padding_allowed
+        assert groupsize in [32, 64, 128, 256]
+        assert inner_k_tiles in [2, 4, 8]
+
+
+    @torch.no_grad()
+    def quantize(self, module):
+        # cur_state_dict = state_dict_device(self.model_.state_dict())
+        # dict_device = "cpu"  # self.device
+
+        device = self.device
+
+        if self.bitwidth == 4:
+            range_min = -8
+            range_max = 7
+        elif self.bitwidth == 8:
+            range_min = -128
+            range_max = 127
+        else:
+            raise ValueError(f"Unsupported bitwidth {self.bitwidth}")
+
+        for name, child in module.named_children():
+            # print(f"name: {name}")
+            if isinstance(child, torch.nn.Linear):
+                assert not child.bias
+                out_features = child.out_features
+                in_features = child.in_features
+                assert out_features % 8 == 0, "require out_features % 8 == 0"
+                # print(f"linear: {fqn}, in={in_features}, out={out_features}")
+
+                weight = child.weight.data
+                if not WeightOnlyInt4Linear._check_k(
+                    k=in_features,
+                    groupsize=self.groupsize,
+                    inner_k_tiles=self.inner_k_tiles,
+                ):
+                    if self.padding_allowed:
+                        print(
+                            f"warning: {fqn} is padded to satisfy in_features % 1024 == 0"
+                        )
+                        padded_in_features = find_multiple(in_features, 1024)
+                        weight = F.pad(
+                            weight, pad=(0, padded_in_features - in_features)
+                        )
+                    else:
+                        print(
+                            f"warning: {fqn} is skipped, int4 requires that in_features is 32, 64, or is divisible by 1024, "
+                            + "and that groupsize and inner_k_tiles*16 evenly divide into it"
+                        )
+                        continue
+                weight_int4pack, scales_and_zeros = (
+                    WeightOnlyInt4Linear._prepare_weight_and_scales_and_zeros(
+                        weight.to(torch.float), self.groupsize, self.inner_k_tiles
+                    )
+                )
+                weight_int4pack = weight_int4pack.to(device=self.device)
+                scales_and_zeros = scales_and_zeros.to(device=self.device)
+                cur_state_dict[f"{fqn}.weight"] = weight_int4pack
+                cur_state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros
+
+                setattr(
+                    module,
+                    name,
+                    WeightOnlyInt4Linear(
+                        child.in_features,
+                        child.out_features,
+                        bias=False,
+                        device=device,
+                        groupsize=groupsize,
+                        inner_k_tiles=inner_k_tiles,
+                        weight=weight_int4pack,
+                        scales_and_zeros=scales_and_zeros
+                    ),
+                )
+            else:
+                self.quantize(child)
+
+        return module
+
+    def quantized_model(self) -> nn.Module:
+        return self.quantize(self.model_)
+
+    
 def replace_linear_int4(
     module,
     device,
@@ -559,18 +659,6 @@ def replace_linear_int4(
                 groupsize=groupsize,
                 inner_k_tiles=inner_k_tiles,
             ):
-                setattr(
-                    module,
-                    name,
-                    WeightOnlyInt4Linear(
-                        device,
-                        child.in_features,
-                        child.out_features,
-                        bias=False,
-                        groupsize=groupsize,
-                        inner_k_tiles=inner_k_tiles,
-                    ),
-                )
         else:
             replace_linear_int4(
                 child, device, groupsize, inner_k_tiles, padding_allowed
@@ -1001,9 +1089,9 @@ class WeightOnlyInt4HqqQuantHandler:
 # Must come last because __future__ annotations don't work for naked
 # class references
 quantizer_class_dict = {
-    "embedding": EmbeddingOnlyInt8QuantHandler,
+    "embedding": EmbeddingOnlyQuantHandler,
     "linear:int8": WeightOnlyInt8QuantHandler,
-    "linear:int4": WeightOnlyInt4QuantHandler,
+    "linear:int4": NewWeightOnlyInt4QuantHandler,
     "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
     "linear:int4-gptq": WeightOnlyInt4GPTQQuantHandler,
     "linear:hqq": WeightOnlyInt4HqqQuantHandler,
