@@ -909,7 +909,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}
 
-      - name: Install ET (cache miss)
       - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
         continue-on-error: true
         run: |
