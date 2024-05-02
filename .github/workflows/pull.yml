@@ -932,7 +932,6 @@ jobs:
     runs-on: ${{matrix.runner}}
     env:
       TORCHCHAT_ROOT: ${{ github.workspace }}
-      REPO_NAME: ${{ matrix.repo_name }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3

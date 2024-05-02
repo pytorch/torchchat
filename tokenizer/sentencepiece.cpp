@@ -65,6 +65,8 @@ std::string SPTokenizer::decode(uint64_t prev_token, uint64_t token) {
   }
   // get rid of the control ids <s> and </s>
   if (_processor->IsControl(token)) {
+    // NB: returning empty string doesn't work for some reason. It causes
+    // free(): invalid pointer error.
     return " ";
   }
 

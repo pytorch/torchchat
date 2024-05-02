@@ -379,11 +379,8 @@ Tokenizer* build_tokenizer(const char* tokenizer_path, ModelType model_type) {
   Tokenizer* tokenizer = NULL;
   switch (model_type) {
     case LLAMA2_MODEL:
-      fprintf(stderr, "NOCOMMIT Instantiate Llama2 tokenizer.\n");
       tokenizer = new SPTokenizer();
-      fprintf(stderr, "NOCOMMIT Loading tokenizer model: %s\n", tokenizer_path);
       tokenizer->load(tokenizer_path);
-      fprintf(stderr, "NOCOMMIT Finished loading tokenizer model.\n");
       break;
     case LLAMA3_MODEL:
       tokenizer = new Tiktoken();
@@ -394,6 +391,10 @@ Tokenizer* build_tokenizer(const char* tokenizer_path, ModelType model_type) {
       exit(EXIT_FAILURE);
   }
   return tokenizer;
+}
+
+void free_tokenizer(Tokenizer* tokenizer) {
+  delete tokenizer;
 }
 
 // ----------------------------------------------------------------------------
@@ -459,7 +460,6 @@ unsigned generate_from_prompt_tokens(
   // If stop_pos == -1, we go until we find stop_token
   // If stop_pos >= 0, we go until we find stop_token or pos <= stop_pos.
   while (!found_stop_token && (stop_pos == -1 || pos <= stop_pos)) {
-    fprintf(stderr, "NOCOMMIT in while loop. pos %d", pos);
     // Get token and next
     if (pos_in_prompt < prompt_tokens.size()) {
       // Token comes from prompt
@@ -495,12 +495,10 @@ unsigned generate_from_prompt_tokens(
       bool next_is_stop =
           std::find(stop_tokens.begin(), stop_tokens.end(), next) !=
           stop_tokens.end();
-      fprintf(stderr, "\tNOCOMMIT next_is_stop %d, token %d", next_is_stop, next);
       if (next_is_stop) {
         printf("\n");
       } else {
         std::string piece = tokenizer->decode(token, next);
-        fprintf(stderr, "\tNOCOMMIT %s\n", piece.c_str());
         safe_printf(piece.c_str()); // same as printf("%s", piece), but skips
                                     // "unsafe" bytes
         fflush(stdout);
@@ -513,7 +511,6 @@ unsigned generate_from_prompt_tokens(
     }
     pos++;
   }
-  fprintf(stderr, "NOCOMMIT out of while loop. pos %d\n", pos);
 
   // report achieved tok/s (pos-1 because the timer starts after first
   // iteration)
@@ -921,9 +918,7 @@ int main(int argc, char* argv[]) {
   build_sampler(&sampler, vocab_size, temperature, topp, rng_seed);
 
   if (strcmp(mode, "generate") == 0) {
-    fprintf(stderr, "NOCOMMIT start to generate with prompt: %s.\n", prompt);
     generate(&transformer, tokenizer, &sampler, prompt, steps, model_type);
-    fprintf(stderr, "NOCOMMIT finish generating with prompt: %s.\n", prompt);
   } else if (strcmp(mode, "chat") == 0) {
     chat(
         &transformer,
@@ -940,7 +935,7 @@ int main(int argc, char* argv[]) {
 
   // memory and file handles cleanup
   free_sampler(&sampler);
-  delete tokenizer;
+  free_tokenizer(tokenizer);
   free_transformer(&transformer);
   return 0;
 }
