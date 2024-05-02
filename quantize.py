@@ -21,7 +21,6 @@ from build.utils import (
     get_precision,
     name_to_dtype,
     state_dict_device,
-    use_et_backend,
 )
 
 from qops import (
@@ -389,8 +388,6 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
         # cur_state_dict = state_dict_device(self.model_.state_dict())
         # dict_device = "cpu"  # self.device
 
-        device = self.device
-
         if self.bitwidth == 4:
             range_min = -8
             range_max = 7
@@ -468,11 +465,6 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
 
     @torch.no_grad()
     def quantize(self, module):
-        # cur_state_dict = state_dict_device(self.model_.state_dict())
-        # dict_device = "cpu"  # self.device
-
-        device = self.device
-
         if self.bitwidth == 4:
             range_min = -8
             range_max = 7
@@ -545,7 +537,7 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
 #####     weight only int4 per channel groupwise quantized code    ######
 
 
-class NewWeightOnlyInt4QuantHandler(QuantHandler):
+class WeightOnlyInt4QuantHandler(QuantHandler):
     def __init__(
         self,
         model: nn.Module,
@@ -568,11 +560,6 @@ class NewWeightOnlyInt4QuantHandler(QuantHandler):
 
     @torch.no_grad()
     def quantize(self, module):
-        # cur_state_dict = state_dict_device(self.model_.state_dict())
-        # dict_device = "cpu"  # self.device
-
-        device = self.device
-
         for name, child in module.named_children():
             # print(f"name: {name}")
             if isinstance(child, torch.nn.Linear):
@@ -631,129 +618,6 @@ class NewWeightOnlyInt4QuantHandler(QuantHandler):
 
     def quantized_model(self) -> nn.Module:
         return self.quantize(self.model_)
-
-
-def replace_linear_int4(
-    module,
-    device,
-    groupsize,
-    inner_k_tiles,
-    padding_allowed,
-):
-    for name, child in module.named_children():
-        if isinstance(child, nn.Linear):
-            if padding_allowed or WeightOnlyInt4Linear._check_k(
-                k=child.in_features,
-                groupsize=groupsize,
-                inner_k_tiles=inner_k_tiles,
-            ):
-                setattr(
-                    module,
-                    name,
-                    WeightOnlyInt4Linear(
-                        child.in_features,
-                        child.out_features,
-                        bias=False,
-                        device=device,
-                        groupsize=groupsize,
-                        inner_k_tiles=inner_k_tiles,
-                    ),
-                )
-        else:
-            replace_linear_int4(
-                child, device, groupsize, inner_k_tiles, padding_allowed
-            )
-
-
-class WeightOnlyInt4QuantHandler(QuantHandler):
-    def __init__(
-        self,
-        model: nn.Module,
-        device,
-        tokenizer=None,
-        *,
-        groupsize=128,
-        inner_k_tiles=8,
-        padding_allowed=True,
-    ):
-        self.model_ = model
-        self.device = device
-        self.groupsize = groupsize
-        self.inner_k_tiles = inner_k_tiles
-        self.padding_allowed = padding_allowed
-        assert groupsize in [32, 64, 128, 256]
-        assert inner_k_tiles in [2, 4, 8]
-
-    # @torch.no_grad()
-    # def p(self):
-    #     cur_state_dict = state_dict_device(self.model_.state_dict())
-    #     dict_device = "cpu"  # self.device
-    #
-    #     for fqn, mod in self.model_.named_modules():
-    #         if hasattr(mod, "weight"):
-    #             print(f"device={str(mod.weight.data.device)}")
-
-    @torch.no_grad()
-    def create_quantized_state_dict(self):
-        cur_state_dict = state_dict_device(self.model_.state_dict())
-        dict_device = "cpu"  # self.device
-
-        for fqn, mod in self.model_.named_modules():
-            if isinstance(mod, torch.nn.Linear):
-                assert not mod.bias
-                out_features = mod.out_features
-                in_features = mod.in_features
-                assert out_features % 8 == 0, "require out_features % 8 == 0"
-                # print(f"linear: {fqn}, in={in_features}, out={out_features}")
-
-                weight = mod.weight.data
-                if not WeightOnlyInt4Linear._check_k(
-                    k=in_features,
-                    groupsize=self.groupsize,
-                    inner_k_tiles=self.inner_k_tiles,
-                ):
-                    if self.padding_allowed:
-                        print(
-                            f"warning: {fqn} is padded to satisfy in_features % 1024 == 0"
-                        )
-                        padded_in_features = find_multiple(in_features, 1024)
-                        weight = F.pad(
-                            weight, pad=(0, padded_in_features - in_features)
-                        )
-                    else:
-                        print(
-                            f"warning: {fqn} is skipped, int4 requires that in_features is 32, 64, or is divisible by 1024, "
-                            + "and that groupsize and inner_k_tiles*16 evenly divide into it"
-                        )
-                        continue
-                weight_int4pack, scales_and_zeros = (
-                    WeightOnlyInt4Linear._prepare_weight_and_scales_and_zeros(
-                        weight.to(torch.float), self.groupsize, self.inner_k_tiles
-                    )
-                )
-                weight_int4pack = weight_int4pack.to(device=dict_device)
-                scales_and_zeros = scales_and_zeros.to(device=dict_device)
-                cur_state_dict[f"{fqn}.weight"] = weight_int4pack
-                cur_state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros
-
-        return cur_state_dict
-
-    def convert_for_runtime(self):
-        replace_linear_int4(
-            self.model_,
-            self.device,
-            self.groupsize,
-            self.inner_k_tiles,
-            self.padding_allowed,
-        )
-        return self.model_
-
-    def quantized_model(self) -> nn.Module:
-        model_updated_state_dict = self.create_quantized_state_dict()
-        self.convert_for_runtime()
-        self.model_.load_state_dict(model_updated_state_dict)
-        # self.p()
-        return self.model_
 
 
 #########################################################################
@@ -1011,13 +875,35 @@ class WeightOnlyInt4GPTQQuantHandler(GPTQQuantHandler):
         self.make_names_and_values_dict_func = make_names_and_values_dict_func
         super().__init__()
 
+    def replace_linear_int4(
+        self,
+        module,
+    ):
+        for name, child in module.named_children():
+            if isinstance(child, nn.Linear):
+                if self.padding_allowed or WeightOnlyInt4Linear._check_k(
+                    k=child.in_features,
+                    groupsize=self.groupsize,
+                    inner_k_tiles=self.inner_k_tiles,
+                ):
+                    setattr(
+                        module,
+                        name,
+                        WeightOnlyInt4Linear(
+                            child.in_features,
+                            child.out_features,
+                            bias=False,
+                            device=self.device,
+                            groupsize=self.groupsize,
+                            inner_k_tiles=self.inner_k_tiles,
+                        ),
+                    )
+            else:
+                self.replace_linear_int4(child)
+
     def convert_for_runtime(self):
-        replace_linear_int4(
+        self.replace_linear_int4(
             self.model_,
-            self.device,
-            self.groupsize,
-            self.inner_k_tiles,
-            self.padding_allowed,
         )
         return self.model_
 
@@ -1048,7 +934,8 @@ class WeightOnlyInt4HqqQuantHandler:
         self.device = device
         self.groupsize = groupsize
 
-    def create_quantized_state_dict(self):
+    @torch.no_grad()
+    def quantize(self, module):
         from hqq.core.quantize import Quantizer
 
         for m in self.model_.modules():
@@ -1066,20 +953,11 @@ class WeightOnlyInt4HqqQuantHandler:
                     )
 
         return WeightOnlyInt4QuantHandler(
-            self.model_, self.device, groupsize=self.groupsize
-        ).create_quantized_state_dict()
-
-    def convert_for_runtime(self):
-        # ALSO: all code must work for CPU, CUDA, MPS
-        return WeightOnlyInt4GPTQQuantHandler(
-            self.model_, self.device, tokenizer=None, groupsize=self.groupsize
-        ).convert_for_runtime()
+            model=self.model_, device=self.device, groupsize=self.groupsize
+        ).quantize(self.model_)
 
     def quantized_model(self) -> nn.Module:
-        model_updated_state_dict = self.create_quantized_state_dict()
-        self.convert_for_runtime()
-        self.model_.load_state_dict(model_updated_state_dict)
-        return self.model_
+        return self.quantize(self.model_)
 
 
 ##########################################################################
@@ -1091,7 +969,7 @@ class WeightOnlyInt4HqqQuantHandler:
 quantizer_class_dict = {
     "embedding": EmbeddingOnlyQuantHandler,
     "linear:int8": WeightOnlyInt8QuantHandler,
-    "linear:int4": NewWeightOnlyInt4QuantHandler,
+    "linear:int4": WeightOnlyInt4QuantHandler,
     "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
     "linear:int4-gptq": WeightOnlyInt4GPTQQuantHandler,
     "linear:hqq": WeightOnlyInt4HqqQuantHandler,
