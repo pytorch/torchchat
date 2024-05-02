@@ -1,5 +1,6 @@
 {
     "embedding": {"bitwidth": 4, "groupsize" : 32},
-    "precision": {"dtype": "bf16"},
-    "linear:int4": {"groupsize" : 256}
+    "linear:int4": {"groupsize" : 256},
+    "dtype" : "fast16",
+    "executor": {"accelerator": "fast" }
 }
