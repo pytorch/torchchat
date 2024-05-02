@@ -1,0 +1,37 @@
+name: Run the README instructions to ensure they work
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-cuda:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        # echo "::group::Install newer objcopy that supports --set-section-alignment"
+        # yum install -y  devtoolset-10-binutils
+        # export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        # echo "::endgroup::"
+
+
+        echo "::group::Create script"
+        python3 scripts/process-readme.py > ./we-run-this.sh
+        echo "::endgroup::"
+
+        echo "::group::Run This"
+        bash ./we-run-this.sh
+        
+        echo "tests complete"
+        echo "******************************************"
+        echo "::endgroup::"
