@@ -12,7 +12,7 @@ from build.utils import (
     state_dict_device,
     use_et_backend,
 )
-from torch.nn.parameter import Parameter
+#from torch.nn.parameter import Parameter
 
 
 def linear_int8_aoti(input, weight, scales):
