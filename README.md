@@ -17,7 +17,7 @@ torchchat is a compact codebase showcasing the ability to run large language mod
   - [Deploy and run on iOS](#deploy-and-run-on-ios)
   - [Deploy and run on Android](#deploy-and-run-on-android)
 - [Evaluate a mode](#eval)
-- [Fine-tuned models from torchtune](#fine-tuned-models-from-torchtune)
+- [Fine-tuned models from torchtune](docs/torchtune.md)
 - [Supported Models](#models)
 - [Troubleshooting](#troubleshooting)
 
@@ -95,7 +95,7 @@ For more information run `python3 torchchat.py chat --help`
 
 ### Generate
 ```bash
-python3 torchchat.py generate llama3
+python3 torchchat.py generate llama3 --prompt "write me a story about a boy and his bear"
 ```
 
 For more information run `python3 torchchat.py generate --help`
@@ -103,7 +103,7 @@ For more information run `python3 torchchat.py generate --help`
 ### Browser
 
 ```
-python3 torchchat.py browser llama3 --temperature 0 --num-samples 10
+python3 torchchat.py browser llama3
 ```
 
 *Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
@@ -120,13 +120,12 @@ AOT compiles models before execution for faster inference
 The following example exports and executes the Llama3 8B Instruct model.  (The first command performs the actual export, the second command loads the exported model into the Python interface to enable users to test the exported model.)
 ```
 # Compile
-python3 torchchat.py export llama3 --output-dso-path llama3.so
+python3 torchchat.py export llama3 --output-dso-path exportedModels/llama3.so
 
 # Execute the exported model using Python
-python3 torchchat.py generate llama3 --quantize config/data/cuda.json --dso-path llama3.so --prompt "Hello my name is"
+python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --prompt "Hello my name is"
 ```
-
-NOTE: We use `--quantize config/data/cuda.json` to quantize the llama3 model to reduce model size and improve performance for on-device use cases.
+NOTE: If you're machine has cuda add this flag for performance `--quantize config/data/cuda.json`
 
 ### Running native using our C++ Runner
 
@@ -139,7 +138,7 @@ scripts/build_native.sh aoti
 
 Execute
 ```bash
-cmake-out/aoti_run model.so -z tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/aoti_run exportedModels/llama3.so -z .model-artifacts/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time"
 ```
 
 ## Mobile Execution
@@ -196,36 +195,7 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
 ### Deploy and run on Android
 
 
-## Fine-tuned models from torchtune
 
-torchchat supports running inference with models fine-tuned using [torchtune](https://github.com/pytorch/torchtune). To do so, we first need to convert the checkpoints into a format supported by torchchat.
-
-Below is a simple workflow to run inference on a fine-tuned Llama3 model. For more details on how to fine-tune Llama3, see the instructions [here](https://github.com/pytorch/torchtune?tab=readme-ov-file#llama3)
-
-```bash
-# install torchtune
-pip install torchtune
-
-# download the llama3 model
-tune download meta-llama/Meta-Llama-3-8B \
-    --output-dir ./Meta-Llama-3-8B \
-    --hf-token <ACCESS TOKEN>
-
-# Run LoRA fine-tuning on a single device. This assumes the config points to <checkpoint_dir> above
-tune run lora_finetune_single_device --config llama3/8B_lora_single_device
-
-# convert the fine-tuned checkpoint to a format compatible with torchchat
-python3 build/convert_torchtune_checkpoint.py \
-  --checkpoint-dir ./Meta-Llama-3-8B \
-  --checkpoint-files meta_model_0.pt \
-  --model-name llama3_8B \
-  --checkpoint-format meta
-
-# run inference on a single GPU
-python3 torchchat.py generate \
-  --checkpoint-path ./Meta-Llama-3-8B/model.pth \
-  --device cuda
-```
 
 ### Eval
 Uses the lm_eval library to evaluate model accuracy on a variety of tasks. Defaults to wikitext and can be manually controlled using the tasks and limit args.
