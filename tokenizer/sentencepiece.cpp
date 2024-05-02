@@ -74,6 +74,9 @@ std::string SPTokenizer::decode(uint64_t prev_token, uint64_t token) {
     result = result.substr(1);
   }
 
+  // handle <0x0A>
+  result = absl::StrReplaceAll(result, {{"<0x0A>", "\n"}});
+
   return result;
 }
 
