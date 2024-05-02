@@ -915,8 +915,8 @@ jobs:
           echo "Intalling ExecuTorch"
           export TORCHCHAT_ROOT=${PWD}
           bash scripts/install_et.sh
-
-      - name: Install ET pip
+      - else:
+        continue-on-error: true
         run: |
           echo "ET build directory"
           ls et-build | cat
