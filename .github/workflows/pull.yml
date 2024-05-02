@@ -915,7 +915,7 @@ jobs:
         run: |
           echo "Intalling ExecuTorch"
           export TORCHCHAT_ROOT=${PWD}
-          bash scripts/build_native.sh et
+          bash scripts/install_et.sh
 
       - name: Run pip install et
         run: |
@@ -925,6 +925,14 @@ jobs:
           pushd et-build/src/executorch
           pip install .
           popd
+
+          # Pull submodules (re2, abseil) for Tiktoken
+          git submodule sync
+          git submodule update --init
+
+          export TORCHCHAT_ROOT=${PWD}
+          cmake -S . -B ./cmake-out -G Ninja
+          cmake --build ./cmake-out --target et_run
 
       - name: Run inference
         run: |
