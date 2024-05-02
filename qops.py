@@ -355,8 +355,8 @@ class LinearInt4(torch.nn.Module):
             in_features % (inner_k_tiles * 16) == 0
         ), "require in_features % (innerKTiles * 16) == 0"
         assert (weight is None) == bool(
-            scales is None
-        ), "must specify both weights and scales, or neither"
+            scales_and_zeros is None
+        ), "must specify both weights and scales_and_zeros, or neither"
 
         if weight is None:
             weight = torch.empty(
