@@ -54,7 +54,7 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
             raise RuntimeError(f"unknown quantizer {quantizer} specified")
 
         model = quantizer_class_dict[quantizer](
-            model, device, tokenizer, **q_kwargs
+            model, device=device, tokenizer=tokenizer, **q_kwargs
         ).quantized_model()
 
 
@@ -549,7 +549,7 @@ class NewWeightOnlyInt4QuantHandler(QuantHandler):
     def __init__(
         self,
         model: nn.Module,
-        device,
+        device=None,
         *,
         tokenizer=None,
         groupsize=128,
@@ -566,22 +566,12 @@ class NewWeightOnlyInt4QuantHandler(QuantHandler):
         assert groupsize in [32, 64, 128, 256]
         assert inner_k_tiles in [2, 4, 8]
 
-
     @torch.no_grad()
     def quantize(self, module):
         # cur_state_dict = state_dict_device(self.model_.state_dict())
         # dict_device = "cpu"  # self.device
 
         device = self.device
-
-        if self.bitwidth == 4:
-            range_min = -8
-            range_max = 7
-        elif self.bitwidth == 8:
-            range_min = -128
-            range_max = 127
-        else:
-            raise ValueError(f"Unsupported bitwidth {self.bitwidth}")
 
         for name, child in module.named_children():
             # print(f"name: {name}")
@@ -600,7 +590,7 @@ class NewWeightOnlyInt4QuantHandler(QuantHandler):
                 ):
                     if self.padding_allowed:
                         print(
-                            f"warning: {fqn} is padded to satisfy in_features % 1024 == 0"
+                            f"warning: {name} is padded to satisfy in_features % 1024 == 0"
                         )
                         padded_in_features = find_multiple(in_features, 1024)
                         weight = F.pad(
@@ -608,7 +598,7 @@ class NewWeightOnlyInt4QuantHandler(QuantHandler):
                         )
                     else:
                         print(
-                            f"warning: {fqn} is skipped, int4 requires that in_features is 32, 64, or is divisible by 1024, "
+                            f"warning: {name} is skipped, int4 requires that in_features is 32, 64, or is divisible by 1024, "
                             + "and that groupsize and inner_k_tiles*16 evenly divide into it"
                         )
                         continue
@@ -619,8 +609,6 @@ class NewWeightOnlyInt4QuantHandler(QuantHandler):
                 )
                 weight_int4pack = weight_int4pack.to(device=self.device)
                 scales_and_zeros = scales_and_zeros.to(device=self.device)
-                cur_state_dict[f"{fqn}.weight"] = weight_int4pack
-                cur_state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros
 
                 setattr(
                     module,
@@ -629,11 +617,11 @@ class NewWeightOnlyInt4QuantHandler(QuantHandler):
                         child.in_features,
                         child.out_features,
                         bias=False,
-                        device=device,
-                        groupsize=groupsize,
-                        inner_k_tiles=inner_k_tiles,
+                        device=self.device,
+                        groupsize=self.groupsize,
+                        inner_k_tiles=self.inner_k_tiles,
                         weight=weight_int4pack,
-                        scales_and_zeros=scales_and_zeros
+                        scales_and_zeros=scales_and_zeros,
                     ),
                 )
             else:
@@ -644,7 +632,7 @@ class NewWeightOnlyInt4QuantHandler(QuantHandler):
     def quantized_model(self) -> nn.Module:
         return self.quantize(self.model_)
 
-    
+
 def replace_linear_int4(
     module,
     device,
