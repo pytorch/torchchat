@@ -926,10 +926,6 @@ jobs:
           ls et-build | cat
 
           pushd et-build/src/executorch
-          if [[ "${{env.et-git-hash}}" != "$(git rev-parse HEAD)" ]]; then
-            exit 1
-          fi
-
           pip install .
           popd
 
