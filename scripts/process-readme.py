@@ -6,11 +6,14 @@ def print_between_triple_backticks(filename, predicate):
         lines = file.readlines()
     print_flag = False
     for line in lines:
-        command_prefix=f"[shell {predicate}]:"
-        command_end=f"[end {predicate}]:"
-        if line.startswith(command_prefix):
-            print(line[len(command_prefix):])
-        elif line.startswith(command_end):
+        command=f"[shell {predicate}]:"
+        prefix=f"[prefix {predicate}]:"
+        end=f"[end {predicate}]:"
+        if line.startswith(prefix):
+            print(line[len(prefix):-1], end='')
+        elif line.startswith(command):
+            print(line[len(command):])
+        elif line.startswith(end):
             return;
         elif line.startswith('```'):
             print_flag = not print_flag
