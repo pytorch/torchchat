@@ -18,13 +18,13 @@ def print_between_triple_backticks(filename, predicate):
             print("exit 0")
             return
         elif line.startswith(skip):
-            keyword = line[len(skip) :]-1).strip
-            if keyword == "begin"
+            keyword = line[len(skip):-1].strip()
+            if keyword == "begin":
                 print("if false; then")
-            elif keyword == "end"
+            elif keyword == "end":
                 print("fi")
             else:
-                print(f"echo 'error in line {i} of README.md")
+                print(f"echo 'error in line {i} of README.md'")
                 return
         elif line.startswith("```"):
             print_flag = not print_flag

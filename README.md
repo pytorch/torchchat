@@ -95,12 +95,12 @@ python3 torchchat.py remove llama3
 [Follow the installation steps if you haven't](#installation)
 
 ### Chat
-[shell default]: if false; then
+[skip default]: begin
 ```bash
 # Llama 3 8B Instruct
 python3 torchchat.py chat llama3
 ```
-[shell default]: fi
+[skip default]: end
 
 For more information run `python3 torchchat.py chat --help`
 
