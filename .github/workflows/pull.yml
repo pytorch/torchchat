@@ -891,6 +891,10 @@ jobs:
             sysctl machdep.cpu.brand_string
             sysctl machdep.cpu.core_count
           fi
+      - name: Set GH SHA Environment
+      id: setup-hash
+      run: |
+        echo "et-git-hash=$(git ls-remote https://github.com/pytorch/executorch.git viable/strict | awk '{ print $1 }')" >> "$GITHUB_ENV"
       - name: Install torchchat
         run: |
           echo "Intalling pip3 packages"
@@ -902,12 +906,12 @@ jobs:
         id: install-et
         uses: actions/cache@v3
         env:
-          cache-name: cache-et-build
+          cache-key: $runner-et-{{runner.os}}-{{env.et-git-hash}}
         with:
           path: ./et-build
-          key: ${{ runner.os }}-${{ env.cache-name }}
+          key: ${{env.cache-key}}
           restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}
+            ${{env.cache-key}}
 
       - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
         continue-on-error: true
@@ -922,6 +926,10 @@ jobs:
           ls et-build | cat
 
           pushd et-build/src/executorch
+          if [[ "${{env.et-git-hash}}" != "$(git rev-parse HEAD)" ]]; then
+            exit 1
+          fi
+
           pip install .
           popd
 
