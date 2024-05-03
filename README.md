@@ -95,12 +95,12 @@ python3 torchchat.py remove llama3
 [Follow the installation steps if you haven't](#installation)
 
 ### Chat
-[command default]: if false; then
+[shell default]: if false; then
 ```bash
 # Llama 3 8B Instruct
 python3 torchchat.py chat llama3
 ```
-[command default]: fi
+[shell default]: fi
 
 For more information run `python3 torchchat.py chat --help`
 
@@ -113,11 +113,11 @@ For more information run `python3 torchchat.py generate --help`
 
 ### Browser
 
-[command default]: if false; then
+[shell default]: if false; then
 ```
 python3 torchchat.py browser llama3
 ```
-[command default]: fi
+[shell default]: fi
 
 *Running on http://127.0.0.1:5000* should be printed out on the
  terminal. Click the link or go to
