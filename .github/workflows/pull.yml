@@ -456,6 +456,7 @@ jobs:
       - name: Set ET git sha
         id: setup-hash
         run: |
+          export TORCHCHAT_ROOT=${PWD}
           echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/.pins/et-pin)" >> "$GITHUB_ENV"
       - name: Load or install ET
         id: install-et
@@ -925,6 +926,7 @@ jobs:
       - name: Set ET git sha
         id: setup-hash
         run: |
+          export TORCHCHAT_ROOT=${PWD}
           echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/.pins/et-pin)" >> "$GITHUB_ENV"
       - name: Load or install ET
         id: install-et
