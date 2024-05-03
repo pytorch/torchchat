@@ -907,9 +907,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./et-build
-          key: et-build-${{runner.os}}
+          key: et-build-${{runner.os}}-${{env.et-git-hash}}
           restore-keys: |
-            et-build-${{runner.os}}
+            et-build-${{runner.os}}-${{env.et-git-hash}}
 
       - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
         continue-on-error: true
