@@ -38,7 +38,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run This"
-        bash ./we-run-this.sh
+        bash -x ./we-run-this.sh
         
         echo "tests complete"
         echo "******************************************"
