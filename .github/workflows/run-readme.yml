@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-cuda:
+  test-readme:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     secrets: inherit
     with:
@@ -26,12 +26,12 @@ jobs:
         # export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         # echo "::endgroup::"
 
-        echo "::group::get_llama"
- 	(
-            set +x
-            HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" bash .ci/scripts/download_llama.sh
-        )
-        echo "::endgroup::"
+        # echo "::group::get_llama"
+        # (
+        #     set +x
+        #     HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" bash .ci/scripts/download_llama.sh
+        # )
+        # echo "::endgroup::"
 
         echo "::group::Create script"
         python3 scripts/process-readme.py > ./we-run-this.sh
