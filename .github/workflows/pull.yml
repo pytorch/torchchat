@@ -457,7 +457,7 @@ jobs:
         id: setup-hash
         run: |
           export TORCHCHAT_ROOT=${PWD}
-          echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/.pins/et-pin)" >> "$GITHUB_ENV"
+          echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/.pins/et-pin.txt)" >> "$GITHUB_ENV"
       - name: Load or install ET
         id: install-et
         uses: actions/cache@v3
@@ -927,7 +927,7 @@ jobs:
         id: setup-hash
         run: |
           export TORCHCHAT_ROOT=${PWD}
-          echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/.pins/et-pin)" >> "$GITHUB_ENV"
+          echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/.pins/et-pin.txt)" >> "$GITHUB_ENV"
       - name: Load or install ET
         id: install-et
         uses: actions/cache@v3
