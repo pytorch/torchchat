@@ -536,6 +536,7 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
 #########################################################################
 #####     weight only int4 per channel groupwise quantized code    ######
 
+
 class WeightOnlyInt4QuantHandler(QuantHandler):
     def __init__(
         self,

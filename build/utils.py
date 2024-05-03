@@ -13,10 +13,10 @@ from pathlib import Path
 ##########################################################################
 ###                       unpack packed weights                        ###
 
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 import torch
-import torch.nn.functional as F
+# import torch.nn.functional as F
 
 
 def unpack_packed_weights(
