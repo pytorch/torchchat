@@ -18,7 +18,7 @@ def linear_int8_aoti(input, weight, scales):
         if (
             torch.compiler.is_compiling()
             or input.device.type != "cpu"
-            or torch.__version__ < "2.4"
+            or not hasattr(torch.ops.aten, "_weight_int8pack_mm")
         ):
             lin = F.linear(input, weight.to(dtype=input.dtype))
             # print(f"linear shape {lin.shape}, scales shape {scales.shape}")
