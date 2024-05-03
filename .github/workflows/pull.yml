@@ -963,6 +963,8 @@ jobs:
           pushd et-build/src/executorch
           if [ $(git rev-parse HEAD) != {{env.et-git-hash}} ]; then
             echo "Mismatched hash.  Make sure branch install_et.sh matches branch from Github cache."
+            echo "On commit $(git rev-parse HEAD)"
+            echo "Expected commit {{env.et-git-hash}}"
             exit 1
           fi
           pip install .
