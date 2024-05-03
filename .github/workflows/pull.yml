@@ -926,6 +926,10 @@ jobs:
           ls et-build | cat
 
           pushd et-build/src/executorch
+          if [ $(git rev-parse HEAD) != {{env.et-git-hash}} ]; then
+            echo "Mismatched hash"
+            exit 1
+          fi
           pip install .
           popd
 
