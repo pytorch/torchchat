@@ -11,7 +11,7 @@ While quantization can potentially degrade the model's performance, the methods 
 | compression | FP Precision | bitwidth| group size | dynamic activation quantization | Eager | AOTI | ExecuTorch |
 |--|--|--|--|--|--|--|--|
 | linear (asymmetric) | fp32, fp16, bf16 | [8, 4]* | [32, 64, 128, 256]** | | ✅ | ✅ | ✅ |
-| linear with dynamic activations (symmetric) | | | [32, 64, 128, 256]** | a8w4dq | ✅ | ✅ | ✅ |
+| linear with dynamic activations (symmetric) | fp32^ | | [32, 64, 128, 256]** | a8w4dq | 🚧 |🚧 | ✅ |
 | linear with GPTQ*** (asymmetric) | | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
 | linear with HQQ*** (asymmetric) | | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
 
@@ -21,6 +21,8 @@ Due to the larger vocabulary size of llama3, we also recommend quantizing the em
 | compression | FP Precision | weight quantization (bitwidth)| weight quantization (group size) | dynamic activation quantization | Eager | AOTI | ExecuTorch |
 |--|--|--|--|--|--|--|--|
 | embedding (symmetric) | fp32, fp16, bf16 | [8, 4]* | [32, 64, 128, 256]** | | ✅ | ✅ | ✅ |
+
+^a8w4dq quantization scheme requires model to be converted to fp32, due to lack of support for fp16 and bf16.
 
 *These are the only valid bitwidth options.
 
@@ -65,15 +67,15 @@ python3 generate.py [--compile] llama3 --prompt "Hello, my name is" --quantize '
 ```
 ### AOTI
 ```
-python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}' --output-dso-path llama3.dso
+python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:int4": {"groupsize" : 256}}' --output-dso-path llama3.dso
 
-python3 generate.py --dso-path llama3.dso  --prompt "Hello my name is"
+python3 generate.py llama3 --dso-path llama3.dso  --prompt "Hello my name is"
 ```
 ### ExecuTorch
 ```
-python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}' --output-pte-path llama3.pte
+python3 torchchat.py export llama3 --dtype fp32 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}' --output-pte-path llama3.pte
 
-python3 generate.py --pte-path llama3.pte  --prompt "Hello my name is"
+python3 generate.py llama3 --pte-path llama3.pte  --prompt "Hello my name is"
 ```
 
 ## Model precision (dtype precision setting)

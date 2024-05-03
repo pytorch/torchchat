@@ -155,10 +155,9 @@ def logits_to_probs(logits, temperature: float = 1.0, top_k: Optional[int] = Non
 def sample(
     logits, need_probs: bool, temperature: float = 1.0, top_k: Optional[int] = None
 ):
-    # if temperature == 0 and not need_probs:
-    #     _, idx_next = torch.topk(logits, k=1, dim=-1)
-    #     idx_next = idx_next.squeeze(dim=(0, 1))
-    #     return (idx_next, None)
+    if temperature == 0 and not need_probs:
+        _, idx_next = torch.topk(logits[0,-1], k=1, dim=-1)
+        return (idx_next, None)
     probs = logits_to_probs(logits[0, -1], temperature, top_k)
     idx_next = multinomial_sample_one_no_sync(probs)
     return idx_next, probs
