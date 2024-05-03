@@ -1,10 +1,11 @@
-name: Run the README instructions to ensure they work
+name: Run the README instructions periodically to ensure they work
 
 on:
-  pull_request:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
   push:
-    branches:
-      - main
+    tags:
+      - ciflow/periodic/*
   workflow_dispatch:
 
 jobs:
