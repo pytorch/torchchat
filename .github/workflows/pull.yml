@@ -905,7 +905,7 @@ jobs:
         id: install-et
         uses: actions/cache@v3
         env:
-          cache-key: et-build-${{runner.os}}-${{env.et-git-hash}}
+          cache-key: et-build-${{runner.name}}-${{env.et-git-hash}}
         with:
           path: ./et-build
           key: ${{env.cache-key}}
