@@ -461,7 +461,7 @@ jobs:
         id: install-et
         uses: actions/cache@v3
         env:
-          cache-key: et-build-${{runner.os}}-${runner.arch}-${{env.et-git-hash}}
+          cache-key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}
         with:
           path: ./et-build
           key: ${{env.cache-key}}
@@ -943,13 +943,12 @@ jobs:
         id: install-et
         uses: actions/cache@v3
         env:
-          cache-key: et-build-${{runner.os}}-${runner.arch}-${{env.et-git-hash}}
+          cache-key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}
         with:
           path: ./et-build
           key: ${{env.cache-key}}
           restore-keys: |
             ${{env.cache-key}}
-
       - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
         continue-on-error: true
         run: |
