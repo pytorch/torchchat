@@ -99,10 +99,12 @@ You can also remove downloaded models with the remove command: `python3 torchcha
 [Follow the installation steps if you haven't](#installation)
 
 ### Chat
+[command default]: if false; then
 ```bash
 # Llama 3 8B Instruct
 python3 torchchat.py chat llama3
 ```
+[command default]: fi
 
 For more information run `python3 torchchat.py chat --help`
 
@@ -115,9 +117,11 @@ For more information run `python3 torchchat.py generate --help`
 
 ### Browser
 
+[command default]: if false; then
 ```
 python3 torchchat.py browser llama3 --temperature 0 --num-samples 10
 ```
+[command default]: fi
 
 *Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
 
@@ -154,6 +158,8 @@ Execute
 ```bash
 cmake-out/aoti_run model.so -z tokenizer.model -l 3 -i "Once upon a time"
 ```
+[end default]:
+
 
 ## Mobile Execution
 ExecuTorch enables you to optimize your model for execution on a mobile or embedded device, but can also be used on desktop for testing.
