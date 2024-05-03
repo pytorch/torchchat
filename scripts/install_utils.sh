@@ -16,7 +16,7 @@ install_pip_dependencies() {
 }
 
 function find_cmake_prefix_path() {
-  path=`python -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())"`
+  path=`python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())"`
   MY_CMAKE_PREFIX_PATH=$path
 }
 
@@ -27,7 +27,7 @@ clone_executorch() {
   pushd ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
   git clone https://github.com/pytorch/executorch.git
   cd executorch
-  git checkout "viable/strict"
+  git checkout $(cat ${TORCHCHAT_ROOT}/.pins/et-pin)
   echo "Install executorch: submodule update"
   git submodule sync
   git submodule update --init
