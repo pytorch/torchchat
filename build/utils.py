@@ -9,14 +9,12 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
+from typing import Any, Callable, Dict, List, Tuple
+
+import torch
 
 ##########################################################################
 ###                       unpack packed weights                        ###
-
-from typing import Any, Callable, Dict, List, Optional, Tuple
-
-import torch
-import torch.nn.functional as F
 
 
 def unpack_packed_weights(
