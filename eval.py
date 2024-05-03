@@ -176,7 +176,10 @@ def eval(
         tasks = ["wikitext"]
 
     model_eval_wrapper = GPTFastEvalWrapper(
-        model, tokenizer, max_seq_length, device=device
+        model,
+        tokenizer,
+        max_seq_length,
+        device=device,
     )
 
     try:
