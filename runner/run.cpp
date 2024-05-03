@@ -192,7 +192,6 @@ float* forward(Transformer* transformer, int token, int pos) {
                              .to(torch::dtype(torch::kFloat32))
                              .to(cpu_device);
   auto logits = result[0].data_ptr();
-
 #else // __ET_MODEL__
   ManagedTensor pos_managed(pos_buffer, sizeof(int64_t), {1}, ScalarType::Long);
   ManagedTensor tokens_managed(
@@ -376,18 +375,15 @@ int sample(Sampler* sampler, float* logits) {
   return next;
 }
 
-Tokenizer* build_tokenizer(
-    const char* tokenizer_path,
-    ModelType model_type,
-    int vocab_size) {
+Tokenizer* build_tokenizer(const char* tokenizer_path, ModelType model_type) {
   Tokenizer* tokenizer = NULL;
   switch (model_type) {
     case LLAMA2_MODEL:
-      tokenizer = new BPETokenizer(vocab_size, /*bos*/ 1, /*eos*/ 2);
+      tokenizer = new SPTokenizer();
       tokenizer->load(tokenizer_path);
       break;
     case LLAMA3_MODEL:
-      tokenizer = new Tiktoken(vocab_size, /*bos*/ 1, /*eos*/ 2);
+      tokenizer = new Tiktoken();
       tokenizer->load(tokenizer_path);
       break;
     default:
@@ -553,10 +549,7 @@ void generate(
       stop_tokens.push_back(tokenizer->eos_tok());
       break;
     case LLAMA3_MODEL:
-      prompt_tokens = tokenizer->encode(prompt, 0, 0);
-      prompt_tokens.insert(
-          prompt_tokens.begin(),
-          tokenizer->encode("<|begin_of_text|>", 0, 0)[0]);
+      prompt_tokens = tokenizer->encode(prompt, 1, 0);
       stop_tokens.push_back(tokenizer->encode("<|end_of_text|>", 0, 0)[0]);
       stop_tokens.push_back(tokenizer->encode("<|eot_id|>", 0, 0)[0]);
       break;
@@ -911,29 +904,15 @@ int main(int argc, char* argv[]) {
   if (steps < 0)
     steps = 0;
 
+  Tokenizer* tokenizer = build_tokenizer(tokenizer_path, model_type);
+
   // If no tokenizer path provided, get default for model_type
   if (vocab_size == -1) {
-    switch (model_type) {
-      case LLAMA2_MODEL:
-        vocab_size = 32000;
-        break;
-      case LLAMA3_MODEL:
-        vocab_size = 128256;
-        break;
-      default:
-        fprintf(
-            stderr,
-            "No vocab_size was provided with -v argument, and there is no default vocab_size for model_type %d.\n",
-            model_type);
-        error_usage();
-    }
+    vocab_size = tokenizer->vocab_size();
   }
 
   Transformer transformer;
   build_transformer(&transformer, model_path, vocab_size, steps);
-
-  Tokenizer* tokenizer =
-      build_tokenizer(tokenizer_path, model_type, vocab_size);
 
   Sampler sampler;
   build_sampler(&sampler, vocab_size, temperature, topp, rng_seed);
