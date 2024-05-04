@@ -40,6 +40,7 @@ torchchat is a small codebase showcasing the ability to run large language model
 ## Installation
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
+[skip default]: begin
 ```bash
 # get the code
 git clone https://github.com/pytorch/torchchat.git
@@ -48,7 +49,9 @@ cd torchchat
 # set up a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-
+```
+[skip default]: end
+```
 # install dependencies
 ./install_requirements.sh
 ```
@@ -63,14 +66,12 @@ python3 torchchat.py --help
 ### Download Weights
 Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace account.
 
-[skip default]: begin
 [prefix default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" 
 Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens).
 Log into huggingface:
 ```
 huggingface-cli login
 ```
-[skip default]: end
 
 Once this is done, torchchat will be able to download model artifacts from
 HuggingFace.
@@ -79,7 +80,9 @@ HuggingFace.
 python3 torchchat.py download llama3
 ```
 
-*NOTE: This command may prompt you to request access to llama3 via HuggingFace, if you do not already have access. Simply follow the prompts and re-run the command when access is granted.*
+*NOTE: This command may prompt you to request access to llama3 via
+ HuggingFace, if you do not already have access. Simply follow the
+ prompts and re-run the command when access is granted.*
 
 View available models with:
 ```
@@ -87,10 +90,7 @@ python3 torchchat.py list
 ```
 
 
-You can also remove downloaded models with the remove command:
-```
-python3 torchchat.py remove llama3
-```
+You can also remove downloaded models with the remove command:`python3 torchchat.py remove llama3`
 
 
 ## Running via PyTorch / Python
@@ -115,11 +115,11 @@ For more information run `python3 torchchat.py generate --help`
 
 ### Browser
 
-[shell default]: if false; then
+[skip default]: begin
 ```
 python3 torchchat.py browser llama3
 ```
-[shell default]: fi
+[skip default]: end
 
 *Running on http://127.0.0.1:5000* should be printed out on the
  terminal. Click the link or go to
@@ -139,9 +139,9 @@ conversation.
 AOT compiles models before execution for faster inference
 
 The following example exports and executes the Llama3 8B Instruct
-model.  (The first command performs the actual export, the second
+model.  The first command performs the actual export, the second
 command loads the exported model into the Python interface to enable
-users to test the exported model.)
+users to test the exported model.
 
 ```
 # Compile
@@ -152,9 +152,10 @@ python3 torchchat.py export llama3 --output-dso-path exportedModels/llama3.so
 python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --prompt "Hello my name is"
 ```
 
-NOTE: If you're machine has cuda add this flag for performance
+NOTE: If your machine has cuda add this flag for performance
 `--quantize config/data/cuda.json`
 
+[end default]:
 ### Running native using our C++ Runner
 
 The end-to-end C++ [runner](runner/run.cpp) runs an `*.so` file
