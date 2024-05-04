@@ -177,7 +177,7 @@ scripts/build_native.sh aoti
 
 Execute
 ```bash
-cmake-out/aoti_run exportedModels/llama3.so -z .model-artifacts/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/aoti_run exportedModels/llama3.so -z ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time"
 ```
 
 [end default]: 
