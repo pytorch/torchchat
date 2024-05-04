@@ -16,7 +16,6 @@ import torch
 ##########################################################################
 ###                       unpack packed weights                        ###
 
-
 def unpack_packed_weights(
     packed_weights: Dict[str, Any],
     packed_linear: Callable,
