@@ -1,0 +1,42 @@
+name: Run the README instructions - with stories - to ensure they work
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-readme:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      timeout: 60
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        # echo "::group::Install newer objcopy that supports --set-section-alignment"
+        # yum install -y  devtoolset-10-binutils
+        # export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        # echo "::endgroup::"
+
+        echo "::group::Create script"
+        python3 scripts/process-readme.py > ./readme-commands.sh
+        echo "exit 1" >> ./readme-commands.sh
+        echo "::endgroup::"
+
+        echo "::group::Run This"
+        grep -v login ./readme-commands.sh | sed  -e '1,$s/llama3/stories15M/g' > ./we-run-this.sh
+        echo "*******************************************"
+        cat ./we-run-this.sh
+        echo "*******************************************"
+        bash -x ./we-run-this.sh
+        
+        echo "tests complete"
+        echo "*******************************************"
+        echo "::endgroup::"
