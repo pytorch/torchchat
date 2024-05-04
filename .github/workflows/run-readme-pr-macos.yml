@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:
 jobs:
-  test-mps:
+  test-readme-macos:
     runs-on: macos-14-xlarge
     steps:
       - name: Checkout code

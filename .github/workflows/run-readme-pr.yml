@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-readme:
+  test-readme-any:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
