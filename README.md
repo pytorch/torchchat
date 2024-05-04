@@ -80,15 +80,18 @@ HuggingFace.
 python3 torchchat.py download llama3
 ```
 
-*NOTE: This command may prompt you to request access to llama3 via HuggingFace, if you do not already have access. Simply follow the prompts and re-run the command when access is granted.*
+*NOTE: This command may prompt you to request access to llama3 via
+ HuggingFace, if you do not already have access. Simply follow the
+ prompts and re-run the command when access is granted.*
 
 View available models with:
 ```
 python3 torchchat.py list
 ```
 
+You can also remove downloaded models with the remove command:
+`python3 torchchat.py remove llama3`
 
-You can also remove downloaded models with the remove command: `python3 torchchat.py remove llama3`
 
 
 ## Running via PyTorch / Python
@@ -111,15 +114,15 @@ python3 torchchat.py generate llama3 --prompt "write me a story about a boy and 
 
 For more information run `python3 torchchat.py generate --help`
 
-[end default]: 
 
 ### Browser
 
-[shell default]: if false; then
+[skip default]: begin
 ```
 python3 torchchat.py browser llama3
 ```
-[shell default]: fi
+[skip default]: end
+
 
 *Running on http://127.0.0.1:5000* should be printed out on the
  terminal. Click the link or go to
@@ -139,9 +142,15 @@ conversation.
 AOT compiles models before execution for faster inference
 
 The following example exports and executes the Llama3 8B Instruct
+<<<<<<< HEAD
+model.  The first command performs the actual export, the second
+command loads the exported model into the Python interface to enable
+users to test the exported model.
+=======
 model.  (The first command performs the actual export, the second
 command loads the exported model into the Python interface to enable
 users to test the exported model.)
+>>>>>>> cf83f45a1949b3d45e356d375486a4013badf4db
 
 ```
 # Compile
@@ -152,9 +161,10 @@ python3 torchchat.py export llama3 --output-dso-path exportedModels/llama3.so
 python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --prompt "Hello my name is"
 ```
 
-NOTE: If you're machine has cuda add this flag for performance
+NOTE: If your machine has cuda add this flag for performance
 `--quantize config/data/cuda.json`
 
+[end default]: end
 ### Running native using our C++ Runner
 
 The end-to-end C++ [runner](runner/run.cpp) runs an `*.so` file
@@ -167,7 +177,7 @@ scripts/build_native.sh aoti
 
 Execute
 ```bash
-cmake-out/aoti_run exportedModels/llama3.so -z .model-artifacts/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/aoti_run exportedModels/llama3.so -z ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time"
 ```
 
 [end default]: 
@@ -243,9 +253,9 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
   <img src="https://pytorch.org/executorch/main/_static/img/llama_ios_app.png" width="600" alt="iOS app running a LlaMA model">
 </a>
 
-
 ### Deploy and run on Android
 
+MISSING. TBD.
 
 
 

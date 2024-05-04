@@ -27,6 +27,7 @@ jobs:
 
         echo "::group::Create script"
         python3 scripts/process-readme.py > ./readme-commands.sh
+        echo "exit 1" >> ./readme-commands.sh
         echo "::endgroup::"
 
         echo "::group::Run This"
