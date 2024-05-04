@@ -8,21 +8,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-mps:
-    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
+  test-readme-any:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
-      runner: macos-14-xlarge 
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      timeout: 60
       script: |
-        set -x
-        # NS: Remove previous installation  of torch first
-        # as this script does not isntall anything into conda env but rather as system dep
-        pip3 uninstall -y torch || true
-        set -eou pipefail
-
         echo "::group::Print machine info"
         uname -a
-        sysctl machdep.cpu.brand_string
-        sysctl machdep.cpu.core_count
         echo "::endgroup::"
 
         # echo "::group::Install newer objcopy that supports --set-section-alignment"
@@ -31,7 +26,8 @@ jobs:
         # echo "::endgroup::"
 
         echo "::group::Create script"
-        python3 scripts/process-readme.py > ./readme-commands.sh
+        echo "set -eou pipefail" > ./readme-commands.sh
+        python3 scripts/process-readme.py >> ./readme-commands.sh
         echo "exit 1" >> ./readme-commands.sh
         echo "::endgroup::"
 
