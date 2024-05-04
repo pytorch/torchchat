@@ -8,16 +8,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-readme:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+  test-mps:
+    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
-      timeout: 60
+      runner: macos-14-xlarge 
       script: |
+        set -x
+        # NS: Remove previous installation  of torch first
+        # as this script does not isntall anything into conda env but rather as system dep
+        pip3 uninstall -y torch || true
+        set -eou pipefail
+
         echo "::group::Print machine info"
         uname -a
+        sysctl machdep.cpu.brand_string
+        sysctl machdep.cpu.core_count
         echo "::endgroup::"
 
         # echo "::group::Install newer objcopy that supports --set-section-alignment"
