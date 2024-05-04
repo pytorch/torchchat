@@ -40,6 +40,7 @@ torchchat is a small codebase showcasing the ability to run large language model
 ## Installation
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
+[skip default]: begin
 ```bash
 # get the code
 git clone https://github.com/pytorch/torchchat.git
@@ -48,7 +49,9 @@ cd torchchat
 # set up a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-
+```
+[skip default]: end
+```
 # install dependencies
 ./install_requirements.sh
 ```
