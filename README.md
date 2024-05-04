@@ -237,7 +237,7 @@ enabled.
 
 After the app launched successfully, copy an exported ExecuTorch model (`.pte`) and tokenizer (`.bin`) files to the iLLaMA folder.
 
-For the Simulator, just drap&drop both files onto the Simulator window and save at `On My iPhone > iLLaMA` folder.
+For the Simulator, just drag&drop both files onto the Simulator window and save at `On My iPhone > iLLaMA` folder.
 
 For a device, open it in a separate Finder window, navigate to the Files tab, drag&drop both files to the iLLaMA folder and wait till the copying finishes.
 
