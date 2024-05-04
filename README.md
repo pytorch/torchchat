@@ -158,7 +158,6 @@ python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --promp
 NOTE: If your machine has cuda add this flag for performance
 `--quantize config/data/cuda.json`
 
-[end default]: end
 ### Running native using our C++ Runner
 
 The end-to-end C++ [runner](runner/run.cpp) runs an `*.so` file
