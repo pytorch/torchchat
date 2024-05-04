@@ -35,7 +35,9 @@ jobs:
         # echo "::endgroup::"
 
         echo "::group::Create script"
-        python3 scripts/process-readme.py > ./we-run-this.sh
+        echo "set -eou pipefail" > ./we-run-this.sh
+        python3 scripts/process-readme.py >> ./we-run-this.sh
+        echo "exit 1"  >> ./we-run-this.sh
         echo "::endgroup::"
 
         echo "::group::Run This"
