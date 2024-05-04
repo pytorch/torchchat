@@ -142,15 +142,9 @@ conversation.
 AOT compiles models before execution for faster inference
 
 The following example exports and executes the Llama3 8B Instruct
-<<<<<<< HEAD
 model.  The first command performs the actual export, the second
 command loads the exported model into the Python interface to enable
 users to test the exported model.
-=======
-model.  (The first command performs the actual export, the second
-command loads the exported model into the Python interface to enable
-users to test the exported model.)
->>>>>>> cf83f45a1949b3d45e356d375486a4013badf4db
 
 ```
 # Compile
@@ -164,7 +158,6 @@ python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --promp
 NOTE: If your machine has cuda add this flag for performance
 `--quantize config/data/cuda.json`
 
-[end default]: end
 ### Running native using our C++ Runner
 
 The end-to-end C++ [runner](runner/run.cpp) runs an `*.so` file
@@ -179,8 +172,6 @@ Execute
 ```bash
 cmake-out/aoti_run exportedModels/llama3.so -z ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time"
 ```
-
-[end default]: 
 
 ## Mobile Execution
 
@@ -221,6 +212,8 @@ on-device use cases.
 For more details on quantization and what settings to use for your use
 case visit our [Quanitization documentation](docs/quantization.md) or
 run `python3 torchchat.py export`
+
+[end default]: 
 
 ### Deploy and run on iOS
 
