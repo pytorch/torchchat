@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import json
+import os
 from pathlib import Path
 
 import torch
@@ -13,6 +14,9 @@ from build.utils import allowable_dtype_names, allowable_params_table, get_devic
 from download import download_and_convert, is_model_downloaded
 
 default_device = "fast"
+default_model_dir = Path(
+    os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")
+).expanduser()
 
 
 # Handle CLI arguments that are common to a majority of subcommands.
@@ -282,7 +286,7 @@ def _add_arguments_common(parser):
     parser.add_argument(
         "--model-directory",
         type=Path,
-        default=".model-artifacts",
+        default=default_model_dir,
         help="The directory to store downloaded model artifacts",
     )
     parser.add_argument(

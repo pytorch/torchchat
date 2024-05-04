@@ -1,5 +1,5 @@
 {
-    "linear:int4": {"groupsize" : 256},
-    "dtype" : "fast16",
-    "executor": {"accelerator": "fast" }
+    "executor": {"accelerator": "fast" },
+    "precision": {"dtype" : "fast16"},
+    "linear:int4": {"groupsize" : 256}
 }

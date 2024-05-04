@@ -87,10 +87,7 @@ python3 torchchat.py list
 ```
 
 
-You can also remove downloaded models with the remove command:
-```
-python3 torchchat.py remove llama3
-```
+You can also remove downloaded models with the remove command: `python3 torchchat.py remove llama3`
 
 
 ## Running via PyTorch / Python
@@ -112,6 +109,8 @@ python3 torchchat.py generate llama3 --prompt "write me a story about a boy and 
 ```
 
 For more information run `python3 torchchat.py generate --help`
+
+[end default]: 
 
 ### Browser
 
@@ -189,7 +188,7 @@ root directory*.  This will download the ExecuTorch repo to
 ./et-build/install.
 
 ```
-export TORCHCHAT_ROOT=$PWD
+export TORCHCHAT_ROOT=${PWD}
 ./scripts/install_et.sh
 ```
 
