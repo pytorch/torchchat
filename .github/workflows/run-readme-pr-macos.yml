@@ -11,8 +11,15 @@ jobs:
   test-mps:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-14-xlarge 
-      script: |
+      runner: macos-14-xlarge
+
+    steps:
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
+      - script: |
         set -x
         # NS: Remove previous installation  of torch first
         # as this script does not isntall anything into conda env but rather as system dep
@@ -31,7 +38,7 @@ jobs:
         # echo "::endgroup::"
 
         echo "::group::Create script"
-	echo "set -eou pipefail" > ./readme-commands.sh
+        echo "set -eou pipefail" > ./readme-commands.sh
         python3 scripts/process-readme.py >> ./readme-commands.sh
         echo "exit 1" >> ./readme-commands.sh
         echo "::endgroup::"
