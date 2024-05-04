@@ -35,6 +35,10 @@ def print_between_triple_backticks(filename, predicate):
 if len(sys.argv) > 1:
     predicate = sys.argv[1]
 else:
+<<<<<<< HEAD
     predicate="default"
+=======
+    predicate = "default"
+>>>>>>> cf83f45a1949b3d45e356d375486a4013badf4db
 
 print_between_triple_backticks("README.md", predicate)

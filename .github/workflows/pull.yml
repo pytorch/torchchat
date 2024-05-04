@@ -891,20 +891,56 @@ jobs:
             sysctl machdep.cpu.brand_string
             sysctl machdep.cpu.core_count
           fi
-      - name: Install requirements
+      - name: Install torchchat
         run: |
           echo "Intalling pip3 packages"
           ./install_requirements.sh
-
-          export TORCHCHAT_ROOT=${PWD}
-          bash scripts/build_native.sh et
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
-          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
-          python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
-
-      - name: Download checkpoints
+      - name: Set ET git sha
+        id: setup-hash
         run: |
+          export TORCHCHAT_ROOT=${PWD}
+          echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/.pins/et-pin.txt)" >> "$GITHUB_ENV"
+      - name: Load or install ET
+        id: install-et
+        uses: actions/cache@v3
+        env:
+          cache-key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}
+        with:
+          path: ./et-build
+          key: ${{env.cache-key}}
+          restore-keys: |
+            ${{env.cache-key}}
+      - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
+        continue-on-error: true
+        run: |
+          echo "Intalling ExecuTorch"
+          export TORCHCHAT_ROOT=${PWD}
+          bash scripts/install_et.sh
+      - name: Install ET pip
+        run: |
+          echo "ET build directory"
+          ls et-build | cat
+
+          pushd et-build/src/executorch
+          if [ $(git rev-parse HEAD) != ${{env.et-git-hash}} ]; then
+            echo "Mismatched hash.  Make sure branch install_et.sh matches branch from Github cache."
+            echo "On commit $(git rev-parse HEAD)"
+            echo "Expected commit ${{env.et-git-hash}}"
+            exit 1
+          fi
+          pip install .
+          popd
+      - name: Install runner
+        run: |
+          # Pull submodules (re2, abseil) for Tiktoken
+          git submodule sync
+          git submodule update --init
+
+          export TORCHCHAT_ROOT=${PWD}
+          cmake -S . -B ./cmake-out -G Ninja
+          cmake --build ./cmake-out --target et_run
 
       - name: Run inference
         run: |

@@ -89,8 +89,9 @@ View available models with:
 python3 torchchat.py list
 ```
 
+You can also remove downloaded models with the remove command:
+`python3 torchchat.py remove llama3`
 
-You can also remove downloaded models with the remove command:`python3 torchchat.py remove llama3`
 
 
 ## Running via PyTorch / Python
@@ -113,6 +114,7 @@ python3 torchchat.py generate llama3 --prompt "write me a story about a boy and 
 
 For more information run `python3 torchchat.py generate --help`
 
+
 ### Browser
 
 [skip default]: begin
@@ -120,6 +122,7 @@ For more information run `python3 torchchat.py generate --help`
 python3 torchchat.py browser llama3
 ```
 [skip default]: end
+
 
 *Running on http://127.0.0.1:5000* should be printed out on the
  terminal. Click the link or go to
@@ -139,9 +142,15 @@ conversation.
 AOT compiles models before execution for faster inference
 
 The following example exports and executes the Llama3 8B Instruct
+<<<<<<< HEAD
 model.  The first command performs the actual export, the second
 command loads the exported model into the Python interface to enable
 users to test the exported model.
+=======
+model.  (The first command performs the actual export, the second
+command loads the exported model into the Python interface to enable
+users to test the exported model.)
+>>>>>>> cf83f45a1949b3d45e356d375486a4013badf4db
 
 ```
 # Compile
@@ -155,7 +164,7 @@ python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --promp
 NOTE: If your machine has cuda add this flag for performance
 `--quantize config/data/cuda.json`
 
-[end default]:
+[end default]: end
 ### Running native using our C++ Runner
 
 The end-to-end C++ [runner](runner/run.cpp) runs an `*.so` file
@@ -190,7 +199,7 @@ root directory*.  This will download the ExecuTorch repo to
 ./et-build/install.
 
 ```
-export TORCHCHAT_ROOT=$PWD
+export TORCHCHAT_ROOT=${PWD}
 ./scripts/install_et.sh
 ```
 
@@ -244,9 +253,9 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
   <img src="https://pytorch.org/executorch/main/_static/img/llama_ios_app.png" width="600" alt="iOS app running a LlaMA model">
 </a>
 
-
 ### Deploy and run on Android
 
+MISSING. TBD.
 
 
 
