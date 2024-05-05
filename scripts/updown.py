@@ -1,10 +1,9 @@
 import argparse
 import os
 import re
-import sys
 
 
-def output(*args, replace_list=None, suppress_list=None, file=None, end="\n"):
+def output(*args, **kwargs):
     """
     Prints the given arguments after performing replacements and suppressions.
     Args:
@@ -16,6 +15,13 @@ def output(*args, replace_list=None, suppress_list=None, file=None, end="\n"):
     Returns:
         None
     """
+    # expand kwargs, make it error to not specify replace list or suppress list
+    # because we should always have these for updown processor
+    replace_list = kwargs["replace_list"]  # .get("replace_list", None)
+    suppress_list = kwargs["suppress_list"]  # get("suppress_list", None)
+    file = kwargs.get("file", None)
+    end = kwargs.get("end", "\n")
+
     # Convert args to a list of strings
     str_args = [str(arg) for arg in args]
     # If replace_list is provided
@@ -49,9 +55,7 @@ def command_regexp(command):
     return rf"^\[\s*{command}\s+(\w+)\s*\]\s*:\s*(.*)"
 
 
-def updown_processor(
-    filename, predicate_list, replace_list, suppress_list
-):
+def updown_processor(filename, predicate_list, replace_list, suppress_list):
     """
     Processes a file based on the given predicates, replacements, and suppressions.
     Args:
@@ -65,7 +69,7 @@ def updown_processor(
     with open(filename, "r") as file:
         lines = file.readlines()
     print_flag = False
-    output("set -eou pipefail")
+    output("set -eou pipefail", replace_list=None, suppress_list=None)
     for i, line in enumerate(lines):
         shell = command_regexp("shell")
         prefix = command_regexp("prefix")
@@ -110,7 +114,11 @@ def updown_processor(
                         suppress_list=suppress_list,
                     )
                 else:
-                    output(f"echo 'error in line {i} of README.md'\nexit 1;")
+                    output(
+                        f"echo 'error in line {i} of {filename}'\nexit 1;",
+                        suppress_list=None,
+                        replace_list=None,
+                    )
                     exit(1)
         elif match := re.search(end, line):
             # Extract the matched groups
@@ -122,12 +130,17 @@ def updown_processor(
                     replace_list=replace_list,
                     suppress_list=suppress_list,
                 )
+                return
         elif line.startswith("```"):
             print_flag = not print_flag
         elif print_flag:
-            output(line, end="", suppress_list=suppress_list)
+            output(line, end="", replace_list=replace_list, suppress_list=suppress_list)
 
-    output("echo 'reached end of file without exit command'\nexit 1;")
+    output(
+        "echo 'reached end of file without exit command'\nexit 1;",
+        suppress_list=None,
+        replace_list=None,
+    )
 
 
 # Initialize the ArgumentParser object
@@ -154,6 +167,4 @@ replace_list = (
 # Get suppress strings, split by comma
 suppress_list = args.suppress.split(",") if args.suppress else []
 # Call updown_processor function
-updown_processor(
-    filename, predicate_list, replace_list, suppress_list
-)
+updown_processor(filename, predicate_list, replace_list, suppress_list)
