@@ -1,4 +1,4 @@
-name: Run the README instructions - with stories - to ensure they work
+name: Run the README instructions - with stories 
 
 on:
   pull_request:
