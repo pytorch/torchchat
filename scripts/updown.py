@@ -213,7 +213,7 @@ def updown_processor(
             suppress_list=suppress_list,
         ):
             pass
-        elif line.startswith("```"):
+        elif re.search(r"^\s*```", line):
             print_flag = not print_flag
         elif print_flag:
             updown_process_line(
