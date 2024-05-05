@@ -75,6 +75,9 @@ def updown_process_line(
     line, lineno, filename, replace_list, suppress_list, expand_options
 ):
     if not expand_options:
+        # [ x1 | c2 | x3 ] means "pick one", so we may have to check that and pick one
+        # of the options.  Probably pick the last option because testing has more likely
+        # been performed with the first option!
         output(
             remove_text_between_brackets(line),
             replace_list=replace_list,
