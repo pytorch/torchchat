@@ -39,7 +39,7 @@ jobs:
           # echo "::endgroup::"
   
           echo "::group::Create script"
-          python3 scripts/updown.py --file README.md --replace llama3:stories15M --suppress huggingface-cli > ./we-run-this.sh
+          python3 scripts/updown.py --file README.md --replace llama3:stories15M --suppress huggingface-cli,HF_TOKEN > ./we-run-this.sh
           echo "::endgroup::"
 
           echo "::group::Run This"
