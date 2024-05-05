@@ -18,7 +18,7 @@ def print_between_triple_backticks(filename, predicate):
             print("exit 0")
             return
         elif line.startswith(skip):
-            keyword = line[len(skip):-1].strip()
+            keyword = line[len(skip) : -1].strip()
             if keyword == "begin":
                 print("if false; then")
             elif keyword == "end":
@@ -35,6 +35,6 @@ def print_between_triple_backticks(filename, predicate):
 if len(sys.argv) > 1:
     predicate = sys.argv[1]
 else:
-    predicate="default"
+    predicate = "default"
 
 print_between_triple_backticks("README.md", predicate)
