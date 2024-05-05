@@ -633,6 +633,8 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
         tokenizer=None,
         groupsize=128,
         padding_allowed=True,
+        precision=torch.float32,
+        scales_precision=torch.float32,
     ):
         if dtype is None:
             dtype = torch.float32
@@ -643,6 +645,8 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
 
         self.groupsize = groupsize
         self.padding_allowed = padding_allowed
+        self.precision = precision
+        self.scales_precision = scales_precision
         assert groupsize in [32, 64, 128, 256]
 
     @torch.no_grad()

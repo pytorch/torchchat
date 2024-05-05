@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import json
+import logging
 import os
 from pathlib import Path
 
@@ -12,6 +13,13 @@ import torch
 
 from build.utils import allowable_dtype_names, allowable_params_table, get_device_str
 from download import download_and_convert, is_model_downloaded
+
+FORMAT = (
+    "%(levelname)s: %(asctime)-15s: %(filename)s: %(funcName)s: %(module)s: %(message)s"
+)
+logging.basicConfig(filename="/var/log/out.log", level=logging.WARNING, format=FORMAT)
+logger = logging.getLogger(__name__)
+
 
 default_device = "fast"
 default_model_dir = Path(

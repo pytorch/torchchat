@@ -5,7 +5,6 @@
 # LICENSE file in the root directory of this source tree.
 import argparse
 import itertools
-
 import logging
 import sys
 import time
@@ -25,9 +24,7 @@ from build.builder import (
 )
 from build.model import Transformer
 from build.utils import device_sync, set_precision
-from cli import add_arguments_for_generate, arg_init, check_args
-
-logger = logging.getLogger(__name__)
+from cli import add_arguments_for_generate, arg_init, check_args, logger
 
 B_INST, E_INST = "[INST]", "[/INST]"
 B_SYS, E_SYS = "<<SYS>>", "<</SYS>>"
