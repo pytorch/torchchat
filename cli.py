@@ -17,7 +17,7 @@ from download import download_and_convert, is_model_downloaded
 FORMAT = (
     "%(levelname)s: %(asctime)-15s: %(filename)s: %(funcName)s: %(module)s: %(message)s"
 )
-logging.basicConfig(filename="/var/log/out.log", level=logging.WARNING, format=FORMAT)
+logging.basicConfig(filename="/tmp/torchchat.log", level=logging.INFO, format=FORMAT)
 logger = logging.getLogger(__name__)
 
 
