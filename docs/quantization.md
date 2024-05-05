@@ -11,9 +11,9 @@ While quantization can potentially degrade the model's performance, the methods 
 | compression | FP Precision | bitwidth| group size | dynamic activation quantization | Eager | AOTI | ExecuTorch |
 |--|--|--|--|--|--|--|--|
 | linear (asymmetric) | fp32, fp16, bf16 | [8, 4]* | [32, 64, 128, 256]** | | ✅ | ✅ | 🚧 |
-| linear with dynamic activations (symmetric) | fp32^ | | [32, 64, 128, 256]** | a8w4dq | 🚧 |🚧 | ✅ |
 | linear with GPTQ*** (asymmetric) | | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
 | linear with HQQ*** (asymmetric) | | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
+| linear with dynamic activations (symmetric) | fp32^ | | [32, 64, 128, 256] | a8w4dq | 🚧 |🚧 | ✅ |
 
 ### Embedding Quantization
 Due to the larger vocabulary size of llama3, we also recommend quantizing the embeddings to further reduce the model size for on-device usecases.

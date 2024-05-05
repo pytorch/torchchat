@@ -316,7 +316,7 @@ def arg_init(args):
     if args.output_pte_path:
         if args.device not in ["cpu", "fast"]:
             raise RuntimeError("Device not supported by ExecuTorch")
-        args.device="cpu"
+        args.device = "cpu"
     else:
         args.device = get_device_str(
             args.quantize.get("executor", {}).get("accelerator", args.device)

@@ -22,7 +22,7 @@ blobfile
 
 # Build tools
 wheel
-cmake
+cmake>=3.24
 ninja
 zstd
 
