@@ -35,7 +35,7 @@ def output(*args, replace_list=None, suppress_list=None, file=None, end="\n"):
     print(*str_args, file=file, end=end)
 
 
-def regexp(command):
+def command_regexp(command):
     """
     Processes a file based on the given predicates, replacements, and suppressions.
     Args:
@@ -46,11 +46,11 @@ def regexp(command):
     Returns:
         None
     """
-    return r"^\[\s*{command}\s+(\w+)\s*\]\s*:\s*(.*)"
+    return rf"^\[\s*{command}\s+(\w+)\s*\]\s*:\s*(.*)"
 
 
 def updown_processor(
-    filename, predicate_list, replace_list, suppress_list, exit_on_error
+    filename, predicate_list, replace_list, suppress_list
 ):
     """
     Processes a file based on the given predicates, replacements, and suppressions.
@@ -67,22 +67,21 @@ def updown_processor(
     print_flag = False
     output("set -eou pipefail")
     for i, line in enumerate(lines):
-        shell = regexp("shell")
-        prefix = regexp("prefix")
-        skip = regexp("skip")
-        end = regexp("end")
-        if match := re.search(shell, str):
+        shell = command_regexp("shell")
+        prefix = command_regexp("prefix")
+        skip = command_regexp("skip")
+        end = command_regexp("end")
+        if match := re.search(shell, line):
             # Extract the matched groups
             predicate = match.group(1)
             trailing_command = match.group(2)
             if predicate in predicate_list:
                 output(
                     trailing_command,
-                    file=file,
                     replace_list=replace_list,
                     suppress_list=suppress_list,
                 )
-        elif match := re.search(prefix, str):
+        elif match := re.search(prefix, line):
             # Extract the matched groups
             predicate = match.group(1)
             trailing_command = match.group(2)
@@ -90,11 +89,10 @@ def updown_processor(
                 output(
                     trailing_command,
                     end="",
-                    file=file,
                     replace_list=replace_list,
                     suppress_list=suppress_list,
                 )
-        elif match := re.skip(skip, str):
+        elif match := re.search(skip, line):
             # Extract the matched groups
             predicate = match.group(1)
             trailing_command = match.group(2)
@@ -102,31 +100,25 @@ def updown_processor(
                 if trailing_command == "begin":
                     output(
                         "if true; then",
-                        end="",
-                        file=file,
                         replace_list=replace_list,
                         suppress_list=suppress_list,
                     )
                 elif trailing_command == "end":
                     output(
                         "fi",
-                        end="",
-                        file=file,
                         replace_list=replace_list,
                         suppress_list=suppress_list,
                     )
                 else:
                     output(f"echo 'error in line {i} of README.md'\nexit 1;")
                     exit(1)
-        elif match := re.end(skip, str):
+        elif match := re.search(end, line):
             # Extract the matched groups
             predicate = match.group(1)
             trailing_command = match.group(2)
             if predicate in predicate_list:
                 output(
                     "exit 0",
-                    end="",
-                    file=file,
                     replace_list=replace_list,
                     suppress_list=suppress_list,
                 )
@@ -150,7 +142,7 @@ args = parser.parse_args()
 filename = args.filename
 # Check if file exists
 if not os.path.isfile(filename):
-    print(f"File {filename} does not exist.")
+    output(f"echo 'File {filename} does not exist.'\n exit 1;")
     exit(1)
 # Get predicates, split by comma, and add "default"
 predicate_list = args.predicate.split(",") if args.predicate else []
@@ -163,5 +155,5 @@ replace_list = (
 suppress_list = args.suppress.split(",") if args.suppress else []
 # Call updown_processor function
 updown_processor(
-    filename, predicate_list, replace_list, suppress_list, args.exit_on_error
+    filename, predicate_list, replace_list, suppress_list
 )
