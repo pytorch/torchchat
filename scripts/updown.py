@@ -140,7 +140,7 @@ def process_command(
         )
     elif keyword == "prefix":
         output(
-            trailing_command[:-1],
+            trailing_command,
             end="",
             replace_list=replace_list,
             suppress_list=suppress_list,
@@ -172,6 +172,18 @@ def process_command(
             suppress_list=suppress_list,
         )
         exit(0)
+    elif keyword == "comment":
+        output(
+            "# " + trailing_command,
+            suppress_list=None,
+            replace_list=None,
+        )
+    else:
+        output("echo 'unknown updown command'\nexit 1",
+            suppress_list=None,
+            replace_list=None,
+        )
+        exit(1)
 
     # We have processed this line as a command
     return True

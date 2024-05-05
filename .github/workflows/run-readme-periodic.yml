@@ -62,6 +62,20 @@ jobs:
         bash -x ./run-quantization.sh
         echo "::endgroup::"
 
+        echo "::group::Create script to run gguf"
+        python3 scripts/updown.py --file docs/GGUF.md > ./run-gguf.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-gguf.sh
+        echo "::endgroup::"
+
+        echo "::group::Run gguf"
+        echo "*******************************************"
+        cat ./run-gguf.sh
+        echo "*******************************************"
+        bash -x ./run-gguf.sh
+        echo "::endgroup::"
+
         echo "::group::Completion"
         echo "tests complete"
         echo "*******************************************"
