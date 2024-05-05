@@ -35,14 +35,16 @@ jobs:
         # echo "::endgroup::"
 
         echo "::group::Create script"
-        echo "set -eou pipefail" > ./we-run-this.sh
-        python3 scripts/process-readme.py >> ./we-run-this.sh
-        echo "exit 1"  >> ./we-run-this.sh
+        python3 scripts/updown.py --file README.md > ./we-run-this.sh
         echo "::endgroup::"
 
         echo "::group::Run This"
+        echo "*******************************************"
+        cat ./we-run-this.sh
+        echo "*******************************************"
         bash -x ./we-run-this.sh
         
         echo "tests complete"
-        echo "******************************************"
+        echo "*******************************************"
         echo "::endgroup::"
+
