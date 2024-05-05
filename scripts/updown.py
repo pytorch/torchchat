@@ -82,9 +82,18 @@ def updown_process_line(
         )
     else:
         options = extract_text_between_brackets(line)
+        if len(options) == 0:
+            output(
+                line,
+                replace_list=replace_list,
+                suppress_list=suppress_list,
+            )
+            return
         if len(options) > 1:
             output(
-                "echo 'cross product of options not yet supported anot line {line} of {filename}'\nexit 1"
+                "echo 'cross product of options not yet supported anot line {line} of {filename}'\nexit 1",
+                suppress_list=None,
+                replace_list=None,
             )
             exit(1)
         for option in options[0].split("|"):
