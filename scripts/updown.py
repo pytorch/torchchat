@@ -99,7 +99,7 @@ def updown_processor(
             if predicate in predicate_list:
                 if trailing_command == "begin":
                     output(
-                        "if true; then",
+                        "if false; then",
                         replace_list=replace_list,
                         suppress_list=suppress_list,
                     )
