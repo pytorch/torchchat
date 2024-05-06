@@ -26,9 +26,6 @@ def export_model(model: nn.Module, device, output_path, args=None):
 
     model.to(device)
 
-    from export_aoti_util import replace_linear_with_custom_linear # NOCOMMIT
-    replace_linear_with_custom_linear(model) # NOCOMMIT
-
     so = torch._export.aot_compile(
         model,
         args=input,
