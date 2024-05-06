@@ -43,7 +43,7 @@ The following steps require that you have [Python 3.10](https://www.python.org/d
 [skip default]: begin
 ```bash
 # get the code
-git clone https://github.com/pytorch/torchchat.git
+git clone https://github.com/pytorch/torchchat.git --recurse-submodules --shallow-submodules
 cd torchchat
 
 # set up a virtual environment
