@@ -93,7 +93,6 @@ You can also remove downloaded models with the remove command:
 `python3 torchchat.py remove llama3`
 
 
-
 ## Running via PyTorch / Python
 [Follow the installation steps if you haven't](#installation)
 
@@ -199,7 +198,7 @@ export TORCHCHAT_ROOT=${PWD}
 ### Export for mobile
 The following example uses the Llama3 8B Instruct model.
 
-[#shell default]: echo '{"embedding": {"bitwidth": 4, "groupsize" : 32}, "linear:a8w4dq": {"groupsize" : 32}}' >./config/data/mobile.json
+[comment default]: echo '{"embedding": {"bitwidth": 4, "groupsize" : 32}, "linear:a8w4dq": {"groupsize" : 32}}' >./config/data/mobile.json
 
 ```
 # Export
@@ -250,7 +249,10 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
   <img src="https://pytorch.org/executorch/main/_static/img/llama_ios_app.png" width="600" alt="iOS app running a LlaMA model">
 </a>
 
+
 ### Deploy and run on Android
+
+
 
 MISSING. TBD.
 
@@ -261,6 +263,8 @@ MISSING. TBD.
 Uses the lm_eval library to evaluate model accuracy on a variety of
 tasks. Defaults to wikitext and can be manually controlled using the
 tasks and limit args.
+
+See [Evaluation](docs/evaluation.md)
 
 For more information run `python3 torchchat.py eval --help`
 
@@ -317,6 +321,7 @@ you can perform the example commands with any of these models.
 **CERTIFICATE_VERIFY_FAILED**
 Run `pip install --upgrade certifi`.
 
+
 **Access to model is restricted and you are not in the authorized
 list** Some models require an additional step to access. Follow the
 link provided in the error to get access.
@@ -335,6 +340,22 @@ results, both alone and in combination with any other
 technologies. Additionally, you may have other legal obligations that
 govern your use of other content, such as the terms of service for
 third-party models, weights, data, or other technologies, and you are
+solely responsible for complying with all such obligations.
+
+
+### Disclaimer
+The torchchat Repository Content is provided without any guarantees about 
+performance or compatibility. In particular, torchchat makes available 
+model architectures written in Python for PyTorch that may not perform 
+in the same manner or meet the same standards as the original versions 
+of those models. When using the torchchat Repository Content, including 
+any model architectures, you are solely responsible for determining the 
+appropriateness of using or redistributing the torchchat Repository Content 
+and assume any risks associated with your use of the torchchat Repository Content 
+or any models, outputs, or results, both alone and in combination with 
+any other technologies. Additionally, you may have other legal obligations 
+that govern your use of other content, such as the terms of service for 
+third-party models, weights, data, or other technologies, and you are 
 solely responsible for complying with all such obligations.
 
 
