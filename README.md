@@ -66,7 +66,7 @@ python3 torchchat.py --help
 ### Download Weights
 Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace account.
 
-[prefix default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" 
+[prefix default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}"
 Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens).
 Log into huggingface:
 ```
@@ -195,6 +195,22 @@ export TORCHCHAT_ROOT=${PWD}
 ./scripts/install_et.sh
 ```
 
+### Test it out using our Executorch runner
+Build the runner
+```bash
+scripts/build_native.sh et
+```
+
+**Get a PTE file if you don't have one already**
+```
+python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
+```
+
+Execute using the runner
+```bash
+cmake-out/et_run llama3.pte -z ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -i "Once upon a time"
+```
+
 ### Export for mobile
 The following example uses the Llama3 8B Instruct model.
 
@@ -216,7 +232,7 @@ For more details on quantization and what settings to use for your use
 case visit our [Quanitization documentation](docs/quantization.md) or
 run `python3 torchchat.py export`
 
-[end default]: 
+[end default]:
 
 ### Deploy and run on iOS
 
@@ -344,18 +360,18 @@ solely responsible for complying with all such obligations.
 
 
 ### Disclaimer
-The torchchat Repository Content is provided without any guarantees about 
-performance or compatibility. In particular, torchchat makes available 
-model architectures written in Python for PyTorch that may not perform 
-in the same manner or meet the same standards as the original versions 
-of those models. When using the torchchat Repository Content, including 
-any model architectures, you are solely responsible for determining the 
-appropriateness of using or redistributing the torchchat Repository Content 
-and assume any risks associated with your use of the torchchat Repository Content 
-or any models, outputs, or results, both alone and in combination with 
-any other technologies. Additionally, you may have other legal obligations 
-that govern your use of other content, such as the terms of service for 
-third-party models, weights, data, or other technologies, and you are 
+The torchchat Repository Content is provided without any guarantees about
+performance or compatibility. In particular, torchchat makes available
+model architectures written in Python for PyTorch that may not perform
+in the same manner or meet the same standards as the original versions
+of those models. When using the torchchat Repository Content, including
+any model architectures, you are solely responsible for determining the
+appropriateness of using or redistributing the torchchat Repository Content
+and assume any risks associated with your use of the torchchat Repository Content
+or any models, outputs, or results, both alone and in combination with
+any other technologies. Additionally, you may have other legal obligations
+that govern your use of other content, such as the terms of service for
+third-party models, weights, data, or other technologies, and you are
 solely responsible for complying with all such obligations.
 
 
@@ -401,4 +417,3 @@ code in this distribution is covered by the MIT and Apache Open Source
 licenses.) However you may have other legal obligations that govern
 your use of content, such as the terms of service for third-party
 models.
-
