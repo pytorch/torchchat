@@ -155,6 +155,25 @@ class ExecutorHandler(QuantHandler):
         return self.model_.to(device=self.device)
 
 
+class CustomHandler(QuantHandler):
+    def __init__(self, model: nn.Module, device="cpu", tokenizer=None):
+        self.model_ = model
+        self.device = device
+        self.tokenizer = tokenizer
+
+    def create_quantized_state_dict(self) -> Dict:  # "StateDict"
+        pass
+
+    def convert_for_runtime(self) -> nn.Module:
+        pass
+
+    def quantized_model(self) -> nn.Module:
+        self.model_ = self.model_.to(device=self.device)
+
+        from _custom_linear import _replace_linear_with_custom_linear
+        _replace_linear_with_custom_linear(self.model_)
+        return self.model_
+
 #########################################################################
 #####                     Quantization Primitives                  ######
 
@@ -1059,4 +1078,5 @@ quantizer_class_dict = {
     "linear:hqq": WeightOnlyInt4HqqQuantHandler,
     "precision": PrecisionHandler,
     "executor": ExecutorHandler,
+    "_custom": CustomHandler,
 }
