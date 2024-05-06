@@ -2,7 +2,7 @@
 # Quantization
 
 [shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
-[shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
+[comment default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
 
 ## Introduction
 Quantization focuses on reducing the precision of model parameters and computations from floating-point to lower-bit integers, such as 8-bit integers. This approach aims to minimize memory requirements, accelerate inference speeds, and decrease power consumption, making models more feasible for deployment on edge devices with limited computational resources. For high-performance devices such as GPUs, quantization provides a way to reduce the required memory bandwidth and take advantage of the massive compute capabilities provided by today's server-based accelerators such as GPUs.
@@ -153,3 +153,5 @@ We invite contributors to submit established quantization schemes, with accuracy
 - Quantization reference, describe options for --quantize parameter
 - Show a table with performance/accuracy metrics
 - Quantization support matrix? torchchat Quantization Support Matrix
+
+[end defult]: end

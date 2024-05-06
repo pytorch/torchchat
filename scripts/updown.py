@@ -179,7 +179,8 @@ def process_command(
             replace_list=None,
         )
     else:
-        output("echo 'unknown updown command'\nexit 1",
+        output(
+            "echo 'unknown updown command'\nexit 1",
             suppress_list=None,
             replace_list=None,
         )
