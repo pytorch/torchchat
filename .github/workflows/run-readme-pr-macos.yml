@@ -1,5 +1,5 @@
-name: Run the README instructions - with stories - on MacOS 
-on:  
+name: Run the README instructions - with stories - on MacOS
+on:
   pull_request:
   push:
     branches:
@@ -26,20 +26,20 @@ jobs:
           # as this script does not isntall anything into conda env but rather as system dep
           pip3 uninstall -y torch || true
           set -eou pipefail
-  
+
           echo "::group::Print machine info"
           uname -a
           sysctl machdep.cpu.brand_string
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
-  
+
           # echo "::group::Install newer objcopy that supports --set-section-alignment"
           # yum install -y  devtoolset-10-binutils
           # export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
           # echo "::endgroup::"
-  
+
           echo "::group::Create script"
-          python3 scripts/updown.py --file README.md --replace llama3:stories15M --suppress huggingface-cli,HF_TOKEN > ./we-run-this.sh
+          python3 scripts/updown.py --file README.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./we-run-this.sh
             # for good measure, if something happened to updown processor,
           # and it did not error out, fail with an exit 1
           echo "exit 1" >> ./we-run-this.sh
@@ -50,8 +50,7 @@ jobs:
           cat ./we-run-this.sh
           echo "*******************************************"
           bash -x ./we-run-this.sh
-        
+
           echo "tests complete"
           echo "*******************************************"
           echo "::endgroup::"
-
