@@ -215,9 +215,10 @@ def dynamically_quantize_per_channel(
 
     # quantize based on qmin/qmax/scales/zp
     # reference: https://www.internalfb.com/code/fbsource/[8edc275012b1]/fbcode/caffe2/torch/ao/quantization/fx/_decomposed.py?lines=63
-    x_div = x / scales.unsqueeze(-1)
-    x_round = torch.round(x_div)
-    x_zp = x_round + zero_points.unsqueeze(-1)
+    # x_div = x / scales.unsqueeze(-1)
+    # x_round = torch.round(x_div)
+    # x_zp = x_round + zero_points.unsqueeze(-1)
+    x_zp = torch.round(x/scales.unsqueeze(-1))+zero_points.unsqueeze(-1)
     quant = (
         torch.clamp(x_zp, quant_min, quant_max).to(target_dtype).view(x.shape[0], -1)
     )
