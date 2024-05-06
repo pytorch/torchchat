@@ -82,10 +82,6 @@ To build runner-et, run the following commands *from the torchchat root director
 Note: the above script will wipe ./et-build if present and re-install ExecuTorch to ./et-build, which can take a while.  If you already installed ExecuTorch, running the commands below will build the runner, without re-installing ExecuTorch from source:
 
 ```
-# Pull submodules (re2, abseil) for Tiktoken
-git submodule sync
-git submodule update --init
-
 export TORCHCHAT_ROOT=${PWD}
 cmake -S . -B ./cmake-out -G Ninja
 cmake --build ./cmake-out --target et_run
