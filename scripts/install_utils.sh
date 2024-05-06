@@ -25,12 +25,9 @@ clone_executorch() {
   rm -rf ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}
   mkdir -p ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
   pushd ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
-  git clone https://github.com/pytorch/executorch.git
+  git clone https://github.com/pytorch/executorch.git --recurse-submodules --shallow-submodules
   cd executorch
   git checkout $(cat ${TORCHCHAT_ROOT}/.pins/et-pin.txt)
-  echo "Install executorch: submodule update"
-  git submodule sync
-  git submodule update --init
 
   popd
 }
