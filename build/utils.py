@@ -227,8 +227,8 @@ def is_mps_available() -> bool:
     # out system says mps is available, but it's not on VMs
     # so let's set up some memry, and see if that work:
     try:
-        mps_tensor = torch.zero(1024, dtype=torch.float16, device="mps")
-    except:
+        mps_tensor = torch.zeros(1024, dtype=torch.float16, device="mps")
+    except RuntimeError:
         return False
 
     # MPS, is that you?
