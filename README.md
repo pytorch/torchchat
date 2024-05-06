@@ -40,6 +40,7 @@ torchchat is a small codebase showcasing the ability to run large language model
 ## Installation
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
+[skip default]: begin
 ```bash
 # get the code
 git clone https://github.com/pytorch/torchchat.git
@@ -48,7 +49,9 @@ cd torchchat
 # set up a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-
+```
+[skip default]: end
+```
 # install dependencies
 ./install_requirements.sh
 ```
@@ -63,6 +66,7 @@ python3 torchchat.py --help
 ### Download Weights
 Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace account.
 
+[prefix default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" 
 Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens).
 Log into huggingface:
 ```
@@ -76,28 +80,29 @@ HuggingFace.
 python3 torchchat.py download llama3
 ```
 
-*NOTE: This command may prompt you to request access to llama3 via HuggingFace, if you do not already have access. Simply follow the prompts and re-run the command when access is granted.*
+*NOTE: This command may prompt you to request access to llama3 via
+ HuggingFace, if you do not already have access. Simply follow the
+ prompts and re-run the command when access is granted.*
 
 View available models with:
 ```
 python3 torchchat.py list
 ```
 
-
 You can also remove downloaded models with the remove command:
-```
-python3 torchchat.py remove llama3
-```
+`python3 torchchat.py remove llama3`
 
 
 ## Running via PyTorch / Python
 [Follow the installation steps if you haven't](#installation)
 
 ### Chat
+[skip default]: begin
 ```bash
 # Llama 3 8B Instruct
 python3 torchchat.py chat llama3
 ```
+[skip default]: end
 
 For more information run `python3 torchchat.py chat --help`
 
@@ -108,15 +113,25 @@ python3 torchchat.py generate llama3 --prompt "write me a story about a boy and 
 
 For more information run `python3 torchchat.py generate --help`
 
+
 ### Browser
 
+[skip default]: begin
 ```
 python3 torchchat.py browser llama3
 ```
+[skip default]: end
 
-*Running on http://127.0.0.1:5000* should be printed out on the terminal. Click the link or go to [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to start interacting with it.
 
-Enter some text in the input box, then hit the enter key or click the “SEND” button. After a second or two, the text you entered together with the generated text will be displayed. Repeat to have a conversation.
+*Running on http://127.0.0.1:5000* should be printed out on the
+ terminal. Click the link or go to
+ [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to
+ start interacting with it.
+
+Enter some text in the input box, then hit the enter key or click the
+“SEND” button. After a second or two, the text you entered together
+with the generated text will be displayed. Repeat to have a
+conversation.
 
 
 
@@ -125,7 +140,10 @@ Enter some text in the input box, then hit the enter key or click the “SEND”
 ### AOTI (AOT Inductor)
 AOT compiles models before execution for faster inference
 
-The following example exports and executes the Llama3 8B Instruct model.  (The first command performs the actual export, the second command loads the exported model into the Python interface to enable users to test the exported model.)
+The following example exports and executes the Llama3 8B Instruct
+model.  The first command performs the actual export, the second
+command loads the exported model into the Python interface to enable
+users to test the exported model.
 
 ```
 # Compile
@@ -135,38 +153,52 @@ python3 torchchat.py export llama3 --output-dso-path exportedModels/llama3.so
 
 python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --prompt "Hello my name is"
 ```
-NOTE: If you're machine has cuda add this flag for performance `--quantize config/data/cuda.json`
+
+NOTE: If your machine has cuda add this flag for performance
+`--quantize config/data/cuda.json`
 
 ### Running native using our C++ Runner
 
-The end-to-end C++ [runner](runner/run.cpp) runs an `*.so` file exported in the previous step.
+The end-to-end C++ [runner](runner/run.cpp) runs an `*.so` file
+exported in the previous step.
 
 To build the runner binary on your Mac or Linux:
 ```bash
 scripts/build_native.sh aoti
 ```
 
+[skip default]: begin
 Execute
 ```bash
-cmake-out/aoti_run exportedModels/llama3.so -z .model-artifacts/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/aoti_run exportedModels/llama3.so -z ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time"
 ```
+[skip default]: end
 
 ## Mobile Execution
-ExecuTorch enables you to optimize your model for execution on a mobile or embedded device, but can also be used on desktop for testing.
+
+ExecuTorch enables you to optimize your model for execution on a
+mobile or embedded device, but can also be used on desktop for
+testing.
 
 ### Set Up Executorch
-Before running any commands in torchchat that require ExecuTorch, you must first install ExecuTorch.
 
-To install ExecuTorch, run the following commands *from the torchchat root directory*.
-This will download the ExecuTorch repo to ./et-build/src and install various ExecuTorch libraries to ./et-build/install.
+Before running any commands in torchchat that require ExecuTorch, you
+must first install ExecuTorch.
+
+To install ExecuTorch, run the following commands *from the torchchat
+root directory*.  This will download the ExecuTorch repo to
+./et-build/src and install various ExecuTorch libraries to
+./et-build/install.
 
 ```
-export TORCHCHAT_ROOT=$PWD
+export TORCHCHAT_ROOT=${PWD}
 ./scripts/install_et.sh
 ```
 
 ### Export for mobile
 The following example uses the Llama3 8B Instruct model.
+
+[comment default]: echo '{"embedding": {"bitwidth": 4, "groupsize" : 32}, "linear:a8w4dq": {"groupsize" : 32}}' >./config/data/mobile.json
 
 ```
 # Export
@@ -175,12 +207,21 @@ python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-p
 # Execute
 python3 torchchat.py generate llama3 --device cpu --pte-path llama3.pte --prompt "Hello my name is"
 ```
-NOTE: We use `--quantize config/data/mobile.json` to quantize the llama3 model to reduce model size and improve performance for on-device use cases.
 
-For more details on quantization and what settings to use for your use case visit our [Quanitization documentation](docs/quantization.md) or run `python3 torchchat.py export`
+NOTE: We use `--quantize config/data/mobile.json` to quantize the
+llama3 model to reduce model size and improve performance for
+on-device use cases.
+
+For more details on quantization and what settings to use for your use
+case visit our [Quanitization documentation](docs/quantization.md) or
+run `python3 torchchat.py export`
+
+[end default]: 
 
 ### Deploy and run on iOS
-The following assumes you've completed the steps for [Setting up Executorch](#set-up-executorch) and
+
+The following assumes you've completed the steps for [Setting up
+Executorch](#set-up-executorch) and
 
 Open the xcode project
 ```
@@ -188,7 +229,12 @@ open et-build/src/executorch/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj
 ```
 Then click the Play button to launch the app in Simulator.
 
-To run on a device, given that you already have it set up for development, you'll need to have a provisioning profile with the [`increased-memory-limit`](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_developer_kernel_increased-memory-limit) entitlement. Just change the app's bundle identifier to whatever matches your provisioning profile with the aforementioned capability enabled.
+To run on a device, given that you already have it set up for
+development, you'll need to have a provisioning profile with the
+[`increased-memory-limit`](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_developer_kernel_increased-memory-limit)
+entitlement. Just change the app's bundle identifier to whatever
+matches your provisioning profile with the aforementioned capability
+enabled.
 
 After the app launched successfully, copy an exported ExecuTorch model (`.pte`) and tokenizer (`.bin`) files to the iLLaMA folder.
 
@@ -208,9 +254,17 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
 
 
 
+MISSING. TBD.
+
+
 
 ### Eval
-Uses the lm_eval library to evaluate model accuracy on a variety of tasks. Defaults to wikitext and can be manually controlled using the tasks and limit args.
+
+Uses the lm_eval library to evaluate model accuracy on a variety of
+tasks. Defaults to wikitext and can be manually controlled using the
+tasks and limit args.
+
+See [Evaluation](docs/evaluation.md)
 
 For more information run `python3 torchchat.py eval --help`
 
@@ -221,7 +275,8 @@ Eager mode:
 python3 torchchat.py eval llama3 -d fp32 --limit 5
 ```
 
-To test the perplexity for a lowered or quantized model, pass it in the same way you would to generate:
+To test the perplexity for a lowered or quantized model, pass it in
+the same way you would to generate:
 
 ```
 python3 torchchat.py eval llama3 --pte-path llama3.pte --limit 5
@@ -230,7 +285,10 @@ python3 torchchat.py eval llama3 --pte-path llama3.pte --limit 5
 
 
 ## Models
-The following models are supported by torchchat and have associated aliases. Other models, including GGUF format, can be run by specifying a URL directly.
+
+The following models are supported by torchchat and have associated
+aliases. Other models, including GGUF format, can be run by specifying
+a URL directly.
 
 | Model | Mobile Friendly | Notes |
 |------------------|---|---------------------|
@@ -250,9 +308,12 @@ The following models are supported by torchchat and have associated aliases. Oth
 |[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories110M`.|
 |[openlm-research/open_llama_7b](https://huggingface.co/openlm-research/open_llama_7b)|✅|Best for `generate`. Alias to `open-llama`.|
 
-torchchat also supports loading of many models in the GGUF format. See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
+torchchat also supports loading of many models in the GGUF format. See
+the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF
+files.
 
-While we describe how to use torchchat using the popular llama3 model, you can perform the example commands with any of these models.
+While we describe how to use torchchat using the popular llama3 model,
+you can perform the example commands with any of these models.
 
 ## Troubleshooting
 
@@ -260,16 +321,47 @@ While we describe how to use torchchat using the popular llama3 model, you can p
 **CERTIFICATE_VERIFY_FAILED**
 Run `pip install --upgrade certifi`.
 
-**Access to model is restricted and you are not in the authorized list**
-Some models require an additional step to access. Follow the link provided in the error to get access.
+
+**Access to model is restricted and you are not in the authorized
+list** Some models require an additional step to access. Follow the
+link provided in the error to get access.
 
 ### Disclaimer
-The torchchat Repository Content is provided without any guarantees about performance or compatibility. In particular, torchchat makes available model architectures written in Python for PyTorch that may not perform in the same manner or meet the same standards as the original versions of those models. When using the torchchat Repository Content, including any model architectures, you are solely responsible for determining the appropriateness of using or redistributing the torchchat Repository Content and assume any risks associated with your use of the torchchat Repository Content or any models, outputs, or results, both alone and in combination with any other technologies. Additionally, you may have other legal obligations that govern your use of other content, such as the terms of service for third-party models, weights, data, or other technologies, and you are solely responsible for complying with all such obligations.
+The torchchat Repository Content is provided without any guarantees
+about performance or compatibility. In particular, torchchat makes
+available model architectures written in Python for PyTorch that may
+not perform in the same manner or meet the same standards as the
+original versions of those models. When using the torchchat Repository
+Content, including any model architectures, you are solely responsible
+for determining the appropriateness of using or redistributing the
+torchchat Repository Content and assume any risks associated with your
+use of the torchchat Repository Content or any models, outputs, or
+results, both alone and in combination with any other
+technologies. Additionally, you may have other legal obligations that
+govern your use of other content, such as the terms of service for
+third-party models, weights, data, or other technologies, and you are
+solely responsible for complying with all such obligations.
+
+
+### Disclaimer
+The torchchat Repository Content is provided without any guarantees about 
+performance or compatibility. In particular, torchchat makes available 
+model architectures written in Python for PyTorch that may not perform 
+in the same manner or meet the same standards as the original versions 
+of those models. When using the torchchat Repository Content, including 
+any model architectures, you are solely responsible for determining the 
+appropriateness of using or redistributing the torchchat Repository Content 
+and assume any risks associated with your use of the torchchat Repository Content 
+or any models, outputs, or results, both alone and in combination with 
+any other technologies. Additionally, you may have other legal obligations 
+that govern your use of other content, such as the terms of service for 
+third-party models, weights, data, or other technologies, and you are 
+solely responsible for complying with all such obligations.
 
 
 ## Acknowledgements
-Thank you to the [community](docs/ACKNOWLEDGEMENTS.md) for all the awesome libraries and tools
-you've built around local LLM inference.
+Thank you to the [community](docs/ACKNOWLEDGEMENTS.md) for all the
+awesome libraries and tools you've built around local LLM inference.
 
 * Georgi Gerganov and his [GGML](https://github.com/ggerganov/ggml)
   project shining a spotlight on community-based enablement and
@@ -303,6 +395,10 @@ you've built around local LLM inference.
 
 
 ## License
-torchchat is released under the [BSD 3 license](LICENSE). (Additional code in this
-distribution is covered by the MIT and Apache Open Source licenses.) However you may have other legal obligations
-that govern your use of content, such as the terms of service for third-party models.
+
+torchchat is released under the [BSD 3 license](LICENSE). (Additional
+code in this distribution is covered by the MIT and Apache Open Source
+licenses.) However you may have other legal obligations that govern
+your use of content, such as the terms of service for third-party
+models.
+

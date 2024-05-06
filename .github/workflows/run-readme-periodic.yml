@@ -1,0 +1,53 @@
+name: Run the README instructions periodically to ensure they work
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  push:
+    tags:
+      - ciflow/periodic/*
+  workflow_dispatch:
+
+jobs:
+  test-readme:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    secrets: inherit
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      secrets-env: "HF_TOKEN_PERIODIC"
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        # echo "::group::Install newer objcopy that supports --set-section-alignment"
+        # yum install -y  devtoolset-10-binutils
+        # export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        # echo "::endgroup::"
+
+        # echo "::group::get_llama"
+        # (
+        #     set +x
+        #     HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" bash .ci/scripts/download_llama.sh
+        # )
+        # echo "::endgroup::"
+
+        echo "::group::Create script"
+        python3 scripts/updown.py --file README.md > ./we-run-this.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./we-run-this.sh
+        echo "::endgroup::"
+
+        echo "::group::Run This"
+        echo "*******************************************"
+        cat ./we-run-this.sh
+        echo "*******************************************"
+        bash -x ./we-run-this.sh
+        
+        echo "tests complete"
+        echo "*******************************************"
+        echo "::endgroup::"
+

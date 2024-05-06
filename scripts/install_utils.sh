@@ -16,7 +16,7 @@ install_pip_dependencies() {
 }
 
 function find_cmake_prefix_path() {
-  path=`python -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())"`
+  path=`python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())"`
   MY_CMAKE_PREFIX_PATH=$path
 }
 
@@ -27,7 +27,7 @@ clone_executorch() {
   pushd ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
   git clone https://github.com/pytorch/executorch.git
   cd executorch
-  git checkout "viable/strict"
+  git checkout $(cat ${TORCHCHAT_ROOT}/.pins/et-pin.txt)
   echo "Install executorch: submodule update"
   git submodule sync
   git submodule update --init
@@ -60,26 +60,26 @@ COMMON_CMAKE_ARGS="\
     -DCMAKE_BUILD_TYPE=Release \
     -DEXECUTORCH_ENABLE_LOGGING=ON \
     -DEXECUTORCH_LOG_LEVEL=Info \
-    -DEXECUTORCH_BUILD_OPTIMIZED=ON \
+    -DEXECUTORCH_BUILD_KERNELS_OPTIMIZED=ON \
     -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON \
     -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON \
-    -DEXECUTORCH_BUILD_QUANTIZED=ON"
+    -DEXECUTORCH_BUILD_KERNELS_QUANTIZED=ON"
 
 install_executorch() {
   # AOT lib has to be build for model export
   # So by default it is built, and you can explicitly opt-out
-  EXECUTORCH_BUILD_CUSTOM_OPS_AOT_VAR=OFF
-  if [ "${EXECUTORCH_BUILD_CUSTOM_OPS_AOT}" == "" ]; then
-    EXECUTORCH_BUILD_CUSTOM_OPS_AOT_VAR=ON
+  EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT_VAR=OFF
+  if [ "${EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT}" == "" ]; then
+    EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT_VAR=ON
   fi
 
   # but for runner not
-  EXECUTORCH_BUILD_CUSTOM_VAR=OFF
-  if [ ! ["${EXECUTORCH_BUILD_CUSTOM}" == ""] ]; then
-    EXECUTORCH_BUILD_CUSTOM_VAR=ON
+  EXECUTORCH_BUILD_KERNELS_CUSTOM_VAR=OFF
+  if [ ! ["${EXECUTORCH_BUILD_KERNELS_CUSTOM}" == ""] ]; then
+    EXECUTORCH_BUILD_KERNELS_CUSTOM_VAR=ON
   fi
-  echo "${EXECUTORCH_BUILD_CUSTOM_OPS_AOT_VAR}"
-  echo "${EXECUTORCH_BUILD_CUSTOM_VAR}"
+  echo "${EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT_VAR}"
+  echo "${EXECUTORCH_BUILD_KERNELS_CUSTOM_VAR}"
   if [ ! -d "${TORCHCHAT_ROOT}/${ET_BUILD_DIR}" ]; then
     echo "Directory ${TORCHCHAT_ROOT}/${ET_BUILD_DIR} does not exist."
     echo "Make sure you run clone_executorch"
@@ -103,8 +103,8 @@ install_executorch() {
   mkdir ${CMAKE_OUT_DIR}
   cmake ${COMMON_CMAKE_ARGS} \
         -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
-        -DEXECUTORCH_BUILD_CUSTOM_OPS_AOT=${EXECUTORCH_BUILD_CUSTOM_OPS_AOT_VAR} \
-        -DEXECUTORCH_BUILD_CUSTOM=${EXECUTORCH_BUILD_CUSTOM_VAR} \
+        -DEXECUTORCH_BUILD_KERNELS_CUSTOM_AOT=${EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT_VAR} \
+        -DEXECUTORCH_BUILD_KERNELS_CUSTOM=${EXECUTORCH_BUILD_KERNELS_CUSTOM_VAR} \
         -DEXECUTORCH_BUILD_XNNPACK=ON \
         ${CROSS_COMPILE_ARGS} \
         -S . -B ${CMAKE_OUT_DIR} -G Ninja
