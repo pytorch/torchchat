@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import json
+import logging
 import os
 from pathlib import Path
 
@@ -12,6 +13,13 @@ import torch
 
 from build.utils import allowable_dtype_names, allowable_params_table, get_device_str
 from download import download_and_convert, is_model_downloaded
+
+FORMAT = (
+    "%(levelname)s: %(asctime)-15s: %(filename)s: %(funcName)s: %(module)s: %(message)s"
+)
+logging.basicConfig(filename="/tmp/torchchat.log", level=logging.INFO, format=FORMAT)
+logger = logging.getLogger(__name__)
+
 
 default_device = "fast"
 default_model_dir = Path(
@@ -312,9 +320,15 @@ def arg_init(args):
 
     # if we specify dtype in quantization recipe, replicate it as args.dtype
     args.dtype = args.quantize.get("precision", {}).get("dtype", args.dtype)
-    args.device = get_device_str(
-        args.quantize.get("executor", {}).get("accelerator", args.device)
-    )
+
+    if args.output_pte_path:
+        if args.device not in ["cpu", "fast"]:
+            raise RuntimeError("Device not supported by ExecuTorch")
+        args.device = "cpu"
+    else:
+        args.device = get_device_str(
+            args.quantize.get("executor", {}).get("accelerator", args.device)
+        )
 
     if hasattr(args, "seed") and args.seed:
         torch.manual_seed(args.seed)

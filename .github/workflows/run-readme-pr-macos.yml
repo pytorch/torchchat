@@ -1,0 +1,57 @@
+name: Run the README instructions - with stories - on MacOS 
+on:  
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  test-readme-macos:
+    runs-on: macos-14-xlarge
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.11'
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
+      - name: Run script
+        run: |
+          set -x
+          # NS: Remove previous installation  of torch first
+          # as this script does not isntall anything into conda env but rather as system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
+  
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+          echo "::endgroup::"
+  
+          # echo "::group::Install newer objcopy that supports --set-section-alignment"
+          # yum install -y  devtoolset-10-binutils
+          # export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+          # echo "::endgroup::"
+  
+          echo "::group::Create script"
+          python3 scripts/updown.py --file README.md --replace llama3:stories15M --suppress huggingface-cli,HF_TOKEN > ./we-run-this.sh
+            # for good measure, if something happened to updown processor,
+          # and it did not error out, fail with an exit 1
+          echo "exit 1" >> ./we-run-this.sh
+          echo "::endgroup::"
+
+          echo "::group::Run This"
+          echo "*******************************************"
+          cat ./we-run-this.sh
+          echo "*******************************************"
+          bash -x ./we-run-this.sh
+        
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"
+
