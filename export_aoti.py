@@ -25,6 +25,10 @@ def export_model(model: nn.Module, device, output_path, args=None):
     dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
 
     model.to(device)
+
+    from export_aoti_util import replace_linear_with_custom_linear # NOCOMMIT
+    replace_linear_with_custom_linear(model) # NOCOMMIT
+
     so = torch._export.aot_compile(
         model,
         args=input,
