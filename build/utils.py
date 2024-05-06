@@ -222,6 +222,7 @@ def state_dict_device(d, device="cpu") -> Dict:
 
 def is_mps_available() -> bool:
     if not torch.backends.mps.is_available():
+        print("torch.backends.mps.is_available")
         return False
 
     # out system says mps is available, but it's not on VMs
@@ -229,6 +230,7 @@ def is_mps_available() -> bool:
     try:
         mps_tensor = torch.zero(1024, dtype=torch.float16, device="mps")
     except:
+        print("allocate failed")
         return False
 
     # MPS, is that you?
@@ -237,11 +239,12 @@ def is_mps_available() -> bool:
 
 def get_device_str(device) -> str:
     if isinstance(device, str) and device == "fast":
-        return (
+        device = (
             "cuda"
             if torch.cuda.is_available()
             else "mps" if is_mps_available() else "cpu"
         )
+        return device
     else:
         return str(device)
 
