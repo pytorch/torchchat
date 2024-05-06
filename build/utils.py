@@ -228,7 +228,7 @@ def is_mps_available() -> bool:
     # so let's set up some memry, and see if that work:
     try:
         mps_tensor = torch.zeros(1024, dtype=torch.float16, device="mps")
-    except:
+    except RuntimeError:
         return False
 
     # MPS, is that you?
