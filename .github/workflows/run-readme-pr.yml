@@ -26,7 +26,7 @@ jobs:
         # echo "::endgroup::"
 
         echo "::group::Create script"
-        python3 scripts/updown.py --file README.md --replace llama3:stories15M --suppress huggingface-cli,HF_TOKEN > ./we-run-this.sh
+        python3 scripts/updown.py --file README.md --replace llama3:stories15M,meta-llama/Meta-Llama-3-8B-Instruct:stories15M  --suppress huggingface-cli,HF_TOKEN > ./we-run-this.sh
         # for good measure, if something happened to updown processor,
         # and it did not error out, fail with an exit 1
         echo "exit 1" >> ./we-run-this.sh

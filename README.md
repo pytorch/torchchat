@@ -167,12 +167,10 @@ To build the runner binary on your Mac or Linux:
 scripts/build_native.sh aoti
 ```
 
-[skip default]: begin
 Execute
 ```bash
 cmake-out/aoti_run exportedModels/llama3.so -z ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time"
 ```
-[skip default]: end
 
 ## Mobile Execution
 
