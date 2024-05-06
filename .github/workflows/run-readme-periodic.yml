@@ -77,6 +77,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Completion"
+
         echo "tests complete"
         echo "*******************************************"
         echo "::endgroup::"
+

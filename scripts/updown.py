@@ -240,6 +240,7 @@ def updown_processor(
                 replace_list=replace_list,
                 suppress_list=suppress_list,
             )
+
     output(
         "echo 'reached end of file without exit command'\nexit 1;",
         suppress_list=None,
