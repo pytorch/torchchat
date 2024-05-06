@@ -237,11 +237,12 @@ def is_mps_available() -> bool:
 
 def get_device_str(device) -> str:
     if isinstance(device, str) and device == "fast":
-        return (
+        device = (
             "cuda"
             if torch.cuda.is_available()
             else "mps" if is_mps_available() else "cpu"
         )
+        return device
     else:
         return str(device)
 

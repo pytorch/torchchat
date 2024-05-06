@@ -6,8 +6,6 @@ import torch.nn.functional as F
 
 from build.utils import find_multiple, get_precision, use_et_backend
 
-# from torch.nn.parameter import Parameter
-
 
 def linear_int8_aoti(input, weight, scales):
     n_groups = scales.numel() // scales.shape[0]
