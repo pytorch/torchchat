@@ -3,6 +3,7 @@ import os
 import re
 
 
+
 ###############################################################################################
 ###
 ### print, with the ability to replace strings, or suppress lines
@@ -182,7 +183,8 @@ def process_command(
 
 def updown_processor(
     filename, predicate_list, replace_list, suppress_list, expand_options
-):
+)
+
     """
     Processes a file based on the given predicates, replacements, and suppressions.
     Args:
@@ -224,6 +226,7 @@ def updown_processor(
                 replace_list=replace_list,
                 suppress_list=suppress_list,
             )
+            
     output(
         "echo 'reached end of file without exit command'\nexit 1;",
         suppress_list=None,
