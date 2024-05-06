@@ -49,12 +49,12 @@ cd torchchat
 # set up a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-```
-[skip default]: end
-```
+
 # install dependencies
 ./install_requirements.sh
 ```
+[skip default]: end
+[shell default]: ./install_requirements.sh
 
 Installations can be tested by
 
@@ -167,12 +167,10 @@ To build the runner binary on your Mac or Linux:
 scripts/build_native.sh aoti
 ```
 
-[skip default]: begin
 Execute
 ```bash
 cmake-out/aoti_run exportedModels/llama3.so -z ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time"
 ```
-[skip default]: end
 
 ## Mobile Execution
 
