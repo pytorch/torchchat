@@ -332,7 +332,7 @@ def arg_init(args):
 
     if "mps" in args.device:
         if args.compile or args.compile_prefill:
-            print("Warning: compilation is not available with device MPS, ignoring option to engage compilation"
+            print("Warning: compilation is not available with device MPS, ignoring option to engage compilation")
             args.compile = False
             args.compile_prefill = False
             
