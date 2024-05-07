@@ -295,7 +295,7 @@ def _add_arguments_common(parser):
         "--model-directory",
         type=Path,
         default=default_model_dir,
-        help="The directory to store downloaded model artifacts",
+        help=f"The directory to store downloaded model artifacts. Default: {default_model_dir}",
     )
     parser.add_argument(
         "--port",
