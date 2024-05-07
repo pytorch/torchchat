@@ -330,6 +330,12 @@ def arg_init(args):
             args.quantize.get("executor", {}).get("accelerator", args.device)
         )
 
+    if "mps" in args.device:
+        if args.compile or args.compile_prefill:
+            print("Warning: compilation is not available with device MPS, ignoring option to engage compilation"
+            args.compile = False
+            args.compile_prefill = False
+            
     if hasattr(args, "seed") and args.seed:
         torch.manual_seed(args.seed)
     return args
