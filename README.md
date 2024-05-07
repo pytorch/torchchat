@@ -216,7 +216,7 @@ For more details on quantization and what settings to use for your use
 case visit our [Quanitization documentation](docs/quantization.md) or
 run `python3 torchchat.py export`
 
-[end default]:
+[end default]: end
 
 ### Deploy and run on iOS
 
