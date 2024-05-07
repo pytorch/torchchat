@@ -318,7 +318,7 @@ you can perform the example commands with any of these models.
 
 ## Design Principles
 
-torchtune embodies PyTorch’s design philosophy [[details](https://pytorch.org/docs/stable/community/design.html)], especially "usability over everything else".
+torchchat embodies PyTorch’s design philosophy [[details](https://pytorch.org/docs/stable/community/design.html)], especially "usability over everything else".
 
 ### Native PyTorch
 
