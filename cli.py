@@ -287,7 +287,7 @@ def _add_arguments_common(parser):
     )
     parser.add_argument(
         "--hf-token",
-        type=tstr,
+        type=str,
         default=None,
         help="A HuggingFace API token to use when downloading model artifacts",
     )
