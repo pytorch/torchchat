@@ -170,7 +170,7 @@ class CustomHandler(QuantHandler):
     def quantized_model(self) -> nn.Module:
         self.model_ = self.model_.to(device=self.device)
 
-        from _custom_linear import _replace_linear_with_custom_linear
+        from _custom_linear._custom_linear import _replace_linear_with_custom_linear
         _replace_linear_with_custom_linear(self.model_)
         return self.model_
 
