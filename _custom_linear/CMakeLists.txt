@@ -5,6 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package(Torch REQUIRED)
 
-# Define our library target
 add_library(custom_linear SHARED custom_linear.cpp)
-target_link_libraries(custom_linear "${TORCH_LIBRARIES}")
+target_include_directories(custom_linear PRIVATE "${TORCHCHAT_ROOT}/..")
+target_link_libraries(custom_linear PRIVATE "${TORCH_LIBRARIES}")
