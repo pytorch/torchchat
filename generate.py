@@ -5,12 +5,13 @@
 # LICENSE file in the root directory of this source tree.
 import argparse
 import itertools
+
 import logging
 import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple, List
 
 import torch
 import torch._dynamo.config
@@ -24,11 +25,12 @@ from build.builder import (
 )
 from build.model import Transformer
 from build.utils import device_sync, set_precision
-from cli import add_arguments_for_generate, arg_init, check_args, logger
+from cli import add_arguments, add_arguments_for_generate, arg_init, check_args
+
+logger = logging.getLogger(__name__)
 
 B_INST, E_INST = "[INST]", "[/INST]"
 B_SYS, E_SYS = "<<SYS>>", "<</SYS>>"
-
 
 class ChatFormat:
     def __init__(self, tokenizer):
@@ -60,6 +62,7 @@ class ChatFormat:
         return tokens
 
 
+
 @dataclass
 class GeneratorArgs:
     prompt: str = "torchchat is pronounced torch-chat and is so cool because"
@@ -73,7 +76,7 @@ class GeneratorArgs:
     compile: bool = False
     compile_prefill: bool = False
     speculate_k: int = 5
-    sequential_prefill: bool = False
+    sequential_prefill: bool = True
 
     def __post_init__(self):
         if self.compile_prefill and self.sequential_prefill:
@@ -100,11 +103,7 @@ class GeneratorArgs:
             )
 
     @classmethod
-    def from_args(cls, args):
-        sequential_prefill = (
-            args.sequential_prefill or bool(args.dso_path) or bool(args.pte_path)
-        )
-
+    def from_args(cls, args):  # -> GeneratorArgs:
         return cls(
             prompt=args.prompt,
             encoded_prompt=None,
@@ -117,7 +116,7 @@ class GeneratorArgs:
             compile=args.compile,
             compile_prefill=args.compile_prefill,
             speculate_k=args.speculate_k,
-            sequential_prefill=sequential_prefill,
+            sequential_prefill=not args.parallel_prefill,
         )
 
 
@@ -153,7 +152,8 @@ def sample(
     logits, need_probs: bool, temperature: float = 1.0, top_k: Optional[int] = None
 ):
     if temperature == 0 and not need_probs:
-        _, idx_next = torch.topk(logits[0, -1], k=1, dim=-1)
+        _, idx_next = torch.topk(logits, k=1, dim=-1)
+        idx_next = idx_next.squeeze(dim=(0, 1))
         return (idx_next, None)
     probs = logits_to_probs(logits[0, -1], temperature, top_k)
     idx_next = multinomial_sample_one_no_sync(probs)
@@ -168,21 +168,19 @@ def prefill(
     sequential_prefill=True,
     **sampling_kwargs,
 ) -> torch.Tensor:
-    # logging.debug(f"x: {x}, input_pos: {input_pos}")
+    logging.debug(f"x: {x}, input_pos: {input_pos}")
     width = x.size(1)
     assert input_pos.size(0) == width
 
     if sequential_prefill:
         for i in range(width):
             x_sliced, ip_sliced = x[:, i].view(-1, 1), input_pos[i].view(-1)
-            # logging.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
+            logging.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
             logits = model(x_sliced, ip_sliced)  # (x[:, i], input_pos[i])
     else:
         # input_pos: [B, S]
         logits = model(x, input_pos)
-        # print(f"logits {logits.shape}")
 
-    # print(f"x: {x},\n  input_pos: {input_pos}\n")
     return sample(logits, need_probs=False, **sampling_kwargs)[0]
 
 
@@ -196,7 +194,6 @@ def decode_one_token(
     # input_pos: [B, 1]
     assert input_pos.shape[-1] == 1
     logits = model(x, input_pos)
-    # print(f"x: {x},\n  input_pos: {input_pos}\n")
     return sample(logits, need_probs=need_probs, **sampling_kwargs)
 
 
@@ -213,17 +210,11 @@ def decode_n_tokens(
 ):
     new_tokens, new_probs = [], []
     encountered_eos = False
-    for _i in range(
-        num_new_tokens - 1
-    ):  # -1 to save space to run an EoS if dont generate it naturally
+    for i in range(num_new_tokens - 1): # -1 to save space to run an EoS if dont generate it naturally
         # Actually better for Inductor to codegen attention here
         with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]):
             next_token, next_prob = decode_one_token(
-                model,
-                cur_token.clone(),
-                input_pos,
-                need_probs=need_probs,
-                **sampling_kwargs,
+                model, cur_token.clone(), input_pos, need_probs=need_probs, **sampling_kwargs
             )
             input_pos += 1
             new_tokens.append(next_token.clone())
@@ -232,25 +223,15 @@ def decode_n_tokens(
                 new_probs.append(next_prob.clone())
             cur_token = next_token.view(1, -1)
             # encountered eos
-            if next_token.item() == eos_token_id or (
-                eot_id is not None and next_token.item() == eot_id
-            ):
+            if (next_token.item() == eos_token_id or (eot_id is not None and next_token.item() == eot_id)):
                 encountered_eos = True
-                _, _ = decode_one_token(
-                    model, cur_token, input_pos, need_probs, **sampling_kwargs
-                )
+                _, _ = decode_one_token(model, cur_token, input_pos, need_probs, **sampling_kwargs)
                 input_pos += 1
                 break
     if not encountered_eos:
-        eos_token = torch.tensor(
-            [eos_token_id if eot_id is None else eot_id],
-            dtype=cur_token.dtype,
-            device=cur_token.device,
-        )
+        eos_token = torch.tensor([eos_token_id if eot_id is None else eot_id], dtype=cur_token.dtype, device=cur_token.device)
         new_tokens.append(eos_token.clone())
-        _, _ = decode_one_token(
-            model, eos_token.view(1, -1), input_pos, need_probs, **sampling_kwargs
-        )
+        _, _ = decode_one_token(model, eos_token.view(1, -1), input_pos, need_probs, **sampling_kwargs)
         input_pos += 1
 
     return new_tokens, new_probs
@@ -345,8 +326,7 @@ def generate(
     is_speculative = draft_model is not None
     device, dtype = prompt.device, prompt.dtype
 
-    # create an empty tensor of the expected final shape and
-    # fill in the current tokens
+    # create an empty tensor of the expected final shape and fill in the current tokens
     T = prompt.size(0)
     max_new_tokens = min(max_new_tokens, max_seq_length - start_pos - T)
     T_new = T + max_new_tokens
@@ -356,12 +336,9 @@ def generate(
         with torch.device(device):
             model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
             if is_speculative and draft_model is not model:
-                draft_model.setup_caches(
-                    max_batch_size=1, max_seq_length=max_seq_length
-                )
+                draft_model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
 
-    # create an empty tensor of the expected final shape and
-    # fill in the current tokens
+    # create an empty tensor of the expected final shape and fill in the current tokens
     empty = torch.empty(T_new, dtype=dtype, device=device)
     empty[:T] = prompt
     seq = empty
@@ -382,15 +359,12 @@ def generate(
             sequential_prefill=sequential_prefill,
             **sampling_kwargs,
         )
-    # print(f"sizes: {T} {seq[T].shape} {seq.shape} {next_token.shape}")
     seq[T] = next_token
     callback(next_token.clone().view(-1))
 
     num_tokens_generated = 0
     input_pos = torch.tensor([start_pos + T], device=device, dtype=torch.int)
-    accept_counts = [0] * (
-        speculate_k + 1
-    )  # creates array of [0, 0, 0, ...] that is speculate_k + 1 long
+    accept_counts = [0] * (speculate_k + 1) # creates array of [0, 0, 0, ...] that is speculate_k + 1 long
 
     if is_speculative:
         input_pos = input_pos.item()  # for speculative decoding easier to keep on host
@@ -416,14 +390,12 @@ def generate(
             max_new_tokens - 1,
             callback=callback,
             need_probs=False,
-            eos_token_id=tokenizer.eos_id() if tokenizer else 2,
-            eot_id=tokenizer.special_tokens["<|eot_id|>"] if is_llama3_model else None,
+            eos_token_id = tokenizer.eos_id() if tokenizer else 2,
+            eot_id = tokenizer.special_tokens["<|eot_id|>"] if is_llama3_model else None,
             **sampling_kwargs,
         )
         seq[T + 1 : T + 1 + len(generated_tokens)] = torch.cat(generated_tokens)
-        seq = seq[
-            : T + 1 + len(generated_tokens)
-        ]  # If we dont generate all the way to max_new_tokens slice off the extra space we allocated.
+        seq = seq[:T + 1 + len(generated_tokens)] # If we dont generate all the way to max_new_tokens slice off the extra space we allocated.
 
     generate_stats = {"accept_counts": accept_counts}
     return seq, generate_stats
@@ -434,6 +406,7 @@ def encode_tokens(tokenizer, string, bos=True, device="cpu"):
     if bos:
         tokens = [tokenizer.bos_id()] + tokens
     return torch.tensor(tokens, dtype=torch.int, device=device)
+
 
 
 def get_device_info(name: str) -> str:
@@ -458,23 +431,6 @@ def get_device_info(name: str) -> str:
     if name == "cuda":
         return torch.cuda.get_device_name(0)
     return ""
-
-
-def _callback(x, buffer, period_id, done_generating, tokenizer, is_llama3_model):
-    if done_generating:
-        return
-    buffer.append(
-        tokenizer.decode([period_id] + x.tolist())[1:]
-    )  # I think this results in the first output token being dropped from the display which is wrong.
-    if x.item() == tokenizer.eos_id():
-        done_generating = True
-    if is_llama3_model and x.item() == tokenizer.special_tokens["<|eot_id|>"]:
-        done_generating = True
-        buffer = buffer[:-1]  # drop the eot_id from the output buffer
-    if len(buffer) == 4 or done_generating:
-        print("".join(buffer), end="", flush=True)
-        buffer.clear()
-    # print(, end='', flush=True)
 
 
 def _main(
@@ -505,6 +461,8 @@ def _main(
     is_speculative = speculative_builder_args.checkpoint_path is not None
 
     if generator_args.chat_mode and not builder_args.is_chat_model:
+        # This is not a log message, it's a dangerous condition message
+        # that we must ensure is displayed
         print(
             """
 *******************************************************
@@ -519,19 +477,17 @@ def _main(
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
 
-    # Right now the assumption is only llama3 uses tiktokenizer and it
-    # must use tiktokenizer.
-    # Piggy backing off of this flag then for now to identify llama3
-    # without prompting user.
+    # Right now the assumption is only llama3 uses tiktokenizer and it must use tiktokenizer.
+    # Piggy backing off of this flag then for now to identify llama3 without prompting user.
     is_llama3_model = tokenizer_args.is_tiktoken
     if generator_args.chat_mode and is_llama3_model:
-        logging.debug(
-            "Llama3 model detected in chat mode. Using updated sentence schemas"
-        )
+        logging.debug("Llama3 model detected in chat mode. Using updated sentence schemas")
 
     builder_args.setup_caches = False
     model = _initialize_model(builder_args, quantize, tokenizer)
 
+    # will add a version of _initialize_model in future
+    # (need additional args)
     if is_speculative:
         draft_model = _initialize_model(
             speculative_builder_args,
@@ -577,32 +533,26 @@ def _main(
             decode_one_token, mode="reduce-overhead", fullgraph=True
         )
 
+        # Uncomment to squeeze more perf out of prefill
         if generator_args.compile_prefill:
             prefill = torch.compile(prefill, fullgraph=True, dynamic=True)
 
-    system_prompt = None
+    system_prompt=None
     # Set up our max_seq_length
     if generator_args.chat_mode:
-        max_seq_length = model.config.max_seq_length
-        print(
-            f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye"
-        )
-        get_system_prompt = input(
-            "Do you want to enter a system prompt? Enter y for yes and anything else for no. \n"
-        )
-        if get_system_prompt == "y" or get_system_prompt == "Y":
+        max_seq_length = 2048
+        print(f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye")
+        get_system_prompt = input("Do you want to enter a system prompt? Enter y for yes and anything else for no. \n")
+        if (get_system_prompt == "y" or get_system_prompt == "Y"):
             system_prompt = input("What is your system prompt? \n")
         if is_llama3_model:
             chat_formatter = ChatFormat(tokenizer)
     else:
-        max_seq_length = min(
-            encoded.size(0) + generator_args.max_new_tokens, model.config.block_size
-        )
+        max_seq_length = min(encoded.size(0) + generator_args.max_new_tokens, model.config.block_size)
+
 
     max_seq_length = (
-        max_seq_length + speculative_builder_args.speculate_k + 1
-        if draft_model is not None
-        else max_seq_length
+        max_seq_length + speculate_k + 1 if draft_model is not None else max_seq_length
     )
 
     aggregate_metrics = {
@@ -612,26 +562,20 @@ def _main(
     start = -1 if generator_args.compile else 0
     start_pos = 0
 
-    # arbitrarily large number as chat mode goes until max_seq length
-    # or user exits
+
+    # arbitrarily large number as chat mode goes until max_seq length or user exits
     num_samples = generator_args.num_samples if not generator_args.chat_mode else 100000
-    i = (
-        -1
-    )  # long loop and Im scared someone will add a continue in it, so start at -1 and increment at the start
-    while i < num_samples:
-        i += 1
+    for i in range(num_samples):
         device_sync(device=builder_args.device)
         if i >= 0 and generator_args.chat_mode:
-            prompt = input("User: ")
-            if prompt == "/bye":
+            prompt = input("What is your prompt? \n")
+            if (prompt == "/bye"):
                 print("Exiting Chat.\n")
                 break
             if not is_llama3_model:
-                if system_prompt:
-                    prompt = f"{B_INST} {B_SYS}\n{system_prompt.strip()}\n{E_SYS}\n\n{prompt.strip()} {E_INST}"
-                    system_prompt = (
-                        None  # can only provide system prompt on first interaction
-                    )
+                if system_prompt is not None:
+                    prompt = f"{B_INST} {B_SYS}\n{system_prompt.strip()}\n{E_SYS}\n\n{prompt.strip} {E_INST}"
+                    system_prompt = None # can only provide system prompt on first interaction
                 else:
                     prompt = f"{B_INST} {prompt.strip()} {E_INST}"
                 encoded = encode_tokens(
@@ -639,67 +583,43 @@ def _main(
                 )
             else:
                 if system_prompt is not None:
-                    encoded = chat_formatter.encode_dialog_prompt(
-                        [
-                            {"role": "system", "content": system_prompt},
-                            {"role": "user", "content": prompt},
-                        ]
-                    )
+                    encoded = chat_formatter.encode_dialog_prompt([{"role" : "system", "content" : system_prompt}, {"role" : "user", "content" : prompt}])
                     system_prompt = None
-                elif i == 0:
-                    encoded = chat_formatter.encode_dialog_prompt(
-                        [{"role": "user", "content": prompt}]
-                    )
+                elif(i == 0):
+                    encoded = chat_formatter.encode_dialog_prompt([{"role" : "user", "content" : prompt}])
                 else:
-                    encoded = chat_formatter.encode_message(
-                        {"role": "user", "content": prompt}
-                    )
-                    encoded.extend(
-                        chat_formatter.encode_header(
-                            {"role": "assistant", "content": ""}
-                        )
-                    )
-                encoded = torch.tensor(
-                    encoded, dtype=torch.int, device=builder_args.device
-                )
-            if encoded.size(0) + start_pos > max_seq_length:
-                print(
-                    "This prompt would take us past the max_seq_length. Ending Conversation."
-                )
+                    encoded = chat_formatter.encode_message({"role" : "user", "content" : prompt})
+                    encoded.extend(chat_formatter.encode_header({"role": "assistant", "content": ""}))
+                encoded = torch.tensor(encoded, dtype=torch.int, device=builder_args.device)
+            if (encoded.size(0) + start_pos > max_seq_length):
+                print("This prompt would take us past the max_seq_length. Ending Conversation.")
                 break
 
         if generator_args.chat_mode and i >= 0:
-            print("Model: ", end="")
-
             buffer = []
             period_id = tokenizer.encode(".")[0]
             done_generating = False
 
-            def callback(x):
-                return _callback(
-                    x,
-                    buffer=buffer,
-                    period_id=period_id,
-                    done_generating=done_generating,
-                    tokenizer=tokenizer,
-                    is_llama3_model=is_llama3_model,
-                )
+            def callback(
+                x, buffer=buffer, period_id=period_id, done_generating=done_generating
+            ):
+                if done_generating:
+                    return
+                buffer.append(tokenizer.decode([period_id] + x.tolist())[1:]) # I think this results in the first output token being dropped from the display which is wrong.
+                if x.item() == tokenizer.eos_id():
+                    done_generating = True
+                if (is_llama3_model and x.item() == tokenizer.special_tokens["<|eot_id|>"]):
+                    done_generating = True
+                    buffer = buffer[:-1] # drop the eot_id from the output buffer
+                if len(buffer) == 4 or done_generating:
+                    print("".join(buffer), end="", flush=True)
+                    buffer.clear()
+                # print(, end='', flush=True)
 
         else:
-            assert not generator_args.chat_mode
-            buffer = [generator_args.prompt]
-            period_id = tokenizer.encode(".")[0]
-            done_generating = False
 
             def callback(x):
-                return _callback(
-                    x,
-                    buffer=buffer,
-                    period_id=period_id,
-                    done_generating=done_generating,
-                    tokenizer=tokenizer,
-                    is_llama3_model=is_llama3_model,
-                )
+                return x
 
         t0 = time.perf_counter()
         import contextlib
@@ -741,38 +661,35 @@ def _main(
         device_sync(device=builder_args.device)
         t = time.perf_counter() - t0
 
-        print()
-
+        if not generator_args.chat_mode:
+            print(tokenizer.decode(y.tolist()))
+        else:
+            print()
         tokens_generated = y.size(0) - prompt_length
         tokens_sec = tokens_generated / t
         aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-        print(
+        logging.info(
             f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_sec:.02f} tokens/sec"
         )
-        print(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
+        logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
 
-        if start_pos >= max_seq_length:
-            print(f"[Max Sequence Length Reached. Ending Conversation.]")
-            print(f"---------------------------------------------------")
-            if generator_args.chat_mode:
-                break
+        if (start_pos >= max_seq_length):
+            print("Max Sequence Length Reached. Ending Conversation.")
+            break
 
-        if not generator_args.chat_mode:
-            start_pos = 0
-
-    print("\n========================================\n")
+    print("==========")
     if is_speculative:
         counts_aggregated = [sum(i) for i in zip(*aggregate_metrics["accept_counts"])]
         acceptance_probs = [i / sum(counts_aggregated) for i in counts_aggregated]
-        print(f"Acceptance probs: {acceptance_probs}")
-        print(
+        logging.info(f"Acceptance probs: {acceptance_probs}")
+        logging.info(
             f"Mean Accepted: {sum([idx * i for idx, i in enumerate(counts_aggregated)])/sum(counts_aggregated)}"
         )
 
-    print(
+    logging.info(
         f"Average tokens/sec: {torch.mean(torch.tensor(aggregate_metrics['tokens_per_sec'])).item():.2f}"
     )
-    print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
+    logging.info(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
 
 def main(args):
@@ -794,6 +711,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="torchchat generate CLI")
+    add_arguments(parser)
     add_arguments_for_generate(parser)
     args = parser.parse_args()
     check_args(args, "generate")
