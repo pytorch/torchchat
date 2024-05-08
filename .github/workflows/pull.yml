@@ -915,9 +915,8 @@ jobs:
       - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
         continue-on-error: true
         run: |
-          echo "Intalling ExecuTorch"
-          export TORCHCHAT_ROOT=${PWD}
-          bash scripts/install_et.sh
+          echo "Installing ExecuTorch"
+          bash scripts/build_native.sh et
       - name: Install ET pip
         run: |
           echo "ET build directory"
