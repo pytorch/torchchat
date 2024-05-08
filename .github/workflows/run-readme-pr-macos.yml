@@ -58,7 +58,7 @@ jobs:
           echo "::endgroup::"
 
 
-  test-readme-macos:
+  test-quantization-macos:
     runs-on: macos-14-xlarge 
     steps:
       - name: Checkout code

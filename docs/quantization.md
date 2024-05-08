@@ -118,9 +118,9 @@ python3 generate.py [--compile] llama3 --prompt "Hello, my name is" --quantize '
 ```
 ### AOTI
 ```
-python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:int4": {"groupsize" : 256}}' --output-dso-path llama3.dso
+python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:int4": {"groupsize" : 256}}' --output-dso-path llama3.so
 
-python3 generate.py llama3 --dso-path llama3.dso  --prompt "Hello my name is"
+python3 generate.py llama3 --dso-path llama3.so  --prompt "Hello my name is"
 ```
 ### ExecuTorch
 ```
