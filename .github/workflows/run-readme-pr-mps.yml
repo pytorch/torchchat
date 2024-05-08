@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:
 jobs:
-  test-readme-mps+macos:
+  test-readme-mps-macos:
     runs-on: macos-m1-stable
     steps:
       - name: Checkout code
@@ -57,7 +57,7 @@ jobs:
           echo "*******************************************"
           echo "::endgroup::"
 
-  test-quantization-mps+macos:
+  test-quantization-mps-macos:
     runs-on: macos-m1-stable
     steps:
       - name: Checkout code
