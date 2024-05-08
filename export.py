@@ -48,6 +48,10 @@ def main(args):
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
 
+    if output_dso_path and "mps" in builder_args.device:
+        print("Warning! Device MPS not supported for export. Exporting for device CPU.")
+        builder_args.device = "cpu"
+        
     # TODO: clean this up
     # This mess is because ET does not support _weight_int4pack_mm right now
     if not builder_args.gguf_path:
@@ -85,7 +89,6 @@ def main(args):
     with torch.no_grad():
         if output_pte_path:
             output_pte_path = str(os.path.abspath(output_pte_path))
-            print(f">{output_pte_path}<")
             if executorch_export_available:
                 print(f"Exporting model using ExecuTorch to {output_pte_path}")
                 export_model_et(
