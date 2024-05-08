@@ -57,7 +57,7 @@ jobs:
           echo "*******************************************"
           echo "::endgroup::"
 
-  test-readme-mps+macos:
+  test-quant-mps+macos:
     runs-on: macos-m1-stable
     steps:
       - name: Checkout code
