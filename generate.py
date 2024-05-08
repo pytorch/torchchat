@@ -565,9 +565,7 @@ def _main(
 
     # arbitrarily large number as chat mode goes until max_seq length or user exits
     num_samples = generator_args.num_samples if not generator_args.chat_mode else 100000
-    i = -1  # long loop and Im scared someone will add a continue in it, so start at -1 and increment at the start
-    while (i < num_samples):
-        i += 1
+    for i in range(num_samples):
         device_sync(device=builder_args.device)
         if i >= 0 and generator_args.chat_mode:
             prompt = input("What is your prompt? \n")
