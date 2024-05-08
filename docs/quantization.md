@@ -153,3 +153,5 @@ We invite contributors to submit established quantization schemes, with accuracy
 - Quantization reference, describe options for --quantize parameter
 - Show a table with performance/accuracy metrics
 - Quantization support matrix? torchchat Quantization Support Matrix
+
+[end default]: end
