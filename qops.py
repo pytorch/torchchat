@@ -15,7 +15,7 @@ def linear_int8_aoti(input, weight, scales):
         scales = scales.view(-1)
         if (
             torch.compiler.is_compiling()
-            or input.device.type != "cpu"
+            or input.device.type not in ["cpu", "mps"]
             or not hasattr(torch.ops.aten, "_weight_int8pack_mm")
         ):
             lin = F.linear(input, weight.to(dtype=input.dtype))
@@ -395,9 +395,15 @@ class LinearInt4(torch.nn.Module):
         weight_int32, scales_and_zeros = group_quantize_tensor(
             weight_bf16, n_bit=4, groupsize=groupsize
         )
-        weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
-            weight_int32, inner_k_tiles
-        )
+        if weight_bf16.device.type == "mps":
+            # There are still no MPS-accelerated conversion OP
+            weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
+                weight_int32.cpu(), inner_k_tiles
+            ).to("mps")
+        else:
+            weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
+                weight_int32, inner_k_tiles
+            )
         return weight_int4pack, scales_and_zeros
 
     @classmethod
