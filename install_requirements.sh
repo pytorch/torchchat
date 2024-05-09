@@ -47,6 +47,8 @@ NIGHTLY_VERSION=dev20240507
 if [[ -x "$(command -v nvidia-smi)" ]]; 
 then
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu121"
+  # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
+  $PIP_EXECUTABLE uninstall -y triton
 else
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
 fi
