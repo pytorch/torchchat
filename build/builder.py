@@ -382,9 +382,11 @@ def _initialize_model(
 
         try:
             if "mps" in builder_args.device:
-                print("Warning: MPS currently does not support DSO models. Trying to load for CPU.")
+                print(
+                    "Cannot load specified DSO to MPS. Attempting to load model to CPU instead"
+                )
                 builder_args.device = "cpu"
-                
+
             # Replace model forward with the AOT-compiled forward
             # This is a hacky way to quickly demo AOTI's capability.
             # model is still a Python object, and any mutation to its
