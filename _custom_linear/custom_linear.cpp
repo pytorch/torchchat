@@ -42,6 +42,9 @@ at::Tensor prepack_and_run_qd8_f32_qb4w(
     at::Tensor input,
     int64_t group_size) {
 
+        TORCH_CHECK(group_size >= 1, "group_size must be >= 1");
+        TORCH_CHECK((group_size&(group_size-1)) == 0, "group_size must be a power of 2");
+
         xnn_status status;
 
         status = xnn_initialize(/*allocator=*/nullptr);
@@ -68,7 +71,7 @@ xnn_operator_t fc_op = nullptr;
     group_size, /*size_t block_size*/
     weight_zero_point, /*uint8_t kernel_zero_point*/
     weight_scales.const_data_ptr<float>(), /*const float* kernel_scale*/
-    weight.const_data_ptr(), /*const void* kernel*/ /* <--------- THIS IS OUTPUT OF PREPACK */
+    weight.const_data_ptr(), /*const void* kernel*/
     nullptr, /*const float* bias*/
     output_min, /*float output_min*/
     output_max, /*float output_max*/
