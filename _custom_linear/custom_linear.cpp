@@ -1,54 +1,29 @@
 #include <torch/library.h>
 #include <torch/script.h>
-#include <ATen/native/xnnpack/Linear.h>
-#include <ATen/native/xnnpack/OpContext.h>
-#include <torchchat/_custom_linear/custom_linear.h>
+#include <ATen/native/xnnpack/Common.h>
 
 
-// Used for: make_zero_points_and_scales_tensor
-// #include <ATen/native/quantized/cpu/QnnpackUtils.h>
-#include <ATen/native/quantized/cpu/QuantUtils.h>
+class XnnpackOperatorClass : public torch::jit::CustomClassHolder {
+ private:
+  at::native::xnnpack::Operator op_;
+
+public:
+  XnnpackOperatorClass(at::native::xnnpack::Operator op) : op_(std::move(op)) {}
+  xnn_operator_t get() {
+    return op_.get();
+  }
+};
 
 
-#include <ATen/native/quantized/cpu/XnnpackUtils.h>
-
-
-c10::intrusive_ptr<at::native::xnnpack::LinearOpContext> prepack(
-    torch::Tensor weight,
-    c10::optional<torch::Tensor> bias,
-    const c10::optional<at::Scalar>& output_min,
-    const c10::optional<at::Scalar>& output_max) {
-  return at::native::xnnpack::XNNPackLinearOpContext::create_context(
-      std::move(weight), std::move(bias), output_min, output_max);
-}
-
-torch::Tensor run(const torch::Tensor& input, const c10::intrusive_ptr<at::native::xnnpack::LinearOpContext>& op_context) {
-    return op_context->run(input);
-}
-
-torch::Tensor prepack_and_run(
-    const torch::Tensor& input,
-    torch::Tensor weight,
-    c10::optional<torch::Tensor> bias,
-    const c10::optional<at::Scalar>& output_min,
-    const c10::optional<at::Scalar>& output_max) {
-    auto prepacked_op_context = prepack(weight, bias, output_min, output_max);
-    return run(input, prepacked_op_context);
-}
-
-at::Tensor prepack_and_run_qd8_f32_qb4w(
+c10::intrusive_ptr<XnnpackOperatorClass> create_fully_connected_nc_qd8_f32_qb4w(
     at::Tensor weight,
-    at::Tensor weight_scales,
-    at::Tensor input,
-    int64_t group_size) {
+    at::Tensor weight_scales) {
 
-        TORCH_CHECK(group_size > 1, "group_size must be > 1");
-        TORCH_CHECK((group_size&(group_size-1)) == 0, "group_size must be a power of 2");
+        TORCH_CHECK(weight.dim() == 2, "weight must be 2-dimensional");
+        TORCH_CHECK(weight.size(1) % 2 == 0, "weight columns must be even (packed int4)");
 
-        xnn_status status;
-
-        status = xnn_initialize(/*allocator=*/nullptr);
-        TORCH_CHECK(status == xnn_status_success);
+        TORCH_CHECK(weight_scales.dim() == 2, "weight_scales must be 2-dimensional");
+        TORCH_CHECK(weight.size(0) == weight_scales.size(0), "weight and weight_scale must have same number of rows");
 
         const float output_min = -std::numeric_limits<float>::infinity();
         const float output_max = std::numeric_limits<float>::infinity();
@@ -57,13 +32,15 @@ at::Tensor prepack_and_run_qd8_f32_qb4w(
         auto input_channels = 2*weight.size(1); // Multiply by 2 because weights are packed
         auto output_channels = weight.size(0);
 
-    std::cout << "input_channels: " << input_channels << std::endl;
-    std::cout << "output_channels: " << output_channels << std::endl;
-    std::cout << "group_size: " << group_size << std::endl;
+
+        TORCH_CHECK((input_channels % weight_scales.size(1)) == 0, "number of columns in weight_scales should divide input_channels");
+        size_t group_size = input_channels / weight_scales.size(1);
+        TORCH_CHECK(group_size > 1, "inferred group_size must be > 1");
+        TORCH_CHECK((group_size&(group_size-1)) == 0, "inferred group_size must be a power of 2");
 
 // Create FC
 xnn_operator_t fc_op = nullptr;
-  status = xnn_create_fully_connected_nc_qd8_f32_qb4w(
+  auto status = xnn_create_fully_connected_nc_qd8_f32_qb4w(
     input_channels, /*size_t input_channels*/
     output_channels, /*size_t output_channels*/
     input_channels, /*size_t input_stride*/
@@ -83,27 +60,36 @@ xnn_operator_t fc_op = nullptr;
 TORCH_CHECK(status == xnn_status_success, "Operator xnn_create_fully_connected_nc_qd8_f32_qb4w failed with status ", status, ".");
 TORCH_CHECK(fc_op != nullptr);
 
-// std::unique_ptr<xnn_operator, decltype(&xnn_delete_operator)> auto_fc_op(fc_op, xnn_delete_operator);
+   return c10::make_intrusive<XnnpackOperatorClass>(at::native::xnnpack::Operator(fc_op));
+}
 
 
-// Create, reshape, setup, and run convert
-TORCH_CHECK(input.dim() == 2);
-auto batch_size = input.size(0);
-
-// Holds output of convert
-std::vector<int8_t> output_convert(batch_size * input_channels + XNN_EXTRA_BYTES);
-std::vector<xnn_dynamic_quantization_params> quantization_params(batch_size + XNN_EXTRA_QUANTIZATION_PARAMS);
-
-  xnn_operator_t convert_op = nullptr;
-  status = xnn_create_convert_nc_f32_qd8(
+c10::intrusive_ptr<XnnpackOperatorClass> create_convert_nc_f32_qd8() {
+    xnn_operator_t convert_op = nullptr;
+  auto status = xnn_create_convert_nc_f32_qd8(
   0, /*uint32_t flags*/
   &convert_op /*xnn_operator_t* convert_op_out*/
  );
  TORCH_CHECK(status == xnn_status_success, "Operator xnn_create_convert_nc_f32_qd8 failed with status ", status, ".");
  TORCH_CHECK(convert_op != nullptr);
+ return c10::make_intrusive<XnnpackOperatorClass>(at::native::xnnpack::Operator(convert_op));
+}
 
+
+at::Tensor run_linear_qd8_f32_qb4w(c10::intrusive_ptr<XnnpackOperatorClass>  fc_op, c10::intrusive_ptr<XnnpackOperatorClass>  convert_op, int64_t output_channels, at::Tensor input) {
+    TORCH_CHECK(input.dim() == 2);
+
+auto batch_size = input.size(0);
+auto input_channels = input.size(1);
+xnn_status status;
+
+// Holds output of convert
+std::vector<int8_t> output_convert(batch_size * input_channels + XNN_EXTRA_BYTES);
+std::vector<xnn_dynamic_quantization_params> quantization_params(batch_size + XNN_EXTRA_QUANTIZATION_PARAMS);
+
+// Run input convert
 status = xnn_reshape_convert_nc_f32_qd8(
-  convert_op, /*xnn_operator_t convert_op*/
+  convert_op->get(), /*xnn_operator_t convert_op*/
   batch_size, /*size_t batch_size*/
   input_channels, /*size_t channels*/
   input_channels, /*size_t input_stride*/
@@ -112,34 +98,32 @@ status = xnn_reshape_convert_nc_f32_qd8(
 );
  TORCH_CHECK(status == xnn_status_success, "Operator xnn_reshape_convert_nc_f32_qd8 failed with status ", status, ".");
 
-
  status = xnn_setup_convert_nc_f32_qd8(
-  convert_op, /*xnn_operator_t convert_op*/
+  convert_op->get(), /*xnn_operator_t convert_op*/
  input.const_data_ptr<float>(), /*const float* input*/
  output_convert.data(), /*int8_t* output*/
   quantization_params.data() /*struct xnn_dynamic_quantization_params* quantization_params*/
   );
   TORCH_CHECK(status == xnn_status_success, "Operator xnn_setup_convert_nc_f32_qd8 failed with status ", status, ".");
 
-  status = xnn_run_operator(convert_op, /*threadpool=*/nullptr);
+  status = xnn_run_operator(convert_op->get(), /*threadpool=*/nullptr);
   TORCH_CHECK(status == xnn_status_success, "Running convert_op failed with status ", status, ".");
 
 
-
- // Reshape, setup, and run FC
-  status = xnn_reshape_fully_connected_nc_qd8_f32_qb4w(
-    fc_op, /*xnn_operator_t fully_connected_op*/
-    batch_size, /*size_t batch_size*/
-    nullptr /*pthreadpool_t threadpool*/ // TODO: set to something sensible
-    );
-TORCH_CHECK(status == xnn_status_success, "Operator xnn_reshape_fully_connected_nc_qd8_f32_qb4w failed with status ", status, ".");
-
-// Create tensor to hold output
+// Holds output of linear
 auto options = torch::TensorOptions().dtype(torch::kFloat32);
 auto output_tensor = torch::empty({batch_size, output_channels}, options);
 
+ // Run linear
+  status = xnn_reshape_fully_connected_nc_qd8_f32_qb4w(
+    fc_op->get(), /*xnn_operator_t fully_connected_op*/
+    batch_size, /*size_t batch_size*/
+    nullptr /*pthreadpool_t threadpool*/ // TODO: set to something sensible
+    );
+    TORCH_CHECK(status == xnn_status_success, "Operator xnn_reshape_fully_connected_nc_qd8_f32_qb4w failed with status ", status, ".");
+
  status = xnn_setup_fully_connected_nc_qd8_f32_qb4w(
-    fc_op, /*xnn_operator_t fully_connected_op*/
+    fc_op->get(), /*xnn_operator_t fully_connected_op*/
     output_convert.data(), /*const int8_t* input*/
     output_tensor.data_ptr<float>(), /*float* output*/
     quantization_params.data() /*const struct xnn_dynamic_quantization_params* quantization_params*/
@@ -147,20 +131,30 @@ auto output_tensor = torch::empty({batch_size, output_channels}, options);
  TORCH_CHECK(status == xnn_status_success, "Operator xnn_setup_fully_connected_nc_qd8_f32_qb4w failed with status ", status, ".");
 
 
-status = xnn_run_operator(fc_op, /*threadpool=*/nullptr);
+status = xnn_run_operator(fc_op->get(), /*threadpool=*/nullptr);
 TORCH_CHECK(status == xnn_status_success, "Running fc_op failed with status ", status, ".");
-
-std::cout << "RETURNING." << std::endl;
 
 return output_tensor;
 }
 
+at::Tensor create_and_run(
+    at::Tensor weight,
+    at::Tensor weight_scales,
+    at::Tensor input) {
 
+    auto status = xnn_initialize(/*allocator=*/nullptr);
+    TORCH_CHECK(status == xnn_status_success);
+    auto fc_op = create_fully_connected_nc_qd8_f32_qb4w(weight, weight_scales);
+    auto convert_op = create_convert_nc_f32_qd8();
+    auto output_channels = weight.size(0);
+    return run_linear_qd8_f32_qb4w(std::move(fc_op), std::move(convert_op), output_channels, input);
+}
 
 
 TORCH_LIBRARY(torchchat, m) {
-  m.def("prepack", prepack);
-  m.def("run", run);
-  m.def("prepack_and_run", prepack_and_run);
-  m.def("prepack_and_run_qd8_f32_qb4w", prepack_and_run_qd8_f32_qb4w);
+    m.class_<XnnpackOperatorClass>("XnnpackOperatorClass");
+    m.def("create_and_run", create_and_run);
+    m.def("create_fully_connected_nc_qd8_f32_qb4w", create_fully_connected_nc_qd8_f32_qb4w);
+     m.def("create_convert_nc_f32_qd8", create_convert_nc_f32_qd8);
+     m.def("run_linear_qd8_f32_qb4w", run_linear_qd8_f32_qb4w);
 }
