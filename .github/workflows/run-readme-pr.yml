@@ -20,10 +20,10 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        # echo "::group::Install newer objcopy that supports --set-section-alignment"
-        # yum install -y  devtoolset-10-binutils
-        # export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        # echo "::endgroup::"
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
 
         echo "::group::Create script to run README"
         python3 scripts/updown.py --file README.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-readme.sh
