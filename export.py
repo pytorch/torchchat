@@ -48,7 +48,12 @@ def main(args):
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
 
-    if output_dso_path and "mps" in builder_args.device:
+    if output_pte_path and builder_args.device != "cpu":
+        print(
+            f"Warning! ExecuTorch export target is controlled by export recipe, not device setting. Ignoring device={builder_args.device} setting."
+        )
+        builder_args.device = "cpu"
+    elif "mps" in builder_args.device:
         print("Warning! Device MPS not supported for export. Exporting for device CPU.")
         builder_args.device = "cpu"
 
