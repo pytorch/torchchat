@@ -39,7 +39,8 @@ torch::Tensor prepack_and_run(
 at::Tensor prepack_and_run_qd8_f32_qb4w(
     at::Tensor weight,
     at::Tensor weight_scales,
-    at::Tensor input) {
+    at::Tensor input,
+    int64_t block_size) {
 
         xnn_status status;
 
@@ -54,7 +55,7 @@ at::Tensor prepack_and_run_qd8_f32_qb4w(
 
         auto input_channels = weight.size(1);
         auto output_channels = weight.size(0);
-        auto block_size = weight_scales.size(1);
+        // auto block_size = weight_scales.size(1);
 
     std::cout << "input_channels: " << input_channels << std::endl;
     std::cout << "output_channels: " << output_channels << std::endl;
@@ -79,7 +80,7 @@ xnn_operator_t fc_op = nullptr;
     nullptr, /*xnn_weights_cache_t weights_cache*/
     &fc_op /*xnn_operator_t* fully_connected_op_out*/
 );
-TORCH_CHECK(status == xnn_status_success, status);
+TORCH_CHECK(status == xnn_status_success, "Operator xnn_create_fully_connected_nc_qd8_f32_qb4w failed with status ", status, ".");
 TORCH_CHECK(fc_op != nullptr);
 
 // std::unique_ptr<xnn_operator, decltype(&xnn_delete_operator)> auto_fc_op(fc_op, xnn_delete_operator);
@@ -99,7 +100,7 @@ std::vector<xnn_dynamic_quantization_params> quantization_params(batch_size + XN
   0, /*uint32_t flags*/
   &convert_op /*xnn_operator_t* convert_op_out*/
  );
- TORCH_CHECK(status == xnn_status_success);
+ TORCH_CHECK(status == xnn_status_success, "Operator xnn_create_convert_nc_f32_qd8 failed with status ", status, ".");
  TORCH_CHECK(convert_op != nullptr);
 
 status = xnn_reshape_convert_nc_f32_qd8(
@@ -110,7 +111,7 @@ status = xnn_reshape_convert_nc_f32_qd8(
   input_channels, /*size_t output_stride*/
   nullptr /*pthreadpool_t threadpool*/
 );
- TORCH_CHECK(status == xnn_status_success);
+ TORCH_CHECK(status == xnn_status_success, "Operator xnn_reshape_convert_nc_f32_qd8 failed with status ", status, ".");
 
 
  status = xnn_setup_convert_nc_f32_qd8(
@@ -119,10 +120,10 @@ status = xnn_reshape_convert_nc_f32_qd8(
  output_convert.data(), /*int8_t* output*/
   quantization_params.data() /*struct xnn_dynamic_quantization_params* quantization_params*/
   );
-  TORCH_CHECK(status == xnn_status_success);
+  TORCH_CHECK(status == xnn_status_success, "Operator xnn_setup_convert_nc_f32_qd8 failed with status ", status, ".");
 
   status = xnn_run_operator(convert_op, /*threadpool=*/nullptr);
-  TORCH_CHECK(status == xnn_status_success);
+  TORCH_CHECK(status == xnn_status_success, "Running convert_op failed with status ", status, ".");
 
 
 
@@ -132,7 +133,7 @@ status = xnn_reshape_convert_nc_f32_qd8(
     batch_size, /*size_t batch_size*/
     nullptr /*pthreadpool_t threadpool*/ // TODO: set to something sensible
     );
-TORCH_CHECK(status == xnn_status_success);
+TORCH_CHECK(status == xnn_status_success, "Operator xnn_reshape_fully_connected_nc_qd8_f32_qb4w failed with status ", status, ".");
 
 // Create tensor to hold output
 auto options = torch::TensorOptions().dtype(torch::kFloat32);
@@ -144,11 +145,11 @@ auto output_tensor = torch::empty({batch_size, output_channels}, options);
     output_tensor.data_ptr<float>(), /*float* output*/
     quantization_params.data() /*const struct xnn_dynamic_quantization_params* quantization_params*/
  );
- TORCH_CHECK(status == xnn_status_success);
+ TORCH_CHECK(status == xnn_status_success, "Operator xnn_setup_fully_connected_nc_qd8_f32_qb4w failed with status ", status, ".");
 
 
- status = xnn_run_operator(fc_op, /*threadpool=*/nullptr);
-TORCH_CHECK(status == xnn_status_success);
+status = xnn_run_operator(fc_op, /*threadpool=*/nullptr);
+TORCH_CHECK(status == xnn_status_success, "Running fc_op failed with status ", status, ".");
 
 std::cout << "RETURNING." << std::endl;
 
