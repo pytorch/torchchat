@@ -198,8 +198,6 @@ export TORCHCHAT_ROOT=${PWD}
 ### Export for mobile
 The following example uses the Llama3 8B Instruct model.
 
-[comment default]: echo '{"embedding": {"bitwidth": 4, "groupsize" : 32}, "linear:a8w4dq": {"groupsize" : 32}}' >./config/data/mobile.json
-
 ```
 # Export
 python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
