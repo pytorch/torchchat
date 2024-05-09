@@ -1,4 +1,9 @@
 # Using GGUF Models
+
+[shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
+
+[shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
+
 We support parsing [GGUF](https://github.com/ggerganov/ggml/blob/master/docs/gguf.md) files with
 the following tensor types:
 - F16
