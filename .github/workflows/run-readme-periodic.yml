@@ -2,7 +2,7 @@ name: Run the README instructions periodically to ensure they work
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC 
   push:
     tags:
       - ciflow/periodic/*
