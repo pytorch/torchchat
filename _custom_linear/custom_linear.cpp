@@ -40,26 +40,23 @@ at::Tensor prepack_and_run_qd8_f32_qb4w(
     at::Tensor weight,
     at::Tensor weight_scales,
     at::Tensor input,
-    int64_t block_size) {
+    int64_t group_size) {
 
         xnn_status status;
 
         status = xnn_initialize(/*allocator=*/nullptr);
         TORCH_CHECK(status == xnn_status_success);
 
-
         const float output_min = -std::numeric_limits<float>::infinity();
         const float output_max = std::numeric_limits<float>::infinity();
         const uint8_t weight_zero_point = 8;
 
-
-        auto input_channels = weight.size(1);
+        auto input_channels = 2*weight.size(1); // Multiply by 2 because weights are packed
         auto output_channels = weight.size(0);
-        // auto block_size = weight_scales.size(1);
 
     std::cout << "input_channels: " << input_channels << std::endl;
     std::cout << "output_channels: " << output_channels << std::endl;
-    std::cout << "block_size: " << block_size << std::endl;
+    std::cout << "group_size: " << group_size << std::endl;
 
 // Create FC
 xnn_operator_t fc_op = nullptr;
@@ -68,7 +65,7 @@ xnn_operator_t fc_op = nullptr;
     output_channels, /*size_t output_channels*/
     input_channels, /*size_t input_stride*/
     output_channels, /*size_t output_stride*/
-    block_size, /*size_t block_size*/
+    group_size, /*size_t block_size*/
     weight_zero_point, /*uint8_t kernel_zero_point*/
     weight_scales.const_data_ptr<float>(), /*const float* kernel_scale*/
     weight.const_data_ptr(), /*const void* kernel*/ /* <--------- THIS IS OUTPUT OF PREPACK */
@@ -84,7 +81,6 @@ TORCH_CHECK(status == xnn_status_success, "Operator xnn_create_fully_connected_n
 TORCH_CHECK(fc_op != nullptr);
 
 // std::unique_ptr<xnn_operator, decltype(&xnn_delete_operator)> auto_fc_op(fc_op, xnn_delete_operator);
-
 
 
 // Create, reshape, setup, and run convert
