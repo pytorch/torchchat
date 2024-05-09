@@ -42,7 +42,7 @@ at::Tensor prepack_and_run_qd8_f32_qb4w(
     at::Tensor input,
     int64_t group_size) {
 
-        TORCH_CHECK(group_size >= 1, "group_size must be >= 1");
+        TORCH_CHECK(group_size > 1, "group_size must be > 1");
         TORCH_CHECK((group_size&(group_size-1)) == 0, "group_size must be a power of 2");
 
         xnn_status status;
