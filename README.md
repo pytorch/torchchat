@@ -66,7 +66,7 @@ python3 torchchat.py --help
 ### Download Weights
 Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace account.
 
-[prefix default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" 
+[prefix default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}"
 Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens).
 Log into huggingface:
 ```
@@ -91,7 +91,6 @@ python3 torchchat.py list
 
 You can also remove downloaded models with the remove command:
 `python3 torchchat.py remove llama3`
-
 
 
 ## Running via PyTorch / Python
@@ -199,7 +198,7 @@ export TORCHCHAT_ROOT=${PWD}
 ### Export for mobile
 The following example uses the Llama3 8B Instruct model.
 
-[#shell default]: echo '{"embedding": {"bitwidth": 4, "groupsize" : 32}, "linear:a8w4dq": {"groupsize" : 32}}' >./config/data/mobile.json
+[comment default]: echo '{"embedding": {"bitwidth": 4, "groupsize" : 32}, "linear:a8w4dq": {"groupsize" : 32}}' >./config/data/mobile.json
 
 ```
 # Export
@@ -217,7 +216,7 @@ For more details on quantization and what settings to use for your use
 case visit our [Quanitization documentation](docs/quantization.md) or
 run `python3 torchchat.py export`
 
-[end default]: 
+[end default]: end
 
 ### Deploy and run on iOS
 
@@ -250,7 +249,10 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
   <img src="https://pytorch.org/executorch/main/_static/img/llama_ios_app.png" width="600" alt="iOS app running a LlaMA model">
 </a>
 
+
 ### Deploy and run on Android
+
+
 
 MISSING. TBD.
 
@@ -261,6 +263,8 @@ MISSING. TBD.
 Uses the lm_eval library to evaluate model accuracy on a variety of
 tasks. Defaults to wikitext and can be manually controlled using the
 tasks and limit args.
+
+See [Evaluation](docs/evaluation.md)
 
 For more information run `python3 torchchat.py eval --help`
 
@@ -311,15 +315,49 @@ files.
 While we describe how to use torchchat using the popular llama3 model,
 you can perform the example commands with any of these models.
 
+
+## Design Principles
+
+torchchat embodies PyTorch’s design philosophy [[details](https://pytorch.org/docs/stable/community/design.html)], especially "usability over everything else".
+
+### Native PyTorch
+
+torchchat is a native-PyTorch library. While we provide integrations with the surrounding ecosystem (eg: Hugging Face models, etc), all of the core functionality is written in PyTorch.
+
+### Simplicity and Extensibility
+
+torchchat is designed to be easy to understand, use and extend.
+
+- Composition over implementation inheritance - layers of inheritance for code re-use makes the code hard to read and extend
+- No training frameworks - explicitly outlining the training logic makes it easy to extend for custom use cases
+- Code duplication is preferred over unnecessary abstractions
+- Modular building blocks over monolithic components
+
+### Correctness
+
+torchchat provides well-tested components with a high-bar on correctness.
+We provide
+
+- Extensive unit-tests to ensure things operate as they should
+
+## Community Contributions
+
+We really value our community and the contributions made by our wonderful users. We'll use this section to call out some of these contributions! If you'd like to help out as well, please see the [CONTRIBUTING](docs/CONTRIBUTING.md) guide.
+
 ## Troubleshooting
 
 
 **CERTIFICATE_VERIFY_FAILED**
 Run `pip install --upgrade certifi`.
 
-**Access to model is restricted and you are not in the authorized
-list** Some models require an additional step to access. Follow the
+
+**Access to model is restricted and you are not in the authorized list**
+Some models require an additional step to access. Follow the
 link provided in the error to get access.
+
+**Installing ET Fails**
+If `./scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
+
 
 ### Disclaimer
 The torchchat Repository Content is provided without any guarantees
@@ -334,6 +372,22 @@ use of the torchchat Repository Content or any models, outputs, or
 results, both alone and in combination with any other
 technologies. Additionally, you may have other legal obligations that
 govern your use of other content, such as the terms of service for
+third-party models, weights, data, or other technologies, and you are
+solely responsible for complying with all such obligations.
+
+
+### Disclaimer
+The torchchat Repository Content is provided without any guarantees about
+performance or compatibility. In particular, torchchat makes available
+model architectures written in Python for PyTorch that may not perform
+in the same manner or meet the same standards as the original versions
+of those models. When using the torchchat Repository Content, including
+any model architectures, you are solely responsible for determining the
+appropriateness of using or redistributing the torchchat Repository Content
+and assume any risks associated with your use of the torchchat Repository Content
+or any models, outputs, or results, both alone and in combination with
+any other technologies. Additionally, you may have other legal obligations
+that govern your use of other content, such as the terms of service for
 third-party models, weights, data, or other technologies, and you are
 solely responsible for complying with all such obligations.
 
@@ -380,4 +434,3 @@ code in this distribution is covered by the MIT and Apache Open Source
 licenses.) However you may have other legal obligations that govern
 your use of content, such as the terms of service for third-party
 models.
-

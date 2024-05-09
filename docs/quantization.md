@@ -2,7 +2,7 @@
 # Quantization
 
 [shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
-[comment default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
+[shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
 
 ## Introduction
 Quantization focuses on reducing the precision of model parameters and computations from floating-point to lower-bit integers, such as 8-bit integers. This approach aims to minimize memory requirements, accelerate inference speeds, and decrease power consumption, making models more feasible for deployment on edge devices with limited computational resources. For high-performance devices such as GPUs, quantization provides a way to reduce the required memory bandwidth and take advantage of the massive compute capabilities provided by today's server-based accelerators such as GPUs.
@@ -118,9 +118,9 @@ python3 generate.py [--compile] llama3 --prompt "Hello, my name is" --quantize '
 ```
 ### AOTI
 ```
-python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:int4": {"groupsize" : 256}}' --output-dso-path llama3.dso
+python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:int4": {"groupsize" : 256}}' --output-dso-path llama3.so
 
-python3 generate.py llama3 --dso-path llama3.dso  --prompt "Hello my name is"
+python3 generate.py llama3 --dso-path llama3.so  --prompt "Hello my name is"
 ```
 ### ExecuTorch
 ```
@@ -154,4 +154,4 @@ We invite contributors to submit established quantization schemes, with accuracy
 - Show a table with performance/accuracy metrics
 - Quantization support matrix? torchchat Quantization Support Matrix
 
-[end defult]: end
+[end default]: end

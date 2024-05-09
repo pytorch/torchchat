@@ -38,7 +38,7 @@ clone_executorch() {
 install_executorch_python_libs() {
   if [ ! -d "${TORCHCHAT_ROOT}/${ET_BUILD_DIR}" ]; then
     echo "Directory ${TORCHCHAT_ROOT}/${ET_BUILD_DIR} does not exist."
-    echo "Make sur eyou run clone_executorch"
+    echo "Make sure you run clone_executorch"
     exit 1
   fi
   pushd ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
@@ -63,7 +63,8 @@ COMMON_CMAKE_ARGS="\
     -DEXECUTORCH_BUILD_KERNELS_OPTIMIZED=ON \
     -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON \
     -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON \
-    -DEXECUTORCH_BUILD_KERNELS_QUANTIZED=ON"
+    -DEXECUTORCH_BUILD_KERNELS_QUANTIZED=ON \
+    -DEXECUTORCH_BUILD_XNNPACK=ON"
 
 install_executorch() {
   # AOT lib has to be build for model export
