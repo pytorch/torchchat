@@ -16,6 +16,7 @@ from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
 # TODO: change back to executorch.examples.portable.utils
 # when executorch installs correctly
 
+from executorch.exir.backend.backend_details import CompileSpec
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
 from executorch.exir.passes.quant_fusion_pass import QuantFusionPass
 from executorch.exir.passes.sym_shape_eval_pass import ConstraintBasedSymShapeEvalPass
@@ -85,7 +86,8 @@ def export_model(model, device, output_path, args=None, backend="xnnpack") -> st
     else:
         raise ValueError(f"Unsupported dtype for ET export: {target_precision}")
 
-    replace_attention_with_custom_sdpa_attention(model)
+    if backend == "xnnpack":
+        replace_attention_with_custom_sdpa_attention(model)
     with torch.nn.attention.sdpa_kernel(
         [torch.nn.attention.SDPBackend.MATH]
     ), torch.no_grad():
@@ -115,8 +117,12 @@ def export_model(model, device, output_path, args=None, backend="xnnpack") -> st
                 skip_ops_for_coreml_delegation=None, compile_specs=compile_specs
             )
         )
+    elif backend == "mps":
+        from executorch.backends.apple.mps.partition.mps_partitioner import MPSPartitioner
+        compile_specs = [CompileSpec("use_fp16", bytes([target_precision == torch.float16]))]
+        edge_manager = edge_manager.to_backend(MPSPartitioner(compile_specs=compile_specs))
     else:
-        raise Exception(f"Unknown backend {backend}; choices are: xnnpack, coreml")
+        raise Exception(f"Unknown backend {backend}; choices are: xnnpack, coreml, mps")
     # Delegation visualization APIs: https://pytorch.org/executorch/main/debug-backend-delegate.html
     # from executorch.exir.backend.utils import get_delegation_info, format_delegated_graph
     # from tabulate import tabulate

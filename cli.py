@@ -71,7 +71,7 @@ def add_arguments_for_export(parser):
         type=str,
         default="xnnpack",
         help="Target backend for Executorch export. Options are: xnnpack, " +
-        "coreml. Advanced configuration can be done programmatically in " +
+        "coreml, mps. Advanced configuration can be done programmatically in " +
         "export_et.py.")
     _add_arguments_common(parser)
 
