@@ -10,7 +10,7 @@ class _CustomLinear(nn.Module):
         self.weight = weight
         assert bias is None
 
-        self.group_size = 8
+        self.group_size = 32
         w_int, s, z = group_quantize_tensor_symmetric(self.weight, self.group_size, torch.float32)
         w_packed = convert_to_qc4w(w_int)
         self.prepacked = torch.ops.torchchat.prepack.default(w_packed, s)
