@@ -227,8 +227,8 @@ def is_mps_available() -> bool:
     # out system says mps is available, but it's not on VMs
     # so let's set up some memry, and see if that work:
     try:
-        mps_tensor = torch.zero(1024, dtype=torch.float16, device="mps")
-    except:
+        mps_tensor = torch.zeros(1024, dtype=torch.float16, device="mps")
+    except RuntimeError:
         return False
 
     # MPS, is that you?
@@ -237,11 +237,12 @@ def is_mps_available() -> bool:
 
 def get_device_str(device) -> str:
     if isinstance(device, str) and device == "fast":
-        return (
+        device = (
             "cuda"
             if torch.cuda.is_available()
             else "mps" if is_mps_available() else "cpu"
         )
+        return device
     else:
         return str(device)
 

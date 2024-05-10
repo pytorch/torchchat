@@ -214,8 +214,6 @@ cmake-out/et_run llama3.pte -z ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-
 ### Export for mobile
 The following example uses the Llama3 8B Instruct model.
 
-[comment default]: echo '{"embedding": {"bitwidth": 4, "groupsize" : 32}, "linear:a8w4dq": {"groupsize" : 32}}' >./config/data/mobile.json
-
 ```
 # Export
 python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
@@ -232,7 +230,7 @@ For more details on quantization and what settings to use for your use
 case visit our [Quanitization documentation](docs/quantization.md) or
 run `python3 torchchat.py export`
 
-[end default]:
+[end default]: end
 
 ### Deploy and run on iOS
 
@@ -331,6 +329,35 @@ files.
 While we describe how to use torchchat using the popular llama3 model,
 you can perform the example commands with any of these models.
 
+
+## Design Principles
+
+torchchat embodies PyTorch’s design philosophy [[details](https://pytorch.org/docs/stable/community/design.html)], especially "usability over everything else".
+
+### Native PyTorch
+
+torchchat is a native-PyTorch library. While we provide integrations with the surrounding ecosystem (eg: Hugging Face models, etc), all of the core functionality is written in PyTorch.
+
+### Simplicity and Extensibility
+
+torchchat is designed to be easy to understand, use and extend.
+
+- Composition over implementation inheritance - layers of inheritance for code re-use makes the code hard to read and extend
+- No training frameworks - explicitly outlining the training logic makes it easy to extend for custom use cases
+- Code duplication is preferred over unnecessary abstractions
+- Modular building blocks over monolithic components
+
+### Correctness
+
+torchchat provides well-tested components with a high-bar on correctness.
+We provide
+
+- Extensive unit-tests to ensure things operate as they should
+
+## Community Contributions
+
+We really value our community and the contributions made by our wonderful users. We'll use this section to call out some of these contributions! If you'd like to help out as well, please see the [CONTRIBUTING](docs/CONTRIBUTING.md) guide.
+
 ## Troubleshooting
 
 
@@ -338,9 +365,13 @@ you can perform the example commands with any of these models.
 Run `pip install --upgrade certifi`.
 
 
-**Access to model is restricted and you are not in the authorized
-list** Some models require an additional step to access. Follow the
+**Access to model is restricted and you are not in the authorized list**
+Some models require an additional step to access. Follow the
 link provided in the error to get access.
+
+**Installing ET Fails**
+If `./scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
+
 
 ### Disclaimer
 The torchchat Repository Content is provided without any guarantees

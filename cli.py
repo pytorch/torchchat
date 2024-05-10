@@ -295,7 +295,7 @@ def _add_arguments_common(parser):
         "--model-directory",
         type=Path,
         default=default_model_dir,
-        help="The directory to store downloaded model artifacts",
+        help=f"The directory to store downloaded model artifacts. Default: {default_model_dir}",
     )
     parser.add_argument(
         "--port",
@@ -329,6 +329,14 @@ def arg_init(args):
         args.device = get_device_str(
             args.quantize.get("executor", {}).get("accelerator", args.device)
         )
+
+    if "mps" in args.device:
+        if args.compile or args.compile_prefill:
+            print(
+                "Warning: compilation is not available with device MPS, ignoring option to engage compilation"
+            )
+            args.compile = False
+            args.compile_prefill = False
 
     if hasattr(args, "seed") and args.seed:
         torch.manual_seed(args.seed)

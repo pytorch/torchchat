@@ -33,7 +33,7 @@ torch::Device cpu_device(torch::kCPU);
 #include <executorch/runtime/core/exec_aten/exec_aten.h>
 #include <executorch/runtime/core/exec_aten/util/scalar_type_util.h>
 
-#if defined(ET_USE_ADPATIVE_THREADS)
+#if defined(ET_USE_ADAPTIVE_THREADS)
 #include <executorch/backends/xnnpack/threadpool/cpuinfo_utils.h>
 #include <executorch/backends/xnnpack/threadpool/threadpool.h>
 #endif
@@ -823,7 +823,7 @@ int main(int argc, char* argv[]) {
   int vocab_size = -1;
   int llama_ver = 2;
 
-#if defined(ET_USE_ADPATIVE_THREADS)
+#if defined(ET_USE_ADAPTIVE_THREADS)
   uint32_t num_performant_cores =
       torch::executorch::cpuinfo::get_num_performant_cores();
   if (num_performant_cores > 0) {
