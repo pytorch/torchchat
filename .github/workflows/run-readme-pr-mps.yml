@@ -9,7 +9,7 @@ jobs:
   test-readme-mps-macos:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-m1-stable  # neeps MPS, was macos-m1-stable
+      runner: macos-m1-14
       script: |
           conda create -y -n test-readme-mps-macos python=3.10.11
           conda activate test-readme-mps-macos
