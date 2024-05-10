@@ -75,7 +75,7 @@ class CustomSDPAAttention(nn.Module):
             v,
             self.kv_cache.k_cache,
             self.kv_cache.v_cache,
-            input_pos[-1].item(),
+            input_pos[-1],
             seqlen,
         )
         output = output.view(bsz, seqlen, self.dim).to(dtype=q.dtype)
