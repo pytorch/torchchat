@@ -66,6 +66,13 @@ def add_arguments_for_eval(parser):
 
 def add_arguments_for_export(parser):
     # Only export specific options should be here
+    parser.add_argument(
+        "--executorch-backend",
+        type=str,
+        default="xnnpack",
+        help="Target backend for Executorch export. Options are: xnnpack, " +
+        "coreml. Advanced configuration can be done programmatically in " +
+        "export_et.py.")
     _add_arguments_common(parser)
 
 

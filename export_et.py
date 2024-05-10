@@ -52,7 +52,7 @@ def materialze_broadcast_of_rope_freq_cis(
     return module
 
 
-def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
+def export_model(model, device, output_path, args=None, backend="xnnpack") -> str:  # noqa: C901
 
     input = (
         torch.tensor([[1]], dtype=torch.long, device=device),
@@ -97,7 +97,26 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
             dynamic_shapes=dynamic_shapes,
             edge_compile_config=edge_config,
         )
-    edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
+    if backend == "xnnpack":
+        edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
+    elif backend == "coreml":
+        from executorch.backends.apple.coreml.compiler import CoreMLBackend
+        from executorch.backends.apple.coreml.partition.coreml_partitioner import (
+            CoreMLPartitioner,
+        )
+        import coremltools as ct
+        # TODO: make this configurable?
+        compile_specs = CoreMLBackend.generate_compile_specs(
+            model_type=CoreMLBackend.MODEL_TYPE.COMPILED_MODEL,
+            minimum_deployment_target=ct.target.macOS13,
+        )
+        edge_manager = edge_manager.to_backend(
+            CoreMLPartitioner(
+                skip_ops_for_coreml_delegation=None, compile_specs=compile_specs
+            )
+        )
+    else:
+        raise Exception(f"Unknown backend {backend}; choices are: xnnpack, coreml")
     # Delegation visualization APIs: https://pytorch.org/executorch/main/debug-backend-delegate.html
     # from executorch.exir.backend.utils import get_delegation_info, format_delegated_graph
     # from tabulate import tabulate

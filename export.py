@@ -97,7 +97,7 @@ def main(args):
             if executorch_export_available:
                 print(f"Exporting model using ExecuTorch to {output_pte_path}")
                 export_model_et(
-                    model_to_pte, builder_args.device, args.output_pte_path, args
+                    model_to_pte, builder_args.device, args.output_pte_path, args, args.executorch_backend
                 )
             else:
                 print(
