@@ -271,7 +271,6 @@ For more information run `python3 torchchat.py eval --help`
 Eager mode:
 ```
 python3 torchchat.py eval llama3 --dtype fp32 --limit 5
-
 ```
 
 To test the perplexity for a lowered or quantized model, pass it in
