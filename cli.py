@@ -21,8 +21,7 @@ FORMAT = (
 logging.basicConfig(filename="/tmp/torchchat.log", level=logging.INFO, format=FORMAT)
 logger = logging.getLogger(__name__)
 
-
-default_device = "fast"
+default_device = os.getenv("TORCHCHAT_DEVICE", "fast")
 default_model_dir = Path(
     os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")
 ).expanduser()
