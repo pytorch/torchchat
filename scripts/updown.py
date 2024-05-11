@@ -114,7 +114,7 @@ def updown_process_line(
 
 
 def process_command(
-        line, lineno, filename, predicate_list, replace_list, suppress_list, create_sections
+    line, lineno, filename, predicate_list, replace_list, suppress_list, create_sections
 ) -> bool:
 
     command = r"^\[\s*(\w+)\s+(\w+)\s*\]\s*:\s*(.*)"
@@ -203,7 +203,12 @@ def process_command(
 
 
 def updown_processor(
-        filename, predicate_list, replace_list, suppress_list, expand_options, create_sections
+    filename,
+    predicate_list,
+    replace_list,
+    suppress_list,
+    expand_options,
+    create_sections,
 ):
     """
     Processes a file based on the given predicates, replacements, and suppressions.
@@ -323,7 +328,12 @@ def main():
     suppress_list = args.suppress.split(",") if args.suppress else []
     # Call updown_processor function
     updown_processor(
-        filename, predicate_list, replace_list, suppress_list, args.expand_options, args.create_sections
+        filename,
+        predicate_list,
+        replace_list,
+        suppress_list,
+        args.expand_options,
+        args.create_sections,
     )
 
 
