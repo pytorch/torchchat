@@ -6,6 +6,7 @@ from torch.ao.quantization.quantizer.xnnpack_quantizer import (
 )
 from torch.ao.quantization.quantizer.xnnpack_quantizer_utils import QuantizationConfig
 
+
 # Note: not using from torchao.quantization.quant_primitives because it will run into op registraion issues
 def get_group_qparams_symmetric(w, n_bit, groupsize, precision):
     # needed for GPTQ with padding
@@ -29,15 +30,16 @@ def get_group_qparams_symmetric(w, n_bit, groupsize, precision):
 
     # max_int - min_int is just 2**(n_bit) - 1
 
-    scales = max_val_abs / (float(max_int - min_int) / 2) # This is just 2 * max(abs(x)) / (int range)
-    scales = torch.max(
-        scales, torch.full_like(scales, torch.finfo(torch.float32).eps)
-    )
+    scales = max_val_abs / (
+        float(max_int - min_int) / 2
+    )  # This is just 2 * max(abs(x)) / (int range)
+    scales = torch.max(scales, torch.full_like(scales, torch.finfo(torch.float32).eps))
     # TODO: make sure abs(scales) is not too small?
     zeros = torch.full_like(scales, 0)
-    return scales.to(precision).reshape(w.shape[0], -1), zeros.to(
-        precision
-    ).reshape(w.shape[0], -1)
+    return scales.to(precision).reshape(w.shape[0], -1), zeros.to(precision).reshape(
+        w.shape[0], -1
+    )
+
 
 # Note: not using from torchao.quantization.quant_primitives because it will run into op registraion issues
 # Does 4-bit quantization
