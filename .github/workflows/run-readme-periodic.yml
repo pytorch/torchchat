@@ -17,6 +17,7 @@ jobs:
       secrets-env: "HF_TOKEN_PERIODIC"
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
+      timeout: 60
       script: |
         echo "::group::Print machine info"
         uname -a
@@ -27,15 +28,8 @@ jobs:
         export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
-        # echo "::group::get_llama"
-        # (
-        #     set +x
-        #     HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" bash .ci/scripts/download_llama.sh
-        # )
-        # echo "::endgroup::"
-
         echo "::group::Create script to run README"
-        python3 scripts/updown.py --file README.md > ./run-readme.sh
+        python3 scripts/updown.py --create-sections --file README.md > ./run-readme.sh
         # for good measure, if something happened to updown processor,
         # and it did not error out, fail with an exit 1
         echo "exit 1" >> ./run-readme.sh
@@ -48,8 +42,31 @@ jobs:
         bash -x ./run-readme.sh
         echo "::endgroup::"
 
+        echo "::group::Completion"
+        echo "tests complete"
+        echo "*******************************************"
+        echo "::endgroup::"
+
+  test-quantization-any:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      secrets: inherit
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      timeout: 60
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
         echo "::group::Create script to run quantization"
-        python3 scripts/updown.py --file docs/quantization.md  > ./run-quantization.sh
+        python3 scripts/updown.py --create-sections --file docs/quantization.md > ./run-quantization.sh
         # for good measure, if something happened to updown processor,
         # and it did not error out, fail with an exit 1
         echo "exit 1" >> ./run-quantization.sh
@@ -66,4 +83,3 @@ jobs:
         echo "tests complete"
         echo "*******************************************"
         echo "::endgroup::"
-
