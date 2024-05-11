@@ -21,9 +21,8 @@ logging.basicConfig(filename="/tmp/torchchat.log", level=logging.INFO, format=FO
 logger = logging.getLogger(__name__)
 
 # Check if the TORCHCHAT_DEVICE environment variable is set
-torchchat_device = os.getenv('TORCHCHAT_DEVICE')
 # If TORCHCHAT_DEVICE is set, use its value; otherwise, default to "fast"
-default_device = torchchat_device if torchchat_device is not None else "fast"
+default_device = os.getenv("TORCHCHAT_DEVICE", "fast")
 
 default_model_dir = Path(
     os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")
