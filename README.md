@@ -214,8 +214,6 @@ For more details on quantization and what settings to use for your use
 case visit our [Quanitization documentation](docs/quantization.md) or
 run `python3 torchchat.py export`
 
-[end default]: end
-
 ### Deploy and run on iOS
 
 The following assumes you've completed the steps for [Setting up
@@ -246,6 +244,8 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
 <a href="https://pytorch.org/executorch/main/_static/img/llama_ios_app.mp4">
   <img src="https://pytorch.org/executorch/main/_static/img/llama_ios_app.png" width="600" alt="iOS app running a LlaMA model">
 </a>
+
+[end default]: end
 
 
 ### Deploy and run on Android
