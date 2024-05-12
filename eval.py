@@ -141,7 +141,7 @@ class GPTFastEvalWrapper(eval_wrapper):
             )
         )
         x = seq.index_select(0, input_pos).view(1, -1)
-        with measure_time(message=None as measure:
+        with measure_time(message=None) as measure:
             logits = model_forward(self._model, x, input_pos)
         self.times.append(measure.time())
         return logits
