@@ -119,11 +119,14 @@ class BuilderArgs:
 
         if args.output_pte_path and args.dtype.startswith("fast"):
             if args.dtype == "fast":
+                # As per Kimish, float32 should be faster on ET XNNPACK
+                # (because fp16 is implemented as upcast to fp32 for several
+                # operators, and in particular a8w4dq and ET's sdpa+kv)
                 dtype = torch.float32
             else:
                 dtype = torch.float16
         else:
-            dtype = name_to_dtype(args.dtype)
+            dtype = name_to_dtype(args.dtype, args.device)
 
         return cls(
             checkpoint_dir=checkpoint_dir,
