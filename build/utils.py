@@ -256,9 +256,10 @@ def get_device(device) -> str:
         )
     return torch.device(device)
 
+
 def is_cuda_or_cpu_device(device) -> bool:
     return device == "" or str(device) == "cpu" or ("cuda" in str(device))
 
+
 def is_cpu_device(device) -> bool:
     return device == "" or str(device) == "cpu"
-

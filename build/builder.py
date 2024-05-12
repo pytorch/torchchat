@@ -19,7 +19,7 @@ from config.model_config import resolve_model_config
 from quantize import quantize_model
 
 from build.model import Transformer
-from build.utils import device_sync, name_to_dtype, is_cpu_or_cuda_device, is_cpu_device
+from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
 
 
 @dataclass
@@ -371,7 +371,7 @@ def _initialize_model(
         _set_gguf_kwargs(builder_args, is_et=is_pte, context="generate")
 
     if builder_args.dso_path:
-        if not is_cpu_or_cuda_device(builder_args.device):
+        if not is_cuda_or_cpu_device(builder_args.device):
             print(
                 f"Cannot load specified DSO to {builder_args.device}. Attempting to load model to CPU instead"
             )
@@ -404,7 +404,7 @@ def _initialize_model(
                 f"Cannot load specified PTE to {builder_args.device}. Attempting to load model to CPU instead"
             )
             builder_args.device = "cpu"
-            
+
         # assert (
         #     quantize is None or quantize == "{ }"
         # ), "quantize not valid for exported PTE model. Specify quantization during export."
