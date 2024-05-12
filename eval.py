@@ -10,7 +10,7 @@ from typing import Optional
 import torch
 import torch._dynamo.config
 import torch._inductor.config
-
+from utils.measure_time import measure_time
 from build.builder import (
     _initialize_model,
     _initialize_tokenizer,
@@ -141,9 +141,9 @@ class GPTFastEvalWrapper(eval_wrapper):
             )
         )
         x = seq.index_select(0, input_pos).view(1, -1)
-        start = time.time()
-        logits = model_forward(self._model, x, input_pos)
-        self.times.append(time.time() - start)
+        with measure_time(message=None as measure:
+            logits = model_forward(self._model, x, input_pos)
+        self.times.append(measure.time())
         return logits
 
     def _model_generate(self, context, max_length, eos_token_id):
@@ -241,16 +241,16 @@ def main(args) -> None:
         )
         torch._inductor.config.coordinate_descent_tuning = True
 
-    t1 = time.time()
-    result = eval(
-        model.to(device),
-        tokenizer,
-        tasks,
-        limit,
-        max_seq_length,
-        device=builder_args.device,
-    )
-    print(f"Time to run eval: {time.time() - t1:.02f}s.")
+    with measure_time("Time to run eval: {time:.02f}s.")
+        result = eval(
+            model.to(device),
+            tokenizer,
+            tasks,
+            limit,
+            max_seq_length,
+            device=builder_args.device,
+        )
+
     times = torch.tensor(result["times"])
     print(
         f"Time in model.forward: {times.sum():.02f}s, over {times.numel()} model evaluations"
