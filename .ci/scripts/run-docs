@@ -1,0 +1,42 @@
+# /bin/bash -x
+
+if [ "X$1" == "X" ]; then
+  echo "Must specify document to run"
+  exit 1
+fi
+
+if [ "$1" == "readme" ]; then
+        echo "::group::Create script to run README"
+        python3 scripts/updown.py --create-sections --file README.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-readme.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-readme.sh
+        echo "::endgroup::"
+
+        echo "::group::Run README"
+        echo "*******************************************"
+        cat ./run-readme.sh
+        echo "*******************************************"
+        bash -x ./run-readme.sh
+        echo "::endgroup::"
+
+        exit 0
+fi
+
+if [ "$1" == "quantization" ]; then
+        echo "::group::Create script to run quantization"
+        python3 scripts/updown.py --create-sections --file docs/quantization.md --replace llama3:stories15M --suppress huggingface-cli,HF_TOKEN > ./run-quantization.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-quantization.sh
+        echo "::endgroup::"
+
+        echo "::group::Run quantization"
+        echo "*******************************************"
+        cat ./run-quantization.sh
+        echo "*******************************************"
+        bash -x ./run-quantization.sh
+        echo "::endgroup::"
+
+        ecit 0
+fi
