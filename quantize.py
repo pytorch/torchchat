@@ -93,7 +93,7 @@ class PrecisionHandler(QuantHandler):
         self.tokenizer = tokenizer
 
         if isinstance(dtype, str):
-            dtype = name_to_dtype(dtype)
+            dtype = name_to_dtype(dtype, device)
         self.dtype = dtype
 
     def create_quantized_state_dict(self) -> Dict:  # "StateDict"
