@@ -114,7 +114,7 @@ def updown_process_line(
 
 
 def process_command(
-    line, lineno, filename, predicate_list, replace_list, suppress_list
+    line, lineno, filename, predicate_list, replace_list, suppress_list, create_sections
 ) -> bool:
 
     command = r"^\[\s*(\w+)\s+(\w+)\s*\]\s*:\s*(.*)"
@@ -166,6 +166,12 @@ def process_command(
             )
             exit(1)
     elif keyword == "end":
+        if create_sections:
+            output(
+                "echo '::endgroup::'",
+                suppress_list=None,
+                replace_list=None,
+            )
         output(
             "exit 0",
             replace_list=replace_list,
@@ -184,7 +190,12 @@ def process_command(
 
 
 def updown_processor(
-    filename, predicate_list, replace_list, suppress_list, expand_options
+    filename,
+    predicate_list,
+    replace_list,
+    suppress_list,
+    expand_options,
+    create_sections,
 ):
     """
     Processes a file based on the given predicates, replacements, and suppressions.
@@ -202,6 +213,12 @@ def updown_processor(
 
     output("set -eou pipefail", replace_list=None, suppress_list=None)
 
+    if create_sections:
+        output(
+            "echo '::group::start-of-document'",
+            suppress_list=None,
+            replace_list=None,
+        )
     for lineno, line in enumerate(lines):
         # clip trailing newline
         if line.endswith("\n"):
@@ -214,10 +231,33 @@ def updown_processor(
             predicate_list=predicate_list,
             replace_list=replace_list,
             suppress_list=suppress_list,
+            create_sections=create_sections,
         ):
             pass
         elif re.search(r"^\s*```", line):
             print_flag = not print_flag
+        elif (match := re.search(r"^#\s+([\w\s]+)", line)) and create_sections:
+            output(
+                f"echo '::endgroup::'",
+                suppress_list=None,
+                replace_list=None,
+            )
+            output(
+                f"echo '::group::{match.group(0)}'",
+                suppress_list=None,
+                replace_list=None,
+            )
+        elif (match := re.search(r"^##\s+([\w\s]+)", line)) and create_sections:
+            output(
+                f"echo '::endgroup::'",
+                suppress_list=None,
+                replace_list=None,
+            )
+            output(
+                f"echo '::group::{match.group(0)}'",
+                suppress_list=None,
+                replace_list=None,
+            )
         elif print_flag:
             updown_process_line(
                 line=line,
@@ -252,6 +292,9 @@ def main():
     parser.add_argument(
         "-e", "--expand-options", action="store_true", help="Expand options flag"
     )
+    parser.add_argument(
+        "-g", "--create-sections", action="store_true", help="Expand options flag"
+    )
     args = parser.parse_args()
     # Get filename
     filename = args.filename
@@ -272,7 +315,12 @@ def main():
     suppress_list = args.suppress.split(",") if args.suppress else []
     # Call updown_processor function
     updown_processor(
-        filename, predicate_list, replace_list, suppress_list, args.expand_options
+        filename,
+        predicate_list,
+        replace_list,
+        suppress_list,
+        args.expand_options,
+        args.create_sections,
     )
 
 

@@ -7,6 +7,7 @@
 import json
 import logging
 import os
+import sys
 from pathlib import Path
 
 import torch
@@ -20,8 +21,7 @@ FORMAT = (
 logging.basicConfig(filename="/tmp/torchchat.log", level=logging.INFO, format=FORMAT)
 logger = logging.getLogger(__name__)
 
-
-default_device = "fast"
+default_device = os.getenv("TORCHCHAT_DEVICE", "fast")
 default_model_dir = Path(
     os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")
 ).expanduser()
@@ -310,6 +310,9 @@ def arg_init(args):
         raise RuntimeError(
             f"You are using PyTorch {torch.__version__}. At this time, torchchat uses the latest PyTorch technology with high-performance kernels only available in PyTorch nightly until the PyTorch 2.4 release"
         )
+
+    if sys.version_info.major != 3 or sys.version_info.minor < 10:
+        raise RuntimeError("Please use Python 3.10 or later.")
 
     if hasattr(args, "quantize") and Path(args.quantize).is_file():
         with open(args.quantize, "r") as f:
