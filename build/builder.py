@@ -195,7 +195,7 @@ class TokenizerArgs:
             return
 
         if self.is_tiktoken == self.is_sentencepiece:
-            raise RuntimeError("no tokenizer was found")
+            raise RuntimeError(f"no tokenizer was found at {self.tokenizer_path}")
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
