@@ -21,8 +21,8 @@ fi
 
 export ET_BUILD_DIR="et-build-android"
 export CMAKE_OUT_DIR="cmake-out-android"
-export EXECUTORCH_BUILD_CUSTOM_OPS_AOT="OFF"
-export EXECUTORCH_BUILD_CUSTOM="ON"
+export EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT="OFF"
+export EXECUTORCH_BUILD_KERNELS_CUSTOM="ON"
 export CMAKE_OUT_DIR="cmake-out-android"
 # export DCMAKE_INSTALL_PREFIX=cmake-out-android
 #
@@ -30,7 +30,7 @@ export CMAKE_OUT_DIR="cmake-out-android"
 build_runner_et() {
   rm -rf cmake-out-android
   echo "ET BUILD DIR IS ${ET_BUILD_DIR}"
-  cmake -DET_USE_ADPATIVE_THREADS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-23 -S . -B cmake-out-android -G Ninja
+  cmake -DET_USE_ADAPTIVE_THREADS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-23 -S . -B cmake-out-android -G Ninja
   cmake --build cmake-out-android/ -j16 --config Release --target et_run
 }
 

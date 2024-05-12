@@ -9,14 +9,12 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
+from typing import Any, Callable, Dict, List, Tuple
+
+import torch
 
 ##########################################################################
 ###                       unpack packed weights                        ###
-
-from typing import Any, Callable, Dict, List, Optional, Tuple
-
-import torch
-import torch.nn.functional as F
 
 
 def unpack_packed_weights(
@@ -134,12 +132,13 @@ def get_precision():
 
 def name_to_dtype(name):
     if (name == "fast") or (name == "fast16"):
+        # MacOS now supports bfloat16
         import platform
 
         if platform.processor() == "arm":
-            return torch.float16
-        else:
-            return torch.bfloat16
+            if int(platform.mac_ver()[0].split(".")[0]) < 14:
+                return torch.float16
+        return torch.bfloat16
 
     if name in name_to_dtype_dict:
         return name_to_dtype_dict[name]
@@ -228,8 +227,8 @@ def is_mps_available() -> bool:
     # out system says mps is available, but it's not on VMs
     # so let's set up some memry, and see if that work:
     try:
-        mps_tensor = torch.zero(1024, dtype=torch.float16, device="mps")
-    except:
+        mps_tensor = torch.zeros(1024, dtype=torch.float16, device="mps")
+    except RuntimeError:
         return False
 
     # MPS, is that you?
@@ -238,11 +237,12 @@ def is_mps_available() -> bool:
 
 def get_device_str(device) -> str:
     if isinstance(device, str) and device == "fast":
-        return (
+        device = (
             "cuda"
             if torch.cuda.is_available()
             else "mps" if is_mps_available() else "cpu"
         )
+        return device
     else:
         return str(device)
 

@@ -5,7 +5,6 @@
 # LICENSE file in the root directory of this source tree.
 import argparse
 import itertools
-
 import logging
 import sys
 import time
@@ -25,9 +24,7 @@ from build.builder import (
 )
 from build.model import Transformer
 from build.utils import device_sync, set_precision
-from cli import add_arguments_for_generate, arg_init, check_args
-
-logger = logging.getLogger(__name__)
+from cli import add_arguments_for_generate, arg_init, check_args, logger
 
 B_INST, E_INST = "[INST]", "[/INST]"
 B_SYS, E_SYS = "<<SYS>>", "<</SYS>>"
@@ -155,10 +152,9 @@ def logits_to_probs(logits, temperature: float = 1.0, top_k: Optional[int] = Non
 def sample(
     logits, need_probs: bool, temperature: float = 1.0, top_k: Optional[int] = None
 ):
-    # if temperature == 0 and not need_probs:
-    #     _, idx_next = torch.topk(logits, k=1, dim=-1)
-    #     idx_next = idx_next.squeeze(dim=(0, 1))
-    #     return (idx_next, None)
+    if temperature == 0 and not need_probs:
+        _, idx_next = torch.topk(logits[0, -1], k=1, dim=-1)
+        return (idx_next, None)
     probs = logits_to_probs(logits[0, -1], temperature, top_k)
     idx_next = multinomial_sample_one_no_sync(probs)
     return idx_next, probs
@@ -464,6 +460,23 @@ def get_device_info(name: str) -> str:
     return ""
 
 
+def _callback(x, buffer, period_id, done_generating, tokenizer, is_llama3_model):
+    if done_generating:
+        return
+    buffer.append(
+        tokenizer.decode([period_id] + x.tolist())[1:]
+    )  # I think this results in the first output token being dropped from the display which is wrong.
+    if x.item() == tokenizer.eos_id():
+        done_generating = True
+    if is_llama3_model and x.item() == tokenizer.special_tokens["<|eot_id|>"]:
+        done_generating = True
+        buffer = buffer[:-1]  # drop the eot_id from the output buffer
+    if len(buffer) == 4 or done_generating:
+        print("".join(buffer), end="", flush=True)
+        buffer.clear()
+    # print(, end='', flush=True)
+
+
 def _main(
     builder_args: BuilderArgs,
     speculative_builder_args: BuilderArgs,
@@ -506,8 +519,10 @@ def _main(
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
 
-    # Right now the assumption is only llama3 uses tiktokenizer and it must use tiktokenizer.
-    # Piggy backing off of this flag then for now to identify llama3 without prompting user.
+    # Right now the assumption is only llama3 uses tiktokenizer and it
+    # must use tiktokenizer.
+    # Piggy backing off of this flag then for now to identify llama3
+    # without prompting user.
     is_llama3_model = tokenizer_args.is_tiktoken
     if generator_args.chat_mode and is_llama3_model:
         logging.debug(
@@ -597,13 +612,10 @@ def _main(
     start = -1 if generator_args.compile else 0
     start_pos = 0
 
-    # arbitrarily large number as chat mode goes until max_seq length or user exits
+    # arbitrarily large number as chat mode goes until max_seq length
+    # or user exits
     num_samples = generator_args.num_samples if not generator_args.chat_mode else 100000
-    i = (
-        -1
-    )  # long loop and Im scared someone will add a continue in it, so start at -1 and increment at the start
-    while i < num_samples:
-        i += 1
+    for i in range(num_samples):
         device_sync(device=builder_args.device)
         if i >= 0 and generator_args.chat_mode:
             prompt = input("User: ")
@@ -612,7 +624,7 @@ def _main(
                 break
             if not is_llama3_model:
                 if system_prompt:
-                    prompt = f"{B_INST} {B_SYS}\n{system_prompt.strip()}\n{E_SYS}\n\n{prompt.strip} {E_INST}"
+                    prompt = f"{B_INST} {B_SYS}\n{system_prompt.strip()}\n{E_SYS}\n\n{prompt.strip()} {E_INST}"
                     system_prompt = (
                         None  # can only provide system prompt on first interaction
                     )
@@ -659,26 +671,15 @@ def _main(
             period_id = tokenizer.encode(".")[0]
             done_generating = False
 
-            def callback(
-                x, buffer=buffer, period_id=period_id, done_generating=done_generating
-            ):
-                if done_generating:
-                    return
-                buffer.append(
-                    tokenizer.decode([period_id] + x.tolist())[1:]
-                )  # I think this results in the first output token being dropped from the display which is wrong.
-                if x.item() == tokenizer.eos_id():
-                    done_generating = True
-                if (
-                    is_llama3_model
-                    and x.item() == tokenizer.special_tokens["<|eot_id|>"]
-                ):
-                    done_generating = True
-                    buffer = buffer[:-1]  # drop the eot_id from the output buffer
-                if len(buffer) == 4 or done_generating:
-                    print("".join(buffer), end="", flush=True)
-                    buffer.clear()
-                # print(, end='', flush=True)
+            def callback(x):
+                return _callback(
+                    x,
+                    buffer=buffer,
+                    period_id=period_id,
+                    done_generating=done_generating,
+                    tokenizer=tokenizer,
+                    is_llama3_model=is_llama3_model,
+                )
 
         else:
             assert not generator_args.chat_mode
@@ -686,26 +687,15 @@ def _main(
             period_id = tokenizer.encode(".")[0]
             done_generating = False
 
-            def callback(
-                x, buffer=buffer, period_id=period_id, done_generating=done_generating
-            ):
-                if done_generating:
-                    return
-                buffer.append(
-                    tokenizer.decode([period_id] + x.tolist())[1:]
-                )  # I think this results in the first output token being dropped from the display which is wrong.
-                if x.item() == tokenizer.eos_id():
-                    done_generating = True
-                if (
-                    is_llama3_model
-                    and x.item() == tokenizer.special_tokens["<|eot_id|>"]
-                ):
-                    done_generating = True
-                    buffer = buffer[:-1]  # drop the eot_id from the output buffer
-                if len(buffer) == 4 or done_generating:
-                    print("".join(buffer), end="", flush=True)
-                    buffer.clear()
-                # print(, end='', flush=True)
+            def callback(x):
+                return _callback(
+                    x,
+                    buffer=buffer,
+                    period_id=period_id,
+                    done_generating=done_generating,
+                    tokenizer=tokenizer,
+                    is_llama3_model=is_llama3_model,
+                )
 
         t0 = time.perf_counter()
         import contextlib
@@ -736,9 +726,10 @@ def _main(
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
             start_pos += y.size(0)
-        if i == -1:
-            logging.info(f"Compilation time: {time.perf_counter() - t0:.2f} seconds")
-            continue
+        jit_compile = (i == 0) and (
+            generator_args.compile or generator_args.compile_prefill
+        )
+        compilation_time = time.perf_counter() - t0
         if hasattr(prof, "export_chrome_trace"):
             if use_tp:
                 prof.export_chrome_trace(f"{profile}_rank_{rank}.json")
@@ -747,35 +738,48 @@ def _main(
         device_sync(device=builder_args.device)
         t = time.perf_counter() - t0
 
-        if not generator_args.chat_mode:
-            print(tokenizer.decode(y.tolist()))
-        else:
-            print()
+        print()
+        if start_pos >= max_seq_length:
+            print(f"[Max Sequence Length Reached. Ending Conversation.]")
+            print(f"---------------------------------------------------")
+
         tokens_generated = y.size(0) - prompt_length
         tokens_sec = tokens_generated / t
         aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-        logging.debug(
+
+        if jit_compile:
+            print(f"JIT compilation time (incl runtime): {compilation_time:.2} seconds")
+            # Don't continue here.... because we need to report and reset
+            # continue
+
+        print(
             f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_sec:.02f} tokens/sec"
         )
-        logging.debug(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
-
+        print(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
+        if i == 0:
+            print(
+                f"*** This first iteration will include cold start effects for dynamic import, hardware caches{', JIT compilation' if jit_compile else ''}. ***"
+            )
         if start_pos >= max_seq_length:
-            print("Max Sequence Length Reached. Ending Conversation.")
-            break
+            if generator_args.chat_mode:
+                break
 
-    print("==========")
+        if not generator_args.chat_mode:
+            start_pos = 0
+
+    print("\n========================================\n")
     if is_speculative:
         counts_aggregated = [sum(i) for i in zip(*aggregate_metrics["accept_counts"])]
         acceptance_probs = [i / sum(counts_aggregated) for i in counts_aggregated]
-        logging.info(f"Acceptance probs: {acceptance_probs}")
-        logging.info(
+        print(f"Acceptance probs: {acceptance_probs}")
+        print(
             f"Mean Accepted: {sum([idx * i for idx, i in enumerate(counts_aggregated)])/sum(counts_aggregated)}"
         )
 
-    logging.info(
+    print(
         f"Average tokens/sec: {torch.mean(torch.tensor(aggregate_metrics['tokens_per_sec'])).item():.2f}"
     )
-    logging.info(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
+    print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
 
 def main(args):

@@ -1,0 +1,4 @@
+{
+    "executor": {"accelerator": "fast"},
+    "precision": {"dtype" : "fast16"}
+}

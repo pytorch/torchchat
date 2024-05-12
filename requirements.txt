@@ -1,9 +1,7 @@
 # Requires python >=3.10
 
 # PyTorch ecosystem
-torch
 torchao
-executorch
 
 # Hugging Face download
 huggingface_hub
@@ -24,7 +22,7 @@ blobfile
 
 # Build tools
 wheel
-cmake
+cmake>=3.24
 ninja
 zstd
 

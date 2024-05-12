@@ -194,13 +194,16 @@ class TokenizerArgs:
         if model is None:
             return
 
+        if self.is_tiktoken == self.is_sentencepiece:
+            raise RuntimeError("no tokenizer was found")
+
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
         use_tiktoken = model.config.use_tiktoken
 
         if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
             raise RuntimeError(
-                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)}) does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)} for {model_description}"
+                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)}) does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}) for {model_description}"
             )
 
         return
@@ -378,6 +381,12 @@ def _initialize_model(
         print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
         try:
+            if "mps" in builder_args.device:
+                print(
+                    "Cannot load specified DSO to MPS. Attempting to load model to CPU instead"
+                )
+                builder_args.device = "cpu"
+
             # Replace model forward with the AOT-compiled forward
             # This is a hacky way to quickly demo AOTI's capability.
             # model is still a Python object, and any mutation to its

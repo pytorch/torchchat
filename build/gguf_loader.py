@@ -181,10 +181,10 @@ def load_model_and_state_dict(
                 parent,
                 _fqn_last(fqn),
                 WeightOnlyInt4Linear(
-                    "meta",
-                    in_features,
-                    out_features,
+                    in_features=in_features,
+                    out_features=out_features,
                     bias=False,
+                    device="meta",
                     groupsize=Q4_0.groupsize,
                     inner_k_tiles=inner_k_tiles,
                 ),

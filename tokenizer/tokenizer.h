@@ -22,14 +22,11 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "sentencepiece_processor.h"
 
 class Tokenizer {
  public:
-  explicit Tokenizer(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok)
-      : initialized_(false),
-        vocab_size_(vocab_size),
-        bos_tok_(bos_tok),
-        eos_tok_(eos_tok) {}
+  explicit Tokenizer() {}
   virtual ~Tokenizer() {}
 
   virtual void load(const std::string& tokenizer_path) = 0;
@@ -54,21 +51,21 @@ class Tokenizer {
 
  protected:
   bool initialized_;
-  const int32_t vocab_size_;
+  int32_t vocab_size_;
   uint64_t bos_tok_, eos_tok_;
 };
 
-// ----------------------- BPETokenizer -----------------------
+// ----------------------- SPTokenizer -----------------------
 // Used by sentencepiece. Adapted from llama2.c.
 struct TokenIndex {
   const char* str;
   int32_t id;
 };
 
-class BPETokenizer : public Tokenizer {
+class SPTokenizer : public Tokenizer {
  public:
-  explicit BPETokenizer(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok);
-  ~BPETokenizer() override;
+  explicit SPTokenizer();
+  ~SPTokenizer() override;
 
   void load(const std::string& tokenizer_path) override;
 
@@ -78,11 +75,7 @@ class BPETokenizer : public Tokenizer {
   std::string decode(uint64_t prev_token, uint64_t token) override;
 
  private:
-  std::unique_ptr<char*[]> vocab_;
-  std::unique_ptr<float[]> vocab_scores_;
-  std::unique_ptr<TokenIndex[]> sorted_vocab_;
-  unsigned int max_token_length_;
-  unsigned char byte_pieces_[512]; // stores all single-byte strings
+  std::unique_ptr<sentencepiece::SentencePieceProcessor> _processor;
 };
 
 // ----------------------- Tiktoken -----------------------
@@ -94,7 +87,7 @@ using Re2UPtr = std::unique_ptr<re2::RE2>;
 
 class Tiktoken : public Tokenizer {
  public:
-  explicit Tiktoken(int32_t vocab_size, uint64_t bos_tok, uint64_t eos_tok);
+  explicit Tiktoken();
   ~Tiktoken(){};
 
   void load(const std::string& tokenizer_path);
