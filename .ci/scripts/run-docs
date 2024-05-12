@@ -38,5 +38,5 @@ if [ "$1" == "quantization" ]; then
         bash -x ./run-quantization.sh
         echo "::endgroup::"
 
-        ecit 0
+        exit 0
 fi
