@@ -123,7 +123,7 @@ python3 generate.py llama3 --dso-path llama3.so  --prompt "Hello my name is"
 ```
 ### ExecuTorch
 ```
-python3 torchchat.py export llama3 --dtype fp32 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}' --output-pte-path llama3.pte
+python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}' --output-pte-path llama3.pte
 
 python3 generate.py llama3 --pte-path llama3.pte  --prompt "Hello my name is"
 ```
