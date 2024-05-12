@@ -89,7 +89,12 @@ View available models with:
 python3 torchchat.py list
 ```
 
-You can also remove downloaded models with the remove command:
+Query the location of a particular model -- this is particularly useful in scripts when you do not want to hard-code paths:
+```
+python3 torchchat.py where llama3
+```
+
+Finally, you can also remove downloaded models with the remove command:
 `python3 torchchat.py remove llama3`
 
 
@@ -170,7 +175,7 @@ scripts/build_native.sh aoti
 [skip default]: begin
 Execute
 ```bash
-cmake-out/aoti_run exportedModels/llama3.so -z ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time"
 ```
 [skip default]: end
 
