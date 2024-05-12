@@ -241,7 +241,7 @@ def main(args) -> None:
         )
         torch._inductor.config.coordinate_descent_tuning = True
 
-    with measure_time("Time to run eval: {time:.02f}s.")
+    with measure_time("Time to run eval: {time:.02f}s."):
         result = eval(
             model.to(device),
             tokenizer,
