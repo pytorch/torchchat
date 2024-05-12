@@ -28,27 +28,12 @@ torch._inductor.config.triton.unique_kernel_names = True
 torch._inductor.config.epilogue_fusion = False
 torch._inductor.config.triton.cudagraphs = True
 torch._dynamo.config.cache_size_limit = 100000
-import time
 
-try:
-    import lm_eval
+import lm_eval
 
-    lm_eval_available = True
-except:
-    lm_eval_available = False
-
-
-if lm_eval_available:
-    try:  # lm_eval version 0.4
-        from lm_eval.evaluator import evaluate
-        from lm_eval.models.huggingface import HFLM as eval_wrapper
-        from lm_eval.tasks import get_task_dict
-    except:  # lm_eval version 0.3
-        from lm_eval import base, evaluator, tasks
-
-        eval_wrapper = base.BaseLM
-        get_task_dict = tasks.get_task_dict
-        evaluate = evaluator.evaluate
+from lm_eval.evaluator import evaluate
+from lm_eval.models.huggingface import HFLM as eval_wrapper
+from lm_eval.tasks import get_task_dict
 
 
 def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(

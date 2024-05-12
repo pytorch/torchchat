@@ -50,8 +50,8 @@ if(executorch_FOUND)
 
   set(_srcs runner/run.cpp)
   set(_common_compile_options -D__ET__MODEL -D_GLIBCXX_USE_CXX11_ABI=1)
-  if(ET_USE_ADPATIVE_THREADS)
-    list(APPEND _common_compile_options -DET_USE_ADPATIVE_THREADS)
+  if(ET_USE_ADAPTIVE_THREADS)
+    list(APPEND _common_compile_options -DET_USE_ADAPTIVE_THREADS)
 
     set(EXECUTORCH_SRC_ROOT ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch)
     set(XNNPACK_ROOT ${EXECUTORCH_SRC_ROOT}/backends/xnnpack)

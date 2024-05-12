@@ -37,6 +37,7 @@ class BuilderArgs:
     setup_caches: bool = False
     use_tp: bool = False
     is_chat_model: bool = False
+    prefill_possible: bool = False
 
     def __post_init__(self):
         if self.device is None:
@@ -68,6 +69,8 @@ class BuilderArgs:
             print(
                 "Warning: GGUF path ignored because an exported DSO or PTE path specified"
             )
+        if not (self.dso_path) and not (self.pte_path):
+            self.prefill_possible = True
 
     @classmethod
     def from_args(cls, args):  # -> BuilderArgs:
@@ -114,6 +117,14 @@ class BuilderArgs:
                     if "chat" in path_basename or "instruct" in path_basename:
                         is_chat_model = True
 
+        if args.output_pte_path and args.dtype.startswith("fast"):
+            if args.dtype == "fast":
+                dtype = torch.float32
+            else:
+                dtype = torch.float16
+        else:
+            dtype = name_to_dtype(args.dtype)
+
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
@@ -124,7 +135,7 @@ class BuilderArgs:
             dso_path=args.dso_path,
             pte_path=args.pte_path,
             device=args.device,
-            precision=name_to_dtype(args.dtype),
+            precision=dtype,
             setup_caches=(args.output_dso_path or args.output_pte_path),
             use_tp=False,
             is_chat_model=is_chat_model,
@@ -183,13 +194,16 @@ class TokenizerArgs:
         if model is None:
             return
 
+        if self.is_tiktoken == self.is_sentencepiece:
+            raise RuntimeError("no tokenizer was found")
+
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
         use_tiktoken = model.config.use_tiktoken
 
         if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
             raise RuntimeError(
-                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)}) does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)} for {model_description}"
+                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)}) does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}) for {model_description}"
             )
 
         return
@@ -367,6 +381,12 @@ def _initialize_model(
         print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
         try:
+            if "mps" in builder_args.device:
+                print(
+                    "Cannot load specified DSO to MPS. Attempting to load model to CPU instead"
+                )
+                builder_args.device = "cpu"
+
             # Replace model forward with the AOT-compiled forward
             # This is a hacky way to quickly demo AOTI's capability.
             # model is still a Python object, and any mutation to its

@@ -18,7 +18,7 @@ jobs:
           submodules: 'false'
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10.11'
       - name: Extract the list of models to run on CPU
         id: gather-models-cpu
         run: |
@@ -40,14 +40,13 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10.11'
       - name: Print machine info
         run: |
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip3 install -r requirements.txt
+          ./install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -76,14 +75,13 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10.11'
       - name: Print machine info
         run: |
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip3 install -r requirements.txt
+          ./install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -111,14 +109,13 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10.11'
       - name: Print machine info
         run: |
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip3 install -r requirements.txt
+          ./install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -129,7 +126,77 @@ jobs:
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           pushd ${TORCHCHAT_ROOT}
           bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
-          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check"
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check-bfloat16"
+
+  test-cpu-eval-sanity-check-float16:
+    name: test-cpu-eval-sanity-check-float16 (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.11'
+      - name: Print machine info
+        run: |
+          echo "$(uname -a)"
+      - name: Install dependencies
+        run: |
+          ./install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Download checkpoints
+        run: |
+          bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
+      - name: Run validation
+        run: |
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          pushd ${TORCHCHAT_ROOT}
+          bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check-float16"
+
+  test-cpu-eval-sanity-check-float32:
+    name: test-cpu-eval-sanity-check-float32 (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.11'
+      - name: Print machine info
+        run: |
+          echo "$(uname -a)"
+      - name: Install dependencies
+        run: |
+          ./install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Download checkpoints
+        run: |
+          bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
+      - name: Run validation
+        run: |
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          pushd ${TORCHCHAT_ROOT}
+          bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check-float32"
 
   gather-models-gpu:
     runs-on: ubuntu-22.04
@@ -141,7 +208,7 @@ jobs:
           submodules: 'false'
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10.11'
       - name: Extract the list of models to run on GPU
         id: gather-models-gpu
         run: |
@@ -164,8 +231,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip3 install -r ./requirements.txt
+        ./install_requirements.sh cuda
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -203,11 +269,10 @@ jobs:
         echo "::group::Install newer objcopy that supports --set-section-alignment"
         yum install -y  devtoolset-10-binutils
         export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        echo "::endgroup::"        
+        echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip3 install -r ./requirements.txt
+        ./install_requirements.sh cuda
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -244,11 +309,10 @@ jobs:
         echo "::group::Install newer objcopy that supports --set-section-alignment"
         yum install -y  devtoolset-10-binutils
         export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        echo "::endgroup::"        
+        echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip install -r ./requirements.txt
+        ./install_requirements.sh cuda
         pip list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -291,11 +355,10 @@ jobs:
         echo "::group::Install newer objcopy that supports --set-section-alignment"
         yum install -y  devtoolset-10-binutils
         export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        echo "::endgroup::"        
+        echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip install -r ./requirements.txt
+        ./install_requirements.sh cuda
         pip list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -342,8 +405,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip3 install -r ./requirements.txt
+        ./install_requirements.sh cuda
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -372,7 +434,12 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10.11
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
       - name: Print machine info
         run: |
           uname -a
@@ -383,26 +450,12 @@ jobs:
       - name: Install requirements
         run: |
           echo "Intalling pip3 packages"
-          pip3 install wheel
-          pip3 install cmake
-          pip3 install ninja
-          pip3 install zstd
-          pip3 install -r requirements.txt
+          ./install_requirements.sh
 
-          echo "Executorch: cloning"
-          mkdir etorch
-          cd etorch
-          git clone https://github.com/pytorch/executorch.git
-          cd executorch
-          echo "Inside: ${PWD}"
+          export TORCHCHAT_ROOT=$PWD
+          ./scripts/install_et.sh
 
-          echo "Executorch: submodule update"
-          git submodule sync
-          git submodule update --init
-
-          echo "Executorch: installing python interface"
-          ./install_requirements.sh --pybind xnnpack
-
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
           python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
@@ -415,7 +468,6 @@ jobs:
           pushd checkpoints/stories15M
           wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
           wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
-          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
           popd
 
           mkdir gguf_files
@@ -441,7 +493,7 @@ jobs:
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
-          
+
           echo "******************************************"
           echo "***               vanilla              ***"
           echo "******************************************"
@@ -532,7 +584,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10.11
       - name: Print machine info
         run: |
           uname -a
@@ -543,8 +595,8 @@ jobs:
       - name: Install requirements
         run: |
           echo "Installing pip3 packages"
-          pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip3 install -r requirements.txt
+          ./install_requirements.sh
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
       - name: Download Stories files
@@ -578,7 +630,7 @@ jobs:
   test-mps:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-m1-stable
+      runner: macos-m1-stable  # neeps MPS, was macos-m1-stable
       script: |
         set -x
         # NS: Remove previous installation  of torch first
@@ -594,10 +646,10 @@ jobs:
 
         echo "::group::Install requirements"
         # Install requirements
-        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+        ./install_requirements.sh
         ls -la
         pwd
-        pip3 install -r requirements.txt
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -648,7 +700,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10.11
       - name: Print machine info
         run: |
           uname -a
@@ -660,8 +712,8 @@ jobs:
         run: |
           echo "Intalling pip3 packages"
           pip3 install gguf
-          pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip3 install -r requirements.txt
+          ./install_requirements.sh
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
           git clone https://github.com/ggerganov/llama.cpp.git
@@ -687,7 +739,7 @@ jobs:
   test-mps-dtype:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-m1-stable
+      runner: macos-m1-stable  # needs MPS, was macos-m1-stable
       script: |
         set -x
         # NS: Remove previous installation  of torch first
@@ -704,10 +756,10 @@ jobs:
 
         echo "::group::Install requirements"
         # Install requirements
-        pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+        ./install_requirements.sh
         ls -la
         pwd
-        pip3 install -r requirements.txt
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -753,7 +805,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10.11
       - name: Print machine info
         run: |
           uname -a
@@ -763,9 +815,8 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          pip3 install gguf
-          pip3 install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip3 install -r requirements.txt
+          ./install_requirements.sh
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download GGUF
         run: |
@@ -817,7 +868,7 @@ jobs:
   runner-et:
     strategy:
       matrix:
-        runner: [macos-14-xlarge, 8-core-ubuntu]
+        runner: [16-core-ubuntu, macos-14-xlarge]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -827,7 +878,12 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10.11
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
       - name: Print machine info
         run: |
           uname -a
@@ -835,43 +891,82 @@ jobs:
             sysctl machdep.cpu.brand_string
             sysctl machdep.cpu.core_count
           fi
-      - name: Install requirements
+      - name: Install torchchat
         run: |
           echo "Intalling pip3 packages"
-          pip3 install -r requirements.txt
+          ./install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Set ET git sha
+        id: setup-hash
+        run: |
+          export TORCHCHAT_ROOT=${PWD}
+          echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/.pins/et-pin.txt)" >> "$GITHUB_ENV"
+      - name: Load or install ET
+        id: install-et
+        uses: actions/cache@v3
+        env:
+          cache-key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}
+        with:
+          path: ./et-build
+          key: ${{env.cache-key}}
+          restore-keys: |
+            ${{env.cache-key}}
+      - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
+        continue-on-error: true
+        run: |
+          echo "Installing ExecuTorch"
+          bash scripts/build_native.sh et
+      - name: Install ET pip
+        run: |
+          echo "ET build directory"
+          ls et-build | cat
+
+          pushd et-build/src/executorch
+          if [ $(git rev-parse HEAD) != ${{env.et-git-hash}} ]; then
+            echo "Mismatched hash.  Make sure branch install_et.sh matches branch from Github cache."
+            echo "On commit $(git rev-parse HEAD)"
+            echo "Expected commit ${{env.et-git-hash}}"
+            exit 1
+          fi
+          pip install .
+          popd
+      - name: Install runner
+        run: |
+          # Pull submodules (re2, abseil) for Tiktoken
+          git submodule sync
+          git submodule update --init
 
           export TORCHCHAT_ROOT=${PWD}
-          bash scripts/build_native.sh et
-          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
-          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
-          python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
-
-      - name: Download checkpoints
-        run: |
+          cmake -S . -B ./cmake-out -G Ninja
+          cmake --build ./cmake-out --target et_run
 
       - name: Run inference
         run: |
           python torchchat.py download stories15M
-          wget -O ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+          wget -O ./tokenizer.model https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
 
           export PRMT="Once upon a time in a land far away"
 
           python torchchat.py generate stories15M --temperature 0 --prompt "${PRMT}"
 
           python torchchat.py export stories15M --output-pte-path ./model.pte
-          ./cmake-out/et_run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}"
+          ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
+
+          for dtype in fp32 fp16; do   # bf16 needs to be supported
+            echo "Testing export + runner with dtype=$dtype"
+            python torchchat.py export stories15M --dtype $dtype --output-pte-path ./model.pte
+            ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
+          done
 
           echo "Tests complete."
   runner-aoti:
-    name: test-runner-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
-    needs: gather-models-cpu
     strategy:
-      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
-      fail-fast: false
-    runs-on: ${{ matrix.runner }}
+      matrix:
+        runner: [16-core-ubuntu, macos-14-xlarge]
+    runs-on: ${{matrix.runner}}
     env:
       TORCHCHAT_ROOT: ${{ github.workspace }}
-      REPO_NAME: ${{ matrix.repo_name }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -880,15 +975,15 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10.11'
       - name: Print machine info
         run: |
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip3 install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip3 install -r requirements.txt
+          ./install_requirements.sh
           pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
           bash scripts/build_native.sh aoti
 
@@ -898,7 +993,6 @@ jobs:
           pushd checkpoints/stories15M
           wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
           wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
-          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
           popd
       - name: Run inference
         run: |
@@ -909,9 +1003,11 @@ jobs:
 
           python torchchat.py generate --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}"
 
-          python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-dso-path /tmp/model.so
-
-          ./cmake-out/aoti_run /tmp/model.so -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}"
+          for dtype in fp32 fp16 bf16 fast fast16; do
+            echo "Running export + runner with dtype=$dtype"
+            python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --dtype $dtype --output-dso-path /tmp/model.so
+            ./cmake-out/aoti_run /tmp/model.so -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}"
+          done
 
           echo "Tests complete."
 
@@ -925,17 +1021,19 @@ jobs:
             sysctl machdep.cpu.brand_string
             sysctl machdep.cpu.core_count
           fi
-          git submodule sync
-          git submodule update --init
-          echo "Intalling pip3 packages"
-          pip3 install cmake --upgrade
-          cmake --version
-          pip3 install -r requirements.txt
+          ./install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+
           export TORCHCHAT_ROOT=${PWD}
           pushd /tmp
           wget https://dl.google.com/android/repository/android-ndk-r26c-linux.zip
           unzip android-ndk-r26c-linux.zip
           popd
           export ANDROID_NDK=/tmp/android-ndk-r26c
+
+          # Pull submodules (re2, abseil) for Tiktoken
+          git submodule sync
+          git submodule update --init
           ./runner/build_android.sh
           echo "Tests complete."
