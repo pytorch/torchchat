@@ -19,7 +19,7 @@ from config.model_config import resolve_model_config
 from quantize import quantize_model
 
 from build.model import Transformer
-from build.utils import device_sync, name_to_dtype
+from build.utils import device_sync, name_to_dtype, is_cpu_or_cuda_device, is_cpu_device
 
 
 @dataclass
@@ -371,6 +371,12 @@ def _initialize_model(
         _set_gguf_kwargs(builder_args, is_et=is_pte, context="generate")
 
     if builder_args.dso_path:
+        if not is_cpu_or_cuda_device(builder_args.device):
+            print(
+                f"Cannot load specified DSO to {builder_args.device}. Attempting to load model to CPU instead"
+            )
+            builder_args.device = "cpu"
+
         # assert (
         #     quantize is None or quantize == "{ }"
         # ), "quantize not valid for exported DSO model. Specify quantization during export."
@@ -381,12 +387,6 @@ def _initialize_model(
         print(f"Time to load model: {time.time() - t0:.02f} seconds")
 
         try:
-            if "mps" in builder_args.device:
-                print(
-                    "Cannot load specified DSO to MPS. Attempting to load model to CPU instead"
-                )
-                builder_args.device = "cpu"
-
             # Replace model forward with the AOT-compiled forward
             # This is a hacky way to quickly demo AOTI's capability.
             # model is still a Python object, and any mutation to its
@@ -399,6 +399,12 @@ def _initialize_model(
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {builder_args.dso_path}")
     elif builder_args.pte_path:
+        if not is_cpu_device(builder_args.device):
+            print(
+                f"Cannot load specified PTE to {builder_args.device}. Attempting to load model to CPU instead"
+            )
+            builder_args.device = "cpu"
+            
         # assert (
         #     quantize is None or quantize == "{ }"
         # ), "quantize not valid for exported PTE model. Specify quantization during export."
