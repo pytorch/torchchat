@@ -13,12 +13,12 @@ While quantization can potentially degrade the model's performance, the methods 
 
 ## Supported Quantization Schemes
 ### Weight Quantization
-| compression | FP Precision | bitwidth| group size | dynamic activation quantization | Eager | AOTI | ExecuTorch |
+| compression | bitwidth| group size | dynamic activation quantization | Eager | AOTI | ExecuTorch |
 |--|--|--|--|--|--|--|--|
-| linear (asymmetric) | fp32, fp16, bf16 | [8, 4]* | [32, 64, 128, 256]** | | ✅ | ✅ | 🚧 |
-| linear with GPTQ*** (asymmetric) | | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
-| linear with HQQ*** (asymmetric) | | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
-| linear with dynamic activations (symmetric) | fp32^ | | [32, 64, 128, 256]* | a8w4dq | 🚧 |🚧 | ✅ |
+| linear (asymmetric) | [8, 4]* | [32, 64, 128, 256]** | | ✅ | ✅ | 🚧 |
+| linear with GPTQ*** (asymmetric) | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
+| linear with HQQ*** (asymmetric) | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
+| linear with dynamic activations (symmetric) | | [32, 64, 128, 256]* | a8w4dq | 🚧 |🚧 | ✅ |
 
 ### Embedding Quantization
 
@@ -26,13 +26,10 @@ Due to the larger vocabulary size of llama3, we also recommend
 quantizing the embeddings to further reduce the model size for
 on-device usecases.
 
-| compression | FP Precision | weight quantization (bitwidth)| weight quantization (group size) | dynamic activation quantization | Eager | AOTI | ExecuTorch |
+| compression | weight quantization (bitwidth)| weight quantization (group size) | dynamic activation quantization | Eager | AOTI | ExecuTorch |
 |--|--|--|--|--|--|--|--|
-| embedding (symmetric) | fp32, fp16, bf16 | [8, 4]* | [ any > 1 ] | | ✅ | ✅ | ✅ |
+| embedding (symmetric) | [8, 4]* | [ any > 1 ] | | ✅ | ✅ | ✅ |
 
-^ a8w4dq quantization scheme requires model to be converted to fp32,
-  due to lack of support for fp16 and bf16 in the kernels provided with
-  ExecuTorch.
 
 * These are the only valid bitwidth options.
 
