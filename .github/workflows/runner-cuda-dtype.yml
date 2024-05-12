@@ -48,7 +48,7 @@ jobs:
         export MODEL_NAME=stories15M
         export MODEL_DIR=/tmp
 
-	set -eou pipefail
+        set -eou pipefail
         export MODEL_DIR=${PWD}/checkpoints/stories15M
         export PROMPT="Once upon a time in a land far away"
 
