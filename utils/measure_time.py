@@ -20,5 +20,5 @@ class measure_time:
         if self.message is not None:
             print(self.message.format(time=self.time))
 
-    def time(self):
+    def get_time(self):
         return self.time
