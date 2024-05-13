@@ -78,6 +78,10 @@ def add_arguments_for_remove(parser):
     # Only remove specific options should be here
     _add_arguments_common(parser)
 
+def add_arguments_for_where(parser):
+    # Only remove specific options should be here
+    _add_arguments_common(parser)
+
 
 def _add_arguments_common(parser):
     # Model specification. TODO Simplify this.

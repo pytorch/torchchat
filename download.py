@@ -26,7 +26,10 @@ def _download_hf_snapshot(
     from requests.exceptions import HTTPError
 
     # Download and store the HF model artifacts.
-    print(f"Downloading {model_config.name} from HuggingFace...")
+    print(
+        f"Downloading {model_config.name} from HuggingFace...",
+        file=sys.stderr
+    )
     try:
         snapshot_download(
             model_config.distribution_path,
@@ -51,7 +54,10 @@ def _download_hf_snapshot(
             raise e
 
     # Convert the model to the torchchat format.
-    print(f"Converting {model_config.name} to torchchat format...")
+    print(
+        f"Converting {model_config.name} to torchchat format...",
+        file=sys.stderr
+    )
     convert_hf_checkpoint(
         model_dir=artifact_dir, model_name=model_config.name, remove_bin_files=True
     )
@@ -64,7 +70,7 @@ def _download_direct(
     for url in model_config.distribution_path:
         filename = url.split("/")[-1]
         local_path = artifact_dir / filename
-        print(f"Downloading {url}...")
+        print(f"Downloading {url}...", file=sys.stderr)
         urllib.request.urlretrieve(url, str(local_path.absolute()))
 
 
@@ -178,6 +184,24 @@ def remove_main(args) -> None:
     shutil.rmtree(model_dir)
     print("Done.")
 
+# Subcommand to print downloaded model artifacts directory.
+# Asking for location will/should trigger download of model if not available.
+def where_main(args) -> None:
+    # TODO It would be nice to have argparse validate this. However, we have
+    # model as an optional named parameter for all subcommands, so we'd
+    # probably need to move it to be registered per-command.
+    if not args.model:
+        print("Usage: torchchat.py where <model-or-alias>")
+        return
+
+    model_config = resolve_model_config(args.model)
+    model_dir = args.model_directory / model_config.name
+
+    if not os.path.isdir(model_dir):
+        raise RuntimeError(f"Model {args.model} has no downloaded artifacts.")
+
+    print(str(os.path.abspath(model_dir)))
+    exit(0)
 
 # Subcommand to download model artifacts.
 def download_main(args) -> None:
