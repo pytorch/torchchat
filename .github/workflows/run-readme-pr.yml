@@ -154,6 +154,7 @@ jobs:
         echo "*******************************************"
         echo "::endgroup::"
 
+
   test-advanced-any:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     secrets: inherit
@@ -181,7 +182,7 @@ jobs:
         echo "::endgroup::"
 
 
-  test-gguf-cpu:
+  test-advanced-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     secrets: inherit
     with:
