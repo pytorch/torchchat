@@ -251,7 +251,7 @@ ExecuTorch-exported PTE models.
 
 ## PyTorch eager mode and JIT-compiled execution
 ```
-python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --device [ cuda | cpu | mps ]
+python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --device [ cuda | mps | cpu ]
 ```
 
 To improve performance, you can compile the model with `--compile`
@@ -307,7 +307,7 @@ execution with the ExecuTorch runtime (and enabling execution on a
 wide range of community and vendor supported backends):
 
 ```
-python3 export.py --checkpoint-path ${MODEL_PATH} --device [ cpu | cuda ] --output-pte-path ${MODEL_NAME}.pte
+python3 export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_NAME}.pte
 ```
 
 Alternatively, we may generate a native instruction stream binary
@@ -343,7 +343,7 @@ tests against the exported model with the same interface, and support
 additional experiments to confirm model quality and speed.
 
 ```
-python3 generate.py --device {cuda,cpu} --dso-path ${MODEL_NAME}.so --prompt "Once upon a time"
+python3 generate.py --device [ cuda | cpu ] --dso-path ${MODEL_NAME}.so --prompt "Once upon a time"
 ```
 
 

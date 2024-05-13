@@ -55,9 +55,13 @@ if [ "$1" == "gguf" ]; then
         echo "*******************************************"
         bash -x ./run-gguf.sh
         echo "::endgroup::"
+<<<<<<< HEAD
 fi
 
 
 if [ "$1" == "advanced" ]; then
    echo "TBD"
 fi            
+=======
+fi
+>>>>>>> e3db2486f80b71b3143945a44f58d50c02488c90
