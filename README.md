@@ -263,7 +263,12 @@ The torchchat app skeleton is located at `android/Torchchat`. Use Android Studio
 
 You may notice that the project is missing a file `app/libs/executorch.aar`. Please download our prebuilt archive.
 
-[Download](https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar) (SHASUM: 09d17f7bc59589b581e45bb49511d19196d0297d)
+[executorch-llama.aar](https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar) (SHASUM: 09d17f7bc59589b581e45bb49511d19196d0297d)
+
+```
+curl https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar -o android/Torchchat/app/libs/executorch.aar
+echo "09d17f7bc59589b581e45bb49511d19196d0297d  android/Torchchat/app/libs/executorch.aar" | shasum --check
+```
 
 Then, click the Play button (^R) to launch it to emulator/device.
 
