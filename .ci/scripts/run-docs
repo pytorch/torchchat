@@ -55,13 +55,23 @@ if [ "$1" == "gguf" ]; then
         echo "*******************************************"
         bash -x ./run-gguf.sh
         echo "::endgroup::"
-<<<<<<< HEAD
 fi
 
 
 if [ "$1" == "advanced" ]; then
+        echo "::group::Create script to run advanced"
+        python3 scripts/updown.py --file docs/ADVANCED-USERS.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-advanced.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-advanced.sh
+        echo "::endgroup::"
+
+        echo "::group::Run advanced"
+        echo "*******************************************"
+        cat ./run-advanced.sh
+        echo "*******************************************"
+        bash -x ./run-advanced.sh
+        echo "::endgroup::"
    echo "TBD"
 fi            
-=======
-fi
->>>>>>> e3db2486f80b71b3143945a44f58d50c02488c90
+
