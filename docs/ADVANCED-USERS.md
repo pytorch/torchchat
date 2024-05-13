@@ -206,8 +206,8 @@ which are not available for exported DSO and PTE models.
 
 ## Eval
 
-For an introduction to the model evaluation tool `eval`, please see the introductory
-README.
+For an introduction to the model evaluation tool `eval`, please see
+the introductory README.
 
 In addition to running eval on models in eager mode (optionally
 compiled with `torch.compile()`), you can also load dso and pte models
@@ -276,11 +276,16 @@ to achieve this.
 
 ### Visualizing the backend delegate on ExecuTorch export
 
-By default, export will lower to the XNNPACK delegate for improved performance. ExecuTorch export
-provides APIs to visualize what happens after the `to_backend()` call in the lowering process.
+By default, export will lower to the XNNPACK delegate for improved
+performance. ExecuTorch export provides APIs to visualize what happens
+after the `to_backend()` call in the lowering process.
 
-- `get_delegation_info()`: provide a summary of the model after the `to_backend()` call, including the total delegated subgraphs, number of delegated nodes and number of non-delegated nodes.
-- `format_delegated_graph`: a formatted str of the whole graph, as well as the subgraph/s consumed by the backend.
+- `get_delegation_info()`: provide a summary of the model after the
+  `to_backend()` call, including the total delegated subgraphs, number
+  of delegated nodes and number of non-delegated nodes.
+
+- `format_delegated_graph`: a formatted str of the whole graph, as
+  well as the subgraph/s consumed by the backend.
 
 See the
 [debug backend delegate documentation](https://pytorch.org/executorch/main/debug-backend-delegate.html)
@@ -318,11 +323,6 @@ On top of quantizing models with quantization schemes mentioned above, models ca
 python3 generate.py --dtype [bf16 | fp16 | fp32] ...
 python3 export.py --dtype [bf16 | fp16 | fp32] ...
 ```
-
-**Unlike gpt-fast which uses bfloat16 as default, Torchchat uses
-  float32 as the default. As a consequence you will have to set to
-  `--dtype bf16` or `--dtype fp16` on server / desktop for best
-  performance.**
 
 You can find instructions for quantizing models in
 [docs/quantization.md](file:///./quantization.md).  Advantageously,
