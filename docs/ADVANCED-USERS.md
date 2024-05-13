@@ -257,8 +257,8 @@ supported in a future release.
 
 ## Model quality evaluation
 
-For an introduction to the model evaluation tool `eval`, please see the introductory
-README.
+For an introduction to the model evaluation tool `eval`, please see
+the introductory README.
 
 In addition to running eval on models in eager mode and JIT-compiled
 mode with `torch.compile()`, you can also load dso and pte models back
@@ -348,15 +348,62 @@ to achieve this.
 
 ### Visualizing the backend delegate on ExecuTorch export
 
-By default, export will lower to the XNNPACK delegate for improved performance. ExecuTorch export
-provides APIs to visualize what happens after the `to_backend()` call in the lowering process.
+By default, export will lower to the XNNPACK delegate for improved
+performance. ExecuTorch export provides APIs to visualize what happens
+after the `to_backend()` call in the lowering process.
 
-- `get_delegation_info()`: provide a summary of the model after the `to_backend()` call, including the total delegated subgraphs, number of delegated nodes and number of non-delegated nodes.
-- `format_delegated_graph`: a formatted str of the whole graph, as well as the subgraph/s consumed by the backend.
+- `get_delegation_info()`: provide a summary of the model after the
+  `to_backend()` call, including the total delegated subgraphs, number
+  of delegated nodes and number of non-delegated nodes.
+
+- `format_delegated_graph`: a formatted str of the whole graph, as
+  well as the subgraph/s consumed by the backend.
 
 See the
 [debug backend delegate documentation](https://pytorch.org/executorch/main/debug-backend-delegate.html)
 for more details.
+
+
+## Optimizing your model for server, desktop and mobile devices
+
+To compress models, torchchat offers a variety of strategies:
+
+* Configurable floating-point precision, depending on backend
+  capabilities (for activations and weights): float32, float16,
+  bfloat16
+
+* weight-quantization: embedding quantization and linear operator
+  quantization
+
+* dynamic activation quantization with weight quantization: a8w4dq
+
+In addition, we support GPTQ and HQQ for improving the quality of 4b
+weight-only quantization. Support for HQQ is a work in progress.
+
+| compression | FP precision |  weight quantization | dynamic activation quantization |
+|--|--|--|--|
+embedding table (symmetric) | fp32, fp16, bf16 | 8b (group/channel), 4b (group/channel) | n/a |
+linear operator (symmetric) | fp32, fp16, bf16 | 8b (group/channel) | n/a |
+linear operator (asymmetric) | n/a | 4b (group), a6w4dq | a8w4dq (group) |
+linear operator (asymmetric) with GPTQ | n/a | 4b (group) | n/a |
+linear operator (asymmetric) with HQQ | n/a |  work in progress | n/a |
+
+## Model precision (dtype precision setting)
+On top of quantizing models with quantization schemes mentioned above, models can be converted to lower bit floating point precision to reduce the memory bandwidth requirement and take advantage of higher density compute available. For example, many GPUs and some of the CPUs have good support for bfloat16 and float16. This can be taken advantage of via `--dtype arg` as shown below.
+
+```
+python3 generate.py --dtype [bf16 | fp16 | fp32] ...
+python3 export.py --dtype [bf16 | fp16 | fp32] ...
+```
+
+You can find instructions for quantizing models in
+[docs/quantization.md](file:///./quantization.md).  Advantageously,
+quantization is available in eager mode as well as during export,
+enabling you to do an early exploration of your quantization setttings
+in eager mode.  However, final accuracy should always be confirmed on
+the actual execution target, since all targets have different build
+processes, compilers, and kernel implementations with potentially
+significant impact on accuracy.
 
 
 ## Loading GGUF models

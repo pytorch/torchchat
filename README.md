@@ -159,7 +159,7 @@ NOTE: If your machine has cuda add this flag for performance
 
 ### Running native using our C++ Runner
 
-The end-to-end C++ [runner](runner/run.cpp) runs an `*.so` file
+The end-to-end C++ [runner](runner/run.cpp) runs a [DSO](https://en.wikipedia.org/wiki/Shared_library)  model (represented by a file with extension `.so`)
 exported in the previous step.
 
 To build the runner binary on your Mac or Linux:
@@ -250,9 +250,19 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
 
 ### Deploy and run on Android
 
+**This section is copied from the original REAMDE and may require additional integration work**
 
+Please refer to our [tutorial on how to build an Android app running
+your PyTorch models with
+Executorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html)
+to for an example on how to run your torchchat models on Android.
 
-MISSING. TBD.
+![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png
+ "Android app running Llama model")
+
+Detailed step by step in conjunction with ET Android build, to run on
+simulator for Android. `scripts/android_example.sh` for running a
+model on an Android simulator (on Mac), and in `docs/Android.md`.
 
 
 
