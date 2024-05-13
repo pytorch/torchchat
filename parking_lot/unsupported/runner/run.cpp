@@ -151,31 +151,22 @@ float* forward(Transformer* transformer, int token, int pos) {
     torch::Tensor token_tensor = torch::from_blob(token_buffer, {1, 1}, torch::kLong);
     torch::Tensor pos_tensor = torch::from_blob(pos_buffer, {1}, torch::kLong);
     std::vector<torch::Tensor> inputs{token_tensor, pos_tensor};
-
+    // call AOTI model
     torch::Tensor result = transformer->runner->run(inputs)[0];
     auto logits = result[0].data_ptr();
-
 #else // __ET_MODEL__
     ManagedTensor pos_managed(
         pos_buffer, sizeof(int64_t), { 1 }, ScalarType::Long);
-#ifndef __KV_CACHE__
-    // @lint-ignore CLANGTIDY facebook-hte-LocalUncheckedArrayBounds
-    ManagedTensor tokens_managed(&(s->toks[pos]), /*ignored*/sizeof(int64_t)*(pos+1), {1, 1}, ScalarType::Long);
-#else // __KV_CACHE__
     ManagedTensor tokens_managed(
       token_buffer, sizeof(int64_t), {1, 1}, ScalarType::Long);
-#endif
     std::vector<EValue> inputs;
     auto tmp1 = EValue(tokens_managed.get_aliasing_tensor());
     auto tmp2 = EValue(pos_managed.get_aliasing_tensor());
-
     inputs.push_back(tmp1);
     inputs.push_back(tmp2);
+    // call ET model
     Result<std::vector<EValue>> outputs_res = transformer->runner->forward(inputs);
-    if (!outputs_res.ok()) {
-        fprintf(stderr, "Executorch forward() failed.");
-        exit(EXIT_FAILURE);
-    }
+    assert(outputs_res.ok());
     std::vector<EValue> result = outputs_res.get();
     auto logits = result[0].toTensor().const_data_ptr();
 #endif
