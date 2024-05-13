@@ -18,6 +18,7 @@ from cli import (
     add_arguments_for_generate,
     add_arguments_for_list,
     add_arguments_for_remove,
+    add_arguments_for_where,
     arg_init,
     check_args,
 )
@@ -85,6 +86,12 @@ if __name__ == "__main__":
         help="Remove downloaded model artifacts",
     )
     add_arguments_for_remove(parser_remove)
+
+    parser_where = subparsers.add_parser(
+        "where",
+        help="Return directory containing downloaded model artifacts",
+    )
+    add_arguments_for_where(parser_where)
 
     # Now parse the arguments
     args = parser.parse_args()
@@ -158,6 +165,11 @@ if __name__ == "__main__":
         from download import list_main
 
         list_main(args)
+    elif args.command == "where":
+        check_args(args, "where")
+        from download import where_main
+
+        where_main(args)
     elif args.command == "remove":
         check_args(args, "remove")
         from download import remove_main
