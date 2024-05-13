@@ -10,15 +10,8 @@ import subprocess
 import sys
 
 from cli import (
-    add_arguments_for_browser,
-    add_arguments_for_chat,
-    add_arguments_for_download,
-    add_arguments_for_eval,
-    add_arguments_for_export,
-    add_arguments_for_generate,
-    add_arguments_for_list,
-    add_arguments_for_remove,
-    add_arguments_for_where,
+    add_arguments_for_verb,
+    KNOWN_VERBS,
     arg_init,
     check_args,
 )
@@ -39,59 +32,20 @@ if __name__ == "__main__":
     )
     subparsers.required = True
 
-    parser_chat = subparsers.add_parser(
-        "chat",
-        help="Chat interactively with a model",
-    )
-    add_arguments_for_chat(parser_chat)
-
-    parser_browser = subparsers.add_parser(
-        "browser",
-        help="Chat interactively in a browser",
-    )
-    add_arguments_for_browser(parser_browser)
-
-    parser_download = subparsers.add_parser(
-        "download",
-        help="Download a model from Hugging Face or others",
-    )
-    add_arguments_for_download(parser_download)
-
-    parser_generate = subparsers.add_parser(
-        "generate",
-        help="Generate responses from a model given a prompt",
-    )
-    add_arguments_for_generate(parser_generate)
-
-    parser_eval = subparsers.add_parser(
-        "eval",
-        help="Evaluate a model given a prompt",
-    )
-    add_arguments_for_eval(parser_eval)
-
-    parser_export = subparsers.add_parser(
-        "export",
-        help="Export a model for AOT Inductor or ExecuTorch",
-    )
-    add_arguments_for_export(parser_export)
-
-    parser_list = subparsers.add_parser(
-        "list",
-        help="List supported models",
-    )
-    add_arguments_for_list(parser_list)
-
-    parser_remove = subparsers.add_parser(
-        "remove",
-        help="Remove downloaded model artifacts",
-    )
-    add_arguments_for_remove(parser_remove)
-
-    parser_where = subparsers.add_parser(
-        "where",
-        help="Return directory containing downloaded model artifacts",
-    )
-    add_arguments_for_where(parser_where)
+    VERB_HELP = {
+       "chat": "Chat interactively with a model",
+       "browser": "Chat interactively in a browser",
+       "download": "Download a model from Hugging Face or others",
+       "generate": "Generate responses from a model given a prompt",
+       "eval": "Evaluate a model given a prompt",
+       "export": "Export a model for AOT Inductor or ExecuTorch",
+       "list": "List supported models",
+       "remove": "Remove downloaded model artifacts",
+       "where": "Return directory containing downloaded model artifacts",
+    }
+    for verb in KNOWN_VERBS:
+       subparser = subparsers.add_parser(verb, help=VERB_HELP[verb])
+       add_arguments_for_verb(subparser, verb)
 
     # Now parse the arguments
     args = parser.parse_args()
