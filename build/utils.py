@@ -130,13 +130,15 @@ def get_precision():
 ###               dtype name to torch.dtype mapping                    ###
 
 
-def name_to_dtype(name):
+def name_to_dtype(name, device):
     if (name == "fast") or (name == "fast16"):
         # MacOS now supports bfloat16
         import platform
 
         if platform.processor() == "arm":
-            if int(platform.mac_ver()[0].split(".")[0]) < 14:
+            device=get_device_str(device)
+            # ARM CPU is faster with float16, MPS with bf16 if supported
+            if device == "cpu" or int(platform.mac_ver()[0].split(".")[0]) < 14:
                 return torch.float16
         return torch.bfloat16
 
