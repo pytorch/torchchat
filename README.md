@@ -159,7 +159,7 @@ NOTE: If your machine has cuda add this flag for performance
 
 ### Running native using our C++ Runner
 
-The end-to-end C++ [runner](runner/run.cpp) runs an `*.so` file
+The end-to-end C++ [runner](runner/run.cpp) runs a [DSO](https://en.wikipedia.org/wiki/Shared_library)  model (represented by a file with extension `.so`)
 exported in the previous step.
 
 To build the runner binary on your Mac or Linux:
