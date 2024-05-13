@@ -8,8 +8,10 @@ on:
 jobs:
   test-readme-mps-macos:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
+    secrets: inherit
     with:
       runner: macos-m1-14
+      secrets-env: "HF_TOKEN_PERIODIC"
       script: |
           conda create -y -n test-readme-mps-macos python=3.10.11
           conda activate test-readme-mps-macos
@@ -43,12 +45,7 @@ jobs:
           echo "*******************************************"
           bash -x ./run-readme.sh
           echo "::endgroup::"
-  
-          echo "::group::Completion"
-          echo "tests complete"
-          echo "*******************************************"
-          echo "::endgroup::"
-
+	  
   test-quantization-mps-macos:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:

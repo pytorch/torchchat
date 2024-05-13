@@ -28,7 +28,8 @@ on-device usecases.
 
 | compression | weight quantization (bitwidth)| weight quantization (group size) | dynamic activation quantization | Eager | AOTI | ExecuTorch |
 |--|--|--|--|--|--|--|--|
-| embedding (symmetric) | [8, 4]* | [ any > 1 ] | | ✅ | ✅ | ✅ |
+| embedding (symmetric) | [8, 4]* | [32, 64, 128, 256]+ | | ✅ | ✅ | ✅ |
+
 
 
 * These are the only valid bitwidth options.
@@ -43,6 +44,16 @@ on-device usecases.
     algorithms to address accuracy loss when using lower bit
     quantization. Due to HQQ relying on data/calibration free
     quantization, it tends to take less time to quantize model.
+    HQQ is currently enabled with axis=1 configuration. 
+    
+    Presently, torchchat includes a subset of the HQQ distribution in 
+    the hqq subdirectory, but HQQ is not installed by default with torchchat,
+    due to dependence incompatibilities between torchchat and the hqq
+    project.  We may integrate hqq via requirements.txt in the future. 
+    (As a result, there's presently no upstream path for changes and/or
+    improvements to HQQ.)
+
++ Should support non-power-of-2-groups as well.
 
 ## Quantization Profiles
 
@@ -68,6 +79,7 @@ data types. The default data type for models is "fast16".  The
 "fast" data type is a virtual data type that defaults to the best
 floating point data type available on the selected device.  ("Best"
 tangibly representing a combination of speed and accuracy.)
+
 
 ## Quantization API
 
