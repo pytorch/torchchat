@@ -173,25 +173,13 @@ jobs:
         export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
-        echo "::group::Create script to run advanced"
-        python3 scripts/updown.py --file docs/ADVANCED-USERS.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-advanced.sh
-        # for good measure, if something happened to updown processor,
-        # and it did not error out, fail with an exit 1
-        echo "exit 1" >> ./run-advanced.sh
-        echo "::endgroup::"
-
-        echo "::group::Run advanced"
-        echo "*******************************************"
-        cat ./run-advanced.sh
-        echo "*******************************************"
-        bash -x ./run-advanced.sh
-=======
+        .ci/scripts/run-docs advanced
 
         echo "::group::Completion"
         echo "tests complete"
         echo "*******************************************"
->>>>>>> e3db2486f80b71b3143945a44f58d50c02488c90
         echo "::endgroup::"
+
 
   test-gguf-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
@@ -212,9 +200,10 @@ jobs:
         export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs gguf
+        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
 
         echo "::group::Completion"
         echo "tests complete"
         echo "*******************************************"
         echo "::endgroup::"
+
