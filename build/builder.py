@@ -10,6 +10,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
+from utils.measure_time import measure_time
 
 import torch
 import torch._dynamo.config
@@ -381,10 +382,9 @@ def _initialize_model(
         #     quantize is None or quantize == "{ }"
         # ), "quantize not valid for exported DSO model. Specify quantization during export."
 
-        t0 = time.time()
-        model = _load_model(builder_args, only_config=True)
-        device_sync(device=builder_args.device)
-        print(f"Time to load model: {time.time() - t0:.02f} seconds")
+        with measure_time("Time to load model: {time:.02f} seconds"):
+            model = _load_model(builder_args, only_config=True)
+            device_sync(device=builder_args.device)
 
         try:
             # Replace model forward with the AOT-compiled forward
@@ -409,10 +409,9 @@ def _initialize_model(
         #     quantize is None or quantize == "{ }"
         # ), "quantize not valid for exported PTE model. Specify quantization during export."
 
-        t0 = time.time()
-        model = _load_model(builder_args, only_config=True)
-        device_sync(device=builder_args.device)
-        print(f"Time to load model: {time.time() - t0:.02f} seconds")
+        with measure_time("Time to load model: {time:.02f} seconds"):
+            model = _load_model(builder_args, only_config=True)
+            device_sync(device=builder_args.device)
 
         try:
             from build.model_et import PTEModel
@@ -421,17 +420,15 @@ def _initialize_model(
         except Exception:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
     else:
-        t0 = time.time()
-        model = _load_model(builder_args)
-        device_sync(device=builder_args.device)
-        print(f"Time to load model: {time.time() - t0:.02f} seconds")
+        with measure_time("Time to load model: {time:.02f} seconds"):
+            model = _load_model(builder_args)
+            device_sync(device=builder_args.device)
 
         if quantize:
-            t0q = time.time()
             print(f"Quantizing the model with: {quantize}")
-            quantize_model(model, builder_args.device, quantize, tokenizer)
-            device_sync(device=builder_args.device)
-            print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
+            with measure_time("Time to quantize model: {time:.02f} seconds"):
+                quantize_model(model, builder_args.device, quantize, tokenizer)
+                device_sync(device=builder_args.device)
 
         if builder_args.setup_caches:
             with torch.device(builder_args.device):
