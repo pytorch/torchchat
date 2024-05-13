@@ -20,7 +20,7 @@ Start by installing torchtune:
 pip install torchtune
 ```
 
-Download the model checkpoint to torchtune:
+Download the model checkpoint with torchtune:
 
 [shell default]: export HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}
 
@@ -32,7 +32,9 @@ tune download meta-llama/Meta-Llama-3-8B \
     --hf-token ${HF_TOKEN}
 ```
 
-After installing torchtune and downloading the weights of the Llama3 model checkpoint to be torchtuned, we perform LoRA fine-tuning:
+After installing torchtune and downloading the weights of the Llama3
+model checkpoint to be torchtuned, we perform LoRA fine-tuning:
+
 ```
 # Run LoRA fine-tuning on a single device. This assumes the config points to <checkpoint_dir> above
 tune run lora_finetune_single_device --config llama3/8B_lora_single_device
