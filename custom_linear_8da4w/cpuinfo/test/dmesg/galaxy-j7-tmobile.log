@@ -1,0 +1,1263 @@
+[   18.409179]  [1:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   18.409196]  [1:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   18.409206]  [1:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   18.409214]  [1:         mc_log: 2322] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   18.409223]  [1:         mc_log: 2322] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   18.409233]  [1:         mc_log: 2322] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   18.409242]  [1:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   18.409250]  [1:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   18.409259]  [1:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   18.409267]  [1:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   18.412721]  [1:         mc_log: 2322] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   18.412742]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   18.412754]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   18.412766]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   18.416089]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   18.416109]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   18.416121]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   18.416130]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop done
+[   18.416139]  [1:         mc_log: 2322] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   18.416146]  [1:         mc_log: 2322] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   18.422533]  [0:       watchdog: 3704] logger: !@Sync 0 [09-12 20:28:29.012]
+[   18.427254]  [2:SdpManagerServi: 3296] MobiCore mcd: closed by PID(3296), name(SdpManagerServi)
+[   18.439480]  [3:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   18.450189]  [0:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   18.450206]  [0:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   18.450216]  [0:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   18.450224]  [0:         mc_log: 2322] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   18.450233]  [0:         mc_log: 2322] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   18.451347]  [0:         mc_log: 2322] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   18.451367]  [0:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   18.451376]  [0:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   18.451385]  [0:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   18.451393]  [0:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   18.458819]  [2:         mc_log: 2322] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   18.458840]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   18.458852]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   18.458864]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   18.458876]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   18.458888]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   18.458900]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   18.458908]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop done
+[   18.458916]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   18.458924]  [2:         mc_log: 2322] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   18.472135]  [2:SdpManagerServi: 3296] MobiCore mcd: closed by PID(3296), name(SdpManagerServi)
+[   18.509398]  [0:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   18.511247]  [0:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   18.511263]  [0:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   18.511272]  [0:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   18.511280]  [0:         mc_log: 2322] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   18.511289]  [0:         mc_log: 2322] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   18.512729]  [1:         mc_log: 2322] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   18.513353]  [1:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   18.513367]  [1:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   18.513376]  [1:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   18.513385]  [1:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   18.519853]  [0:         mc_log: 2322] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   18.519872]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   18.519884]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   18.519897]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   18.519909]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   18.519921]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   18.519933]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   18.519941]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop done
+[   18.519949]  [0:         mc_log: 2322] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   18.519956]  [0:         mc_log: 2322] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   18.530781]  [0:SdpManagerServi: 3296] MobiCore mcd: closed by PID(3296), name(SdpManagerServi)
+[   18.548485]  [4:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   18.552751]  [4:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   18.552766]  [4:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   18.552775]  [4:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   18.552783]  [4:         mc_log: 2322] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   18.552792]  [4:         mc_log: 2322] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   18.553700]  [4:         mc_log: 2322] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   18.553718]  [4:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   18.553727]  [4:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   18.553736]  [4:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   18.553745]  [4:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   18.558865]  [4:         mc_log: 2322] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   18.558890]  [4:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   18.558903]  [4:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   18.558915]  [4:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   18.558927]  [4:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   18.558939]  [4:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   18.560363]  [4:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   18.560379]  [4:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop done
+[   18.560387]  [4:         mc_log: 2322] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   18.560395]  [4:         mc_log: 2322] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   18.571247]  [1:SdpManagerServi: 3296] MobiCore mcd: closed by PID(3296), name(SdpManagerServi)
+[   18.581852]  [1:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   18.585892]  [1:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   18.585912]  [1:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   18.585923]  [1:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   18.585931]  [1:         mc_log: 2322] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   18.585941]  [1:         mc_log: 2322] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   18.587435]  [3:         mc_log: 2322] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   18.587455]  [3:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   18.587464]  [3:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   18.587473]  [3:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   18.587487]  [3:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   18.589761]  [3:         mc_log: 2322] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   18.592828]  [3:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   18.592850]  [3:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   18.592863]  [3:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   18.595707]  [3:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   18.595728]  [3:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   18.595740]  [3:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   18.595748]  [3:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop done
+[   18.595756]  [3:         mc_log: 2322] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   18.595764]  [3:         mc_log: 2322] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   18.609084]  [5:SdpManagerServi: 3296] MobiCore mcd: closed by PID(3296), name(SdpManagerServi)
+[   18.619573]  [7:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   18.632979]  [7:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   18.632996]  [7:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   18.633005]  [7:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_unwrap_key:
+[   18.633015]  [7:         mc_log: 2322] MobiCore mcd: 701|TIMA trustlet:  get_sec_TIMA_address tima_sec_mem_addr : BEE00000
+[   18.633024]  [7:         mc_log: 2322] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   18.633031]  [7:         mc_log: 2322] MobiCore mcd: 501|drTima: data_len = 32 = 0x20
+[   18.633039]  [7:         mc_log: 2322] MobiCore mcd: 501|drTima: PHYS_READ
+[   18.633046]  [7:         mc_log: 2322] MobiCore mcd: 701|TIMA trustlet: warranty okay 13
+[   18.633055]  [7:         mc_log: 2322] MobiCore mcd: 701|TIMA trustlet: Reading golden measurement
+[   18.633064]  [7:         mc_log: 2322] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   18.633071]  [7:         mc_log: 2322] MobiCore mcd: 501|drTima: data_len = 512 = 0x200
+[   18.633078]  [7:         mc_log: 2322] MobiCore mcd: 501|drTima: PHYS_READ
+[   18.633087]  [7:         mc_log: 2322] MobiCore mcd: 701|TIMA trustlet: Measurement size is : 192
+[   18.633096]  [7:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: tz_keystore_chk_boot_msr , after read_golden_measurement
+[   18.633105]  [7:         mc_log: 2322] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   18.633113]  [7:         mc_log: 2322] MobiCore mcd: 501|drTima: data_len = 192 = 0xc0
+[   18.633120]  [7:         mc_log: 2322] MobiCore mcd: 501|drTima: PHYS_READ
+[   18.633129]  [7:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: tz_keystore_chk_boot_msr , after boot_measurement
+[   18.633137]  [7:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: tz_keystore_chk_boot_msr done
+[   18.633145]  [7:         mc_log: 2322] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   18.633154]  [7:         mc_log: 2322] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   18.633161]  [7:         mc_log: 2322] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   18.633169]  [7:         mc_log: 2322] MobiCore mcd: 501|drTima: PHYS_READ
+[   18.633176]  [7:         mc_log: 2322] MobiCore mcd: 701|read license status is: 0
+[   18.633183]  [7:         mc_log: 2322] MobiCore mcd: 701|low security mode
+[   18.635973]  [5:         mc_log: 2322] MobiCore mcd: 701|TL_TZ: TZ_aes_decrypt decryption key length: 32, ciphertext length: 64
+[   18.637218]  [5:         mc_log: 2322] MobiCore mcd: 701|TL_TZ: decrypt_data() finished; plaintext length is 56
+[   18.637236]  [5:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000005
+[   18.637245]  [5:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000005
+[   18.637254]  [5:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   18.637262]  [5:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   18.640804]  [1:         mc_log: 2322] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   18.640825]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   18.643916]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   18.643939]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   18.646948]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   18.646970]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   18.648595]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   18.648616]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop done
+[   18.661289]  [1:         mc_log: 2322] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   18.661307]  [1:         mc_log: 2322] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   18.673265]  [4:SdpManagerServi: 3296] MobiCore mcd: closed by PID(3296), name(SdpManagerServi)
+[   18.730702]  [0:wl_event_handle: 3584] CFG80211-TRACE) wl_escan_handler : SCAN COMPLETED: scanned AP count=19
+[   18.740127]  [2: wpa_supplicant: 3416] dhd_wl_ioctl: WLC_IOCTL: cmd: 23, ret = -17
+[   18.746793]  [0: wpa_supplicant: 3416] CFG80211-INFO2) wl_cfg80211_connect : Connectting witha8:55:61 channel (6) ssid "fbguest", len (7)
+[   18.746793]  [0: wpa_supplicant: 3416] 
+[   18.786113]  [4:  system_server: 2749] logger: !@Boot: Loop forever
+[   18.786305]  [4:  system_server: 2749] logger: !@[BatteryInfo] InitBatteryInfo()
+[   18.787728]  [4:  system_server: 2749] logger: !@[BatteryInfo] readFromFile /efs/FactoryApp/asoc: -1
+[   18.788990]  [4:  system_server: 2749] logger: !@[BatteryInfo] readFromFile /sys/class/power_supply/battery/fg_asoc: -1
+[   18.789510]  [4:  system_server: 2749] logger: !@[BatteryInfo] writeToFile /efs/FactoryApp/asoc: -1
+[   18.790331]  [4:  system_server: 2749] logger: !@[BatteryInfo] readFromFile /efs/FactoryApp/batt_discharge_level: 20870
+[   18.791550]  [4:  system_server: 2749] logger: !@[BatteryInfo] readFromFile /efs/FactoryApp/max_current: 1609
+[   18.794724]  [4:  system_server: 2749] logger: !@[BatteryInfo] readFromFile /efs/FactoryApp/max_temp: 477
+[   18.796171]  [4:  system_server: 2749] logger: !@[BatteryInfo] readFromFile /sys/class/power_supply/battery/fg_asoc: -1
+[   18.796435]  [4:  system_server: 2749] logger: !@[BatteryInfo] writeToFile /efs/FactoryApp/asoc: -1
+[   18.796674]  [4:  system_server: 2749] logger: !@[BatteryInfo] readFromFile /sys/class/power_supply/battery/fg_asoc: -1
+[   18.796821]  [4:  system_server: 2749] logger: !@[BatteryInfo] writeToFile /efs/FactoryApp/asoc: -1
+[   18.812828]  [7:         mc_log: 2322] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   18.812848]  [7:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   18.812861]  [7:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   18.817003]  [4:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   18.817025]  [4:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   18.817037]  [4:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   18.817050]  [4:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   18.817058]  [4:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop done
+[   18.817066]  [4:         mc_log: 2322] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   18.817074]  [4:         mc_log: 2322] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   18.828655]  [7:    sdp_cryptod: 2554] MobiCore mcd: closed by PID(2554), name(sdp_cryptod)
+[   18.919429]  [6:InputDeviceLigh: 3442] sec_touchkey_driver 6-0020: [TK] led off
+[   19.112503]  [3: wpa_supplicant: 3416] wl_android_priv_cmd: fccpwrlimit2g is deactivated
+[   19.436593]  [0:        dhd_dpc: 2308] ETHER_TYPE_802_1X [RX] : M1 of 4way
+[   19.437449]  [5:wl_event_handle: 3584] CFG80211-INFO2) wl_get_auth_assoc_status : event=3 status 0 reason 0 
+[   19.437480]  [5:wl_event_handle: 3584] CFG80211-INFO2) wl_get_auth_assoc_status : event=7 status 0 reason 0 
+[   19.437492]  [5:wl_event_handle: 3584] CFG80211-INFO2) wl_notify_connect_status : wl_bss_connect_done succeeded with a8:55:61
+[   19.441239]  [0:wl_event_handle: 3584] dhdcdc_set_ioctl: SET PM to 0
+[   19.452977] I[0: wpa_supplicant: 3416] ETHER_TYPE_802_1X [TX] : M2 of 4way
+[   19.455219]  [0:        dhd_dpc: 2308] ETHER_TYPE_802_1X [RX] : M3 of 4way
+[   19.458675] I[1: wpa_supplicant: 3416] ETHER_TYPE_802_1X [TX] : M4 of 4way
+[   19.464259]  [2: wpa_supplicant: 3416] CFG80211-TRACE) __wl_cfg80211_scan : START SCAN
+[   19.505958]  [3:           netd: 3081] IPv6: ipv6_generate_eui64: dev type: 1
+[   19.719722]  [7: wpa_supplicant: 3416] CFG80211-TRACE) wl_cfg80211_set_btcoex_dhcp : DHCP session starts
+[   19.811171]  [5: wpa_supplicant: 3416] dhd_set_cpucore: chan_status(0) cpucore!!!
+[   19.811191]  [5: wpa_supplicant: 3416] dhd_set_suspend: Remove extra suspend setting 
+[   19.818971]  [4: wpa_supplicant: 3416] dhdcdc_set_ioctl: SET PM to 0
+[   19.822470] I[1:        dhd_rxf: 2309] IPv6: ipv6_generate_eui64: dev type: 1
+[   19.824422]  [2:wl_event_handle: 3584] CFG80211-INFO2) wl_notify_connect_status : wl_bss_connect_done succeeded with a8:55:61
+[   19.849752]  [4:m.android.phone: 3846] logger: !@Boot_SVC : PhoneApp OnCrate
+[   19.925996] I[6:id.app.launcher: 3863] mif: LNK-TX(16): fc eb 0c 00 08 00 00 00 09 02 03 02 34 00 00 00
+[   19.927132] I[0:        mmcqd/0: 1218] mif: LNK-RX(16): fc eb 10 00 0c 00 07 00 80 01 02 09 02 03 00 80
+[   20.022355]  [7:   RILReceiver0: 4238] logger: !@Boot_SVC : RIL_UNSOL_RIL_CONNECTED
+[   20.061135] I[5:      swapper/5:    0] mif: LNK-TX(16): fc eb 0c 00 08 00 01 00 0a 0f 05 01 01 00 00 00
+[   20.061152] I[5:      swapper/5:    0] mif: LNK-TX(16): fc eb 0c 00 08 00 02 00 07 01 02 01 0c 00 d0 f8
+[   20.062253] I[0:      swapper/0:    0] mif: LNK-RX(24): fc eb 15 00 11 00 08 02 07 01 02 01 00 00 00 00 ...
+[   20.093064] I[0:      swapper/0:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 03 00 0f 30 02 00 00 00 00 00
+[   20.094156] I[0:ndroid.systemui: 3472] mif: LNK-RX(16): fc eb 0c 00 08 00 09 03 0f 30 02 00 00 00 00 00
+[   20.225873] I[2:ndroid.systemui: 3472] mif: LNK-TX(16): fc eb 0b 00 07 00 04 00 05 01 02 00 00 00 00 00
+[   20.227025] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0d 00 09 00 0a 04 05 01 02 80 00 00 00 00
+[   20.651817]  [3:ActivityManager: 2920] logger: !@Boot: performEnableScreen
+[   21.276405]  [2:android.display: 2998] logger: !@skp
+[   21.276529]  [2:android.display: 2998] logger: !@skp
+[   21.287138]  [3:android.display: 2998] logger: !@skp
+[   21.834869]  [0: wpa_supplicant: 3416] dhdcdc_set_ioctl: SET PM to 2
+[   21.842865]  [1: wpa_supplicant: 3416] CFG80211-TRACE) wl_cfg80211_set_btcoex_dhcp : DHCP is complete 
+[   21.927163]  [1:       Binder_C: 3900] running cache cleanup thread - sdp-id : 0
+[   21.928207]  [0:     android.ui: 2926] [SENSOR] k2hh_set_odr: change odr 3
+[   21.928222]  [0:     android.ui: 2926] [SENSOR] k2hh_delay_store: poll_delay = 66667000
+[   21.928382]  [6:     sdp_cached: 4594] ecryptfs_mm_drop_pagecache start() sb:ecryptfs [0], userid:0
+[   21.928397]  [6:     sdp_cached: 4594] ecryptfs_mm_drop_pagecache start() sb:ecryptfs [0], userid:0
+[   21.928422]  [0:     android.ui: 2926] [SENSOR] k2hh_enable_store: new_value = 1
+[   21.929074]  [0:     android.ui: 2926] [SENSOR] k2hh_open_calibration:  No Calibration
+[   21.929346]  [0:     android.ui: 2926] [SENSOR] k2hh_set_range: 0x20
+[   21.930051]  [2:     android.ui: 2926] [SENSOR] k2hh_set_mode: change mode 1
+[   21.937871] I[6:      swapper/6:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 05 00 05 01 02 68 01 81 01 74
+[   21.939010] I[0:ConnectivitySer: 3366] mif: LNK-RX(16): fc eb 0d 00 09 00 0b 05 05 01 02 80 00 00 00 00
+[   21.943908]  [0:m.android.phone: 3846] logger: !@Boot_SVC : setRadioPower on
+[   21.949256] I[6:     Thread-144: 4599] mif: LNK-TX(16): fc eb 0d 00 09 00 06 00 01 07 01 02 02 00 00 00
+[   21.950378] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 10 00 0c 00 0c 06 80 01 02 01 07 01 00 80
+[   21.950417] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0c 00 08 00 0d 00 01 07 03 02 00 00 00 00
+[   21.962258]  [5:  BootAnimation: 2370] logger: !@BootAnimation : service.bootanim.exit = 1
+[   21.962287]  [5:  BootAnimation: 2370] logger: !@BootAnimation : @@@@ bootani exit
+[   21.962307]  [5:  BootAnimation: 2370] logger: !@BootAnimation : service.bootanim.exit = 1
+[   21.962327]  [5:  BootAnimation: 2370] logger: !@BootAnimation : BootAnimation is completed
+[   21.965557]  [5:  BootAnimation: 2370] logger: !@BootAnimation : doCleanup() Call
+[   21.971692]  [1:  BootAnimation: 2370] logger: !@BootAnimation : stopProcess() Call
+[   21.971863]  [1:  BootAnimation: 2370] logger: !@BootAnimation : kill() Call
+[   21.999608] I[0:CaptivePortalHa: 3404] mif: LNK-RX(16): fc eb 0c 00 08 00 0e 00 05 07 03 00 00 00 00 00
+[   22.000564] I[0:CaptivePortalHa: 3404] mif: LNK-RX(16): fc eb 0d 00 09 00 0f 00 05 01 03 80 00 00 00 00
+[   22.008140] I[0:gle.android.gms: 4479] mif: LNK-RX(24): fc eb 12 00 0e 00 10 00 02 16 03 30 30 30 30 30 ...
+[   22.086801] I[4:       Binder_5: 3544] mif: LNK-TX(16): fc eb 0b 00 07 00 07 00 08 03 02 00 34 00 00 00
+[   22.088779] I[0:        dhd_dpc: 2308] mif: LNK-RX(40): fc eb 25 00 21 00 11 07 08 03 02 02 01 04 30 30 ...
+[   22.090410] I[0:      swapper/0:    0] mif: LNK-TX(16): fc eb 0d 00 09 00 08 00 08 05 02 ff 03 00 00 01
+[   22.092472] I[0:       Binder_6: 3750] mif: LNK-RX(32): fc eb 1e 00 1a 00 12 08 08 05 02 04 03 01 00 00 ...
+[   22.105613] I[2:           adbd: 2434] mif: LNK-TX(16): fc eb 0d 00 09 00 09 00 08 05 02 ff 02 75 74 69
+[   22.108134] I[0:      swapper/0:    0] mif: LNK-RX(32): fc eb 1e 00 1a 00 13 09 08 05 02 04 02 01 00 00 ...
+[   22.111301] I[0:      swapper/0:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 0a 00 08 02 02 64 65 66 61 75
+[   22.113368] I[0:.gms.persistent: 4118] mif: LNK-RX(16): fc eb 0c 00 08 00 14 0a 08 02 02 02 00 00 00 00
+[   22.125590]  [0:android.display: 2998] logger: !@performEnableScreen return becase StatusBar com.android.systemui is not fully drawn!
+[   22.125662]  [0:android.display: 2998] logger: !@performEnableScreen return becase StatusBar com.android.systemui is not fully drawn!
+[   22.157424]  [2:android.display: 2998] logger: !@performEnableScreen return becase StatusBar com.android.systemui is not fully drawn!
+[   22.192551]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_ocv: read = 0x453, ocv = 4324
+[   22.218739]  [0:    kworker/0:3: 1538] sm5703_test_read: 0x4 = 0xbe, 0x5 = 0xff, 0x6 = 0xf3, 0x7 = 0xff, 0x8 = 0x08, 0x9 = 0x08, 0xa = 0x03, 0xb = 0x00, 0xc = 0x55, 0xd = 0x07, 0xe = 0x03, 0xf = 0x07, 0x10 = 0x1b, 0x11 = 0xa0, 0x12 = 0x7a, 0x13 = 0x08, 0x60 = 0x03, 0x6b = 0x20, 0x66 = 0x80, 
+[   22.220782]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: fg_vbatocv_check: iocv_error_count (0)
+[   22.220808]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: fg_vbatocv_check: mode change to mix RS auto mode
+[   22.225543]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_temperature: read = 0x21d0, temperature = 338
+[   22.226561]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_ocv: read = 0x453, ocv = 4324
+[   22.226594]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_soc: fg_get_soc : temp_std = 25, temperature = 338, temp_offset = 10, temp_offset_cal = 0x1, curr_cal = 0x7485, bat_temp = 263
+[   22.228632]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_soc: read = 0x6224, soc = 981
+[   22.229662]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x30 = 0x2229 
+[   22.230574]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x31 = 0x2228 
+[   22.231588]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x32 = 0x2229 
+[   22.232592]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x33 = 0x2229 
+[   22.233926]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x34 = 0x2229 
+[   22.234978]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x35 = 0x2228 
+[   22.235972]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x36 = 0x2229 
+[   22.236953]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x37 = 0x2228 
+[   22.237969]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x40 = 0x2219 
+[   22.239086]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x41 = 0x2219 
+[   22.240124]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x42 = 0x2219 
+[   22.241119]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x43 = 0x2219 
+[   22.244926]  [0:    kworker/0:3: 1538] 0xAC=0x2029, 0xAD=0x2029, 0xAE=0x22c5, 0xAF=0x22c5 
+[   22.248760]  [0:    kworker/0:3: 1538] 0xBC=0x2400, 0xBD=0x20f0, 0xBE=0x20f0, 0xBF=0x22c5 
+[   22.252433]  [0:    kworker/0:3: 1538] 0xCC=0x10cc, 0xCD=0x1333, 0xCE=0x1333, 0xCF=0x1800 
+[   22.256294]  [0:    kworker/0:3: 1538] 0x85=0x8178, 0x86=0x834f, 0x87=0x2f1c, 0x28=0x0aac 
+[   22.256331]  [0:    kworker/0:3: 1538] sec-battery battery.20: sec_bat_get_battery_info:Vnow(4250mV),Inow(-238mA),Imax(450mA),SOC(100%),Tbat(263),Tchg(0),is_hc_usb(0)
+[   22.267937]  [2:android.display: 2998] logger: !@performEnableScreen return becase StatusBar com.android.systemui is not fully drawn!
+[   22.312704]  [0:    kworker/0:3: 1538] sec-battery battery.20: sec_bat_battery_cable_check: Battery Connected
+[   22.313393]  [0:    kworker/0:3: 1538] sm5703_get_charging_health : charger->is_charging = 1, charger->cable_type = 4, charger->aicl_state = 0
+[   22.314076]  [0:    kworker/0:3: 1538] sm5703_get_charging_health: SM5703_CNTL, nCHG : 0x55, 0
+[   22.314087]  [0:    kworker/0:3: 1538] sm5703_get_charging_health : vbus_status = 32
+[   22.314093]  [0:    kworker/0:3: 1538] sm5703_get_charging_health : Health : 1
+[   22.314110]  [0:    kworker/0:3: 1538] sec-battery battery.20: sec_bat_monitor_work: Status(Charging), mode(Normal), Health(Good), Cable(4), level(100%)
+[   22.314165]  [0:    kworker/0:3: 1538] sec_chg_get_property: slow-charging mode
+[   22.318344]  [3:        healthd: 2313] sec_chg_get_property: slow-charging mode
+[   22.318568]  [3:        healthd: 2313] healthd: battery l=100 v=4250 t=26.3 h=2 st=2 c=0 o=4 ca=-238 ct=2 ps=0 chg=u 2017-09-13 00:28:32.908867754 UTC
+[   22.318591]  [3:        healthd: 2313] healthd: battery l=100 v=4250 t=26.3 h=2 st=2 c=0 o=4 ca=-238 ct=2 ps=0 chg=u 2017-09-13 00:28:32.908867754 UTC hv=0 chg=u
+[   22.318607]  [3:        healthd: 2313] healthd-android: healthd_mode_android_battery_update
+[   22.318622]  [3:        healthd: 2313] BatteryPropertiesRegistrar: notifyListeners : start
+[   22.318638]  [3:        healthd: 2313] IBatteryPropertiesListener : batteryPropertiesChanged!
+[   22.318638]  [3:        healthd: 2313] : BatteryPropertiesRegistrar: notifyListeners : done
+[   22.320652]  [2:       Binder_4: 3320] logger: !@BatteryListener : batteryPropertiesChanged!
+[   22.432254]  [3:android.display: 2998] logger: !@Boot: Enabling Screen!
+[   22.435346]  [0:  system_server: 2749] logger: !@bootCompleted
+[   22.564176]  [0:NetworkTimeUpda: 3762] s2m-rtc s2m-rtc: s2m_rtc_set_time: 2017-09-13 00:28:33(0x08)AM
+[   22.566877]  [2:    kworker/2:1: 1209] s2m-rtc s2m-rtc: s2m_rtc_read_time: 2017-09-13 00:28:33(0x08)AM
+[   22.996342] I[1:        dhd_rxf: 2309] IPv6: ipv6_generate_eui64: dev type: 1
+[   23.032800] I[0:    kworker/0:1:  404] mif: LNK-TX(16): fc eb 0c 00 08 00 0b 00 0a 01 02 ff 00 00 00 00
+[   23.033937] I[0:d.process.media: 4775] mif: LNK-RX(280): fc eb 15 01 11 01 15 0b 0a 01 02 ff 4a 37 30 30 ...
+[   23.052179]  [0:           rild: 2555] KAP Read STATUS val = 5afe0000
+[   23.053280] I[0:      Thread-63: 4056] mif: LNK-TX(16): fc eb 0e 00 0a 00 0c 00 13 0b 05 01 00 00 00 00
+[   23.053297] I[0:      Thread-63: 4056] mif: LNK-TX(16): fc eb 0c 00 08 00 0d 00 0a 03 02 01 0d 00 00 00
+[   23.055417] I[0:      swapper/0:    0] mif: LNK-RX(48): fc eb 2d 00 29 00 16 0d 0a 03 02 01 11 33 35 37 ...
+[   23.064042] I[3:      swapper/3:    0] mif: LNK-TX(16): fc eb 0c 00 08 00 0e 00 0a 03 02 01 05 00 00 00
+[   23.066117] I[0:      swapper/0:    0] mif: LNK-RX(48): fc eb 2d 00 29 00 17 0e 0a 03 02 01 11 33 35 37 ...
+[   23.077740] I[3:      swapper/3:    0] mif: LNK-TX(48): fc eb 2f 00 2b 00 0f 00 13 01 03 05 00 59 00 01 ...
+[   23.078831] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 10 00 0c 00 18 0f 80 01 02 13 01 03 00 80
+[   23.080310] I[3:      swapper/3:    0] mif: LNK-TX(48): fc eb 2f 00 2b 00 10 00 13 01 03 05 00 59 01 01 ...
+[   23.081829] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 10 00 0c 00 19 10 80 01 02 13 01 03 00 80
+[   23.083322] I[0:      swapper/0:    0] mif: LNK-TX(16): fc eb 0c 00 08 00 11 00 0a 0c 05 00 05 00 00 00
+[   23.213574]  [1:wl_event_handle: 3584] CFG80211-TRACE) wl_escan_handler : SCAN COMPLETED: scanned AP count=69
+[   23.221341]  [0:  mali-renderer: 4150] mali 11400000.mali: state restore latency exceeded, new value 551115 ns
+[   23.287553] I[4:GeofencerStateM: 4735] mif: LNK-TX(16): fc eb 0b 00 07 00 12 00 0f 05 02 7b 00 00 00 0f
+[   23.288699] I[0:        mmcqd/0: 1218] mif: LNK-RX(16): fc eb 0c 00 08 00 1a 12 0f 05 02 00 00 00 00 00
+[   23.292008] I[4:      swapper/4:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 13 00 08 03 02 66 00 00 00 0d
+[   23.293632] I[0:d.process.media: 4775] mif: LNK-RX(40): fc eb 25 00 21 00 1b 13 08 03 02 02 01 04 30 30 ...
+[   23.295295] I[7:      swapper/7:    0] mif: LNK-TX(16): fc eb 0d 00 09 00 14 00 08 05 02 ff 03 53 49 47
+[   23.296621] I[0:d.process.media: 4775] mif: LNK-RX(32): fc eb 1e 00 1a 00 1c 14 08 05 02 04 03 01 00 00 ...
+[   23.306196] I[5:       Binder_5: 4336] mif: LNK-TX(16): fc eb 0b 00 07 00 15 00 02 06 02 72 6f 75 74 69
+[   23.306217] I[5:       Binder_5: 4336] mif: LNK-TX(16): fc eb 0d 00 09 00 16 00 08 05 02 ff 02 00 00 00
+[   23.307353] I[0:d.process.media: 4775] mif: LNK-RX(16): fc eb 0c 00 08 00 1d 15 02 06 02 00 00 00 00 00
+[   23.307386] I[0:d.process.media: 4775] mif: LNK-RX(32): fc eb 1e 00 1a 00 1e 16 08 05 02 04 02 01 00 00 ...
+[   23.311920] I[0:           rild: 2555] mif: LNK-TX(16): fc eb 0b 00 07 00 17 00 08 02 02 00 07 00 00 00
+[   23.313280] I[0:d.process.media: 4775] mif: LNK-RX(16): fc eb 0c 00 08 00 1f 17 08 02 02 02 00 00 00 00
+[   23.668765]  [4:android.display: 2998] logger: !@Boot: bootcomplete
+[   23.930196] I[4:      swapper/4:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 18 00 0a 2d 02 00 63 00 2e 00
+[   23.931327] I[0:  thread-pool-0: 4859] mif: LNK-RX(16): fc eb 0c 00 08 00 20 18 0a 2d 02 04 00 00 00 00
+[   23.932848] I[7:GoogleApiHandle: 5055] mif: LNK-TX(16): fc eb 0d 00 09 00 19 00 0a 2d 03 03 00 00 00 00
+[   23.934347] I[0:  thread-pool-3: 4862] mif: LNK-RX(16): fc eb 10 00 0c 00 21 19 80 01 02 0a 2d 03 00 80
+[   23.941017] I[0:      swapper/0:    0] mif: LNK-RX(24): fc eb 15 00 11 00 22 00 07 01 03 01 00 00 00 00 ...
+[   23.941045] I[0:      swapper/0:    0] mif: LNK-RX(32): fc eb 1e 00 1a 00 23 00 08 05 03 04 03 01 00 00 ...
+[   23.941055] I[0:      swapper/0:    0] mif: LNK-RX(24): fc eb 15 00 11 00 24 00 07 01 03 01 00 00 00 00 ...
+[   23.941066] I[0:      swapper/0:    0] mif: LNK-RX(32): fc eb 1e 00 1a 00 25 00 08 05 03 04 02 01 00 00 ...
+[   23.941076] I[0:      swapper/0:    0] mif: LNK-RX(40): fc eb 25 00 21 00 26 00 08 03 03 02 01 04 30 30 ...
+[   23.941086] I[0:      swapper/0:    0] mif: LNK-RX(24): fc eb 12 00 0e 00 27 00 02 16 03 30 30 30 30 30 ...
+[   23.947871] I[0:      swapper/0:    0] mif: LNK-RX(24): fc eb 12 00 0e 00 28 00 02 16 03 30 30 30 30 30 ...
+[   24.274314]  [5: wpa_supplicant: 3416] wl_android_set_fcc_pwr_limit_2g: fccpwrlimit2g set (1)
+[   24.444647] I[1:    Initializer: 5123] mif: LNK-TX(16): fc eb 0c 00 08 00 1a 00 0f 05 03 00 34 00 00 00
+[   24.445834] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 10 00 0c 00 29 1a 80 01 02 0f 05 03 00 80
+[   24.456617] I[6:GoogleLocationS: 4605] mif: LNK-TX(16): fc eb 0b 00 07 00 1b 00 08 03 02 a0 05 00 00 00
+[   24.457739] I[0:      swapper/0:    0] mif: LNK-RX(40): fc eb 25 00 21 00 2a 1b 08 03 02 02 01 04 30 30 ...
+[   24.459344] I[6:      swapper/6:    0] mif: LNK-TX(16): fc eb 0d 00 09 00 1c 00 08 05 02 ff 03 00 00 01
+[   24.460703] I[0:  mali-renderer: 4150] mif: LNK-RX(32): fc eb 1e 00 1a 00 2b 1c 08 05 02 04 03 01 00 00 ...
+[   24.469478] I[5:      swapper/5:    0] mif: LNK-TX(16): fc eb 0d 00 09 00 1d 00 08 05 02 ff 02 00 00 00
+[   24.470588] I[0:m.android.phone: 3846] mif: LNK-RX(32): fc eb 1e 00 1a 00 2c 1d 08 05 02 04 02 01 00 00 ...
+[   24.473226] I[4:ndroid.systemui: 3472] mif: LNK-TX(16): fc eb 0b 00 07 00 1e 00 08 02 02 13 50 e8 ff 12
+[   24.474759] I[0:           adbd: 2434] mif: LNK-RX(16): fc eb 0c 00 08 00 2d 1e 08 02 02 02 00 00 00 00
+[   24.623424] I[4:m.android.phone: 3846] mif: LNK-TX(16): fc eb 0b 00 07 00 1f 00 0f 05 02 13 d0 a9 16 13
+[   24.624562] I[0:FinalizerDaemon: 3872] mif: LNK-RX(16): fc eb 0c 00 08 00 2e 1f 0f 05 02 00 00 00 00 00
+[   24.669722] I[2:   networkPool1: 5135] mif: LNK-TX(16): fc eb 0b 00 07 00 20 00 08 11 02 b2 05 00 00 00
+[   24.671129] I[0:           adbd: 5182] mif: LNK-RX(32): fc eb 20 00 1c 00 2f 20 08 11 02 00 00 00 01 01 ...
+[   25.056545]  [1:MediaScannerSer: 5279] logger: !@start scanning volume external: [/storage/emulated/0]
+[   25.402486]  [7:   AsyncTask #1: 5374] pn547_dev_ioctl power off, irq=0
+[   25.402509]  [7:   AsyncTask #1: 5374] set_pd , val : 30
+[   25.419007]  [7:   AsyncTask #1: 5374] set_pd , val : 31
+[   25.424140]  [7:   AsyncTask #1: 5374] wake enabled for irq 2
+[   25.424155]  [7:   AsyncTask #1: 5374] pn547_dev_ioctl power on, irq=1
+[   25.600319]  [3:MediaScannerSer: 5279] logger: !@done scanning volume external
+[   26.071459] I[1:        dhd_rxf: 2309] IPv6: ipv6_generate_eui64: dev type: 1
+[   26.104082]  [5:       Binder_E: 4269] binder: 5166: binder_alloc_buf, no vma
+[   26.104098]  [5:       Binder_E: 4269] binder: 2749:4269 transaction failed 29201, size 2352-0
+[   26.495163]  [4:         mc_log: 2322] MobiCore mcd: 701|WV_TL_2.0_2017.01.20
+[   26.527604]  [5:         mc_log: 2322] MobiCore mcd: 701|get_hdcp_capability is successful.
+[   26.589118] I[2:      swapper/2:    0] mif: LNK-TX(16): fc eb 0f 00 0b 00 21 00 0a 10 05 00 04 00 00 00
+[   26.659019] I[6:      swapper/6:    0] mif: LNK-TX(16): fc eb 0d 00 09 00 22 00 0d 0f 01 04 01 68 d0 f8
+[   26.660138] I[0:        mmcqd/0: 1218] mif: LNK-RX(16): fc eb 10 00 0c 00 30 22 80 01 02 0d 0f 01 00 80
+[   26.660163] I[0:        mmcqd/0: 1218] mif: LNK-RX(16): fc eb 0d 00 09 00 31 00 0d 0f 03 06 01 00 00 00
+[   26.702727]  [1:         mc_log: 2322] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   26.702748]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   26.702760]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   26.702772]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   26.702785]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   26.702798]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   26.702809]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   26.702817]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop done
+[   26.702825]  [1:         mc_log: 2322] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   26.703034]  [1:         mc_log: 2322] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   26.713681]  [2:    mediaserver: 2451] MobiCore mcd: closed by PID(2451), name(mediaserver)
+[   26.938685] I[1:      swapper/1:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 23 00 04 0e 02 00 00 00 00 00
+[   26.939812] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0f 00 0b 00 32 00 04 0e 02 02 02 32 00 00
+[   26.983006]  [2:.MtpApplication: 5670] mtp: [guid_show]	line = [512]
+[   26.991820] I[1:      swapper/1:    0] mif: LNK-TX(120): fc eb 72 00 6e 00 24 00 04 0e 03 02 02 32 ff ff ...
+[   26.992937] I[0:    kworker/0:3: 1538] mif: LNK-RX(16): fc eb 10 00 0c 00 33 24 80 01 02 04 0e 03 00 80
+[   27.035483] I[0:      swapper/0:    0] mif: LNK-TX(16): fc eb 10 00 0c 00 25 00 04 0e 03 01 80 01 11 12
+[   27.036615] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 10 00 0c 00 34 25 80 01 02 04 0e 03 00 80
+[   27.054168] I[3:      swapper/3:    0] mif: LNK-TX(24): fc eb 14 00 10 00 26 00 04 0e 03 01 80 03 11 12 ...
+[   27.055269] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 10 00 0c 00 35 26 80 01 02 04 0e 03 00 80
+[   27.064688] I[3: ettingsReceive: 5709] mif: LNK-TX(32): fc eb 20 00 1c 00 27 00 04 0e 03 01 80 09 11 12 ...
+[   27.065815] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 10 00 0c 00 36 27 80 01 02 04 0e 03 00 80
+[   27.082090] I[4:      swapper/4:    0] mif: LNK-TX(40): fc eb 22 00 1e 00 28 00 04 0e 03 01 80 0a 11 12 ...
+[   27.083203] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 10 00 0c 00 37 28 80 01 02 04 0e 03 00 80
+[   27.114605]  [5:     Thread-285: 5733] [mtpg_open]	line = [589]
+[   27.114648]  [5:     Thread-285: 5733] [mtpg_ioctl]SET_MTP_USER_PID;pid=5670	line=[1135]
+[   27.243672] I[4:      swapper/4:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 29 00 04 0e 02 00 12 11 00 00
+[   27.244805] I[0:      swapper/0:    0] mif: LNK-RX(40): fc eb 23 00 1f 00 38 28 04 0e 02 01 80 32 0a 11 ...
+[   27.281641] I[6:      swapper/6:    0] mif: LNK-TX(40): fc eb 22 00 1e 00 2a 00 04 0e 03 01 80 0a 11 12 ...
+[   27.282762] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 10 00 0c 00 39 2a 80 01 02 04 0e 03 00 80
+[   27.306164] I[4:      swapper/4:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 2b 00 04 0e 02 00 12 11 00 00
+[   27.307299] I[0:le.pr.mytmobile: 5616] mif: LNK-RX(40): fc eb 23 00 1f 00 3a 2a 04 0e 02 01 80 32 0a 11 ...
+[   27.467529] I[0:      swapper/0:    0] exynos5-hsi2c 13890000.hsi2c: HSI2C Error Interrupt occurred(IS:0x00000400, TR:0x0002000d)
+[   27.467556]  [0:   AsyncTask #1: 5386] exynos5-hsi2c 13890000.hsi2c: ack was not received at write
+[   29.247983] I[1:        dhd_rxf: 2309] IPv6: ipv6_generate_eui64: dev type: 1
+[   30.148330] I[0:       Binder_3: 3188] mif: LNK-RX(24): fc eb 15 00 11 00 3b 00 07 01 03 01 00 00 00 00 ...
+[   30.149327] I[0:      swapper/0:    0] mif: LNK-RX(32): fc eb 1e 00 1a 00 3c 00 08 05 03 04 02 04 00 2b ...
+[   30.149369] I[0:      swapper/0:    0] mif: LNK-RX(32): fc eb 1e 00 1a 00 3d 00 08 05 03 04 03 01 00 2b ...
+[   30.149380] I[0:      swapper/0:    0] mif: LNK-RX(40): fc eb 25 00 21 00 3e 00 08 03 03 02 04 04 33 31 ...
+[   30.157722] I[4:       Binder_7: 3870] mif: LNK-TX(16): fc eb 0b 00 07 00 2c 00 08 03 02 e8 06 00 00 00
+[   30.158845] I[0:      swapper/0:    0] mif: LNK-RX(40): fc eb 25 00 21 00 3f 2c 08 03 02 02 04 04 33 31 ...
+[   30.162529] I[4:      swapper/4:    0] mif: LNK-TX(16): fc eb 0d 00 09 00 2d 00 08 05 02 ff 03 00 00 00
+[   30.163818] I[0:ndroid.systemui: 3472] mif: LNK-RX(32): fc eb 1e 00 1a 00 40 2d 08 05 02 04 03 01 00 2b ...
+[   30.175256] I[6:      swapper/6:    0] mif: LNK-TX(16): fc eb 0d 00 09 00 2e 00 08 05 02 ff 02 00 00 00
+[   30.176375] I[0:      swapper/0:    0] mif: LNK-RX(32): fc eb 1e 00 1a 00 41 2e 08 05 02 04 02 04 00 2b ...
+[   30.179197] I[4:      swapper/4:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 2f 00 08 02 02 f7 06 00 00 00
+[   30.180323] I[0:  mali-renderer: 4150] mif: LNK-RX(16): fc eb 0c 00 08 00 42 2f 08 02 02 02 00 00 00 00
+[   30.958804] I[0:        mmcqd/0: 1218] mif: LNK-RX(32): fc eb 1a 00 16 00 43 00 07 06 03 7d 00 63 63 00 ...
+[   30.959779] I[0:      swapper/0:    0] mif: LNK-RX(24): fc eb 15 00 11 00 44 00 07 01 03 01 01 00 00 00 ...
+[   30.961495]  [2:PowerManagerSer: 3002] logger: !@[ps] Screen__Off - 0 :  dream(timeout) (2)
+[   31.103849]  [2:PhotonicModulat: 3445] dsim_panel_set_brightness : platform : 19, : mapping : 20, real : 20, index : 14
+[   31.147590]  [0:PhotonicModulat: 3445] dsim_panel_set_elvss: 0 Tset: 48 Temp: 25
+[   31.365268]  [7:PowerManagerSer: 3002] logger: !@ [0] ColorFade entry
+[   31.376479]  [0:PhotonicModulat: 3445] dsim_panel_set_brightness : platform : 0, : mapping : 5, real : 5, index : 0
+[   31.378261]  [7:PowerManagerSer: 3002] [SENSOR] k2hh_enable_store: new_value = 0
+[   31.378546]  [0:PowerManagerSer: 3002] [SENSOR] k2hh_set_mode: change mode 0
+[   31.431296]  [3:PhotonicModulat: 3445] dsim_panel_set_elvss: 0 Tset: 48 Temp: 25
+[   31.432176]  [3:PmsDisplayThrea: 6201] sec_touchkey_driver 6-0020: [TK] tc300k_input_close: users=2
+[   31.432184]  [5:PmsDisplayThrea: 6203] mms_ts 11-0048: mms_disable [START]
+[   31.432207]  [3:PmsDisplayThrea: 6201] sec_touchkey_driver 6-0020: [TK] tc300k_suspend: users=2
+[   31.432210]  [5:PmsDisplayThrea: 6203] mms_ts 11-0048: mms_power_control [START off] 
+[   31.432233]  [3:PmsDisplayThrea: 6201] [TK] tc300k_touchkey_power off
+[   31.443925]  [4:PmsDisplayThrea: 6203] mms_ts 11-0048: mms_power_control [DONE off] 
+[   31.443945]  [4:PmsDisplayThrea: 6203] mms_ts 11-0048: mms_disable [DONE]
+[   31.445061]  [2:PmsDisplayThrea: 3012] logger: !@display_state: ON -> OFF brightness: 19 -> 0
+[   31.462805] I[5:      swapper/5:    0] mif: LNK-TX(16): fc eb 0c 00 08 00 30 00 0a 0f 05 00 00 00 00 0b
+[   31.485977]  [0: surfaceflinger: 2317] decon_blank ++ blank_mode : 4 
+[   31.485983]  [0: surfaceflinger: 2317] decon-int POWERDOWN mode: 0type (0: DSI)
+[   31.485994]  [0: surfaceflinger: 2317] decon_esd_disable_interrupt: err(31) is high
+[   31.486033]  [0: surfaceflinger: 2317] dsim_disable ++
+[   31.486037]  [0: surfaceflinger: 2317] MDD : ea8061_exit was called
+[   31.703008]  [0: surfaceflinger: 2317] dsim_set_panel_power_disable is not exist, so create it
+[   31.703014]  [0: surfaceflinger: 2317] dsim_set_panel_power_disable is empty, so make list
+[   31.703225]  [0: surfaceflinger: 2317] check_dt: gpio: 1, regulator: 2, delay: 4, pinctrl: 0
+[   31.703634]  [0: surfaceflinger: 2317] LCD_3P0: Failed to create debugfs directory
+[   31.703654]  [0: surfaceflinger: 2317] LCD_1P8: Failed to create debugfs directory
+[   31.721054]  [2: surfaceflinger: 2317] dsim_disable --
+[   31.731989]  [2: surfaceflinger: 2317] decon_blank -- blank_mode : 4 
+[   31.732035]  [2: surfaceflinger: 2317] dsim_panel_set_brightness : panel is not active state..
+[   31.733548]  [7:    migration/7:   43] IRQ145 no longer affine to CPU7
+[   31.734095]  [0: surfaceflinger: 2317] CPU7: shutdown
+[   31.736030]  [6:    migration/6:   38] IRQ144 no longer affine to CPU6
+[   31.736616]  [4: surfaceflinger: 2317] CPU6: shutdown
+[   31.738190]  [5:    migration/5:   33] IRQ143 no longer affine to CPU5
+[   31.738768]  [4: surfaceflinger: 2317] CPU5: shutdown
+[   31.741380]  [4:    migration/4:   28] IRQ142 no longer affine to CPU4
+[   31.742443]  [0: surfaceflinger: 2317] CPU4: shutdown
+[   31.743836]  [3:PmsDisplayThrea: 3012] logger: !@autosuspend_wakeup_count_enable
+[   31.743836]  [3:PmsDisplayThrea: 3012] 
+[   31.743878]  [3:PmsDisplayThrea: 3012] logger: !@autosuspend_wakeup_count_enable done
+[   31.743878]  [3:PmsDisplayThrea: 3012] 
+[   31.779924]  [0:   irq/8-sm5703: 1048] SM5703 IRQ triggered
+[   31.779946]  [0:   irq/8-sm5703: 1048] sm5703_irq_work : handle IRQ event
+[   31.780635]  [0:   irq/8-sm5703: 1048] charger irq1 = 0x0
+[   31.781308]  [0:   irq/8-sm5703: 1048] irq2 = 0x0
+[   31.781968]  [0:   irq/8-sm5703: 1048] irq3 = 0x4
+[   31.782682]  [0:   irq/8-sm5703: 1048] irq4 = 0x0
+[   31.782698]  [0:   irq/8-sm5703: 1048] sm5703_irq_work : Trigger IRQ topoff, irq : 545 
+[   31.782706]  [0:   irq/8-sm5703: 1048] sm5703_chg_topoff_irq_handler : Full charged(topoff)
+[   31.795417]  [2:   irq/8-sm5703: 1048] sm5703_test_read: 0x4 = 0xbe, 0x5 = 0xff, 0x6 = 0xf3, 0x7 = 0xff, 0x8 = 0x08, 0x9 = 0x08, 0xa = 0x07, 0xb = 0x00, 0xc = 0x55, 0xd = 0x07, 0xe = 0x03, 0xf = 0x07, 0x10 = 0x1b, 0x11 = 0xa0, 0x12 = 0x7a, 0x13 = 0x08, 0x60 = 0x03, 0x6b = 0x20, 0x66 = 0x80, 
+[   31.816018]  [0: wpa_supplicant: 3416] dhd_set_cpucore: chan_status(0) cpucore!!!
+[   31.816036]  [0: wpa_supplicant: 3416] dhd_set_suspend: Remove extra suspend setting 
+[   31.958800] I[0:      swapper/0:    0] mif: LNK-RX(32): fc eb 1a 00 16 00 45 00 07 06 03 52 0f 63 63 00 ...
+[   31.959773] I[0:m.android.phone: 3846] mif: LNK-RX(24): fc eb 15 00 11 00 46 00 07 01 03 01 02 00 00 00 ...
+[   32.192952]  [4:      swapper/4:    0] CPU4: Booted secondary processor
+[   32.193616]  [0:    kworker/0:3: 1538] cpu cpu4: exynos_cpufreq_init: CPU 4 initialized
+[   32.203036]  [5:      swapper/5:    0] CPU5: Booted secondary processor
+[   32.213322]  [6:      swapper/6:    0] CPU6: Booted secondary processor
+[   32.214504]  [7:      swapper/7:    0] CPU7: Booted secondary processor
+[   32.317745] I[1:        dhd_rxf: 2309] IPv6: ipv6_generate_eui64: dev type: 1
+[   32.322509]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_ocv: read = 0x453, ocv = 4324
+[   32.341984]  [0:    kworker/0:3: 1538] sm5703_test_read: 0x4 = 0xbe, 0x5 = 0xff, 0x6 = 0xf3, 0x7 = 0xff, 0x8 = 0x08, 0x9 = 0x08, 0xa = 0x07, 0xb = 0x00, 0xc = 0x55, 0xd = 0x07, 0xe = 0x03, 0xf = 0x07, 0x10 = 0x1b, 0x11 = 0xa0, 0x12 = 0x7a, 0x13 = 0x08, 0x60 = 0x03, 0x6b = 0x20, 0x66 = 0x80, 
+[   32.344266]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: fg_vbatocv_check: iocv_error_count (0)
+[   32.344291]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: fg_vbatocv_check: mode change to mix RS auto mode
+[   32.347866]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_temperature: read = 0x24f0, temperature = 369
+[   32.348781]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_ocv: read = 0x453, ocv = 4324
+[   32.348807]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_soc: fg_get_soc : temp_std = 25, temperature = 369, temp_offset = 10, temp_offset_cal = 0x1, curr_cal = 0x7385, bat_temp = 263
+[   32.350469]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_soc: read = 0x6218, soc = 980
+[   32.351589]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x30 = 0x2229 
+[   32.353104]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x31 = 0x2228 
+[   32.353730]  [1: wpa_supplicant: 3416] dhd_set_cpucore: chan_status(0) cpucore!!!
+[   32.353748]  [1: wpa_supplicant: 3416] dhd_set_suspend: force extra Suspend setting 
+[   32.354336]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x32 = 0x2229 
+[   32.356645]  [1: wpa_supplicant: 3416] dhd_get_suspend_bcn_li_dtim beacon=100 bcn_li_dtim=9 DTIM=1 Listen=10
+[   32.357185]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x33 = 0x2229 
+[   32.359453]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x34 = 0x2229 
+[   32.360457]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x35 = 0x2228 
+[   32.361539]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x36 = 0x2229 
+[   32.362714]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x37 = 0x2228 
+[   32.363697]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x40 = 0x2219 
+[   32.364607]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x41 = 0x2219 
+[   32.365533]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x42 = 0x2219 
+[   32.366501]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x43 = 0x2219 
+[   32.370285]  [0:    kworker/0:3: 1538] 0xAC=0x2219, 0xAD=0x20f0, 0xAE=0x20f0, 0xAF=0x22c5 
+[   32.374422]  [0:    kworker/0:3: 1538] 0xBC=0x2029, 0xBD=0x20f0, 0xBE=0x22c5, 0xBF=0x2400 
+[   32.378545]  [0:    kworker/0:3: 1538] 0xCC=0x2400, 0xCD=0x10cc, 0xCE=0x1333, 0xCF=0x1800 
+[   32.382260]  [0:    kworker/0:3: 1538] 0x85=0x0030, 0x86=0x0062, 0x87=0x2f1a, 0x28=0x0488 
+[   32.382287]  [0:    kworker/0:3: 1538] sec-battery battery.20: sec_bat_get_battery_info:Vnow(4316mV),Inow(-39mA),Imax(450mA),SOC(100%),Tbat(263),Tchg(0),is_hc_usb(0)
+[   32.393372] I[0:m.android.phone: 3846] exynos5-hsi2c 13890000.hsi2c: HSI2C Error Interrupt occurred(IS:0x00000400, TR:0x0002000d)
+[   32.393415]  [4:   AsyncTask #1: 5386] exynos5-hsi2c 13890000.hsi2c: ack was not received at write
+[   32.432878]  [0:    kworker/0:3: 1538] sec-battery battery.20: sec_bat_battery_cable_check: Battery Connected
+[   32.433704]  [0:    kworker/0:3: 1538] sm5703_get_charging_health : charger->is_charging = 1, charger->cable_type = 4, charger->aicl_state = 0
+[   32.434372]  [0:    kworker/0:3: 1538] sm5703_get_charging_health: SM5703_CNTL, nCHG : 0x55, 0
+[   32.434387]  [0:    kworker/0:3: 1538] sm5703_get_charging_health : vbus_status = 32
+[   32.434394]  [0:    kworker/0:3: 1538] sm5703_get_charging_health : Health : 1
+[   32.434412]  [0:    kworker/0:3: 1538] sec-battery battery.20: sec_bat_time_management: Charging Time : 31 secs
+[   32.434425]  [0:    kworker/0:3: 1538] sec-battery battery.20: sec_bat_temperature: HLT(800) HLR(750) HT(550), HR(500), LT(-50), LR(0)
+[   32.435095]  [0:    kworker/0:3: 1538] sec_bat_swelling_check: status(1), swell_mode(0:0), cv(0x1126), temp(263)
+[   32.435111]  [0:    kworker/0:3: 1538] sec_bat_check_fullcharged : full_check_type(2)
+[   32.435125]  [0:    kworker/0:3: 1538] sec-battery battery.20: sec_bat_fullcharged_check: Charging Mode : Normal
+[   32.435136]  [0:    kworker/0:3: 1538] sec-battery battery.20: sec_bat_monitor_work: Status(Charging), mode(Normal), Health(Good), Cable(4), level(100%)
+[   32.435201]  [0:    kworker/0:3: 1538] sec_chg_get_property: slow-charging mode
+[   32.438038]  [1:        healthd: 2313] sec_chg_get_property: slow-charging mode
+[   32.438269]  [1:        healthd: 2313] healthd: battery l=100 v=4316 t=26.3 h=2 st=2 c=0 o=4 ca=-38 ct=2 ps=0 chg=u 2017-09-13 00:28:43.161161723 UTC
+[   32.438291]  [1:        healthd: 2313] healthd: battery l=100 v=4316 t=26.3 h=2 st=2 c=0 o=4 ca=-38 ct=2 ps=0 chg=u 2017-09-13 00:28:43.161161723 UTC hv=0 chg=u
+[   32.438307]  [1:        healthd: 2313] healthd-android: healthd_mode_android_battery_update
+[   32.438323]  [1:        healthd: 2313] BatteryPropertiesRegistrar: notifyListeners : start
+[   32.438344]  [1:        healthd: 2313] IBatteryPropertiesListener : batteryPropertiesChanged!
+[   32.438344]  [1:        healthd: 2313] : BatteryPropertiesRegistrar: notifyListeners : done
+[   32.440141]  [5:       Binder_9: 3897] logger: !@BatteryListener : batteryPropertiesChanged!
+[   32.958808] I[0:      swapper/0:    0] mif: LNK-RX(24): fc eb 15 00 11 00 47 00 07 01 03 01 03 00 00 00 ...
+[   33.144302]  [6:         mc_log: 2322] MobiCore mcd: 701|WV_TL_2.0_2017.01.20
+[   33.169008]  [5:ConnectivitySer: 3366] binder: 2749:3366 transaction failed 29189, size 320-0
+[   33.176766]  [1:         mc_log: 2322] MobiCore mcd: 701|get_hdcp_capability is successful.
+[   33.345467]  [0:         mc_log: 2322] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   33.345487]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   33.350263]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   33.350288]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   33.350301]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   33.350313]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   33.350325]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   33.350333]  [1:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop done
+[   33.351248]  [1:         mc_log: 2322] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   33.351264]  [1:         mc_log: 2322] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   33.361734]  [0:       Binder_1: 2775] MobiCore mcd: closed by PID(2775), name(Binder_1)
+[   33.958838] I[0:      swapper/0:    0] mif: LNK-RX(24): fc eb 15 00 11 00 48 00 07 01 03 01 04 00 00 00 ...
+[   34.958834] I[0:n.mShop.android: 6550] mif: LNK-RX(24): fc eb 15 00 11 00 49 00 07 01 03 01 05 00 00 00 ...
+[   35.064525]  [7:       Binder_6: 3750] binder: 6414: binder_alloc_buf, no vma
+[   35.064542]  [7:       Binder_6: 3750] binder: 2749:3750 transaction failed 29201, size 76-0
+[   35.066047]  [7:       Binder_6: 3750] binder: 6414: binder_alloc_buf, no vma
+[   35.066063]  [7:       Binder_6: 3750] binder: 2749:3750 transaction failed 29201, size 312-4
+[   35.066907]  [7:       Binder_6: 3750] binder: 6414: binder_alloc_buf, no vma
+[   35.066923]  [7:       Binder_6: 3750] binder: 2749:3750 transaction failed 29201, size 76-0
+[   36.876780]  [2:com.sec.factory: 6976] muic-universal:muic_show_attached_dev attached_dev:1
+[   36.953084]  [5:     Thread-174: 7032] logger: !@RecoverySystem handleAftermath
+[   37.046474]  [3:MediaScannerSer: 7010] logger: !@start scanning volume internal: [/system/media, /oem/media]
+[   37.191064]  [6:MediaScannerSer: 7010] logger: !@done scanning volume internal
+[   37.193170]  [1:MediaScannerSer: 7010] logger: !@start scanning volume external: [/storage/emulated/0]
+[   37.314236]  [5:MediaScannerSer: 7010] logger: !@done scanning volume external
+[   37.813381] I[4:      swapper/4:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 31 00 08 03 02 21 c0 ff ff ff
+[   37.814519] I[0:      swapper/0:    0] mif: LNK-RX(40): fc eb 25 00 21 00 4a 31 08 03 02 02 04 04 33 31 ...
+[   37.816404] I[1:      swapper/1:    0] mif: LNK-TX(16): fc eb 0d 00 09 00 32 00 08 05 02 ff 03 00 00 00
+[   37.817488] I[0:      swapper/0:    0] mif: LNK-RX(32): fc eb 1e 00 1a 00 4b 32 08 05 02 04 03 01 00 2b ...
+[   37.821309]  [5:     Thread-493: 7101] qtaguid: ctrl_untag(u -1): failed to lookup sock_fd=-1 err=-9 pid=7101 tgid=6992 uid=10129
+[   37.831803] I[0:c.wfccontroller: 7214] mif: LNK-TX(16): fc eb 0d 00 09 00 33 00 08 05 02 ff 02 00 00 05
+[   37.832883] I[0: cfinteractive0: 1196] mif: LNK-RX(32): fc eb 1e 00 1a 00 4c 33 08 05 02 04 02 04 00 2b ...
+[   37.836174] I[1:      swapper/1:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 34 00 08 02 02 2e 6c 74 65 76
+[   37.837840] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0c 00 08 00 4d 34 08 02 02 02 00 00 00 00
+[   37.985405]  [2:     Thread-494: 7102] qtaguid: ctrl_untag(u -1): failed to lookup sock_fd=-1 err=-9 pid=7102 tgid=6992 uid=10129
+[   38.027779]  [4:ConnectivitySer: 3366] binder: 2749:3366 transaction failed 29189, size 320-0
+[   38.365754]  [2:     Thread-524: 7144] qtaguid: ctrl_untag(u -1): failed to lookup sock_fd=-1 err=-9 pid=7144 tgid=6992 uid=10129
+[   39.395231]  [0:SSRM Handler Th: 7403] sec-battery battery.20: sec_bat_store_attrs: siop level: 70
+[   39.395283]  [0:    kworker/0:3: 1538] sec_bat_siop_work : set current by siop level(70)
+[   39.395302]  [0:    kworker/0:3: 1538] sec_chg_set_property : input current (460mA)
+[   39.397096]  [0:    kworker/0:3: 1538] sm5703_set_input_current_limit : SM5703_VBUSCNTL (Input current limit) : 0x07
+[   39.397756]  [0:    kworker/0:3: 1538] sec_chg_set_property : fast charging current (460mA), topoff current (200mA)
+[   39.397768]  [0:    kworker/0:3: 1538] sm5703_set_charging_current adj_current = 460mA charger->siop_level = 70
+[   39.405698]  [0:    kworker/0:3: 1538] __sm5703_set_fast_charging_current : SM5703_CHGCNTL2 (fastchg current) : 0x07
+[   39.408465] I[4:      swapper/4:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 35 00 08 11 02 e8 00 00 00 05
+[   39.411125] I[0:      swapper/0:    0] mif: LNK-RX(520): ff eb 05 02 81 2b 02 4e 35 08 11 02 00 00 00 20 ...
+[   39.411152] I[0:      swapper/0:    0] mif: gather_multi_frame: umts_ipc0<-ss310ap: start of multi-frame (ID:1 len:555)
+[   39.411164] I[0:      swapper/0:    0] mif: gather_multi_frame: umts_ipc0<-ss310ap: recv multi-frame (ID:1 rcvd:512)
+[   39.411178] I[0:      swapper/0:    0] mif: LNK-RX(48): ff eb 30 00 01 00 1d 00 00 00 42 01 1f 00 00 33 ...
+[   39.411190] I[0:      swapper/0:    0] mif: gather_multi_frame: umts_ipc0<-ss310ap: end of multi-frame (ID:1 rcvd:43)
+[   39.424793]  [1:SSRM Handler Th: 7403] sec-battery battery.20: sec_bat_store_attrs: siop level: 100
+[   39.424855]  [0:    kworker/0:3: 1538] sec_bat_siop_work : set current by siop level(100)
+[   39.424875]  [0:    kworker/0:3: 1538] sec_chg_set_property : input current (460mA)
+[   39.426757]  [0:    kworker/0:3: 1538] sm5703_set_input_current_limit : SM5703_VBUSCNTL (Input current limit) : 0x07
+[   39.427408]  [0:    kworker/0:3: 1538] sec_chg_set_property : fast charging current (460mA), topoff current (200mA)
+[   39.427422]  [0:    kworker/0:3: 1538] sm5703_set_charging_current adj_current = 460mA charger->siop_level = 100
+[   39.428554]  [0:    kworker/0:3: 1538] __sm5703_set_fast_charging_current : SM5703_CHGCNTL2 (fastchg current) : 0x07
+[   39.738084]  [3: KiesUsbManager: 3388] usb: state_show buf=CONFIGURED
+[   39.746170]  [3:           adbd: 2434] adb_release
+[   39.746239]  [3:           adbd: 2434] [mtpg_function_disable]	line = [1617]
+[   39.746278]  [7:     Thread-286: 5736] [mtpg_read]	638:dev->error so break r=-5
+[   39.746292]  [3:           adbd: 2434] usb: android_disconnect con(0), sw(1)
+[   39.746302]  [3:           adbd: 2434] usb: android_disconnect schedule_work con(0) sw(1)
+[   39.746313]  [3:           adbd: 2434] usb: usb_remove_config cdev->config=          (null), config=ffffffc0010ed478
+[   39.746322]  [3:           adbd: 2434] usb: unbind_config, 
+[   39.746331]  [3:           adbd: 2434] [mtpg_function_unbind]	line = [1415]
+[   39.746366]  [3:           adbd: 2434] usb: unbind_config, 
+[   39.746376]  [3:           adbd: 2434] DUN is unregisterd
+[   39.746382]  [3:           adbd: 2434] usb: unbind_config, 
+[   39.746520]  [3:    kworker/3:1: 1094] usb: android_work config=          (null),connected=0,sw_connected=1
+[   39.746621]  [3:    kworker/3:1: 1094] usb: android_work sent uevent USB_STATE=DISCONNECTED
+[   39.746825]  [4:           init:    1] usb: enable_store enabled=0, !dev->enabled=0
+[   39.765928]  [4:           init:    1] usb: enable_store enabled=0, !dev->enabled=1
+[   39.765945]  [4:           init:    1] android_usb: already disabled
+[   39.796861]  [5:           init:    1] usb: enable_store enabled=0, !dev->enabled=1
+[   39.796877]  [5:           init:    1] android_usb: already disabled
+[   39.796969]  [5:           init:    1] usb: functions_store buff=askon,adb
+[   39.796980]  [5:           init:    1] usb: android_enable_function name=askon
+[   39.796993]  [5:           init:    1] android_usb: Cannot enable 'askon' (-22)
+[   39.797001]  [5:           init:    1] usb: android_enable_function name=adb
+[   39.797746]  [5:           init:    1] usb: enable_store enabled=0, !dev->enabled=1
+[   39.797760]  [5:           init:    1] android_usb: already disabled
+[   39.797833]  [5:           init:    1] usb: functions_store buff=askon,adb
+[   39.797845]  [5:           init:    1] usb: android_enable_function name=askon
+[   39.797858]  [5:           init:    1] android_usb: Cannot enable 'askon' (-22)
+[   39.797864]  [5:           init:    1] usb: android_enable_function name=adb
+[   39.837187]  [6:.MtpApplication: 5670] [mtpg_release_device]	line = [1289]
+[   39.888977]  [3:ActivityManager: 2920] binder: 5670: binder_alloc_buf, no vma
+[   39.888997]  [3:ActivityManager: 2920] binder: 2749:2920 transaction failed 29201, size 76-0
+[   39.890639]  [3:ActivityManager: 2920] binder: 5670: binder_alloc_buf, no vma
+[   39.890659]  [3:ActivityManager: 2920] binder: 2749:2920 transaction failed 29201, size 2116-0
+[   40.178509]  [4:ConnectivitySer: 3366] binder: 2749:3366 transaction failed 29189, size 320-0
+[   40.279092]  [5:           init:    1] usb: enable_store enabled=0, !dev->enabled=1
+[   40.279108]  [5:           init:    1] android_usb: already disabled
+[   40.279735]  [5:           init:    1] usb: enable_store enabled=0, !dev->enabled=1
+[   40.279751]  [5:           init:    1] android_usb: already disabled
+[   40.329959]  [5:           init:    1] usb: enable_store enabled=0, !dev->enabled=1
+[   40.329975]  [5:           init:    1] android_usb: already disabled
+[   40.330168]  [5:           init:    1] usb: functions_store buff=mtp,adb
+[   40.330179]  [5:           init:    1] usb: android_enable_function name=mtp
+[   40.330189]  [5:           init:    1] usb: android_enable_function name=acm
+[   40.330196]  [5:           init:    1] usb: android_enable_function name=adb
+[   40.330289]  [5:           init:    1] usb: enable_store enabled=1, !dev->enabled=1
+[   40.330297]  [5:           init:    1] usb: enable_store f:mtp
+[   40.330305]  [5:           init:    1] usb: enable_store f:acm
+[   40.330312]  [5:           init:    1] usb: acm is enabled. (bcdDevice=0x400)
+[   40.330319]  [5:           init:    1] usb: enable_store f:adb
+[   40.330330]  [5:           init:    1] usb: enable_store vendor=4e8,product=6860,bcdDevice=400
+[   40.330337]  [5:           init:    1] ,Class=0,SubClass=0,Protocol=0
+[   40.330344]  [5:           init:    1] usb: enable_store next cmd : usb_add_config
+[   40.340421]  [7:           adbd: 7648] adb_open
+[   40.340443]  [7:           adbd: 7648] usb: android_bind_enabled_functions f:mtp
+[   40.340452]  [7:           adbd: 7648] [mtpg_function_bind]	line = [1442]
+[   40.340797]  [7:           adbd: 7648] dual speed mtp: IN/ep1in-bulk, OUT/ep2out-bulk
+[   40.340814]  [7:           adbd: 7648] usb: android_bind_enabled_functions f:acm
+[   40.340831]  [7:           adbd: 7648] DUN is registerd
+[   40.340839]  [7:           adbd: 7648] usb: android_bind_enabled_functions f:adb
+[   40.340845]  [7:           adbd: 7648] adb_bind_config
+[   40.442090] I[0:      swapper/0:    0] usb: Reset interrupt
+[   40.442107] I[0:      swapper/0:    0] 	 OTG core got reset (1)!!
+[   40.510965] I[0:      swapper/0:    0] usb: GET_DES
+[   40.511065]  [0:    kworker/0:3: 1538] usb: android_work config=          (null),connected=1,sw_connected=0
+[   40.511159]  [0:    kworker/0:3: 1538] usb: android_work sent uevent USB_STATE=CONNECTED
+[   40.513991] I[0:      swapper/0:    0] usb: set_config_number single config num=0
+[   40.514009] I[0:      swapper/0:    0] usb: config_buf f->mtp
+[   40.514018] I[0:      swapper/0:    0] usb: config_buf f->acm0
+[   40.514026] I[0:      swapper/0:    0] usb: config_buf f->adb
+[   40.514033] I[0:      swapper/0:    0] usb: set_interface_count next_interface_id=4
+[   40.514173] I[0:        mmcqd/0: 1218] usb: set_config_number single config num=0
+[   40.514181] I[0:        mmcqd/0: 1218] usb: config_buf f->mtp
+[   40.514188] I[0:        mmcqd/0: 1218] usb: config_buf f->acm0
+[   40.514194] I[0:        mmcqd/0: 1218] usb: config_buf f->adb
+[   40.514200] I[0:        mmcqd/0: 1218] usb: set_interface_count next_interface_id=4
+[   40.576113] I[0:        mmcqd/0: 1218] android_usb gadget: high-speed config #1: android
+[   40.576127] I[0:        mmcqd/0: 1218] usb: set_config e mtp[0]
+[   40.576151] I[0:        mmcqd/0: 1218] usb: set_config e acm0[1]
+[   40.576164] I[0:        mmcqd/0: 1218] usb: set_config e acm0[2]
+[   40.576215] I[0:        mmcqd/0: 1218] usb: set_config e adb[3]
+[   40.576237] I[0:        mmcqd/0: 1218] usb: SET_CON
+[   40.576244] I[0:        mmcqd/0: 1218] usb: set_config_number single config num=0
+[   40.576456]  [0:    kworker/0:3: 1538] usb: android_work config=ffffffc0010ed478,connected=1,sw_connected=1
+[   40.576573]  [0:    kworker/0:3: 1538] usb: android_work sent uevent USB_STATE=CONFIGURED
+[   40.735572]  [4:.MtpApplication: 7495] mtp: [guid_show]	line = [512]
+[   41.072079]  [6:     Thread-517: 7873] [mtpg_open]	line = [589]
+[   41.072137]  [6:     Thread-517: 7873] [mtpg_ioctl]SET_MTP_USER_PID;pid=7495	line=[1135]
+[   41.739816] I[1:        dhd_rxf: 2309] IPv6: ipv6_generate_eui64: dev type: 1
+[   41.842718]  [0:    kworker/0:3: 1538] dhdcdc_set_ioctl: SET PM to 2
+[   42.123078] I[6:      swapper/6:    0] mif: LNK-TX(16): fc eb 0c 00 08 00 36 00 07 01 02 01 00 00 00 00
+[   42.125750] I[0:      swapper/0:    0] mif: LNK-RX(24): fc eb 15 00 11 00 4f 36 07 01 02 01 05 00 00 00 ...
+[   42.434034]  [2:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   42.441581]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_ocv: read = 0x453, ocv = 4324
+[   42.444568]  [2:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   42.444585]  [2:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   42.444594]  [2:         mc_log: 2322] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_init:
+[   42.444604]  [2:         mc_log: 2322] MobiCore mcd: 701|TIMA trustlet:  get_sec_TIMA_address tima_sec_mem_addr : BEE00000
+[   42.444613]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   42.444621]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: data_len = 32 = 0x20
+[   42.444629]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: PHYS_READ
+[   42.444637]  [2:         mc_log: 2322] MobiCore mcd: 701|TIMA trustlet: warranty okay 13
+[   42.444646]  [2:         mc_log: 2322] MobiCore mcd: 701|TZ_COMMON: tamper_fuse_good - process_init, msr_size: 0
+[   42.444654]  [2:         mc_log: 2322] MobiCore mcd: 701|TIMA trustlet: Reading golden measurement
+[   42.444663]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   42.444671]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: data_len = 512 = 0x200
+[   42.444679]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: PHYS_READ
+[   42.444687]  [2:         mc_log: 2322] MobiCore mcd: 701|TIMA trustlet: Measurement size is : 192
+[   42.444695]  [2:         mc_log: 2322] MobiCore mcd: 701|TZ_COMMON: Read boot time measurement
+[   42.444704]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   42.444712]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: data_len = 192 = 0xc0
+[   42.444719]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: PHYS_READ
+[   42.444729]  [2:         mc_log: 2322] MobiCore mcd: 701|TZ_COMMON: compare measurements from boot and golden_msrs
+[   42.444738]  [2:         mc_log: 2322] MobiCore mcd: 701|TZ_COMMON: Measurements match, now check for license nad kap fuse status
+[   42.444747]  [2:         mc_log: 2322] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   42.444756]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   42.444764]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   42.444771]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: PHYS_READ
+[   42.444779]  [2:         mc_log: 2322] MobiCore mcd: 701|read license status is: 0
+[   42.444786]  [2:         mc_log: 2322] MobiCore mcd: 701|low security mode
+[   42.444795]  [2:         mc_log: 2322] MobiCore mcd: 701|TZ_COMMON: Measurements match - Initialization complete
+[   42.444805]  [2:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000001
+[   42.445569]  [2:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000001
+[   42.445589]  [2:         mc_log: 2322] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   42.445598]  [2:         mc_log: 2322] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   42.452453]  [2:         mc_log: 2322] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   42.452474]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   42.452487]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   42.452499]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   42.452512]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   42.452525]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   42.452542]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   42.452550]  [2:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop done
+[   42.452558]  [2:         mc_log: 2322] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   42.452566]  [2:         mc_log: 2322] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   42.460842]  [0:    kworker/0:3: 1538] sm5703_test_read: 0x4 = 0xbe, 0x5 = 0xff, 0x6 = 0xf3, 0x7 = 0xff, 0x8 = 0x08, 0x9 = 0x08, 0xa = 0x07, 0xb = 0x00, 0xc = 0x55, 0xd = 0x07, 0xe = 0x03, 0xf = 0x07, 0x10 = 0x1b, 0x11 = 0xa0, 0x12 = 0x7a, 0x13 = 0x08, 0x60 = 0x03, 0x6b = 0x20, 0x66 = 0x80, 
+[   42.463317]  [3:       Binder_9: 3897] MobiCore mcd: closed by PID(3897), name(Binder_9)
+[   42.464179]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: fg_vbatocv_check: iocv_error_count (0)
+[   42.464225]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: fg_vbatocv_check: mode change to mix RS auto mode
+[   42.467769]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_temperature: read = 0x2650, temperature = 383
+[   42.468621]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_ocv: read = 0x453, ocv = 4324
+[   42.468653]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_soc: fg_get_soc : temp_std = 25, temperature = 383, temp_offset = 10, temp_offset_cal = 0x1, curr_cal = 0x7585, bat_temp = 263
+[   42.470785]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_get_soc: read = 0x6218, soc = 980
+[   42.471749]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x30 = 0x2229 
+[   42.472692]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x31 = 0x2228 
+[   42.473832]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x32 = 0x2229 
+[   42.474794]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x33 = 0x2229 
+[   42.475622]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x34 = 0x2229 
+[   42.476532]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x35 = 0x2228 
+[   42.477386]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x36 = 0x2229 
+[   42.478311]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x37 = 0x2228 
+[   42.479134]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x40 = 0x2219 
+[   42.479948]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x41 = 0x2219 
+[   42.480840]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x42 = 0x2219 
+[   42.481666]  [0:    kworker/0:3: 1538] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x43 = 0x2219 
+[   42.485430]  [0:    kworker/0:3: 1538] 0xAC=0x2029, 0xAD=0x20f0, 0xAE=0x22c5, 0xAF=0x2400 
+[   42.488795]  [0:    kworker/0:3: 1538] 0xBC=0x2400, 0xBD=0x20f0, 0xBE=0x20f0, 0xBF=0x2400 
+[   42.492546]  [0:    kworker/0:3: 1538] 0xCC=0x2400, 0xCD=0x1333, 0xCE=0x1333, 0xCF=0x1812 
+[   42.496185]  [0:    kworker/0:3: 1538] 0x85=0x8051, 0x86=0x8021, 0x87=0x2f1a, 0x28=0x07a8 
+[   42.496222]  [0:    kworker/0:3: 1538] sec-battery battery.20: sec_bat_get_battery_info:Vnow(4304mV),Inow(19mA),Imax(450mA),SOC(100%),Tbat(263),Tchg(0),is_hc_usb(0)
+[   42.552749]  [0:    kworker/0:3: 1538] sec-battery battery.20: sec_bat_battery_cable_check: Battery Connected
+[   42.553513]  [0:    kworker/0:3: 1538] sm5703_get_charging_health : charger->is_charging = 1, charger->cable_type = 4, charger->aicl_state = 0
+[   42.554361]  [0:    kworker/0:3: 1538] sm5703_get_charging_health: SM5703_CNTL, nCHG : 0x55, 0
+[   42.554370]  [0:    kworker/0:3: 1538] sm5703_get_charging_health : vbus_status = 32
+[   42.554377]  [0:    kworker/0:3: 1538] sm5703_get_charging_health : Health : 1
+[   42.554392]  [0:    kworker/0:3: 1538] sec-battery battery.20: sec_bat_monitor_work: Status(Charging), mode(Normal), Health(Good), Cable(4), level(100%)
+[   42.554451]  [0:    kworker/0:3: 1538] sec_chg_get_property: slow-charging mode
+[   42.557069]  [7:        healthd: 2313] sec_chg_get_property: slow-charging mode
+[   42.557289]  [7:        healthd: 2313] healthd: battery l=100 v=4304 t=26.3 h=2 st=2 c=0 o=4 ca=18 ct=2 ps=0 chg=u 2017-09-13 00:28:53.280171601 UTC
+[   42.557306]  [7:        healthd: 2313] healthd: battery l=100 v=4304 t=26.3 h=2 st=2 c=0 o=4 ca=18 ct=2 ps=0 chg=u 2017-09-13 00:28:53.280171601 UTC hv=0 chg=u
+[   42.557323]  [7:        healthd: 2313] healthd-android: healthd_mode_android_battery_update
+[   42.557338]  [7:        healthd: 2313] BatteryPropertiesRegistrar: notifyListeners : start
+[   42.557353]  [7:        healthd: 2313] IBatteryPropertiesListener : batteryPropertiesChanged!
+[   42.557353]  [7:        healthd: 2313] : BatteryPropertiesRegistrar: notifyListeners : done
+[   42.558587]  [4:       Binder_A: 3898] logger: !@BatteryListener : batteryPropertiesChanged!
+[   43.126106]  [5:       Binder_3: 3164] logger: !@ SecCameraCoreManager created: pid=2451, cameraId=0
+[   43.184679]  [1:       Binder_2: 3163] [@][0][SS1:V] fimc_is_ssx_video_open
+[   43.186271]  [1:       Binder_2: 3163] pd-isp: Power-on latency exceeded, new value 1487500 ns
+[   43.186355]  [1:       Binder_2: 3163] [@][SEN:D:0] fimc_is_sensor_runtime_resume():0
+[   43.186369]  [1:       Binder_2: 3163] [@][RSC] rsctype : 0, rsccount : 1
+[   43.186377]  [1:       Binder_2: 3163] [@][0][SEN:D] fimc_is_sensor_open():0
+[   43.186745]  [1:       Binder_2: 3163] dout_sclk_isp_sensor0_b : 26Mhz
+[   43.188156]  [1:       Binder_2: 3163] samsung_usermux_enable: failed to enable clock mout_phyclk_csi_link0_rx_user.
+[   43.188167]  [1:       Binder_2: 3163] fimc_is_enable_dt: clk_enable is fail(mout_phyclk_csi_link0_rx_user)
+[   43.189336]  [1:       Binder_2: 3163] samsung_usermux_enable: failed to enable clock mout_phyclk_csi_link1_rx_user.
+[   43.189346]  [1:       Binder_2: 3163] fimc_is_enable_dt: clk_enable is fail(mout_phyclk_csi_link1_rx_user)
+[   43.189429]  [1:       Binder_2: 3163] [@] pin_ctrl(act(5), pin(0), val(1), nm(VDD_CAM_SENSOR_A2P8)
+[   43.189437]  [1:       Binder_2: 3163] [@] pin_ctrl(act(5), pin(0), val(1), nm(VDD_CAM_1P2)
+[   43.189444]  [1:       Binder_2: 3163] [@] pin_ctrl(act(5), pin(0), val(1), nm(VDDAF_2.8V_CAM)
+[   43.189450]  [1:       Binder_2: 3163] [@] pin_ctrl(act(5), pin(0), val(1), nm(VDDIO_1.8V_CAM)
+[   43.189457]  [1:       Binder_2: 3163] [@] pin_ctrl(act(4), pin(0), val(0), nm(pin)
+[   43.189464]  [1:       Binder_2: 3163] [@] pin_ctrl(act(1), pin(148), val(1), nm((null))
+[   43.190653]  [0:       Binder_2: 3163] exynos_fimc_is_module_pin_control : regulator_set_voltage(2800000)
+[   43.191370]  [0:       Binder_2: 3163] sm5703-regulator VDDAF_2.8V_CAM sm5703_regulator_is_enabled ret (0)
+[   43.191402]  [0:       Binder_2: 3163] sm5703-regulator select = 3, output list count = 8
+[   43.191411]  [0:       Binder_2: 3163] sm5703-regulator Vout = 2800000
+[   43.193313]  [0:       Binder_2: 3163] sm5703-regulator VDDAF_2.8V_CAM sm5703_regulator_set_voltage_sel ret (0)
+[   43.194055]  [0:       Binder_2: 3163] sm5703-regulator VDDAF_2.8V_CAM sm5703_regulator_is_enabled ret (0)
+[   43.194772]  [0:       Binder_2: 3163] sm5703-regulator VDDAF_2.8V_CAM sm5703_regulator_is_enabled ret (0)
+[   43.195544]  [0:       Binder_2: 3163] sm5703-regulator VDDAF_2.8V_CAM sm5703_regulator_is_enabled ret (0)
+[   43.195562]  [0:       Binder_2: 3163] sm5703-regulator Enable regulator VDDAF_2.8V_CAM
+[   43.196915]  [3:       Binder_2: 3163] sm5703-regulator VDDAF_2.8V_CAM sm5703_regulator_enable ret (0)
+[   43.204774]  [3:       Binder_2: 3163] [@][0][SEN:D] fimc_is_sensor_s_input(8, 0):0
+[   43.205003]  [3:       Binder_2: 3163] [@][ERR]get_sensor_mode:318:could not find proper sensor mode: 4144x3106@120fps
+[   43.205012]  [3:       Binder_2: 3163] [@][SEN:D:0] framerate: req@120fps, cur@120fps
+[   43.205138]  [3:       Binder_2: 3163] [@]sensor mode(1008x568@120) = 6
+[   43.205445]  [3:       Binder_2: 3163] [@][0][30S:V] fimc_is_3aa_video_open
+[   43.205673]  [3:       Binder_2: 3163] [@][0][30C:V] fimc_is_3xc_video_open
+[   43.205746]  [3:       Binder_2: 3163] [@][0][SCP:V] fimc_is_scp_video_open
+[   43.205813]  [3:       Binder_2: 3163] [@][0][30P:V] fimc_is_3xp_video_open
+[   43.205891]  [3:       Binder_2: 3163] [@][0][I0S:V] fimc_is_ixs_video_open
+[   43.206193]  [3:       Binder_2: 3163] [@][0][I0P:V] fimc_is_ixp_video_open
+[   43.207320]  [3:       Binder_2: 3163] [@]FIMC_IS runtime resume in
+[   43.209848]  [3:       Binder_2: 3163] isp_pll : 1060Mhz
+[   43.213404]  [0:       Binder_2: 3163] [@][RSC] fimc_is_ischain_runtime_resume: QoS LOCK [INT(400000), MIF(825000), CAM(530000)]
+[   43.221153]  [0:       Binder_2: 3163] dout_isp_pll_div2 : 530Mhz
+[   43.221190]  [0:       Binder_2: 3163] dout_isp_pll_div3 : 530Mhz
+[   43.221226]  [0:       Binder_2: 3163] dout_sclk_cpu_isp_clkin : 530Mhz
+[   43.221265]  [0:       Binder_2: 3163] dout_sclk_cpu_isp_atclkin : 265Mhz
+[   43.221311]  [0:       Binder_2: 3163] dout_sclk_cpu_isp_pclkdbg : 66Mhz
+[   43.221430]  [0:       Binder_2: 3163] dout_pclk_csi_link0_225 : 265Mhz
+[   43.221504]  [0:       Binder_2: 3163] dout_aclk_link_data : 400Mhz
+[   43.221620]  [0:       Binder_2: 3163] dout_aclk_csi_link1_75 : 200Mhz
+[   43.221763]  [0:       Binder_2: 3163] dout_pclk_csi_link1_37 : 100Mhz
+[   43.221835]  [0:       Binder_2: 3163] dout_aclk_fimc_isp_450 : 530Mhz
+[   43.221913]  [0:       Binder_2: 3163] dout_pclk_fimc_isp_225 : 265Mhz
+[   43.221996]  [0:       Binder_2: 3163] dout_aclk_fimc_fd_300 : 530Mhz
+[   43.222081]  [0:       Binder_2: 3163] dout_pclk_fimc_fd_150 : 265Mhz
+[   43.222173]  [0:       Binder_2: 3163] dout_aclk_isp_266 : 266Mhz
+[   43.222271]  [0:       Binder_2: 3163] dout_aclk_isp_133 : 133Mhz
+[   43.222378]  [0:       Binder_2: 3163] dout_aclk_isp_67 : 66Mhz
+[   43.222536]  [0:       Binder_2: 3163] dout_sclk_isp_spi0_ext_clk_a : 26Mhz
+[   43.222747]  [0:       Binder_2: 3163] dout_sclk_isp_spi0_ext_clk_b : 8Mhz
+[   43.222869]  [0:       Binder_2: 3163] dout_sclk_isp_spi1_ext_clk_a : 26Mhz
+[   43.222992]  [0:       Binder_2: 3163] dout_sclk_isp_spi1_ext_clk_b : 8Mhz
+[   43.223122]  [0:       Binder_2: 3163] dout_sclk_isp_uart_ext_uclk : 50Mhz
+[   43.223166]  [0:       Binder_2: 3163] [@]FIMC-IS runtime resume out
+[   43.223182]  [0:       Binder_2: 3163] exynos-fimc-is 14580000.fimc_is: state restore latency exceeded, new value 15866462 ns
+[   43.289271]  [0:       Binder_2: 3163] [@]FW version : 7580 17765-2016/03/23 11:50:19]T13LLJC02SA
+[   43.289770]  [0:       Binder_2: 3163] [@]Camera: the default FW were applied successfully.
+[   43.300460]  [0:       Binder_2: 3163] [@]fimc_is_fd.bin version: 0x1001b Oct 15 2014 19:55:42
+[   43.300500]  [0:       Binder_2: 3163] [@]fimc_is_ischain_config_secure : PA_FIMC_IS_GIC_C : 0x000000fc
+[   43.300513]  [0:       Binder_2: 3163] [@]fimc_is_ischain_power(1):0
+[   43.300573]  [0:       Binder_2: 3163] [@][RSC] rsctype : 2, rsccount : 2
+[   43.300581]  [0:       Binder_2: 3163] [@][0][ISC:D] fimc_is_ischain_open():0
+[   43.302447]  [0:       Binder_2: 3163] [@]sensor mode(1008x568@120) = 6
+[   43.302460]  [0:       Binder_2: 3163] [@][SEN:D:0] framerate: req@120fps, cur@120fps
+[   43.303322]  [0:       Binder_2: 3163] [@][0] =STM CFG===============
+[   43.303331]  [0:       Binder_2: 3163] [@][0] STM(N) PH: 01 -> GP0 ( 11 *12 ) -> GP2 ( 32 52 )
+[   43.303338]  [0:       Binder_2: 3163] [@][0] DEVICE GRAPH : 0 2 FFFFFFFF 5
+[   43.303344]  [0:       Binder_2: 3163] [@][0] =======================
+[   43.303354]  [0:       Binder_2: 3163] [@]CAL DATA : MAP ver : V001
+[   43.303360]  [0:       Binder_2: 3163] [@]Camera : Front Sensor Version : 0xff
+[   43.303367]  [0:       Binder_2: 3163] [@]eeprom_fw_version = T13LLIA00SM, phone_fw_version = T13LLJC02SA, loaded_fw_version = 
+[   43.303384]  [0:       Binder_2: 3163] [@]Rear Camera : the dumped Cal. data was applied successfully.
+[   43.303395]  [0:       Binder_2: 3163] [@][0]calibration loading is success
+[   43.305161]  [0:   kworker/0:1H: 2271] [@]IS Version: 244.130 [0x02]
+[   43.422686]  [1:    kworker/1:1: 1047] GPIO-KEY : key is pressed!!
+[   43.422907]  [2:    InputReader: 3243] logger: !@notifyKey(116), action=0
+[   43.423917]  [2:    InputReader: 3243] logger: !@interceptKeyBeforeQueueing(116), action=0, interactive=false
+[   43.430041]  [3:       Binder_2: 3163] [@]SETFILE version : 160129_S5K3L2_LSI_11079 2016/01/29/11:55 E7580
+[   43.430087]  [3:       Binder_2: 3163] [@]Camera: the default Setfile were applied successfully.
+[   43.432451]  [1:       Binder_2: 3163] [@][0][ISC:D] stream off ready
+[   43.437103]  [3:       Binder_2: 3163] [@]input & output sizes are same(1008, 568)
+[   43.437122]  [3:       Binder_2: 3163] [@][0][SEN:D] fimc_is_sensor_back_start(1008x568, 0)
+[   43.437184]  [3:       Binder_2: 3163] [@][0][GP0]async: 3, shot resource: 5
+[   43.437195]  [3:       Binder_2: 3163] [@][0] =GRP CFG===============
+[   43.437205]  [3:       Binder_2: 3163] [@][0][GP0] SRC10:1008x0568
+[   43.437215]  [3:       Binder_2: 3163] [@][0][GP0] CAP11:1008x0568
+[   43.437228]  [3:       Binder_2: 3163] [@][0][GP2] SRC30:0992x0558
+[   43.437238]  [3:       Binder_2: 3163] [@][0][GP2] CAP52:0992x0558
+[   43.437248]  [3:       Binder_2: 3163] [@][0] =======================
+[   43.441806]  [2:       Binder_2: 3163] [@][0][ISC:D] fimc_is_ischain_start(0):0
+[   43.442123]  [5:fimc_is_gworker: 8403] sm5703_led_mode_ctrl : state = 0
+[   43.442138]  [5:fimc_is_gworker: 8403] sm5703-fled:sm5703_fled_set_mode() line-514: FLASHLIGHT_MODE_OFF
+[   43.443130]  [2:       Binder_2: 3163] [@][0][CSI] settle(1008x568@120) = 9
+[   43.443146]  [2:       Binder_2: 3163] [@][0][CSI] vci(0x32314742) = 1
+[   43.443315]  [5:fimc_is_gworker: 8403] sm5703-fled:sm5703_fled_notification() line-491: sm5703_fled_notification, set done
+[   43.445542]  [5:fimc_is_gworker: 8403] [@][0][3XS][F1]in_crop[8, 6, 992, 558]
+[   43.445559]  [5:fimc_is_gworker: 8403] [@][0][3XS][F1]ot_crop[0, 0, 992, 558]
+[   43.447479]  [2:       Binder_2: 3163] [@][0][ISC:D] stream on ready(3, 3)
+[   43.447492]  [2:       Binder_2: 3163] [@][0][ISC:D] tbl[0] is selected(1.0 HAL)
+[   43.447504]  [2:       Binder_2: 3163] [@][0][ISC:D] tbl[0] static scenario(24)-[FIMC_IS_SN_PREVIEW_HIGH_SPEED_FPS]
+[   43.467278]  [3:       Binder_2: 3163] [@]DTP checking...
+[   43.483353]  [2:    InputReader: 3243] logger: !@[ps] Screen__On  - 1 :  wakeUpWithReason: 1 (uid: 1000 pid: 2749) (1)
+[   43.486198]  [2:    InputReader: 3243] logger: !@handleInterceptActions(116), action=0, wmActions=0
+[   43.493336]  [0:PmsDisplayThrea: 3012] logger: !@autosuspend_wakeup_count_disable
+[   43.493336]  [0:PmsDisplayThrea: 3012] 
+[   43.493382]  [0:PmsDisplayThrea: 3012] logger: !@autosuspend_wakeup_count_disable done
+[   43.493382]  [0:PmsDisplayThrea: 3012] 
+[   43.493460]  [0:PmsDisplayThrea: 3012] logger: !@display_state: OFF -> ON brightness: 0 -> 0
+[   43.507796]  [0: surfaceflinger: 2317] decon_blank ++ blank_mode : 0 
+[   43.507802]  [0: surfaceflinger: 2317] decon-int UNBLANK mode: 0type (0: DSI)
+[   43.508154]  [0: surfaceflinger: 2317] decon 14830000.decon_fb: pm_stay_awake
+[   43.508158]  [0: surfaceflinger: 2317] dsim_enable ++
+[   43.515031]  [0:   kworker/0:1H: 2271] [@][0][GP0][WRN] complete bufs : 6
+[   43.519764]  [3: surfaceflinger: 2317] dsim_reset_panel is not exist, so create it
+[   43.519774]  [3: surfaceflinger: 2317] dsim_reset_panel is empty, so make list
+[   43.519933]  [3: surfaceflinger: 2317] check_dt: gpio: 3, regulator: 0, delay: 6, pinctrl: 0
+[   43.523374]  [0:   kworker/0:1H: 2271] [@][0][GP0][WRN] complete bufs : 7
+[   43.524234] I[0:      swapper/0:    0] [@]grp1(res 2, rcnt 0, scnt 10), grp2(res 3, rcnt 0, scnt 0), fcount 11(0, 0) pcount 14
+[   43.531743]  [0:   kworker/0:1H: 2271] [@][0][GP0][WRN] complete bufs : 8
+[   43.531868] I[0:      swapper/0:    0] mif: LNK-TX(16): fc eb 0c 00 08 00 37 00 0a 0f 05 01 c0 ff ff ff
+[   43.531874] I[0:      swapper/0:    0] mif: LNK-TX(16): fc eb 0c 00 08 00 38 00 07 01 02 01 00 00 00 0b
+[   43.532584] I[0:       Binder_C: 3900] [@]grp1(res 3, rcnt 0, scnt 10), grp2(res 3, rcnt 0, scnt 0), fcount 12(0, 0) pcount 14
+[   43.534562] I[0: servicemanager: 2315] mif: LNK-RX(24): fc eb 15 00 11 00 50 38 07 01 02 01 05 00 00 00 ...
+[   43.540100]  [0:   kworker/0:1H: 2271] [@][0][GP0][WRN] complete bufs : 9
+[   43.540951] I[0:       Binder_C: 3900] [@]grp1(res 4, rcnt 0, scnt 10), grp2(res 3, rcnt 0, scnt 0), fcount 13(0, 0) pcount 14
+[   43.540980]  [3:       Binder_2: 3163] [@][0][ISC:D] stream off ready
+[   43.548490]  [0:   kworker/0:1H: 2271] [@][0][GP0][WRN] complete bufs : 10
+[   43.553224]  [2: surfaceflinger: 2317] MDD : ea8061_init was called
+[   43.553275] I[4:      swapper/4:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 39 00 08 03 02 1d 00 00 00 01
+[   43.553345]  [3:       Binder_2: 3163] [@][0][FRT:D] fimc_is_sensor_front_stop(0)
+[   43.553381]  [3:       Binder_2: 3163] [@][FRT:D:0] instant off(fcount : 0, time : 70ms)
+[   43.553381]  [3:       Binder_2: 3163] [@][0][WRN]fimc_is_flite_stop, no waiting...
+[   43.553394]  [3:       Binder_2: 3163] [@][0][BAK:D] fimc_is_sensor_back_stop(0)
+[   43.553540]  [3:       Binder_2: 3163] [@][0][WRN]video10 stream off : queued buffer is not empty(10)
+[   43.554379] I[0:pool-8-thread-1: 5947] mif: LNK-RX(40): fc eb 25 00 21 00 51 39 08 03 02 02 04 04 33 31 ...
+[   43.557850]  [3:       Binder_2: 3163] [@][0][GP0] sensor fcount: 13, fcount: 10
+[   43.557859]  [3:       Binder_2: 3163] [@][0][GP0]fimc_is_ischain_3aa_stop(10):0
+[   43.557864]  [3:       Binder_2: 3163] [@][WRN]com frame1 is flushed(count : 9)
+[   43.557866]  [3:       Binder_2: 3163] [@][WRN]com frame2 is flushed(count : 8)
+[   43.557868]  [3:       Binder_2: 3163] [@][WRN]com frame3 is flushed(count : 7)
+[   43.557871]  [3:       Binder_2: 3163] [@][WRN]com frame4 is flushed(count : 6)
+[   43.557873]  [3:       Binder_2: 3163] [@][WRN]com frame5 is flushed(count : 5)
+[   43.557876]  [3:       Binder_2: 3163] [@][WRN]com frame6 is flushed(count : 4)
+[   43.557878]  [3:       Binder_2: 3163] [@][WRN]com frame7 is flushed(count : 3)
+[   43.557880]  [3:       Binder_2: 3163] [@][WRN]com frame8 is flushed(count : 2)
+[   43.557882]  [3:       Binder_2: 3163] [@][WRN]com frame9 is flushed(count : 1)
+[   43.557884]  [3:       Binder_2: 3163] [@][WRN]com frame10 is flushed(count : 0)
+[   43.558977]  [3:       Binder_2: 3163] [@]sensor mode(1008x568@120) = 6
+[   43.558982]  [3:       Binder_2: 3163] [@][SEN:D:0] framerate: req@30fps, cur@30fps
+[   43.561290]  [2:       Binder_2: 3163] [@]sensor mode(1008x568@120) = 6
+[   43.561295]  [2:       Binder_2: 3163] [@][SEN:D:0] framerate: req@30fps, cur@30fps
+[   43.561451]  [2:       Binder_2: 3163] [@]sensor mode(4144x3106@30) = 0
+[   43.562437] I[7:      swapper/7:    0] mif: LNK-TX(16): fc eb 0d 00 09 00 3a 00 08 05 02 ff 03 00 00 01
+[   43.563533] I[0:      swapper/0:    0] mif: LNK-RX(32): fc eb 1e 00 1a 00 52 3a 08 05 02 04 03 01 00 2b ...
+[   43.563992]  [2:       Binder_2: 3163] [@][0][GP0]async: 1, shot resource: 3
+[   43.563997]  [2:       Binder_2: 3163] [@][0] =GRP CFG===============
+[   43.564003]  [2:       Binder_2: 3163] [@][0][GP0] SRC10:4144x3106
+[   43.564006]  [2:       Binder_2: 3163] [@][0][GP0] CAP11:4128x3096
+[   43.564013]  [2:       Binder_2: 3163] [@][0][GP2] SRC30:4128x3096
+[   43.564016]  [2:       Binder_2: 3163] [@][0][GP2] CAP52:0960x0720
+[   43.564020]  [2:       Binder_2: 3163] [@][0] =======================
+[   43.572120]  [1:       Binder_2: 3163] [@][0][ISC:D] fimc_is_ischain_start(0):0
+[   43.572247]  [1:       Binder_2: 3163] [@]input & output sizes are same(4144, 3106)
+[   43.572253]  [1:       Binder_2: 3163] [@][0][SEN:D] fimc_is_sensor_back_start(4144x3106, 0)
+[   43.576958]  [5:fimc_is_gworker: 8403] [@][0][3XC][F11]ot_crop[0, 0, 4128, 3096]
+[   43.576984]  [5:fimc_is_gworker: 8403] [@][0][SCP][F11]CRange:W
+[   43.576992]  [5:fimc_is_gworker: 8403] [@][0][SCP][F11]in_crop[0, 0, 4128, 3096]
+[   43.576997]  [5:fimc_is_gworker: 8403] [@][0][SCP][F11]ot_crop[0, 0, 960, 720]
+[   43.577646] I[0:      swapper/0:    0] mif: LNK-TX(16): fc eb 0d 00 09 00 3b 00 08 05 02 ff 02 00 00 00
+[   43.578738] I[0:      swapper/0:    0] mif: LNK-RX(32): fc eb 1e 00 1a 00 53 3b 08 05 02 04 02 04 00 2b ...
+[   43.584051] I[4:      swapper/4:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 3c 00 08 02 02 00 04 00 00 00
+[   43.584795]  [1:       Binder_2: 3163] [@][0][CSI] settle(4144x3106@30) = 24
+[   43.584801]  [1:       Binder_2: 3163] [@][0][CSI] vci(0x32314742) = 1
+[   43.584823]  [1:       Binder_2: 3163] [@][0][ISC:D] stream on ready(1, 1)
+[   43.584827]  [1:       Binder_2: 3163] [@][0][ISC:D] tbl[0] is selected(1.0 HAL)
+[   43.584838]  [1:       Binder_2: 3163] [@][0][ISC:D] tbl[0] static scenario(9)-[FIMC_IS_SN_REAR_PREVIEW_FHD]
+[   43.585178] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0c 00 08 00 54 3c 08 02 02 02 00 00 00 00
+[   43.652960]  [3:    InputReader: 3243] logger: !@notifyKey(116), action=1
+[   43.653021]  [3:    InputReader: 3243] logger: !@interceptKeyBeforeQueueing(116), action=1, interactive=true
+[   43.704657]  [0: wpa_supplicant: 3416] dhd_set_cpucore: chan_status(0) cpucore!!!
+[   43.704671]  [0: wpa_supplicant: 3416] dhd_set_suspend: Remove extra suspend setting 
+[   43.712730]  [0: surfaceflinger: 2317] dsim_panel_set_brightness : panel is not active state..
+[   43.713081]  [0: surfaceflinger: 2317] dsim_panel_set_brightness : platform : 0, : mapping : 5, real : 5, index : 0
+[   43.713188]  [0: surfaceflinger: 2317] dsim_panel_set_elvss: 0 Tset: 48 Temp: 25
+[   43.713199]  [0: surfaceflinger: 2317] acl: 2, auto_brightness: 0
+[   43.713211]  [0: surfaceflinger: 2317] MDD : ea8061_displayon was called
+[   43.713215]  [0: surfaceflinger: 2317] pclk_dsi_link0: 133 Mhz
+[   43.713217]  [0: surfaceflinger: 2317] phyclk_rxclkesc0: 20 Mhz
+[   43.713218]  [0: surfaceflinger: 2317] phyclk_bitclkdiv8: 188 Mhz
+[   43.713220]  [0: surfaceflinger: 2317] sclk_dsi_link0_i_rgb_vclk: 166 Mhz
+[   43.713222]  [0: surfaceflinger: 2317] pclk_decon_int: 133 Mhz
+[   43.713223]  [0: surfaceflinger: 2317] dsim_enable --
+[   43.713272]  [0: surfaceflinger: 2317] decon_esd_enable_interrupt: err(31) is high
+[   43.713293] I[0: surfaceflinger: 2317] decon_esd_err_handler: level: 1, state: 1, count: 0
+[   43.713300] I[0: surfaceflinger: 2317] decon_esd_err_handler: level: 1, state: 1, count: 0
+[   43.713305]  [0: surfaceflinger: 2317] decon_blank -- blank_mode : 0 
+[   43.713351]  [0: surfaceflinger: 2317] dsim_panel_set_brightness : platform : 0, : mapping : 5, real : 5, index : 0
+[   43.715988]  [7:    migration/7:   43] IRQ145 no longer affine to CPU7
+[   43.716677]  [1: surfaceflinger: 2317] CPU7: shutdown
+[   43.718768]  [6:    migration/6:   38] IRQ144 no longer affine to CPU6
+[   43.719455]  [1: surfaceflinger: 2317] CPU6: shutdown
+[   43.721766]  [5:    migration/5:   33] IRQ143 no longer affine to CPU5
+[   43.722468]  [3: surfaceflinger: 2317] CPU5: shutdown
+[   43.725573]  [4:    migration/4:   28] IRQ142 no longer affine to CPU4
+[   43.726889]  [3: surfaceflinger: 2317] CPU4: shutdown
+[   43.726950]  [1:    InputReader: 3243] logger: !@handleInterceptActions(116), action=1, wmActions=0
+[   43.736951]  [1:PmsDisplayThrea: 8488] sec_touchkey_driver 6-0020: [TK] tc300k_input_open: users=0
+[   43.736983]  [1:PmsDisplayThrea: 8488] sec_touchkey_driver 6-0020: [TK] tc300k_resume: users=0
+[   43.736991]  [1:PmsDisplayThrea: 8488] [TK] tc300k_touchkey_power on
+[   43.737623]  [1:PmsDisplayThrea: 8489] mms_ts 11-0048: mms_enable [START]
+[   43.738260]  [1:PmsDisplayThrea: 8489] mms_ts 11-0048: mms_power_control [START on] 
+[   43.755117]  [1:    mediaserver: 2451] [@][0][ISC:D] stream off ready
+[   43.774644]  [1:    mediaserver: 2451] [@][0][FRT:D] fimc_is_sensor_front_stop(0)
+[   43.774733]  [1:    mediaserver: 2451] [@][0][WRN]fimc_is_flite_stop, no waiting...
+[   43.774752]  [1:    mediaserver: 2451] [@][0][BAK:D] fimc_is_sensor_back_stop(0)
+[   43.774879]  [1:    mediaserver: 2451] [@][0][WRN]video10 stream off : queued buffer is not empty(2)
+[   43.774892]  [1:    mediaserver: 2451] [@][0][WRN] front is stopped, forcely trigger(pc 15)
+[   43.774910]  [1:    mediaserver: 2451] [@][0][GP0][WRN] 1 reqs waiting...
+[   43.774921]  [0:fimc_is_gworker: 8403] [@][0][GP0][WRN] cancel by fstop2
+[   43.774933]  [0:fimc_is_gworker: 8403] [@][0][3XC][F0][ERR] CANCEL(3)
+[   43.774947]  [0:fimc_is_gworker: 8403] [@][0][SCP][F0][ERR] CANCEL(3)
+[   43.774957]  [0:fimc_is_gworker: 8403] [@][0][GP0][F13][ERR] CANCEL(3)
+[   43.792794]  [1:PmsDisplayThrea: 8489] mms_ts 11-0048: mms_power_control [DONE on] 
+[   43.792817]  [1:PmsDisplayThrea: 8489] mms_ts 11-0048: mms_enable [DONE]
+[   43.796477]  [2:     android.ui: 2926] [SENSOR] k2hh_set_odr: change odr 3
+[   43.796490]  [2:     android.ui: 2926] [SENSOR] k2hh_delay_store: poll_delay = 66667000
+[   43.796646]  [2:     android.ui: 2926] [SENSOR] k2hh_enable_store: new_value = 1
+[   43.797338]  [2:     android.ui: 2926] [SENSOR] k2hh_open_calibration:  No Calibration
+[   43.798715]  [0:     android.ui: 2926] [SENSOR] k2hh_set_range: 0x20
+[   43.799474]  [0:     android.ui: 2926] [SENSOR] k2hh_set_mode: change mode 1
+[   43.800686]  [0:PowerManagerSer: 3002] logger: !@ [0] ColorFade exit
+[   43.803008]  [0:   kworker/0:1H: 2271] [@][0][3XC][F13][ERR] NDONE(2, E1)
+[   43.803038]  [0:   kworker/0:1H: 2271] [@][0][SCP][F13][ERR] NDONE(2, E1)
+[   43.803060]  [0:   kworker/0:1H: 2271] [@][0][GP0][F13][ERR] NDONE(2, EF(L0 H0))
+[   43.808199]  [1:    mediaserver: 2451] [@][0][GP0] sensor fcount: 13, fcount: 13
+[   43.808215]  [1:    mediaserver: 2451] [@][0][GP0]fimc_is_ischain_3aa_stop(3):0
+[   43.808224]  [1:    mediaserver: 2451] [@][WRN]com frame13 is flushed(count : 1)
+[   43.808231]  [1:    mediaserver: 2451] [@][WRN]com frame13 is flushed(count : 0)
+[   43.809109]  [1:    mediaserver: 2451] [@][0][WRN]video11 stream off : queued buffer is not empty(2)
+[   43.809198]  [1:    mediaserver: 2451] [@][0][WRN]video52 stream off : queued buffer is not empty(2)
+[   43.816761]  [1:PhotonicModulat: 3445] dsim_panel_set_brightness : platform : 255, : mapping : 350, real : 350, index : 61
+[   43.863557]  [0:PhotonicModulat: 3445] dsim_panel_set_elvss: 0 Tset: 48 Temp: 25
+[   43.864551]  [0:InputDeviceLigh: 3442] sec_touchkey_driver 6-0020: [TK] led on
+[   43.887716]  [2:       Binder_4: 4228] [@][0][WRN]already back stop
+[   43.887736]  [2:       Binder_4: 4228] [@][0][BAK:D] fimc_is_sensor_back_stop(0)
+[   43.887743]  [2:       Binder_4: 4228] [@][0][WRN]already front stop
+[   43.887750]  [2:       Binder_4: 4228] [@][0][FRT:D] fimc_is_sensor_front_stop(0)
+[   43.887796]  [2:       Binder_4: 4228] [@][RSC] rsctype : 0, rsccount : 1
+[   43.887803]  [2:       Binder_4: 4228] [@][0][SEN:D] fimc_is_sensor_close():0
+[   43.887823]  [2:       Binder_4: 4228] [@][0][SS0:V] fimc_is_ssx_video_close(0):0
+[   43.887965]  [2:       Binder_4: 4228] [@][0][SCP:V] fimc_is_scp_video_close(5,0):0
+[   43.888025]  [2:       Binder_4: 4228] [@][0][30C:V] fimc_is_3xc_video_close(4,0):0
+[   43.888071]  [2:       Binder_4: 4228] [@][0][WRN]already group stop
+[   43.888079]  [2:       Binder_4: 4228] [@][0][WRN]already stop
+[   43.888086]  [2:       Binder_4: 4228] [@][0][GP0]fimc_is_ischain_3aa_stop(3):0
+[   43.889104]  [2:       Binder_4: 4228] [@][0][30S:V] fimc_is_3aa_video_close(3,0):0
+[   43.889662]  [2:       Binder_4: 4228] [@][0][I0P:V] fimc_is_ixp_video_close(2,0):0
+[   43.889736]  [2:       Binder_4: 4228] [@][0][WRN]already group stop
+[   43.889752]  [2:       Binder_4: 4228] [@][0][GP2]fimc_is_ischain_isp_stop(0):0
+[   43.889940]  [2:       Binder_4: 4228] [@][0][I0S:V] fimc_is_ixs_video_close(1,0):0
+[   43.890033]  [2:       Binder_4: 4228] [@][@][0][DRC][ERR]fimc_is_subdev_close:184:subdev is already close
+[   43.890041]  [2:       Binder_4: 4228] [@][@][0][ODC][ERR]fimc_is_subdev_close:184:subdev is already close
+[   43.890050]  [2:       Binder_4: 4228] [@][@][0][DNR][ERR]fimc_is_subdev_close:184:subdev is already close
+[   44.092960]  [2:       Binder_4: 4228] [@]A5 state(0x2000)
+[   44.093004]  [2:       Binder_4: 4228] [@] pin_ctrl(act(5), pin(0), val(0), nm(VDDAF_2.8V_CAM)
+[   44.093011]  [2:       Binder_4: 4228] [@] pin_ctrl(act(4), pin(0), val(1), nm(pin)
+[   44.093018]  [2:       Binder_4: 4228] [@] pin_ctrl(act(1), pin(148), val(0), nm((null))
+[   44.093025]  [2:       Binder_4: 4228] [@] pin_ctrl(act(5), pin(0), val(0), nm(VDDIO_1.8V_CAM)
+[   44.093031]  [2:       Binder_4: 4228] [@] pin_ctrl(act(5), pin(0), val(0), nm(VDD_CAM_1P2)
+[   44.093038]  [2:       Binder_4: 4228] [@] pin_ctrl(act(5), pin(0), val(0), nm(VDD_CAM_SENSOR_A2P8)
+[   44.093791]  [2:       Binder_4: 4228] sm5703-regulator VDDAF_2.8V_CAM sm5703_regulator_is_enabled ret (1)
+[   44.093809]  [2:       Binder_4: 4228] sm5703-regulator Disable regulator VDDAF_2.8V_CAM
+[   44.095025]  [0:       Binder_4: 4228] sm5703-regulator sm5703_regulator_disable ret (0)
+[   44.096569]  [0:       Binder_4: 4228] [@][SEN:D:0] fimc_is_sensor_runtime_suspend():0
+[   44.096593]  [0:       Binder_4: 4228] exynos-fimc-is-sensor 144a0000.fimc_is_sensor: state save latency exceeded, new value 3597885 ns
+[   44.096603]  [0:       Binder_4: 4228] [@]FIMC_IS runtime suspend in
+[   44.101150]  [0:       Binder_4: 4228] [@]FIMC_IS runtime suspend out
+[   44.101183]  [0:       Binder_4: 4228] exynos-fimc-is 14580000.fimc_is: state save latency exceeded, new value 4574192 ns
+[   44.101318]  [0:       Binder_4: 4228] [@]fimc_is_ischain_power(0):0
+[   44.101330]  [0:       Binder_4: 4228] [@][RSC] rsctype : 2, rsccount : 0
+[   44.101338]  [0:       Binder_4: 4228] [@][0][ISC:D] fimc_is_ischain_close():0
+[   44.101356]  [0:       Binder_4: 4228] [@][0][30P:V] fimc_is_3xp_video_close(0,0):0
+[   44.342907]  [4:      swapper/4:    0] CPU4: Booted secondary processor
+[   44.343641]  [0:    kworker/0:0:    4] cpu cpu4: exynos_cpufreq_init: CPU 4 initialized
+[   44.347436]  [5:      swapper/5:    0] CPU5: Booted secondary processor
+[   44.348655]  [6:      swapper/6:    0] CPU6: Booted secondary processor
+[   44.352122]  [7:      swapper/7:    0] CPU7: Booted secondary processor
+[   44.359996] I[0:       Binder_7: 3870] exynos5-hsi2c 13890000.hsi2c: HSI2C Error Interrupt occurred(IS:0x00000400, TR:0x0002000d)
+[   44.360127]  [3:   AsyncTask #1: 5386] exynos5-hsi2c 13890000.hsi2c: ack was not received at write
+[   44.813137] I[1:        dhd_rxf: 2309] IPv6: ipv6_generate_eui64: dev type: 1
+[   44.877403]  [6:bluedroid wake/: 8514] [BT] Bluetooth Power Off.
+[   44.877619]  [6:bluedroid wake/: 8514] [BT] Bluetooth Power On.
+[   44.877635]  [6:bluedroid wake/: 8514] wake enabled for irq 12
+[   44.984912]  [4:     hci_thread: 8601] [BT] set_wake_locked value = 1
+[   45.220921]  [7:         mc_log: 2322] MobiCore mcd: 701|ICCC:Trustlet ICCC::Starting
+[   45.222850]  [7:         mc_log: 2322] MobiCore mcd: 701|TL ICCC: we got a command: 2
+[   45.222872]  [7:         mc_log: 2322] MobiCore mcd: 701|ICCC :case ICCC_SAVEDATA_TA
+[   45.222886]  [7:         mc_log: 2322] MobiCore mcd: 701|ICCC : In save data, type = ff200000 , value = 0 
+[   45.222901]  [7:         mc_log: 2322] MobiCore mcd: 701|ICCC:  get_sec_TIMA_address tima_sec_mem_addr : BEE00000
+[   45.222914]  [7:         mc_log: 2322] MobiCore mcd: 701|iccc: ICCC_save_data@#
+[   45.224758]  [4:         mc_log: 2322] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   45.224779]  [4:         mc_log: 2322] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   45.224792]  [4:         mc_log: 2322] MobiCore mcd: 501|drTima: PHYS_READ
+[   45.224806]  [4:         mc_log: 2322] MobiCore mcd: 701|ICCC Magic Got is  = fffd , ret is = 0 
+[   45.224820]  [4:         mc_log: 2322] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   45.224833]  [4:         mc_log: 2322] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   45.224845]  [4:         mc_log: 2322] MobiCore mcd: 501|drTima: PHYS_READ
+[   45.224859]  [4:         mc_log: 2322] MobiCore mcd: 701|ICCC : iccc lock is 1 
+[   45.227202]  [0:         mc_log: 2322] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   45.227219]  [0:         mc_log: 2322] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   45.227227]  [0:         mc_log: 2322] MobiCore mcd: 501|drTima: PHYS_WRITE
+[   45.227236]  [0:         mc_log: 2322] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   45.227243]  [0:         mc_log: 2322] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   45.227250]  [0:         mc_log: 2322] MobiCore mcd: 501|drTima: PHYS_READ
+[   45.227258]  [0:         mc_log: 2322] MobiCore mcd: 701|ICCC : iccc lock is 1 
+[   45.227266]  [0:         mc_log: 2322] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   45.227274]  [0:         mc_log: 2322] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   45.227282]  [0:         mc_log: 2322] MobiCore mcd: 501|drTima: PHYS_WRITE
+[   45.232719]  [0:         mc_log: 2322] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   45.232742]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   45.232754]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   45.232767]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   45.232779]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   45.235031]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   45.235056]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   45.235064]  [0:         mc_log: 2322] MobiCore mcd: 103|BroadCast loop done
+[   45.235072]  [0:         mc_log: 2322] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   45.235081]  [0:         mc_log: 2322] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   45.246323]  [1:  system_server: 2749] MobiCore mcd: closed by PID(2749), name(system_server)
+[   45.313387] I[1:      swapper/1:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 3d 00 08 11 02 58 0a 00 00 00
+[   45.316139] I[0:      swapper/0:    0] mif: LNK-RX(520): ff eb 05 02 81 2b 02 55 3d 08 11 02 00 00 00 20 ...
+[   45.316169] I[0:      swapper/0:    0] mif: gather_multi_frame: umts_ipc0<-ss310ap: start of multi-frame (ID:1 len:555)
+[   45.316178] I[0:      swapper/0:    0] mif: gather_multi_frame: umts_ipc0<-ss310ap: recv multi-frame (ID:1 rcvd:512)
+[   45.316191] I[0:      swapper/0:    0] mif: LNK-RX(48): ff eb 30 00 01 00 1d 00 00 00 42 01 1f 00 00 33 ...
+[   45.316200] I[0:      swapper/0:    0] mif: gather_multi_frame: umts_ipc0<-ss310ap: end of multi-frame (ID:1 rcvd:43)
+[   45.365456]  [0:InputDeviceLigh: 3442] sec_touchkey_driver 6-0020: [TK] led off
+[   45.374044]  [3:SSRM Handler Th: 7403] sec-battery battery.20: sec_bat_store_attrs: siop level: 70
+[   45.374084]  [0:    kworker/0:1:  404] sec_bat_siop_work : set current by siop level(70)
+[   45.374104]  [0:    kworker/0:1:  404] sec_chg_set_property : input current (460mA)
+[   45.376021]  [0:    kworker/0:1:  404] sm5703_set_input_current_limit : SM5703_VBUSCNTL (Input current limit) : 0x07
+[   45.376708]  [0:    kworker/0:1:  404] sec_chg_set_property : fast charging current (460mA), topoff current (200mA)
+[   45.376726]  [0:    kworker/0:1:  404] sm5703_set_charging_current adj_current = 460mA charger->siop_level = 70
+[   45.377928]  [0:    kworker/0:1:  404] __sm5703_set_fast_charging_current : SM5703_CHGCNTL2 (fastchg current) : 0x07
+[   46.295896]  [1:       Binder_5: 3544] binder: 3945: binder_alloc_buf failed to map pages in userspace, no vma
+[   46.295916]  [1:       Binder_5: 3544] binder: 2749:3544 transaction failed 29201, size 1716-8
+[   46.295925]  [1:       Binder_5: 3544] binder: send failed reply for transaction 112221 to 3945:4468
+[   46.719459] I[0:      swapper/0:    0] [BT] update_host_wake_locked host_wake is deasserted. release wakelock in 1s
+[   46.823244]  [0:    kworker/0:3: 1538] mali 11400000.mali: state save latency exceeded, new value 534192 ns
+[   47.027535]  [1:  kworker/u16:0:    6] binder: undelivered transaction 116704
+[   47.689679]  [0:  mali-renderer: 4150] mali 11400000.mali: state restore latency exceeded, new value 795384 ns
+[   47.696765]  [0:       Binder_D: 4244] binder: 3811: binder_alloc_buf, no vma
+[   47.696785]  [0:       Binder_D: 4244] binder: 2749:4244 transaction failed 29201, size 104-0
+[   47.711944]  [7:       Binder_E: 4269] binder: 3811: binder_alloc_buf, no vma
+[   47.711986]  [7:       Binder_E: 4269] binder: 2749:4269 transaction failed 29201, size 104-0
+[   47.718025]  [7:       Binder_C: 3900] binder: 3811: binder_alloc_buf, no vma
+[   47.718067]  [7:       Binder_C: 3900] binder: 2749:3900 transaction failed 29201, size 104-0
+[   47.724399]  [0:       Binder_B: 3899] binder: 3811: binder_alloc_buf, no vma
+[   47.724420]  [0:       Binder_B: 3899] binder: 2749:3899 transaction failed 29201, size 104-0
+[   47.729712]  [4:       Binder_C: 3900] binder: 3811: binder_alloc_buf, no vma
+[   47.729746]  [4:       Binder_C: 3900] binder: 2749:3900 transaction failed 29201, size 104-0
+[   47.735230]  [6:       Binder_8: 3890] binder: 3811: binder_alloc_buf, no vma
+[   47.735264]  [6:       Binder_8: 3890] binder: 2749:3890 transaction failed 29201, size 104-0
+[   47.740223]  [6:       Binder_A: 3898] binder: 3811: binder_alloc_buf, no vma
+[   47.740257]  [6:       Binder_A: 3898] binder: 2749:3898 transaction failed 29201, size 104-0
+[   47.744060]  [0:    kworker/0:1:  404] mali 11400000.mali: state save latency exceeded, new value 1334731 ns
+[   47.745623]  [0:      Binder_10: 4477] binder: 3811: binder_alloc_buf, no vma
+[   47.745648]  [0:      Binder_10: 4477] binder: 2749:4477 transaction failed 29201, size 104-0
+[   47.750209]  [1:       Binder_7: 3870] binder: 3811: binder_alloc_buf, no vma
+[   47.750236]  [1:       Binder_7: 3870] binder: 2749:3870 transaction failed 29201, size 104-0
+[   47.792486]  [1:     Thread-749: 8885] binder: 8779:8885 transaction failed 29189, size 104-0
+[   48.423545]  [0:       watchdog: 3704] logger: !@Sync 1 [09-12 20:28:59.146]
+[   48.551184]  [2:     Thread-815: 9062] qtaguid: ctrl_untag(u -1): failed to lookup sock_fd=-1 err=-9 pid=9062 tgid=8976 uid=10129
+[   48.765224]  [0: wpa_supplicant: 3416] CFG80211-TRACE) __wl_cfg80211_scan : START SCAN
+[   48.994666]  [2:     Thread-845: 9100] qtaguid: ctrl_untag(u -1): failed to lookup sock_fd=-1 err=-9 pid=9100 tgid=8976 uid=10129
+[   49.383018]  [0:  mali-renderer: 4150] mali 11400000.mali: state restore latency exceeded, new value 1021346 ns
+[   49.464983]  [2:wl_event_handle: 3584] CFG80211-TRACE) wl_escan_handler : SCAN COMPLETED: scanned AP count=11
+[   49.466698]  [2:  kworker/u16:0:    6] [SENSOR] k2hh_work_func: x = -121, y = 2365, z = 7872 (ra:0)
+[   49.806139]  [4:PowerManagerSer: 3002] logger: !@[ps] Screen__Off - 1 :  dream(timeout) (2)
+[   49.860989]  [0:PhotonicModulat: 3445] dsim_panel_set_brightness : platform : 184, : mapping : 249, real : 249, index : 55
+[   49.921297]  [0:PhotonicModulat: 3445] dsim_panel_set_elvss: 0 Tset: 48 Temp: 25
+[   49.938372]  [0:PhotonicModulat: 3445] dsim_panel_set_brightness : platform : 19, : mapping : 20, real : 20, index : 14
+[   50.004704]  [0:PhotonicModulat: 3445] dsim_panel_set_elvss: 0 Tset: 48 Temp: 25
+[   50.123964]  [4:PowerManagerSer: 3002] logger: !@ [0] ColorFade entry
+[   50.126433]  [0:PhotonicModulat: 3445] dsim_panel_set_brightness : platform : 0, : mapping : 5, real : 5, index : 0
+[   50.127355]  [4:PowerManagerSer: 3002] [SENSOR] k2hh_enable_store: new_value = 0
+[   50.127863]  [0:PowerManagerSer: 3002] [SENSOR] k2hh_set_mode: change mode 0
+[   50.171617]  [1:PhotonicModulat: 3445] dsim_panel_set_elvss: 0 Tset: 48 Temp: 25
+[   50.188952]  [5:PmsDisplayThrea: 9267] mms_ts 11-0048: mms_disable [START]
+[   50.188986]  [5:PmsDisplayThrea: 9267] mms_ts 11-0048: mms_power_control [START off] 
+[   50.190143]  [4:PmsDisplayThrea: 9266] sec_touchkey_driver 6-0020: [TK] tc300k_input_close: users=2
+[   50.190161]  [4:PmsDisplayThrea: 9266] sec_touchkey_driver 6-0020: [TK] tc300k_suspend: users=2
+[   50.190178]  [4:PmsDisplayThrea: 9266] [TK] tc300k_touchkey_power off
+[   50.200406]  [7:PmsDisplayThrea: 9267] mms_ts 11-0048: mms_power_control [DONE off] 
+[   50.200424]  [7:PmsDisplayThrea: 9267] mms_ts 11-0048: mms_disable [DONE]
+[   50.201452]  [2:PmsDisplayThrea: 3012] logger: !@display_state: ON -> OFF brightness: 19 -> 0
+[   50.215519]  [4: surfaceflinger: 2317] decon_blank ++ blank_mode : 4 
+[   50.215523]  [4: surfaceflinger: 2317] decon-int POWERDOWN mode: 0type (0: DSI)
+[   50.215534]  [4: surfaceflinger: 2317] decon_esd_disable_interrupt: err(31) is high
+[   50.215680]  [4: surfaceflinger: 2317] dsim_disable ++
+[   50.215683]  [4: surfaceflinger: 2317] MDD : ea8061_exit was called
+[   50.222546] I[0:      swapper/0:    0] mif: LNK-TX(16): fc eb 0c 00 08 00 3e 00 0a 0f 05 00 00 00 00 00
+[   50.440349]  [0: surfaceflinger: 2317] dsim_disable --
+[   50.455585]  [0: surfaceflinger: 2317] decon_blank -- blank_mode : 4 
+[   50.455629]  [0: surfaceflinger: 2317] dsim_panel_set_brightness : panel is not active state..
+[   50.457426]  [7:    migration/7:   43] IRQ145 no longer affine to CPU7
+[   50.458094]  [0: surfaceflinger: 2317] CPU7: shutdown
+[   50.459798]  [6:    migration/6:   38] IRQ144 no longer affine to CPU6
+[   50.460473]  [4: surfaceflinger: 2317] CPU6: shutdown
+[   50.463308]  [5:    migration/5:   33] IRQ143 no longer affine to CPU5
+[   50.463994]  [4: surfaceflinger: 2317] CPU5: shutdown
+[   50.467048]  [4:    migration/4:   28] IRQ142 no longer affine to CPU4
+[   50.468298]  [2: surfaceflinger: 2317] CPU4: shutdown
+[   50.469330]  [3:PmsDisplayThrea: 3012] logger: !@autosuspend_wakeup_count_enable
+[   50.469330]  [3:PmsDisplayThrea: 3012] 
+[   50.469358]  [3:PmsDisplayThrea: 3012] logger: !@autosuspend_wakeup_count_enable done
+[   50.469358]  [3:PmsDisplayThrea: 3012] 
+[   50.518450]  [1: wpa_supplicant: 3416] dhd_set_cpucore: chan_status(0) cpucore!!!
+[   50.518469]  [1: wpa_supplicant: 3416] dhd_set_suspend: force extra Suspend setting 
+[   50.521744]  [3: wpa_supplicant: 3416] dhd_get_suspend_bcn_li_dtim beacon=100 bcn_li_dtim=9 DTIM=1 Listen=10
+[   50.597698]  [3:ConnectivitySer: 3366] binder: 2749:3366 transaction failed 29189, size 320-0
+[   50.625975] I[0:       Binder_4: 3320] exynos5-hsi2c 13890000.hsi2c: HSI2C Error Interrupt occurred(IS:0x00000400, TR:0x0002000d)
+[   50.626005]  [2:   AsyncTask #1: 5386] exynos5-hsi2c 13890000.hsi2c: ack was not received at write
+[   50.749878] I[0:       Binder_3: 3188] mif: LNK-TX(16): fc eb 0b 00 07 00 3f 00 08 11 02 73 2f 64 65 76
+[   50.752528] I[0:roid.music:main: 9350] mif: LNK-RX(520): ff eb 05 02 81 2b 02 56 3f 08 11 02 00 00 00 20 ...
+[   50.752552] I[0:roid.music:main: 9350] mif: gather_multi_frame: umts_ipc0<-ss310ap: start of multi-frame (ID:1 len:555)
+[   50.752560] I[0:roid.music:main: 9350] mif: gather_multi_frame: umts_ipc0<-ss310ap: recv multi-frame (ID:1 rcvd:512)
+[   50.752571] I[0:roid.music:main: 9350] mif: LNK-RX(48): ff eb 30 00 01 00 1d 00 00 00 42 01 1f 00 00 33 ...
+[   50.752579] I[0:roid.music:main: 9350] mif: gather_multi_frame: umts_ipc0<-ss310ap: end of multi-frame (ID:1 rcvd:43)
+[   50.758023]  [1:SSRM Handler Th: 7403] sec-battery battery.20: sec_bat_store_attrs: siop level: 100
+[   50.758077]  [0:    kworker/0:1:  404] sec_bat_siop_work : set current by siop level(100)
+[   50.758093]  [0:    kworker/0:1:  404] sec_chg_set_property : input current (460mA)
+[   50.760005]  [0:    kworker/0:1:  404] sm5703_set_input_current_limit : SM5703_VBUSCNTL (Input current limit) : 0x07
+[   50.760720]  [0:    kworker/0:1:  404] sec_chg_set_property : fast charging current (460mA), topoff current (200mA)
+[   50.760734]  [0:    kworker/0:1:  404] sm5703_set_charging_current adj_current = 460mA charger->siop_level = 100
+[   50.762043]  [0:    kworker/0:1:  404] __sm5703_set_fast_charging_current : SM5703_CHGCNTL2 (fastchg current) : 0x07
+[   51.346679] I[0:      swapper/0:    0] [BT] update_host_wake_locked host_wake is deasserted. release wakelock in 1s
+[   52.560976]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_get_ocv: read = 0x453, ocv = 4324
+[   52.579038]  [0:    kworker/0:1:  404] sm5703_test_read: 0x4 = 0xbe, 0x5 = 0xff, 0x6 = 0xf3, 0x7 = 0xff, 0x8 = 0x08, 0x9 = 0x08, 0xa = 0x07, 0xb = 0x00, 0xc = 0x55, 0xd = 0x07, 0xe = 0x03, 0xf = 0x07, 0x10 = 0x1b, 0x11 = 0xa0, 0x12 = 0x7a, 0x13 = 0x08, 0x60 = 0x03, 0x6b = 0x20, 0x66 = 0x80, 
+[   52.581044]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: fg_vbatocv_check: iocv_error_count (0)
+[   52.581076]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: fg_vbatocv_check: mode change to mix RS auto mode
+[   52.585349]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_get_temperature: read = 0x2650, temperature = 383
+[   52.586267]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_get_ocv: read = 0x453, ocv = 4324
+[   52.586298]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_get_soc: fg_get_soc : temp_std = 25, temperature = 383, temp_offset = 10, temp_offset_cal = 0x1, curr_cal = 0x7585, bat_temp = 264
+[   52.588027]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_get_soc: read = 0x6218, soc = 980
+[   52.589045]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x30 = 0x2229 
+[   52.589969]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x31 = 0x2228 
+[   52.590884]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x32 = 0x2229 
+[   52.591795]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x33 = 0x2229 
+[   52.592899]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x34 = 0x2229 
+[   52.593933]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x35 = 0x2228 
+[   52.594869]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x36 = 0x2229 
+[   52.595771]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x37 = 0x2228 
+[   52.596675]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x40 = 0x2219 
+[   52.597573]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x41 = 0x2219 
+[   52.598471]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x42 = 0x2219 
+[   52.599371]  [0:    kworker/0:1:  404] sm5703-fuelgauge 4-0071: sm5703_fg_test_read: sm5703 FG 0x43 = 0x2219 
+[   52.603189]  [0:    kworker/0:1:  404] 0xAC=0x2029, 0xAD=0x2029, 0xAE=0x20f0, 0xAF=0x22c5 
+[   52.606769]  [0:    kworker/0:1:  404] 0xBC=0x2029, 0xBD=0x20f0, 0xBE=0x20f0, 0xBF=0x22c5 
+[   52.610389]  [0:    kworker/0:1:  404] 0xCC=0x10cc, 0xCD=0x10cc, 0xCE=0x1800, 0xCF=0x1800 
+[   52.614032]  [0:    kworker/0:1:  404] 0x85=0x0266, 0x86=0x8019, 0x87=0x2f18, 0x28=0x047c 
+[   52.614057]  [0:    kworker/0:1:  404] sec-battery battery.20: sec_bat_get_battery_info:Vnow(4355mV),Inow(253mA),Imax(450mA),SOC(100%),Tbat(264),Tchg(0),is_hc_usb(0)
+[   52.672745]  [0:    kworker/0:1:  404] sec-battery battery.20: sec_bat_battery_cable_check: Battery Connected
+[   52.673434]  [0:    kworker/0:1:  404] sm5703_get_charging_health : charger->is_charging = 1, charger->cable_type = 4, charger->aicl_state = 0
+[   52.674085]  [0:    kworker/0:1:  404] sm5703_get_charging_health: SM5703_CNTL, nCHG : 0x55, 0
+[   52.674095]  [0:    kworker/0:1:  404] sm5703_get_charging_health : vbus_status = 32
+[   52.674102]  [0:    kworker/0:1:  404] sm5703_get_charging_health : Health : 1
+[   52.674119]  [0:    kworker/0:1:  404] sec-battery battery.20: sec_bat_monitor_work: Status(Charging), mode(Normal), Health(Good), Cable(4), level(100%)
+[   52.674181]  [0:    kworker/0:1:  404] sec_chg_get_property: slow-charging mode
+[   52.676969]  [1:        healthd: 2313] sec_chg_get_property: slow-charging mode
+[   52.677177]  [1:        healthd: 2313] healthd: battery l=100 v=4355 t=26.4 h=2 st=2 c=0 o=4 ca=252 ct=2 ps=0 chg=u 2017-09-13 00:29:03.400070939 UTC
+[   52.677196]  [1:        healthd: 2313] healthd: battery l=100 v=4355 t=26.4 h=2 st=2 c=0 o=4 ca=252 ct=2 ps=0 chg=u 2017-09-13 00:29:03.400070939 UTC hv=0 chg=u
+[   52.677212]  [1:        healthd: 2313] healthd-android: healthd_mode_android_battery_update
+[   52.677226]  [1:        healthd: 2313] BatteryPropertiesRegistrar: notifyListeners : start
+[   52.677241]  [1:        healthd: 2313] IBatteryPropertiesListener : batteryPropertiesChanged!
+[   52.677241]  [1:        healthd: 2313] : BatteryPropertiesRegistrar: notifyListeners : done
+[   52.678653]  [2:       Binder_E: 4269] logger: !@BatteryListener : batteryPropertiesChanged!
+[   52.912945]  [4:      swapper/4:    0] CPU4: Booted secondary processor
+[   52.913896]  [0:    kworker/0:1:  404] cpu cpu4: exynos_cpufreq_init: CPU 4 initialized
+[   52.916842]  [5:      swapper/5:    0] CPU5: Booted secondary processor
+[   52.923659]  [6:      swapper/6:    0] CPU6: Booted secondary processor
+[   52.924857]  [7:      swapper/7:    0] CPU7: Booted secondary processor
+[   53.931594] I[0:      swapper/0:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 40 00 08 03 02 e8 00 00 00 09
+[   53.934368] I[0:      swapper/0:    0] mif: LNK-RX(40): fc eb 25 00 21 00 57 40 08 03 02 02 04 04 33 31 ...
+[   53.936076] I[3:      swapper/3:    0] mif: LNK-TX(16): fc eb 0d 00 09 00 41 00 08 05 02 ff 03 00 00 00
+[   53.937282] I[0:      swapper/0:    0] mif: LNK-RX(32): fc eb 1e 00 1a 00 58 41 08 05 02 04 03 01 00 2b ...
+[   53.949235] I[3:      swapper/3:    0] mif: LNK-TX(16): fc eb 0d 00 09 00 42 00 08 05 02 ff 02 64 65 76
+[   53.950336] I[0:      swapper/0:    0] mif: LNK-RX(32): fc eb 1e 00 1a 00 59 42 08 05 02 04 02 04 00 2b ...
+[   53.953045] I[3:      swapper/3:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 43 00 08 02 02 72 6f 75 74 69
+[   53.954321] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0c 00 08 00 5a 43 08 02 02 02 08 00 03 00
+[   54.948579]  [1:m.android.phone: 3846] binder: 3846:3846 transaction failed 29189, size 104-0
+[   55.258047]  [0:ConnectivitySer: 3366] binder: 2749:3366 transaction failed 29189, size 320-0
+[   56.046022] I[1:       Binder_5: 4607] [BT] set_wake_locked value = 0

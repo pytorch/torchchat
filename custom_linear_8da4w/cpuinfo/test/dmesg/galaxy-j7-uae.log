@@ -1,0 +1,1144 @@
+[   16.270733]  [3:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   16.270742]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match - Initialization complete
+[   16.270750]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000001
+[   16.270759]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000001
+[   16.270768]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.270775]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.275215]  [3:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.275234]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.275246]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.275258]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.275270]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.277487]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.278775]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.278790]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.278798]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.278806]  [1:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.289701]  [4:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.303677]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.305275]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.305291]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.305300]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_init:
+[   16.305309]  [3:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet:  get_sec_TIMA_address tima_sec_mem_addr : 9F700000
+[   16.305318]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.305500]  [7:         sdcard: 3038] sdcardfs: version 3.2.0
+[   16.305512]  [7:         sdcard: 3038] sdcardfs: dev_name -> /data/media
+[   16.305519]  [7:         sdcard: 3038] sdcardfs: options -> low_uid=1023,low_gid=1023,userid=0,multi_user,reserved_mb=20,gid=1015,mask=0006,label=emulated,type=default
+[   16.305795]  [4:         sdcard: 3038] sdcardfs: created packagelist pkgld/3047
+[   16.305892]  [7:          pkgld: 3047] sdcardfs: read_package_list
+[   16.306301]  [4:         sdcard: 3038] sdcardfs: mounted on top of /data/media type ext4
+[   16.306336]  [4:         sdcard: 3038] SELinux: initialized (dev sdcardfs, type sdcardfs), uses xattr
+[   16.306754]  [4:         sdcard: 3038] sdcardfs: version 3.2.0
+[   16.306765]  [4:         sdcard: 3038] sdcardfs: dev_name -> /data/media
+[   16.306772]  [4:         sdcard: 3038] sdcardfs: options -> low_uid=1023,low_gid=1023,userid=0,multi_user,reserved_mb=20,gid=9997,mask=0027,label=emulated,type=read
+[   16.307036]  [6:         sdcard: 3038] sdcardfs: created packagelist pkgld/3048
+[   16.307094]  [6:         sdcard: 3038] sdcardfs: mounted on top of /data/media type ext4
+[   16.307102]  [4:          pkgld: 3048] sdcardfs: read_package_list
+[   16.307124]  [6:         sdcard: 3038] SELinux: initialized (dev sdcardfs, type sdcardfs), uses xattr
+[   16.307358]  [0: wpa_supplicant: 3019] sdioh_request_buffer: [1] doing memory copy buf=ffffffc04fc65000, len=2017
+[   16.307368]  [6:         sdcard: 3038] sdcardfs: version 3.2.0
+[   16.307375]  [6:         sdcard: 3038] sdcardfs: dev_name -> /data/media
+[   16.307381]  [6:         sdcard: 3038] sdcardfs: options -> low_uid=1023,low_gid=1023,userid=0,multi_user,reserved_mb=20,gid=9997,mask=0007,label=emulated,type=write
+[   16.307630]  [6:         sdcard: 3038] sdcardfs: created packagelist pkgld/3050
+[   16.307661]  [6:         sdcard: 3038] sdcardfs: mounted on top of /data/media type ext4
+[   16.307678]  [2:          pkgld: 3050] sdcardfs: read_package_list
+[   16.307681]  [6:         sdcard: 3038] SELinux: initialized (dev sdcardfs, type sdcardfs), uses xattr
+[   16.309190]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 32 = 0x20
+[   16.309202]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.309210]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: warranty okay 13
+[   16.309218]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: tamper_fuse_good - process_init, msr_size: 0
+[   16.309227]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading golden measurement
+[   16.309235]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.309243]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 512 = 0x200
+[   16.309250]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.309258]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Measurement size is : 192
+[   16.309266]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Read boot time measurement
+[   16.309274]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.309282]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 192 = 0xc0
+[   16.309289]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.309297]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: compare measurements from boot and golden_msrs
+[   16.309307]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match, now check for license nad kap fuse status
+[   16.309315]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   16.309323]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.309330]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   16.309337]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.309344]  [2:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   16.309351]  [2:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   16.309360]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match - Initialization complete
+[   16.309368]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000001
+[   16.309377]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000001
+[   16.309385]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.309393]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.309754]  [0: wpa_supplicant: 3019] dhdsdio_write_vars: Download, Upload and compare of NVRAM succeeded.
+[   16.315195]  [1:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.315215]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.315227]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.315239]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.315251]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.315263]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.315275]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.315282]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.315290]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.316008]  [1:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.326937]  [6:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.329668]  [2:  system_server: 2674] logger: !@Boot_DEBUG: start networkManagement
+[   16.351252]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: tciBufferLen = 38912 = 0x9800
+[   16.351270]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Starting
+[   16.364383]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: tciBufferLen = 38912 = 0x9800
+[   16.364401]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg envelope length = 19456 = 0x4c00
+[   16.364410]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg = 0002ccb8, respmsg = 00031894
+[   16.364418]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Got a message!
+[   16.364425]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: we got a command
+[   16.364433]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: process_cmd: CMD_TZ_CCM_C_Initialize:
+[   16.364441]  [1:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   16.364450]  [1:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet:  get_sec_TIMA_address tima_sec_mem_addr : 9F700000
+[   16.364459]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.364466]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   16.364473]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.364481]  [1:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   16.364488]  [1:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   16.364496]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.364504]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 32 = 0x20
+[   16.364511]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.364519]  [1:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: warranty okay 13
+[   16.364527]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: tamper_fuse_good - process_init, msr_size: 0
+[   16.364535]  [1:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading golden measurement
+[   16.364544]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.364551]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 512 = 0x200
+[   16.364558]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.364566]  [1:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Measurement size is : 192
+[   16.364573]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Read boot time measurement
+[   16.364582]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.364590]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 192 = 0xc0
+[   16.364596]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.364605]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: compare measurements from boot and golden_msrs
+[   16.364614]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match, now check for license nad kap fuse status
+[   16.364622]  [1:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   16.364631]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.364638]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   16.364645]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.364652]  [1:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   16.364659]  [1:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   16.364667]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match - Initialization complete
+[   16.364676]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: sendmsg->header.id = 0x00000002
+[   16.364684]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.id = 0x80000002
+[   16.364692]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.status = 0x00000000
+[   16.364700]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Returning = 0x00000000
+[   16.369057]  [0: wpa_supplicant: 3019] dhd_bus_init: enable 0x06, ready 0x06 (waited 0us)
+[   16.369393]  [0: wpa_supplicant: 3019] wake enabled for irq 8
+[   16.373528]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: tciBufferLen = 38912 = 0x9800
+[   16.373544]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg envelope length = 19456 = 0x4c00
+[   16.373553]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg = 0002ccb8, respmsg = 00031894
+[   16.373561]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Got a message!
+[   16.373568]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: we got a command
+[   16.373577]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: process_cmd: CMD_TZ_CCM_db_init
+[   16.373584]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ CCM: Initing Key database
+[   16.373592]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ CCM: Max slots/tokens: 4
+[   16.373599]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ CCM: Max DB entries supported: 64
+[   16.373608]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Wifi UID: 1010 Per user range: 100000 System UID: 1000
+[   16.373616]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: DB unpack Token count is 1
+[   16.373625]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: DB un pack Token 0 has slot 0 and 4 records
+[   16.373632]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: DB un pack obj count is 4
+[   16.373642]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[0] - slot:0-admin:0-alias Samsung default-class:0x1-cka_id:0x0
+[   16.373651]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[0] - obj_addr:0x00020098; allowRawSigning:0
+[   16.373661]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[1] - slot:0-admin:0-alias Samsung default-class:0x3-cka_id:0x0
+[   16.373670]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[1] - obj_addr:0x00020162; allowRawSigning:0
+[   16.373679]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[2] - slot:0-admin:0-alias Digital Signature-class:0x1-cka_id:0x1
+[   16.373689]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[2] - obj_addr:0x0002022c; allowRawSigning:0
+[   16.373699]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[3] - slot:0-admin:0-alias Digital Signature-class:0x3-cka_id:0x1
+[   16.373708]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[3] - obj_addr:0x000202f6; allowRawSigning:0
+[   16.373717]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: sendmsg->header.id = 0x00000011
+[   16.373725]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.id = 0x80000011
+[   16.373733]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.status = 0x00000000
+[   16.373741]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Returning = 0x00000000
+[   16.376514]  [6: wpa_supplicant: 3019] Firmware up: op_mode=0x0005, MAC=5c:93:90
+[   16.377687]  [4: wpa_supplicant: 3019] [WIFI_SEC] sec_get_param_wfa_cert: File [/data/.roamoff.info] doesn't exist 
+[   16.385078]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: tciBufferLen = 38912 = 0x9800
+[   16.385094]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg envelope length = 19456 = 0x4c00
+[   16.385103]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg = 0002ccb8, respmsg = 00031894
+[   16.385110]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Got a message!
+[   16.385118]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: we got a command
+[   16.385126]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: process_cmd: CMD_TZ_CCM_C_Finalize:
+[   16.385133]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: exiting process_C_Finalize
+[   16.385142]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: sendmsg->header.id = 0x00000029
+[   16.385150]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.id = 0x80000029
+[   16.385543]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.status = 0x00000000
+[   16.385555]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Returning = 0x00000000
+[   16.387846]  [7: wpa_supplicant: 3019] dhdcdc_set_ioctl: SET PM to 2
+[   16.388379]  [7: wpa_supplicant: 3019] [WIFI_SEC] sec_control_pm: /data/.psm.info open failed, so set PM to 2
+[   16.389016]  [7: wpa_supplicant: 3019] [WIFI_SEC] sec_get_param_wfa_cert: File [/data/.bustxglom.info] doesn't exist 
+[   16.392584]  [0:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.392603]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.392615]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.392628]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.392639]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.392652]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.392663]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.392699]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.392708]  [0:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.392716]  [0:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.403356]  [6:     tlc_server: 2927] MobiCore mcd: closed by PID(2927), name(tlc_server)
+[   16.405541]  [5: wpa_supplicant: 3019] Firmware version = wl0: Mar 16 2016 14:05:52 version 7.10.323.73 (A1 Station/P2P) FWID 01-ee7f2eb9
+[   16.406632]  [5: wpa_supplicant: 3019] [WIFI_SEC] save .wifiver.info file.
+[   16.406678]  [5: wpa_supplicant: 3019] [WIFI_SEC] sec_get_param_wfa_cert: File [/data/.proptx.info] doesn't exist 
+[   16.408348]  [5: wpa_supplicant: 3019] dhd_wlfc_init(): successfully enabled bdcv2 tlv signaling, 79
+[   16.409124]  [5: wpa_supplicant: 3019] dhd_wlfc_init: query wlfc_mode succeed, fw_caps=0x1c
+[   16.409994] I[5: wpa_supplicant: 3019] dhd_wlfc_init(): wlfc_mode=0x1c, ret=0
+[   16.410015]  [5: wpa_supplicant: 3019] dhdsdio_func_blocksize: F2 Block size set from 512 to 128
+[   16.411016]  [4: wpa_supplicant: 3019] dhd_wl_ioctl: WLC_GET_VAR: pfnlbest, ret = -14
+[   16.414102]  [4: wpa_supplicant: 3019] dhd_wl_ioctl: WLC_SET_VAR: wnm, ret = -23
+[   16.414119]  [4: wpa_supplicant: 3019] dhd_interworking_enable: set wnm returned (-23)
+[   16.416406]  [4:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.420420]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.420436]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.420446]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   16.420454]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   16.420462]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   16.420470]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   16.420479]  [5:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   16.420487]  [5:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   16.420496]  [5:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.420504]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.422697]  [5:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.422716]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.422728]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.425302]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.425321]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.425333]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.426849]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.426868]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.426876]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.426884]  [5:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.437623]  [4:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.449454]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.452740]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.452755]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.452764]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   16.452772]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   16.452780]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   16.453647]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   16.453662]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   16.453671]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   16.453680]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.453687]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.455154]  [5:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.460075]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.460095]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.460108]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.460120]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.460131]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.460143]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.460151]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.460159]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.460167]  [5:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.471070]  [5:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.471693]  [7:        dhd_dpc: 2156] CFG80211-INFO2) wl_cfg80211_event : Event handler is not created
+[   16.471775]  [7:        dhd_dpc: 2156] CFG80211-INFO2) wl_cfg80211_event : Event handler is not created
+[   16.471959]  [7:        dhd_dpc: 2156] CFG80211-INFO2) wl_cfg80211_event : Event handler is not created
+[   16.488352]  [5: wpa_supplicant: 3019] wl_create_event_handler(): thread:wl_event_handler:c2d started
+[   16.488401]  [4:wl_event_handle: 3117] CFG80211-INFO2) wl_event_handler : tsk Enter, tsk = 0xffffffc047ab8bd0
+[   16.490649]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.491242]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.491255]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.491264]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   16.491272]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   16.493600]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   16.493617]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   16.493625]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   16.493634]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   16.493643]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.493651]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.495072]  [3:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.499995]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.500015]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.500027]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.500039]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.500051]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.500063]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.500070]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.500078]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.500086]  [3:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.510707]  [3:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.520618]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.524731]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.524748]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.524757]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   16.524765]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   16.524774]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   16.524782]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   16.524790]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   16.524799]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   16.524807]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.524815]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.531153]  [0:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.531171]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.531183]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.531195]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.531207]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.531218]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.531230]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.531237]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.531245]  [0:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.531252]  [0:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.541872]  [2:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.551795]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.555084]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.555100]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.555109]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   16.555117]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   16.555126]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   16.555935]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   16.555949]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   16.555958]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   16.555967]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.555974]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.562319]  [2:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.562338]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.562350]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.562362]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.562373]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.562385]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.562397]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.562404]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.562412]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.562420]  [2:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.572931]  [2:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.583164]  [0:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.593491]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.593507]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.593516]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_unwrap_key:
+[   16.593525]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet:  get_sec_TIMA_address tima_sec_mem_addr : 9F700000
+[   16.593534]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.593541]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 32 = 0x20
+[   16.593549]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.593556]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: warranty okay 13
+[   16.593564]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading golden measurement
+[   16.593572]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.593580]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 512 = 0x200
+[   16.593587]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.593595]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Measurement size is : 192
+[   16.593604]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: tz_keystore_chk_boot_msr , after read_golden_measurement
+[   16.593612]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.593620]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 192 = 0xc0
+[   16.593626]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.593635]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: tz_keystore_chk_boot_msr , after boot_measurement
+[   16.593643]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: tz_keystore_chk_boot_msr done
+[   16.593651]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   16.593660]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.593671]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   16.593679]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.593686]  [2:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   16.593693]  [2:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   16.593702]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: TZ_aes_decrypt decryption key length: 32, ciphertext length: 48
+[   16.593711]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: decrypt_data() finished; plaintext length is 43
+[   16.593719]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000005
+[   16.593733]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000005
+[   16.593742]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.593750]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.595092]  [3:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.595109]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.599842]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.599863]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.599876]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.599888]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.599900]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.599908]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.599916]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.599923]  [3:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.610394]  [1:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.643847]  [0:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.646804]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.646819]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.646828]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_init:
+[   16.651141]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet:  get_sec_TIMA_address tima_sec_mem_addr : 9F700000
+[   16.651160]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.651168]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 32 = 0x20
+[   16.651176]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.651183]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: warranty okay 13
+[   16.651192]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: tamper_fuse_good - process_init, msr_size: 0
+[   16.651200]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading golden measurement
+[   16.651209]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.651216]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 512 = 0x200
+[   16.651223]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.651231]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Measurement size is : 192
+[   16.651239]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Read boot time measurement
+[   16.651247]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.651254]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 192 = 0xc0
+[   16.651261]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.651270]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: compare measurements from boot and golden_msrs
+[   16.651279]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match, now check for license nad kap fuse status
+[   16.651287]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   16.651295]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.651303]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   16.651310]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.651317]  [2:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   16.651329]  [2:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   16.651338]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match - Initialization complete
+[   16.651346]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000001
+[   16.651355]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000001
+[   16.651363]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.651372]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.655077]  [2:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.655097]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.655109]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.655121]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.655132]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.657478]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.657497]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.657505]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.657513]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.657521]  [2:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.668382]  [7:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.679857]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.687350]  [4: wpa_supplicant: 3019] CFGP2P-INFO2) wl_cfgp2p_add_p2p_disc_if : P2P interface registered
+[   16.700740]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.700754]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.700762]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_init:
+[   16.700772]  [5:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet:  get_sec_TIMA_address tima_sec_mem_addr : 9F700000
+[   16.700780]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.700789]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 32 = 0x20
+[   16.700797]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.700805]  [5:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: warranty okay 13
+[   16.700813]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: tamper_fuse_good - process_init, msr_size: 0
+[   16.700821]  [5:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading golden measurement
+[   16.700829]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.700837]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 512 = 0x200
+[   16.700844]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.700852]  [5:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Measurement size is : 192
+[   16.700860]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Read boot time measurement
+[   16.700868]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.700881]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 192 = 0xc0
+[   16.700888]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.700896]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: compare measurements from boot and golden_msrs
+[   16.700905]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match, now check for license nad kap fuse status
+[   16.700913]  [5:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   16.700922]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.700929]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   16.700936]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.700943]  [5:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   16.700950]  [5:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   16.700958]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match - Initialization complete
+[   16.700967]  [5:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000001
+[   16.700975]  [5:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000001
+[   16.700984]  [5:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.700992]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.705106]  [7:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.705127]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.705140]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.705151]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.705163]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.707384]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.707404]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.707412]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.707420]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.707427]  [7:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.717992]  [1:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.718835]  [7:        dhd_dpc: 2156] WLC_E_IF: NO_IF set, event Ignored
+
+[   16.733908]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: tciBufferLen = 38912 = 0x9800
+[   16.733926]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Starting
+[   16.741917]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: tciBufferLen = 38912 = 0x9800
+[   16.741933]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg envelope length = 19456 = 0x4c00
+[   16.741943]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg = 0002ccb8, respmsg = 00031894
+[   16.741951]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Got a message!
+[   16.741958]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: we got a command
+[   16.741967]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: process_cmd: CMD_TZ_CCM_C_Initialize:
+[   16.741975]  [3:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   16.741984]  [3:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet:  get_sec_TIMA_address tima_sec_mem_addr : 9F700000
+[   16.741993]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.742001]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   16.742007]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.742015]  [3:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   16.742022]  [3:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   16.742030]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.742038]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 32 = 0x20
+[   16.742045]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.742052]  [3:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: warranty okay 13
+[   16.742061]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: tamper_fuse_good - process_init, msr_size: 0
+[   16.742069]  [3:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading golden measurement
+[   16.742077]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.742085]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 512 = 0x200
+[   16.742092]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.742100]  [3:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Measurement size is : 192
+[   16.742107]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Read boot time measurement
+[   16.742116]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.742123]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 192 = 0xc0
+[   16.742130]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.742139]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: compare measurements from boot and golden_msrs
+[   16.742148]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match, now check for license nad kap fuse status
+[   16.742156]  [3:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   16.742164]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.742172]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   16.742179]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.742186]  [3:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   16.742193]  [3:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   16.742202]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match - Initialization complete
+[   16.742210]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: sendmsg->header.id = 0x00000002
+[   16.742218]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.id = 0x80000002
+[   16.742226]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.status = 0x00000000
+[   16.742234]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Returning = 0x00000000
+[   16.748031]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: tciBufferLen = 38912 = 0x9800
+[   16.751087]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg envelope length = 19456 = 0x4c00
+[   16.751104]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg = 0002ccb8, respmsg = 00031894
+[   16.751112]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Got a message!
+[   16.751119]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: we got a command
+[   16.751128]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: process_cmd: CMD_TZ_CCM_db_init
+[   16.751136]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ CCM: Initing Key database
+[   16.751143]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ CCM: Max slots/tokens: 4
+[   16.751151]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ CCM: Max DB entries supported: 64
+[   16.751160]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Wifi UID: 1010 Per user range: 100000 System UID: 1000
+[   16.751168]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: DB unpack Token count is 1
+[   16.751177]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: DB un pack Token 0 has slot 0 and 4 records
+[   16.751185]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: DB un pack obj count is 4
+[   16.751195]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[0] - slot:0-admin:0-alias Samsung default-class:0x1-cka_id:0x0
+[   16.751204]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[0] - obj_addr:0x00020098; allowRawSigning:0
+[   16.751214]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[1] - slot:0-admin:0-alias Samsung default-class:0x3-cka_id:0x0
+[   16.751223]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[1] - obj_addr:0x00020162; allowRawSigning:0
+[   16.751233]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[2] - slot:0-admin:0-alias Digital Signature-class:0x1-cka_id:0x1
+[   16.752429]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[2] - obj_addr:0x0002022c; allowRawSigning:0
+[   16.752448]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[3] - slot:0-admin:0-alias Digital Signature-class:0x3-cka_id:0x1
+[   16.752458]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[3] - obj_addr:0x000202f6; allowRawSigning:0
+[   16.752467]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: sendmsg->header.id = 0x00000011
+[   16.752475]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.id = 0x80000011
+[   16.752483]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.status = 0x00000000
+[   16.752491]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Returning = 0x00000000
+[   16.755072]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: tciBufferLen = 38912 = 0x9800
+[   16.755089]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg envelope length = 19456 = 0x4c00
+[   16.755098]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg = 0002ccb8, respmsg = 00031894
+[   16.755105]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Got a message!
+[   16.755113]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: we got a command
+[   16.755121]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: process_cmd: CMD_TZ_CCM_C_Finalize:
+[   16.755128]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: exiting process_C_Finalize
+[   16.755137]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: sendmsg->header.id = 0x00000029
+[   16.755720]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.id = 0x80000029
+[   16.755736]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.status = 0x00000000
+[   16.755745]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Returning = 0x00000000
+[   16.762466]  [2:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.762485]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.762497]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.762509]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.762521]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.762533]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.762544]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.762552]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.762559]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.762566]  [2:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.768658]  [3:  system_server: 2674] logger: !@Boot_DEBUG: end networkManagement
+[   16.773170]  [7:       Binder_1: 2932] MobiCore mcd: closed by PID(2932), name(Binder_1)
+[   16.783656]  [4:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.788117]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.788133]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.788142]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   16.788150]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   16.788158]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   16.788167]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   16.788175]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   16.788183]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   16.788192]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.788200]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.790834]  [4: wpa_supplicant: 3019] Unknown PRIVATE command LTECOEX 0 - ignored
+[   16.795118]  [0:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.795140]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.795152]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.795164]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.795176]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.795188]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.795200]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.795208]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.795216]  [0:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.795224]  [0:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.799526]  [7: wpa_supplicant: 3019] dhd_wl_ioctl: WLC_GET_VAR: ie, ret = -30
+[   16.801674]  [4: wpa_supplicant: 3019] CFG80211-TRACE) __wl_cfg80211_scan : START SCAN
+[   16.806309]  [5:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.816383]  [6: wpa_supplicant: 3019] wl_android_set_fcc_pwr_limit_2g: fccpwrlimit2g set (0)
+[   16.817620]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.821803]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.821825]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.821834]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   16.821842]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   16.821850]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   16.821858]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   16.821867]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   16.821876]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   16.821886]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.821894]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.825130]  [5:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.825148]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.825161]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.828565]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.828585]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.828597]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.828609]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.828617]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.828625]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.828632]  [5:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.839226]  [0:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.842667]  [4: wpa_supplicant: 3019] WLDEV-INFO) wldev_set_country: set country for US as US rev 988
+[   16.842681]  [4: wpa_supplicant: 3019] wl_android_priv_cmd: fccpwrlimit2g is deactivated
+[   16.844586]  [5:           netd: 2907] IPv6: ipv6_generate_eui64: dev type: 1
+[   16.848853]  [4: wpa_supplicant: 3019] dhd_set_suspend: Remove extra suspend setting 
+[   16.849310]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.853384]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.853399]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.853408]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   16.853416]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   16.853424]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   16.853432]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   16.853441]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   16.853449]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   16.853458]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.853466]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.855118]  [0:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.855135]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.859852]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.859877]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.859889]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.859901]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.859913]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.859920]  [2:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.859928]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.859935]  [2:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.870718]  [4:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.880152]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.884229]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.884245]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.884254]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   16.884261]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   16.884270]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   16.884278]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   16.884286]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   16.884295]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   16.884304]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.884311]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.890843]  [1:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.890862]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.890875]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.890887]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.890898]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.890910]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.890921]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.890929]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.890936]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.890944]  [1:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.901601]  [6:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.911073]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.915093]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.915108]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.915117]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   16.915125]  [3:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   16.915133]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   16.915142]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   16.915150]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   16.915159]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   16.915168]  [3:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.915177]  [3:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.918027]  [3:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.918048]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.918060]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.922018]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.922039]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.922052]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.922063]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.922072]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.922079]  [0:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.922087]  [0:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.932727]  [7:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.943910]  [6:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   16.945141]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   16.945158]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   16.945167]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_unwrap_key:
+[   16.952787]  [7:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet:  get_sec_TIMA_address tima_sec_mem_addr : 9F700000
+[   16.952804]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.952812]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 32 = 0x20
+[   16.952819]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.952826]  [7:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: warranty okay 13
+[   16.952834]  [7:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading golden measurement
+[   16.952843]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.952850]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 512 = 0x200
+[   16.952857]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.952865]  [7:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Measurement size is : 192
+[   16.952874]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: tz_keystore_chk_boot_msr , after read_golden_measurement
+[   16.952883]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.952890]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 192 = 0xc0
+[   16.952898]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.952906]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: tz_keystore_chk_boot_msr , after boot_measurement
+[   16.952915]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: tz_keystore_chk_boot_msr done
+[   16.952923]  [7:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   16.952931]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   16.952939]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   16.952946]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   16.952953]  [7:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   16.952960]  [7:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   16.952969]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: TZ_aes_decrypt decryption key length: 32, ciphertext length: 48
+[   16.952977]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: decrypt_data() finished; plaintext length is 43
+[   16.952986]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000005
+[   16.952994]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000005
+[   16.953003]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   16.953011]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   16.955183]  [7:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   16.955196]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   16.959292]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   16.959312]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   16.959324]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   16.959336]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   16.959348]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   16.959355]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   16.959363]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   16.959371]  [7:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   16.970145]  [5:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   16.975158]  [7:           vold: 2362] ecryptfs_parse_options : chamber dirs : Chamber|Vault
+[   16.975176]  [7:           vold: 2362] ecryptfs_parse_options : partition_id : 0
+[   16.977442]  [7:           vold: 2362] SELinux: initialized (dev ecryptfs, type ecryptfs), uses xattr
+[   16.979812]  [7:           vold: 2362] ecryptfs_parse_options : chamber dirs : Chamber|Vault
+[   16.979832]  [7:           vold: 2362] ecryptfs_parse_options : partition_id : 1
+[   16.980264]  [7:           vold: 2362] SELinux: initialized (dev ecryptfs, type ecryptfs), uses xattr
+[   16.980921]  [7:           vold: 2362] Lookup a directoy under root directory of current partition.
+[   17.022073]  [1:SdpManagerServi: 2964] Lookup a directoy under root directory of current partition.
+[   17.026490]  [1:SdpManagerServi: 2964] KEK_PACK[2964] find_kek_pack :: Can't find kek-pack : 0
+[   17.026503]  [1:SdpManagerServi: 2964] KEK_PACK[2964] find_kek_pack :: Can't find kek-pack : 0
+[   17.063626]  [6:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   17.068366]  [4:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   17.068382]  [4:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   17.068390]  [4:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_init:
+[   17.068399]  [4:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet:  get_sec_TIMA_address tima_sec_mem_addr : 9F700000
+[   17.068408]  [4:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.068416]  [4:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 32 = 0x20
+[   17.068423]  [4:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.068430]  [4:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: warranty okay 13
+[   17.068439]  [4:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: tamper_fuse_good - process_init, msr_size: 0
+[   17.068447]  [4:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading golden measurement
+[   17.071741]  [4:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.071759]  [4:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 512 = 0x200
+[   17.071766]  [4:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.071774]  [4:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Measurement size is : 192
+[   17.071783]  [4:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Read boot time measurement
+[   17.071791]  [4:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.071798]  [4:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 192 = 0xc0
+[   17.071805]  [4:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.071814]  [4:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: compare measurements from boot and golden_msrs
+[   17.071823]  [4:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match, now check for license nad kap fuse status
+[   17.071832]  [4:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   17.071840]  [4:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.071848]  [4:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   17.071855]  [4:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.071862]  [4:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   17.071869]  [4:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   17.071877]  [4:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match - Initialization complete
+[   17.071886]  [4:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000001
+[   17.071895]  [4:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000001
+[   17.071903]  [4:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   17.071911]  [4:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   17.075108]  [4:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   17.075129]  [4:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   17.075141]  [4:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   17.075153]  [4:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   17.078469]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   17.078489]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   17.078501]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   17.078509]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   17.078517]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   17.078525]  [5:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   17.089137]  [1:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   17.101193]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   17.101208]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   17.101676]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   17.101686]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_init:
+[   17.105130]  [7:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet:  get_sec_TIMA_address tima_sec_mem_addr : 9F700000
+[   17.105140]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.105148]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 32 = 0x20
+[   17.105155]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.105162]  [7:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: warranty okay 13
+[   17.105171]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: tamper_fuse_good - process_init, msr_size: 0
+[   17.105179]  [7:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading golden measurement
+[   17.105187]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.105195]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 512 = 0x200
+[   17.105202]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.105210]  [7:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Measurement size is : 192
+[   17.105217]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Read boot time measurement
+[   17.107624]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.107643]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 192 = 0xc0
+[   17.107651]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.107660]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: compare measurements from boot and golden_msrs
+[   17.107669]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match, now check for license nad kap fuse status
+[   17.107677]  [7:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   17.107686]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.107693]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   17.107700]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.107707]  [7:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   17.107714]  [7:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   17.107723]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match - Initialization complete
+[   17.107731]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000001
+[   17.107740]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000001
+[   17.107749]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   17.107756]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   17.113964]  [7:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   17.113986]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   17.113998]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   17.114010]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   17.114022]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   17.114034]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   17.114045]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   17.114053]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   17.114061]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   17.114069]  [7:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   17.124567]  [5:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   17.140330]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: tciBufferLen = 38912 = 0x9800
+[   17.140533]  [4:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Starting
+[   17.145128]  [6:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: tciBufferLen = 38912 = 0x9800
+[   17.145142]  [6:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg envelope length = 19456 = 0x4c00
+[   17.145151]  [6:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg = 0002ccb8, respmsg = 00031894
+[   17.145159]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Got a message!
+[   17.145167]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: we got a command
+[   17.145175]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: process_cmd: CMD_TZ_CCM_C_Initialize:
+[   17.145183]  [6:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   17.145192]  [6:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet:  get_sec_TIMA_address tima_sec_mem_addr : 9F700000
+[   17.145201]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.145208]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   17.145215]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.145222]  [6:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   17.145229]  [6:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   17.145263]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.145271]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 32 = 0x20
+[   17.145278]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.145285]  [6:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: warranty okay 13
+[   17.145294]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: tamper_fuse_good - process_init, msr_size: 0
+[   17.145301]  [6:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading golden measurement
+[   17.148447]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.148463]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 512 = 0x200
+[   17.148470]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.148478]  [6:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Measurement size is : 192
+[   17.148486]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Read boot time measurement
+[   17.148495]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.148503]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 192 = 0xc0
+[   17.148510]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.148518]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: compare measurements from boot and golden_msrs
+[   17.148528]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match, now check for license nad kap fuse status
+[   17.148536]  [6:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   17.148544]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.148552]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   17.148559]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.148566]  [6:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   17.148573]  [6:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   17.148581]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Measurements match - Initialization complete
+[   17.148590]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: sendmsg->header.id = 0x00000002
+[   17.148598]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.id = 0x80000002
+[   17.148607]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.status = 0x00000000
+[   17.148616]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Returning = 0x00000000
+[   17.153696]  [6:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: tciBufferLen = 38912 = 0x9800
+[   17.153713]  [6:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg envelope length = 19456 = 0x4c00
+[   17.153722]  [6:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg = 0002ccb8, respmsg = 00031894
+[   17.153730]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Got a message!
+[   17.153738]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: we got a command
+[   17.153746]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: process_cmd: CMD_TZ_CCM_db_init
+[   17.153753]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ CCM: Initing Key database
+[   17.153761]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ CCM: Max slots/tokens: 4
+[   17.153768]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ CCM: Max DB entries supported: 64
+[   17.153778]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Wifi UID: 1010 Per user range: 100000 System UID: 1000
+[   17.153786]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: DB unpack Token count is 1
+[   17.153794]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: DB un pack Token 0 has slot 0 and 4 records
+[   17.153802]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: DB un pack obj count is 4
+[   17.153812]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[0] - slot:0-admin:0-alias Samsung default-class:0x1-cka_id:0x0
+[   17.153821]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[0] - obj_addr:0x00020098; allowRawSigning:0
+[   17.153831]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[1] - slot:0-admin:0-alias Samsung default-class:0x3-cka_id:0x0
+[   17.153841]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[1] - obj_addr:0x00020162; allowRawSigning:0
+[   17.153851]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[2] - slot:0-admin:0-alias Digital Signature-class:0x1-cka_id:0x1
+[   17.153860]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[2] - obj_addr:0x0002022c; allowRawSigning:0
+[   17.153870]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[3] - slot:0-admin:0-alias Digital Signature-class:0x3-cka_id:0x1
+[   17.153879]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ DB Utils: Unpacking object[3] - obj_addr:0x000202f6; allowRawSigning:0
+[   17.153887]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: sendmsg->header.id = 0x00000011
+[   17.153896]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.id = 0x80000011
+[   17.153905]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.status = 0x00000000
+[   17.153913]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Returning = 0x00000000
+[   17.155319]  [6:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: tciBufferLen = 38912 = 0x9800
+[   17.155330]  [6:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg envelope length = 19456 = 0x4c00
+[   17.156580]  [6:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: sendmsg = 0002ccb8, respmsg = 00031894
+[   17.156602]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Got a message!
+[   17.156610]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: we got a command
+[   17.156618]  [6:         mc_log: 2174] MobiCore mcd: 701|TZ_CCM: process_cmd: CMD_TZ_CCM_C_Finalize:
+[   17.156625]  [6:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_CCM: exiting process_C_Finalize
+[   17.156634]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: sendmsg->header.id = 0x00000029
+[   17.156643]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.id = 0x80000029
+[   17.156651]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: respmsg->header.status = 0x00000000
+[   17.156660]  [6:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_CCM: Returning = 0x00000000
+[   17.163652]  [6:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   17.163674]  [6:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   17.163686]  [6:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   17.163698]  [6:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   17.163710]  [6:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   17.163722]  [6:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   17.163734]  [6:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   17.163741]  [6:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   17.163749]  [6:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   17.163757]  [6:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   17.174445]  [7:     tlc_server: 2927] MobiCore mcd: closed by PID(2927), name(tlc_server)
+[   17.184103]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   17.188804]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   17.188820]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   17.188829]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   17.188837]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   17.188845]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   17.188854]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   17.188862]  [5:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   17.188871]  [5:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   17.188879]  [5:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   17.188887]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   17.191922]  [5:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   17.191941]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   17.191953]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   17.191964]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   17.195213]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   17.195229]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   17.195241]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   17.195249]  [7:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   17.195257]  [7:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   17.195264]  [7:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   17.206002]  [7:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   17.216370]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   17.220130]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   17.220160]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   17.220180]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   17.220199]  [5:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   17.220218]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   17.220237]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   17.220261]  [5:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   17.220280]  [5:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   17.220299]  [5:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   17.220318]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   17.225136]  [5:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   17.225150]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   17.225162]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   17.225174]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   17.225185]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   17.225197]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   17.226559]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   17.226574]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   17.226583]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   17.226591]  [5:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   17.237263]  [7:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   17.248405]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   17.252435]  [4:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   17.252451]  [4:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   17.252460]  [4:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   17.252468]  [4:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   17.252476]  [4:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   17.252485]  [4:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   17.252493]  [4:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   17.252502]  [4:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   17.252511]  [4:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   17.252518]  [4:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   17.255128]  [5:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   17.255141]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   17.255154]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   17.259257]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   17.259277]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   17.259289]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   17.259301]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   17.259308]  [5:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   17.259316]  [5:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   17.259324]  [5:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   17.270013]  [4:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   17.279481]  [5:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   17.283804]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   17.283820]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   17.283829]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   17.283838]  [7:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   17.283846]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   17.283855]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   17.283863]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   17.283872]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   17.283881]  [7:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   17.283889]  [7:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   17.285161]  [5:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   17.290670]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   17.290693]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   17.290705]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   17.290718]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   17.290730]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   17.290742]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   17.290749]  [0:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   17.290772]  [0:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   17.290781]  [0:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   17.301445]  [5:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   17.301924]  [3:       watchdog: 3261] logger: !@Sync 0 [09-12 20:36:15.053]
+[   17.315126]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   17.318350]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   17.318366]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   17.318376]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_encrypt_filename:
+[   17.318384]  [1:         mc_log: 2174] MobiCore mcd: 701|TZ_COMMON: Get filename called
+[   17.318392]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encryption key length: 32, data length: 63
+[   17.318400]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: encrypt_data finished; ciphertext length is 64
+[   17.318409]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000002
+[   17.318417]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000002
+[   17.318426]  [1:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   17.318434]  [1:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   17.325153]  [1:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   17.325177]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   17.325190]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   17.325202]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   17.325214]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   17.328337]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   17.328357]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   17.328365]  [3:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   17.328373]  [3:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   17.328381]  [3:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   17.340610]  [3:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   17.365089]  [0:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Starting
+[   17.373215]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Got a message!
+[   17.373232]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: we got a command
+[   17.373241]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: process_cmd: CMD_TZ_KEYSTORE_unwrap_key:
+[   17.373250]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet:  get_sec_TIMA_address tima_sec_mem_addr : 9F700000
+[   17.373261]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.373269]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 32 = 0x20
+[   17.373276]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.373284]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: warranty okay 13
+[   17.373292]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading golden measurement
+[   17.373301]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.373308]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 512 = 0x200
+[   17.373315]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.373323]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Measurement size is : 192
+[   17.373331]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: tz_keystore_chk_boot_msr , after read_golden_measurement
+[   17.373340]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.373347]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 192 = 0xc0
+[   17.373355]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.373363]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: tz_keystore_chk_boot_msr , after boot_measurement
+[   17.373371]  [2:         mc_log: 2174] MobiCore mcd: 701|TZ_KEYSTORE: tz_keystore_chk_boot_msr done
+[   17.373379]  [2:         mc_log: 2174] MobiCore mcd: 701|TIMA trustlet: Reading knox license status
+[   17.373387]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: processing TIMA_DRIVER_PHYS_MEM_ACCESS_COPY
+[   17.373395]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: data_len = 4 = 0x4
+[   17.373402]  [2:         mc_log: 2174] MobiCore mcd: 501|drTima: PHYS_READ
+[   17.373409]  [2:         mc_log: 2174] MobiCore mcd: 701|read license status is: 0
+[   17.373416]  [2:         mc_log: 2174] MobiCore mcd: 701|low security mode
+[   17.373425]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: TZ_aes_decrypt decryption key length: 32, ciphertext length: 64
+[   17.373434]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ: decrypt_data() finished; plaintext length is 56
+[   17.373442]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: sendmsg->header.id = 0x00000005
+[   17.373450]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.id = 0x80000005
+[   17.373461]  [2:         mc_log: 2174] MobiCore mcd: 701|Trustlet TL_TZ_KEYSTORE: respmsg->header.status = 0x00000000
+[   17.373469]  [2:         mc_log: 2174] MobiCore mcd: 701|TL_TZ_KEYSTORE: Returning = 0x00000000
+[   17.375100]  [1:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   17.375124]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   17.379943]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   17.379964]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   17.379976]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   17.379988]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   17.380000]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   17.380007]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   17.380015]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   17.380023]  [1:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   17.396330]  [5:SdpManagerServi: 2964] MobiCore mcd: closed by PID(2964), name(SdpManagerServi)
+[   17.474400]  [0: wpa_supplicant: 3019] wl_android_priv_cmd: fccpwrlimit2g is deactivated
+[   17.540886]  [5:wl_event_handle: 3117] CFG80211-TRACE) wl_escan_handler : SCAN COMPLETED: scanned AP count=16
+[   17.541032]  [5:wl_event_handle: 3117] CFG80211-INFO2) wl_notify_scan_status : scan is not ready 
+[   17.545138]  [1:         mc_log: 2174] MobiCore mcd: 104| SMGNT send MSG_CLOSE_TRUSTLET for thread 701 to IPCH
+[   17.550208]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 202 (UUID=02010000-0000-0000-0000-000000005000) (server 0/6 status is 00000001)
+[   17.550230]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 302 (UUID=ffffffff-0000-0000-0000-000000000002) (server 1/6 status is 00000001)
+[   17.550243]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 402 (UUID=ffffffff-0000-0000-0000-000000000001) (server 2/6 status is 00000001)
+[   17.550254]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 501 (UUID=ffffffff-d000-0000-0000-00000000000a) (server 3/6 status is 00000001)
+[   17.550267]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 602 (UUID=ffffffff-d000-0000-0000-000000000016) (server 4/6 status is 00000001)
+[   17.550279]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop send Event to 802 (UUID=07050500-0000-0000-0000-000000000000) (server 5/6 status is 00000001)
+[   17.550286]  [1:         mc_log: 2174] MobiCore mcd: 103|BroadCast loop done
+[   17.550294]  [1:         mc_log: 2174] MobiCore mcd: 501|drTima: MSG_CLOSE_TRUSTLET call 0x40001
+[   17.550296]  [0: wpa_supplicant: 3019] dhd_wl_ioctl: WLC_IOCTL: cmd: 23, ret = -17
+[   17.550308]  [1:         mc_log: 2174] MobiCore mcd: 104| SMGNT smgntCloseSession done
+[   17.556953]  [0: wpa_supplicant: 3019] CFG80211-INFO2) wl_cfg80211_connect : Connectting with18:84:a0 channel (1) ssid "fbguest", len (7)
+[   17.556953]  [0: wpa_supplicant: 3019] 
+[   17.561151]  [2:    sdp_cryptod: 2336] MobiCore mcd: closed by PID(2336), name(sdp_cryptod)
+[   17.598051]  [7:  system_server: 2674] logger: !@Boot: Loop forever
+[   17.598229]  [7:  system_server: 2674] logger: !@[BatteryInfo] InitBatteryInfo()
+[   17.607975]  [0:  system_server: 2674] logger: !@[BatteryInfo] readFromFile /efs/FactoryApp/asoc: -1
+[   17.608903]  [0:  system_server: 2674] logger: !@[BatteryInfo] readFromFile /sys/class/power_supply/battery/fg_asoc: -1
+[   17.609341]  [0:  system_server: 2674] logger: !@[BatteryInfo] writeToFile /efs/FactoryApp/asoc: -1
+[   17.610052]  [1:  system_server: 2674] logger: !@[BatteryInfo] readFromFile /efs/FactoryApp/batt_discharge_level: 11
+[   17.610529]  [1:  system_server: 2674] logger: !@[BatteryInfo] readFromFile /efs/FactoryApp/max_current: 1265
+[   17.611032]  [1:  system_server: 2674] logger: !@[BatteryInfo] readFromFile /efs/FactoryApp/max_temp: 332
+[   17.611325]  [1:  system_server: 2674] logger: !@[BatteryInfo] readFromFile /sys/class/power_supply/battery/fg_asoc: -1
+[   17.611553]  [1:  system_server: 2674] logger: !@[BatteryInfo] writeToFile /efs/FactoryApp/asoc: -1
+[   17.714538]  [5:InputDeviceLigh: 3029] sec_touchkey_driver 4-0020: [TK] led off
+[   18.103641] I[1:       Binder_1: 2708] mif: LNK-TX(16): fc eb 0c 00 08 00 00 00 09 02 03 02 6e 10 4e 0a
+[   18.104825] I[0:      ip6tables: 3510] mif: LNK-RX(16): fc eb 10 00 0c 00 05 00 80 01 02 09 02 03 00 80
+[   18.210518]  [5:wl_event_handle: 3117] CFG80211-INFO2) wl_get_auth_assoc_status : event=3 status 0 reason 0 
+[   18.212606]  [4:wl_event_handle: 3117] CFG80211-INFO2) wl_get_auth_assoc_status : event=7 status 0 reason 0 
+[   18.212629]  [4:wl_event_handle: 3117] CFG80211-INFO2) wl_notify_connect_status : wl_bss_connect_done succeeded with 18:84:a0
+[   18.215132]  [7:        dhd_dpc: 2156] ETHER_TYPE_802_1X [RX] : M1 of 4way
+[   18.217833]  [5:wl_event_handle: 3117] dhdcdc_set_ioctl: SET PM to 0
+[   18.226209] I[7: wpa_supplicant: 3019] ETHER_TYPE_802_1X [TX] : M2 of 4way
+[   18.228949]  [7:        dhd_dpc: 2156] ETHER_TYPE_802_1X [RX] : M3 of 4way
+[   18.233895] I[0: wpa_supplicant: 3019] ETHER_TYPE_802_1X [TX] : M4 of 4way
+[   18.240061]  [6: wpa_supplicant: 3019] CFG80211-TRACE) __wl_cfg80211_scan : START SCAN
+[   18.271767]  [7:           netd: 2907] IPv6: ipv6_generate_eui64: dev type: 1
+[   18.282987]  [1:  system_server: 2674] [VIB] sec_vib_enable 0ms
+[   18.438803]  [2:m.android.phone: 3349] logger: !@Boot_SVC : PhoneApp OnCrate
+[   18.482225]  [7: wpa_supplicant: 3019] CFG80211-TRACE) wl_cfg80211_set_btcoex_dhcp : DHCP session starts
+[   18.487128]  [1:   RILReceiver0: 3567] logger: !@Boot_SVC : RIL_UNSOL_RIL_CONNECTED
+[   18.498550]  [0:   RILReceiver1: 3569] logger: !@Boot_SVC : RIL_UNSOL_RIL_CONNECTED
+[   18.500421] I[0:      swapper/0:    0] mif: LNK-TX(16): fc eb 0c 00 08 00 01 00 0a 0f 05 01 01 00 00 00
+[   18.500438] I[0:      swapper/0:    0] mif: LNK-TX(16): fc eb 0c 00 08 00 02 00 07 01 02 01 69 6f 6e 2e
+[   18.501598] I[0: servicemanager: 2163] mif: LNK-RX(24): fc eb 15 00 11 00 06 02 07 01 02 01 00 00 00 00 ...
+[   18.520588] I[3:       Binder_8: 3409] mif: LNK-TX(16): fc ec 0c 00 08 00 00 00 0a 0f 05 01 34 00 00 00
+[   18.520605] I[3:       Binder_8: 3409] mif: LNK-TX(16): fc ec 0c 00 08 00 01 00 07 01 02 01 30 51 36 70
+[   18.521645] I[3:   RILReceiver0: 3567] mif: LNK-TX(16): fc eb 0b 00 07 00 03 00 0f 30 02 00 00 00 00 00
+[   18.521775] I[0:      swapper/0:    0] mif: LNK-RX(24): fc ec 15 00 11 00 04 01 07 01 02 01 00 00 00 00 ...
+[   18.522784] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0c 00 08 00 07 03 0f 30 02 00 00 00 00 00
+[   18.527968] I[5:m.android.phone: 3349] mif: LNK-TX(16): fc ec 0b 00 07 00 02 00 0f 30 02 30 20 47 45 54
+[   18.529114] I[0:      swapper/0:    0] mif: LNK-RX(16): fc ec 0c 00 08 00 05 02 0f 30 02 00 00 00 00 00
+[   18.573864]  [6: wpa_supplicant: 3019] dhd_set_suspend: Remove extra suspend setting 
+[   18.584472]  [7: wpa_supplicant: 3019] dhdcdc_set_ioctl: SET PM to 0
+[   18.601518] I[3:earchbox:search: 3491] mif: LNK-TX(16): fc eb 0b 00 07 00 04 00 05 01 02 4b 04 00 00 00
+[   18.602671] I[0:id.app.launcher: 3363] mif: LNK-RX(16): fc eb 0d 00 09 00 08 04 05 01 02 80 00 00 00 00
+[   18.603906] I[6:      swapper/6:    0] mif: LNK-TX(16): fc ec 0b 00 07 00 03 00 05 01 02 20 c0 ff ff ff
+[   18.605693] I[0:id.app.launcher: 3363] mif: LNK-RX(16): fc ec 0d 00 09 00 06 03 05 01 02 80 00 00 00 00
+[   18.912342]  [5:wl_event_handle: 3117] CFG80211-TRACE) wl_escan_handler : SCAN COMPLETED: scanned AP count=7
+[   18.915450]  [5:wl_event_handle: 3117] CFG80211-INFO2) wl_notify_scan_status : scan is not ready 
+[   19.044852]  [3:ActivityManager: 2810] logger: !@Boot: performEnableScreen
+[   19.044923]  [3:ActivityManager: 2810] logger: !@performEnableScreen return becase StatusBar com.android.systemui is not fully drawn!
+[   19.073973]  [5:wl_event_handle: 3117] CFG80211-INFO2) wl_notify_connect_status : wl_bss_connect_done succeeded with 18:84:a0
+[   19.257425]  [7:android.display: 2841] logger: !@skp
+[   19.257470]  [7:android.display: 2841] logger: !@performEnableScreen return becase StatusBar com.android.systemui is not fully drawn!
+[   19.257541]  [7:android.display: 2841] logger: !@skp
+[   19.257565]  [7:android.display: 2841] logger: !@performEnableScreen return becase StatusBar com.android.systemui is not fully drawn!
+[   19.309517]  [7:android.display: 2841] logger: !@performEnableScreen return becase StatusBar com.android.systemui is not fully drawn!
+[   19.340307]  [7:android.display: 2841] logger: !@performEnableScreen return becase Bouncer com.android.systemui is not fully drawn!
+[   19.340433]  [7:android.display: 2841] logger: !@performEnableScreen return becase Bouncer com.android.systemui is not fully drawn!
+[   19.652324] I[1:ndroid.systemui: 3054] mif: LNK-TX(16): fc eb 0b 00 07 00 05 00 05 01 02 30 20 53 49 47
+[   19.652340] I[1:ndroid.systemui: 3054] mif: LNK-TX(16): fc ec 0b 00 07 00 04 00 05 01 02 1b 00 00 00 0f
+[   19.653499] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0d 00 09 00 09 05 05 01 02 80 00 00 00 00
+[   19.653528] I[0:      swapper/0:    0] mif: LNK-RX(16): fc ec 0d 00 09 00 07 04 05 01 02 80 00 00 00 00
+[   19.657421]  [7:m.android.phone: 3349] logger: !@Boot_SVC : setRadioPower on
+[   19.659907] I[1:      swapper/1:    0] mif: LNK-TX(16): fc eb 0d 00 09 00 06 00 01 07 01 02 02 53 49 47
+[   19.661062] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 10 00 0c 00 0a 06 80 01 02 01 07 01 00 80
+[   19.661089] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0c 00 08 00 0b 00 01 07 03 02 00 00 00 00
+[   19.688842]  [4:       Binder_8: 3409] running cache cleanup thread - sdp-id : 0
+[   19.689152]  [4:     sdp_cached: 3736] ecryptfs_mm_drop_pagecache start() sb:ecryptfs [0], userid:0
+[   19.689168]  [4:     sdp_cached: 3736] ecryptfs_mm_drop_pagecache start() sb:ecryptfs [0], userid:0
+[   19.710324] I[0:       Binder_6: 3198] mif: LNK-RX(16): fc eb 0c 00 08 00 0c 00 05 07 03 00 00 00 00 00
+[   19.711321] I[0:        mmcqd/0: 1241] mif: LNK-RX(16): fc eb 0d 00 09 00 0d 00 05 01 03 80 00 00 00 00
+[   19.721478] I[0:      swapper/0:    0] mif: LNK-RX(24): fc eb 12 00 0e 00 0e 00 02 16 03 30 30 30 30 30 ...
+[   19.723372]  [4:android.display: 2841] logger: !@performEnableScreen return becase StatusBar com.android.systemui is not fully drawn!
+[   19.723448]  [4:android.display: 2841] logger: !@performEnableScreen return becase StatusBar com.android.systemui is not fully drawn!
+[   19.742076] I[5:      swapper/5:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 07 00 08 03 02 77 6f 72 6b 2e
+[   19.744752] I[0:id.app.launcher: 3363] mif: LNK-RX(40): fc eb 25 00 21 00 0f 07 08 03 02 02 01 04 30 30 ...
+[   19.746426] I[7:       Binder_2: 3361] mif: LNK-TX(16): fc eb 0d 00 09 00 08 00 08 05 02 ff 03 00 00 00
+[   19.748337] I[0:id.app.launcher: 3363] mif: LNK-RX(32): fc eb 1e 00 1a 00 10 08 08 05 02 04 03 01 00 00 ...
+[   19.755292] I[5:rosoft.skydrive: 3717] mif: LNK-TX(16): fc eb 0d 00 09 00 09 00 08 05 02 ff 02 00 00 00
+[   19.758893] I[0:id.app.launcher: 3363] mif: LNK-RX(32): fc eb 1e 00 1a 00 11 09 08 05 02 04 02 01 00 00 ...
+[   19.762595] I[4:      swapper/4:    0] mif: LNK-TX(16): fc eb 0b 00 07 00 0a 00 08 02 02 7c 04 00 00 00
+[   19.765789] I[0:        mmcqd/0: 1241] mif: LNK-RX(16): fc eb 0c 00 08 00 12 0a 08 02 02 02 00 00 00 00
+[   19.836326]  [7:android.display: 2841] logger: !@performEnableScreen return becase StatusBar com.android.systemui is not fully drawn!
+[   19.860712]  [4:android.display: 2841] logger: !@performEnableScreen return becase StatusBar com.android.systemui is not fully drawn!
+[   19.861145]  [2:     android.ui: 2813] [SENSOR] k2hh_set_odr: change odr 3
+[   19.861165]  [2:     android.ui: 2813] [SENSOR] k2hh_delay_store: poll_delay = 66667000
+[   19.861483]  [2:     android.ui: 2813] [SENSOR] k2hh_enable_store: new_value = 1
+[   19.862285]  [2:     android.ui: 2813] [SENSOR] k2hh_open_calibration:  No Calibration
+[   19.862552]  [1:     android.ui: 2813] [SENSOR] k2hh_set_range: 0x20
+[   19.863641]  [3:     android.ui: 2813] [SENSOR] k2hh_set_mode: change mode 1
+[   19.864885]  [4:android.display: 2841] logger: !@performEnableScreen return becase StatusBar com.android.systemui is not fully drawn!
+[   19.981758]  [3:  BootAnimation: 2358] logger: !@BootAnimation : service.bootanim.exit = 1
+[   19.981792]  [3:  BootAnimation: 2358] logger: !@BootAnimation : @@@@ bootani exit
+[   19.981812]  [3:  BootAnimation: 2358] logger: !@BootAnimation : service.bootanim.exit = 1
+[   19.981833]  [3:  BootAnimation: 2358] logger: !@BootAnimation : BootAnimation is completed
+[   19.985862]  [0:  BootAnimation: 2358] logger: !@BootAnimation : doCleanup() Call
+[   19.987497]  [0:  BootAnimation: 2358] logger: !@BootAnimation : stopProcess() Call
+[   19.987605]  [0:  BootAnimation: 2358] logger: !@BootAnimation : kill() Call
+[   20.184804]  [1:android.display: 2841] logger: !@Boot: Enabling Screen!
+[   20.275575]  [5:  system_server: 2674] logger: !@bootCompleted
+[   20.276737]  [2:     android.bg: 2805] [VIB] sec_vib_enable 0ms
+[   20.382459]  [4:android.display: 2841] logger: !@Boot: bootcomplete

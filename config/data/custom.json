@@ -1,0 +1,5 @@
+{
+    "_custom": {},
+    "precision": {"dtype" : "float32"},
+    "executor": {"accelerator": "cpu"}
+}

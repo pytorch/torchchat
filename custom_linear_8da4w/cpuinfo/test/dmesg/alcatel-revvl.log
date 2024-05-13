@@ -1,0 +1,1367 @@
+[   15.931619]  (6)[460:cameraserver]OV13855_camera_sensor[OV13855_MIPI_RAW_SensorInit] MICKEY6TTMO: OV13855_MIPI_RAW_SensorInit 
+[   15.931649]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3003
+[   15.931662]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3002
+[   15.931817]  (6)[460:cameraserver]OV13855_camera_sensor[get_info] scenario_id = 0
+[   15.931827]  (6)[460:cameraserver]OV13855_camera_sensor[get_info] scenario_id = 1
+[   15.931834]  (6)[460:cameraserver]OV13855_camera_sensor[get_info] scenario_id = 2
+[   15.931844]  (6)[460:cameraserver]OV13855_camera_sensor[get_info] scenario_id = 3
+[   15.931852]  (6)[460:cameraserver]OV13855_camera_sensor[get_info] scenario_id = 9
+[   15.931863]  (6)[460:cameraserver]OV13855_camera_sensor[get_info] scenario_id = 10
+[   15.931869]  (6)[460:cameraserver]OV13855_camera_sensor[get_info] scenario_id = 11
+[   15.931876]  (6)[460:cameraserver]OV13855_camera_sensor[get_info] scenario_id = 12
+[   15.931883]  (6)[460:cameraserver]OV13855_camera_sensor[get_info] scenario_id = 13
+[   15.931890]  (6)[460:cameraserver]OV13855_camera_sensor[get_info] scenario_id = 14
+[   15.931898]  (6)[460:cameraserver]OV13855_camera_sensor[get_resolution] E
+[   15.932012]  (6)[460:cameraserver]OV5675_MIPI_RAW_Sensor Init! 
+[   15.932024]  (6)[460:cameraserver]feature_id = 3003
+[   15.932034]  (6)[460:cameraserver]feature_id = 3002
+[   15.932090]  (6)[460:cameraserver]ov5675 scenario_id = 0
+[   15.932098]  (6)[460:cameraserver]ov5675 scenario_id = 1
+[   15.932104]  (6)[460:cameraserver]ov5675 scenario_id = 2
+[   15.932110]  (6)[460:cameraserver]ov5675 scenario_id = 3
+[   15.932117]  (6)[460:cameraserver]ov5675 scenario_id = 9
+[   15.932124]  (6)[460:cameraserver]ov5675 scenario_id = 10
+[   15.932130]  (6)[460:cameraserver]ov5675 scenario_id = 11
+[   15.932136]  (6)[460:cameraserver]ov5675 scenario_id = 12
+[   15.932143]  (6)[460:cameraserver]ov5675 scenario_id = 13
+[   15.932149]  (6)[460:cameraserver]ov5675 scenario_id = 14
+[   15.932156]  (6)[460:cameraserver]E
+[   15.932255]  (6)[460:cameraserver]OV13855_camera_sensor[OV13855_MIPI_RAW_SensorInit] MICKEY6TTMO: OV13855_MIPI_RAW_SensorInit 
+[   15.932280]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3003
+[   15.932291]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3002
+[   15.932353]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3058
+[   15.932362]  (6)[460:cameraserver]OV13855_camera_sensor[get_default_framerate_by_scenario] scenario_id = 0
+[   15.932374]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3058
+[   15.932380]  (6)[460:cameraserver]OV13855_camera_sensor[get_default_framerate_by_scenario] scenario_id = 1
+[   15.932391]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3058
+[   15.932399]  (6)[460:cameraserver]OV13855_camera_sensor[get_default_framerate_by_scenario] scenario_id = 2
+[   15.932409]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3058
+[   15.932416]  (6)[460:cameraserver]OV13855_camera_sensor[get_default_framerate_by_scenario] scenario_id = 3
+[   15.932427]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3058
+[   15.932434]  (6)[460:cameraserver]OV13855_camera_sensor[get_default_framerate_by_scenario] scenario_id = 9
+[   15.932444]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3058
+[   15.932451]  (6)[460:cameraserver]OV13855_camera_sensor[get_default_framerate_by_scenario] scenario_id = 10
+[   15.932462]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3058
+[   15.932469]  (6)[460:cameraserver]OV13855_camera_sensor[get_default_framerate_by_scenario] scenario_id = 11
+[   15.932479]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3058
+[   15.932486]  (6)[460:cameraserver]OV13855_camera_sensor[get_default_framerate_by_scenario] scenario_id = 12
+[   15.932497]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3058
+[   15.932504]  (6)[460:cameraserver]OV13855_camera_sensor[get_default_framerate_by_scenario] scenario_id = 13
+[   15.932514]  (6)[460:cameraserver]OV13855_camera_sensor[feature_control] feature_id = 3058
+[   15.932522]  (6)[460:cameraserver]OV13855_camera_sensor[get_default_framerate_by_scenario] scenario_id = 14
+[   15.932786]  (6)[460:cameraserver]OV5675_MIPI_RAW_Sensor Init! 
+[   15.932803]  (6)[460:cameraserver]feature_id = 3003
+[   15.932814]  (6)[460:cameraserver]feature_id = 3002
+[   15.932894]  (6)[460:cameraserver]feature_id = 3058
+[   15.932902]  (6)[460:cameraserver]scenario_id = 0
+[   15.932912]  (6)[460:cameraserver]feature_id = 3058
+[   15.932919]  (6)[460:cameraserver]scenario_id = 1
+[   15.932929]  (6)[460:cameraserver]feature_id = 3058
+[   15.932935]  (6)[460:cameraserver]scenario_id = 2
+[   15.932945]  (6)[460:cameraserver]feature_id = 3058
+[   15.932951]  (6)[460:cameraserver]scenario_id = 3
+[   15.932961]  (6)[460:cameraserver]feature_id = 3058
+[   15.932967]  (6)[460:cameraserver]scenario_id = 9
+[   15.932977]  (6)[460:cameraserver]feature_id = 3058
+[   15.932983]  (6)[460:cameraserver]scenario_id = 10
+[   15.932993]  (6)[460:cameraserver]feature_id = 3058
+[   15.932999]  (6)[460:cameraserver]scenario_id = 11
+[   15.933009]  (6)[460:cameraserver]feature_id = 3058
+[   15.933015]  (6)[460:cameraserver]scenario_id = 12
+[   15.933025]  (6)[460:cameraserver]feature_id = 3058
+[   15.933031]  (6)[460:cameraserver]scenario_id = 13
+[   15.933041]  (6)[460:cameraserver]feature_id = 3058
+[   15.933047]  (6)[460:cameraserver]scenario_id = 14
+[   16.100179] -(4)[0:swapper/4]AEE_MONITOR_SET[status]: 0x1
+[   16.204813] -(4)[0:swapper/4]Power/swap DP: No enter --- SODI3: No enter --- SODI: No enter --- 
+[   16.303994]  (4)[459:audioserver]Audio_Vow_Cfg2_Set()  = 8995
+[   16.304024]  (4)[459:audioserver]Audio_Vow_Cfg3_Set()  = 42856
+[   16.304041]  (4)[459:audioserver]Audio_Vow_Cfg4_Set()  = 111
+[   16.313375]  (4)[459:audioserver]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   16.313432]  (4)[459:audioserver]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   16.376101]  (4)[318:ccci_fsd]otp: write_prot_grpsz is 15
+[   16.376119]  (4)[318:ccci_fsd]otp: non-hc unit sg_wp_size 8388608
+[   16.376224]  (4)[318:ccci_fsd]mmc0: set ext_csd.cmdq_mode_en = 0
+[   16.376428]  (4)[318:ccci_fsd]mmc0: set ext_csd.cmdq_mode_en = 1
+[   16.485956]  (7)[1:init]init: Starting service 'emdlogger1'...
+[   16.492362]  (7)[1:init]init: Starting service 'gsm0710muxd'...
+[   17.049851]  (6)[457:main]BOOTPROF:     17049.838040:Zygote:Preload Start
+[   17.095793]  (7)[458:main]BOOTPROF:     17095.778501:Zygote:Preload Start
+[   17.100449]  (5)[194:rpmb_open]AEE_MONITOR_SET[status]: 0x1
+[   17.201041]  (5)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(4)
+[   17.201071]  (5)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   17.201080]  (5)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   17.210776]  (7)[1:init]init: avc:  denied  { set } for property=ro.mtk_pq_color_mode pid=468 uid=1013 gid=1005 scontext=u:r:mediaserver:s0 tcontext=u:object_r:default_prop:s0 tclass=property_service permissive=0
+[   17.210807]  (7)[1:init]init: sys_prop: permission denied uid:1013  name:ro.mtk_pq_color_mode
+[   17.211414]  (6)[1:init]init: avc:  denied  { set } for property=persist.sys.pq.mdp.color.dbg pid=468 uid=1013 gid=1005 scontext=u:r:mediaserver:s0 tcontext=u:object_r:system_prop:s0 tclass=property_service permissive=0
+[   17.211443]  (6)[1:init]init: sys_prop: permission denied uid:1013  name:persist.sys.pq.mdp.color.dbg
+[   17.211963]  (6)[1:init]init: avc:  denied  { set } for property=debug.pq.shp.en pid=468 uid=1013 gid=1005 scontext=u:r:mediaserver:s0 tcontext=u:object_r:debug_prop:s0 tclass=property_service permissive=0
+[   17.211991]  (6)[1:init]init: sys_prop: permission denied uid:1013  name:debug.pq.shp.en
+[   17.212426]  (4)[1:init]init: avc:  denied  { set } for property=debug.pq.dshp.en pid=468 uid=1013 gid=1005 scontext=u:r:mediaserver:s0 tcontext=u:object_r:debug_prop:s0 tclass=property_service permissive=0
+[   17.212460]  (4)[1:init]init: sys_prop: permission denied uid:1013  name:debug.pq.dshp.en
+[   17.213161]  (4)[1:init]init: avc:  denied  { set } for property=persist.sys.pq.mdp.color.idx pid=468 uid=1013 gid=1005 scontext=u:r:mediaserver:s0 tcontext=u:object_r:system_prop:s0 tclass=property_service permissive=0
+[   17.213192]  (4)[1:init]init: sys_prop: permission denied uid:1013  name:persist.sys.pq.mdp.color.idx
+[   17.213643]  (6)[1:init]init: avc:  denied  { set } for property=persist.sys.pq.adl.idx pid=468 uid=1013 gid=1005 scontext=u:r:mediaserver:s0 tcontext=u:object_r:system_prop:s0 tclass=property_service permissive=0
+[   17.213673]  (6)[1:init]init: sys_prop: permission denied uid:1013  name:persist.sys.pq.adl.idx
+[   17.215053]  (6)[1:init]init: avc:  denied  { set } for property=persist.sys.pq.iso.shp.en pid=468 uid=1013 gid=1005 scontext=u:r:mediaserver:s0 tcontext=u:object_r:system_prop:s0 tclass=property_service permissive=0
+[   17.215085]  (6)[1:init]init: sys_prop: permission denied uid:1013  name:persist.sys.pq.iso.shp.en
+[   17.518102]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   17.518170]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   17.518959]  (7)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   17.519018]  (7)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   17.519528]  (7)[910:AudioOut_D]-RF clk_buf_ctrl(CLK_BUF_AUDIO,true)
+[   17.519690] -(7)[910:AudioOut_D]-----------  AudDrv_Clk_On, Aud_AFE_Clk_cntr:1
+[   17.519805]  (7)[910:AudioOut_D]mtk_pcm_I2S0dl1_close
+[   17.519963] -(7)[910:AudioOut_D]-----------  AudDrv_Clk_On, Aud_AFE_Clk_cntr:1
+[   17.520043]  (7)[910:AudioOut_D]mtk_pcm_I2S0dl1_close
+[   17.520516] -(7)[910:AudioOut_D]-----------  AudDrv_Clk_On, Aud_AFE_Clk_cntr:1
+[   17.533646]  (7)[910:AudioOut_D]Speaker_Amp_Set() value = 1
+[   17.533646]  
+[   17.534827]  (7)[910:AudioOut_D]Speaker_ClassD_Open
+[   17.550169]  (7)[910:AudioOut_D]spk trim offset=2
+[   17.550214]  (7)[910:AudioOut_D]Apply_Speaker_Gain Speaker_pga_gain= 7
+[   17.550603]  (7)[910:AudioOut_D]Audio_Irqcnt1_Set()
+[   17.550618]  (7)[910:AudioOut_D]warn, cannot update irq counter, user_id =           (null), irq1_cnt = 1024
+[   17.923424]  (4)[315:wmt_launcher][WMT-CONSYS-HW][E]mtk_wcn_consys_set_dbg_mode(1324):fw dbg mode register value(0x00000000)
+[   18.100699]  (4)[207:kworker/4:2]AEE_MONITOR_SET[status]: 0x1
+[   18.189998]  (4)[207:kworker/4:2][Auxadc] [AUXADC] ch:4(2b6, 62c, 1, 1)
+[   18.462201]  (4)[142:ccci_rpc_k][Power/clkbuf]clk_buf_get_swctrl_status: is_flightmode_on=0, swctrl:clkbuf3=1/1, clkbuf4=1/1
+[   18.462222]  (4)[142:ccci_rpc_k][Power/clkbuf]clk_buf_get_rf_drv_curr: rf_drv_curr_vals=2 2 2 2
+[   18.481051]  (5)[318:ccci_fsd]mmc0: set ext_csd.cmdq_mode_en = 0
+[   18.481333]  (4)[318:ccci_fsd]mmc0: set ext_csd.cmdq_mode_en = 1
+[   18.558667]  (6)[1:init]init: no such service 'ril-daemon'
+[   18.560180]  (6)[1:init]init: Starting service 'ril-daemon-mtk'...
+[   18.767402]  (6)[457:main]BOOTPROF:     18767.387659:Zygote:Preload 4161 classes in 1576ms
+[   18.777893]  (7)[458:main]BOOTPROF:     18777.877428:Zygote:Preload 4161 classes in 1588ms
+[   18.817566]  (6)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   18.818461]  (6)[102:hps_main]CPU7: shutdown
+[   18.819717]  (6)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   18.820184]  (6)[102:hps_main][HPS] END :(0400)(0)(4) action end(250)(273)(0)(1) (0)(4)(0)(1) (1004)(160)(1) (250)(160)(0) (0)(273)(160)(0)(273) (4)(0)(3)
+[   18.978666] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   18.978685] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   18.979596]  (7)[102:hps_main][HPS] END :(0040)(0)(3) action end(296)(353)(0)(3) (0)(4)(0)(1) (807)(3)(0) (290)(3)(0) (1)(353)(4)(0)(353) (4)(0)(4)
+[   19.048582]  (6)[296:logd.auditd]type=1400 audit(1483538492.440:38): avc: denied { search } for pid=1386 comm="mtkrild" name="/" dev="mmcblk0p7" ino=2 scontext=u:r:mtkrild:s0 tcontext=u:object_r:mobile_info_file:s0 tclass=dir permissive=0
+[   19.100969]  (4)[457:main]AEE_MONITOR_SET[status]: 0x1
+[   19.123962]  (4)[457:main]BOOTPROF:     19123.945814:Zygote:Preload 114 obtain resources in 227ms
+[   19.124279]  (7)[458:main]BOOTPROF:     19124.267814:Zygote:Preload 114 obtain resources in 227ms
+[   19.134588]  (6)[457:main]BOOTPROF:     19134.572122:Zygote:Preload 41 resources in 11ms
+[   19.142275]  (7)[458:main]BOOTPROF:     19142.257583:Zygote:Preload 41 resources in 17ms
+[   19.213568]  (5)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(5)
+[   19.213597]  (5)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   19.213605]  (5)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   19.278387]  (6)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   19.279242]  (4)[102:hps_main]CPU7: shutdown
+[   19.280186]  (4)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   19.280624]  (4)[102:hps_main][HPS] END :(0400)(0)(4) action end(221)(222)(0)(2) (0)(4)(0)(1) (890)(8)(2) (221)(8)(0) (0)(222)(8)(0)(222) (4)(0)(3)
+[   19.348686]  (6)[457:main]BOOTPROF:     19348.669276:Zygote:Preload End
+[   19.431694]  (5)[1474:netd]Dump cpuinfo
+[   19.458688]  (5)[458:main]BOOTPROF:     19458.672661:Zygote:Preload End
+[   19.477656]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   19.478714]  (5)[102:hps_main]CPU6: shutdown
+[   19.479622]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   19.480079]  (5)[102:hps_main][HPS] END :(0400)(0)(3) action end(124)(141)(0)(0) (0)(4)(0)(1) (644)(5)(2) (124)(5)(0) (0)(141)(5)(0)(141) (4)(0)(2)
+[   19.543832]  (4)[1487:system_server]BOOTPROF:     19543.815430:Android:SysServerInit_START
+[   19.668178]  (4)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 1487 woke 2 threads
+[   19.755309]  (5)[1:init]init: Starting service 'ril-proxy'...
+[   19.848658] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   19.848678] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   19.849830] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   19.849848] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   19.850706]  (7)[102:hps_main][HPS] END :(0040)(0)(2) action end(200)(362)(0)(2) (0)(4)(0)(1) (518)(9)(0) (193)(9)(0) (1)(362)(10)(0)(362) (4)(0)(4)
+[   19.888368]  (6)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   19.889207]  (6)[102:hps_main]CPU7: shutdown
+[   19.889983]  (6)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   19.890443]  (6)[102:hps_main][HPS] END :(0400)(0)(4) action end(249)(270)(0)(1) (0)(4)(0)(1) (249)(1)(1) (249)(1)(0) (0)(270)(1)(0)(270) (4)(0)(3)
+[   19.962012]  (4)[296:logd.auditd]type=1400 audit(1483538493.360:39): avc: denied { open } for pid=1524 comm="rilproxy" path="/proc/ged" dev="proc" ino=4026533840 scontext=u:r:rilproxy:s0 tcontext=u:object_r:proc_ged:s0 tclass=file permissive=0
+[   19.988952]  (5)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.003635]  (6)[137:kworker/u16:2]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.006630]  (5)[318:ccci_fsd]mmc0: set ext_csd.cmdq_mode_en = 0
+[   20.006854]  (5)[318:ccci_fsd]mmc0: set ext_csd.cmdq_mode_en = 1
+[   20.009999]  (5)[1386:mtkrild][Power/clkbuf]clk_buf_set_by_flightmode: g/is_flightmode_on=0->1, srcclkena_o1=1, pcm_reg13=0x4e00102c
+[   20.020481]  (5)[137:kworker/u16:2]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.036032]  (6)[318:ccci_fsd]mmc0: set ext_csd.cmdq_mode_en = 0
+[   20.036460]  (6)[318:ccci_fsd]mmc0: set ext_csd.cmdq_mode_en = 1
+[   20.037542]  (6)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.049769]  (6)[318:ccci_fsd]mmc0: set ext_csd.cmdq_mode_en = 0
+[   20.050042]  (6)[318:ccci_fsd]mmc0: set ext_csd.cmdq_mode_en = 1
+[   20.054925]  (4)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.062531]  (5)[1487:system_server][state_store]: state = (0)
+[   20.062549]  (5)[1487:system_server][state_store]: pm_suspend() return (-22)
+[   20.068858]  (5)[137:kworker/u16:2]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.085173]  (5)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.098070]  (6)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.101297]  (5)[164:kworker/u16:3]AEE_MONITOR_SET[status]: 0x1
+[   20.111185]  (5)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.115087]  (6)[1555:android.display][AAL] led_mode=5 , aal_need_lock=0
+[   20.127921]  (6)[108:kworker/u16:1]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.138483]  (4)[1386:mtkrild][KL_ENV]cann't find name=persist.radio.cfu.querytype
+[   20.142425]  (4)[108:kworker/u16:1]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.158055]  (6)[108:kworker/u16:1]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.160809]  (6)[1487:system_server]BOOTPROF:     20160.794432:Android:PackageManagerService_Start
+[   20.171730]  (5)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.185204]  (4)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.199205]  (5)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.212012]  (4)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.226975]  (6)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.241528]  (5)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.256131]  (6)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.269027]  (6)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   20.367611]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   20.368464]  (5)[102:hps_main]CPU6: shutdown
+[   20.369335]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   20.369787]  (5)[102:hps_main][HPS] END :(0400)(0)(3) action end(129)(141)(0)(1) (0)(4)(0)(1) (548)(13)(1) (129)(13)(0) (0)(141)(13)(0)(141) (4)(0)(2)
+[   20.774691]  (5)[1487:system_server]BOOTPROF:     20774.674741:Android:PMS_scan_START
+[   20.855823]  (4)[1487:system_server]BOOTPROF:     20855.810587:Android:PMS_scan_data:/vendor/overlay
+[   21.101531]  (5)[1487:system_server]AEE_MONITOR_SET[status]: 0x1
+[   21.159422]  (5)[1487:system_server]BOOTPROF:     21159.402819:Android:PMS_scan_data:/system/framework
+[   21.202440]  (5)[1487:system_server]BOOTPROF:     21202.422819:Android:PMS_scan_data:/custpack/app/unremoveable
+[   21.205734] -(4)[0:swapper/4]Power/swap DP: No enter --- SODI3: No enter --- SODI: No enter --- 
+[   21.218287]  (5)[200:wdtk-5][WDK]: kick Ex WDT,RT[21218271819]
+[   21.222294]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(6)
+[   21.222324]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   21.222332]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   21.228765]  (4)[1487:system_server]BOOTPROF:     21228.748665:Android:PMS_scan_data:/custpack/GMS
+[   21.990291]  (4)[1487:system_server]BOOTPROF:     21990.273974:Android:PMS_scan_data:/custpack/app/removeable
+[   22.008297]  (5)[1499:kworker/5:3][Power/clkbuf]clkbuf_delayed_worker: g_is_flightmode_on=1, srcclkena_o1=0, pcm_reg13=0xe040000
+[   22.101783]  (4)[1487:system_server]AEE_MONITOR_SET[status]: 0x1
+[   22.500991]  (4)[1487:system_server]BOOTPROF:     22500.971206:Android:PMS_scan_data:/custpack/app/priv-app
+[   22.648982]  (5)[1487:system_server]BOOTPROF:     22648.966053:Android:PMS_scan_data:/custpack/GMS_pri
+[   23.102034]  (4)[1487:system_server]AEE_MONITOR_SET[status]: 0x1
+[   23.111917]  (4)[1487:system_server]BOOTPROF:     23111.898362:Android:PMS_scan_data:/vendor/framework
+[   23.120327]  (4)[1487:system_server]BOOTPROF:     23120.309593:Android:PMS_scan_data:/system/priv-app
+[   23.200046]  (4)[207:kworker/4:2][Auxadc] [AUXADC] ch:4(2b7, 62f, 1, 1)
+[   23.230790]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(7)
+[   23.230815]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   23.230823]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   23.445437]  (5)[447:fuelgauged]MTK_FG: FG parameters v1(3051,2989,1254,596) (2993,2932,1232,587) (30,10,10) 60 100 3350 (4,98) (1,1,10) 0
+[   23.445470] -(5)[447:fuelgauged]mtk_rtc_hal_common: rtc_spare_reg[0] = {16412, 127, 8}
+[   23.446646]  (5)[208:bat_routine_thr][Auxadc] [AUXADC] ch:2(21a, 4c9, 1, 1)
+[   23.448376]  (5)[208:bat_routine_thr][Auxadc] [AUXADC] ch:0(10b6, 656a, 1, 1)
+[   23.451621]  (5)[208:bat_routine_thr][Auxadc] [AUXADC] ch:1(10d8, 6637, 1, 1)
+[   23.458071]  (5)[208:bat_routine_thr][Auxadc] [AUXADC] ch:2(21a, 4c9, 1, 1)
+[   23.459820]  (5)[447:fuelgauged][Auxadc] [AUXADC] ch:3(2c5, 64f, 1, 1)
+[   23.501454] -(5)[447:fuelgauged]mtk_rtc_hal_common: rtc_spare_reg[0] = {16412, 127, 8}
+[   23.501552]  (5)[447:fuelgauged][fg_res] set rtc = 92
+[   23.520498]  (5)[910:AudioOut_D]Speaker_Amp_Set() value = 0
+[   23.520498]  
+[   23.520520]  (5)[910:AudioOut_D]Speaker_ClassD_close
+[   23.521351] -(5)[910:AudioOut_D]TopCkCount <0 =0
+[   23.521351]  
+[   23.521518] -(5)[910:AudioOut_D]mtk_pcm_I2S0dl1_stop
+[   23.533011]  (5)[910:AudioOut_D]mtk_pcm_I2S0dl1_close
+[   23.544897]  (5)[910:AudioOut_D]-RF clk_buf_ctrl(CLK_BUF_AUDIO,false)
+[   23.720027]  (4)[208:bat_routine_thr][Auxadc] [AUXADC] ch:3(2c5, 64f, 1, 1)
+[   23.738453]  (4)[208:bat_routine_thr][Auxadc] [AUXADC] ch:3(2c3, 64b, 1, 1)
+[   23.752228]  (4)[208:bat_routine_thr][kernel]AvgVbat 4254,bat_vol 4278, AvgI 543, I 602, VChr 5090, AvgT 22, T 22, ZCV 4326, CHR_Type 1, SOC  92: 92: 94, bcct 1:0, Ichg 500, IBat 137
+[   24.018842]  (5)[208:bat_routine_thr][BATTERY] Battery pre health is Good,current temperature is 22 
+[   24.018863]  (5)[208:bat_routine_thr][BATTERY] Default CC mode charging : 50000, input current = 50000
+[   24.020456]  (5)[208:bat_routine_thr]Can't find closest level 
+[   24.020465]  (5)[208:bat_routine_thr]charging_set_current current is 55000 Fan REG4[6:4]=0
+[   24.025038]  (4)[208:bat_routine_thr][BATTERY] set_bat_charging_current_limit (500)
+[   24.025056]  (4)[208:bat_routine_thr][mt_battery_CheckBatteryStatus]  chargingenablebytemp =1,state=4097
+[   24.025096]  (4)[208:bat_routine_thr][adc_driver]: channel0[0]raw =2834
+[   24.038340]  (4)[208:bat_routine_thr]adc: channel4[0]vol =1037
+[   24.038392]  (4)[208:bat_routine_thr][adc_driver]: channel0[1]raw =2834
+[   24.058336]  (4)[208:bat_routine_thr]adc: channel4[1]vol =1037
+[   24.058384]  (4)[208:bat_routine_thr][adc_driver]: channel0[2]raw =2832
+[   24.078303]  (4)[208:bat_routine_thr]adc: channel4[2]vol =1037
+[   24.078320]  (4)[208:bat_routine_thr][BATT_ID] bat_id_vol:1037
+[   24.078328]  (4)[208:bat_routine_thr]battery id is right(BYD),  battery id:  1037
+[   24.079175]  (4)[208:bat_routine_thr][BATTERY] CC mode charge, timer=30 on 40!!
+[   24.080560]  (4)[208:bat_routine_thr]charger_type=1
+[   24.081256]  (5)[208:bat_routine_thr][BATTERY] Default CC mode charging : 50000, input current = 50000
+[   24.082874]  (4)[208:bat_routine_thr]Can't find closest level 
+[   24.082889]  (4)[208:bat_routine_thr]charging_set_current current is 55000 Fan REG4[6:4]=0
+[   24.086070]  (4)[208:bat_routine_thr]Fan OREG[7:2]=45
+[   24.089719]  (4)[208:bat_routine_thr][fan5405] [0x0]=0xd0 [0x1]=0x78 [0x2]=0xb6 [0x3]=0x94 [0x4]=0x8a [0x5]=0x5 [0x6]=0x7a [0x10]=0xca 
+[   24.102265]  (4)[1:init]AEE_MONITOR_SET[status]: 0x1
+[   24.194549]  (4)[1:init]init: Service 'nvram_daemon' (pid 430) exited with status 0
+[   24.578758] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   24.578777] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   24.579696]  (6)[102:hps_main][HPS] END :(0040)(0)(2) action end(200)(220)(0)(2) (0)(4)(0)(1) (386)(113)(2) (161)(113)(0) (1)(220)(114)(0)(220) (4)(0)(3)
+[   24.618374]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   24.619167]  (5)[102:hps_main]CPU6: shutdown
+[   24.619900]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   24.620340]  (5)[102:hps_main][HPS] END :(0400)(0)(3) action end(115)(123)(0)(1) (0)(4)(0)(1) (115)(1)(1) (115)(1)(0) (0)(123)(1)(0)(123) (4)(0)(2)
+[   25.102482]  (4)[194:rpmb_open]AEE_MONITOR_SET[status]: 0x1
+[   25.240571]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(8)
+[   25.240598]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   25.240606]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   25.402540]  (4)[296:logd.auditd]type=1400 audit(1483538498.800:40): avc: denied { getattr } for pid=1802 comm=73657276696365203138 path="/sys/devices/system/cpu/cpu5/topology/core_id" dev="sysfs" ino=17883 scontext=u:r:adbd:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0
+[   25.419680]  (4)[296:logd.auditd]type=1400 audit(1483538498.820:41): avc: denied { getattr } for pid=1803 comm=73657276696365203138 path="/sys/devices/system/cpu/cpu5/topology/core_siblings" dev="sysfs" ino=17886 scontext=u:r:adbd:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0
+[   25.438503]  (4)[296:logd.auditd]type=1400 audit(1483538498.840:42): avc: denied { getattr } for pid=1804 comm=73657276696365203138 path="/sys/devices/system/cpu/cpu5/topology/core_siblings_list" dev="sysfs" ino=17887 scontext=u:r:adbd:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0
+[   25.489331]  (4)[296:logd.auditd]type=1400 audit(1483538498.890:43): avc: denied { getattr } for pid=1807 comm=73657276696365203138 path="/sys/devices/system/cpu/cpu5/topology/physical_package_id" dev="sysfs" ino=17882 scontext=u:r:adbd:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0
+[   25.508009]  (4)[296:logd.auditd]type=1400 audit(1483538498.900:44): avc: denied { getattr } for pid=1808 comm=73657276696365203138 path="/sys/devices/system/cpu/cpu5/topology/thread_siblings" dev="sysfs" ino=17884 scontext=u:r:adbd:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0
+[   25.528060]  (4)[296:logd.auditd]type=1400 audit(1483538498.920:45): avc: denied { getattr } for pid=1809 comm=73657276696365203138 path="/sys/devices/system/cpu/cpu5/topology/thread_siblings_list" dev="sysfs" ino=17885 scontext=u:r:adbd:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0
+[   26.102721] -(4)[0:swapper/4]AEE_MONITOR_SET[status]: 0x1
+[   26.207669] -(4)[0:swapper/4]Power/swap DP: No enter --- SODI3: No enter --- SODI: No enter --- 
+[   26.819701]  (4)[1487:system_server]BOOTPROF:     26819.687832:Android:PMS_scan_data:/system/app
+[   27.102972]  (4)[194:rpmb_open]AEE_MONITOR_SET[status]: 0x1
+[   27.250244]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(9)
+[   27.250271]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   27.250279]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   28.103211]  (5)[1487:system_server]AEE_MONITOR_SET[status]: 0x1
+[   28.132431]  (5)[1487:system_server]BOOTPROF:     28132.415835:Android:PMS_scan_data:/vendor/priv-app
+[   28.210004]  (4)[207:kworker/4:2][Auxadc] [AUXADC] ch:4(2b8, 632, 1, 1)
+[   28.223824]  (4)[1487:system_server]BOOTPROF:     28223.806989:Android:PMS_scan_data:/system/vendor/app
+[   28.453643]  (4)[1487:system_server]BOOTPROF:     28453.625374:Android:PMS_scan_data:/vendor/plugin
+[   28.552390]  (4)[1487:system_server]BOOTPROF:     28552.372605:Android:PMS_scan_END
+[   29.103418] -(6)[0:swapper/6]AEE_MONITOR_SET[status]: 0x1
+[   29.258682] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   29.258704] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   29.259849] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   29.259869] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   29.260886]  (7)[102:hps_main][HPS] END :(0040)(0)(2) action end(199)(371)(0)(2) (0)(4)(0)(1) (385)(123)(0) (123)(123)(0) (1)(371)(124)(0)(371) (4)(0)(4)
+[   29.261154]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(10)
+[   29.261174]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   29.261181]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   29.298383]  (4)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   29.299215]  (4)[102:hps_main]CPU7: shutdown
+[   29.299966]  (4)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   29.300450]  (4)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   29.301286]  (5)[102:hps_main]CPU6: shutdown
+[   29.302094]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   29.302546]  (5)[102:hps_main][HPS] END :(0400)(0)(4) action end(155)(185)(0)(1) (0)(4)(0)(1) (155)(1)(1) (155)(1)(0) (0)(185)(1)(0)(185) (4)(0)(2)
+[   29.356359]  (5)[1487:system_server]BOOTPROF:     29356.345069:Android:PMS_READY
+[   29.477210]  (4)[1487:system_server]<HWMSEN> hwmsen_open
+[   29.477722]  (4)[1487:system_server]<ALS/PS> ps vender_div value: 100
+[   29.477946]  (4)[1487:system_server]<ALS/PS> als vender_div value: 100
+[   29.480755]  (4)[1487:system_server]<ALS/PS> ps_store_active buf=0
+[   29.480765]  (4)[1487:system_server]<ALS/PS> PS disable
+[   29.480772]  (4)[1487:system_server]stk3x1x_obj als enable value = 0
+[   29.480778]  (4)[1487:system_server]<ALS/PS> ps real disable
+[   29.480784]  (4)[1487:system_server]<ALS/PS>  ps_store_active done
+[   29.480902]  (4)[1487:system_server]<ALS/PS> als_store_active buf=0
+[   29.480910]  (4)[1487:system_server]<ALS/PS> ALSPS disable
+[   29.480917]  (4)[1487:system_server]<ALS/PS> AAL status is 1
+[   29.480922]  (4)[1487:system_server]<ALS/PS> alsps real disable
+[   29.480928]  (4)[1487:system_server]<ALS/PS>  alsps_store_active done
+[   29.481846]  (4)[1487:system_server]<HWMSEN> hwmsen_enable_nodata
+[   29.481855]  (4)[1487:system_server]<HWMSEN> hwmsen_enable_nodata 727 : the sensor (0) is not attached!!
+[   29.528339]  (4)[102:hps_main]MobiCore mcd: Cpu 5 is going to die
+[   29.529106]  (4)[102:hps_main]CPU5: shutdown
+[   29.530186]  (4)[102:hps_main]MobiCore mcd: Cpu 5 is dead
+[   29.530601]  (4)[102:hps_main][HPS] END :(0400)(0)(2) action end(6)(6)(0)(0) (0)(4)(0)(1) (264)(6)(0) (6)(6)(0) (0)(6)(6)(0)(6) (4)(0)(1)
+[   29.758907]  (4)[312:healthd]healthd: battery l=94 v=4252 t=22.0 h=2 st=2 chg=u
+[   29.758930]  (4)[312:healthd]healthd: battery l=94 v=4252 t=22.0 h=2 st=2 chg=u
+[   29.758978]  (4)[312:healthd]healthd: send_already = 0
+[   29.809440] -(5)[0:swapper/5]CPU5: Booted secondary processor
+[   29.809460] -(5)[0:swapper/5]Detected VIPT I-cache on CPU5
+[   29.810228]  (5)[102:hps_main][HPS] END :(0040)(0)(1) action end(100)(195)(0)(0) (0)(4)(0)(1) (45)(6)(0) (0)(0)(0) (1)(195)(7)(0)(195) (4)(0)(2)
+[   29.896600]  (5)[1487:system_server]AEEIOCTL_RT_MON_Kick ( 0)
+[   29.896617]  (5)[1487:system_server][Hang_Detect] hang_detect disabled
+[   30.103666] -(6)[0:swapper/6]AEE_MONITOR_SET[status]: 0x1
+[   30.238637] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   30.238658] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   30.239813] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   30.239831] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   30.240732]  (7)[102:hps_main][HPS] END :(0040)(0)(2) action end(199)(449)(0)(1) (0)(4)(0)(1) (480)(10)(1) (179)(10)(0) (1)(449)(11)(0)(449) (4)(0)(4)
+[   30.278390]  (7)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   30.279301]  (5)[102:hps_main]CPU7: shutdown
+[   30.280129]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   30.280589]  (5)[102:hps_main][HPS] END :(0400)(0)(4) action end(218)(259)(0)(1) (0)(4)(0)(1) (218)(1)(1) (218)(1)(0) (0)(259)(1)(0)(259) (4)(0)(3)
+[   30.318412]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   30.319236]  (5)[102:hps_main]CPU6: shutdown
+[   30.320077]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   30.320545]  (5)[102:hps_main][HPS] END :(0400)(0)(3) action end(109)(114)(0)(1) (0)(4)(0)(1) (109)(1)(1) (109)(1)(0) (0)(114)(1)(0)(114) (4)(0)(2)
+[   30.389317]  (4)[60:dlpt_notify_thr][Auxadc] [AUXADC] ch:0(10b6, 656b, 1, 1)
+[   30.391097]  (4)[60:dlpt_notify_thr][Auxadc] [AUXADC] ch:0(10ad, 6531, 1, 1)
+[   30.391111]  (4)[60:dlpt_notify_thr][PBM] [ma_to_mw] 4269(mV) * 5500(mA) = 23479(mW)
+[   30.391129]  (4)[60:dlpt_notify_thr][DLPT_final] 5500,0,94,94,1,5500
+[   30.698323]  (4)[102:hps_main]MobiCore mcd: Cpu 5 is going to die
+[   30.699164]  (4)[102:hps_main]CPU5: shutdown
+[   30.700140]  (4)[102:hps_main]MobiCore mcd: Cpu 5 is dead
+[   30.700568]  (4)[102:hps_main][HPS] END :(0400)(0)(2) action end(0)(1)(0)(0) (0)(4)(0)(1) (236)(10)(1) (0)(10)(0) (0)(1)(10)(0)(1) (4)(0)(1)
+[   30.708263]  (4)[152:hang_detect][Hang_Detect] hang_detect disabled.
+[   30.898691] -(5)[0:swapper/5]CPU5: Booted secondary processor
+[   30.898712] -(5)[0:swapper/5]Detected VIPT I-cache on CPU5
+[   30.899843] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   30.899862] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   30.900637]  (4)[102:hps_main][HPS] END :(0040)(0)(1) action end(100)(201)(0)(0) (0)(4)(0)(1) (59)(4)(1) (0)(0)(0) (1)(201)(5)(0)(201) (4)(0)(3)
+[   30.938412]  (6)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   30.939315]  (5)[102:hps_main]CPU6: shutdown
+[   30.940184]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   30.940663]  (5)[102:hps_main][HPS] END :(0400)(0)(3) action end(134)(133)(0)(1) (0)(4)(0)(1) (134)(1)(1) (134)(1)(0) (0)(133)(1)(0)(133) (4)(0)(2)
+[   31.067901] -(4)[1487:system_server][g_android][USB]state_show, state:CONFIGURED
+[   31.069143]  (4)[1487:system_server]acc_open
+[   31.069177]  (4)[1487:system_server]acc_release
+[   31.103915]  (5)[296:logd.auditd]AEE_MONITOR_SET[status]: 0x1
+[   31.180490]  (5)[296:logd.auditd]type=1400 audit(1483538504.580:46): avc: denied { read } for pid=2081 comm="Thread-2" name="ged" dev="proc" ino=4026533840 scontext=u:r:system_server:s0 tcontext=u:object_r:proc_ged:s0 tclass=file permissive=0
+[   31.197681] -(5)[0:swapper/5]Power/swap CNT(dpidle,rgidle): [0] = (0,0), [1] = (0,0), [2] = (0,0), [3] = (0,0), [4] = (0,22482), [5] = (0,22629), [6] = (0,4460), [7] = (0,3169), 
+[   31.197705] -(5)[0:swapper/5]Power/swap dpidle_block_cnt: [by_cpu] = 46635, [by_clk] = 237, [by_tmr] = 0, [by_oth] = 0, [by_vtg] = 0, [by_frm] = 8133, [by_pll] = 0, [by_pwm] = 0, [by_dvfsp] = 0, [by_conn] = 0, 
+[   31.197717] -(5)[0:swapper/5]Power/swap dpidle_block_mask: 0x00000000, 0x00000000, 0x00000006, 0x00010003, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 
+[   31.203948]  (5)[453:goodixfingerpri][gf] gf_open, 1143, enter
+[   31.203964]  (5)[453:goodixfingerpri][gf] gf_open, Found
+[   31.203971]  (5)[453:goodixfingerpri][gf] gf_open, Success to open device. irq = 0
+[   31.203978]  (5)[453:goodixfingerpri][gf] gf_open, 1161, exit
+[   31.204001]  (5)[453:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.204009]  (5)[453:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=8001670b
+[   31.204015]  (5)[453:goodixfingerpri][gf] gf_ioctl: GF_IOC_GET_FW_INFO ======
+[   31.204022]  (5)[453:goodixfingerpri][gf] gf_ioctl: firmware info  0x0
+[   31.204028]  (5)[453:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.204035]  (5)[453:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.204042]  (5)[453:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=6702
+[   31.204048]  (5)[453:goodixfingerpri][gf] gf_ioctl: chip reset command
+[   31.228688] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   31.228706] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   31.229540]  (6)[102:hps_main][HPS] END :(0040)(0)(2) action end(200)(234)(0)(1) (0)(4)(0)(1) (468)(7)(1) (190)(7)(0) (1)(234)(8)(0)(234) (4)(0)(3)
+[   31.250893] -(4)[0:swapper/4]Power/swap DP: No enter --- SODI3: No enter --- SODI: No enter --- 
+[   31.269095]  (5)[453:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.270226]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(11)
+[   31.270252]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   31.270259]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   31.307598]  (6)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   31.308537]  (5)[102:hps_main]CPU6: shutdown
+[   31.309492]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   31.310018]  (5)[102:hps_main][HPS] END :(0400)(0)(3) action end(121)(118)(0)(0) (0)(4)(0)(1) (295)(2)(2) (121)(2)(0) (0)(118)(2)(0)(118) (4)(0)(2)
+[   31.311853]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_ta_entry]  TA_CreateEntryPoint
+[   31.312375]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_ta_entry]  TA_OpenSessionEntryPoint enter
+[   31.312387]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_ta_entry]  allocated session at 0037f238
+[   31.312397]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_ta_entry]  TA_OpenSessionEntryPoint exit
+[   31.312461]  (5)[453:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.312469]  (5)[453:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=40046705
+[   31.312477]  (5)[453:goodixfingerpri][gf] gf_ioctl: GF_IOC_ENABLE_SPI_CLK ======
+[   31.312491]  (5)[453:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.313587]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][gf_milan_detect_sensor] chip id=0x002202a0
+[   31.314033]  (4)[453:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.314042]  (4)[453:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=6706
+[   31.314049]  (4)[453:goodixfingerpri][gf] gf_ioctl: GF_IOC_DISABLE_SPI_CLK ======
+[   31.314062]  (4)[453:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.314682]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.314697]  (5)[2097:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=8001670b
+[   31.314704]  (5)[2097:goodixfingerpri][gf] gf_ioctl: GF_IOC_GET_FW_INFO ======
+[   31.314711]  (5)[2097:goodixfingerpri][gf] gf_ioctl: firmware info  0x0
+[   31.314718]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.314947]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.314956]  (5)[2097:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=40046705
+[   31.314963]  (5)[2097:goodixfingerpri][gf] gf_ioctl: GF_IOC_ENABLE_SPI_CLK ======
+[   31.314978]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.372822]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] open so(gf_otp_info.so) success
+[   31.373386]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][milan_f_update_config_array_from_opt] REG[0130]:0064
+[   31.373401]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][milan_f_update_config_array_from_opt] new REG[0220]:0064
+[   31.373948]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][milan_f_update_config_array_from_opt] REG[0140]:0000
+[   31.373959]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][milan_f_update_config_array_from_opt] new REG[0140]:0000
+[   31.374506]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][milan_f_update_config_array_from_opt] REG[0200]:1e1c
+[   31.374517]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][milan_f_update_config_array_from_opt] REG[0200]:1e1c
+[   31.375112]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][milan_f_update_config_array_from_opt] REG[0220]:0328
+[   31.375124]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][milan_f_update_config_array_from_opt] REG[0220]:0328
+[   31.375134]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][milan_check_sensor_otp_info] OTP check success at boot up phase
+[   31.375926]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][gf_milan_chip_init] vendor id=0x0000
+[   31.377256]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] so(auth_token.so) not exist, ret=0xffff0008
+[   31.377270]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_tee_storage][gf_tee_open_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.377281]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] so(auth_token.so) not exist
+[   31.377293]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.377303]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_ta][gf_ta_load_auth_token] Load secure id failed
+[   31.377315]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan_f_series_nav][gf_milan_f_series_nav_init] Milan-f-series navigation algorithm's version=Milan-E/F/G/L_Navigation_v_1.03.11
+[   31.377324]  (5)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.377764]  (4)[2097:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.377774]  (4)[2097:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=6706
+[   31.377781]  (4)[2097:goodixfingerpri][gf] gf_ioctl: GF_IOC_DISABLE_SPI_CLK ======
+[   31.377795]  (4)[2097:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.377986]  (4)[2097:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.377993]  (4)[2097:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=40046705
+[   31.378001]  (4)[2097:goodixfingerpri][gf] gf_ioctl: GF_IOC_ENABLE_SPI_CLK ======
+[   31.378012]  (4)[2097:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.378934]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.378945]  (5)[2097:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=6706
+[   31.378952]  (5)[2097:goodixfingerpri][gf] gf_ioctl: GF_IOC_DISABLE_SPI_CLK ======
+[   31.378964]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.379075]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.379082]  (5)[2097:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=80016700
+[   31.379089]  (5)[2097:goodixfingerpri][gf] gf_ioctl: GF_IOC_INIT gf init====== cmd=80016700
+[   31.379096]  (5)[2097:goodixfingerpri][gf] gf_ioctl: Linux Version V1.01.04
+[   31.379519]  (5)[2097:goodixfingerpri][gf] gf_irq_gpio_cfg, gf_irq = 296
+[   31.379709]  (5)[2097:goodixfingerpri][gf] gf_ioctl irq thread request success!
+[   31.379719]  (5)[2097:goodixfingerpri][gf] gf_disable_irq disable interrupt!
+[   31.379729]  (5)[2097:goodixfingerpri][gf] gf_ioctl: gf init finished======
+[   31.379735]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.379856]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.379864]  (5)[2097:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=6703
+[   31.379871]  (5)[2097:goodixfingerpri][gf] gf_ioctl: GF_IOC_ENABLE_IRQ ======
+[   31.379878]  (5)[2097:goodixfingerpri][gf] gf_enable_irq enable interrupt!
+[   31.379885]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.379893]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.379899]  (5)[2097:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=4008670d
+[   31.379906]  (5)[2097:goodixfingerpri][gf] gf_ioctl: vendor_id 0x0
+[   31.379912]  (5)[2097:goodixfingerpri][gf] gf_ioctl: mode 0x4c
+[   31.379918]  (5)[2097:goodixfingerpri][gf] gf_ioctl: operation 0x2e
+[   31.379924]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.379935]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.379941]  (5)[2097:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=40046705
+[   31.379948]  (5)[2097:goodixfingerpri][gf] gf_ioctl: GF_IOC_ENABLE_SPI_CLK ======
+[   31.379961]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.380179]  (5)[2101:goodixfingerpri][gf] [gf_netlink_recv] : enter 
+[   31.380187]  (5)[2101:goodixfingerpri][gf] [gf_netlink_recv] : pid: 453, msg: GF
+[   31.380577]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][milan_read_tcode_and_fdt_threshold] update IMAGE configuration's 0x005C register to 0x000000d0
+[   31.381463]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][milan_get_fifo_spi_rates] get image fifo rate=8 , nav fifo rate=10
+[   31.383052]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] chip_series=1
+[   31.383066]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] flag_chip_info=907411461
+[   31.383076]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] thr_select_bmp=800
+[   31.383089]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] chip_id=0xa0, 0x02, 0x22, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+[   31.383103]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] vendor_id=0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+[   31.383116]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] sensor_id=0x08, 0x66, 0x26, 0x07, 0x94, 0x14, 0xe1, 0x05, 0x22, 0x62, 0x23, 0x91, 0x02, 0x10, 0x24, 0x29
+[   31.383125]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] max_fingers=32
+[   31.383135]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] max_fingers_per_user=5
+[   31.383144]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] support_bio_assay=0
+[   31.383154]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] enrolling_min_templates=8
+[   31.383163]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] valid_image_quality_threshold=25
+[   31.383173]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] valid_image_area_threshold=65
+[   31.383183]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] duplicate_finger_overlay_score=70
+[   31.383193]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] increase_rate_between_stitch_info=15
+[   31.383203]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] forbidden_enroll_duplicate_fingers=1
+[   31.383212]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] authenticate_order=0
+[   31.383222]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] algorithm version:Milan_v_2.03.03
+[   31.383232]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_init] preprocess version:Preprocess_v_1.01.01
+[   31.402857]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] open so(gf_calibration.so) success
+[   31.402879]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_algo][gf_algo_load_calibration] milan f series & milan a series should decode B from so
+[   31.404834]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] open so(gf_fdt_base.so) success
+[   31.416810]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] open so(gf_nav_base.so) success
+[   31.416828]  (5)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.416838]  (5)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.416848]  (5)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.416856]  (5)[284:mc_log]MobiCore mcd: 702|SpiEnableDma, TX [4d000]
+[   31.422870]  (5)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.422882]  (5)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.422892]  (5)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.426158]  (5)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.426168]  (5)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (3) ms start
+[   31.426178]  (5)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(3)ms, real sleep(3)ms
+[   31.426841]  (5)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.426851]  (5)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.427494]  (5)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.429061]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][gf_milan_set_mode] current_mode=MODE_IDLE, current_mode_code=8, cur_chip_state=5, new_mode=MODE_NAV_BASE, new_mode_code=5
+[   31.429071]  (4)[284:mc_log]MobiCore mcd: 702|SpiEnableDma, TX [4d000]
+[   31.435057]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.435067]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.435078]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.435314]  (4)[2100:irq/296-goodix_][gf] gf_irq, 649, enter
+[   31.435322]  (4)[2100:irq/296-goodix_][gf] [gf_netlink_send] : enter, send command 1
+[   31.435335]  (5)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.435355]  (4)[2100:irq/296-goodix_][gf] [gf_netlink_send] : send done, data length is 32
+[   31.435362]  (4)[2100:irq/296-goodix_][gf] gf_irq, 654, exit
+[   31.435487]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][gf_milan_data_sample_resume] didn't suspend data sampling, so don't need to re-trigger
+[   31.436001]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.436009]  (5)[2097:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=6706
+[   31.436016]  (5)[2097:goodixfingerpri][gf] gf_ioctl: GF_IOC_DISABLE_SPI_CLK ======
+[   31.436030]  (5)[2097:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.436063]  (4)[2098:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.436070]  (4)[2098:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=40046705
+[   31.436078]  (4)[2098:goodixfingerpri][gf] gf_ioctl: GF_IOC_ENABLE_SPI_CLK ======
+[   31.436088]  (4)[2098:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.437707]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] so(finger_0_0.so) not exist, ret=0xffff0008
+[   31.437723]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_tee_storage][gf_tee_open_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.437733]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] so(finger_0_0.so) not exist
+[   31.437745]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.438287]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] so(finger_0_0_bak.so) not exist, ret=0xffff0008
+[   31.438300]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_tee_storage][gf_tee_open_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.438311]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] so(finger_0_0_bak.so) not exist
+[   31.438323]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.438333]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_ta][gf_ta_load_finger] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.438344]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_ta][gf_ta_switch_fingerprint_user] load group_id(0), index(0) failed
+[   31.439964]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] so(finger_0_1.so) not exist, ret=0xffff0008
+[   31.439984]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_tee_storage][gf_tee_open_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.439996]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] so(finger_0_1.so) not exist
+[   31.440008]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.441608]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] so(finger_0_1_bak.so) not exist, ret=0xffff0008
+[   31.441627]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_tee_storage][gf_tee_open_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.441639]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] so(finger_0_1_bak.so) not exist
+[   31.441651]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.441661]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_ta][gf_ta_load_finger] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.441672]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_ta][gf_ta_switch_fingerprint_user] load group_id(0), index(1) failed
+[   31.442322]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] so(finger_0_2.so) not exist, ret=0xffff0008
+[   31.442361]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_tee_storage][gf_tee_open_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.442373]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] so(finger_0_2.so) not exist
+[   31.442384]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.444006]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] so(finger_0_2_bak.so) not exist, ret=0xffff0008
+[   31.444021]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_tee_storage][gf_tee_open_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.444031]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] so(finger_0_2_bak.so) not exist
+[   31.444043]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.444054]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_ta][gf_ta_load_finger] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.444064]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_ta][gf_ta_switch_fingerprint_user] load group_id(0), index(2) failed
+[   31.444681]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] so(finger_0_3.so) not exist, ret=0xffff0008
+[   31.444695]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_tee_storage][gf_tee_open_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.444705]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] so(finger_0_3.so) not exist
+[   31.444717]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.445905]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] so(finger_0_3_bak.so) not exist, ret=0xffff0008
+[   31.445919]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_tee_storage][gf_tee_open_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.445930]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] so(finger_0_3_bak.so) not exist
+[   31.445941]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.445952]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_ta][gf_ta_load_finger] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.445962]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_ta][gf_ta_switch_fingerprint_user] load group_id(0), index(3) failed
+[   31.446681]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] so(finger_0_4.so) not exist, ret=0xffff0008
+[   31.446694]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_tee_storage][gf_tee_open_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.446705]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] so(finger_0_4.so) not exist
+[   31.446716]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.447260]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] so(finger_0_4_bak.so) not exist, ret=0xffff0008
+[   31.447273]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_tee_storage][gf_tee_open_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.447284]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] so(finger_0_4_bak.so) not exist
+[   31.447296]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_secure_object] [gf_so_load_persistent_object] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.447306]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_ta][gf_ta_load_finger] exit. err=GF_ERROR_OPEN_SECURE_OBJECT_FAILED, errno=1033
+[   31.447317]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_ta][gf_ta_switch_fingerprint_user] load group_id(0), index(4) failed
+[   31.447325]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.447821]  (4)[2098:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.447830]  (4)[2098:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=6706
+[   31.447837]  (4)[2098:goodixfingerpri][gf] gf_ioctl: GF_IOC_DISABLE_SPI_CLK ======
+[   31.447851]  (4)[2098:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.447886]  (5)[453:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.447894]  (5)[453:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=40046705
+[   31.447901]  (5)[453:goodixfingerpri][gf] gf_ioctl: GF_IOC_ENABLE_SPI_CLK ======
+[   31.447912]  (5)[453:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.448734]  (5)[453:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.448743]  (5)[453:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=6706
+[   31.448750]  (5)[453:goodixfingerpri][gf] gf_ioctl: GF_IOC_DISABLE_SPI_CLK ======
+[   31.448759]  (5)[453:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.449088]  (4)[2099:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.449096]  (4)[2099:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=40046705
+[   31.449103]  (4)[2099:goodixfingerpri][gf] gf_ioctl: GF_IOC_ENABLE_SPI_CLK ======
+[   31.449114]  (4)[2099:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.452015]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][gf_milan_get_irq_type] IRQ type=0x0008
+[   31.452521]  (4)[284:mc_log]MobiCore mcd: 702|SpiEnableDma, TX [53000]
+[   31.467545]  (4)[284:mc_log]MobiCore mcd: 702|SpiEnableDma, TX [55000]
+[   31.476776]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.476795]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.477464]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.477478]  (4)[284:mc_log]MobiCore mcd: 702|SpiEnableDma, TX [4d000]
+[   31.482629]  (5)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.482649]  (5)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.483599]  (5)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.484739]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.484754]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (3) ms start
+[   31.487341]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(3)ms, real sleep(3)ms
+[   31.488355]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.488370]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.489103]  (5)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.492061]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][gf_milan_set_mode] current_mode=MODE_NAV_BASE, current_mode_code=5, cur_chip_state=5, new_mode=MODE_FINGER_BASE, new_mode_code=7
+[   31.492483]  (4)[284:mc_log]MobiCore mcd: 702|SpiEnableDma, TX [4d000]
+[   31.498393]  (5)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.498413]  (5)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.498626]  (5)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.498923]  (5)[2100:irq/296-goodix_][gf] gf_irq, 649, enter
+[   31.498932]  (5)[2100:irq/296-goodix_][gf] [gf_netlink_send] : enter, send command 1
+[   31.498964]  (5)[2100:irq/296-goodix_][gf] [gf_netlink_send] : send done, data length is 32
+[   31.498972]  (5)[2100:irq/296-goodix_][gf] gf_irq, 654, exit
+[   31.499697]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.499714]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][gf_milan_data_sample_resume] didn't suspend data sampling, so don't need to re-trigger
+[   31.500266]  (5)[2099:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.500277]  (5)[2099:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=6706
+[   31.500285]  (5)[2099:goodixfingerpri][gf] gf_ioctl: GF_IOC_DISABLE_SPI_CLK ======
+[   31.500299]  (5)[2099:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.500652]  (5)[2099:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.500661]  (5)[2099:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=40046705
+[   31.500667]  (5)[2099:goodixfingerpri][gf] gf_ioctl: GF_IOC_ENABLE_SPI_CLK ======
+[   31.500678]  (5)[2099:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.502325]  (5)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][gf_milan_get_irq_type] IRQ type=0x0008
+[   31.502343]  (5)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.502352]  (5)[284:mc_log]MobiCore mcd: 702|SpiEnableDma, TX [53000]
+[   31.517597]  (5)[284:mc_log]MobiCore mcd: 702|SpiEnableDma, TX [55000]
+[   31.521329]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.521348]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.521359]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.521367]  (4)[284:mc_log]MobiCore mcd: 702|SpiEnableDma, TX [4d000]
+[   31.527431]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.527450]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.527960]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.528328]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.528340]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (3) ms start
+[   31.531328]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(3)ms, real sleep(3)ms
+[   31.533086]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.533105]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.533116]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.568355]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] open so(gf_calibration.so) success
+[   31.613217]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] open so(gf_nav_base.so) success
+[   31.622599]  (4)[1585:PowerManagerSer]<ALS/PS>  als_delay 250000000 ns
+[   31.622720]  (4)[1585:PowerManagerSer]<ALS/PS> als_store_batch buf=0
+[   31.622728]  (4)[1585:PowerManagerSer]<ALS/PS>  als_store_batch not supported
+[   31.622735]  (4)[1585:PowerManagerSer]<ALS/PS>  als_store_batch done: 0
+[   31.622898]  (4)[1585:PowerManagerSer]<ALS/PS> als_store_active buf=1
+[   31.622905]  (4)[1585:PowerManagerSer]<ALS/PS> ALSPS enable data
+[   31.622912]  (4)[1585:PowerManagerSer]stk3x1x_obj als enable value = 1
+[   31.622919]  (4)[1585:PowerManagerSer]stk3x1x_enable_als:enable=1
+[   31.622925]  (4)[1585:PowerManagerSer]<ALS/PS> alsps real enable
+[   31.622936]  (4)[1585:PowerManagerSer]<ALS/PS>  alsps_store_active done
+[   31.628290]  (5)[1487:system_server]BOOTPROF:     31628.272613:AMS:systemReady
+[   31.642212]  (5)[1487:system_server]BOOTPROF:     31642.195459:AMS:AMS_READY
+[   31.647635]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_tee_storage][gf_tee_open_object] open so(gf_fdt_base.so) success
+[   31.652089]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][E][gf_state_common][state_pick_next_operation] g_operation_array is empty,execute default operation!
+[   31.652112]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][gf_milan_set_mode] current_mode=MODE_FINGER_BASE, current_mode_code=7, cur_chip_state=5, new_mode=MODE_KEY, new_mode_code=1
+[   31.653499]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.653517]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.654028]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.654038]  (4)[284:mc_log]MobiCore mcd: 702|SpiEnableDma, TX [4d000]
+[   31.658789] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   31.658810] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   31.659704]  (6)[102:hps_main][HPS] END :(0100)(0)(2) action end(196)(471)(0)(1) (0)(4)(0)(1) (578)(9)(0) (187)(8)(0) (0)(471)(9)(0)(471) (4)(0)(3)
+[   31.661888]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.661907]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.662458]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.665102]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.665120]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (3) ms start
+[   31.666668]  (6)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(3)ms, real sleep(3)ms
+[   31.666679]  (6)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.666689]  (6)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.667756]  (6)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.670843]  (4)[284:mc_log]MobiCore mcd: d01|[GF_TA][I][gf_milan][gf_milan_set_mode] reissue key down for mode=MODE_KEY, mode_code=1
+[   31.670861]  (4)[284:mc_log]MobiCore mcd: 702|SpiEnableDma, TX [4d000]
+[   31.676926]  (4)[284:mc_log]MobiCore mcd: 902|[drIpchLoop] GF_DR version: GF_DR_v1.0
+[   31.676946]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep (1) ms start
+[   31.676956]  (4)[284:mc_log]MobiCore mcd: 902|[gf_dr_ipch][gf_dr_invoke_cmd_entry_point] sleep(1)ms, real sleep(1)ms
+[   31.677590]  (6)[2099:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.677604]  (6)[2099:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=6706
+[   31.677611]  (6)[2099:goodixfingerpri][gf] gf_ioctl: GF_IOC_DISABLE_SPI_CLK ======
+[   31.677626]  (6)[2099:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.677829]  (4)[2098:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.677838]  (4)[2098:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=40046705
+[   31.677845]  (4)[2098:goodixfingerpri][gf] gf_ioctl: GF_IOC_ENABLE_SPI_CLK ======
+[   31.677856]  (4)[2098:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.680755]  (5)[2098:goodixfingerpri][gf] gf_ioctl, 677, enter
+[   31.680771]  (5)[2098:goodixfingerpri][gf] gf_ioctl: gf_ioctl cmd=6706
+[   31.680778]  (5)[2098:goodixfingerpri][gf] gf_ioctl: GF_IOC_DISABLE_SPI_CLK ======
+[   31.680792]  (5)[2098:goodixfingerpri][gf] gf_ioctl, 1023, exit
+[   31.739797]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   31.739858]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   31.741989]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   31.742065]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   31.742484]  (5)[910:AudioOut_D]-RF clk_buf_ctrl(CLK_BUF_AUDIO,true)
+[   31.742646] -(5)[910:AudioOut_D]-----------  AudDrv_Clk_On, Aud_AFE_Clk_cntr:1
+[   31.742758]  (5)[910:AudioOut_D]mtk_pcm_I2S0dl1_close
+[   31.742927] -(5)[910:AudioOut_D]-----------  AudDrv_Clk_On, Aud_AFE_Clk_cntr:1
+[   31.742999]  (5)[910:AudioOut_D]mtk_pcm_I2S0dl1_close
+[   31.743318] -(5)[910:AudioOut_D]-----------  AudDrv_Clk_On, Aud_AFE_Clk_cntr:1
+[   31.755702]  (4)[910:AudioOut_D]Speaker_Amp_Set() value = 1
+[   31.755702]  
+[   31.756902]  (4)[910:AudioOut_D]Speaker_ClassD_Open
+[   31.772218]  (4)[910:AudioOut_D]spk trim offset=2
+[   31.772262]  (4)[910:AudioOut_D]Apply_Speaker_Gain Speaker_pga_gain= 7
+[   31.772534]  (4)[910:AudioOut_D]Audio_Irqcnt1_Set()
+[   31.772547]  (4)[910:AudioOut_D]warn, cannot update irq counter, user_id =           (null), irq1_cnt = 1024
+[   31.807654]  (6)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   31.808602]  (4)[102:hps_main]CPU6: shutdown
+[   31.809361]  (4)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   31.809897]  (4)[102:hps_main][HPS] END :(0400)(0)(3) action end(123)(145)(0)(0) (0)(4)(0)(1) (623)(4)(1) (123)(4)(0) (0)(145)(4)(0)(145) (4)(0)(2)
+[   31.813452]  (4)[1487:system_server]BOOTPROF:     31813.434152:AP_Init:[service]:[com.google.android.inputmethod.latin]:[com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME]:pid:2123
+[   31.836244]  (4)[1487:system_server]BOOTPROF:     31836.226690:AP_Init:[service]:[com.android.systemui]:[com.android.systemui/.ImageWallpaper]:pid:2128:(PersistAP)
+[   31.848658] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   31.848678] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   31.849838] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   31.849858] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   31.850776]  (7)[102:hps_main][HPS] END :(0040)(0)(2) action end(197)(486)(0)(1) (0)(4)(0)(1) (0)(0)(0) (0)(0)(0) (1)(486)(1)(0)(486) (4)(0)(4)
+[   31.882407]  (6)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   31.883283]  (4)[2142:sdcard]sdcardfs version 2.0
+[   31.883299]  (4)[2142:sdcard]sdcardfs: dev_name -> /data/media
+[   31.883307]  (4)[2142:sdcard]sdcardfs: options -> fsuid=1023,fsgid=1023,multiuser,mask=6,userid=0,gid=1015
+[   31.883363]  (4)[2142:sdcard]sdcardfs: mounted on top of /data/media type ext4
+[   31.883712]  (4)[2142:sdcard]SELinux: initialized (dev sdcardfs, type sdcardfs), uses genfs_contexts
+[   31.883972]  (4)[2142:sdcard]sdcardfs version 2.0
+[   31.883986]  (4)[2142:sdcard]sdcardfs: dev_name -> /data/media
+[   31.883993]  (4)[2142:sdcard]sdcardfs: options -> fsuid=1023,fsgid=1023,multiuser,mask=23,userid=0,gid=9997
+[   31.884344]  (4)[2142:sdcard]sdcardfs: mounted on top of /data/media type ext4
+[   31.884374]  (4)[2142:sdcard]SELinux: initialized (dev sdcardfs, type sdcardfs), uses genfs_contexts
+[   31.884586]  (4)[2142:sdcard]sdcardfs version 2.0
+[   31.884596]  (4)[2142:sdcard]sdcardfs: dev_name -> /data/media
+[   31.884603]  (4)[2142:sdcard]sdcardfs: options -> fsuid=1023,fsgid=1023,multiuser,mask=7,userid=0,gid=9997
+[   31.884651]  (4)[2142:sdcard]sdcardfs: mounted on top of /data/media type ext4
+[   31.884671]  (4)[2142:sdcard]SELinux: initialized (dev sdcardfs, type sdcardfs), uses genfs_contexts
+[   31.899303]  (6)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   31.916654]  (4)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   31.933474]  (7)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   31.951518]  (4)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   31.968291]  (6)[187:read_poweroff_l]ram_console: open expdb partition error [-2]!
+[   31.968763]  (7)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   31.985001]  (7)[1487:system_server]BOOTPROF:     31984.982998:AP_Init:[]:[WebViewLoader-armeabi-v7a]:pid:2162
+[   31.985400]  (6)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.003012]  (5)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.007721]  (6)[1487:system_server]BOOTPROF:     32007.707306:AP_Init:[]:[WebViewLoader-arm64-v8a]:pid:2170
+[   32.015329]  (6)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.019580]  (5)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.036494]  (5)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.053672]  (6)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.058131]  (7)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.070784]  (5)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.079831]  (6)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.088151]  (7)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.104403]  (5)[2108:PhotonicModulat]AEE_MONITOR_SET[status]: 0x1
+[   32.105684]  (5)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.122365]  (5)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.131109]  (4)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.139288]  (7)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.153680]  (5)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.157758]  (4)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.173666]  (5)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.190805]  (4)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.195246]  (4)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.208030]  (4)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.223760]  (5)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.225029]  (6)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.242844]  (6)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   32.243816]  (4)[108:kworker/u16:1]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.265292]  (7)[108:kworker/u16:1]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.294013]  (4)[1487:system_server]BOOTPROF:     32293.994307:SystemServer:NetworkManagementService systemReady
+[   32.320245]  (5)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.339035]  (7)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.356902]  (7)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.373239]  (4)[108:kworker/u16:1]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.388592]  (4)[1487:system_server]BOOTPROF:     32388.574692:SystemServer:NetworkStatsService systemReady
+[   32.441051]  (4)[108:kworker/u16:1]binder: [name:binder&]binder_flush: 469 woke 2 threads
+[   32.461686]  (5)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 3 threads
+[   32.504610]  (6)[601:debuggerd64][Power/PPM] [ERROR]@mt_ppm_sysboost_core: Invalid input: user = 6, core_num = 4
+[   32.506303]  (6)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.506367]  (6)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.508411]  (6)[601:debuggerd64][Power/PPM] [ERROR]@mt_ppm_sysboost_core: Invalid input: user = 6, core_num = 0
+[   32.515731]  (5)[601:debuggerd64][Power/PPM] [ERROR]@mt_ppm_sysboost_core: Invalid input: user = 6, core_num = 4
+[   32.516784]  (7)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   32.520712]  (4)[601:debuggerd64][Power/PPM] [ERROR]@mt_ppm_sysboost_core: Invalid input: user = 6, core_num = 0
+[   32.529396]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.529454]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.531480]  (6)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   32.545440]  (6)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   32.552595]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.552658]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.559205]  (6)[108:kworker/u16:1]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   32.568388]  (7)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   32.569291]  (4)[102:hps_main]CPU7: shutdown
+[   32.570409]  (4)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   32.570938]  (4)[102:hps_main][HPS] END :(0400)(0)(4) action end(253)(277)(0)(2) (0)(4)(0)(1) (927)(20)(2) (253)(20)(0) (0)(277)(20)(0)(277) (4)(0)(3)
+[   32.575866]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.575926]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.599027]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.599087]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.608427]  (4)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   32.609258]  (4)[102:hps_main]CPU6: shutdown
+[   32.610339]  (4)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   32.610844]  (4)[102:hps_main][HPS] END :(0400)(0)(3) action end(143)(149)(0)(1) (0)(4)(0)(1) (143)(1)(1) (143)(1)(0) (0)(149)(1)(0)(149) (4)(0)(2)
+[   32.622258]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.622317]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.645456]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.645520]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.668753]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.668810]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.669470]  (5)[1487:system_server]BOOTPROF:     32669.458308:SystemServer:NetworkPolicyManagerService systemReady
+[   32.691902]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.691961]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.715135]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.715193]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.738405]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.738463]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.749500]  (4)[1487:system_server]BOOTPROF:     32749.481846:SystemServer:ConnectivityService systemReady
+[   32.754478]  (5)[2247:watchdog]AEEIOCTL_RT_MON_Kick ( 300)
+[   32.754494]  (5)[2247:watchdog][Hang_Detect] hang_detect enabled 10
+[   32.761581]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.761634]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.784778]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.784837]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.808005]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.808062]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.808742] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   32.808757] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   32.809919] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   32.809941] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   32.810855]  (4)[102:hps_main][HPS] END :(0040)(0)(2) action end(200)(400)(0)(2) (0)(4)(0)(1) (506)(4)(1) (195)(4)(0) (1)(400)(5)(0)(400) (4)(0)(4)
+[   32.831269]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.831333]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.848421]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   32.849606]  (5)[102:hps_main]CPU7: shutdown
+[   32.850503]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   32.851024]  (5)[102:hps_main][HPS] END :(0400)(0)(4) action end(250)(280)(19)(2) (0)(4)(0)(1) (250)(1)(1) (250)(1)(0) (0)(280)(1)(0)(280) (4)(0)(3)
+[   32.854462]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.854521]  (5)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.877677]  (6)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.877734]  (6)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.885829]  (5)[1487:system_server]BOOTPROF:     32885.813000:SystemServer:PhaseThirdPartyAppsCanStart
+[   32.900886]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.900949]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.911306]  (4)[1487:system_server]BOOTPROF:     32911.289924:AP_Init:[added application]:[com.android.phone]:[com.android.phone]:pid:2257:(PersistAP)
+[   32.924117]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.924176]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.929745]  (4)[1487:system_server]BOOTPROF:     32929.727154:AP_Init:[added application]:[com.mediatek.ims]:[com.mediatek.ims]:pid:2268:(PersistAP)
+[   32.945271]  (6)[1487:system_server]BOOTPROF:     32945.253616:AP_Init:[added application]:[com.jrdcom.jrdwfcmanager]:[com.jrdcom.jrdwfcmanager]:pid:2282:(PersistAP)
+[   32.947340]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.947409]  (4)[910:AudioOut_D]Audio_Speaker_Pga_Gain_Set Speaker_pga_gain= 7
+[   32.977108]  (5)[1487:system_server]BOOTPROF:     32977.091308:AP_Init:[added application]:[com.mediatek.wfo.impl]:[com.mediatek.wfo.impl]:pid:2295:(PersistAP)
+[   32.993991]  (5)[1487:system_server]BOOTPROF:     32993.972693:AP_Init:[added application]:[com.android.contacts]:[com.android.contacts]:pid:2308:(PersistAP)
+[   33.008710] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   33.008731] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   33.009644]  (7)[102:hps_main][HPS] END :(0040)(0)(3) action end(299)(766)(0)(3) (0)(4)(0)(1) (805)(3)(0) (287)(3)(0) (1)(766)(4)(0)(766) (4)(0)(4)
+[   33.014300]  (5)[1487:system_server]BOOTPROF:     33014.284385:AP_Init:[added application]:[com.android.dialer]:[com.android.dialer]:pid:2322:(PersistAP)
+[   33.048382]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   33.049497]  (4)[102:hps_main]CPU7: shutdown
+[   33.050409]  (4)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   33.050954]  (4)[102:hps_main][HPS] END :(0400)(0)(4) action end(253)(397)(2)(0) (0)(4)(0)(1) (253)(1)(1) (253)(1)(0) (0)(397)(1)(0)(397) (4)(0)(3)
+[   33.052105]  (5)[1502:Binder:1487_2]BOOTPROF:     33052.088616:AP_Init:[activity]:[com.android.settings]:[com.android.settings/.FallbackHome]:pid:2341
+[   33.070623]  (4)[1487:system_server]BOOTPROF:     33070.605539:Android:SysServerInit_END
+[   33.076833]  (6)[296:logd.auditd]type=1400 audit(1483538506.470:47): avc: denied { getattr } for pid=2128 comm="ndroid.systemui" path="/data/data/com.mediatek.op08.plugin" dev="dm-2" ino=1081441 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:system_app_data_file:s0 tclass=dir permissive=0
+[   33.104747] -(7)[0:swapper/7]AEE_MONITOR_SET[status]: 0x1
+[   33.128730] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   33.128753] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   33.129691]  (7)[102:hps_main][HPS] END :(0040)(0)(3) action end(300)(1269)(0)(4) (0)(4)(0)(1) (293)(1)(1) (293)(1)(0) (1)(1269)(2)(0)(1269) (4)(0)(4)
+[   33.220045]  (4)[207:kworker/4:2][Auxadc] [AUXADC] ch:4(2b7, 62f, 1, 1)
+[   33.280929]  (6)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(12)
+[   33.280958]  (6)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   33.280966]  (6)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   33.308390]  (4)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   33.309255]  (4)[102:hps_main]CPU7: shutdown
+[   33.310197]  (4)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   33.310742]  (4)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   33.311537]  (5)[102:hps_main]CPU6: shutdown
+[   33.312540]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   33.313079]  (5)[102:hps_main][HPS] END :(0400)(0)(4) action end(121)(122)(0)(1) (0)(4)(0)(1) (803)(5)(2) (121)(5)(0) (0)(122)(5)(0)(122) (4)(0)(2)
+[   33.445501]  (5)[447:fuelgauged]MTK_FG: FG parameters v1(3051,2989,1254,596) (2993,2932,1232,587) (30,10,10) 60 100 3350 (4,98) (1,1,10) 0
+[   33.445537] -(5)[447:fuelgauged]mtk_rtc_hal_common: rtc_spare_reg[0] = {16412, 127, 8}
+[   33.446717]  (5)[208:bat_routine_thr][Auxadc] [AUXADC] ch:2(21a, 4c9, 1, 1)
+[   33.448484]  (5)[208:bat_routine_thr][Auxadc] [AUXADC] ch:0(10c0, 65a8, 1, 1)
+[   33.451803]  (5)[208:bat_routine_thr][Auxadc] [AUXADC] ch:1(10e8, 669b, 1, 1)
+[   33.456829]  (5)[208:bat_routine_thr][Auxadc] [AUXADC] ch:2(21a, 4ca, 1, 1)
+[   33.458581]  (5)[447:fuelgauged][Auxadc] [AUXADC] ch:3(2c3, 649, 1, 1)
+[   33.508637] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   33.508658] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   33.509946] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   33.509967] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   33.510990]  (7)[102:hps_main][HPS] END :(0040)(0)(2) action end(199)(1162)(0)(1) (0)(4)(0)(1) (353)(4)(1) (135)(4)(0) (1)(1162)(5)(0)(1162) (4)(0)(4)
+[   33.538456] -(6)[447:fuelgauged]mtk_rtc_hal_common: rtc_spare_reg[0] = {16412, 127, 8}
+[   33.538562]  (6)[447:fuelgauged][fg_res] set rtc = 92
+[   33.719574]  (5)[1:init]init: avc:  denied  { set } for property=net.handover.rat pid=326 uid=1001 gid=1001 scontext=u:r:mtkmal:s0 tcontext=u:object_r:system_prop:s0 tclass=property_service permissive=0
+[   33.719610]  (5)[1:init]init: sys_prop: permission denied uid:1001  name:net.handover.rat
+[   33.720277]  (4)[208:bat_routine_thr][Auxadc] [AUXADC] ch:3(2be, 63f, 1, 1)
+[   33.742024]  (7)[208:bat_routine_thr][Auxadc] [AUXADC] ch:3(2c0, 642, 1, 1)
+[   33.775492]  (4)[208:bat_routine_thr][kernel]AvgVbat 4256,bat_vol 4288, AvgI 548, I 558, VChr 5090, AvgT 22, T 23, ZCV 4326, CHR_Type 1, SOC  92: 92: 94, bcct 1:0, Ichg 500, IBat -42
+[   33.844822]  (6)[342:Binder:325_1][ION]warn: ion mm heap allocate buffer size: 3686400 time: 14111615 ns --10
+[   33.910033]  (4)[1555:android.display]BOOTPROF:     33910.015003:AP_Launch: com.android.settings/.FallbackHome 871ms
+[   33.915562]  (6)[1519:ActivityManager]BOOTPROF:     33915.544311:AMS:ENABLE_SCREEN
+[   33.995142]  (5)[1:init]init: Starting service 'volte_stack'...
+[   33.998631]  (5)[1:init]init: Starting service 'volte_ua'...
+[   34.005990]  (5)[1:init]init: Starting service 'volte_imcb'...
+[   34.038794]  (7)[208:bat_routine_thr][BATTERY] Battery pre health is Good,current temperature is 22 
+[   34.038816]  (7)[208:bat_routine_thr][BATTERY] Default CC mode charging : 50000, input current = 50000
+[   34.040955]  (7)[208:bat_routine_thr]Can't find closest level 
+[   34.040977]  (7)[208:bat_routine_thr]charging_set_current current is 55000 Fan REG4[6:4]=0
+[   34.045456]  (7)[208:bat_routine_thr][BATTERY] set_bat_charging_current_limit (500)
+[   34.045476]  (7)[208:bat_routine_thr][mt_battery_CheckBatteryStatus]  chargingenablebytemp =1,state=4097
+[   34.045517]  (7)[208:bat_routine_thr][adc_driver]: channel0[0]raw =2825
+[   34.059683]  (7)[208:bat_routine_thr]adc: channel4[0]vol =1034
+[   34.059736]  (7)[208:bat_routine_thr][adc_driver]: channel0[1]raw =2824
+[   34.078287]  (4)[208:bat_routine_thr]adc: channel4[1]vol =1034
+[   34.078342]  (4)[208:bat_routine_thr][adc_driver]: channel0[2]raw =2827
+[   34.098291]  (4)[208:bat_routine_thr]adc: channel4[2]vol =1035
+[   34.098308]  (4)[208:bat_routine_thr][BATT_ID] bat_id_vol:1034
+[   34.098316]  (4)[208:bat_routine_thr]battery id is right(BYD),  battery id:  1034
+[   34.099219]  (6)[208:bat_routine_thr][BATTERY] CC mode charge, timer=40 on 50!!
+[   34.100973]  (6)[208:bat_routine_thr]charger_type=1
+[   34.103697]  (5)[208:bat_routine_thr][BATTERY] Default CC mode charging : 50000, input current = 50000
+[   34.104991]  (4)[208:bat_routine_thr]AEE_MONITOR_SET[status]: 0x1
+[   34.105636]  (4)[208:bat_routine_thr]Can't find closest level 
+[   34.105656]  (4)[208:bat_routine_thr]charging_set_current current is 55000 Fan REG4[6:4]=0
+[   34.109315]  (5)[208:bat_routine_thr]Fan OREG[7:2]=45
+[   34.113500]  (4)[208:bat_routine_thr][fan5405] [0x0]=0xd0 [0x1]=0x78 [0x2]=0xb6 [0x3]=0x94 [0x4]=0x8a [0x5]=0x5 [0x6]=0x7a [0x10]=0xca 
+[   34.538630]  (6)[938:IMCB msg handle]vcodec_open pid = 938, Driver_Open_Count 1
+[   34.538657]  (6)[938:IMCB msg handle][VCODEC] ENC_EMI_USER = 1
+[   34.539549]  (6)[938:IMCB msg handle]vcodec_open pid = 938, Driver_Open_Count 2
+[   34.542980]  (6)[938:IMCB msg handle]vcodec_flush pid = 938, Driver_Open_Count 2
+[   34.543001]  (6)[938:IMCB msg handle]vcodec_release pid = 938, Driver_Open_Count 2
+[   34.543043]  (6)[938:IMCB msg handle][VCODEC] ENC_EMI_USER = 0
+[   34.543446]  (6)[938:IMCB msg handle]vcodec_flush pid = 938, Driver_Open_Count 1
+[   34.543457]  (6)[938:IMCB msg handle]vcodec_release pid = 938, Driver_Open_Count 1
+[   34.544430]  (6)[938:IMCB msg handle]vcodec_open pid = 938, Driver_Open_Count 1
+[   34.544456]  (6)[938:IMCB msg handle][VCODEC] ENC_EMI_USER = 1
+[   34.544923]  (6)[938:IMCB msg handle]vcodec_open pid = 938, Driver_Open_Count 2
+[   34.546568]  (6)[938:IMCB msg handle]vcodec_flush pid = 938, Driver_Open_Count 2
+[   34.546589]  (6)[938:IMCB msg handle]vcodec_release pid = 938, Driver_Open_Count 2
+[   34.546623]  (6)[938:IMCB msg handle][VCODEC] ENC_EMI_USER = 0
+[   34.547051]  (6)[938:IMCB msg handle]vcodec_flush pid = 938, Driver_Open_Count 1
+[   34.547064]  (6)[938:IMCB msg handle]vcodec_release pid = 938, Driver_Open_Count 1
+[   34.689633]  (4)[654:mnld][HIF-SDIO][I]mtk_wcn_wmt_func_ctrl:wmt-exp: OPID(3) type(2) start
+[   34.719045]  (5)[330:mtk_wmtd][HIF-SDIO][I]wmt_ctrl_gps_sync_set:ctrl GPS_SYNC(4)
+[   34.719064]  (5)[330:mtk_wmtd][WMT-FUNC][I]wmt_func_gps_pre_ctrl:ctrl GPS_SYNC_SET(0) ok
+[   34.719956]  (5)[330:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_pin_ctrl:ret = (0)
+[   34.719973]  (5)[330:mtk_wmtd][WMT-FUNC][I]wmt_func_gps_pre_ctrl:set reg for GPS_SYNC function okay by chip ic_pin_ctrl
+[   34.719981]  (5)[330:mtk_wmtd][WMT-FUNC][I]wmt_func_gps_pre_ctrl:ctrl combo chip gps sync function succeed
+[   34.719988]  (5)[330:mtk_wmtd][WMT-FUNC][I]wmt_func_gps_pre_ctrl:host pin used for gps lna
+[   34.719996]  (5)[330:mtk_wmtd][HIF-SDIO][I]wmt_ctrl_gps_lna_set:ctrl GPS_LNA(2)
+[   34.720027]  (5)[330:mtk_wmtd][WMT-FUNC][I]wmt_func_gps_pre_ctrl:ctrl host gps lna function succeed
+[   34.724314]  (6)[330:mtk_wmtd][WMT-CORE][I]wmt_core_dump_func_state:[AF FUNC ON]status(b:0 f:0 g:2 w:0 lpbk:2 coredump:0 wmt:2 ant:0 sd1:0 sd2:0 stp:0)
+[   34.724393]  (5)[654:mnld][HIF-SDIO][I]mtk_wcn_wmt_func_ctrl:OPID(3) type(2) ok
+[   34.724463]  (5)[654:mnld]GPS_compat_ioctl: cmd (11)
+[   34.724470]  (5)[654:mnld]GPS_ioctl(): cmd (11)
+[   34.724478]  (5)[654:mnld]GPS_compat_ioctl: cmd (11)
+[   34.726467]  (6)[654:mnld]GPS_compat_ioctl: cmd (10)
+[   34.726484]  (6)[654:mnld]GPS_ioctl(): cmd (10)
+[   34.726492]  (6)[654:mnld]GPS_compat_ioctl: cmd (10)
+[   34.726576]  (6)[654:mnld]GPS_compat_ioctl: cmd (9)
+[   34.726583]  (6)[654:mnld]GPS_ioctl(): cmd (9)
+[   34.726590]  (6)[654:mnld][GPS] [E]GPS_unlocked_ioctl: Read Efuse not supported in this platform
+[   34.726596]  (6)[654:mnld]GPS_compat_ioctl: cmd (9)
+[   34.726963]  (6)[654:mnld]GPS_compat_ioctl: cmd (7)
+[   34.726975]  (6)[654:mnld]GPS_ioctl(): cmd (7)
+[   34.726983]  (6)[654:mnld]GPS_compat_ioctl: cmd (7)
+[   34.726990]  (6)[654:mnld]GPS_compat_ioctl: cmd (8)
+[   34.726996]  (6)[654:mnld]GPS_ioctl(): cmd (8)
+[   34.727002]  (6)[654:mnld]GPS_compat_ioctl: cmd (8)
+[   34.732878]  (5)[296:logd.auditd]type=1400 audit(1483538508.130:48): avc: denied { search } for pid=2480 comm="mnld" name="user" dev="tmpfs" ino=10745 scontext=u:r:mnld:s0 tcontext=u:object_r:mnt_user_file:s0 tclass=dir permissive=0
+[   34.758808]  (4)[2484:mnld]GPS_compat_ioctl: cmd (21505)
+[   34.758826]  (4)[2484:mnld]GPS_ioctl(): cmd (21505)
+[   34.758833]  (4)[2484:mnld]GPS_compat_ioctl: cmd (21505)
+[   34.758842]  (4)[2484:mnld]GPS_compat_ioctl: cmd (21506)
+[   34.758848]  (4)[2484:mnld]GPS_ioctl(): cmd (21506)
+[   34.758854]  (4)[2484:mnld]GPS_compat_ioctl: cmd (21506)
+[   34.758861]  (4)[2484:mnld]GPS_compat_ioctl: cmd (21515)
+[   34.758866]  (4)[2484:mnld]GPS_ioctl(): cmd (21515)
+[   34.758872]  (4)[2484:mnld]GPS_compat_ioctl: cmd (21515)
+[   34.765180]  (5)[2484:mnld]GPS_compat_ioctl: cmd (21505)
+[   34.765198]  (5)[2484:mnld]GPS_ioctl(): cmd (21505)
+[   34.765205]  (5)[2484:mnld]GPS_compat_ioctl: cmd (21505)
+[   34.765215]  (5)[2484:mnld]GPS_compat_ioctl: cmd (21506)
+[   34.765220]  (5)[2484:mnld]GPS_ioctl(): cmd (21506)
+[   34.765227]  (5)[2484:mnld]GPS_compat_ioctl: cmd (21506)
+[   34.765234]  (5)[2484:mnld]GPS_compat_ioctl: cmd (21515)
+[   34.765240]  (5)[2484:mnld]GPS_ioctl(): cmd (21515)
+[   34.765246]  (5)[2484:mnld]GPS_compat_ioctl: cmd (21515)
+[   34.777424]  (7)[2484:mnld]GPS_compat_ioctl: cmd (21505)
+[   34.777442]  (7)[2484:mnld]GPS_ioctl(): cmd (21505)
+[   34.777449]  (7)[2484:mnld]GPS_compat_ioctl: cmd (21505)
+[   34.777458]  (7)[2484:mnld]GPS_compat_ioctl: cmd (21506)
+[   34.777464]  (7)[2484:mnld]GPS_ioctl(): cmd (21506)
+[   34.777471]  (7)[2484:mnld]GPS_compat_ioctl: cmd (21506)
+[   34.777478]  (7)[2484:mnld]GPS_compat_ioctl: cmd (21515)
+[   34.777484]  (7)[2484:mnld]GPS_ioctl(): cmd (21515)
+[   34.777490]  (7)[2484:mnld]GPS_compat_ioctl: cmd (21515)
+[   35.105319]  (7)[194:rpmb_open]AEE_MONITOR_SET[status]: 0x1
+[   35.291132]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(13)
+[   35.291161]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   35.291169]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   35.657335]  (7)[1377:mtkrild][Power/clkbuf]clk_buf_set_by_flightmode: g/is_flightmode_on=1->0, srcclkena_o1=0, pcm_reg13=0xc004000
+[   35.795309]  (6)[1377:mtkrild][Power/clkbuf]clk_buf_set_by_flightmode: g/is_flightmode_on=0->0, srcclkena_o1=1, pcm_reg13=0x4e04402c
+[   35.931061]  (4)[910:AudioOut_D]Speaker_Amp_Set() value = 0
+[   35.931061]  
+[   35.931083]  (4)[910:AudioOut_D]Speaker_ClassD_close
+[   35.931906] -(4)[910:AudioOut_D]TopCkCount <0 =0
+[   35.931906]  
+[   35.932094] -(4)[910:AudioOut_D]mtk_pcm_I2S0dl1_stop
+[   35.943452]  (4)[910:AudioOut_D]mtk_pcm_I2S0dl1_close
+[   35.955148]  (4)[910:AudioOut_D]-RF clk_buf_ctrl(CLK_BUF_AUDIO,false)
+[   36.105620] -(7)[0:swapper/7]AEE_MONITOR_SET[status]: 0x1
+[   36.209173] -(7)[0:swapper/7]Power/swap CNT(soidle3,rgidle): [0] = (0,0), [1] = (0,0), [2] = (0,0), [3] = (0,0), [4] = (0,23971), [5] = (0,24500), [6] = (0,5556), [7] = (0,4058), 
+[   36.209199] -(7)[0:swapper/7]Power/swap soidle3_block_cnt: [by_cpu] = 0, [by_clk] = 0, [by_tmr] = 0, [by_oth] = 53919, [by_vtg] = 0, [by_frm] = 0, [by_pll] = 0, [by_pwm] = 0, [by_dvfsp] = 0, [by_conn] = 0, 
+[   36.209210] -(7)[0:swapper/7]Power/swap soidle3_block_mask: 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 
+[   36.375142] -(4)[0:swapper/4]Power/swap DP: No enter --- SODI3: No enter --- SODI: No enter --- 
+[   36.394119]  (5)[2518:initCamdevice]OV13855_camera_sensor[OV13855_MIPI_RAW_SensorInit] MICKEY6TTMO: OV13855_MIPI_RAW_SensorInit 
+[   36.394160]  (5)[2518:initCamdevice]OV13855_camera_sensor[feature_control] feature_id = 3003
+[   36.394173]  (5)[2518:initCamdevice]OV13855_camera_sensor[feature_control] feature_id = 3002
+[   36.396702]  (5)[1660:Binder:460_1][ION] error: cache_map_vm_struct is NULL, retry
+[   36.398322]  (4)[2518:initCamdevice]__sched_setscheduler 2519:Imem_Dbg_thread sched_priority=-2
+[   36.434070]  (4)[2518:initCamdevice]OV13855_camera_sensor[open] OV13855,MIPI 4LANE
+[   36.434090]  (4)[2518:initCamdevice]OV13855_camera_sensor[open] preview 2096*1552@30fps,640Mbps/lane; video 4192*3104@30fps,1.2Gbps/lane; capture 13M@30fps,1.2Gbps/lane
+[   36.449174]  (4)[2518:initCamdevice]OV13855_camera_sensor[open] i2c write id: 0x6c, sensor id: 0xd855
+[   36.449191]  (4)[2518:initCamdevice]OV13855_camera_sensor[sensor_init] E
+[   36.488397]  (6)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   36.489318]  (5)[102:hps_main]CPU7: shutdown
+[   36.490390]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   36.490942]  (5)[102:hps_main][HPS] END :(0400)(0)(4) action end(251)(259)(0)(1) (0)(4)(0)(1) (980)(76)(1) (251)(76)(0) (0)(259)(76)(0)(259) (4)(0)(3)
+[   36.578858]  (4)[1660:Binder:460_1]selective_read_region offset =3 size 4 data read = 6
+[   36.579028]  (4)[1660:Binder:460_1]selective_read_region offset =24 size 1868 data read = 255
+[   36.584735]  (4)[1660:Binder:460_1]OV13855_camera_sensor[feature_control] feature_id = 3080
+[   36.584753]  (4)[1660:Binder:460_1]OV13855_camera_sensor[feature_control] SENSOR_FEATURE_GET_CROP_INFO scenarioId:0
+[   36.584769]  (4)[1660:Binder:460_1]OV13855_camera_sensor[feature_control] feature_id = 3080
+[   36.584776]  (4)[1660:Binder:460_1]OV13855_camera_sensor[feature_control] SENSOR_FEATURE_GET_CROP_INFO scenarioId:1
+[   36.584787]  (4)[1660:Binder:460_1]OV13855_camera_sensor[feature_control] feature_id = 3080
+[   36.584794]  (4)[1660:Binder:460_1]OV13855_camera_sensor[feature_control] SENSOR_FEATURE_GET_CROP_INFO scenarioId:2
+[   36.584805]  (4)[1660:Binder:460_1]OV13855_camera_sensor[feature_control] feature_id = 3080
+[   36.584811]  (4)[1660:Binder:460_1]OV13855_camera_sensor[feature_control] SENSOR_FEATURE_GET_CROP_INFO scenarioId:3
+[   36.584822]  (4)[1660:Binder:460_1]OV13855_camera_sensor[feature_control] feature_id = 3080
+[   36.584829]  (4)[1660:Binder:460_1]OV13855_camera_sensor[feature_control] SENSOR_FEATURE_GET_CROP_INFO scenarioId:9
+[   36.594342]  (4)[1501:Binder:1487_1]__sched_setscheduler 2523:F858THREAD sched_priority=-3
+[   36.597254]  (4)[1501:Binder:1487_1]BOOTPROF:     36597.237394:AP_Init:[service]:[com.android.contacts:remote]:[com.android.contacts/.tct.simcontacts.SimContactsService]:pid:2522
+[   36.648516]  (6)[1660:Binder:460_1]OV13855_camera_sensor[close] E
+[   36.648743] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   36.648756] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   36.649666]  (7)[102:hps_main][HPS] END :(0040)(0)(3) action end(297)(815)(0)(4) (0)(4)(0)(1) (795)(3)(0) (269)(3)(0) (1)(815)(4)(0)(815) (4)(0)(4)
+[   36.698698]  (5)[2542:initCamdevice]OV5675_MIPI_RAW_Sensor Init! 
+[   36.698724]  (5)[2542:initCamdevice]feature_id = 3003
+[   36.698737]  (5)[2542:initCamdevice]feature_id = 3002
+[   36.706561]  (5)[2542:initCamdevice]__sched_setscheduler 2545:Imem_Dbg_thread sched_priority=-2
+[   36.733607]  (5)[2542:initCamdevice]ov5675 sensorinit:E
+[   36.733813]  (5)[2542:initCamdevice]ERROR,545: id=1,addr: 36, transfer error
+[   36.733823]  (5)[2542:initCamdevice]ERROR,551: I2C_ACKERR
+[   36.733838]  (5)[2542:initCamdevice][CAMERA SENSOR] I2C send failed!!, Addr = 0x30
+[   36.734112]  (5)[2542:initCamdevice]ERROR,545: id=1,addr: 36, transfer error
+[   36.734122]  (5)[2542:initCamdevice]ERROR,551: I2C_ACKERR
+[   36.734136]  (5)[2542:initCamdevice][CAMERA SENSOR] I2C send failed!!, Addr = 0x30
+[   36.734291]  (5)[2542:initCamdevice]ERROR,545: id=1,addr: 36, transfer error
+[   36.734299]  (5)[2542:initCamdevice]ERROR,551: I2C_ACKERR
+[   36.734311]  (5)[2542:initCamdevice][CAMERA SENSOR] I2C send failed!!, Addr = 0x30
+[   36.734454]  (5)[2542:initCamdevice]ERROR,545: id=1,addr: 36, transfer error
+[   36.734462]  (5)[2542:initCamdevice]ERROR,551: I2C_ACKERR
+[   36.734472]  (5)[2542:initCamdevice][CAMERA SENSOR] I2C send failed!!, Addr = 0x30
+[   36.736096]  (7)[2542:initCamdevice]ov5675 i2c write id: 0x20, sensor id: 0x5675
+[   36.736113]  (7)[2542:initCamdevice]ov5675  Read sensor id fail, id: 0x5675
+[   36.736121]  (7)[2542:initCamdevice]ov5675 sensor begin init
+[   36.736127]  (7)[2542:initCamdevice]OV5675_Sensor_Init_2lane E
+[   36.838171]  (4)[2542:initCamdevice]TCL ov5675 otp info otp_flag:0x40,module_integrator_id:0x44,		lens_id:0x72,vcm_id:0x0,vcm_ic_id:0x0,date is 17-10-28
+[   36.838390]  (4)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   36.838771]  (5)[2542:initCamdevice][ov5675 otp read] addr = 7027
+[   36.839270]  (4)[102:hps_main]CPU7: shutdown
+[   36.840182]  (4)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   36.840737]  (4)[102:hps_main][HPS] END :(0400)(0)(4) action end(234)(233)(0)(2) (0)(4)(0)(1) (981)(5)(2) (234)(5)(0) (0)(233)(5)(0)(233) (4)(0)(3)
+[   36.844859]  (4)[2542:initCamdevice][ov5675 otp read]rg_h = 0x71, rg_l = 0x1, bg_h = 0x85, bg_l = 0x1
+[   36.844877]  (4)[2542:initCamdevice][ov5675 otp read]rg = 0x1c5, bg = 0x215,g_rg = 0x1e1,g_bg = 0x214
+[   36.870267]  (4)[2542:initCamdevice][ov5675 otp write]rg = 0x1c5, bg = 0x215
+[   36.870285]  (4)[2542:initCamdevice][ov5675 otp write]g_rg = 0x1e4, g_bg = 0x215
+[   36.870293]  (4)[2542:initCamdevice][ov5675 otp write]rg=0x1c5, bg=0x215, R_gain=0x445, B_gain=0x400, G_gain=0x400
+[   36.871463]  (4)[2542:initCamdevice]ov5675 sensor init: X
+[   36.873091]  (4)[460:cameraserver]feature_id = 3080
+[   36.873117]  (4)[460:cameraserver]feature_id = 3080
+[   36.873128]  (4)[460:cameraserver]feature_id = 3080
+[   36.873138]  (4)[460:cameraserver]feature_id = 3080
+[   36.873148]  (4)[460:cameraserver]feature_id = 3080
+[   36.887172]  (4)[460:cameraserver]__sched_setscheduler 2553:F858THREAD sched_priority=-3
+[   36.913552]  (4)[460:cameraserver]E
+[   36.918678] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   36.918699] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   36.919592]  (7)[102:hps_main][HPS] END :(0040)(0)(3) action end(299)(482)(0)(2) (0)(4)(0)(1) (255)(1)(1) (255)(1)(0) (1)(482)(2)(0)(482) (4)(0)(4)
+[   37.028403]  (6)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   37.029261]  (6)[102:hps_main]CPU7: shutdown
+[   37.030149]  (6)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   37.030678]  (6)[102:hps_main][HPS] END :(0400)(0)(4) action end(249)(248)(0)(2) (0)(4)(0)(1) (910)(3)(0) (249)(3)(0) (0)(248)(3)(0)(248) (4)(0)(3)
+[   37.105910] -(7)[0:swapper/7]AEE_MONITOR_SET[status]: 0x1
+[   37.177930] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   37.177952] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   37.178819]  (5)[102:hps_main][HPS] END :(0040)(0)(3) action end(296)(441)(0)(2) (0)(4)(0)(1) (732)(3)(0) (250)(3)(0) (1)(441)(4)(0)(441) (4)(0)(4)
+[   37.300668]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(14)
+[   37.300694]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   37.300703]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   37.398378]  (7)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   37.399339]  (4)[102:hps_main]CPU7: shutdown
+[   37.400184]  (4)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   37.400727]  (4)[102:hps_main][HPS] END :(0400)(0)(4) action end(245)(248)(0)(2) (0)(4)(0)(1) (882)(6)(0) (245)(6)(0) (0)(248)(6)(0)(248) (4)(0)(3)
+[   37.598709] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   37.598730] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   37.599611]  (5)[102:hps_main][HPS] END :(0100)(0)(3) action end(279)(378)(0)(2) (0)(4)(0)(1) (862)(5)(2) (291)(4)(0) (0)(378)(5)(0)(378) (4)(0)(4)
+[   37.638400]  (6)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   37.639282]  (5)[102:hps_main]CPU7: shutdown
+[   37.639976]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   37.640504]  (5)[102:hps_main][HPS] END :(0400)(0)(4) action end(208)(210)(0)(1) (0)(4)(0)(1) (208)(1)(1) (208)(1)(0) (0)(210)(1)(0)(210) (4)(0)(3)
+[   37.678388]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   37.679425]  (5)[102:hps_main]CPU6: shutdown
+[   37.680522]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   37.681069]  (5)[102:hps_main][HPS] END :(0400)(0)(3) action end(158)(173)(0)(1) (0)(4)(0)(1) (158)(1)(1) (158)(1)(0) (0)(173)(1)(0)(173) (4)(0)(2)
+[   38.038652] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   38.038673] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   38.039901] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   38.039923] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   38.041067]  (7)[102:hps_main][HPS] END :(0040)(0)(2) action end(199)(1366)(0)(1) (0)(4)(0)(1) (539)(8)(2) (186)(8)(0) (1)(1366)(9)(0)(1366) (4)(0)(4)
+[   38.106167]  (5)[102:hps_main]AEE_MONITOR_SET[status]: 0x1
+[   38.228377]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   38.229268]  (4)[102:hps_main]CPU7: shutdown
+[   38.230058]  (4)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   38.230574]  (4)[102:hps_main][HPS] END :(0400)(0)(4) action end(192)(206)(0)(0) (0)(4)(0)(1) (788)(5)(2) (192)(5)(0) (0)(206)(5)(0)(206) (4)(0)(3)
+[   38.230655]  (4)[207:kworker/4:2][Auxadc] [AUXADC] ch:4(2b5, 62a, 1, 1)
+[   38.249201]  (5)[330:mtk_wmtd][WMT-CORE][I]opfunc_therm_ctrl:Send WMT_THERM_CTRL_CMD command OK!
+[   38.250621]  (5)[330:mtk_wmtd][WMT-CORE][I]opfunc_therm_ctrl:Send WMT_THERM_READ_CMD command OK!
+[   38.251846]  (5)[330:mtk_wmtd][WMT-CORE][I]opfunc_therm_ctrl:Send WMT_THERM_CTRL_CMD command OK!
+[   38.251893]  (4)[207:kworker/4:2][HIF-SDIO][I]wmt_dev_tm_temp_query:[Thermal] current_temp = 0x19
+[   38.308407]  (6)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   38.309293]  (5)[102:hps_main]CPU6: shutdown
+[   38.310199]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   38.310733]  (5)[102:hps_main][HPS] END :(0400)(0)(3) action end(140)(145)(0)(1) (0)(4)(0)(1) (313)(2)(2) (140)(2)(0) (0)(145)(2)(0)(145) (4)(0)(2)
+[   38.428683] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   38.428704] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   38.429897] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   38.429918] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   38.430863]  (7)[102:hps_main][HPS] END :(0040)(0)(2) action end(200)(530)(0)(1) (0)(4)(0)(1) (284)(2)(2) (160)(2)(0) (1)(530)(3)(0)(530) (4)(0)(4)
+[   38.460017]  (5)[2383:Binder:325_4]BOOTPROF:     38460.003706:BOOT_Animation:END
+[   38.460040]  (5)[2383:Binder:325_4]BOOTPROF:     38460.036091: OFF
+[   38.477209]  (4)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 370 woke 2 threads
+[   38.508416]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   38.509498]  (5)[102:hps_main]CPU7: shutdown
+[   38.510267]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   38.510832]  (5)[102:hps_main][HPS] END :(0400)(0)(4) action end(197)(217)(0)(1) (0)(4)(0)(1) (528)(2)(2) (197)(2)(0) (0)(217)(2)(0)(217) (4)(0)(3)
+[   38.548404]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   38.549789]  (5)[102:hps_main]CPU6: shutdown
+[   38.550673]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   38.551204]  (5)[102:hps_main][HPS] END :(0400)(0)(3) action end(163)(193)(0)(1) (0)(4)(0)(1) (163)(1)(1) (163)(1)(0) (0)(193)(1)(0)(193) (4)(0)(2)
+[   38.590112]  (4)[1:init]init: Service 'bootanim' (pid 370) exited with status 0
+[   38.592225]  (4)[1:init]init: Starting service 'exec 7 (/system/bin/bootstat)'...
+[   38.628660] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   38.628680] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   38.629898] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   38.629919] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   38.630919]  (7)[102:hps_main][HPS] END :(0040)(0)(2) action end(200)(473)(0)(3) (0)(4)(0)(1) (196)(1)(1) (196)(1)(0) (1)(473)(2)(0)(473) (4)(0)(4)
+[   38.632679]  (4)[1:init]init: Service 'exec 7 (/system/bin/bootstat)' (pid 2580) exited with status 0
+[   38.633309]  (4)[1:init]init: Starting service 'exec 8 (/system/bin/bootstat)'...
+[   38.652014]  (7)[1:init]init: Service 'exec 8 (/system/bin/bootstat)' (pid 2581) exited with status 0
+[   38.652668]  (7)[1:init]init: Starting service 'exec 9 (/system/bin/bootstat)'...
+[   38.675589]  (7)[1:init]init: Service 'exec 9 (/system/bin/bootstat)' (pid 2582) exited with status 0
+[   38.676267]  (7)[1:init]init: Starting service 'exec 10 (/system/bin/bootstat)'...
+[   38.694205]  (5)[1:init]init: Service 'exec 10 (/system/bin/bootstat)' (pid 2583) exited with status 0
+[   38.728784]  (5)[2340:Binder:1487_A]<ALS/PS>  ps_delay 20000000 ns
+[   38.728937]  (5)[2340:Binder:1487_A]<ALS/PS> ps_store_batch buf=0
+[   38.728945]  (5)[2340:Binder:1487_A]<ALS/PS>  ps_store_batch not supported
+[   38.728952]  (5)[2340:Binder:1487_A]<ALS/PS>  ps_store_batch done: 0
+[   38.729129]  (5)[2340:Binder:1487_A]<ALS/PS> ps_store_active buf=1
+[   38.729137]  (5)[2340:Binder:1487_A]<ALS/PS> PS enable data
+[   38.729144]  (5)[2340:Binder:1487_A]stk3x1x_obj als enable value = 1
+[   38.741634]  (4)[2340:Binder:1487_A]stk3x1x_enable_ps: ps input event=1, ps code = 155
+[   38.741650]  (4)[2340:Binder:1487_A]als_enable_nodata is failed!!
+[   38.741658]  (4)[2340:Binder:1487_A]stk3x1x_obj als enable value = 1
+[   38.741664]  (4)[2340:Binder:1487_A]<ALS/PS> ps real enable
+[   38.741671]  (4)[2340:Binder:1487_A]<ALS/PS>  ps_store_active done
+[   38.747908]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   38.748947]  (5)[102:hps_main]CPU7: shutdown
+[   38.749901]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   38.750447]  (5)[102:hps_main][HPS] END :(0400)(0)(4) action end(226)(251)(0)(1) (0)(4)(0)(1) (914)(3)(0) (226)(3)(0) (0)(251)(3)(0)(251) (4)(0)(3)
+[   38.808500]  (6)[108:kworker/u16:1]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   38.828727]  (4)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   38.841273]  (4)[1:init]init: Starting service 'ged_srv'...
+[   38.842388]  (4)[1:init][name:mt_ppm_main&][Power/PPM] (0x230)(-1)(1)[L_ONLY]: (0)(0)(0)(0) (7)(0)(1)(4) 
+[   38.845450]  (6)[1:init]init: Starting service 'forcc'...
+[   38.848425]  (5)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   38.868693] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   38.868714] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   38.869656]  (7)[102:hps_main][HPS] END :(0040)(0)(3) action end(300)(873)(0)(3) (0)(4)(0)(1) (780)(3)(0) (270)(3)(0) (1)(873)(4)(0)(873) (4)(0)(4)
+[   38.881785]  (4)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   38.947687]  (6)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   38.948671]  (5)[102:hps_main]CPU7: shutdown
+[   38.949440]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   38.949976]  (5)[102:hps_main][HPS] END :(0400)(0)(4) action end(191)(201)(0)(1) (0)(4)(0)(1) (507)(2)(2) (191)(2)(0) (0)(201)(2)(0)(201) (4)(0)(3)
+[   38.988381]  (4)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   38.989562]  (4)[102:hps_main]CPU6: shutdown
+[   38.990296]  (4)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   38.990852]  (4)[102:hps_main][HPS] END :(0400)(0)(3) action end(129)(139)(0)(1) (0)(4)(0)(1) (129)(1)(1) (129)(1)(0) (0)(139)(1)(0)(139) (4)(0)(2)
+[   39.106467]  (4)[61:cfinteractive]AEE_MONITOR_SET[status]: 0x1
+[   39.128298]  (4)[61:cfinteractive][name:mt_cpufreq&][Power/cpufreq] @_cpufreq_set_locked(), MT_CPU_DVFS_BIG: (7, 0): freq = 1508000 (1508000), volt = 110000 (110000), cpus = 2, cur = 1352000
+[   39.168693] -(6)[0:swapper/6]CPU6: Booted secondary processor
+[   39.168712] -(6)[0:swapper/6]Detected VIPT I-cache on CPU6
+[   39.169938] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   39.169958] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   39.170962]  (7)[102:hps_main][HPS] END :(0040)(0)(2) action end(200)(1070)(0)(1) (0)(4)(0)(1) (402)(4)(1) (162)(4)(0) (1)(1070)(5)(0)(1070) (4)(0)(4)
+[   39.314609]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(15)
+[   39.314639]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   39.314646]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   39.845679]  (5)[108:kworker/u16:1]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   39.877723]  (7)[164:kworker/u16:3]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   40.106876]  (7)[60:dlpt_notify_thr]AEE_MONITOR_SET[status]: 0x1
+[   40.393747]  (7)[60:dlpt_notify_thr][Auxadc] [AUXADC] ch:0(108d, 6474, 1, 1)
+[   40.395494]  (5)[60:dlpt_notify_thr][Auxadc] [AUXADC] ch:0(108e, 6478, 1, 1)
+[   40.395520]  (5)[60:dlpt_notify_thr][PBM] [ma_to_mw] 4238(mV) * 5500(mA) = 23309(mW)
+[   40.395543]  (5)[60:dlpt_notify_thr][DLPT_final] 5500,0,94,94,1,5500
+[   41.107291] -(6)[0:swapper/6]AEE_MONITOR_SET[status]: 0x1
+[   41.230893] -(6)[0:swapper/6]Power/swap CNT(soidle,rgidle): [0] = (0,0), [1] = (0,0), [2] = (0,0), [3] = (0,0), [4] = (0,27015), [5] = (0,27604), [6] = (0,6577), [7] = (0,4851), 
+[   41.230920] -(6)[0:swapper/6]Power/swap soidle_block_cnt: [by_cpu] = 55139, [by_clk] = 189, [by_tmr] = 0, [by_oth] = 0, [by_vtg] = 0, [by_frm] = 0, [by_pll] = 0, [by_pwm] = 0, [by_dvfsp] = 0, [by_conn] = 0, 
+[   41.230932] -(6)[0:swapper/6]Power/swap soidle_block_mask: 0x00000000, 0x00000000, 0x00000002, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 
+[   41.248278]  (7)[202:wdtk-7][WDK]: kick Ex WDT,RT[41248268867]
+[   41.295455]  (7)[296:logd.auditd]type=1400 audit(1483538514.690:49): avc: denied { read } for pid=2903 comm="om.tct.launcher" name="u:object_r:tct_default_prop:s0" dev="tmpfs" ino=10438 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:tct_default_prop:s0 tclass=file permissive=0
+[   41.328313]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(16)
+[   41.328341]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   41.328349]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   41.637063] -(4)[0:swapper/4]Power/swap DP: No enter --- SODI3: No enter --- SODI: No enter --- 
+[   42.107613]  (4)[165:kworker/u16:4]AEE_MONITOR_SET[status]: 0x1
+[   42.453758]  (4)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   42.470369]  (4)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   43.107950]  (4)[207:kworker/4:2]AEE_MONITOR_SET[status]: 0x1
+[   43.240186]  (4)[207:kworker/4:2][Auxadc] [AUXADC] ch:4(2b3, 626, 1, 1)
+[   43.341050]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(17)
+[   43.341079]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   43.341087]  (4)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   43.445781]  (5)[447:fuelgauged]MTK_FG: FG parameters v1(3051,2989,1254,596) (2993,2932,1232,587) (30,10,10) 60 100 3350 (4,98) (1,1,10) 0
+[   43.445817] -(5)[447:fuelgauged]mtk_rtc_hal_common: rtc_spare_reg[0] = {16412, 127, 8}
+[   43.447143]  (5)[208:bat_routine_thr][Auxadc] [AUXADC] ch:2(21a, 4c9, 1, 1)
+[   43.449186]  (6)[447:fuelgauged][Auxadc] [AUXADC] ch:3(2bd, 63d, 1, 1)
+[   43.451343]  (5)[208:bat_routine_thr][Auxadc] [AUXADC] ch:0(1099, 64bb, 1, 1)
+[   43.453187]  (7)[208:bat_routine_thr][Auxadc] [AUXADC] ch:1(10bf, 65a3, 1, 1)
+[   43.460133]  (6)[208:bat_routine_thr][Auxadc] [AUXADC] ch:2(21b, 4cb, 1, 1)
+[   43.496448] -(6)[447:fuelgauged]mtk_rtc_hal_common: rtc_spare_reg[0] = {16412, 127, 8}
+[   43.496559]  (6)[447:fuelgauged][fg_res] set rtc = 92
+[   43.730022]  (6)[208:bat_routine_thr][Auxadc] [AUXADC] ch:3(2bc, 63b, 1, 1)
+[   43.746669]  (4)[208:bat_routine_thr][Auxadc] [AUXADC] ch:3(2bd, 63d, 1, 1)
+[   43.763433]  (7)[208:bat_routine_thr][kernel]AvgVbat 4255,bat_vol 4249, AvgI 544, I 455, VChr 5099, AvgT 22, T 23, ZCV 4326, CHR_Type 1, SOC  92: 92: 94, bcct 1:0, Ichg 500, IBat -56
+[   44.028823]  (4)[208:bat_routine_thr][BATTERY] Battery pre health is Good,current temperature is 22 
+[   44.028844]  (4)[208:bat_routine_thr][BATTERY] Default CC mode charging : 50000, input current = 50000
+[   44.030525]  (4)[208:bat_routine_thr]Can't find closest level 
+[   44.030542]  (4)[208:bat_routine_thr]charging_set_current current is 55000 Fan REG4[6:4]=0
+[   44.033867]  (4)[208:bat_routine_thr][BATTERY] set_bat_charging_current_limit (500)
+[   44.033888]  (4)[208:bat_routine_thr][mt_battery_CheckBatteryStatus]  chargingenablebytemp =1,state=4097
+[   44.033928]  (4)[208:bat_routine_thr][adc_driver]: channel0[0]raw =2830
+[   44.038441]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   44.039421]  (6)[102:hps_main]CPU7: shutdown
+[   44.040477]  (6)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   44.041133]  (6)[102:hps_main][HPS] END :(0400)(0)(4) action end(217)(218)(0)(1) (0)(4)(0)(1) (847)(124)(1) (217)(124)(0) (0)(218)(124)(0)(218) (4)(0)(3)
+[   44.048283]  (4)[208:bat_routine_thr]adc: channel4[0]vol =1036
+[   44.048335]  (4)[208:bat_routine_thr][adc_driver]: channel0[1]raw =2831
+[   44.068280]  (5)[208:bat_routine_thr]adc: channel4[1]vol =1036
+[   44.068335]  (5)[208:bat_routine_thr][adc_driver]: channel0[2]raw =2831
+[   44.088282]  (6)[208:bat_routine_thr]adc: channel4[2]vol =1036
+[   44.088299]  (6)[208:bat_routine_thr][BATT_ID] bat_id_vol:1036
+[   44.088307]  (6)[208:bat_routine_thr]battery id is right(BYD),  battery id:  1036
+[   44.089212]  (5)[208:bat_routine_thr][BATTERY] CC mode charge, timer=50 on 60!!
+[   44.090823]  (6)[208:bat_routine_thr]charger_type=1
+[   44.091557]  (6)[208:bat_routine_thr][BATTERY] Default CC mode charging : 50000, input current = 50000
+[   44.093200]  (5)[208:bat_routine_thr]Can't find closest level 
+[   44.093217]  (5)[208:bat_routine_thr]charging_set_current current is 55000 Fan REG4[6:4]=0
+[   44.096699]  (4)[208:bat_routine_thr]Fan OREG[7:2]=45
+[   44.100562]  (6)[208:bat_routine_thr][fan5405] [0x0]=0xd0 [0x1]=0x78 [0x2]=0xb6 [0x3]=0x94 [0x4]=0x8a [0x5]=0x5 [0x6]=0x7a [0x10]=0xca 
+[   44.108259]  (4)[165:kworker/u16:4]AEE_MONITOR_SET[status]: 0x1
+[   44.130619]  (4)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   44.147741]  (6)[165:kworker/u16:4]binder: [name:binder&]binder_flush: 469 woke 4 threads
+[   44.668702] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   44.668723] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   44.669741]  (7)[102:hps_main][HPS] END :(0040)(0)(3) action end(295)(472)(0)(2) (0)(4)(0)(1) (741)(16)(1) (272)(16)(0) (1)(472)(17)(0)(472) (4)(0)(4)
+[   44.817556]  (7)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   44.818713]  (4)[102:hps_main]CPU7: shutdown
+[   44.819684]  (4)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   44.820330]  (4)[102:hps_main][HPS] END :(0400)(0)(4) action end(249)(255)(5)(1) (0)(4)(0)(1) (939)(4)(1) (249)(4)(0) (0)(255)(4)(0)(255) (4)(0)(3)
+[   45.108549]  (6)[296:logd.auditd]AEE_MONITOR_SET[status]: 0x1
+[   45.244172]  (6)[296:logd.auditd]type=1400 audit(1483538518.640:50): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/protect_f" dev="mmcblk0p9" ino=2 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:protect_f_data_file:s0 tclass=dir permissive=0
+[   45.245887]  (4)[296:logd.auditd]type=1400 audit(1483538518.640:51): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/protect_s" dev="mmcblk0p10" ino=2 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:protect_s_data_file:s0 tclass=dir permissive=0
+[   45.246064]  (4)[296:logd.auditd]type=1400 audit(1483538518.640:52): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/nvdata" dev="mmcblk0p5" ino=2 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:nvdata_file:s0 tclass=dir permissive=0
+[   45.246157]  (4)[296:logd.auditd]type=1400 audit(1483538518.640:53): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/persist" dev="mmcblk0p28" ino=2 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:persist_data_file:s0 tclass=dir permissive=0
+[   45.246241]  (4)[296:logd.auditd]type=1400 audit(1483538518.640:54): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/mobile_info" dev="mmcblk0p7" ino=2 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:mobile_info_file:s0 tclass=dir permissive=0
+[   45.246322]  (4)[296:logd.auditd]type=1400 audit(1483538518.640:55): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/parameter" dev="mmcblk0p27" ino=2 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:parameter_file:s0 tclass=dir permissive=0
+[   45.247622]  (5)[296:logd.auditd]type=1400 audit(1483538518.640:56): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/mobile_info" dev="mmcblk0p7" ino=2 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:mobile_info_file:s0 tclass=dir permissive=0
+[   45.247809]  (5)[296:logd.auditd]type=1400 audit(1483538518.640:57): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/protect_f" dev="mmcblk0p9" ino=2 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:protect_f_data_file:s0 tclass=dir permissive=0
+[   45.247906]  (5)[296:logd.auditd]type=1400 audit(1483538518.640:58): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/protect_s" dev="mmcblk0p10" ino=2 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:protect_s_data_file:s0 tclass=dir permissive=0
+[   45.247989]  (5)[296:logd.auditd]type=1400 audit(1483538518.640:59): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/parameter" dev="mmcblk0p27" ino=2 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:parameter_file:s0 tclass=dir permissive=0
+[   45.248070]  (5)[296:logd.auditd]type=1400 audit(1483538518.640:60): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/persist" dev="mmcblk0p28" ino=2 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:persist_data_file:s0 tclass=dir permissive=0
+[   45.328681] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   45.328702] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   45.329724]  (7)[102:hps_main][HPS] END :(0040)(0)(3) action end(300)(657)(0)(2) (0)(4)(0)(1) (771)(13)(1) (293)(13)(0) (1)(657)(14)(0)(657) (4)(0)(4)
+[   45.352851]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(18)
+[   45.352879]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   45.352887]  (7)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   46.061380]  (7)[296:logd.auditd]type=1400 audit(1483538519.460:61): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/nvdata" dev="mmcblk0p5" ino=2 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:nvdata_file:s0 tclass=dir permissive=0
+[   46.062131]  (4)[296:logd.auditd]type=1400 audit(1483538519.460:62): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/nvdata" dev="mmcblk0p5" ino=2 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:nvdata_file:s0 tclass=dir permissive=0
+[   46.063548]  (6)[296:logd.auditd]type=1400 audit(1483538519.460:63): avc: denied { getattr } for pid=3307 comm="pool-14-thread-" path="/mnt/media_rw" dev="tmpfs" ino=10744 scontext=u:r:priv_app:s0:c512,c768 tcontext=u:object_r:mnt_media_rw_file:s0 tclass=dir permissive=0
+[   46.108864]  (5)[102:hps_main]AEE_MONITOR_SET[status]: 0x1
+[   46.507735]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   46.508808]  (5)[102:hps_main]CPU7: shutdown
+[   46.509823]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   46.510486]  (5)[102:hps_main][HPS] END :(0400)(0)(4) action end(240)(226)(1)(0) (0)(4)(0)(1) (841)(32)(2) (240)(32)(0) (0)(226)(32)(0)(226) (4)(0)(3)
+[   46.637722] -(4)[0:swapper/4]Power/swap DP: No enter --- SODI3: No enter --- SODI: No enter --- 
+[   47.109098] -(7)[0:swapper/7]AEE_MONITOR_SET[status]: 0x1
+[   47.168025] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   47.168050] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   47.169123]  (4)[102:hps_main][HPS] END :(0040)(0)(3) action end(296)(642)(0)(0) (0)(4)(0)(1) (701)(17)(2) (254)(17)(0) (1)(642)(18)(0)(642) (4)(0)(4)
+[   47.187883]  (6)[3218:d.process.media]mtp_open
+[   47.205868]  (5)[3481:MtpServer]MTP_QUEUE_DBG, <mtp_read(), 580> save active <3481,MtpServer>
+[   47.263233]  (7)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   47.280346]  (5)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   47.297462]  (6)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   47.314576]  (4)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   47.317643]  (4)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   47.319334]  (5)[102:hps_main]CPU7: shutdown
+[   47.320261]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   47.320918]  (5)[102:hps_main][HPS] END :(0400)(0)(4) action end(254)(249)(1)(0) (0)(4)(0)(1) (899)(4)(1) (254)(4)(0) (0)(249)(4)(0)(249) (4)(0)(3)
+[   47.333428]  (4)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   47.349315]  (4)[2108:PhotonicModulat][AAL] led_mode=5 , aal_need_lock=0
+[   47.363735]  (6)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, mc_open_session failed.(19)
+[   47.363763]  (6)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, free wsm result (0)
+[   47.363770]  (6)[194:rpmb_open][emmcrpmb] emmc_rpmb_gp_open_session, try free wsm and close device
+[   47.468345] -(7)[0:swapper/7]CPU7: Booted secondary processor
+[   47.468367] -(7)[0:swapper/7]Detected VIPT I-cache on CPU7
+[   47.469339]  (7)[102:hps_main][HPS] END :(0100)(0)(3) action end(293)(488)(0)(0) (0)(4)(0)(1) (858)(4)(1) (281)(3)(0) (0)(488)(4)(0)(488) (4)(0)(4)
+[   47.508386]  (5)[102:hps_main]MobiCore mcd: Cpu 7 is going to die
+[   47.509428]  (6)[102:hps_main]CPU7: shutdown
+[   47.510258]  (6)[102:hps_main]MobiCore mcd: Cpu 7 is dead
+[   47.510926]  (6)[102:hps_main][HPS] END :(0400)(0)(4) action end(248)(222)(14)(1) (0)(4)(0)(1) (248)(1)(1) (248)(1)(0) (0)(222)(1)(0)(222) (4)(0)(3)
+[   47.688321]  (5)[61:cfinteractive][name:mt_cpufreq&][Power/cpufreq] @_cpufreq_set_locked(), MT_CPU_DVFS_BIG: (7, 0): freq = 1196000 (1196000), volt = 100000 (100000), cpus = 3, cur = 1508000
+[   47.767930]  (6)[102:hps_main]MobiCore mcd: Cpu 6 is going to die
+[   47.769155]  (5)[102:hps_main]CPU6: shutdown
+[   47.770295]  (5)[102:hps_main]MobiCore mcd: Cpu 6 is dead
+[   47.770989]  (5)[102:hps_main][HPS] END :(0400)(0)(3) action end(110)(109)(0)(0) (0)(4)(0)(1) (541)(7)(1) (110)(7)(0) (0)(109)(7)(0)(109) (4)(0)(2)
+[   47.908314]  (4)[61:cfinteractive][name:mt_cpufreq&][Power/cpufreq] @_cpufreq_set_locked(), MT_CPU_DVFS_BIG: (7, 0): freq = 1508000 (1508000), volt = 110000 (110000), cpus = 2, cur = 1352000

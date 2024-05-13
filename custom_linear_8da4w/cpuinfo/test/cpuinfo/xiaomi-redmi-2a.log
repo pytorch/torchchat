@@ -1,0 +1,14 @@
+processor	: 0
+model name	: ARMv7 Processor rev 5 (v7l)
+Processor	: ARMv7 Processor rev 5 (v7l)
+BogoMIPS	: 1244.61
+Features	: swp half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xc07
+CPU revision	: 5
+
+Hardware	: Leadcore Innopower
+Revision	: 0000
+Serial		: 0000000000000000

@@ -1,0 +1,1305 @@
+<6>[    1.962719]  [1:      swapper/0:    1] sensor_3l2_probe(0)
+<7>[    1.962982]  [1:      swapper/0:    1] [@][front eeprom] sda = gpc2-2, scl = gpc2-3, pinname = 139C0000.pinctrl, pinfunc_on = 2, pinfunc_off = 0
+<6>[    1.962996]  [1:      swapper/0:    1] fimc_is_eeprom_i2c 1-0051[1]: fimc_is_sensor_eeprom probed!
+<7>[    1.963049]  [1:      swapper/0:    1] [@][rear eeprom] sda = gpc2-2, scl = gpc2-3, pinname = 139C0000.pinctrl, pinfunc_on = 2, pinfunc_off = 0
+<6>[    1.963061]  [1:      swapper/0:    1] fimc_is_eeprom_i2c 1-0058[0]: fimc_is_sensor_eeprom probed!
+<6>[    1.963317]  [1:      swapper/0:    1] PM DOMAIN: spd-mscl0, Device : 12c00000.scaler Registered
+<6>[    1.963336]  [1:      swapper/0:    1] exynos5-scaler 12c00000.scaler: exynos-iommu gpd_dev_ops inserted!
+<6>[    1.964081]  [1:      swapper/0:    1] exynos5-scaler 12c00000.scaler: Driver probed successfully(version: 8004000c(20200))
+<6>[    1.964232]  [1:      swapper/0:    1] PM DOMAIN: spd-mscl1, Device : 12c10000.scaler Registered
+<6>[    1.964251]  [1:      swapper/0:    1] exynos5-scaler 12c10000.scaler: exynos-iommu gpd_dev_ops inserted!
+<6>[    1.964823]  [1:      swapper/0:    1] exynos5-scaler 12c10000.scaler: Driver probed successfully(version: 8004000c(20200))
+<6>[    1.965271]  [1:      swapper/0:    1] PM DOMAIN: spd-jpeg, Device : 12c20000.jpeg Registered
+<6>[    1.965291]  [1:      swapper/0:    1] jpeg-hx2 12c20000.jpeg: exynos-iommu gpd_dev_ops inserted!
+<6>[    1.965593]  [1:      swapper/0:    1] jpeg-hx2 12c20000.jpeg: JPEG driver is registered to /dev/video14
+<6>[    1.965704]  [1:      swapper/0:    1] jpeg-hx2 12c20000.jpeg: JPEG driver is registered to /dev/video13
+<3>[    1.965843]  [1:      swapper/0:    1] jpeg-hx2 12c20000.jpeg: jpeg-hx2.0 registered successfully
+<3>[    1.966376]  [1:      swapper/0:    1] sec-thermistor sec_thermistor.41: sec_therm_probe: fail to get iio channel
+<6>[    1.966400]  [1:      swapper/0:    1] platform sec_thermistor.41: Driver sec-thermistor requests probe deferral
+<6>[    1.966686]  [1:      swapper/0:    1] platform 10030000.tmuctrl: Driver exynos-tmu requests probe deferral
+<6>[    1.966752]  [1:      swapper/0:    1] platform 10040000.tmuctrl: Driver exynos-tmu requests probe deferral
+<6>[    1.967557]  [1:      swapper/0:    1] s3c2410-wdt 101c0000.watchdog: watchdog inactive, reset disabled, irq disabled
+<6>[    1.968084]  [1:      swapper/0:    1] device-mapper: ioctl: 4.24.0-ioctl (2013-01-15) initialised: dm-devel@redhat.com
+<6>[    1.968503]  [2:      swapper/0:    1] [BT] bcm43455_bluetooth_probe.
+<6>[    1.968622]  [2:      swapper/0:    1] [BT] Bluetooth Power On.
+<3>[    1.968635]  [2:      swapper/0:    1] [BT] Set_irq_wake failed.
+<6>[    1.968868]  [2:      swapper/0:    1] [BT] bcm43455_bluetooth_probe End 
+<6>[    1.969419]  [2:      swapper/0:    1] CL0[0] offset_percent: 0 Freq: 1600000000KHz Actual:Margin volts[1287500 : 1287500] 
+<6>[    1.969462]  [2:      swapper/0:    1] CL0[0] offset_percent: 0 Freq: 1500000000KHz Actual:Margin volts[1237500 : 1237500] CL0[0] offset_percent: 0 Freq: 1400000000KHz Actual:Margin volts[1193750 : 1193750] 
+<6>[    1.969485]  [2:      swapper/0:    1] CL0[0] offset_percent: 0 Freq: 1300000000KHz Actual:Margin volts[1150000 : 1150000] CL0[0] offset_percent: 0 Freq: 1200000000KHz Actual:Margin volts[1106250 : 1106250] 
+<6>[    1.969507]  [2:      swapper/0:    1] CL0[0] offset_percent: 0 Freq: 1100000000KHz Actual:Margin volts[1068750 : 1068750] CL0[0] offset_percent: 0 Freq: 1000000000KHz Actual:Margin volts[1031250 : 1031250] 
+<6>[    1.969528]  [2:      swapper/0:    1] CL0[0] offset_percent: 0 Freq: 900000000KHz Actual:Margin volts[993750 : 993750] CL0[0] offset_percent: 0 Freq: 800000000KHz Actual:Margin volts[956250 : 956250] 
+<6>[    1.969550]  [2:      swapper/0:    1] CL0[0] offset_percent: 0 Freq: 700000000KHz Actual:Margin volts[925000 : 925000] CL0[0] offset_percent: 0 Freq: 600000000KHz Actual:Margin volts[900000 : 900000] 
+<6>[    1.969572]  [2:      swapper/0:    1] CL0[0] offset_percent: 0 Freq: 500000000KHz Actual:Margin volts[875000 : 875000] CL0[0] offset_percent: 0 Freq: 400000000KHz Actual:Margin volts[850000 : 850000] 
+<6>[    1.969594]  [2:      swapper/0:    1] CL0[0] offset_percent: 0 Freq: 300000000KHz Actual:Margin volts[850000 : 850000] <6>[    1.969904]  [0:      swapper/0:    1] cpu cpu0: exynos_cpufreq_init: CPU 0 initialized
+<6>[    1.970163]  [1:      swapper/0:    1] cpuidle: using governor ladder
+<6>[    1.970176]  [1:      swapper/0:    1] cpuidle: using governor menu
+<6>[    1.971244]  [1:      swapper/0:    1] Synopsys Designware Multimedia Card Interface Driver
+<6>[    1.972099]  [1:      swapper/0:    1] dwmmc_exynos 13540000.dwmmc0: Clock pin control Pin:gpr0-0 Addr:13750000.pinctrl Val:2 Num:4
+<6>[    1.972360]  [1:      swapper/0:    1] dwmmc_exynos 13540000.dwmmc0: Using internal DMA controller.
+<6>[    1.972395]  [1:      swapper/0:    1] dwmmc_exynos 13540000.dwmmc0: FIFOTH: 0x 300f0030
+<6>[    1.972410]  [1:      swapper/0:    1] dwmmc_exynos 13540000.dwmmc0: Version ID is 270a
+<6>[    1.972586]  [2:      swapper/0:    1] dwmmc_exynos 13540000.dwmmc0: DW MMC controller at irq 277, 64 bit host data width, 64 deep fifo
+<6>[    1.988886]  [3:      swapper/0:    1] mmc_host mmc0: Bus speed (slot 0) = 25000000Hz (slot req 400000Hz, actual 390625HZ div = 32)
+<6>[    2.008910]  [3:      swapper/0:    1] dwmmc_exynos 13540000.dwmmc0: 1 slots initialized
+<6>[    2.009189]  [3:      swapper/0:    1] dwmmc_exynos 13550000.dwmmc1: Clock pin control Pin:gpr2-0 Addr:13750000.pinctrl Val:2 Num:4
+<6>[    2.009315]  [3:      swapper/0:    1] dwmmc_exynos 13550000.dwmmc1: Using internal DMA controller.
+<6>[    2.009327]  [3:      swapper/0:    1] dwmmc_exynos 13550000.dwmmc1: FIFOTH: 0x 300f0030
+<6>[    2.009336]  [3:      swapper/0:    1] dwmmc_exynos 13550000.dwmmc1: Version ID is 270a
+<6>[    2.009384]  [3:    kworker/3:1: 1164] mmc_host mmc0: card inserted
+<6>[    2.009588]  [3:      swapper/0:    1] dwmmc_exynos 13550000.dwmmc1: DW MMC controller at irq 278, 64 bit host data width, 64 deep fifo
+<6>[    2.038876]  [3:      swapper/0:    1] mmc_host mmc1: Bus speed (slot 0) = 25000000Hz (slot req 400000Hz, actual 390625HZ div = 32)
+<4>[    2.058885]  [0:      swapper/0:    1] mmc1 skip mmc_detect_change
+<4>[    2.058915]  [0:      swapper/0:    1] mmc1, set DW_MCI_CD_EXTERNAL 
+<4>[    2.058922]  [0:      swapper/0:    1] Enter ext_cd_init_callback
+<6>[    2.058934]  [0:      swapper/0:    1] dwmmc_exynos 13550000.dwmmc1: 1 slots initialized
+<6>[    2.059281]  [0:      swapper/0:    1] dwmmc_exynos 13560000.dwmmc2: Clock pin control Pin:gpr4-0 Addr:13750000.pinctrl Val:2 Num:4
+<6>[    2.059456]  [0:      swapper/0:    1] dwmmc_exynos 13560000.dwmmc2: Using internal DMA controller.
+<6>[    2.059476]  [0:      swapper/0:    1] dwmmc_exynos 13560000.dwmmc2: FIFOTH: 0x 300f0030
+<6>[    2.059485]  [0:      swapper/0:    1] dwmmc_exynos 13560000.dwmmc2: Version ID is 270a
+<6>[    2.059609]  [0:      swapper/0:    1] dwmmc_exynos 13560000.dwmmc2: DW MMC controller at irq 279, 64 bit host data width, 64 deep fifo
+<6>[    2.060056]  [0:      swapper/0:    1] mmc2: vmmc regulator found
+<6>[    2.060585]  [0:      swapper/0:    1] mmc2: vqmmc regulator found
+<6>[    2.072081]  [0:   kworker/u8:0:    6] mmc0: BKOPS_EN bit is not set
+<4>[    2.073586]  [0:   kworker/u8:0:    6] mmc0: STROBE ENHANCED enable
+<6>[    2.078928]  [1:      swapper/0:    1] mmc_host mmc2: Bus speed (slot 0) = 25000000Hz (slot req 400000Hz, actual 390625HZ div = 32)
+<6>[    2.082176]  [0:   kworker/u8:0:    6] mmc_host mmc0: Bus speed (slot 0) = 50000000Hz (slot req 400000Hz, actual 396825HZ div = 63)
+<6>[    2.082211]  [0:   kworker/u8:0:    6] mmc_host mmc0: Bus speed (slot 0) = 50000000Hz (slot req 50000000Hz, actual 50000000HZ div = 0)
+<6>[    2.082406]  [0:   kworker/u8:0:    6] mmc_host mmc0: Bus speed (slot 0) = 200000000Hz (slot req 50000000Hz, actual 50000000HZ div = 2)
+<6>[    2.082440]  [0:   kworker/u8:0:    6] mmc_host mmc0: Bus speed (slot 0) = 200000000Hz (slot req 200000000Hz, actual 200000000HZ div = 0)
+<6>[    2.082575]  [0:   kworker/u8:0:    6] mmc0: new high speed HS200-DDR MMC card at address 0001
+<6>[    2.083031]  [0:   kworker/u8:0:    6] mmcblk0: mmc0:0001 AJNB3R 14.6 GiB 
+<6>[    2.083252]  [0:   kworker/u8:0:    6] mmcblk0boot0: mmc0:0001 AJNB3R partition 1 4.00 MiB
+<6>[    2.083471]  [0:   kworker/u8:0:    6] mmcblk0boot1: mmc0:0001 AJNB3R partition 2 4.00 MiB
+<6>[    2.083686]  [0:   kworker/u8:0:    6] mmcblk0rpmb: mmc0:0001 AJNB3R partition 3 4.00 MiB
+<6>[    2.086345]  [1:   kworker/u8:0:    6]  mmcblk0: p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12 p13 p14 p15 p16 p17 p18 p19 p20 p21 p22 p23
+<6>[    2.089246]  [1:   kworker/u8:0:    6]  mmcblk0boot1: unknown partition table
+<6>[    2.089922]  [1:   kworker/u8:0:    6]  mmcblk0boot0: unknown partition table
+<6>[    2.098857]  [1:      swapper/0:    1] dwmmc_exynos 13560000.dwmmc2: 1 slots initialized
+<4>[    2.099031]  [1:      swapper/0:    1] dwmmc_exynos 13560000.dwmmc2: success to request irq for card detect.
+<6>[    2.099039]  [1:      swapper/0:    1] wake enabled for irq 12
+<6>[    2.099495]  [1:      swapper/0:    1] [s2mu003_led_probe] s2mu003_fled start
+<6>[    2.099508]  [1:      swapper/0:    1] s2mu003_led_dt_parse_pdata : s2mu003-lvp-disable
+<6>[    2.099701]  [1:      swapper/0:    1] s2mu003_led_probe 2 leds
+<6>[    2.099707]  [1:      swapper/0:    1] s2mu003_led_probe led0 setup ...
+<7>[    2.099759]  [1:      swapper/0:    1] [muic] muic_notifier_register: listener=4
+<6>[    2.099817]  [1:    kworker/1:1:  958] mmc_host mmc2: card inserted
+<6>[    2.101937]  [0:      swapper/0:    1] s2mu003_led_setup : led setup complete
+<6>[    2.101944]  [0:      swapper/0:    1] s2mu003_led_probe led1 setup ...
+<7>[    2.102017]  [0:      swapper/0:    1] [muic] muic_notifier_register: listener=4
+<6>[    2.103860]  [0:      swapper/0:    1] s2mu003_led_setup : led setup complete
+<6>[    2.104000]  [0:      swapper/0:    1] hidraw: raw HID events driver (C) Jiri Kosina
+<6>[    2.105253]  [3:      swapper/0:    1] Successfully registered hid_synaptics_driver
+<6>[    2.105291]  [3:      swapper/0:    1] usbcore: registered new interface driver usbhid
+<6>[    2.105298]  [3:      swapper/0:    1] usbhid: USB HID core driver
+<6>[    2.105653]  [1:      swapper/0:    1] ashmem: initialized
+<6>[    2.105711]  [1:      swapper/0:    1] logger: created 2048K log 'log_main'
+<6>[    2.105720]  [1:      swapper/0:    1] sec_debug: GetLog support (mark:0xffffffc000f55110, log_main:	0xffffffc0013427e0)
+<6>[    2.105758]  [1:      swapper/0:    1] logger: Enable to hook log_main, Buffer:ffffff80006b1000
+<6>[    2.105820]  [1:      swapper/0:    1] logger: created 256K log 'log_events'
+<6>[    2.105828]  [1:      swapper/0:    1] sec_debug: GetLog support (mark:0xffffffc000f55110, log_events:	0xffffffc0013027e0)
+<6>[    2.105887]  [1:      swapper/0:    1] logger: created 2048K log 'log_radio'
+<6>[    2.105894]  [1:      swapper/0:    1] sec_debug: GetLog support (mark:0xffffffc000f55110, log_radio:	0xffffffc0011027e0)
+<6>[    2.105905]  [1:      swapper/0:    1] logger: Enable to hook log_radio, Buffer:ffffff80006bb000
+<6>[    2.105960]  [1:      swapper/0:    1] logger: created 256K log 'log_system'
+<6>[    2.105967]  [1:      swapper/0:    1] sec_debug: GetLog support (mark:0xffffffc000f55110, log_system:	0xffffffc0010c27e0)
+<6>[    2.106999]  [1:      swapper/0:    1] platform 17000020.bus_mif: Driver exynos7-devfreq-mif requests probe deferral
+<6>[    2.107266]  [1:      swapper/0:    1] platform 17000010.bus_int: Driver exynos7-devfreq-int requests probe deferral
+<6>[    2.107443]  [1:      swapper/0:    1] platform 17000030.bus_isp: Driver exynos7-devfreq-isp requests probe deferral
+<6>[    2.107952]  [1:      swapper/0:    1] s2mu003_fuelgauge_init: S2MU003 Fuelgauge Init
+<6>[    2.108061]  [1:      swapper/0:    1] s2mu003_fuelgauge_probe: S2MU003 Fuelgauge Driver Loading
+<6>[    2.110251]  [1:      swapper/0:    1] s2mu003-fuelgauge 4-0035: s2mu003_get_rawsoc: raw capacity (0x4b0:2929)
+<6>[    2.110258]  [1:      swapper/0:    1] s2mu003_init_regs: s2mu003 fuelgauge initialize
+<7>[    2.111232]  [1:      swapper/0:    1] s2mu003-fuelgauge 4-0035: s2mu003_get_vbat: vbat (3943)
+<3>[    2.111249]  [1:      swapper/0:    1] s2mu003_get_current_average: Fail to get psy (battery)
+<7>[    2.112146]  [1:      swapper/0:    1] s2mu003-fuelgauge 4-0035: s2mu003_get_vbat: vbat (3943)
+<6>[    2.113930]  [1:      swapper/0:    1] s2mu003-fuelgauge 4-0035: s2mu003_get_soc: raw capacity (0x4b0:2929)
+<6>[    2.115716]  [1:      swapper/0:    1] s2mu003-fuelgauge 4-0035: s2mu003_get_soc: raw capacity (0x4b0:2929)
+<7>[    2.115724]  [1:      swapper/0:    1] s2mu003-fuelgauge 4-0035: s2mu003_fg_get_scaled_capacity: scaled capacity (29.4)
+<3>[    2.115733]  [1:      swapper/0:    1] s2mu003-fuelgauge 4-0035: s2mu003_fg_get_atomic_capacity: capacity (old 0 : new 1)
+<7>[    2.116629]  [1:      swapper/0:    1] s2mu003-fuelgauge 4-0035: s2mu003_get_temperature: temperature (250)
+<7>[    2.117525]  [1:      swapper/0:    1] s2mu003-fuelgauge 4-0035: s2mu003_get_temperature: temperature (250)
+<3>[    2.117537]  [1:      swapper/0:    1] power_supply sec-fuelgauge: driver failed to report `charge_type' property: -22
+<7>[    2.119224]  [1:    kworker/1:1:  958] s2mu003-fuelgauge 4-0035: s2mu003_get_vbat: vbat (3943)
+<3>[    2.119238]  [1:    kworker/1:1:  958] s2mu003_get_current_average: Fail to get psy (battery)
+<7>[    2.120135]  [1:    kworker/1:1:  958] s2mu003-fuelgauge 4-0035: s2mu003_get_vbat: vbat (3943)
+<6>[    2.121920]  [1:    kworker/1:1:  958] s2mu003-fuelgauge 4-0035: s2mu003_get_soc: raw capacity (0x4b0:2929)
+<6>[    2.123705]  [1:    kworker/1:1:  958] s2mu003-fuelgauge 4-0035: s2mu003_get_soc: raw capacity (0x4b0:2929)
+<7>[    2.123714]  [1:    kworker/1:1:  958] s2mu003-fuelgauge 4-0035: s2mu003_fg_get_scaled_capacity: scaled capacity (29.4)
+<3>[    2.123722]  [1:    kworker/1:1:  958] s2mu003-fuelgauge 4-0035: s2mu003_fg_get_atomic_capacity: capacity (old 0 : new 1)
+<7>[    2.124618]  [1:    kworker/1:1:  958] s2mu003-fuelgauge 4-0035: s2mu003_get_temperature: temperature (250)
+<7>[    2.125515]  [1:    kworker/1:1:  958] s2mu003-fuelgauge 4-0035: s2mu003_get_temperature: temperature (250)
+<3>[    2.125527]  [1:    kworker/1:1:  958] power_supply sec-fuelgauge: driver failed to report `charge_type' property: -22
+<7>[    2.127159]  [1:      swapper/0:    1] s2mu003-fuelgauge 4-0035: s2mu003_fuelgauge_fuelalert_init: irq_reg(1c00) irq(1)
+<6>[    2.127196]  [1:      swapper/0:    1] s2mu003-fuelgauge 4-0035: s2mu003_fuelgauge_probe: fg_irq = 14
+<6>[    2.127440]  [1:      swapper/0:    1] wake enabled for irq 14
+<6>[    2.127447]  [1:      swapper/0:    1] s2mu003_fuelgauge_probe: S2MU003 Fuelgauge Driver Loaded
+<6>[    2.127776]  [1:      swapper/0:    1] using rtc device, s2m-rtc, for alarms
+<3>[    2.128053]  [1:      swapper/0:    1] exynos-adc 13900000.adc: operating without regulator vdd[-19]
+<6>[    2.128279]  [1:      swapper/0:    1] exynos-adc 13900000.adc: Probed successfully driver.
+<6>[    2.128406]  [1:      swapper/0:    1] mckernelapi : Mobicore API module initialized!
+<6>[    2.128427]  [1:      swapper/0:    1] MobiCore mcd: MobiCore Driver, Build: Wed Apr 27 12:16:17 2016
+<6>[    2.128434]  [1:      swapper/0:    1] MobiCore mcd: MobiCore mcDrvModuleApi version is 1.1
+<6>[    2.128441]  [1:      swapper/0:    1] MobiCore mcd: MobiCore t-base-EXYNOS64-Android-302A-V013-641_641
+<4>[    2.129251]  [1:      swapper/0:    1] [SENSOR]taos_init
+<6>[    2.129380]  [1:      swapper/0:    1] [SENSOR] taos_i2c_probe: Start
+<6>[    2.129802]  [1:      swapper/0:    1] [SENSOR] taos_parse_dt: irq_gpio:7, dgf: 1200, cct_coef:3193, cct_offset:1950, r:270, g:1000, b:90
+<3>[    2.129818]  [1:      swapper/0:    1] [SENSOR] proximity_open_offset: no offset file
+<3>[    2.129824]  [1:      swapper/0:    1] [SENSOR] taos_get_initial_offset: initial offset = 0
+<6>[    2.129836]  [1:      swapper/0:    1] [SENSOR] taos_i2c_probe: registering proximity input device
+<6>[    2.129917]  [1:      swapper/0:    1] input: proximity_sensor as /devices/virtual/input/input4
+<6>[    2.130197]  [3:      swapper/0:    1] [SENSOR] taos_i2c_probe: registering lightsensor-level input device
+<6>[    2.130272]  [3:      swapper/0:    1] input: light_sensor as /devices/virtual/input/input5
+<6>[    2.130437]  [3:      swapper/0:    1] [SENSOR] taos_setup_irq: start
+<6>[    2.130589]  [0:      swapper/0:    1] [SENSOR] taos_setup_irq: success
+<6>[    2.130598]  [0:      swapper/0:    1] [SENSOR] taos_chip_on: dgf:1200, cctcoef:3193, cctoff:1950, r:270, g:1000, b:90
+<6>[    2.134861]  [0:      swapper/0:    1] [SENSOR] taos_chip_on: poffset= 2, pre_poffset= 2, ppulse= 12, ppulse_len= 2
+<6>[    2.134868]  [0:      swapper/0:    1] [SENSOR] taos_chip_on: pre_offset_sign= 0, pgain= 2, pldrive= 16, 2<<pgain= 4
+<6>[    2.135751]  [0:      swapper/0:    1] [SENSOR] taos_chip_on: th_min: 70 , th_max: 100, als_gain: 2
+<6>[    2.135757]  [0:      swapper/0:    1] [SENSOR] taos_chip_off: 
+<6>[    2.136635]  [0:      swapper/0:    1] [SENSOR] taos_i2c_probe: > probe OK 
+<6>[    2.136754]  [0:      swapper/0:    1] [SENSOR] yas_probe: PROBE START
+<6>[    2.136834]  [0:      swapper/0:    1] input: magnetic_sensor as /devices/virtual/input/input6
+<6>[    2.142792]  [0:      swapper/0:    1] [SENSOR] yas_parse_dt: yas,orientation = 1
+<3>[    2.142801]  [0:      swapper/0:    1] [SENSOR] yas_parse_dt: softiron = 10383, sign = 2
+<3>[    2.142807]  [0:      swapper/0:    1] [SENSOR] yas_parse_dt: softiron = 414, sign = 0
+<3>[    2.142813]  [0:      swapper/0:    1] [SENSOR] yas_parse_dt: softiron = 79, sign = 0
+<3>[    2.142819]  [0:      swapper/0:    1] [SENSOR] yas_parse_dt: softiron = 144, sign = 0
+<3>[    2.142825]  [0:      swapper/0:    1] [SENSOR] yas_parse_dt: softiron = 9480, sign = 2
+<3>[    2.142831]  [0:      swapper/0:    1] [SENSOR] yas_parse_dt: softiron = 218, sign = 0
+<3>[    2.142837]  [0:      swapper/0:    1] [SENSOR] yas_parse_dt: softiron = 223, sign = 2
+<3>[    2.142842]  [0:      swapper/0:    1] [SENSOR] yas_parse_dt: softiron = 229, sign = 2
+<3>[    2.142849]  [0:      swapper/0:    1] [SENSOR] yas_parse_dt: softiron = 10446, sign = 2
+<6>[    2.142855]  [0:      swapper/0:    1] [SENSOR] yas_probe: set_position (1)
+<6>[    2.142897]  [0:      swapper/0:    1] [SENSOR] yas_probe: PROBE END
+<6>[    2.143100]  [0:      swapper/0:    1] usbcore: registered new interface driver snd-usb-audio
+<6>[    2.144706]  [0:      swapper/0:    1] lpass_register_subip: i2s(ffffffc056689410) registered
+<6>[    2.145136]  [0:      swapper/0:    1] Exynos Audio Mixer driver, (c)2014 Samsung Electronics
+<6>[    2.166233]  [0:      swapper/0:    1] wake enabled for irq 15
+<3>[    2.166514]  [0:      swapper/0:    1] cod3022x 3-a004: Unable to configure codec gpio as idle
+<3>[    2.166568]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: no source widget found for ADCL Mixer
+<3>[    2.166576]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: Failed to add route ADCL Mixer -> ADCL Switch -> SPK Mixer
+<3>[    2.166585]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: no source widget found for ADCR Mixer
+<3>[    2.166593]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: Failed to add route ADCR Mixer -> ADCR Switch -> SPK Mixer
+<3>[    2.166618]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: no source widget found for ADCL Mixer
+<3>[    2.166626]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: Failed to add route ADCL Mixer -> ADCL Switch -> EP Mixer
+<3>[    2.166634]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: no source widget found for ADCR Mixer
+<3>[    2.166642]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: Failed to add route ADCR Mixer -> ADCR Switch -> EP Mixer
+<3>[    2.166664]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: no source widget found for ADCL Mixer
+<3>[    2.166672]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: Failed to add route ADCL Mixer -> ADCL Switch -> HPL Mixer
+<3>[    2.166680]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: no source widget found for ADCR Mixer
+<3>[    2.166688]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: Failed to add route ADCR Mixer -> ADCR Switch -> HPL Mixer
+<3>[    2.166702]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: no source widget found for ADCL Mixer
+<3>[    2.166710]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: Failed to add route ADCL Mixer -> ADCL Switch -> HPR Mixer
+<3>[    2.166719]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: no source widget found for ADCR Mixer
+<3>[    2.166726]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: Failed to add route ADCR Mixer -> ADCR Switch -> HPR Mixer
+<3>[    2.166779]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: no source widget found for ADCL Mixer
+<3>[    2.166787]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: Failed to add route ADCL Mixer -> direct -> ADC
+<3>[    2.166795]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: no source widget found for ADCR Mixer
+<3>[    2.166803]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: Failed to add route ADCR Mixer -> direct -> ADC
+<6>[    2.167389]  [0:      swapper/0:    1] Universal7580-audio sound.32:  cod3022x-aif <-> 11040000.i2s mapping ok
+<6>[    2.167531]  [0:      swapper/0:    1] Audio TX-UHQA-BUF Information, pa = 0x000000008abc0000, size = 40000, kva = ffffff800525a000
+<6>[    2.167540]  [0:      swapper/0:    1] Universal7580-audio sound.32:  cod3022x-aif <-> samsung-i2s-sec mapping ok
+<6>[    2.167605]  [0:      swapper/0:    1] Universal7580-audio sound.32:  cod3022x-aif2 <-> universal7580 voice call mapping ok
+<6>[    2.167667]  [0:      swapper/0:    1] Universal7580-audio sound.32:  dummy-aif2 <-> universal7580 BT mapping ok
+<6>[    2.167706]  [0:      swapper/0:    1] Universal7580-audio sound.32:  cod3022x-aif <-> universal7580 FM mapping ok
+<6>[    2.167795]  [0:      swapper/0:    1] Universal7580-audio sound.32:  cod3022x-aif <-> samsung-eax.0 mapping ok
+<6>[    2.167886]  [0:      swapper/0:    1] Universal7580-audio sound.32:  cod3022x-aif <-> samsung-eax.1 mapping ok
+<6>[    2.167927]  [0:      swapper/0:    1] lpass_register_subip: s2801x(ffffffc056fab028) registered
+<4>[    2.223385]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: Failed to create ADC debugfs file
+<4>[    2.223403]  [0:      swapper/0:    1] cod3022x 3-a004: ASoC: Failed to create DAC debugfs file
+<3>[    2.225201]  [0:      swapper/0:    1] Universal7580-audio sound.32: Property 'gpios' not found
+<4>[    2.225214]  [0:      swapper/0:    1] cod3022x 3-a004: Failed to get jd gpios :-22
+<6>[    2.225341]  [0:      swapper/0:    1] input: Codec3022 Headset Events as /devices/104c0000.hsi2c/i2c-3/3-a004/input/input7
+<3>[    2.279578]  [0:      swapper/0:    1] cod3022x 3-a004: Unable to configure codec gpio as idle
+<6>[    2.279793]  [0:      swapper/0:    1] GACT probability NOT on
+<6>[    2.279806]  [0:      swapper/0:    1] Mirror/redirect action on
+<6>[    2.279813]  [0:      swapper/0:    1] u32 classifier
+<6>[    2.279819]  [0:      swapper/0:    1]     Actions configured
+<6>[    2.279827]  [0:      swapper/0:    1] Netfilter messages via NETLINK v0.30.
+<6>[    2.279872]  [0:      swapper/0:    1] nf_conntrack version 0.5.0 (16384 buckets, 65536 max)
+<6>[    2.280152]  [0:      swapper/0:    1] ctnetlink v0.93: registering with nfnetlink.
+<6>[    2.280214]  [0:      swapper/0:    1] NF_TPROXY: Transparent proxy support initialized, version 4.1.0
+<6>[    2.280221]  [0:      swapper/0:    1] NF_TPROXY: Copyright (c) 2006-2007 BalaBit IT Ltd.
+<6>[    2.280494]  [0:      swapper/0:    1] xt_time: kernel timezone is -0000
+<6>[    2.280522]  [0:      swapper/0:    1] 939-23012-001-quicksec-vpnclient-for-android-3.3.1-2811-b2567729009d-2015-01-30_13-36-53 
+<6>[    2.280528]  [0:      swapper/0:    1] vpnclient kernel spd loaded.
+<6>[    2.280695]  [0:      swapper/0:    1] ip_tables: (C) 2000-2006 Netfilter Core Team
+<6>[    2.280862]  [0:      swapper/0:    1] arp_tables: (C) 2002 David S. Miller
+<6>[    2.280899]  [0:      swapper/0:    1] TCP: bic registered
+<6>[    2.280905]  [0:      swapper/0:    1] TCP: cubic registered
+<6>[    2.280911]  [0:      swapper/0:    1] TCP: westwood registered
+<6>[    2.280917]  [0:      swapper/0:    1] TCP: htcp registered
+<6>[    2.280922]  [0:      swapper/0:    1] Initializing XFRM netlink socket
+<6>[    2.281204]  [0:      swapper/0:    1] NET: Registered protocol family 10
+<6>[    2.281960]  [0:      swapper/0:    1] mip6: Mobile IPv6
+<6>[    2.281985]  [0:      swapper/0:    1] ip6_tables: (C) 2000-2006 Netfilter Core Team
+<6>[    2.282126]  [0:      swapper/0:    1] sit: IPv6 over IPv4 tunneling driver
+<6>[    2.282693]  [0:      swapper/0:    1] NET: Registered protocol family 17
+<6>[    2.282721]  [0:      swapper/0:    1] NET: Registered protocol family 15
+<6>[    2.282731]  [0:      swapper/0:    1] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
+<6>[    2.282741]  [0:      swapper/0:    1] Bluetooth: HIDP socket layer initialized
+<6>[    2.282760]  [0:      swapper/0:    1] NET: Registered protocol family 35
+<5>[    2.283380]  [0:      swapper/0:    1] Registering SWP/SWPB emulation handler
+<7>[    2.283390]  [0:      swapper/0:    1] [muic] muic_notifier_register: listener=5
+<6>[    2.283398]  [0:      swapper/0:    1] exynos_cpuidle_muic_notifier: dev=1, action=1
+<6>[    2.284337]  [0:      swapper/0:    1] zswap: loading zswap
+<6>[    2.284346]  [0:      swapper/0:    1] zpool: creating pool type zsmalloc
+<6>[    2.284383]  [0:      swapper/0:    1] zpool: created zsmalloc pool
+<6>[    2.284389]  [0:      swapper/0:    1] zswap: using zsmalloc pool
+<6>[    2.284413]  [0:      swapper/0:    1] zswap: using lzo compressor
+<6>[    2.284976]  [0:      swapper/0:    1] PM DOMAIN: pd-disp, Device : 14800000.dsim Registered
+<6>[    2.284990]  [0:      swapper/0:    1] dsim(0) probe start..
+<6>[    2.285018]  [0:      swapper/0:    1] /s6e3aa2_hd is founded
+<6>[    2.285025]  [0:      swapper/0:    1] LCD resolution: xres(720), yres(1280)
+<6>[    2.285035]  [0:      swapper/0:    1] mic is disabled
+<6>[    2.285041]  [0:      swapper/0:    1] ddi type(0)
+<6>[    2.285134]  [0:      swapper/0:    1] exynos-mipi-dsi 14800000.dsim: using data lane count(4)
+<6>[    2.285141]  [0:      swapper/0:    1] res: start(0x14800000), end(0x14800fff)
+<6>[    2.287247]  [0:      swapper/0:    1] calculated P(6),M(462),S(2) and HS clock(500)
+<6>[    2.287254]  [0:      swapper/0:    1] requested escape clock 16 MHz
+<6>[    2.287259]  [0:      swapper/0:    1] escape clock divider is 0x4
+<6>[    2.287264]  [0:      swapper/0:    1] escape clock is 15 MHz
+<6>[    2.287272]  [0:      swapper/0:    1] dsim_set_panel_power_enable is not exist, so create it
+<6>[    2.287278]  [0:      swapper/0:    1] dsim_set_panel_power_enable is empty, so make list
+<6>[    2.287305]  [0:      swapper/0:    1] check_dt: gpio: 0, regulator: 2, delay: 2, pinctrl: 1
+<6>[    2.299033]  [0:      swapper/0:    1] s6e3aa2_probe: was called
+<6>[    2.299233]  [0:      swapper/0:    1] exynos-mipi-dsi 14800000.dsim: rx fifo : 1600031c, response : 1c, rx_size : 3
+<6>[    2.299243]  [0:      swapper/0:    1] dsim_read_hl_data: read addr: 4, ret: 3
+<6>[    2.299512]  [0:      swapper/0:    1] exynos-mipi-dsi 14800000.dsim: rx fifo : 3f00231c, response : 1c, rx_size : 35
+<6>[    2.299523]  [0:      swapper/0:    1] dsim_read_hl_data: read addr: c8, ret: 35
+<6>[    2.299766]  [0:      swapper/0:    1] exynos-mipi-dsi 14800000.dsim: rx fifo : 33000b1c, response : 1c, rx_size : 11
+<6>[    2.299775]  [0:      swapper/0:    1] dsim_read_hl_data: read addr: a1, ret: 11
+<6>[    2.300013]  [0:      swapper/0:    1] exynos-mipi-dsi 14800000.dsim: rx fifo : 2900051c, response : 1c, rx_size : 5
+<6>[    2.300022]  [0:      swapper/0:    1] dsim_read_hl_data: read addr: d6, ret: 5
+<6>[    2.300285]  [0:      swapper/0:    1] exynos-mipi-dsi 14800000.dsim: rx fifo : 2c001e1c, response : 1c, rx_size : 30
+<6>[    2.300295]  [0:      swapper/0:    1] dsim_read_hl_data: read addr: b5, ret: 30
+<6>[    2.300573]  [0:      swapper/0:    1] exynos-mipi-dsi 14800000.dsim: rx fifo : 36001f1c, response : 1c, rx_size : 31
+<6>[    2.300583]  [0:      swapper/0:    1] dsim_read_hl_data: read addr: b3, ret: 31
+<6>[    2.301410]  [0:      swapper/0:    1] Dynamic Aid Finished !
+<6>[    2.301475]  [0:      swapper/0:    1] lcd panel: aor: d420
+<6>[    2.301492]  [0:      swapper/0:    1] lcd panel: elvss: 1915511c
+<6>[    2.301517]  [0:      swapper/0:    1] lcd panel: acl: 2, brightness: 128, auto: 0
+<6>[    2.301531]  [0:      swapper/0:    1] lcd panel: hbm: 0, auto: 0
+<6>[    2.301552]  [0:      swapper/0:    1] lcd panel: brightness: 128, bl: 53, nit: 183
+<6>[    2.302060]  [0:      swapper/0:    1] s6e3aa2_probe: done
+<6>[    2.302190]  [0:      swapper/0:    1] mdnie mdnie: STANDARD_UI
+<6>[    2.302199]  [0:      swapper/0:    1] mdnie mdnie: registered successfully
+<6>[    2.302207]  [0:      swapper/0:    1] lcd panel: drivers/video/exynos/decon_7580/panels/s6e3aa2_a3xe_lcd_ctrl.c probe done
+<6>[    2.302217]  [0:      swapper/0:    1] pclk_dsi_link0: 100 Mhz
+<6>[    2.302223]  [0:      swapper/0:    1] phyclk_rxclkesc0: 20 Mhz
+<6>[    2.302229]  [0:      swapper/0:    1] phyclk_bitclkdiv8: 188 Mhz
+<6>[    2.302235]  [0:      swapper/0:    1] sclk_dsi_link0_i_rgb_vclk: 166 Mhz
+<6>[    2.302242]  [0:      swapper/0:    1] pclk_decon_int: 100 Mhz
+<6>[    2.302253]  [0:      swapper/0:    1] exynos-mipi-dsi 14800000.dsim: mipi-dsi driver(CMD mode) has been probed.
+<6>[    2.302618]  [0:      swapper/0:    1] PM DOMAIN: pd-disp, Device : 14830000.decon_fb Registered
+<6>[    2.302631]  [0:      swapper/0:    1] decon 14830000.decon_fb: exynos-iommu gpd_dev_ops inserted!
+<6>[    2.302644]  [0:      swapper/0:    1] decon 14830000.decon_fb: decon_probe start
+<6>[    2.303384]  [0:      swapper/0:    1] decon-int: ver4, max win3, command mode, hw trigger
+<6>[    2.303391]  [0:      swapper/0:    1] dsi mode(0). 0: single 1: dual dsi 2: dual display
+<6>[    2.304246]  [0:      swapper/0:    1] Decon: eint irq(557), gpio number(123), ret(0).
+<6>[    2.304482]  [0:      swapper/0:    1] exynos-decon0 entity init
+<6>[    2.304503]  [0:      swapper/0:    1] decon 14830000.decon_fb: allocating memory for display
+<6>[    2.304512]  [0:      swapper/0:    1] decon 14830000.decon_fb: real_size=921600 (720.1280), virt_size=1843200 (720.2560)
+<6>[    2.304521]  [0:      swapper/0:    1] decon 14830000.decon_fb: want 7372800 bytes for window[0]
+<6>[    2.306903]  [0:      swapper/0:    1] decon 14830000.decon_fb: alloated memory
+<6>[    2.306911]  [0:      swapper/0:    1] decon 14830000.decon_fb: fb start addr = 0x10000000
+<6>[    2.306928]  [0:      swapper/0:    1] decon window[0] create
+<6>[    2.306938]  [0:      swapper/0:    1] decon window[1] create
+<6>[    2.306947]  [0:      swapper/0:    1] decon window[2] create
+<6>[    2.306959]  [0:      swapper/0:    1] decon create links
+<6>[    2.306967]  [0:      swapper/0:    1] exynos-decon0[3] --> [0]exynos-mipi-dsi0-subdev link is created successfully
+<6>[    2.307205]  [0:      swapper/0:    1] Register V4L2 subdev nodes for DECON
+<4>[    2.308500]  [1:      swapper/0:    1] pclk_decon_int: 100 Mhz
+<4>[    2.308507]  [1:      swapper/0:    1] aclk_decon_int: 200 Mhz
+<4>[    2.308513]  [1:      swapper/0:    1] sclk_decon_int_eclk: 160 Mhz
+<4>[    2.308519]  [1:      swapper/0:    1] sclk_decon_int_vclk: 63 Mhz
+<4>[    2.308525]  [1:      swapper/0:    1] aclk_xiu_disp1: 200 Mhz
+<4>[    2.308534]  [1:      swapper/0:    1] decon 14830000.decon_fb: state restore latency exceeded, new value 1107731 ns
+<6>[    2.308552]  [1:      swapper/0:    1] decon_register_esd_funcion +
+<6>[    2.308572]  [1:      swapper/0:    1] decon_register_esd_funcion: found gpio_pcd(135) success
+<6>[    2.308609]  [1:      swapper/0:    1] decon_register_esd_funcion: pcd_active is low, falling
+<6>[    2.308716]  [1:      swapper/0:    1] decon_register_esd_funcion -
+<6>[    2.308722]  [1:      swapper/0:    1] esd: 1 entity was registered
+<6>[    2.308729]  [1:      swapper/0:    1] panel id : 41 : 0 : 2
+<4>[    2.308740]  [1:      swapper/0:    1] decon 14830000.decon_fb: pm_stay_awake
+<6>[    2.308832]  [1:      swapper/0:    1] decon_esd_enable_interrupt: pcd(135) is high, 0
+<6>[    2.308843]  [1:      swapper/0:    1] decon registered successfully
+<6>[    2.309205]  [1:      swapper/0:    1] ldo37: disabling
+<6>[    2.310472]  [0:      swapper/0:    1] regulator-dummy: disabling
+<6>[    2.311043]  [2:   kworker/u8:2: 1176] sec-thermistor sec_thermistor.41: sec-ap-thermistor successfully probed.
+<6>[    2.311204]  [2:   kworker/u8:2: 1176] exynos-tmu 10030000.tmuctrl: Regulator node (vtmu) not found
+<6>[    2.311517]  [2:   kworker/u8:2: 1176] exynos-tmu 10030000.tmuctrl: Exynos: Thermal zone(therm_zone0) registered
+<6>[    2.311666]  [2:   kworker/u8:2: 1176] exynos-tmu 10040000.tmuctrl: Regulator node (vtmu) not found
+<6>[    2.311912]  [2:   kworker/u8:2: 1176] exynos-tmu 10040000.tmuctrl: Exynos: Thermal zone(therm_zone2) registered
+<6>[    2.312594]  [2:   kworker/u8:2: 1176] MIF[3] offset_percent: 0 Freq: 825000KHz Actual:Margin volts[981250 : 981250] 
+<6>[    2.312624]  [2:   kworker/u8:2: 1176] DEVFREQ(MIF) :  825000Khz,  981250V
+<6>[    2.312633]  [2:   kworker/u8:2: 1176] MIF[3] offset_percent: 0 Freq: 728000KHz Actual:Margin volts[950000 : 950000] 
+<6>[    2.312638]  [2:   kworker/u8:2: 1176] DEVFREQ(MIF) :  728000Khz,  950000V
+<6>[    2.312645]  [2:   kworker/u8:2: 1176] MIF[3] offset_percent: 0 Freq: 667000KHz Actual:Margin volts[950000 : 950000] 
+<6>[    2.312650]  [2:   kworker/u8:2: 1176] DEVFREQ(MIF) :  667000Khz,  950000V
+<6>[    2.312657]  [2:   kworker/u8:2: 1176] MIF[3] offset_percent: 0 Freq: 559000KHz Actual:Margin volts[937500 : 937500] 
+<6>[    2.312662]  [2:   kworker/u8:2: 1176] DEVFREQ(MIF) :  559000Khz,  937500V
+<6>[    2.312669]  [2:   kworker/u8:2: 1176] MIF[3] offset_percent: 0 Freq: 416000KHz Actual:Margin volts[856250 : 856250] 
+<6>[    2.312674]  [2:   kworker/u8:2: 1176] DEVFREQ(MIF) :  416000Khz,  856250V
+<6>[    2.312681]  [2:   kworker/u8:2: 1176] MIF[3] offset_percent: 0 Freq: 338000KHz Actual:Margin volts[856250 : 856250] 
+<6>[    2.312686]  [2:   kworker/u8:2: 1176] DEVFREQ(MIF) :  338000Khz,  856250V
+<6>[    2.312693]  [2:   kworker/u8:2: 1176] MIF[3] offset_percent: 0 Freq: 273000KHz Actual:Margin volts[856250 : 856250] 
+<6>[    2.312698]  [2:   kworker/u8:2: 1176] DEVFREQ(MIF) :  273000Khz,  856250V
+<6>[    2.312705]  [2:   kworker/u8:2: 1176] MIF[3] offset_percent: 0 Freq: 200000KHz Actual:Margin volts[856250 : 856250] 
+<6>[    2.312710]  [2:   kworker/u8:2: 1176] DEVFREQ(MIF) :  200000Khz,  856250V
+<6>[    2.314739]  [0:   kworker/u8:2: 1176] INT[2] offset_percent: 0 Freq: 400000KHz Actual:Margin volts[981250 : 981250] 
+<6>[    2.314757]  [0:   kworker/u8:2: 1176] DEVFREQ(INT) :  400000Khz,  981250V
+<6>[    2.314765]  [0:   kworker/u8:2: 1176] INT[2] offset_percent: 0 Freq: 334000KHz Actual:Margin volts[950000 : 950000] 
+<6>[    2.314771]  [0:   kworker/u8:2: 1176] DEVFREQ(INT) :  334000Khz,  950000V
+<6>[    2.314778]  [0:   kworker/u8:2: 1176] INT[2] offset_percent: 0 Freq: 267000KHz Actual:Margin volts[950000 : 950000] 
+<6>[    2.314783]  [0:   kworker/u8:2: 1176] DEVFREQ(INT) :  267000Khz,  950000V
+<6>[    2.314790]  [0:   kworker/u8:2: 1176] INT[2] offset_percent: 0 Freq: 200000KHz Actual:Margin volts[937500 : 937500] 
+<6>[    2.314795]  [0:   kworker/u8:2: 1176] DEVFREQ(INT) :  200000Khz,  937500V
+<6>[    2.314802]  [0:   kworker/u8:2: 1176] INT[2] offset_percent: 0 Freq: 160000KHz Actual:Margin volts[856250 : 856250] 
+<6>[    2.314807]  [0:   kworker/u8:2: 1176] DEVFREQ(INT) :  160000Khz,  856250V
+<6>[    2.314814]  [0:   kworker/u8:2: 1176] INT[2] offset_percent: 0 Freq: 134000KHz Actual:Margin volts[856250 : 856250] 
+<6>[    2.314818]  [0:   kworker/u8:2: 1176] DEVFREQ(INT) :  134000Khz,  856250V
+<6>[    2.314825]  [0:   kworker/u8:2: 1176] INT[2] offset_percent: 0 Freq: 111000KHz Actual:Margin volts[856250 : 856250] 
+<6>[    2.314831]  [0:   kworker/u8:2: 1176] DEVFREQ(INT) :  111000Khz,  856250V
+<6>[    2.314838]  [0:   kworker/u8:2: 1176] INT[2] offset_percent: 0 Freq: 100000KHz Actual:Margin volts[856250 : 856250] 
+<6>[    2.314842]  [0:   kworker/u8:2: 1176] DEVFREQ(INT) :  100000Khz,  856250V
+<6>[    2.315921]  [0:   kworker/u8:2: 1176] ISP[5] offset_percent: 0 Freq: 530000KHz Actual:Margin volts[981250 : 981250] 
+<6>[    2.315938]  [0:   kworker/u8:2: 1176] DEVFREQ(ISP) :  530000Khz,  981250V
+<6>[    2.315946]  [0:   kworker/u8:2: 1176] ISP[5] offset_percent: 0 Freq: 430000KHz Actual:Margin volts[950000 : 950000] 
+<6>[    2.315951]  [0:   kworker/u8:2: 1176] DEVFREQ(ISP) :  430000Khz,  950000V
+<6>[    2.315958]  [0:   kworker/u8:2: 1176] ISP[5] offset_percent: 0 Freq: 400000KHz Actual:Margin volts[950000 : 950000] 
+<6>[    2.315963]  [0:   kworker/u8:2: 1176] DEVFREQ(ISP) :  400000Khz,  950000V
+<6>[    2.315970]  [0:   kworker/u8:2: 1176] ISP[5] offset_percent: 0 Freq: 334000KHz Actual:Margin volts[937500 : 937500] 
+<6>[    2.315975]  [0:   kworker/u8:2: 1176] DEVFREQ(ISP) :  334000Khz,  937500V
+<6>[    2.315982]  [0:   kworker/u8:2: 1176] ISP[5] offset_percent: 0 Freq: 267000KHz Actual:Margin volts[856250 : 856250] 
+<6>[    2.315987]  [0:   kworker/u8:2: 1176] DEVFREQ(ISP) :  267000Khz,  856250V
+<6>[    2.315994]  [0:   kworker/u8:2: 1176] ISP[5] offset_percent: 0 Freq: 200000KHz Actual:Margin volts[856250 : 856250] 
+<6>[    2.315998]  [0:   kworker/u8:2: 1176] DEVFREQ(ISP) :  200000Khz,  856250V
+<7>[    2.316398]  [2:      swapper/0:    1] usb: init
+<7>[    2.316484]  [2:      swapper/0:    1] usb: android_bind disconnect
+<6>[    2.316532]  [2:      swapper/0:    1] file system registered
+<7>[    2.316925]  [2:      swapper/0:    1] [mtp_setup] 	line = [1761]
+<6>[    2.317264]  [0:      swapper/0:    1] android_usb gadget: Mass Storage Function, version: 2009/09/11
+<6>[    2.317271]  [0:      swapper/0:    1] android_usb gadget: Number of LUNs=1
+<6>[    2.317280]  [0:      swapper/0:    1]  lun0: LUN: removable CD-ROM file: (no medium)
+<7>[    2.317578]  [0:      swapper/0:    1] usb: usb_string_id cdev(0xffffffc056fa4d80)->next_string_id=1
+<7>[    2.317586]  [0:      swapper/0:    1] usb: usb_string_id cdev(0xffffffc056fa4d80)->next_string_id=2
+<7>[    2.317596]  [0:      swapper/0:    1] usb: usb_string_id cdev(0xffffffc056fa4d80)->next_string_id=3
+<6>[    2.317604]  [0:      swapper/0:    1] android_usb gadget: android_usb ready
+<6>[    2.317610]  [0:      swapper/0:    1] bound driver 'android_usb'
+<6>[    2.317616]  [0:      swapper/0:    1] usb: Skip udc_enable
+<6>[    2.318511]  [0:      swapper/0:    1] input: gpio_keys.21 as /devices/gpio_keys.21/input/input8
+<6>[    2.318530]  [0:      swapper/0:    1] PWR key is released
+<6>[    2.318545]  [0:      swapper/0:    1] VolumeDown key is released
+<6>[    2.318564]  [0:      swapper/0:    1] VolumeUp key is released
+<6>[    2.318577]  [0:      swapper/0:    1] HOME key is released
+<6>[    2.318687]  [0:      swapper/0:    1] gpio-keys gpio_keys.21: POWER_KEY(116) , gpio_val(1)
+<6>[    2.318696]  [0:      swapper/0:    1] gpio-keys gpio_keys.21: VOL_DOWN(114) , gpio_val(1)
+<6>[    2.318705]  [0:      swapper/0:    1] gpio-keys gpio_keys.21: VOL_UP(115) , gpio_val(1)
+<6>[    2.318714]  [0:      swapper/0:    1] gpio-keys gpio_keys.21: HOME_KEY(172) , gpio_val(1)
+<4>[    2.318849]  [0:      swapper/0:    1] hall_init start
+<6>[    2.319496]  [0:      swapper/0:    1] init_hall_ic_irq : success
+<6>[    2.319592]  [0:      swapper/0:    1] input: hall as /devices/hall.36/input/input9
+<4>[    2.319738]  [0:      swapper/0:    1] certify_hall_init start
+<6>[    2.320310]  [0:      swapper/0:    1] init_certify_hall_ic_irq : success
+<6>[    2.320402]  [0:      swapper/0:    1] input: certify_hall as /devices/certify_hall.37/input/input10
+<6>[    2.321738]  [0:      swapper/0:    1] s2m-rtc s2m-rtc: s2m_rtc_read_time: 2017-12-05 00:29:21(0x04)AM
+<6>[    2.321810]  [0:      swapper/0:    1] s2m-rtc s2m-rtc: setting system clock to 2017-12-05 00:29:21 UTC (1512433761)
+<6>[    2.322725]  [0:      swapper/0:    1] sec_bat_parse_dt: Vendor is Empty
+<6>[    2.323046]  [0:      swapper/0:    1] sec_bat_parse_dt : HIGHLIMIT_THRESHOLD_EVENT(800), HIGHLIMIT_RECOVERY_EVENT(750)
+<6>[    2.323046]  [0:      swapper/0:    1] HIGH_THRESHOLD_EVENT(550), HIGH_RECOVERY_EVENT(500) LOW_THRESHOLD_EVENT(-50), LOW_RECOVERY_EVENT(0)
+<6>[    2.323046]  [0:      swapper/0:    1] HIGHLIMIT_THRESHOLD_NOLMAL(800), HIGHLIMIT_RECOVERY_NORMAL(750)
+<6>[    2.323046]  [0:      swapper/0:    1] HIGH_THRESHOLD_NORMAL(550), HIGH_RECOVERY_NORMAL(500) LOW_THRESHOLD_NORMAL(-50), LOW_RECOVERY_NORMAL(0)
+<6>[    2.323046]  [0:      swapper/0:    1] HIGHLIMIT_THRESHOLD_LPM(800), HIGHLIMIT_RECOVERY_LPM(750)
+<6>[    2.323046]  [0:      swapper/0:    1] HIGH_THRESHOLD_LPM(550), HIGH_RECOVERY_LPM(500) LOW_THRESHOLD_LPM(-50), LOW_RECOVERY_LPM(0)
+<6>[    2.323155]  [0:      swapper/0:    1] sec_bat_parse_dt: swelling high temp chg current is Empty
+<6>[    2.323166]  [0:      swapper/0:    1] sec_bat_parse_dt: swelling low temp chg current is Empty
+<6>[    2.323176]  [0:      swapper/0:    1] sec_bat_parse_dt: swelling_full_check_current_2nd is Empty
+<6>[    2.323203]  [0:      swapper/0:    1] sec_bat_parse_dt : SWELLING_HIGH_TEMP(450) SWELLING_HIGH_TEMP_RECOVERY(400)
+<6>[    2.323203]  [0:      swapper/0:    1] SWELLING_LOW_TEMP(100) SWELLING_LOW_TEMP_RECOVERY(150)
+<6>[    2.323203]  [0:      swapper/0:    1] SWELLING_CHG_CURRENT(1300) SWELLING_HIGH_CHG_CURRENT(0) SWELLING_LOW_CHG_CURRENT(0)
+<6>[    2.323203]  [0:      swapper/0:    1] SWELLING_FULL_CHECK_CURRENT(0)
+<7>[    2.324050]  [0:      swapper/0:    1] [muic] muic_notifier_register: listener=4
+<6>[    2.324060]  [0:      swapper/0:    1] [sec_bat_cable_check]ATTACHED(1)
+<6>[    2.324076]  [0:      swapper/0:    1] sec-battery battery.19: batt_handle_notification: current_cable(4), wc_status(0), wire_status(4)
+<6>[    2.324087]  [0:      swapper/0:    1] batt_handle_notification: CMD=ATTACH, attached_dev=1
+<6>[    2.324094]  [0:      swapper/0:    1] vbus_notifier_register: listener=1 register
+<6>[    2.324101]  [0:      swapper/0:    1] vbus_handle_notification: action=2, vbus_status=2
+<6>[    2.324108]  [0:      swapper/0:    1] cable_initial_check : current_cable_type : (1)
+<6>[    2.324118]  [0:    kworker/0:1:  418] sec-battery battery.19: sec_bat_cable_work: Start
+<6>[    2.324126]  [0:    kworker/0:1:  418] sec_chg_set_property: float voltage(4375)
+<6>[    2.324176]  [0:      swapper/0:    1] sec-battery battery.19: sec_battery_probe: SEC Battery Driver Monitorwork
+<6>[    2.324188]  [0:      swapper/0:    1] sec-battery battery.19: sec_battery_probe: SEC Battery Driver Loaded
+<6>[    2.324620]  [0:    kworker/0:1:  418] sec_chg_set_property:[BATT] Set charging, Cable type = 4
+<6>[    2.324723]  [0:      swapper/0:    1] exynos-mcomp: init
+<6>[    2.324830]  [0:      swapper/0:    1] PM DOMAIN: Power off unused power domains.
+<6>[    2.324858]  [0:    kworker/0:1:  418] s2mu003_configure_charger : Set config charging
+<6>[    2.325108]  [0:      swapper/0:    1] ALSA device list:
+<6>[    2.325115]  [0:      swapper/0:    1]   #0: Universal7580-I2S
+<3>[    2.325188]  [0:      swapper/0:    1] Warning: unable to open an initial console.
+<6>[    2.325212]  [0:      swapper/0:    1] gpio initial-state: gpa0-0 IN/PD/L
+<6>[    2.325223]  [0:      swapper/0:    1] gpio initial-state: gpa0-1 INT/NP/H
+<6>[    2.325232]  [0:      swapper/0:    1] gpio initial-state: gpa0-2 INT/PU/H
+<6>[    2.325242]  [0:      swapper/0:    1] gpio initial-state: gpa0-3 INT/NP/H
+<6>[    2.325251]  [0:      swapper/0:    1] gpio initial-state: gpa0-4 INT/PU/H
+<6>[    2.325260]  [0:      swapper/0:    1] gpio initial-state: gpa0-5 INT/NP/H
+<6>[    2.325270]  [0:      swapper/0:    1] gpio initial-state: gpa0-6 IN/PD/H
+<6>[    2.325279]  [0:      swapper/0:    1] gpio initial-state: gpa0-7 INT/NP/H
+<6>[    2.325289]  [0:      swapper/0:    1] gpio initial-state: gpa1-0 IN/PD/L
+<6>[    2.325299]  [0:      swapper/0:    1] gpio initial-state: gpa1-1 INT/NP/H
+<6>[    2.325308]  [0:      swapper/0:    1] gpio initial-state: gpa1-2 INT/PD/L
+<6>[    2.325317]  [0:      swapper/0:    1] gpio initial-state: gpa1-3 INT/NP/H
+<6>[    2.325327]  [0:      swapper/0:    1] gpio initial-state: gpa1-4 IN/PD/L
+<6>[    2.325337]  [0:      swapper/0:    1] gpio initial-state: gpa1-5 OUT/NP/H
+<6>[    2.325346]  [0:      swapper/0:    1] gpio initial-state: gpa1-6 OUT/NP/L
+<6>[    2.325355]  [0:      swapper/0:    1] gpio initial-state: gpa1-7 IN/NP/L
+<6>[    2.325365]  [0:      swapper/0:    1] gpio initial-state: gpa2-0 INT/PU/H
+<6>[    2.325375]  [0:      swapper/0:    1] gpio initial-state: gpa2-1 INT/PU/H
+<6>[    2.325384]  [0:      swapper/0:    1] gpio initial-state: gpa2-2 OUT/NP/L
+<6>[    2.325394]  [0:      swapper/0:    1] gpio initial-state: gpa2-3 IN/PD/L
+<6>[    2.325403]  [0:      swapper/0:    1] gpio initial-state: gpa2-4 IN/PD/L
+<6>[    2.325413]  [0:      swapper/0:    1] gpio initial-state: gpa2-5 INT/PU/H
+<6>[    2.325422]  [0:      swapper/0:    1] gpio initial-state: gpa2-6 INT/NP/L
+<6>[    2.325432]  [0:      swapper/0:    1] gpio initial-state: gpa2-7 INT/PU/H
+<6>[    2.325441]  [0:      swapper/0:    1] gpio initial-state: gpa3-0 IN/PD/H
+<6>[    2.325451]  [0:      swapper/0:    1] gpio initial-state: gpa3-1 INT/NP/L
+<6>[    2.325460]  [0:      swapper/0:    1] gpio initial-state: gpa3-2 IN/PD/L
+<6>[    2.325470]  [0:      swapper/0:    1] gpio initial-state: gpa3-3 IN/PD/L
+<6>[    2.325479]  [0:      swapper/0:    1] gpio initial-state: gpa3-4 IN/PD/L
+<6>[    2.325488]  [0:      swapper/0:    1] gpio initial-state: gpa3-5 INT/NP/H
+<6>[    2.325498]  [0:      swapper/0:    1] gpio initial-state: gpa3-6 INT/NP/H
+<6>[    2.325508]  [0:      swapper/0:    1] gpio initial-state: gpa3-7 IN/PD/L
+<6>[    2.325522]  [0:      swapper/0:    1] gpio initial-state: gpc0-0 IN/PD/L
+<6>[    2.325530]  [0:      swapper/0:    1] gpio initial-state: gpc0-1 IN/PD/L
+<6>[    2.325539]  [0:      swapper/0:    1] gpio initial-state: gpc0-2 IN/PD/L
+<6>[    2.325547]  [0:      swapper/0:    1] gpio initial-state: gpc0-3 IN/PD/L
+<6>[    2.325557]  [0:      swapper/0:    1] gpio initial-state: gpr0-0 FUNC/NP/L
+<6>[    2.325565]  [0:      swapper/0:    1] gpio initial-state: gpr0-1 FUNC/PU/H
+<6>[    2.325574]  [0:      swapper/0:    1] gpio initial-state: gpr0-2 FUNC/PD/L
+<6>[    2.325583]  [0:      swapper/0:    1] gpio initial-state: gpr1-0 FUNC/PU/H
+<6>[    2.325591]  [0:      swapper/0:    1] gpio initial-state: gpr1-1 FUNC/PU/H
+<6>[    2.325599]  [0:      swapper/0:    1] gpio initial-state: gpr1-2 FUNC/PU/H
+<6>[    2.325608]  [0:      swapper/0:    1] gpio initial-state: gpr1-3 FUNC/PU/H
+<6>[    2.325616]  [0:      swapper/0:    1] gpio initial-state: gpr1-4 FUNC/PU/H
+<6>[    2.325625]  [0:      swapper/0:    1] gpio initial-state: gpr1-5 FUNC/PU/H
+<6>[    2.325633]  [0:      swapper/0:    1] gpio initial-state: gpr1-6 FUNC/PU/H
+<6>[    2.325641]  [0:      swapper/0:    1] gpio initial-state: gpr1-7 FUNC/PU/H
+<6>[    2.325650]  [0:      swapper/0:    1] gpio initial-state: gpr2-0 FUNC/NP/L
+<6>[    2.325658]  [0:      swapper/0:    1] gpio initial-state: gpr2-1 FUNC/NP/H
+<6>[    2.325667]  [0:      swapper/0:    1] gpio initial-state: gpr3-0 FUNC/PU/H
+<6>[    2.325675]  [0:      swapper/0:    1] gpio initial-state: gpr3-1 FUNC/PU/H
+<6>[    2.325684]  [0:      swapper/0:    1] gpio initial-state: gpr3-2 FUNC/PU/H
+<6>[    2.325692]  [0:      swapper/0:    1] gpio initial-state: gpr3-3 FUNC/PU/H
+<6>[    2.325701]  [0:      swapper/0:    1] gpio initial-state: gpr4-0 FUNC/NP/L
+<6>[    2.325709]  [0:      swapper/0:    1] gpio initial-state: gpr4-1 FUNC/NP/H
+<6>[    2.325718]  [0:      swapper/0:    1] gpio initial-state: gpr4-2 IN/PD/L
+<6>[    2.325726]  [0:      swapper/0:    1] gpio initial-state: gpr4-3 FUNC/NP/H
+<6>[    2.325734]  [0:      swapper/0:    1] gpio initial-state: gpr4-4 FUNC/NP/H
+<6>[    2.325743]  [0:      swapper/0:    1] gpio initial-state: gpr4-5 FUNC/NP/H
+<6>[    2.325751]  [0:      swapper/0:    1] gpio initial-state: gpr4-6 FUNC/NP/H
+<6>[    2.325759]  [0:      swapper/0:    1] gpio initial-state: gpm0-0 FUNC/PU/H
+<6>[    2.325766]  [0:      swapper/0:    1] gpio initial-state: gpm0-1 FUNC/PU/H
+<6>[    2.325776]  [0:      swapper/0:    1] gpio initial-state: gpc3-0 FUNC/PU/H
+<6>[    2.325785]  [0:      swapper/0:    1] gpio initial-state: gpc3-1 FUNC/PU/H
+<6>[    2.325793]  [0:      swapper/0:    1] gpio initial-state: gpc3-2 FUNC/PD/L
+<6>[    2.325802]  [0:      swapper/0:    1] gpio initial-state: gpc3-3 FUNC/PD/L
+<6>[    2.325811]  [0:      swapper/0:    1] gpio initial-state: gpb0-0 FUNC/NP/L
+<6>[    2.325819]  [0:      swapper/0:    1] gpio initial-state: gpb0-1 FUNC/NP/H
+<6>[    2.325828]  [0:      swapper/0:    1] gpio initial-state: gpb0-2 IN/NP/H
+<6>[    2.325836]  [0:      swapper/0:    1] gpio initial-state: gpb0-3 IN/NP/H
+<6>[    2.325845]  [0:      swapper/0:    1] gpio initial-state: gpb0-4 FUNC/PU/H
+<6>[    2.325854]  [0:      swapper/0:    1] gpio initial-state: gpb0-5 FUNC/PU/H
+<6>[    2.325862]  [0:      swapper/0:    1] gpio initial-state: gpb0-6 FUNC/PD/L
+<6>[    2.325871]  [0:      swapper/0:    1] gpio initial-state: gpb0-7 FUNC/PD/H
+<6>[    2.325879]  [0:      swapper/0:    1] gpio initial-state: gpb1-0 IN/PD/L
+<6>[    2.325888]  [0:      swapper/0:    1] gpio initial-state: gpb1-1 IN/PD/L
+<6>[    2.325897]  [0:      swapper/0:    1] gpio initial-state: gpb2-0 IN/PD/L
+<6>[    2.325905]  [0:      swapper/0:    1] gpio initial-state: gpb2-1 IN/PD/L
+<6>[    2.325914]  [0:      swapper/0:    1] gpio initial-state: gpb2-2 IN/PD/L
+<6>[    2.325922]  [0:      swapper/0:    1] gpio initial-state: gpb2-3 IN/PD/L
+<6>[    2.325931]  [0:      swapper/0:    1] gpio initial-state: gpb2-4 IN/PD/L
+<6>[    2.325939]  [0:      swapper/0:    1] gpio initial-state: gpb2-5 IN/PD/L
+<6>[    2.325948]  [0:      swapper/0:    1] gpio initial-state: gpb2-6 IN/PD/L
+<6>[    2.325956]  [0:      swapper/0:    1] gpio initial-state: gpb2-7 IN/PD/L
+<6>[    2.325966]  [0:      swapper/0:    1] gpio initial-state: gpc1-0 OUT/NP/H
+<6>[    2.325974]  [0:      swapper/0:    1] gpio initial-state: gpc1-1 IN/PD/L
+<6>[    2.325982]  [0:      swapper/0:    1] gpio initial-state: gpc1-2 IN/PD/L
+<6>[    2.325991]  [0:      swapper/0:    1] gpio initial-state: gpc1-3 IN/PD/L
+<6>[    2.325999]  [0:      swapper/0:    1] gpio initial-state: gpc1-4 IN/PD/L
+<6>[    2.326008]  [0:      swapper/0:    1] gpio initial-state: gpc2-0 FUNC/NP/H
+<6>[    2.326017]  [0:      swapper/0:    1] gpio initial-state: gpc2-1 FUNC/NP/H
+<6>[    2.326025]  [0:      swapper/0:    1] gpio initial-state: gpc2-2 FUNC/NP/L
+<6>[    2.326034]  [0:      swapper/0:    1] gpio initial-state: gpc2-3 FUNC/NP/L
+<6>[    2.326042]  [0:      swapper/0:    1] gpio initial-state: gpc2-4 FUNC/NP/H
+<6>[    2.326051]  [0:      swapper/0:    1] gpio initial-state: gpc2-5 FUNC/NP/H
+<6>[    2.326060]  [0:      swapper/0:    1] gpio initial-state: gpc5-0 FUNC/PU/H
+<6>[    2.326069]  [0:      swapper/0:    1] gpio initial-state: gpc5-1 FUNC/PU/H
+<6>[    2.326078]  [0:      swapper/0:    1] gpio initial-state: gpc5-2 FUNC/PU/H
+<6>[    2.326086]  [0:      swapper/0:    1] gpio initial-state: gpc5-3 FUNC/PU/H
+<6>[    2.326095]  [0:      swapper/0:    1] gpio initial-state: gpd0-0 IN/NP/L
+<6>[    2.326104]  [0:      swapper/0:    1] gpio initial-state: gpd0-1 IN/NP/H
+<6>[    2.326112]  [0:      swapper/0:    1] gpio initial-state: gpd0-2 IN/NP/L
+<6>[    2.326121]  [0:      swapper/0:    1] gpio initial-state: gpd0-3 IN/NP/L
+<6>[    2.326129]  [0:      swapper/0:    1] gpio initial-state: gpd0-4 IN/NP/L
+<6>[    2.326138]  [0:      swapper/0:    1] gpio initial-state: gpd0-5 OUT/NP/L
+<6>[    2.326147]  [0:      swapper/0:    1] gpio initial-state: gpd0-6 IN/PD/L
+<6>[    2.326155]  [0:      swapper/0:    1] gpio initial-state: gpd0-7 INT/PD/L
+<6>[    2.326164]  [0:      swapper/0:    1] gpio initial-state: gpd1-0 OUT/PD/L
+<6>[    2.326173]  [0:      swapper/0:    1] gpio initial-state: gpd1-1 IN/PD/L
+<6>[    2.326182]  [0:      swapper/0:    1] gpio initial-state: gpd1-2 IN/PD/L
+<6>[    2.326190]  [0:      swapper/0:    1] gpio initial-state: gpd1-3 OUT/NP/H
+<6>[    2.326199]  [0:      swapper/0:    1] gpio initial-state: gpd1-4 IN/PD/L
+<6>[    2.326207]  [0:      swapper/0:    1] gpio initial-state: gpd1-5 IN/PD/L
+<6>[    2.326216]  [0:      swapper/0:    1] gpio initial-state: gpd1-6 OUT/PD/L
+<6>[    2.326225]  [0:      swapper/0:    1] gpio initial-state: gpd2-0 IN/NP/H
+<6>[    2.326234]  [0:      swapper/0:    1] gpio initial-state: gpd2-1 IN/NP/H
+<6>[    2.326243]  [0:      swapper/0:    1] gpio initial-state: gpd2-2 OUT/NP/H
+<6>[    2.326251]  [0:      swapper/0:    1] gpio initial-state: gpd2-3 OUT/PU/H
+<6>[    2.326260]  [0:      swapper/0:    1] gpio initial-state: gpd2-4 INT/PD/H
+<6>[    2.326268]  [0:      swapper/0:    1] gpio initial-state: gpd2-5 IN/PD/L
+<6>[    2.326277]  [0:      swapper/0:    1] gpio initial-state: gpd2-6 OUT/PD/L
+<6>[    2.326286]  [0:      swapper/0:    1] gpio initial-state: gpd2-7 IN/PD/L
+<6>[    2.326295]  [0:      swapper/0:    1] gpio initial-state: gpd3-0 IN/PD/L
+<6>[    2.326303]  [0:      swapper/0:    1] gpio initial-state: gpd3-1 OUT/NP/H
+<6>[    2.326312]  [0:      swapper/0:    1] gpio initial-state: gpd3-2 IN/NP/H
+<6>[    2.326320]  [0:      swapper/0:    1] gpio initial-state: gpd3-3 IN/NP/H
+<6>[    2.326329]  [0:      swapper/0:    1] gpio initial-state: gpd3-4 IN/NP/H
+<6>[    2.326338]  [0:      swapper/0:    1] gpio initial-state: gpe0-0 OUT/PD/L
+<6>[    2.326347]  [0:      swapper/0:    1] gpio initial-state: gpe0-1 FUNC/PD/L
+<6>[    2.326355]  [0:      swapper/0:    1] gpio initial-state: gpe0-2 FUNC/PD/L
+<6>[    2.326364]  [0:      swapper/0:    1] gpio initial-state: gpe0-3 OUT/PD/L
+<6>[    2.326373]  [0:      swapper/0:    1] gpio initial-state: gpe0-4 OUT/PD/L
+<6>[    2.326381]  [0:      swapper/0:    1] gpio initial-state: gpe0-5 IN/PD/L
+<6>[    2.326390]  [0:      swapper/0:    1] gpio initial-state: gpe0-6 OUT/NP/H
+<6>[    2.326399]  [0:      swapper/0:    1] gpio initial-state: gpe0-7 OUT/NP/L
+<6>[    2.326408]  [0:      swapper/0:    1] gpio initial-state: gpe1-0 OUT/NP/H
+<6>[    2.326417]  [0:      swapper/0:    1] gpio initial-state: gpe1-1 IN/PD/L
+<6>[    2.326425]  [0:      swapper/0:    1] gpio initial-state: gpe1-2 IN/PD/L
+<6>[    2.326434]  [0:      swapper/0:    1] gpio initial-state: gpe1-3 IN/PD/L
+<6>[    2.326443]  [0:      swapper/0:    1] gpio initial-state: gpe1-4 FUNC/PD/L
+<6>[    2.326452]  [0:      swapper/0:    1] gpio initial-state: gpf0-0 IN/PD/L
+<6>[    2.326460]  [0:      swapper/0:    1] gpio initial-state: gpf0-1 IN/PD/L
+<6>[    2.326469]  [0:      swapper/0:    1] gpio initial-state: gpf0-2 IN/PD/L
+<6>[    2.326478]  [0:      swapper/0:    1] gpio initial-state: gpf0-3 IN/PD/L
+<6>[    2.326486]  [0:      swapper/0:    1] gpio initial-state: gpf0-4 IN/PD/L
+<6>[    2.326496]  [0:      swapper/0:    1] gpio initial-state: gpf1-0 IN/PD/L
+<6>[    2.326504]  [0:      swapper/0:    1] gpio initial-state: gpf1-1 IN/PD/L
+<6>[    2.326513]  [0:      swapper/0:    1] gpio initial-state: gpf1-2 IN/PD/L
+<6>[    2.326521]  [0:      swapper/0:    1] gpio initial-state: gpf1-3 IN/PD/L
+<6>[    2.326530]  [0:      swapper/0:    1] gpio initial-state: gpf1-4 IN/PD/L
+<6>[    2.326539]  [0:      swapper/0:    1] gpio initial-state: gpf1-5 IN/PD/L
+<6>[    2.326548]  [0:      swapper/0:    1] gpio initial-state: gpf1-6 IN/PD/L
+<6>[    2.326556]  [0:      swapper/0:    1] gpio initial-state: gpf1-7 IN/PD/L
+<6>[    2.326565]  [0:      swapper/0:    1] gpio initial-state: gpf2-0 IN/PD/L
+<6>[    2.326574]  [0:      swapper/0:    1] gpio initial-state: gpf2-1 IN/PD/L
+<6>[    2.326583]  [0:      swapper/0:    1] gpio initial-state: gpc4-0 IN/PD/L
+<6>[    2.326592]  [0:      swapper/0:    1] gpio initial-state: gpc4-1 IN/PD/L
+<6>[    2.326600]  [0:      swapper/0:    1] gpio initial-state: gpc4-2 IN/PD/L
+<12>[    2.327353]  [1:           init:    1] !@Boot: start init process
+<7>[    2.332472]  [1:           init:    1] SELinux: 2048 avtab hash slots, 18675 rules.
+<7>[    2.338765]  [1:           init:    1] SELinux: 2048 avtab hash slots, 18675 rules.
+<7>[    2.338855]  [1:           init:    1] SELinux:  1 users, 2 roles, 1532 types, 0 bools, 1 sens, 1024 cats
+<7>[    2.338865]  [1:           init:    1] SELinux:  86 classes, 18675 rules
+<7>[    2.341796]  [1:           init:    1] SELinux:  Completing initialization.
+<7>[    2.341811]  [1:           init:    1] SELinux:  Setting up existing superblocks.
+<7>[    2.341837]  [1:           init:    1] SELinux: initialized (dev sysfs, type sysfs), uses genfs_contexts
+<7>[    2.341855]  [1:           init:    1] SELinux: initialized (dev rootfs, type rootfs), uses genfs_contexts
+<7>[    2.341912]  [1:           init:    1] SELinux: initialized (dev bdev, type bdev), not configured for labeling
+<7>[    2.341928]  [1:           init:    1] SELinux: initialized (dev proc, type proc), uses genfs_contexts
+<7>[    2.341952]  [1:           init:    1] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+<7>[    2.341974]  [1:           init:    1] SELinux: initialized (dev devtmpfs, type devtmpfs), uses transition SIDs
+<7>[    2.342479]  [1:           init:    1] SELinux: initialized (dev debugfs, type debugfs), uses genfs_contexts
+<7>[    2.345861]  [1:           init:    1] SELinux: initialized (dev sockfs, type sockfs), uses task SIDs
+<7>[    2.345877]  [1:           init:    1] SELinux: initialized (dev pipefs, type pipefs), uses task SIDs
+<7>[    2.345890]  [1:           init:    1] SELinux: initialized (dev anon_inodefs, type anon_inodefs), uses genfs_contexts
+<7>[    2.345903]  [1:           init:    1] SELinux: initialized (dev devpts, type devpts), uses transition SIDs
+<7>[    2.345925]  [1:           init:    1] SELinux: initialized (dev selinuxfs, type selinuxfs), uses genfs_contexts
+<7>[    2.345983]  [1:           init:    1] SELinux: initialized (dev configfs, type configfs), not configured for labeling
+<7>[    2.345994]  [1:           init:    1] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+<7>[    2.346021]  [1:           init:    1] SELinux: initialized (dev sysfs, type sysfs), uses genfs_contexts
+<6>[    2.519127]  [0:   kworker/u8:0:    6] dwmmc_exynos 13560000.dwmmc2: vmmc off, vqmmc on.
+<6>[    2.526040]  [0:   kworker/u8:0:    6] dwmmc_exynos 13560000.dwmmc2: vmmc on, vqmmc on.
+<6>[    2.538871]  [0:    kworker/0:1:  418] s2mu003_enable_charging_termination:[BATT] Do termination set(0)
+<6>[    2.539288]  [0:    kworker/0:1:  418] s2mu003_configure_charger : input current (460mA)
+<6>[    2.539697]  [0:    kworker/0:1:  418] s2mu003_configure_charger : float voltage (4375mV)
+<6>[    2.540053]  [0:    kworker/0:1:  418] s2mu003_configure_charger : fast charging current (460mA)
+<6>[    2.540061]  [0:    kworker/0:1:  418] s2mu003_configure_charger : termination current (200mA)
+<6>[    2.540468]  [0:    kworker/0:1:  418] s2mu003_set_termination_current_limit : Set Termination
+<6>[    2.541050]  [0:    kworker/0:1:  418] s2mu003_enable_charger_switch: turn on charger
+<6>[    2.558807]  [0:   kworker/u8:0:    6] mmc_host mmc2: Bus speed (slot 0) = 25000000Hz (slot req 300000Hz, actual 297619HZ div = 42)
+<12>[    2.563112]  [1:           init:    1] SELinux: Loaded policy from /sepolicy
+<6>[    2.602121]  [0:   kworker/u8:0:    6] dwmmc_exynos 13560000.dwmmc2: vmmc off, vqmmc on.
+<6>[    2.609386]  [0:    kworker/0:1:  418] s2mu003_toggle_watchdog: CHG_WDT Enable, S2MU003_CHG_CTRL6 : 0xdc
+<6>[    2.609408]  [0:    kworker/0:1:  418] sec-battery battery.19: sec_bat_cable_work: Status:Charging, Sleep:No, Charging:Yes, Short Poll:Yes
+<6>[    2.609416]  [0:    kworker/0:1:  418] sec-battery battery.19: sec_bat_cable_work: Polling time is reset to 30 sec.
+<7>[    2.610342]  [0:    kworker/0:1:  418] s2mu003-fuelgauge 4-0035: s2mu003_get_vbat: vbat (3943)
+<7>[    2.614794]  [0:    kworker/0:1:  418] s2mu003-fuelgauge 4-0035: s2mu003_get_avgvbat: avgvbat (3942)
+<7>[    2.615692]  [0:    kworker/0:1:  418] s2mu003-fuelgauge 4-0035: s2mu003_get_ocv: rocv (3780)
+<7>[    2.616597]  [0:    kworker/0:1:  418] s2mu003-fuelgauge 4-0035: s2mu003_get_vbat: vbat (3943)
+<6>[    2.618383]  [0:    kworker/0:1:  418] s2mu003-fuelgauge 4-0035: s2mu003_get_soc: raw capacity (0x4b0:2929)
+<7>[    2.620129]  [0:    kworker/0:1:  418] s2mu003-fuelgauge 4-0035: s2mu003_set_temperature: temperature to (232)
+<7>[    2.621646]  [0:    kworker/0:1:  418] s2mu003-fuelgauge 4-0035: s2mu003_set_temperature: temperature to (232)
+<6>[    2.623434]  [0:    kworker/0:1:  418] s2mu003-fuelgauge 4-0035: s2mu003_get_soc: raw capacity (0x4b0:2929)
+<7>[    2.623443]  [0:    kworker/0:1:  418] s2mu003-fuelgauge 4-0035: s2mu003_fg_get_scaled_capacity: scaled capacity (29.4)
+<6>[    2.623451]  [0:    kworker/0:1:  418] sec_bat_get_battery_info : sw_self_discharging (0)
+<6>[    2.623462]  [0:    kworker/0:1:  418] sec-battery battery.19: sec_bat_get_battery_info:Vnow(3943mV),Inow(0mA),Imax(700mA),SOC(29%),Tbat(232),Tchg(0),is_hc_usb(0)
+<6>[    2.626445]  [0:    kworker/0:1:  418] s2mu003_test_read: 0x00:0x24, 0x01:0x44, 0x02:0x77, 0x03:0x00, 0x04:0x78, 0x05:0x8a, 0x06:0x05, 0x07:0x00, 0x08:0xdc, 0x09:0x22, 0x0a:0x04, 0x0b:0x04, 0x0c:0x40, 0x0d:0x02, 0x0e:0x37, 0x89:0x7f, 
+<6>[    2.626456]  [0:    kworker/0:1:  418] sec-battery battery.19: sec_bat_time_management: Charging Time : 0 secs
+<6>[    2.626467]  [0:    kworker/0:1:  418] sec-battery battery.19: sec_bat_temperature: HLT(800) HLR(750) HT(550), HR(500), LT(-50), LR(0)
+<6>[    2.626477]  [0:    kworker/0:1:  418] sec_bat_swelling_check: status(1), swell_mode(0:0), cv(0x1117), temp(232)
+<6>[    2.626487]  [0:    kworker/0:1:  418] sec-battery battery.19: sec_bat_fullcharged_check: Charging Mode : Normal
+<6>[    2.626497]  [0:    kworker/0:1:  418] sec-battery battery.19: sec_bat_monitor_work: Status(Charging), mode(Normal), Health(Good), Cable(4), level(100%)
+<6>[    2.626684]  [0:    kworker/0:1:  418] s2mu003_get_charge_type: S2MU003_CHG_STATUS1 : 36
+<11>[    3.052176]  [1:           init:    1] init: /init.rc: 948: setprop requires 2 arguments
+<11>[    3.054323]  [1:           init:    1] init: /init.samsungexynos7580.rc: 872: ignored duplicate definition of service 'gpsd'
+<11>[    3.055139]  [1:           init:    1] init: could not import file 'init.fac.rc' from '/init.samsungexynos7580.rc'
+<11>[    3.055257]  [1:           init:    1] init: could not import file '/init.sec_debug.rc' from '/init.rc'
+<11>[    3.055370]  [1:           init:    1] init: /init.container.rc: 78: invalid option 'start'
+<11>[    3.055415]  [1:           init:    1] init: /init.rilcommon.rc: 16: ignored duplicate definition of service 'at_distributor'
+<11>[    3.055434]  [1:           init:    1] init: /init.rilcommon.rc: 21: ignored duplicate definition of service 'DR-daemon'
+<11>[    3.055452]  [1:           init:    1] init: /init.rilcommon.rc: 26: ignored duplicate definition of service 'BCS-daemon'
+<11>[    3.055485]  [1:           init:    1] init: could not import file '/init.rilcarrier.rc' from '/init.rilcommon.rc'
+<11>[    3.055525]  [1:           init:    1] init: /init.rilchip.rc: 7: ignored duplicate definition of service 'ril-daemon'
+<11>[    3.055575]  [1:           init:    1] init: /init.rilchip.rc: 29: ignored duplicate definition of service 'SMD-daemon'
+<11>[    3.055597]  [1:           init:    1] init: /init.rilchip.rc: 36: ignored duplicate definition of service 'DIAG-daemon'
+<11>[    3.055618]  [1:           init:    1] init: could not import file '/init.rilepdg.rc' from '/init.rilcommon.rc'
+<7>[    3.269720]  [3:        ueventd: 1494] s2mu003-fuelgauge 4-0035: s2mu003_get_vbat: vbat (3943)
+<7>[    3.270646]  [3:        ueventd: 1494] s2mu003-fuelgauge 4-0035: s2mu003_get_vbat: vbat (3943)
+<6>[    3.272433]  [3:        ueventd: 1494] s2mu003-fuelgauge 4-0035: s2mu003_get_soc: raw capacity (0x4b0:2929)
+<6>[    3.274220]  [3:        ueventd: 1494] s2mu003-fuelgauge 4-0035: s2mu003_get_soc: raw capacity (0x4b0:2929)
+<7>[    3.274229]  [3:        ueventd: 1494] s2mu003-fuelgauge 4-0035: s2mu003_fg_get_scaled_capacity: scaled capacity (29.4)
+<7>[    3.275127]  [3:        ueventd: 1494] s2mu003-fuelgauge 4-0035: s2mu003_get_temperature: temperature (250)
+<7>[    3.276023]  [3:        ueventd: 1494] s2mu003-fuelgauge 4-0035: s2mu003_get_temperature: temperature (250)
+<3>[    3.276037]  [3:        ueventd: 1494] power_supply sec-fuelgauge: driver failed to report `charge_type' property: -22
+<6>[    3.611228]  [0:        ueventd: 1494] s2mu003-mfd 2-0034: s2mu003_get_charging_status : S2MU003_CHG_STATUS1 : 0x24
+<6>[    3.611551]  [0:        ueventd: 1494] s2mu003_get_charge_type: S2MU003_CHG_STATUS1 : 36
+<6>[    3.614542]  [0:        ueventd: 1494] s2mu003_test_read: 0x00:0x24, 0x01:0x44, 0x02:0x77, 0x03:0x00, 0x04:0x78, 0x05:0x8a, 0x06:0x05, 0x07:0x00, 0x08:0xdc, 0x09:0x22, 0x0a:0x04, 0x0b:0x04, 0x0c:0x40, 0x0d:0x02, 0x0e:0x37, 0x89:0x7f, 
+<3>[    3.614711]  [0:        ueventd: 1494] power_supply sec-charger: driver failed to report `current_avg' property: -22
+<6>[    3.617540]  [0:        ueventd: 1494] s2mu003_get_charge_type: S2MU003_CHG_STATUS1 : 36
+<4>[    3.634968]  [2:           init:    1] [ExyRNG] passed the start-up test
+<11>[    3.653235]  [2:           init:    1] init: could not open /dev/keychord
+<7>[    3.655133]  [2:           init:    1] SELinux: initialized (dev cgroup, type cgroup), uses genfs_contexts
+<7>[    3.655569]  [2:           init:    1] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+<7>[    3.657493]  [2:           init:    1] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+<7>[    3.658525]  [2:           init:    1] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+<7>[    3.659030]  [2:           init:    1] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+<7>[    3.660925]  [2:           init:    1] SELinux: initialized (dev cgroup, type cgroup), uses genfs_contexts
+<4>[    3.666311]  [2:           init:    1] SDP_MM: entering open
+<4>[    3.666337]  [2:           init:    1] SDP_MM: entering open
+<11>[    3.685752]  [3:           init: 2218] fs_mgr: debug: ro.security_mode is 1526595584
+<11>[    3.685770]  [3:           init: 2218] fs_mgr: KAP is disabled
+<6>[    3.688384]  [1:           init: 2218] EXT4-fs (mmcblk0p20): mounted filesystem without journal. Opts: errors=panic,noload,block_validity
+<7>[    3.688413]  [1:           init: 2218] SELinux: initialized (dev mmcblk0p20, type ext4), uses xattr
+<14>[    3.688590]  [1:           init: 2218] fs_mgr: __mount(source=/dev/block/platform/13540000.dwmmc0/by-name/SYSTEM,target=/system,type=ext4)=0
+<14>[    3.691132]  [1:           init: 2218] fs_mgr: Running /system/bin/e2fsck on /dev/block/platform/13540000.dwmmc0/by-name/EFS
+<14>[    3.715442]  [1:           init: 2218] e2fsck: e2fsck 1.42.9 (28-Dec-2013)
+<14>[    3.715495]  [1:           init: 2218] e2fsck: skipping journal recoverybecause INCOMPAT_RECOVER was clear.
+<14>[    3.715506]  [1:           init: 2218] e2fsck: check whether gdt & bitmap free count is vaild
+<14>[    3.715517]  [1:           init: 2218] e2fsck: /dev/block/platform/13540000.dwmmc0/by-name/EFS: clean, 71/1280 files, 1678/5120 blocks
+<14>[    3.715528]  [1:           init: 2218] e2fsck: ext2fs_close2 : normal operation, return 0
+<6>[    3.719949]  [2:           init: 2218] EXT4-fs (mmcblk0p3): mounted filesystem with ordered data mode. Opts: noauto_da_alloc,discard,journal_async_commit,errors=panic
+<7>[    3.719976]  [2:           init: 2218] SELinux: initialized (dev mmcblk0p3, type ext4), uses xattr
+<14>[    3.720043]  [2:           init: 2218] fs_mgr: __mount(source=/dev/block/platform/13540000.dwmmc0/by-name/EFS,target=/efs,type=ext4)=0
+<14>[    3.720140]  [2:           init: 2218] fs_mgr: Running /system/bin/e2fsck on /dev/block/platform/13540000.dwmmc0/by-name/CACHE
+<14>[    3.728225]  [2:           init: 2218] e2fsck: e2fsck 1.42.9 (28-Dec-2013)
+<14>[    3.728266]  [2:           init: 2218] e2fsck: skipping journal recoverybecause INCOMPAT_RECOVER was clear.
+<14>[    3.728277]  [2:           init: 2218] e2fsck: check whether gdt & bitmap free count is vaild
+<14>[    3.728289]  [2:           init: 2218] e2fsck: /dev/block/platform/13540000.dwmmc0/by-name/CACHE: clean, 28/12800 files, 2087/51200 blocks
+<14>[    3.728299]  [2:           init: 2218] e2fsck: ext2fs_close2 : normal operation, return 0
+<6>[    3.731130]  [2:           init: 2218] EXT4-fs (mmcblk0p21): mounted filesystem with ordered data mode. Opts: noauto_da_alloc,discard,journal_async_commit,errors=panic
+<7>[    3.731155]  [2:           init: 2218] SELinux: initialized (dev mmcblk0p21, type ext4), uses xattr
+<14>[    3.731214]  [2:           init: 2218] fs_mgr: __mount(source=/dev/block/platform/13540000.dwmmc0/by-name/CACHE,target=/cache,type=ext4)=0
+<12>[    3.732164]  [2:           init: 2218] CryptfsFSCK: Decryption operation succeededfs_mgr: Running /system/bin/e2fsck on /dev/block/platform/13540000.dwmmc0/by-name/USERDATA
+<14>[    3.764623]  [2:           init: 2218] e2fsck: e2fsck 1.42.9 (28-Dec-2013)
+<14>[    3.764663]  [2:           init: 2218] e2fsck: skipping journal recoverybecause INCOMPAT_RECOVER was clear.
+<14>[    3.764675]  [2:           init: 2218] e2fsck: check whether gdt & bitmap free count is vaild
+<14>[    3.764686]  [2:           init: 2218] e2fsck: /dev/block/platform/13540000.dwmmc0/by-name/USERDATA: clean, 2164/368640 files, 111345/2949116 blocks
+<14>[    3.764696]  [2:           init: 2218] e2fsck: ext2fs_close2 : normal operation, return 0
+<6>[    3.767596]  [2:           init: 2218] EXT4-fs (mmcblk0p23): mounted filesystem with ordered data mode. Opts: noauto_da_alloc,discard,journal_async_commit,errors=panic
+<7>[    3.767620]  [2:           init: 2218] SELinux: initialized (dev mmcblk0p23, type ext4), uses xattr
+<14>[    3.767713]  [2:           init: 2218] fs_mgr: __mount(source=/dev/block/platform/13540000.dwmmc0/by-name/USERDATA,target=/data,type=ext4)=0
+<11>[    3.770155]  [3:           init:    1] init: Running /dev/block/platform/13540000.dwmmc0/by-name/PERSDATA on ext4
+<12>[    3.773980]  [1:         e2fsck: 2230] e2fsck 1.42.9 (28-Dec-2013)
+<12>[    3.777316]  [1:         e2fsck: 2230] skipping journal recoverybecause INCOMPAT_RECOVER was clear.
+<12>[    3.777352]  [1:         e2fsck: 2230] check whether gdt & bitmap free count is vaild
+<12>[    3.777462]  [1:         e2fsck: 2230] /dev/block/platform/13540000.dwmmc0/by-name/PERSDATA: clean, 18/384 files, 1062/3072 blocks
+<12>[    3.777889]  [1:         e2fsck: 2230] ext2fs_close2 : normal operation, return 0
+<6>[    3.781516]  [3:           init:    1] EXT4-fs (mmcblk0p18): mounted filesystem with ordered data mode. Opts: barrier=1
+<7>[    3.781542]  [3:           init:    1] SELinux: initialized (dev mmcblk0p18, type ext4), uses xattr
+<7>[    3.787879]  [3:           init:    1] [mtpg_open]	line = [538]
+<7>[    3.787898]  [3:           init:    1] [mtpg_release_device]	line = [1225]
+<7>[    3.787916]  [3:           init:    1] [mtpg_open]	line = [538]
+<7>[    3.787928]  [3:           init:    1] [mtpg_release_device]	line = [1225]
+<11>[    3.798225]  [3:           init:    1] init: Running /dev/block/platform/13540000.dwmmc0/by-name/CPEFS on ext4
+<12>[    3.802073]  [1:         e2fsck: 2235] e2fsck 1.42.9 (28-Dec-2013)
+<12>[    3.804192]  [1:         e2fsck: 2235] skipping journal recoverybecause INCOMPAT_RECOVER was clear.
+<12>[    3.804228]  [1:         e2fsck: 2235] check whether gdt & bitmap free count is vaild
+<12>[    3.804338]  [1:         e2fsck: 2235] /dev/block/platform/13540000.dwmmc0/by-name/CPEFS: clean, 13/512 files, 1197/2048 blocks
+<12>[    3.804649]  [1:         e2fsck: 2235] ext2fs_close2 : normal operation, return 0
+<6>[    3.807720]  [3:           init:    1] EXT4-fs (mmcblk0p4): mounted filesystem with ordered data mode. Opts: barrier=1
+<7>[    3.807745]  [3:           init:    1] SELinux: initialized (dev mmcblk0p4, type ext4), uses xattr
+<12>[    3.817835]  [1:             sh: 2238] init.sec.boot.sh: start
+<4>[    3.818180]  [1:             sh: 2238] Running do_deferred_initcalls()
+<4>[    3.818190]  [1:             sh: 2238] dhd_module_init in
+<4>[    3.818323]  [1:             sh: 2238] Power-up adapter 'DHD generic adapter'
+<4>[    3.818403]  [1:             sh: 2238] wifi_platform_set_power = 1
+<6>[    3.818410]  [1:             sh: 2238] ------------------------------------------------
+<6>[    3.818414]  [1:             sh: 2238] ------------------------------------------------
+<6>[    3.818421]  [1:             sh: 2238] dhd_wlan_power Enter: power on
+<7>[    3.889090]  [3:           init:    1] [mtpg_open]	line = [538]
+<7>[    3.889110]  [3:           init:    1] [mtpg_release_device]	line = [1225]
+<7>[    3.889128]  [3:           init:    1] [mtpg_open]	line = [538]
+<7>[    3.889139]  [3:           init:    1] [mtpg_release_device]	line = [1225]
+<11>[    3.900537]  [3:           init:    1] init: do_restorecon: Could not access /carrier
+<4>[    4.018922]  [2:             sh: 2238] wifi_platform_bus_enumerate device present 1
+<3>[    4.018937]  [2:             sh: 2238] dhd_wlan_set_carddetect: notify_func=ffffffc00071c790, mmc_host_dev=ffffffc04fae0018, val=1
+<3>[    4.018944]  [2:             sh: 2238] card inserted
+<6>[    4.018968]  [2:    kworker/2:1: 1056] mmc_host mmc1: card inserted
+<11>[    4.109203]  [2:           init:    1] init: cannot find '/system/bin/sysmon', disabling 'sysmon'
+<14>[    4.112165]  [1:        healthd: 2241] healthd: Healthd mode is android
+<6>[    4.112736]  [1:        healthd: 2241] binder: 2241:2241 transaction failed 29189, size 0-0
+<6>[    4.123292]  [1:          sswap: 2248] Adding 786428k swap on /dev/block/vnswap0.  Priority:-1 extents:1 across:786428k SSFS
+<11>[    4.126886]  [3:           init:    1] init: cannot find '/system/bin/debuggerd64', disabling 'debuggerd64'
+<11>[    4.134897]  [3:           init:    1] init: cannot find '/system/bin/sensorhubservice', disabling 'sensorhubservice'
+<11>[    4.137511]  [3:           init:    1] init: cannot find '/system/bin/bintvoutservice', disabling 'TvoutService_C'
+<11>[    4.140821]  [3:           init:    1] init: Warning!  Service epmlogd needs a SELinux domain defined; please fix!
+<11>[    4.143256]  [1:            cbd: 2277] mif: cbd: check_debug_level: debug level=0, cp_debug=0
+<6>[    4.143715]  [1:            cbd: 2277] muic-universal:muic_show_attached_dev attached_dev:1
+<11>[    4.143745]  [1:            cbd: 2277] mif: cbd: check_factory_log_path: log path - /sdcard/log
+<11>[    4.143763]  [1:            cbd: 2277] mif: cbd: main: Start CP Boot Daemon (CBD)
+<11>[    4.143867]  [1:            cbd: 2277] mif: cbd: main: SS310 modem
+<11>[    4.143895]  [1:            cbd: 2277] mif: cbd: main: partition number : platform/13540000.dwmmc0/by-name/RADIO
+<11>[    4.143912]  [1:            cbd: 2277] mif: cbd: main: partition path : /dev/block/platform/13540000.dwmmc0/by-name/RADIO
+<11>[    4.143929]  [1:            cbd: 2277] mif: cbd: main: partition number : platform/13540000.dwmmc0/by-name/CP_DEBUG
+<11>[    4.143945]  [1:            cbd: 2277] mif: cbd: main: partition path : /dev/block/platform/13540000.dwmmc0/by-name/CP_DEBUG
+<6>[    4.143965]  [1:            cbd: 2277] warning: `cbd' uses deprecated v2 capabilities in a way that may be insecure.
+<11>[    4.144259]  [1:            cbd: 2277] mif: cbd: main: Modem type = 13
+<11>[    4.144271]  [1:            cbd: 2277] mif: cbd: main: Boot link = 9
+<11>[    4.144281]  [1:            cbd: 2277] mif: cbd: main: Main link = 9
+<11>[    4.147072]  [3:           init:    1] init: cannot find '/system/bin/reactived', disabling 'reactived'
+<11>[    4.149822]  [3:           init: 2280] init: SELinux Warning! Service epmlogd runs as u:r:undefined_service:s0!!! Please fix!
+<11>[    4.153183]  [3:            cbd: 2277] mif: cbd: start_shannon310_boot: CP boot device = /dev/umts_boot0
+<11>[    4.153208]  [3:            cbd: 2277] mif: cbd: start_shannon310_boot: CP binary file = /dev/block/platform/13540000.dwmmc0/by-name/RADIO
+<11>[    4.153223]  [3:            cbd: 2277] mif: cbd: start_shannon310_boot: CP NV file = /efs/nv_data.bin
+<11>[    4.153238]  [3:            cbd: 2277] mif: cbd: start_shannon310_boot: BOOT link SHMEM
+<11>[    4.153252]  [3:            cbd: 2277] mif: cbd: start_shannon310_boot: MAIN link SHMEM
+<7>[    4.153668]  [3:           init:    1] usb: enable_store enabled=0, !dev->enabled=1
+<3>[    4.153680]  [3:           init:    1] android_usb: already disabled
+<7>[    4.153823]  [3:           init:    1] usb: functions_store buff=mtp,adb
+<7>[    4.153833]  [3:           init:    1] usb: android_enable_function name=mtp
+<7>[    4.153841]  [3:           init:    1] usb: android_enable_function name=acm
+<7>[    4.153847]  [3:           init:    1] usb: android_enable_function name=adb
+<7>[    4.153921]  [3:           init:    1] usb: enable_store enabled=1, !dev->enabled=1
+<7>[    4.153928]  [3:           init:    1] usb: enable_store f:mtp
+<7>[    4.153934]  [3:           init:    1] usb: enable_store f:acm
+<7>[    4.153939]  [3:           init:    1] usb: acm is enabled. (bcdDevice=0x400)
+<7>[    4.153945]  [3:           init:    1] usb: enable_store f:adb
+<7>[    4.153954]  [3:           init:    1] usb: enable_store vendor=4e8,product=6860,bcdDevice=400
+<7>[    4.153959]  [3:           init:    1] ,Class=0,SubClass=0,Protocol=0
+<7>[    4.153965]  [3:           init:    1] usb: enable_store next cmd : usb_add_config
+<3>[    4.155366]  [0: mcDriverDaemon: 2245] MobiCore mcd: opened by PID(2245), name(mcDriverDaemon)
+<6>[    4.156377]  [1:         mc_log: 2291] MobiCore mcd: *** <t MTK, Build: Jul  2 2015, 16:03:50 ***
+<6>[    4.156392]  [1:         mc_log: 2291] MobiCore mcd: t-base-EXYNOS64-Android-302A-V013-641_641
+<12>[    4.158520]  [3:             sh: 2290] macloader: macloader triggered
+<12>[    4.162222]  [2:             sh: 2295] macloader: Not yet wlan interface loaded
+<6>[    4.162569]  [3:           adbd: 2296] adb_open
+<7>[    4.162584]  [3:           adbd: 2296] usb: android_bind_enabled_functions f:mtp
+<7>[    4.162593]  [3:           adbd: 2296] usb: usb_string_id cdev(0xffffffc056fa4d80)->next_string_id=5
+<7>[    4.162600]  [3:           adbd: 2296] [mtpg_function_bind]	line = [1375]
+<4>[    4.162636]  [3:           adbd: 2296] dual speed mtp: IN/ep1in-bulk, OUT/ep2out-bulk
+<7>[    4.162643]  [3:           adbd: 2296] usb: android_bind_enabled_functions f:acm
+<7>[    4.162651]  [3:           adbd: 2296] usb: usb_string_id cdev(0xffffffc056fa4d80)->next_string_id=6
+<7>[    4.162657]  [3:           adbd: 2296] usb: usb_string_id cdev(0xffffffc056fa4d80)->next_string_id=7
+<7>[    4.162663]  [3:           adbd: 2296] usb: usb_string_id cdev(0xffffffc056fa4d80)->next_string_id=8
+<6>[    4.162674]  [3:           adbd: 2296] DUN is registerd
+<7>[    4.162680]  [3:           adbd: 2296] usb: android_bind_enabled_functions f:adb
+<6>[    4.162686]  [3:           adbd: 2296] adb_bind_config
+<6>[    4.168622]  [3:        diagexe: 2276] warning: `diagexe' uses 32-bit capabilities (legacy support in use)
+<3>[    4.169581]  [3:        diagexe: 2276] mif: misc_open: umts_dm0 (opened 1) by diagexe
+<6>[    4.289707]  [2:   kworker/u8:0:    6] mmc_host mmc1: Bus speed (slot 0) = 50000000Hz (slot req 400000Hz, actual 396825HZ div = 63)
+<6>[    4.289749]  [2:   kworker/u8:0:    6] mmc_host mmc1: Bus speed (slot 0) = 50000000Hz (slot req 50000000Hz, actual 50000000HZ div = 0)
+<6>[    4.297388]  [1:   kworker/u8:0:    6] mmc1: new high speed SDIO card at address 0001
+<6>[    4.309827]  [1:         sdcard: 2286] sdcardfs: version 2.1.4
+<6>[    4.309844]  [1:         sdcard: 2286] sdcardfs: dev_name -> /data/knox/sdcard
+<6>[    4.309849]  [1:         sdcard: 2286] sdcardfs: options -> uid=1000,gid=1000,wgid=1015
+<6>[    4.310197]  [1:         sdcard: 2286] sdcardfs: mounted on top of /data/knox/sdcard type ext4
+<7>[    4.310319]  [1:         sdcard: 2286] SELinux: initialized (dev sdcardfs, type sdcardfs), uses xattr
+<6>[    4.313424]  [2:         sdcard: 2285] sdcardfs: version 2.1.4
+<6>[    4.313427]  [3:         sdcard: 2287] sdcardfs: version 2.1.4
+<6>[    4.313438]  [3:         sdcard: 2287] sdcardfs: dev_name -> /data/knox/secure_fs/enc_media
+<6>[    4.313443]  [3:         sdcard: 2287] sdcardfs: options -> uid=1000,gid=1000,wgid=1015,reserved_mb=20
+<6>[    4.313453]  [2:         sdcard: 2285] sdcardfs: dev_name -> /data/media
+<6>[    4.313459]  [2:         sdcard: 2285] sdcardfs: options -> uid=1023,gid=1023,wgid=1015,derive=legacy,reserved_mb=20
+<6>[    4.313492]  [3:         sdcard: 2287] sdcardfs: mounted on top of /data/knox/secure_fs/enc_media type ext4
+<7>[    4.313517]  [3:         sdcard: 2287] SELinux: initialized (dev sdcardfs, type sdcardfs), uses xattr
+<6>[    4.313587]  [2:         sdcard: 2285] sdcardfs: created packagelist pkgld/2325
+<6>[    4.313845]  [2:         sdcard: 2285] sdcardfs: mounted on top of /data/media type ext4
+<7>[    4.313870]  [2:         sdcard: 2285] SELinux: initialized (dev sdcardfs, type sdcardfs), uses xattr
+<6>[    4.314241]  [1:          pkgld: 2325] sdcardfs: read_package_list
+<6>[    4.314821]  [0:         mc_log: 2291] MobiCore mcd: 501|drTima: starting main driver thread
+<4>[    4.315105]  [2:             sh: 2238] bcmsdh_sdmmc: bcmsdh_sdmmc_probe Enter
+<4>[    4.315220]  [2:             sh: 2238] bcmsdh_sdmmc: bcmsdh_sdmmc_probe Enter
+<4>[    4.315227]  [2:             sh: 2238] bus num (host idx)=1, slot num (rca)=1
+<4>[    4.315234]  [2:             sh: 2238] found adapter info 'DHD generic adapter'
+<4>[    4.315273]  [2:             sh: 2238] alloc static buf at ffffffc04f680000!
+<6>[    4.316841]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: OpenSSL premainInit Begins
+<6>[    4.317756]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: 		Embedded   = [D00D83557B9D6D5B13B7784D7A3CE46F8B3AB47F]
+<6>[    4.327807]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: 		Calculated = [D00D83557B9D6D5B13B7784D7A3CE46F8B3AB47F]
+<6>[    4.328726]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS Integrity check passed.
+<6>[    4.328740]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS DRBG selftest passed.
+<6>[    4.329675]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS x931 selftest passed.
+<6>[    4.330743]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS Sha1 selftest passed.
+<6>[    4.330775]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS hmac selftest passed.
+<6>[    4.332884]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS cmac selftest passed.
+<6>[    4.332896]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS AES selftest passed.
+<4>[    4.333379]  [3:             sh: 2238] F1 signature OK, socitype:0x1 chip:0xa9a6 rev:0x1 pkg:0x4
+<6>[    4.339007]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS AES_CCM selftest passed.
+<6>[    4.339023]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS AES_GCM selftest passed.
+<6>[    4.339033]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS AES_XTS selftest passed.
+<6>[    4.339042]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS DES selftest passed.
+<4>[    4.344551]  [3:             sh: 2238] DHD: dongle ram size is set to 524288(orig 524288) at 0x0
+<4>[    4.358877]  [3:             sh: 2238] wl_create_event_handler(): thread:wl_event_handler:91a started
+<6>[    4.358893]  [2:wl_event_handle: 2330] CFG80211-INFO2) wl_event_handler : tsk Enter, tsk = 0xffffffc048b36bd0
+<4>[    4.359447]  [3:             sh: 2238] p2p0: P2P Interface Registered
+<4>[    4.369007]  [3:             sh: 2238] dhd_attach(): thread:dhd_watchdog_thread:91c started
+<4>[    4.371843]  [3:             sh: 2238] dhd_attach(): thread:dhd_dpc:920 started
+<4>[    4.371944]  [3:             sh: 2238] dhd_attach(): thread:dhd_rxf:921 started
+<4>[    4.371956]  [3:             sh: 2238] dhd_deferred_work_init: work queue initialized 
+<4>[    4.372453]  [3:             sh: 2238] Dongle Host Driver, version 1.141.64.54 (security_patch)
+<4>[    4.372453]  [3:             sh: 2238] Compiled in drivers/net/wireless/bcmdhd on Apr 27 2016 at 12:27:14
+<4>[    4.372865]  [3:             sh: 2238] Register interface [wlan0]  MAC: 00:cc:63
+<4>[    4.372865]  [3:             sh: 2238] 
+<6>[    4.372888]  [2:wl_event_handle: 2330] CFG80211-INFO2) wl_event_handler : was terminated
+<4>[    4.379229]  [3:             sh: 2238] wl_destroy_event_handler(): thread:wl_event_handler:91a terminated OK
+<4>[    4.379246]  [3:             sh: 2238] dhd_prot_ioctl : bus is down. we have nothing to do
+<4>[    4.379253]  [3:             sh: 2238] dhd_wl_ioctl: WLC_IOCTL: cmd: 3, ret = -1
+<4>[    4.379396]  [3:             sh: 2238] wifi_platform_set_power = 0
+<6>[    4.379404]  [3:             sh: 2238] ------------------------------------------------
+<6>[    4.379408]  [3:             sh: 2238] ------------------------------------------------
+<6>[    4.379414]  [3:             sh: 2238] dhd_wlan_power Enter: power off
+<6>[    4.448889]  [2:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS RSA selftest passed.
+<6>[    4.489270]  [3:             sh: 2238] Freeing unused kernel memory: 676K (ffffffc000e00000 - ffffffc000ea9000)
+<6>[    4.575870]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS ECDSA selftest passed.
+<4>[    4.671748]  [0: surfaceflinger: 2246] setting framebuffer parameters
+<6>[    4.703215]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS DSA selftest passed.
+<6>[    4.766591]  [1: surfaceflinger: 2246] decon_blank ++ blank_mode : 0 
+<6>[    4.766595]  [1: surfaceflinger: 2246] decon-int UNBLANK mode: 0type (0: DSI)
+<6>[    4.766603]  [1: surfaceflinger: 2246] decon in init state
+<6>[    4.766606]  [1: surfaceflinger: 2246] decon_blank -- blank_mode : 0 
+<6>[    4.768889]  [1: surfaceflinger: 2246] lcd panel: aor: d420
+<6>[    4.768922]  [1: surfaceflinger: 2246] lcd panel: brightness: 128, bl: 53, nit: 183
+<6>[    4.768928]  [1: surfaceflinger: 2246] mdnie mdnie: fb_notifier_callback: 0
+<6>[    4.768976]  [1: surfaceflinger: 2246] mdnie mdnie: STANDARD_UI
+<6>[    4.809880]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: FIPS ECDH selftest passed.
+<6>[    4.811796]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: POST(Power-On-Self-Test) passed.
+<6>[    4.812497]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: OpenSSL started in fips mode
+<6>[    4.812952]  [0:         mc_log: 2291] MobiCore mcd: 501|SCRYPTO DRV [INFO]: OpenSSL premainInit ends
+<6>[    4.814835]  [0:         mc_log: 2291] MobiCore mcd: 501|[RTIC] Driver:: rtic_init_done
+<6>[    4.814850]  [0:         mc_log: 2291] MobiCore mcd: 501|Info tima drMain: drTima: main driver thread started
+<11>[    4.956719]  [3:            cbd: 2277] mif: cbd: start_shannon310_boot: NV validation done
+<11>[    4.957230]  [3:            cbd: 2277] mif: cbd: boot_wake_lock: /sys/power/wake_lock/ss310
+<3>[    4.957514]  [3:            cbd: 2277] mif: misc_open: umts_boot0 (opened 1) by cbd
+<11>[    4.957540]  [3:            cbd: 2277] mif: cbd: std_boot_prepare_args: DEV(/dev/umts_boot0) opened (fd 9)
+<11>[    4.957795]  [3:            cbd: 2277] mif: cbd: prepare_boot_args: BIN(/dev/block/platform/13540000.dwmmc0/by-name/RADIO) opened (fd 10)
+<11>[    4.958202]  [0:            cbd: 2277] mif: cbd: prepare_boot_args: toc[0].name = TOC, b_off=0, m_off=0, size=512
+<11>[    4.958224]  [0:            cbd: 2277] mif: cbd: prepare_boot_args: toc[1].name = BOOT, b_off=512, m_off=1073741824, size=6068
+<11>[    4.958243]  [0:            cbd: 2277] mif: cbd: prepare_boot_args: toc[2].name = MAIN, b_off=6592, m_off=1073807360, size=32976536
+<11>[    4.958261]  [0:            cbd: 2277] mif: cbd: prepare_boot_args: toc[3].name = NV, b_off=0, m_off=1150287872, size=1048576
+<11>[    4.958624]  [0:            cbd: 2277] mif: cbd: prepare_boot_args: NV(/efs/nv_data.bin) opened (fd 11)
+<11>[    4.958640]  [0:            cbd: 2277] mif: cbd: build_std_dload_control: stage=0, b_off=512, b_size=6068
+<11>[    4.958655]  [0:            cbd: 2277] mif: cbd: build_std_dload_control: stage=1, b_off=6592, b_size=32976536
+<11>[    4.958668]  [0:            cbd: 2277] mif: cbd: build_std_dload_control: stage=2, b_off=0, b_size=1048576
+<3>[    4.958692]  [0:            cbd: 2277] mif: misc_ioctl: umts_boot0: IOCTL_MODEM_RESET
+<3>[    4.958699]  [0:            cbd: 2277] mif: ss310ap_reset: +++
+<3>[    4.958713]  [0:            cbd: 2277] CP Power status: 8
+<3>[    4.958718]  [0:            cbd: 2277] ERR! Get CP Power status: 8
+<3>[    4.958724]  [0:            cbd: 2277] mif: ss310ap_reset: ---
+<6>[    4.958751]  [0:            cbd: 2277] mif: misc_ioctl: umts_boot0: IOCTL_SECURITY_REQUEST
+<3>[    4.958760]  [0:            cbd: 2277] mif: shmem_security_request: mode=2, size=0, addr=0
+<3>[    4.995065]  [2:           rild: 2357] mif: store_waketime: multipdp: waketime = 0 ms
+<3>[    4.995235]  [2:           rild: 2357] mif: store_waketime: rmnet0: waketime = 0 ms
+<3>[    4.995250]  [2:           rild: 2357] mif: store_waketime: rmnet1: waketime = 0 ms
+<3>[    4.995271]  [2:           rild: 2357] mif: store_waketime: rmnet2: waketime = 0 ms
+<3>[    4.995286]  [2:           rild: 2357] mif: store_waketime: rmnet3: waketime = 0 ms
+<12>[    5.316407]  [2:             sh: 2415] macloader: wlan interface loaded
+<6>[    5.638909]  [0:            cbd: 2277] mif: shmem_security_request: shmem: return_value=0
+<6>[    5.638927]  [0:            cbd: 2277] ---------- PMU CP RegDump ----------
+<6>[    5.638933]  [0:            cbd: 2277] CP_CTRL: 0x00000008
+<6>[    5.638940]  [0:            cbd: 2277] CP_STAT: 0x00000010
+<6>[    5.638946]  [0:            cbd: 2277] CP_DEBUG: 0x00000000
+<6>[    5.638952]  [0:            cbd: 2277] CP_SEMAPHORE: 0x00000000
+<6>[    5.638959]  [0:            cbd: 2277] AUD_PATH_CFG: 0x00000000
+<11>[    5.639335]  [0:            cbd: 2277] mif: cbd: shannon310_boot_xmit_bin: stage=0(0), b_off=512, m_off=0, b_size=6068, mode=0
+<11>[    5.639462]  [0:            cbd: 2277] mif: cbd: shannon310_boot_xmit_bin: 0 stage complelte
+<11>[    5.639489]  [0:            cbd: 2277] mif: cbd: shannon310_boot_xmit_bin: stage=1(1), b_off=6592, m_off=65536, b_size=32976536, mode=0
+<6>[    5.783354]  [1:             cs: 2406] logger: !@preload finished
+<11>[    5.786235]  [1:        healthd: 2241] healthd: initial Capacity max: '949'
+<3>[    5.786353]  [1:        healthd: 2241] sec-battery battery.19: sec_bat_store_attrs: BATT_CAPACITY_MAX(949)
+<6>[    5.786372]  [1:        healthd: 2241] s2mu003-fuelgauge 4-0035: s2mu003_fg_set_property: capacity_max changed, 990 -> 949
+<6>[    5.788186]  [1:        healthd: 2241] s2mu003-fuelgauge 4-0035: s2mu003_get_soc: raw capacity (0x4b0:2929)
+<7>[    5.788198]  [1:        healthd: 2241] s2mu003-fuelgauge 4-0035: s2mu003_fg_get_scaled_capacity: scaled capacity (30.7)
+<12>[    5.788629]  [1:        healthd: 2241] healthd: batteryPogoOnlnePath not found
+<12>[    5.788644]  [1:        healthd: 2241] healthd: batteryFullVoltagePath not found
+<6>[    5.789059]  [1:    kworker/1:1:  958] s2mu003_get_charge_type: S2MU003_CHG_STATUS1 : 36
+<6>[    5.790454]  [1:        healthd: 2241] s2mu003_get_charge_type: S2MU003_CHG_STATUS1 : 36
+<12>[    5.790646]  [1:        healthd: 2241] healthd: battery l=30 v=3943 t=23.2 h=2 st=2 c=0 o=4 ca=0 ct=1 ps=0 hv=0 chg=u
+<14>[    5.790660]  [1:        healthd: 2241] healthd-android: healthd_mode_android_battery_update
+<14>[    5.790672]  [1:        healthd: 2241] BatteryPropertiesRegistrar: notifyListeners : start
+<14>[    5.790683]  [1:        healthd: 2241] BatteryPropertiesRegistrar: notifyListeners : done
+<6>[    5.791621]  [1:        healthd: 2241] s2mu003_get_charge_type: S2MU003_CHG_STATUS1 : 36
+<12>[    5.791791]  [1:        healthd: 2241] healthd: battery l=30 v=3943 t=23.2 h=2 st=2 c=0 o=4 ca=0 ct=1 ps=0 hv=0 chg=u
+<14>[    5.791804]  [1:        healthd: 2241] healthd-android: healthd_mode_android_battery_update
+<14>[    5.791816]  [1:        healthd: 2241] BatteryPropertiesRegistrar: notifyListeners : start
+<14>[    5.791827]  [1:        healthd: 2241] BatteryPropertiesRegistrar: notifyListeners : done
+<3>[    5.844495]  [0:           rild: 2357] mif: misc_open: umts_boot0 (opened 2) by rild
+<4>[    5.851224]  [0:   kworker/u8:3: 2324] pd-disp: Power-off latency exceeded, new value 1125884 ns
+<4>[    5.874049]  [1:    sdp_cryptod: 2281] SDP_PUB_CRYPTO[2281]  : pub_crypto_recv_msg crypto_receive_msg: pid = 2281
+<6>[    5.949285]  [3:  BootAnimation: 2486] logger: !@BootAnimation : Could not open '/sys/bus/w1/devices/w1_bus_master1/w1_master_check_model'
+<6>[    5.957015]  [3:  BootAnimation: 2486] logger: !@BootAnimation : [Encryption info]crypt_state = unencrypted, crypt_input_window = 0, crypt_type = 0
+<6>[    5.967491]  [3:  BootAnimation: 2486] logger: !@BootAnimation : createSurface RGB565
+<6>[    5.991163]  [2:  BootAnimation: 2486] logger: !@BootAnimation : Could not open '/sys/devices/w1_bus_master1/w1_master_verify_mac'
+<6>[    5.991202]  [2:  BootAnimation: 2486] logger: !@BootAnimation : Could not open '/sys/devices/w1_bus_master1/w1_master_check_id'
+<6>[    5.991220]  [2:  BootAnimation: 2486] logger: !@BootAnimation : BootAnimData_STATUS = 0x3
+<6>[    5.992697]  [2:  BootAnimation: 2486] logger: !@BootAnimation : wait_for_audio_policy
+<6>[    5.993167]  [2:  BootAnimation: 2486] logger: !@BootAnimation : media.audio_policy not published, waiting...
+<6>[    6.194026]  [2:  BootAnimation: 2486] logger: !@BootAnimation : media.audio_policy not published, waiting...
+<11>[    6.226613]  [3:            cbd: 2277] mif: cbd: shannon310_boot_xmit_bin: 1 stage complelte
+<11>[    6.226650]  [3:            cbd: 2277] mif: cbd: shannon310_boot_xmit_bin: stage=2(2), b_off=0, m_off=76546048, b_size=1048576, mode=0
+<11>[    6.227908]  [3:            cbd: 2277] mif: cbd: shannon310_boot_xmit_bin: 2 stage complelte
+<6>[    6.227946]  [3:            cbd: 2277] mif: misc_ioctl: umts_boot0: IOCTL_SECURITY_REQUEST
+<3>[    6.227955]  [3:            cbd: 2277] mif: shmem_security_request: mode=0, size=6068, addr=32976536
+<6>[    6.358547]  [3:            cbd: 2277] mif: shmem_security_request: shmem: return_value=0
+<6>[    6.358563]  [3:            cbd: 2277] ---------- PMU CP RegDump ----------
+<6>[    6.358569]  [3:            cbd: 2277] CP_CTRL: 0x06a00000
+<6>[    6.358575]  [3:            cbd: 2277] CP_STAT: 0x00000010
+<6>[    6.358581]  [3:            cbd: 2277] CP_DEBUG: 0x00000000
+<6>[    6.358588]  [3:            cbd: 2277] CP_SEMAPHORE: 0x00000000
+<6>[    6.358594]  [3:            cbd: 2277] AUD_PATH_CFG: 0x00000000
+<3>[    6.358627]  [3:            cbd: 2277] mif: misc_ioctl: umts_boot0: IOCTL_MODEM_ON
+<3>[    6.358634]  [3:            cbd: 2277] mif: ss310ap_on: +++
+<3>[    6.358641]  [3:            cbd: 2277] mif: ss310ap_on: cp_active:0 cp_status:0
+<6>[    6.358648]  [3:            cbd: 2277] exynos-snapshot: item - log_kevents is enabled
+<6>[    6.358747]  [3:            cbd: 2277] mif: init_mailbox_regs: sys_rev:2, ds_det:0 (0x2)
+<3>[    6.358756]  [3:            cbd: 2277] CP Power status: 6a00000
+<3>[    6.358763]  [3:            cbd: 2277] exynos_set_cp_power_onoff: mode[0]
+<6>[    6.358776]  [3:            cbd: 2277] mif: exynos_set_cp_power_onoff: CP Power On & Start: [0x000006A0] -> [0x000006AA]
+<6>[    6.394402]  [1:  BootAnimation: 2486] logger: !@BootAnimation : media.audio_policy not published, waiting...
+<7>[    6.455957]  [1:           main: 2279] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+<3>[    6.668818]  [1:            cbd: 2277] mif: ss310ap_on: change_mr_reset -> 0
+<3>[    6.668830]  [1:            cbd: 2277] mif: ss310ap_on: ---
+<3>[    6.668867]  [1:            cbd: 2277] mif: misc_ioctl: umts_boot0: IOCTL_MODEM_BOOT_ON
+<6>[    6.668874]  [1:            cbd: 2277] mif: ss310ap_boot_on: +++
+<3>[    6.668885]  [1:            cbd: 2277] mif: io_dev_modem_state_changed: ss310ap->state changed (OFFLINE -> BOOTING)
+<3>[    6.668903]  [1:            cbd: 2277] mif: mif_disable_irq: cp_wdt(#511) is not active <ss310ap_boot_on>
+<6>[    6.668915]  [1:            cbd: 2277] mif: mif_enable_irq: cp_fail(#50) is enabled <ss310ap_boot_on>
+<6>[    6.668923]  [1:            cbd: 2277] mif: ss310ap_boot_on: cp_status=1
+<6>[    6.668930]  [1:            cbd: 2277] mif: ss310ap_boot_on: ---
+<6>[    6.668946]  [1:            cbd: 2277] mif: misc_ioctl: umts_boot0: IOCTL_MODEM_DL_START
+<3>[    6.668955]  [1:            cbd: 2277] mif: shmem_start_download: shmem: magic == 0x424F4F54
+<6>[    6.668962]  [1:            cbd: 2277] mif: ss310ap_modem_boot_confirm: ap_status=1
+<11>[    6.670191]  [1:            cbd: 2277] mif: cbd: std_udl_req_resp: OK!! resp 0xA00D == exp
+<11>[    6.670505]  [1:            cbd: 2277] mif: cbd: std_udl_req_resp: OK!! resp 0xAF00 == exp
+<3>[    6.670533]  [1:            cbd: 2277] mif: misc_ioctl: umts_boot0: IOCTL_MODEM_BOOT_OFF
+<6>[    6.670540]  [1:            cbd: 2277] mif: ss310ap_boot_off: +++
+<6>[    6.701578]  [1:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2147: NORMAL instance is opened [0:1]
+<6>[    6.701682]  [1:      NPDecoder: 2602] __ion_secure_protect: enter
+<6>[    6.701711]  [1:      NPDecoder: 2602] __ion_secure_protect: protection enabled for heap mfc_fw
+<6>[    6.701729]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_alloc_firmware:119: Port for DRM F/W : 0x9bc00000
+<6>[    6.708453]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.708912]  [1:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.709556]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [2] Base Address : 9bc00000
+<6>[    6.709910]  [0:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.709976]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.710013]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2256: MFC open completed [0:1] dev = ffffffc04f43b018, ctx = ffffffc0438d2000, version = 151007
+<6>[    6.710101]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_release:2347: MFC driver release is called [0:1], is_drm(0)
+<6>[    6.710430]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_release:2557: mfc driver release finished [0:0], dev = ffffffc04f43b018
+<6>[    6.721300]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2147: NORMAL instance is opened [0:1]
+<6>[    6.731946]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.732292]  [0:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.732969]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [2] Base Address : 9bc00000
+<6>[    6.733334]  [0:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.733411]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.733450]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2256: MFC open completed [0:1] dev = ffffffc04f43b018, ctx = ffffffc0488bd000, version = 151007
+<6>[    6.733530]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_release:2347: MFC driver release is called [0:1], is_drm(0)
+<6>[    6.733862]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_release:2557: mfc driver release finished [0:0], dev = ffffffc04f43b018
+<6>[    6.751326]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2147: NORMAL instance is opened [0:1]
+<6>[    6.757098]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.757454]  [1:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.758063]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [2] Base Address : 9bc00000
+<6>[    6.758388]  [1:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.758447]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.758483]  [1:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2256: MFC open completed [0:1] dev = ffffffc04f43b018, ctx = ffffffc0488b8000, version = 151007
+<6>[    6.758551]  [1:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_release:2347: MFC driver release is called [0:1], is_drm(0)
+<6>[    6.758911]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_release:2557: mfc driver release finished [0:0], dev = ffffffc04f43b018
+<6>[    6.762358]  [1:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2147: NORMAL instance is opened [0:1]
+<6>[    6.769238]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.769592]  [1:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.770204]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [2] Base Address : 9bc00000
+<6>[    6.770521]  [0:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.770592]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.770650]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2256: MFC open completed [0:1] dev = ffffffc04f43b018, ctx = ffffffc0491a8000, version = 151007
+<6>[    6.770768]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_release:2347: MFC driver release is called [0:1], is_drm(0)
+<6>[    6.771181]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_release:2557: mfc driver release finished [0:0], dev = ffffffc04f43b018
+<6>[    6.776803]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2147: NORMAL instance is opened [0:1]
+<6>[    6.786106]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.787989]  [1:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.788641]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [2] Base Address : 9bc00000
+<6>[    6.788978]  [1:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.789045]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.789084]  [1:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2256: MFC open completed [0:1] dev = ffffffc04f43b018, ctx = ffffffc0488b8000, version = 151007
+<6>[    6.789156]  [1:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_release:2347: MFC driver release is called [0:1], is_drm(0)
+<6>[    6.789514]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_release:2557: mfc driver release finished [0:0], dev = ffffffc04f43b018
+<6>[    6.792817]  [1:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2147: NORMAL instance is opened [0:1]
+<6>[    6.798700]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.799089]  [0:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.799801]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [2] Base Address : 9bc00000
+<6>[    6.800136]  [0:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.800199]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.800238]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2256: MFC open completed [0:1] dev = ffffffc04f43b018, ctx = ffffffc0493f7000, version = 151007
+<6>[    6.800309]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_release:2347: MFC driver release is called [0:1], is_drm(0)
+<6>[    6.800672]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_release:2557: mfc driver release finished [0:0], dev = ffffffc04f43b018
+<6>[    6.805730]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2147: NORMAL instance is opened [0:1]
+<6>[    6.811610]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.811963]  [1:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.812577]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [2] Base Address : 9bc00000
+<6>[    6.812902]  [1:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.812964]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.813000]  [1:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2256: MFC open completed [0:1] dev = ffffffc04f43b018, ctx = ffffffc0488bc000, version = 151007
+<6>[    6.813080]  [1:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_release:2347: MFC driver release is called [0:1], is_drm(0)
+<6>[    6.813429]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_release:2557: mfc driver release finished [0:0], dev = ffffffc04f43b018
+<6>[    6.840362]  [1:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2147: NORMAL instance is opened [0:1]
+<3>[    6.845504]  [0:           rild: 2357] mif: misc_release: umts_boot0 (opened 1) by rild
+<3>[    6.845544]  [0:           rild: 2357] mif: misc_open: umts_boot0 (opened 2) by rild
+<6>[    6.846536]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.846918]  [0:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.847598]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [2] Base Address : 9bc00000
+<6>[    6.847925]  [0:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.847996]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.848035]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2256: MFC open completed [0:1] dev = ffffffc04f43b018, ctx = ffffffc0438d5000, version = 151007
+<6>[    6.848106]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_release:2347: MFC driver release is called [0:1], is_drm(0)
+<6>[    6.848506]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_release:2557: mfc driver release finished [0:0], dev = ffffffc04f43b018
+<6>[    6.852417]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2147: NORMAL instance is opened [0:1]
+<6>[    6.859902]  [1:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.860273]  [0:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.860913]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [2] Base Address : 9bc00000
+<6>[    6.861342]  [0:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.861423]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.861463]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2256: MFC open completed [0:1] dev = ffffffc04f43b018, ctx = ffffffc0488bc000, version = 151007
+<6>[    6.861542]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_release:2347: MFC driver release is called [0:1], is_drm(0)
+<6>[    6.861902]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_release:2557: mfc driver release finished [0:0], dev = ffffffc04f43b018
+<6>[    6.870478]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2147: NORMAL instance is opened [0:1]
+<6>[    6.876535]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.876901]  [0:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.877576]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [2] Base Address : 9bc00000
+<6>[    6.877909]  [0:      NPDecoder: 2602] [d:0] mfc_init_hw:429: MFC v7.8, F/W: 15yy, 10mm, 12dd (E)
+<6>[    6.877976]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_init_memctrl:301: [1] Base Address : 10000000
+<6>[    6.878014]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_open:2256: MFC open completed [0:1] dev = ffffffc04f43b018, ctx = ffffffc0488bd000, version = 151007
+<6>[    6.878094]  [0:      NPDecoder: 2602] [d:0, c:0] s5p_mfc_release:2347: MFC driver release is called [0:1], is_drm(0)
+<6>[    6.878499]  [0:      NPDecoder: 2602] [d:0] s5p_mfc_release:2557: mfc driver release finished [0:0], dev = ffffffc04f43b018
+<6>[    6.916323]  [3:           pprr: 2747] logger: !@Boot: beginofpreloadResources()
+<6>[    6.917403]  [3:           main: 2279] logger: !@Boot: beginofpreloadClasses()
+<3>[    7.229517]  [0:   kworker/0:1H: 2219] mif: cmd_phone_start_handler: shmem: CP_START <- ss310ap (ss310ap.state:BOOTING cp_boot_done:0)
+<3>[    7.229537]  [0:   kworker/0:1H: 2219] mif: rild_ready: shmem: umts_ipc0.opened=0, umts_rfs0.opened=0
+<6>[    7.229574]  [1:            cbd: 2277] mif: mif_enable_irq: cp_wdt(#511) is enabled <ss310ap_boot_off>
+<3>[    7.229584]  [1:            cbd: 2277] mif: io_dev_modem_state_changed: ss310ap->state changed (BOOTING -> ONLINE)
+<6>[    7.229590]  [1:            cbd: 2277] mif: ss310ap_boot_off: ---
+<6>[    7.229602]  [1:            cbd: 2277] mif: mif_disable_irq: cp_fail(#50) is disabled <ss310ap_boot_off>
+<3>[    7.229625]  [1:            cbd: 2277] mif: misc_release: umts_boot0 (opened 1) by cbd
+<11>[    7.245119]  [1:            cbd: 2277] mif: cbd: boot_wake_lock: /sys/power/wake_unlock/ss310
+<11>[    7.245169]  [1:            cbd: 2277] mif: cbd: main: Boot up process done!!!
+<11>[    7.245193]  [1:            cbd: 2277] mif: cbd: status_loop: CP status_loop start (modem = 13)
+<3>[    7.245226]  [1:            cbd: 2277] mif: misc_open: umts_boot0 (opened 2) by cbd
+<3>[    7.245765]  [2:           rild: 2357] mif: misc_release: umts_boot0 (opened 1) by rild
+<3>[    7.245923]  [2:           rild: 2357] mif: shmem_init_comm: umts_rfs0 is not opened yet
+<3>[    7.245930]  [2:           rild: 2357] mif: misc_open: umts_ipc0 (opened 1) by rild
+<3>[    7.245952]  [2:           rild: 2357] mif: shmem_init_comm: shmem: umts_rfs0->INIT_END->ss310ap
+<3>[    7.245961]  [2:           rild: 2357] mif: misc_open: umts_rfs0 (opened 1) by rild
+<11>[    7.246416]  [1:            cbd: 2277] mif: cbd: status_loop: Wait event from modem 13
+<6>[    7.322172]  [1:         prct_1: 2776] logger: !@prldclss1: 715 classes in 361ms.
+<6>[    7.554267]  [0:     AudioOut_2: 2580] i2s_startup : sec ++
+<6>[    7.554303]  [0:     AudioOut_2: 2580] i2s_startup : sec --
+<6>[    7.554314]  [0:     AudioOut_2: 2580] dma_open: prtd = ffffffc04a474840
+<6>[    7.554396]  [0:     AudioOut_2: 2580] Universal7580-audio sound.32: aif1: 2ch, 48000Hz, 23040bytes
+<6>[    7.554647]  [0:     AudioOut_2: 2580] No esa_dma dma_hw_params
+<6>[    7.554767]  [0:     AudioOut_2: 2580] ADMA:P:DmaAddr=@3000000 Total=23040 PrdSz=5760(5760) #Prds=4 dma_area=0xffffff8005250000
+<6>[    7.557324]  [0:     AudioOut_2: 2580] Entered dma_prepare
+<6>[    7.557344]  [0:     AudioOut_2: 2580] Entered dma_enqueue
+<6>[    7.628162]  [1:         prct_2: 2777] logger: !@prldclss2: 495 classes in 666ms.
+<6>[    7.637281]  [2:           main: 2279] logger: !@prldclssM: 1799 classes in 677ms.
+<6>[    7.796317]  [3:           main: 2279] logger: !@Boot: EndofpreloadClasses()
+<6>[    7.802212]  [3:           main: 2279] logger: !@Boot: beginofpreparewebview()
+<6>[    7.804721]  [3:           main: 2279] logger: !@Boot: endofpreparewebview()
+<6>[    7.921690]  [3:           pprr: 2747] logger: !@Boot: End of preloadResources()
+<6>[    7.930733] I[0:      swapper/0:    0] mif: LNK-RX(32): fc eb 1d 00 19 00 00 00 13 05 03 0f 00 0d 0a 41 ...
+<6>[    7.930759] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0c 00 08 00 01 00 01 01 03 98 00 00 00 00
+<6>[    7.930769] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0d 00 09 00 02 00 0d 0f 03 06 00 00 00 00
+<6>[    7.930779] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0c 00 08 00 03 00 05 07 03 00 00 00 00 00
+<6>[    7.930788] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0c 00 08 00 04 00 05 07 03 00 00 00 00 00
+<6>[    7.930798] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0c 00 08 00 05 00 05 07 03 00 00 00 00 00
+<6>[    7.930807] I[0:      swapper/0:    0] mif: LNK-RX(16): fc eb 0d 00 09 00 06 00 05 01 03 80 00 00 00 00
+<6>[    8.062947]  [3:  system_server: 2912] logger: !@Boot: Entered the Android system server!
+<6>[    8.399325]  [1:  system_server: 2933] [SENSOR] proximity_enable_store: new_value = 1, old state = 0
+<6>[    8.402389]  [1:  system_server: 2933] [SENSOR] proximity_open_offset: data->offset_value = 0
+<6>[    8.402405]  [1:  system_server: 2933] [SENSOR] proximity_enable_store: th_hi = 100, th_low = 70
+<6>[    8.402414]  [1:  system_server: 2933] [SENSOR] taos_chip_on: dgf:1200, cctcoef:3193, cctoff:1950, r:270, g:1000, b:90
+<6>[    8.406745]  [1:  system_server: 2933] [SENSOR] taos_chip_on: poffset= 2, pre_poffset= 2, ppulse= 12, ppulse_len= 2
+<6>[    8.406758]  [1:  system_server: 2933] [SENSOR] taos_chip_on: pre_offset_sign= 0, pgain= 2, pldrive= 16, 2<<pgain= 4
+<6>[    8.407646]  [1:  system_server: 2933] [SENSOR] taos_chip_on: th_min: 70 , th_max: 100, als_gain: 2
+<6>[    8.407778]  [1:  system_server: 2933] [SENSOR] leda_regulator_onoff: onoff = 1
+<6>[    8.419162]  [1:  system_server: 2933] wake enabled for irq 7
+<6>[    8.419414]  [1:  system_server: 2933] [SENSOR] light_enable_store: new_value = 1, old state = 0
+<6>[    8.581371]  [1:   kworker/u8:2: 1176] [SENSOR] taos_work_func_light: first-lux:46, cct:3590
+<6>[    8.589101]  [1:  system_server: 2933] [I]6BHY<bhy_load_ram_patch><532>Check : ram_patch_loaded = 0 
+<6>[    8.589113]  [1:  system_server: 2933] [I]6BHY<bhy_load_ram_patch><535>Set to ram_patch_loaded = false
+<6>[    8.589292]  [1:  system_server: 2933] [I]6BHY<bhy_load_ram_patch><565>FPGA reset successfully
+<6>[    8.906463]  [2:  system_server: 2912] logger: !@Boot: Start PackageManagerService
+<6>[    9.286340]  [0:  system_server: 2933] [I]6BHY<bhy_load_ram_patch><769>Ram patch loaded successfully.
+<6>[    9.286354]  [0:  system_server: 2933] [E]3BHY<bhy_load_ram_patch><774>Request IRQ!
+<6>[    9.287015]  [0:  system_server: 2933] [I]6BHY<bhy_load_ram_patch><783>Check : ram_patch_loaded = 1 
+<6>[    9.309390]  [1:    irq/565-bhy: 2954] [D]7BHY<detect_init_event><1777>ts-0: 8580317109
+<6>[    9.309403]  [1:    irq/565-bhy: 2954] [D]7BHY<detect_init_event><1778>ts-1: 8584719032
+<6>[    9.309410]  [1:    irq/565-bhy: 2954] [D]7BHY<detect_init_event><1779>ts-2: 9277258416
+<6>[    9.309416]  [1:    irq/565-bhy: 2954] [D]7BHY<detect_init_event><1780>ts-3: 9300602070
+<6>[    9.771007]  [2:  system_server: 2933] [I]6BHY<bhy_store_sensor_conf><2511>sensor: 1, enable: 0
+<6>[    9.772092]  [2:  system_server: 2933] [I]6BHY<bhy_store_sensor_conf><2511>sensor: 49, enable: 0
+<6>[    9.791247]  [3:  system_server: 2933] [I]6BHY<bhy_store_sensor_conf><2511>sensor: 18, enable: 0
+<6>[    9.791262]  [3:  system_server: 2933] [I]6BHY<enable_pedometer><6603>enable pedometer 0
+<6>[    9.792055]  [3:  system_server: 2933] [I]6BHY<bhy_store_sensor_conf><2511>sensor: 60, enable: 0
+<6>[    9.809368]  [0:  system_server: 2933] [I]6BHY<bhy_store_sensor_conf><2511>sensor: 19, enable: 0
+<6>[    9.809384]  [0:  system_server: 2933] [I]6BHY<enable_pedometer><6603>enable pedometer 0
+<6>[    9.813436]  [1:  system_server: 2933] [I]6BHY<bhy_store_sensor_conf><2511>sensor: 60, enable: 0
+<6>[    9.814472]  [3:  system_server: 2933] [I]6BHY<bhy_store_sensor_conf><2511>sensor: 54, enable: 0
+<6>[    9.832220]  [1:  system_server: 2933] [I]6BHY<bhy_store_sensor_conf><2511>sensor: 57, enable: 0
+<6>[    9.833178]  [1:  system_server: 2933] [I]6BHY<bhy_store_sensor_conf><2511>sensor: 26, enable: 0
+<6>[    9.833344]  [1:  system_server: 2933] [SENSOR] yas_enable_store: pre_enable=0
+<6>[    9.833355]  [1:  system_server: 2933] [SENSOR] yas_enable_store: new_value = 0
+<6>[    9.833441]  [1:  system_server: 2933] [SENSOR] yas_enable_store: pre_enable=0
+<6>[    9.833449]  [1:  system_server: 2933] [SENSOR] yas_enable_store: new_value = 0
+<6>[    9.833516]  [1:  system_server: 2933] [SENSOR] proximity_enable_store: new_value = 0, old state = 1
+<6>[    9.833526]  [1:  system_server: 2933] wake disabled for irq 7
+<6>[    9.833534]  [1:  system_server: 2933] [SENSOR] leda_regulator_onoff: onoff = 0
+<6>[    9.833835]  [1:  system_server: 2933] [SENSOR] light_enable_store: new_value = 0, old state = 1
+<6>[    9.833843]  [1:  system_server: 2933] [SENSOR] taos_light_disable: cancelling poll timer
+<6>[    9.833855]  [1:  system_server: 2933] [SENSOR] taos_chip_off: 
+<6>[   10.448905]  [1:    kworker/1:1:  958] muic_print_reg_log:4(0)0 5(dc)0 6(0)0 7(1f)0 a(4)0 b(0)0 13(0)0 14(1)0 1b(0)0 20(6)0 24(4)0 2(e5)0 2(e4)1 2(e4)0 2(e4)0 3(20)0 4(0)0 2(e4)0 a(4)0 b(0)0 7(1f)0 13(0)0 13(24)1 13(24)0 13(24)0 
+<6>[   10.455587]  [1:    kworker/1:1:  958] muic_print_reg_dump:CT:e4 IM1:dc IM2:0 MS1:24 MS2:1 ADC:1f DT1:4 DT2:0 RS2:6
+<6>[   10.671809]  [1:   kworker/u8:1:   30] binder: release 2395:2507 transaction 988 out, still active
+<6>[   10.694790]  [0:    mediaserver: 2265] binder: 2265:2265 transaction failed 29189, size 0-0
+<6>[   10.694805]  [0:    mediaserver: 2265] binder: send failed reply for transaction 988, target dead
+<6>[   10.895990]  [0:          pkgld: 2325] sdcardfs: inotify event: 00000400
+<6>[   10.896010]  [0:          pkgld: 2325] sdcardfs: inotify event: 00008000
+<6>[   10.896374]  [0:          pkgld: 2325] sdcardfs: read_package_list
+<6>[   10.980826]  [3:  system_server: 2912] logger: !@Boot: End PackageManagerService
+<6>[   11.001288]  [3:  system_server: 2912] logger: !@ USE_STATIC_LIGHTS_HAL
+<6>[   11.001288]  [3:  system_server: 2912] 
+<6>[   11.001329]  [3:  system_server: 2912] logger: !@ lights hal name : Samsung lights Module
+<6>[   11.001329]  [3:  system_server: 2912] 
+<6>[   11.001354]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_file_paths[0][0] : /sys/class/leds/lcd-backlight/brightness 
+<6>[   11.001354]  [3:  system_server: 2912] 
+<6>[   11.001411]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_fds Open error! : [2]
+<6>[   11.001411]  [3:  system_server: 2912] 
+<6>[   11.001431]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_file_paths[0][1] : /sys/class/backlight/panel/brightness 
+<6>[   11.001431]  [3:  system_server: 2912] 
+<6>[   11.001782]  [3:  system_server: 2912] logger: !@ initialize_fds : FOUND! : 0x60
+<6>[   11.001782]  [3:  system_server: 2912] 
+<6>[   11.001804]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_file_paths[1][0] : /sys/class/backlight/panel_1/brightness 
+<6>[   11.001804]  [3:  system_server: 2912] 
+<6>[   11.001839]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_fds Open error! : [2]
+<6>[   11.001839]  [3:  system_server: 2912] 
+<6>[   11.001859]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_file_paths[1][1] : (null) 
+<6>[   11.001859]  [3:  system_server: 2912] 
+<6>[   11.001879]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_file_paths[2][0] : /sys/class/sec/sec_touchkey/brightness 
+<6>[   11.001879]  [3:  system_server: 2912] 
+<6>[   11.002099]  [3:  system_server: 2912] logger: !@ initialize_fds : FOUND! : 0x62
+<6>[   11.002099]  [3:  system_server: 2912] 
+<6>[   11.002120]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_file_paths[3][0] : /sys/class/sec/sec_keypad/brightness 
+<6>[   11.002120]  [3:  system_server: 2912] 
+<6>[   11.002151]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_fds Open error! : [2]
+<6>[   11.002151]  [3:  system_server: 2912] 
+<6>[   11.002171]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_file_paths[3][1] : /sys/class/leds/keyboard-backlight/brightness 
+<6>[   11.002171]  [3:  system_server: 2912] 
+<6>[   11.002202]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_fds Open error! : [2]
+<6>[   11.002202]  [3:  system_server: 2912] 
+<6>[   11.002222]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_file_paths[3][2] : (null) 
+<6>[   11.002222]  [3:  system_server: 2912] 
+<6>[   11.002241]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_file_paths[4][0] : /sys/class/sec/led/led_pattern 
+<6>[   11.002241]  [3:  system_server: 2912] 
+<6>[   11.002271]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_fds Open error! : [2]
+<6>[   11.002271]  [3:  system_server: 2912] 
+<6>[   11.002290]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_file_paths[4][1] : (null) 
+<6>[   11.002290]  [3:  system_server: 2912] 
+<6>[   11.002309]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_file_paths[5][0] : /sys/class/sec/led/led_blink 
+<6>[   11.002309]  [3:  system_server: 2912] 
+<6>[   11.002338]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_fds Open error! : [2]
+<6>[   11.002338]  [3:  system_server: 2912] 
+<6>[   11.002358]  [3:  system_server: 2912] logger: !@ initialize_fds : g_lights_file_paths[5][1] : (null) 
+<6>[   11.002358]  [3:  system_server: 2912] 
+<6>[   11.028894]  [3:  system_server: 2912] abov-touchkey-ft1804 5-0020: touchkey_led_control data(0)
+<6>[   11.028930]  [3:  system_server: 2912] logger: !@ initialize_fds_off : 62
+<6>[   11.028930]  [3:  system_server: 2912] 
+<6>[   11.039979]  [2: servicemanager: 2243] binder: 2243:2243 BC_REQUEST_DEATH_NOTIFICATION death notification already set
+<6>[   11.046688]  [3:  system_server: 2912] logger: !@Battery capacity = 280000
+<14>[   11.051267]  [1:        healthd: 2241] BatteryPropertiesRegistrar: registerListener : start
+<6>[   11.053186]  [0:        healthd: 2241] s2mu003_get_charge_type: S2MU003_CHG_STATUS1 : 36
+<12>[   11.053386]  [0:        healthd: 2241] healthd: battery l=30 v=3943 t=23.2 h=2 st=2 c=0 o=4 ca=0 ct=1 ps=0 hv=0 chg=u
+<14>[   11.053400]  [0:        healthd: 2241] healthd-android: healthd_mode_android_battery_update
+<14>[   11.053412]  [0:        healthd: 2241] BatteryPropertiesRegistrar: notifyListeners : start
+<14>[   11.053424]  [0:        healthd: 2241] IBatteryPropertiesListener : batteryPropertiesChanged!
+<14>[   11.053424]  [0:        healthd: 2241] : BatteryPropertiesRegistrar: notifyListeners : done
+<14>[   11.053798]  [0:        healthd: 2241] BatteryPropertiesRegistrar: registerListener : done
+<6>[   11.054059]  [1:       Binder_1: 2924] logger: !@BatteryListener : batteryPropertiesChanged!
+<6>[   11.668891]  [1:    kworker/1:1:  958] usb_notify: reserve_state_check booting delay finished
+<6>[   11.668908]  [1:    kworker/1:1:  958] usb_notify: reserve_state_check event=vbus(1) enable=1
+<6>[   11.668915]  [1:    kworker/1:1:  958] usb_notify: otg_notifier_callback event=vbus(1)
+<6>[   11.668984]  [2:   kworker/u8:1:   30] usb_notify: otg_notify_state+ event=vbus(1), enable=on
+<6>[   11.668996]  [2:   kworker/u8:1:   30] usb_notifier: exynos_set_peripheral usb attached
+<6>[   11.669003]  [2:   kworker/u8:1:   30] usb_notifier: check_usb_vbus_state vbus state = 1
+<6>[   11.669381]  [2:   kworker/u8:1:   30] usb_notifier: check_usb_vbus_state: get the 13580000.usb platform_device
+<7>[   11.669389]  [2:   kworker/u8:1:   30] usb: s3c_vbus_enable is_active=1(udc_enable)
+<7>[   11.670061]  [2:   kworker/u8:1:   30] usb: set PHYPARAM0 for host mode =0x655679f
+<7>[   11.670141]  [2:   kworker/u8:1:   30] usb: set PHYPARAM0 for device mode = 0x795679f
+<7>[   11.670162]  [2:   kworker/u8:1:   30] samsung-dwc-usb2phy 135c0000.usb2phy: end of samsung_dwc_usb2phy_init
+<6>[   11.671203]  [2:   kworker/u8:1:   30] usb_notify: otg_notify_state- event=vbus, cable=vbus
+<7>[   11.771535] I[0:      swapper/0:    0] usb: Reset interrupt
+<7>[   11.771552] I[0:      swapper/0:    0] 	 OTG core got reset (1)!!
+<7>[   11.839738] I[0:      swapper/0:    0] usb: GET_DES
+<7>[   11.839788]  [0:    kworker/0:3: 2492] usb: android_work config=          (null),connected=1,sw_connected=0
+<7>[   11.839894]  [0:    kworker/0:3: 2492] usb: android_work sent uevent USB_STATE=CONNECTED
+<7>[   11.843166] I[0:      swapper/0:    0] usb: set_config_number single config num=0
+<7>[   11.843180] I[0:      swapper/0:    0] usb: config_buf f->mtp
+<7>[   11.843189] I[0:      swapper/0:    0] usb: config_buf f->acm0
+<7>[   11.843196] I[0:      swapper/0:    0] usb: config_buf f->adb
+<7>[   11.843203] I[0:      swapper/0:    0] usb: set_interface_count next_interface_id=4
+<7>[   11.843361] I[0:      swapper/0:    0] usb: set_config_number single config num=0
+<7>[   11.843368] I[0:      swapper/0:    0] usb: config_buf f->mtp
+<7>[   11.843375] I[0:      swapper/0:    0] usb: config_buf f->acm0
+<7>[   11.843381] I[0:      swapper/0:    0] usb: config_buf f->adb
+<7>[   11.843387] I[0:      swapper/0:    0] usb: set_interface_count next_interface_id=4
+<6>[   11.906419] I[0:      swapper/0:    0] android_usb gadget: high-speed config #1: android
+<7>[   11.906433] I[0:      swapper/0:    0] usb: set_config e mtp[0]
+<7>[   11.906455] I[0:      swapper/0:    0] usb: set_config e acm0[1]
+<7>[   11.906467] I[0:      swapper/0:    0] usb: set_config e acm0[2]
+<7>[   11.906524] I[0:      swapper/0:    0] usb: set_config e adb[3]
+<7>[   11.906546] I[0:      swapper/0:    0] usb: SET_CON
+<7>[   11.906552] I[0:      swapper/0:    0] usb: set_config_number single config num=0
+<7>[   11.906597]  [0:    kworker/0:3: 2492] usb: android_work config=ffffffc000f2e8e8,connected=1,sw_connected=1
+<7>[   11.906684]  [0:    kworker/0:3: 2492] usb: android_work sent uevent USB_STATE=CONFIGURED
+<6>[   11.946103]  [2:    InputReader: 2990] logger: !@Ignoring sensor_device, nodeNumber: 6, deviceName: magnetic_sensor
+<6>[   11.946103]  [2:    InputReader: 2990] 
+<6>[   11.946199]  [2:    InputReader: 2990] logger: !@Ignoring sensor_device, nodeNumber: 5, deviceName: light_sensor
+<6>[   11.946199]  [2:    InputReader: 2990] 
+<6>[   11.946278]  [2:    InputReader: 2990] logger: !@Ignoring sensor_device, nodeNumber: 4, deviceName: proximity_sensor
+<6>[   11.946278]  [2:    InputReader: 2990] 
+<6>[   12.027444]  [2:           lmkd: 2242] lowmemorykiller: lowmem_shrink: convert oom_adj to oom_score_adj:
+<6>[   12.027458]  [2:           lmkd: 2242] lowmemorykiller: oom_adj 0 => oom_score_adj 0
+<6>[   12.027465]  [2:           lmkd: 2242] lowmemorykiller: oom_adj 1 => oom_score_adj 58
+<6>[   12.027471]  [2:           lmkd: 2242] lowmemorykiller: oom_adj 2 => oom_score_adj 117
+<6>[   12.027477]  [2:           lmkd: 2242] lowmemorykiller: oom_adj 3 => oom_score_adj 176
+<6>[   12.027483]  [2:           lmkd: 2242] lowmemorykiller: oom_adj 9 => oom_score_adj 529
+<6>[   12.027489]  [2:           lmkd: 2242] lowmemorykiller: oom_adj 15 => oom_score_adj 1000
+<4>[   12.124322]  [3:    InputReader: 2990] [ TSP ] ist30xx_ts_open: IC is already on
+<6>[   12.138373]  [3:    InputReader: 2990] logger: !@Could not open sysfs for EdgeScreen
+<6>[   12.170983]  [0:          pkgld: 2325] sdcardfs: inotify event: 00000400
+<6>[   12.171002]  [0:          pkgld: 2325] sdcardfs: inotify event: 00008000
+<6>[   12.171354]  [0:          pkgld: 2325] sdcardfs: read_package_list

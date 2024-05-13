@@ -1,0 +1,1192 @@
+[    1.811790]  [0:  kworker/u16:6:  259] platform arizona-extcon: Driver arizona-extcon requests probe deferral
+[    1.812163]  [2: ssp_later_init:  352] 
+[    1.812163]  [2: ssp_later_init:  352] #####################################################
+[    1.812242]  [0:  kworker/u16:6:  259] platform qcom,msm-voip-dsp.79: Driver msm-voip-dsp requests probe deferral
+[    1.812411]  [2: ssp_later_init:  352] [SSP] init accelerometer_sensor iio dev, type = 1
+[    1.812550]  [2: ssp_later_init:  352] [SSP] init geomagnetic_sensor iio dev, type = 2
+[    1.812594]  [5:           init:    1] !@Boot: start init process
+[    1.812706]  [2: ssp_later_init:  352] [SSP] init gyro_sensor iio dev, type = 4
+[    1.812747]  [5:           init:    1] init: init started!
+[    1.812846]  [2: ssp_later_init:  352] [SSP] init light_sensor iio dev, type = 5
+[    1.812887]  [5:           init:    1] init: Function: selinux_compare_spd_ram, index[0], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    1.813026]  [2: ssp_later_init:  352] [SSP] init proximity_sensor iio dev, type = 8
+[    1.813144]  [2: ssp_later_init:  352] [SSP] init uncal_geomagnetic_sensor iio dev, type = 14
+[    1.813259]  [2: ssp_later_init:  352] [SSP] init uncal_gyro_sensor iio dev, type = 16
+[    1.813369]  [2: ssp_later_init:  352] [SSP] init sig_motion_sensor iio dev, type = 17
+[    1.813482]  [2: ssp_later_init:  352] [SSP] init step_det_sensor iio dev, type = 18
+[    1.813585]  [2: ssp_later_init:  352] [SSP] init step_cnt_sensor iio dev, type = 19
+[    1.813691]  [2: ssp_later_init:  352] [SSP] init geomagnetic_rotation_vector_sensor iio dev, type = 20
+[    1.813804]  [2: ssp_later_init:  352] [SSP] init tilt_detector iio dev, type = 22
+[    1.813906]  [2: ssp_later_init:  352] [SSP] init pickup_gesture iio dev, type = 25
+[    1.814004]  [2: ssp_later_init:  352] [SSP] init meta_event iio dev, type = 27
+[    1.814105]  [2: ssp_later_init:  352] [SSP] init geomagnetic_power iio dev, type = 30
+[    1.814210]  [2: ssp_later_init:  352] [SSP] init interrupt_gyro_sensor iio dev, type = 31
+[    1.814404]  [2: ssp_later_init:  352] [SSP] requesting IRQ 583
+[    1.814843]  [2: ssp_later_init:  352] [SSP]  initialize_variable(  75): initialize_variable.
+[    1.814972]  [2: ssp_later_init:  352] input: ssp_context as /devices/virtual/input/input5
+[    1.816207]  [0:  kworker/u16:7:  276] sm5705-charger: sm5705_chg_test_read: [CHG] 0x04:0xfe, 0x05:0xbf, 0x06:0xff, 0x07:0xff, 0x08:0x29, 0x09:0x18, 0x0A:0x00, 0x0B:0x00, 0x0C:0x05, 0x0D:0x0f, 0x0E:0x1c, 0x0F:0x03, 0x10:0x26, 0x11:0x12, 0x12:0x64, 0x13:0x08, 0x14:0x02, 0x15:0x2c, 0x16:0x18, 0x17:0x1c, 0x20:0x05, 0x21:0x00, 
+[    1.816400]  [2:  kworker/u16:7:  276] sm5705-charger: sm5705_enable_charging_on_switch: turn-ON Charging enable pin
+[    1.816611]  [5:           init:    1] SELinux: 2048 avtab hash slots, 29555 rules.
+[    1.817368]  [2:  kworker/u16:7:  276] sm5705-charger: sm5705_CHG_enable_AICL: sm5705_CHG_enable_AICL(set)
+[    1.817426]  [2:  kworker/u16:7:  276] sm5705-charger: sm5705_chg_set_property: [start] prev_cable_type(1), cable_type(4), op_mode(5), op_status(0x0)
+[    1.817500]  [2:  kworker/u16:7:  276] sm5705-charger: sm5705_charger_oper_push_event: event_type=5, enable=1
+[    1.817559]  [2:  kworker/u16:7:  276] sm5705_call_fg_device_id: extern call SM5705 fg_device_id = 0xb
+[    1.817616]  [2:  kworker/u16:7:  276] sm5705-charger: sm5705_charger_oper_change_state: New table[1] info (STATUS: 0x20, MODE: 5, BST_OUT: 0x5, OTG_CURRENT: 0x0
+[    1.817695]  [5:           init:    1] SELinux:  Android master kernel running Android M policy in compatibility mode.
+[    1.817763]  [2:  kworker/u16:7:  276] da9155_mode_change: mode(1), prev_cable_type(1), cable_type(4)
+[    1.819046]  [4:  kworker/u16:7:  276] da9155_charger_initialize
+[    1.822744]  [4:  kworker/u16:7:  276] sec_multi_chg_set_property: invalid condition (sub_is_charging(0), chg_mode(0), multi_mode(0))
+[    1.823144]  [4:  kworker/u16:7:  276] sm5705-charger: sm5705_CHG_get_FASTCHG: get FASTCHG src=0, offset=0x26, current=2000mA
+[    1.823209]  [4:  kworker/u16:7:  276] sm5705-charger: sm5705_get_charge_current: src_type=1, current=2000
+[    1.823264]  [4:  kworker/u16:7:  276] sec_bat_check_input_voltage: battery->input_voltage : 5V, 2375mW, 2375mW)
+[    1.823321]  [4:  kworker/u16:7:  276] sec_bat_set_charging_current: keep charging current(capacity=3, tc=5)
+[    1.823376]  [4:  kworker/u16:7:  276] sec_bat_set_charging_current: update charge_power(2375)
+[    1.823426]  [4:  kworker/u16:7:  276] sec_multi_chg_check_input_current: does not need that check input current when sub charger is off.
+[    1.823494]  [4:  kworker/u16:7:  276] sm5705-charger: sm5705_chg_set_property: POWER_SUPPLY_PROP_CURRENT_MAX - current=475
+[    1.823556]  [4:  kworker/u16:7:  276] sm5705-charger: sm5705_CHG_set_INPUT_LIMIT: set Input LIMIT src=0, current=475mA offset=0xf
+[    1.823861]  [4:  kworker/u16:7:  276] sec_multi_chg_set_input_current: set input current - main(475mA)
+[    1.823917]  [4:  kworker/u16:7:  276] sm5705-charger: sm5705_chg_set_property: POWER_SUPPLY_PROP_CURRENT_AVG/NOW - current=475
+[    1.823983]  [4:  kworker/u16:7:  276] sm5705-charger: sm5705_CHG_set_FASTCHG: FASTCHG src=0, current=475mA offset=0x7
+[    1.824284]  [4:  kworker/u16:7:  276] sec_multi_chg_set_charging_current: set charging current - main(475mA)
+[    1.824344]  [4:  kworker/u16:7:  276] sm5705-charger: sm5705_CHG_set_TOPOFF: set TOP-OFF current(500mA - offset=0xf)
+[    1.824959]  [4:  kworker/u16:7:  276] sm5705-charger: psy_chg_set_afc_charger_mode: afc_charger_mode value = 1
+[    1.825016]  [4:  kworker/u16:7:  276] muic_charger_init
+[    1.825056]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_cable_work: Status:Charging, Sleep:No, Charging:Yes, Short Poll:Yes
+[    1.825130]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_cable_work: Polling time is reset to 30 sec.
+[    1.826995]  [4:  kworker/u16:7:  276] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x0
+[    1.828126]  [4:  kworker/u16:7:  276] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x0
+[    1.828513]  [4:  kworker/u16:7:  276] sec_bat_get_temperature_by_adc channel = 2 
+[    1.828580]  [4:  kworker/u16:7:  276] sec_mpp_mux_control: [mux_sel_1] level : 0(0), adc_type : 2
+[    1.829969]  [5:           init:    1] SELinux: 2048 avtab hash slots, 29555 rules.
+[    1.830063]  [5:           init:    1] SELinux:  1 users, 2 roles, 2682 types, 0 bools, 1 sens, 1024 cats
+[    1.830129]  [5:           init:    1] SELinux:  87 classes, 29555 rules
+[    1.833061]  [5:           init:    1] SELinux:  Completing initialization.
+[    1.833108]  [5:           init:    1] SELinux:  Setting up existing superblocks.
+[    1.833169]  [5:           init:    1] SELinux: initialized (dev sysfs, type sysfs), uses genfs_contexts
+[    1.833239]  [5:           init:    1] SELinux: initialized (dev rootfs, type rootfs), uses genfs_contexts
+[    1.833371]  [5:           init:    1] SELinux: initialized (dev bdev, type bdev), not configured for labeling
+[    1.833445]  [5:           init:    1] SELinux: initialized (dev proc, type proc), uses genfs_contexts
+[    1.833514]  [5:           init:    1] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+[    1.833586]  [5:           init:    1] SELinux: initialized (dev debugfs, type debugfs), uses genfs_contexts
+[    1.835242]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(249), Temp-ADC(33860)
+[    1.835315]  [4:  kworker/u16:7:  276] sec_bat_get_temperature_by_adc channel = 3 
+[    1.835361]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(290), Temp-ADC(33000)
+[    1.835424]  [4:  kworker/u16:7:  276] sec_bat_get_temperature_by_adc channel = 6 
+[    1.835473]  [4:  kworker/u16:7:  276] sec_mpp_mux_control: [mux_sel_2] level : 1(1), adc_type : 3
+[    1.841869]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(272), Temp-ADC(33241)
+[    1.841933]  [4:  kworker/u16:7:  276] sec_bat_get_temperature_by_adc channel = 11 
+[    1.842002]  [4:  kworker/u16:7:  276] sec_mpp_mux_control: [mux_sel_1] level : 1(1), adc_type : 6
+[    1.848370]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(257), Temp-ADC(33592)
+[    1.848774]  [4:  kworker/u16:7:  276] sm5705-charger: psy_chg_get_charging_health: is_charging=1(1), cable_type=4, input_limit=475, chg_curr=475, REG_STATUS1=0x29
+[    1.851325]  [4:  kworker/u16:7:  276] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x0
+[    1.852570]  [4:  kworker/u16:7:  276] sm5705_vbatocv_check: mode change to mix RS auto mode
+[    1.854673]  [4:  kworker/u16:7:  276] sm5705_cal_carc: <1 6 1 11 -1 1 6 1 9 1>, temp_fg = 294 ,p_curr_cal = 0x94, n_curr_cal = 0x9f, curr_offset = 0x82, volt_cal = 0x8000 ,fg_delta_volcal = 0x0
+[    1.855403]  [4:  kworker/u16:7:  276] sm5705_cal_carc: <0 2 1 2 1 1 2 3 2 3>, p_curr_cal = 0x94, n_curr_cal = 0x9f, mix_factor=0xcc ,batt_temp = 249
+[    1.856654]  [4:  kworker/u16:7:  276] sm5705_fg_check_reg_init_need: SM5705_REG_FG_OP_STATUS : 0x8010 , return 0
+[    1.859855]  [4:  kworker/u16:7:  276] sm5705_fg_test_read: 0xA0=0x1400, 0xAC=0x20c5, 0xAD=0x21a7, 0xAE=0x22cc, 0xAF=0x2400, 0x28=0x0414, 0x2F=0x021a, 0x01=0xc401, SM5705_ID=0x000b
+[    1.861141]  [5:           init:    1] SELinux: initialized (dev sockfs, type sockfs), uses task SIDs
+[    1.861205]  [5:           init:    1] SELinux: initialized (dev pipefs, type pipefs), uses task SIDs
+[    1.861268]  [5:           init:    1] SELinux: initialized (dev anon_inodefs, type anon_inodefs), uses genfs_contexts
+[    1.861334]  [5:           init:    1] SELinux: initialized (dev devpts, type devpts), uses transition SIDs
+[    1.861401]  [5:           init:    1] SELinux: initialized (dev selinuxfs, type selinuxfs), uses genfs_contexts
+[    1.861515]  [5:           init:    1] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+[    1.861583]  [5:           init:    1] SELinux: initialized (dev sysfs, type sysfs), uses genfs_contexts
+[    1.863843]  [4:  kworker/u16:7:  276] sm5705_fg_test_read: 0xB0=0x0000, 0xBC=0x186c, 0xBD=0x1ba0, 0xBE=0x1ecc, 0xBF=0x1ed4, 0x85=0x8094, 0x86=0x807a, 0x87=0x00fa, 0x1F=0x0010, 0x94=0x0001
+[    1.864342]  [4:  kworker/u16:7:  276] sm5705_get_all_value: chg_h=1, chg_f=0, chg_s=1, is_chg=1, ta_exist=1, v=3582, v_avg=3588, i=56, i_avg=69, ocv=3591, fg_t=294, b_t=249, cycle=0, soc=31, state=0x2
+[    1.864449]  [4:  kworker/u16:7:  276] sm5705_fg_get_scaled_capacity: scaled capacity (3.1)
+[    1.864502]  [4:  kworker/u16:7:  276] sm5705_fg_get_atomic_capacity : NOW(3), OLD(3)
+[    1.864558]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_battery_info:Vnow(3582mV),Inow(56mA),Imax(475mA),SOC(3%),Tbat(249),Tchg(272),Tschg(257),Twpc(0),sw_self_dis(0)
+[    1.865001]  [4:  kworker/u16:7:  276] sm5705-charger: psy_chg_get_charging_health: is_charging=1(1), cable_type=4, input_limit=475, chg_curr=475, REG_STATUS1=0x29
+[    1.865095]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_monitor_work: Status(Charging), mode(Normal), Health(Good), Cable(4, 4, 1, 0), level(100%), HV(NONE), sleep_mode(0)
+[    1.865900]  [4:    kworker/4:2:  180] sec_bat_get_property cable type = 4 sleep_mode = 0
+[    1.892416]  [5:           init:    1] init: SELinux: Loaded policy from /sepolicy
+[    1.893324]  [5:           init:    1] inside Iccc_SaveData_Kernel 
+[    1.893369]  [5:           init:    1] Iccc_SaveData_Kernel: Not ready! type:0xff000002, ret:1
+[    1.893902]  [5:           init:    1] init: (Initializing SELinux enforcing took 0.08s.)
+[    1.894090]  [5:           init:    1] init: Function: selinux_compare_spd_ram, index[3], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    1.931016]  [5:           init:    1] init: SELinux: Loaded file_contexts contexts from /file_contexts.
+[    1.932402]  [5:           init:    1] init: SELinux: set fc_digest(/sbin)
+[    1.934550]  [5:           init:    1] init: init second stage started!
+[    1.935027]  [5:           init:    1] init: property_set("ro.boot.security_mode", "1526595584") failed
+[    1.935303]  [5:           init:    1] init: Function: selinux_compare_spd_ram, index[3], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    1.972027]  [5:           init:    1] init: SELinux: Loaded file_contexts contexts from /file_contexts.
+[    1.972122]  [5:           init:    1] init: Function: selinux_compare_spd_ram, index[2], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    1.973240]  [5:           init:    1] init: SELinux: Loaded property_contexts from /property_contexts.
+[    1.973327]  [5:           init:    1] init: Function: selinux_compare_spd_ram, index[6], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    2.164257]  [5:           init:    1] init: waitpid failed: No child processes
+[    2.164431]  [5:           init:    1] init: (Loading properties from /default.prop took 0.00s.)
+[    2.167340]  [5:           init:    1] init: (Parsing /init.environ.rc took 0.00s.)
+[    2.167480]  [5:           init:    1] init: (Parsing /init.usb.rc took 0.00s.)
+[    2.167862]  [5:           init:    1] init: /init.qcom.rc: 555: user option requires a user id
+[    2.168335]  [5:           init:    1] init: /init.qcom.rc: 1068: ignored duplicate definition of service 'bugreport'
+[    2.169402]  [5:           init:    1] init: (Parsing init.qcom.usb.rc took 0.00s.)
+[    2.169602]  [5:           init:    1] init: init.target.rc: 142: ignored duplicate definition of service 'perfd'
+[    2.169890]  [5:           init:    1] init: init.carrier.rc: 136: ignored duplicate definition of service 'ftm_ptt'
+[    2.169962]  [5:           init:    1] init: init.carrier.rc: 148: invalid option 'chown'
+[    2.170015]  [5:           init:    1] init: init.carrier.rc: 149: invalid option 'chmod'
+[    2.170097]  [5:           init:    1] init: could not import file '/init.fac.rc' from 'init.carrier.rc'
+[    2.170157]  [5:           init:    1] init: (Parsing init.carrier.rc took 0.00s.)
+[    2.170205]  [5:           init:    1] init: (Parsing init.target.rc took 0.00s.)
+[    2.170409]  [5:           init:    1] init: (Parsing init.qcom.factory.rc took 0.00s.)
+[    2.170459]  [5:           init:    1] init: (Parsing /init.qcom.rc took 0.00s.)
+[    2.170640]  [5:           init:    1] init: (Parsing /init.usb.configfs.rc took 0.00s.)
+[    2.170724]  [5:           init:    1] init: (Parsing /init.zygote64_32.rc took 0.00s.)
+[    2.170871]  [5:           init:    1] init: (Parsing /init.trace.rc took 0.00s.)
+[    2.170980]  [5:           init:    1] init: could not import file '/init.rilcarrier.rc' from '/init.rilcommon.rc'
+[    2.171067]  [5:           init:    1] init: /init.rilchip.rc: 8: ignored duplicate definition of service 'ril-daemon'
+[    2.171152]  [5:           init:    1] init: /init.rilchip.rc: 22: ignored duplicate definition of service 'qmuxd'
+[    2.171226]  [5:           init:    1] init: /init.rilchip.rc: 27: ignored duplicate definition of service 'diag_mdlog_start'
+[    2.171306]  [5:           init:    1] init: /init.rilchip.rc: 34: ignored duplicate definition of service 'diag_mdlog_stop'
+[    2.171415]  [5:           init:    1] init: (Parsing /init.rilchip.rc took 0.00s.)
+[    2.171478]  [5:           init:    1] init: could not import file '/init.rilepdg.rc' from '/init.rilcommon.rc'
+[    2.171547]  [5:           init:    1] init: (Parsing /init.rilcommon.rc took 0.00s.)
+[    2.171610]  [5:           init:    1] init: could not import file '/init.sec_debug.rc' from '/init.rc'
+[    2.171742]  [5:           init:    1] init: (Parsing /init.container.rc took 0.00s.)
+[    2.171798]  [5:           init:    1] init: (Parsing /init.rc took 0.01s.)
+[    2.172049]  [5:           init:    1] init: Starting service 'ueventd'...
+[    2.176738]  [0:        ueventd:  356] ueventd: ueventd started!
+[    2.178540]  [0:        ueventd:  356] ueventd: Function: selinux_compare_spd_ram, index[3], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    2.221732]  [5:        ueventd:  356] ueventd: SELinux: Loaded file_contexts contexts from /file_contexts.
+[    2.224535]  [5:        ueventd:  356] ueventd: Function: selinux_compare_spd_ram, index[3], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    2.262121]  [4:        ueventd:  356] ueventd: SELinux: Loaded file_contexts contexts from /file_contexts.
+[    2.281655]  [0:        ueventd:  356] sm5705-charger: sm5705_otg_get_property: POWER_SUPPLY_PROP_ONLINE - OFF
+[    2.284388]  [4:        ueventd:  356] sm5705-charger: psy_chg_get_charging_health: is_charging=1(1), cable_type=4, input_limit=475, chg_curr=475, REG_STATUS1=0x29
+[    2.285454]  [4:        ueventd:  356] sm5705-charger: sm5705_CHG_get_FASTCHG: get FASTCHG src=0, offset=0x7, current=450mA
+[    2.285520]  [4:        ueventd:  356] sm5705-charger: sm5705_get_charge_current: src_type=1, current=450
+[    2.286231]  [4:        ueventd:  356] sm5705-charger: sm5705_chg_get_property: un-known Power-supply property type (psp=18)
+[    2.286299]  [4:        ueventd:  356] power_supply sm5705-charger: driver failed to report `input_voltage_regulation' property: -22
+[    2.289696]  [4:        ueventd:  356] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x0
+[    2.290887]  [4:        ueventd:  356] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x0
+[    2.291297]  [4:        ueventd:  356] sm5705-charger: psy_chg_get_charging_health: is_charging=1(1), cable_type=4, input_limit=475, chg_curr=475, REG_STATUS1=0x29
+[    2.293871]  [4:        ueventd:  356] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x0
+[    2.295154]  [4:        ueventd:  356] sm5705_vbatocv_check: mode change to mix RS auto mode
+[    2.297289]  [4:        ueventd:  356] sm5705_cal_carc: <1 6 1 11 -1 1 6 1 9 1>, temp_fg = 295 ,p_curr_cal = 0x94, n_curr_cal = 0x9f, curr_offset = 0x82, volt_cal = 0x8000 ,fg_delta_volcal = 0x0
+[    2.298035]  [4:        ueventd:  356] sm5705_cal_carc: <0 2 1 2 1 1 2 3 2 3>, p_curr_cal = 0x94, n_curr_cal = 0x9f, mix_factor=0xcc ,batt_temp = 249
+[    2.299379]  [4:        ueventd:  356] sm5705_fg_check_reg_init_need: SM5705_REG_FG_OP_STATUS : 0x8010 , return 0
+[    2.302597]  [4:        ueventd:  356] sm5705_fg_test_read: 0xA0=0x1400, 0xAC=0x20c5, 0xAD=0x21a7, 0xAE=0x22cc, 0xAF=0x2400, 0x28=0x0414, 0x2F=0x021a, 0x01=0xc401, SM5705_ID=0x000b
+[    2.306642]  [4:        ueventd:  356] sm5705_fg_test_read: 0xB0=0x0000, 0xBC=0x186c, 0xBD=0x1ba0, 0xBE=0x1ecc, 0xBF=0x1ed4, 0x85=0x8193, 0x86=0x807a, 0x87=0x00fa, 0x1F=0x0010, 0x94=0x0001
+[    2.307130]  [4:        ueventd:  356] sm5705_get_all_value: chg_h=1, chg_f=0, chg_s=1, is_chg=1, ta_exist=1, v=3566, v_avg=3577, i=56, i_avg=57, ocv=3591, fg_t=295, b_t=249, cycle=0, soc=31, state=0x2
+[    2.307228]  [4:        ueventd:  356] sm5705_fg_get_scaled_capacity: scaled capacity (3.1)
+[    2.307278]  [4:        ueventd:  356] sm5705_fg_get_atomic_capacity : NOW(3), OLD(3)
+[    2.318120]  [0: ssp_later_init:  352] [SSP]           ssp_enable(  25): enable = 1, is_shutdown = 1
+[    2.318439]  [0:irq/583-SSP_Int:  354] [SSP]      parse_dataframe( 207): Reset MSG received from MCU
+[    2.318494]  [0:irq/583-SSP_Int:  354] [SSP]      parse_dataframe( 211): ssp_data is NULL
+[    2.324357]  [1: ssp_later_init:  352] [SSP] MCU Firm Rev : Old = 16111500, New = 16111500
+[    2.324412]  [1: ssp_later_init:  352] [SSP]       initialize_mcu( 133): is_shutdown = 0
+[    2.330609]  [1: ssp_later_init:  352] [SSP]       initialize_mcu( 135): MCU device ID = 85, reading ID = 85
+[    2.330667]  [1: ssp_later_init:  352] [SSP]  set_sensor_position( 564): 
+[    2.336857]  [1: ssp_later_init:  352] [SSP] Sensor Posision A : 0, G : 0, M: 2, P: 0
+[    2.357643]  [2: ssp_later_init:  352] [SSP] state: 11110010010011110100000100110110
+[    2.357691]  [2: ssp_later_init:  352] [SSP] state2: 0000000000000000000011010011111
+[    2.363885]  [2: ssp_later_init:  352] [SSP] set_pdc_matrix: finished
+[    2.370067]  [2: ssp_later_init:  352] [SSP] MCU Firm Rev : New = 16111500
+[    2.370117]  [2: ssp_later_init:  352] [SSP]       ssp_later_init( 589): probe success!
+[    2.370168]  [2: ssp_later_init:  352] #####################################################
+[    2.370168]  [2: ssp_later_init:  352] 
+[    2.395441]  [0:           init:    1] FAT-fs (mmcblk0p37[259:5]): trying to mount...
+[    2.403417]  [0:           init:    1] FAT-fs (mmcblk0p37[259:5]): mounted successfully!
+[    2.403731]  [0:           init:    1] SELinux: initialized (dev mmcblk0p37, type vfat), uses mountpoint labeling
+[    2.404102]  [0:           init:    1] FAT-fs (mmcblk0p36[259:4]): trying to mount...
+[    2.409577]  [3:           init:    1] FAT-fs (mmcblk0p36[259:4]): mounted successfully!
+[    2.409677]  [3:           init:    1] SELinux: initialized (dev mmcblk0p36, type vfat), uses mountpoint labeling
+[    2.421153]  [5:           init:    1] TIMA: lkmauth--launch the tzapp to check kernel module; module len is 556924
+[    2.455888]  [4:           init:    1] TIMA: lkmauth -- hdr before kreq is : ffffff80028bf000
+[    2.455982]  [4:           init:    1] TIMA: lkmauth--send cmd (tima_lkm) cmdlen(134:320), rsplen(108:320) id 0x00050000,                 req (0xFFFFFF80020AA000), rsp(0xFFFFFF80020AA140), module_start_addr(0x        f2539000) module_len 556924
+[    2.487615]  [4:           init:    1] TIMA: lkmauth--verification succeeded.
+[    2.488464]  [4:           init:    1] QSEECOM: qseecom_unload_app: App id 6 now unloaded
+[    2.488686]  [4:           init:    1] qcrypto_module: exports duplicate symbol compat_qcedev_ioctl (owned by kernel)
+[    2.511333]  [5:           init:    1] TIMA: lkmauth--launch the tzapp to check kernel module; module len is 186900
+[    2.528614]  [5:           init:    1] TIMA: lkmauth -- hdr before kreq is : ffffff8002a25000
+[    2.528687]  [5:           init:    1] TIMA: lkmauth--send cmd (tima_lkm) cmdlen(134:320), rsplen(108:320) id 0x00050000,                 req (0xFFFFFF80025F9000), rsp(0xFFFFFF80025F9140), module_start_addr(0x        f2540a00) module_len 186900
+[    2.541670]  [5:           init:    1] TIMA: lkmauth--verification succeeded.
+[    2.542672]  [5:           init:    1] QSEECOM: qseecom_unload_app: App id 7 now unloaded
+[    2.542977]  [5:           init:    1] init: Waiting for /dev/.coldboot_done...
+[    2.765366]  [4:        ueventd:  356] sec_bat_get_property cable type = 4 sleep_mode = 0
+[    2.771578]  [4:        ueventd:  356] ueventd: Coldboot took 0.55s.
+[    2.775125]  [0:           init:    1] init: Waiting for /dev/.coldboot_done took 0.23s.
+[    2.776154]  [0:           init:    1] init: could not open /dev/keychord: No such file or directory
+[    2.777479]  [0:           init:    1] SELinux: initialized (dev cgroup, type cgroup), uses genfs_contexts
+[    2.778313]  [0:           init:    1] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+[    2.780546]  [0:           init:    1] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+[    2.780795]  [0:           init:    1] init: SELinux: set fc_digest(/mnt)
+[    2.781441]  [0:           init:    1] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+[    2.782222]  [0:           init:    1] init: SELinux: set fc_digest(/mnt/secure/staging)
+[    2.782803]  [0:           init:    1] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+[    2.783029]  [0:           init:    1] init: SELinux: set fc_digest(/mnt/secure/asec)
+[    2.787047]  [0:           init:    1] init: write_file: Unable to open '/proc/sys/kernel/hung_task_timeout_secs': No such file or directory
+[    2.787152]  [0:           init:    1] init: write_file: Unable to open '/proc/cpu/alignment': No such file or directory
+[    2.787243]  [0:           init:    1] init: write_file: Unable to open '/proc/sys/kernel/sched_tunable_scaling': No such file or directory
+[    2.787343]  [0:           init:    1] init: write_file: Unable to open '/proc/sys/kernel/sched_latency_ns': No such file or directory
+[    2.787439]  [0:           init:    1] init: write_file: Unable to open '/proc/sys/kernel/sched_wakeup_granularity_ns': No such file or directory
+[    2.787538]  [0:           init:    1] init: write_file: Unable to open '/proc/sys/kernel/sched_compat_yield': No such file or directory
+[    2.789004]  [4:           init:    1] SELinux: initialized (dev cgroup, type cgroup), uses genfs_contexts
+[    2.789294]  [4:           init:    1] init: write_file: Unable to write to '/dev/cpuctl/cpu.shares': Invalid argument
+[    2.789969]  [4:           init:    1] init: write_file: Unable to write to '/dev/cpuctl/bg_non_interactive/cpu.rt_runtime_us': Invalid argument
+[    2.790397]  [4:           init:    1] init: write_file: Unable to write to '/dev/cpuctl/bg_cached/cpu.rt_runtime_us': Invalid argument
+[    2.790883]  [4:           init:    1] init: write_file: Unable to write to '/dev/cpuctl/bg_abnormal/cpu.rt_runtime_us': Invalid argument
+[    2.791400]  [4:           init:    1] init: write_file: Unable to write to '/dev/cpuctl/dex2oat/cpu.rt_runtime_us': Invalid argument
+[    2.791877]  [4:           init:    1] SELinux: initialized (dev cgroup, type cgroup), uses genfs_contexts
+[    2.794851]  [4:           init:    1] init: write_file: Unable to open '/proc/sys/abi/swp': No such file or directory
+[    2.795123]  [4:           init:    1] init: Starting service 'qfintverify'...
+[    2.798698]  [4:           init:    1] SELinux: initialized (dev functionfs, type functionfs), uses genfs_contexts
+[    2.799362]  [1:           init:  360] fs_mgr: Warning : MF_CRYPT -> MF_FORCECRYPT
+[    2.826219]  [1:    qfintverify:  359] qcedev: FIPS140-2 Global status flag: 0
+[    2.826267]  [1:    qfintverify:  359] qcedev: FIPS140-2 Global status flag: 0
+[    2.866954]  [1:  kworker/u16:7:  276] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x81
+[    2.868011]  [1:  kworker/u16:7:  276] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x81
+[    2.868424]  [1:  kworker/u16:7:  276] sec_bat_get_temperature_by_adc channel = 2 
+[    2.868500]  [1:  kworker/u16:7:  276] sec_mpp_mux_control: [mux_sel_1] level : 0(0), adc_type : 2
+[    2.874986]  [1:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(249), Temp-ADC(33861)
+[    2.875052]  [1:  kworker/u16:7:  276] sec_bat_get_temperature_by_adc channel = 3 
+[    2.875102]  [1:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(290), Temp-ADC(33000)
+[    2.875165]  [1:  kworker/u16:7:  276] sec_bat_get_temperature_by_adc channel = 6 
+[    2.875216]  [1:  kworker/u16:7:  276] sec_mpp_mux_control: [mux_sel_2] level : 1(1), adc_type : 3
+[    2.881524]  [1:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(273), Temp-ADC(33231)
+[    2.881588]  [1:  kworker/u16:7:  276] sec_bat_get_temperature_by_adc channel = 11 
+[    2.881654]  [1:  kworker/u16:7:  276] sec_mpp_mux_control: [mux_sel_1] level : 1(1), adc_type : 6
+[    2.887958]  [1:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(257), Temp-ADC(33583)
+[    2.888360]  [1:  kworker/u16:7:  276] sm5705-charger: psy_chg_get_charging_health: is_charging=1(1), cable_type=4, input_limit=475, chg_curr=475, REG_STATUS1=0x29
+[    2.890646]  [1:  kworker/u16:7:  276] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x81
+[    2.891769]  [1:  kworker/u16:7:  276] sm5705_vbatocv_check: sm5705 FG iocv_error_count (1)
+[    2.891818]  [1:  kworker/u16:7:  276] sm5705_vbatocv_check: mode change to mix RS auto mode
+[    2.893706]  [1:  kworker/u16:7:  276] sm5705_cal_carc: <1 6 1 11 -1 1 6 1 9 1>, temp_fg = 295 ,p_curr_cal = 0x94, n_curr_cal = 0x9f, curr_offset = 0x82, volt_cal = 0x8081 ,fg_delta_volcal = 0x0
+[    2.894365]  [1:  kworker/u16:7:  276] sm5705_cal_carc: <0 2 1 2 1 1 2 3 2 3>, p_curr_cal = 0x94, n_curr_cal = 0x9f, mix_factor=0xcc ,batt_temp = 249
+[    2.895493]  [1:  kworker/u16:7:  276] sm5705_fg_check_reg_init_need: SM5705_REG_FG_OP_STATUS : 0x10 , return 0
+[    2.898422]  [4:  kworker/u16:7:  276] sm5705_fg_test_read: 0xA0=0x1400, 0xAC=0x20c5, 0xAD=0x21a7, 0xAE=0x22cc, 0xAF=0x2400, 0x28=0x0414, 0x2F=0x021a, 0x01=0xc401, SM5705_ID=0x000b
+[    2.902215]  [4:  kworker/u16:7:  276] sm5705_fg_test_read: 0xB0=0x0000, 0xBC=0x186c, 0xBD=0x1ba0, 0xBE=0x1ecc, 0xBF=0x1ed4, 0x85=0x8217, 0x86=0x807a, 0x87=0x00fa, 0x1F=0x0010, 0x94=0x0001
+[    2.902681]  [4:  kworker/u16:7:  276] sm5705_get_all_value: chg_h=1, chg_f=0, chg_s=1, is_chg=1, ta_exist=1, v=3558, v_avg=3563, i=195, i_avg=116, ocv=3591, fg_t=295, b_t=249, cycle=0, soc=31, state=0x2
+[    2.902781]  [4:  kworker/u16:7:  276] sm5705_fg_get_scaled_capacity: scaled capacity (3.1)
+[    2.902830]  [4:  kworker/u16:7:  276] sm5705_fg_get_atomic_capacity : NOW(3), OLD(3)
+[    2.902882]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_battery_info:Vnow(3558mV),Inow(195mA),Imax(475mA),SOC(3%),Tbat(249),Tchg(273),Tschg(257),Twpc(0),sw_self_dis(0)
+[    2.903299]  [4:  kworker/u16:7:  276] sm5705-charger: psy_chg_get_charging_health: is_charging=1(1), cable_type=4, input_limit=475, chg_curr=475, REG_STATUS1=0x29
+[    2.903386]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_monitor_work: Status(Charging), mode(Normal), Health(Good), Cable(4, 4, 1, 0), level(100%), HV(NONE), sleep_mode(0)
+[    2.904131]  [4:    kworker/4:2:  180] sec_bat_get_property cable type = 4 sleep_mode = 0
+[    3.038129]  [4:    kworker/4:2:  180] mms_ts 7-0048: [sec_input] create_flash_count: open fail :-2
+[    3.050134]  [1:           init:  360] fs_mgr: debug: ro.security_mode is 1526595584
+[    3.050189]  [1:           init:  360] fs_mgr: KAP is disabled
+[    3.054502]  [1:           init:  360] EXT4-fs (mmcblk0p39): mounted filesystem without journal. Opts: errors=panic,noload,block_validity
+[    3.054589]  [1:           init:  360] SELinux: initialized (dev mmcblk0p39, type ext4), uses xattr
+[    3.054805]  [1:           init:  360] fs_mgr: __mount(source=/dev/block/bootdevice/by-name/system,target=/system,type=ext4)=0
+[    3.057195]  [1:           init:  360] fs_mgr: Running /system/bin/e2fsck on /dev/block/bootdevice/by-name/userdata
+[    3.104413]  [0:           init:  360] e2fsck: e2fsck 1.42.9 (28-Dec-2013)
+[    3.104413]  [0:           init:  360] 
+[    3.104532]  [0:           init:  360] e2fsck: ext2fs_open2: Bad magic number in super-block
+[    3.104532]  [0:           init:  360] 
+[    3.104616]  [0:           init:  360] e2fsck: /system/bin/e2fsck: Superblock invalid, trying backup blocks...
+[    3.104616]  [0:           init:  360] 
+[    3.104707]  [0:           init:  360] e2fsck: /system/bin/e2fsck: Bad magic number in super-block while trying to open /dev/block/bootdevice/by-name/userdata
+[    3.104707]  [0:           init:  360] 
+[    3.104815]  [0:           init:  360] e2fsck: 
+[    3.104815]  [0:           init:  360] 
+[    3.104879]  [0:           init:  360] e2fsck: The superblock could not be read or does not describe a correct ext2
+[    3.104879]  [0:           init:  360] 
+[    3.104970]  [0:           init:  360] e2fsck: filesystem.  If the device is valid and it really contains an ext2
+[    3.104970]  [0:           init:  360] 
+[    3.105060]  [0:           init:  360] e2fsck: filesystem (and not swap or ufs or something else), then the superblock
+[    3.105060]  [0:           init:  360] 
+[    3.105152]  [0:           init:  360] e2fsck: is corrupt, and you might try running e2fsck with an alternate superblock:
+[    3.105152]  [0:           init:  360] 
+[    3.105244]  [0:           init:  360] e2fsck:     e2fsck -b 8193 <device>
+[    3.105244]  [0:           init:  360] 
+[    3.105317]  [0:           init:  360] e2fsck: 
+[    3.105317]  [0:           init:  360] 
+[    3.105385]  [0:           init:  360] e2fsck: e2fsck terminated by exit(8)
+[    3.105385]  [0:           init:  360] 
+[    3.105992]  [1:           init:  360] printing data of superblock-bh
+[    3.106036]  [1:           init:  360]  print_bh: bh ffffffc1750fd270, bh->b_size 1024, bh->b_data ffffffc175661400
+[    3.106095]  [1:           init:  360] As EXT4-fs error, printing data in hex
+[    3.106138]  [1:           init:  360]  [partition info] s_id : mmcblk0p41, start sector# : 10518528
+[    3.106191]  [1:           init:  360]  dump block# : 1, start offset(byte) : 0
+[    3.106236]  [1:           init:  360]  length(byte) : 1024, data_to_dump 0xffffffc175661400
+[    3.106286]  [1:           init:  360] -------------------------------------------------
+[    3.106342]  [1:           init:  360] 0x0000 : c8 7f d3 f4 90 8a 52 df 3d 85 8e 89 a2 81 b3 20  | ......R.=...... 
+[    3.106409]  [1:           init:  360] 0x0010 : 30 b6 42 21 6d 9e 46 b9 32 ff 51 80 3c da e2 91  | 0.B!m.F.2.Q.<...
+[    3.106476]  [1:           init:  360] 0x0020 : 2c f8 77 b7 8d f7 cf 82 20 5f 12 4d c9 1e 3b bc  | ,.w..... _.M..;.
+[    3.106543]  [1:           init:  360] 0x0030 : 9d ea 45 20 b4 55 46 db c3 91 bf 2b f9 3a 6e 7f  | ..E .UF....+.:n.
+[    3.106609]  [1:           init:  360] 0x0040 : 8c 11 7b b8 75 dd 6e 61 ca b3 05 08 26 52 52 cd  | ..{.u.na....&RR.
+[    3.106676]  [1:           init:  360] 0x0050 : e0 2c 9c a9 3a 3e 12 00 7d 2c 3e 6f ec bf 8e 9e  | .,..:>..},>o....
+[    3.106743]  [1:           init:  360] 0x0060 : 3a 30 34 f8 6a 5e 72 ba 54 6f 26 5e e8 62 9f fe  | :04.j^r.To&^.b..
+[    3.106808]  [1:           init:  360] 0x0070 : b6 57 f8 f9 90 54 35 db 19 a8 5d 4c 1c 70 83 9d  | .W...T5...]L.p..
+[    3.106874]  [1:           init:  360] 0x0080 : ca 8c a5 88 08 d1 94 5c 6a 28 e9 10 2b 06 7c 03  | .......\j(..+.|.
+[    3.106940]  [1:           init:  360] 0x0090 : 72 3b b3 1b 90 d9 8c d7 fc af fc 12 f3 38 46 0e  | r;...........8F.
+[    3.107006]  [1:           init:  360] 0x00a0 : 49 ae 06 35 57 0f a0 27 17 d8 4e 01 59 bb 4d d1  | I..5W..'..N.Y.M.
+[    3.107072]  [1:           init:  360] 0x00b0 : e4 73 73 e6 48 2a 3b 5c 12 d8 24 03 c8 0d 60 ea  | .ss.H*;\..$...`.
+[    3.107138]  [1:           init:  360] 0x00c0 : 24 db f9 26 75 de 36 78 51 7c 23 0e 50 5d 26 f2  | $..&u.6xQ|#.P]&.
+[    3.107204]  [1:           init:  360] 0x00d0 : 01 ca 62 0a d0 dc cd d2 2c 5a a8 99 ff 8a c6 fc  | ..b.....,Z......
+[    3.107270]  [1:           init:  360] 0x00e0 : fd 84 41 7a 1c bd 13 ea 6f a9 43 78 4a ef e8 46  | ..Az....o.CxJ..F
+[    3.107336]  [1:           init:  360] 0x00f0 : ba d4 fd 79 7d ab 88 1a 5d 18 43 ea df 15 98 d0  | ...y}...].C.....
+[    3.107403]  [1:           init:  360] 0x0100 : ea 31 80 d2 2d 15 a6 4c 4c d4 dc 3c 6e 08 c0 e7  | .1..-..LL..<n...
+[    3.107469]  [1:           init:  360] 0x0110 : 79 c3 a7 be 69 8d 86 50 9f 69 18 bf 42 5f 42 55  | y...i..P.i..B_BU
+[    3.107536]  [1:           init:  360] 0x0120 : f5 17 a0 b3 4a fe 5e b7 94 5a ca 20 5b 91 6f da  | ....J.^..Z. [.o.
+[    3.107603]  [1:           init:  360] 0x0130 : f6 25 8c c3 b4 ce bc df d6 28 33 96 63 c9 84 03  | .%.......(3.c...
+[    3.107670]  [1:           init:  360] 0x0140 : c9 19 7e 28 e9 77 f7 20 11 f0 41 fb 4b 69 51 89  | ..~(.w. ..A.KiQ.
+[    3.107736]  [1:           init:  360] 0x0150 : 05 c7 ce 48 c2 bb 02 5d 07 4f 9d 12 96 c4 37 4c  | ...H...].O....7L
+[    3.107802]  [1:           init:  360] 0x0160 : 89 37 a9 79 dc e1 4c de 1d 00 3a bf 70 41 f3 a7  | .7.y..L...:.pA..
+[    3.107868]  [1:           init:  360] 0x0170 : b1 28 af 20 a4 c1 d5 cc 3b 39 18 0e cc 62 e2 0a  | .(. ....;9...b..
+[    3.107934]  [1:           init:  360] 0x0180 : 5e 62 7b d3 38 cb 17 58 d6 20 84 5f 61 ae a0 7e  | ^b{.8..X. ._a..~
+[    3.108000]  [1:           init:  360] 0x0190 : bc 41 57 52 35 5b 9f 55 95 b8 06 c2 61 5d 9c 4a  | .AWR5[.U....a].J
+[    3.108066]  [1:           init:  360] 0x01a0 : eb b0 ca 28 fe 50 ec 1b ba bb 51 ae ef 51 64 2c  | ...(.P....Q..Qd,
+[    3.108173]  [1:           init:  360] 0x01b0 : b6 0f b3 03 60 41 04 10 2b ef f4 5c d9 2d 51 9b  | ....`A..+..\.-Q.
+[    3.108240]  [1:           init:  360] 0x01c0 : 5d ae 60 cb a3 19 30 49 af ed 23 b0 d2 78 91 03  | ].`...0I..#..x..
+[    3.108305]  [1:           init:  360] 0x01d0 : a0 07 de e5 47 ed 16 7b 4f 44 6d fd 74 fd ca ef  | ....G..{ODm.t...
+[    3.108371]  [1:           init:  360] 0x01e0 : 6e b4 27 0d cf ae 7d 24 4f bc 7b 00 6d d6 ca 39  | n.'...}$O.{.m..9
+[    3.108438]  [1:           init:  360] 0x01f0 : f2 d2 31 79 00 78 b0 70 c8 b8 98 11 dc 41 99 03  | ..1y.x.p.....A..
+[    3.108504]  [1:           init:  360] 0x0200 : cf 9f 9c d5 ab 7e d8 17 bb 24 69 dc a5 57 f9 fb  | .....~...$i..W..
+[    3.108571]  [1:           init:  360] 0x0210 : 3a 78 8d b0 5c 42 3c f9 3c 4f 66 9c e6 8a bb 9d  | :x..\B<.<Of.....
+[    3.108639]  [1:           init:  360] 0x0220 : cc 99 57 0a 29 41 ec 5c a9 cd 4e 3e b3 4a c7 37  | ..W.)A.\..N>.J.7
+[    3.108705]  [1:           init:  360] 0x0230 : 18 df 75 9f 04 86 91 2f 03 05 8c ff 6a e8 87 2f  | ..u..../....j../
+[    3.108772]  [1:           init:  360] 0x0240 : 2b 73 78 0e 4d 0d d1 85 c2 48 a4 53 9c 77 b8 0d  | +sx.M....H.S.w..
+[    3.108838]  [1:           init:  360] 0x0250 : d5 ca 56 4f 89 5b 8f c3 96 1c 00 d2 5f a7 04 5a  | ..VO.[......_..Z
+[    3.108905]  [1:           init:  360] 0x0260 : 1b be 08 90 82 48 28 a3 e8 65 e4 d5 16 63 f9 eb  | .....H(..e...c..
+[    3.108971]  [1:           init:  360] 0x0270 : eb 68 7d c5 53 03 35 17 a7 47 2b 61 42 c3 dd b4  | .h}.S.5..G+aB...
+[    3.109038]  [1:           init:  360] 0x0280 : ed a3 12 85 d5 3d 20 77 59 3c 44 23 7a 59 ce d3  | .....= wY<D#zY..
+[    3.109103]  [1:           init:  360] 0x0290 : d6 af dd cc c5 ee fc 4e b7 7b a4 77 80 a1 7f 9b  | .......N.{.w....
+[    3.109168]  [1:           init:  360] 0x02a0 : 70 08 33 8a 38 87 07 ae c4 c1 cd cb 43 12 df e2  | p.3.8.......C...
+[    3.109233]  [1:           init:  360] 0x02b0 : 03 c0 2e 38 cf f1 11 f3 84 9a 0f 03 3c 95 d9 f4  | ...8........<...
+[    3.109299]  [1:           init:  360] 0x02c0 : 3e b0 e9 20 77 1a cd e0 dc f7 c6 d7 fc 68 e0 fa  | >.. w........h..
+[    3.109364]  [1:           init:  360] 0x02d0 : ae a5 1f ba c8 0d b2 79 52 41 c2 8a d0 86 e8 98  | .......yRA......
+[    3.109429]  [1:           init:  360] 0x02e0 : 8b af a1 62 c7 cb 48 c7 ab e2 c4 6c fd c3 56 e2  | ...b..H....l..V.
+[    3.109495]  [1:           init:  360] 0x02f0 : c7 bd 45 55 13 52 62 b5 9e ca b8 95 01 be b0 a2  | ..EU.Rb.........
+[    3.109562]  [1:           init:  360] 0x0300 : d8 3b 7d ff 8b b9 51 3b 3a 7f 62 22 7d 0c 71 27  | .;}...Q;:.b"}.q'
+[    3.109629]  [1:           init:  360] 0x0310 : c9 a3 c5 8d 4e 90 8e 27 99 fc d4 47 27 83 75 34  | ....N..'...G'.u4
+[    3.109695]  [1:           init:  360] 0x0320 : 56 e7 24 f6 bc d6 f8 18 96 81 ed 0d fa bc ff 4e  | V.$............N
+[    3.109761]  [1:           init:  360] 0x0330 : 1c 88 18 f2 c8 94 89 22 ed 74 1b 25 22 76 d9 a8  | .......".t.%"v..
+[    3.109828]  [1:           init:  360] 0x0340 : ce 10 51 7d 39 b7 74 e4 48 93 41 1d b9 21 90 6b  | ..Q}9.t.H.A..!.k
+[    3.109894]  [1:           init:  360] 0x0350 : f3 b3 b2 fd 86 e0 c5 1a 05 7d cf da 07 e9 28 c6  | .........}....(.
+[    3.109961]  [1:           init:  360] 0x0360 : ec 46 7b 54 3f 2c 9e 02 c6 dd 43 cc d7 65 3f 14  | .F{T?,....C..e?.
+[    3.110028]  [1:           init:  360] 0x0370 : 95 49 6c 69 a5 b3 4a 81 cf 34 58 ba 0a 9d 49 23  | .Ili..J..4X...I#
+[    3.110094]  [1:           init:  360] 0x0380 : 8f 41 12 b2 7a f8 15 dd 00 70 64 b1 c7 46 12 36  | .A..z....pd..F.6
+[    3.110160]  [1:           init:  360] 0x0390 : 32 92 6b f7 4c aa 60 94 28 80 c1 90 3a d4 b5 3d  | 2.k.L.`.(...:..=
+[    3.110226]  [1:           init:  360] 0x03a0 : f4 b5 5a 68 a8 13 56 53 30 fc d4 cd 5c 55 97 ae  | ..Zh..VS0...\U..
+[    3.110291]  [1:           init:  360] 0x03b0 : 8f 1d 62 20 9d 20 b7 10 6a 3f 03 f0 ee c0 62 90  | ..b . ..j?....b.
+[    3.110357]  [1:           init:  360] 0x03c0 : 66 7d 9e e5 ad 2c 59 2d 75 a5 9c b3 ea 1e db 2e  | f}...,Y-u.......
+[    3.110423]  [1:           init:  360] 0x03d0 : b0 db d5 e7 41 87 09 f5 ee 42 cc c8 62 5d 4a e9  | ....A....B..b]J.
+[    3.110488]  [1:           init:  360] 0x03e0 : 9f 87 8e 7b 11 3f 48 cf 5c 80 9b 38 55 c5 b5 9d  | ...{.?H.\..8U...
+[    3.110554]  [1:           init:  360] 0x03f0 : ce f4 8d 81 a2 ec a3 76 90 59 c1 24 e9 22 5c bb  | .......v.Y.$."\.
+[    3.110612]  [1:           init:  360] ---------------------------------------------------
+[    3.110663]  [1:           init:  360] EXT4-fs (mmcblk0p41): VFS: Can't find ext4 filesystem
+[    3.110777]  [1:           init:  360] fs_mgr: __mount(source=/dev/block/bootdevice/by-name/userdata,target=/data,type=ext4)=-1
+[    3.111359]  [1:           init:  360] fs_mgr: fs_mgr_mount_all(): possibly an encryptable blkdev /dev/block/bootdevice/by-name/userdata for mount /data type ext4 )
+[    3.111534]  [1:           init:  360] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+[    3.111779]  [1:           init:  360] fs_mgr: Running /system/bin/e2fsck on /dev/block/bootdevice/by-name/efs
+[    3.126154]  [0:           init:  360] e2fsck: e2fsck 1.42.9 (28-Dec-2013)
+[    3.126154]  [0:           init:  360] 
+[    3.126250]  [0:           init:  360] e2fsck: skipping journal recoverybecause INCOMPAT_RECOVER was clear.
+[    3.126250]  [0:           init:  360] 
+[    3.126345]  [0:           init:  360] e2fsck: check whether gdt & bitmap free count is vaild
+[    3.126345]  [0:           init:  360] 
+[    3.126433]  [0:           init:  360] e2fsck: /dev/block/bootdevice/by-name/efs: clean, 138/896 files, 1232/3584 blocks
+[    3.126433]  [0:           init:  360] 
+[    3.126534]  [0:           init:  360] e2fsck: ext2fs_close2 : normal operation, return 0
+[    3.126534]  [0:           init:  360] 
+[    3.130183]  [2:           init:  360] EXT4-fs (mmcblk0p20): mounted filesystem with ordered data mode. Opts: noauto_da_alloc,discard,journal_async_commit,data=ordered,errors=panic
+[    3.130295]  [2:           init:  360] SELinux: initialized (dev mmcblk0p20, type ext4), uses xattr
+[    3.130410]  [2:           init:  360] fs_mgr: __mount(source=/dev/block/bootdevice/by-name/efs,target=/efs,type=ext4)=0
+[    3.132570]  [4:           init:    1] init: Service 'qfintverify' (pid 359) exited with status 255
+[    3.132716]  [4:           init:    1] init: Running /dev/block/bootdevice/by-name/cache on ext4
+[    3.144108]  [0:         e2fsck:  366] e2fsck 1.42.9 (28-Dec-2013)
+[    3.146025]  [1:         e2fsck:  366] skipping journal recoverybecause INCOMPAT_RECOVER was clear.
+[    3.146118]  [1:         e2fsck:  366] check whether gdt & bitmap free count is vaild
+[    3.146700]  [1:         e2fsck:  366] /dev/block/bootdevice/by-name/cache: clean, 27/12800 files, 1991/51200 blocks
+[    3.147942]  [1:         e2fsck:  366] ext2fs_close2 : normal operation, return 0
+[    3.150929]  [5:           init:    1] EXT4-fs (mmcblk0p40): mounted filesystem with ordered data mode. Opts: noauto_da_alloc,discard,journal_async_commit,errors=panic
+[    3.151033]  [5:           init:    1] SELinux: initialized (dev mmcblk0p40, type ext4), uses xattr
+[    3.151166]  [5:           init:    1] init: Running /dev/block/bootdevice/by-name/persist on ext4
+[    3.161823]  [0:         e2fsck:  369] e2fsck 1.42.9 (28-Dec-2013)
+[    3.163938]  [1:         e2fsck:  369] skipping journal recoverybecause INCOMPAT_RECOVER was clear.
+[    3.164024]  [1:         e2fsck:  369] check whether gdt & bitmap free count is vaild
+[    3.164194]  [1:         e2fsck:  369] /dev/block/bootdevice/by-name/persist: clean, 34/2048 files, 1182/8192 blocks
+[    3.164516]  [1:         e2fsck:  369] ext2fs_close2 : normal operation, return 0
+[    3.167622]  [5:           init:    1] EXT4-fs (mmcblk0p28): mounted filesystem with ordered data mode. Opts: noauto_da_alloc,discard,journal_async_commit,errors=panic
+[    3.167710]  [5:           init:    1] SELinux: initialized (dev mmcblk0p28, type ext4), uses xattr
+[    3.168902]  [2:           init:    1] init: SELinux: Skipping restorecon_recursive(/persist)
+[    3.169004]  [2:           init:    1] init: Running /dev/block/bootdevice/by-name/dsp on ext4
+[    3.179583]  [2:         e2fsck:  372] e2fsck 1.42.9 (28-Dec-2013)
+[    3.181212]  [4:         e2fsck:  372] skipping journal recoverybecause INCOMPAT_RECOVER was clear.
+[    3.181287]  [4:         e2fsck:  372] check whether gdt & bitmap free count is vaild
+[    3.181413]  [4:         e2fsck:  372] dsp: clean, 32/1024 files, 2082/4096 blocks
+[    3.181663]  [4:         e2fsck:  372] ext2fs_close2 : normal operation, return 0
+[    3.184855]  [2:           init:    1] EXT4-fs (mmcblk0p35): mounted filesystem with ordered data mode. Opts: noauto_da_alloc,discard,journal_async_commit,errors=panic
+[    3.184959]  [2:           init:    1] SELinux: initialized (dev mmcblk0p35, type ext4), uses xattr
+[    3.185365]  [2:           init:    1] init: SELinux: Skipping restorecon_recursive(/dsp)
+[    3.185467]  [2:           init:    1] init: Running /dev/block/bootdevice/by-name/efs on ext4
+[    3.196036]  [1:         e2fsck:  375] e2fsck 1.42.9 (28-Dec-2013)
+[    3.196203]  [1:         e2fsck:  375] /dev/block/bootdevice/by-name/efs is in use.
+[    3.196258]  [1:         e2fsck:  375] e2fsck: Cannot continue, aborting.
+[    3.196258]  [1:         e2fsck:  375] 
+[    3.196258]  [1:         e2fsck:  375] 
+[    3.216887]  [4:           init:    1] init: SELinux: Skipping restorecon_recursive(/cache)
+[    3.218114]  [5:    kworker/5:1:   39] usb: [M] muic_work_without_ccic: working state=0, vbus=2
+[    3.224928]  [4:           init:    1] init: property_set("ro.hwui.texture_cache_size", "72") failed
+[    3.224989]  [4:           init:    1] init: property_set("ro.hwui.layer_cache_size", "48") failed
+[    3.225045]  [4:           init:    1] init: property_set("ro.hwui.r_buffer_cache_size", "8") failed
+[    3.225101]  [4:           init:    1] init: property_set("ro.hwui.path_cache_size", "32") failed
+[    3.225155]  [4:           init:    1] init: property_set("ro.hwui.gradient_cache_size", "1") failed
+[    3.225211]  [4:           init:    1] init: property_set("ro.hwui.drop_shadow_cache_size", "6") failed
+[    3.225268]  [4:           init:    1] init: property_set("ro.hwui.texture_cache_flushrate", "0.4") failed
+[    3.225326]  [4:           init:    1] init: property_set("ro.hwui.text_small_cache_width", "1024") failed
+[    3.225387]  [4:           init:    1] init: property_set("ro.hwui.text_small_cache_height", "1024") failed
+[    3.225448]  [4:           init:    1] init: property_set("ro.hwui.text_large_cache_width", "2048") failed
+[    3.225508]  [4:           init:    1] init: property_set("ro.hwui.text_large_cache_height", "2048") failed
+[    3.226259]  [4:           init:    1] init: property_set("ro.hwui.texture_cache_size", "40") failed
+[    3.231911]  [4:           init:    1] init: property_set("ro.com.google.gmsversion", "6.0_r6") failed
+[    3.231971]  [4:           init:    1] init: property_set("ro.com.google.clientidbase", "android-samsung") failed
+[    3.232035]  [4:           init:    1] init: property_set("ro.com.google.clientidbase.gmm", "android-samsung") failed
+[    3.232108]  [4:           init:    1] init: (Loading properties from /system/build.prop took 0.01s.)
+[    3.232196]  [4:           init:    1] init: (Loading properties from /vendor/build.prop took 0.00s.)
+[    3.232261]  [4:           init:    1] init: (Loading properties from /factory/factory.prop took 0.00s.)
+[    3.232380]  [4:           init:    1] fs_mgr: Warning : MF_CRYPT -> MF_FORCECRYPT
+[    3.482790]  [4:           init:    1] init: /recovery not specified in fstab
+[    3.482903]  [4:           init:    1] init: property_set("ro.vold.forceencryption", "1") failed
+[    3.483007]  [4:           init:    1] init: Function: selinux_compare_spd_ram, index[0], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    3.483941]  [4:           init:    1] init: Function: selinux_compare_spd_ram, index[3], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    3.520700]  [4:           init:    1] init: SELinux: Loaded file_contexts contexts from /file_contexts.
+[    3.520801]  [4:           init:    1] init: Function: selinux_compare_spd_ram, index[2], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    3.521898]  [4:           init:    1] init: SELinux: Loaded property_contexts from /property_contexts.
+[    3.521981]  [4:           init:    1] init: Function: selinux_compare_spd_ram, index[6], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    3.526424]  [4:           init:    1] init: Starting service 'vold'...
+[    3.527400]  [4:           init:    1] init: Not bootcharting.
+[    3.560410]  [5:           init:    1] init: SELinux: set fc_digest(/data)
+[    3.561077]  [5:           init:    1] init: Starting service 'exec 0 (/system/bin/tzdatacheck)'...
+[    3.575419]  [5:           init:    1] init: Service 'exec 0 (/system/bin/tzdatacheck)' (pid 377) exited with status 0
+[    3.597158]  [5:           init:    1] init: write_file: Unable to open '/sys/block/dm-0/queue/read_ahead_kb': No such file or directory
+[    3.597249]  [5:           init:    1] init: property 'persist.sys.ssr.enable_debug' doesn't exist while expanding '${persist.sys.ssr.enable_debug}'
+[    3.597329]  [5:           init:    1] init: cannot expand '${persist.sys.ssr.enable_debug}' while writing to '/sys/module/subsystem_restart/parameters/enable_debug'
+[    3.597425]  [5:           init:    1] init: property 'persist.sys.mba_boot_timeout' doesn't exist while expanding '${persist.sys.mba_boot_timeout}'
+[    3.597505]  [5:           init:    1] init: cannot expand '${persist.sys.mba_boot_timeout}' while writing to '/sys/module/pil_msa/parameters/pbl_mba_boot_timeout_ms'
+[    3.597602]  [5:           init:    1] init: property 'persist.sys.modem_auth_timeout' doesn't exist while expanding '${persist.sys.modem_auth_timeout}'
+[    3.597689]  [5:           init:    1] init: cannot expand '${persist.sys.modem_auth_timeout}' while writing to '/sys/module/pil_msa/parameters/modem_auth_timeout_ms'
+[    3.597784]  [5:           init:    1] init: property 'persist.sys.modem_dbg_cfg' doesn't exist while expanding '${persist.sys.modem_dbg_cfg}'
+[    3.597861]  [5:           init:    1] init: cannot expand '${persist.sys.modem_dbg_cfg}' while writing to '/sys/module/pil_msa/parameters/modem_dbg_cfg'
+[    3.597944]  [5:           init:    1] init: property 'persist.sys.pil_proxy_timeout' doesn't exist while expanding '${persist.sys.pil_proxy_timeout}'
+[    3.598024]  [5:           init:    1] init: cannot expand '${persist.sys.pil_proxy_timeout}' while writing to '/sys/module/peripheral_loader/parameters/proxy_timeout_ms'
+[    3.598141]  [5:           init:    1] init: property 'persist.sys.external' doesn't exist while expanding '${persist.sys.external}'
+[    3.598235]  [5:           init:    1] init: cannot expand '${persist.sys.external}' while writing to '/sys/kernel/codec_type/boot'
+[    3.604568]  [5:           init:    1] subsys-pil-tz c200000.qcom,lpass: adsp: loading from 0x000000008d000000 to 0x000000008e800000
+[    3.901571]  [5:           init:    1] subsys-pil-tz c200000.qcom,lpass: adsp: Brought out of reset
+[    3.905231]  [1:  kworker/u16:6:  259] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x81
+[    3.906289]  [1:  kworker/u16:6:  259] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x81
+[    3.906658]  [1:  kworker/u16:6:  259] sec_bat_get_temperature_by_adc channel = 2 
+[    3.906733]  [1:  kworker/u16:6:  259] sec_mpp_mux_control: [mux_sel_1] level : 0(0), adc_type : 2
+[    3.913268]  [1:  kworker/u16:6:  259] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(249), Temp-ADC(33858)
+[    3.913341]  [1:  kworker/u16:6:  259] sec_bat_get_temperature_by_adc channel = 3 
+[    3.913393]  [1:  kworker/u16:6:  259] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(290), Temp-ADC(33000)
+[    3.913457]  [1:  kworker/u16:6:  259] sec_bat_get_temperature_by_adc channel = 6 
+[    3.913506]  [1:  kworker/u16:6:  259] sec_mpp_mux_control: [mux_sel_2] level : 1(1), adc_type : 3
+[    3.919819]  [1:  kworker/u16:6:  259] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(273), Temp-ADC(33219)
+[    3.919883]  [1:  kworker/u16:6:  259] sec_bat_get_temperature_by_adc channel = 11 
+[    3.919949]  [1:  kworker/u16:6:  259] sec_mpp_mux_control: [mux_sel_1] level : 1(1), adc_type : 6
+[    3.926317]  [1:  kworker/u16:6:  259] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(258), Temp-ADC(33572)
+[    3.926703]  [1:  kworker/u16:6:  259] sm5705-charger: psy_chg_get_charging_health: is_charging=1(1), cable_type=4, input_limit=475, chg_curr=475, REG_STATUS1=0x29
+[    3.929120]  [2:  kworker/u16:6:  259] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x81
+[    3.930254]  [2:  kworker/u16:6:  259] sm5705_vbatocv_check: sm5705 FG iocv_error_count (2)
+[    3.930308]  [2:  kworker/u16:6:  259] sm5705_vbatocv_check: mode change to mix RS auto mode
+[    3.932211]  [2:  kworker/u16:6:  259] sm5705_cal_carc: <1 6 1 11 -1 1 6 1 9 1>, temp_fg = 294 ,p_curr_cal = 0x94, n_curr_cal = 0x9f, curr_offset = 0x82, volt_cal = 0x8081 ,fg_delta_volcal = 0x0
+[    3.932873]  [2:  kworker/u16:6:  259] sm5705_cal_carc: <0 2 1 2 1 1 2 3 2 3>, p_curr_cal = 0x94, n_curr_cal = 0x9f, mix_factor=0xcc ,batt_temp = 249
+[    3.933229] I[0:      swapper/0:    0] subsys-pil-tz c200000.qcom,lpass: Subsystem error monitoring/handling services are up
+[    3.933355]  [0:   irq/587-adsp:  327] subsys-pil-tz c200000.qcom,lpass: adsp: Power/Clock ready interrupt received
+[    3.933611]  [4:           init:    1] init: Starting service 'exec 1 (/init.qcom.early_boot.sh)'...
+[    3.933664]  [0:   irq/587-adsp:  327] L-Notify: Generel: 7
+[    3.934006]  [2:  kworker/u16:6:  259] sm5705_fg_check_reg_init_need: SM5705_REG_FG_OP_STATUS : 0x10 , return 0
+[    3.934077]  [3:  kworker/u16:7:  276] platform qcom,msm-pcm-voice.80: Driver msm-pcm-voice requests probe deferral
+[    3.935151]  [0:  kworker/u16:9:  393] diag: In diag_send_feature_mask_update, control channel is not open, p: 1, 0000000000000000
+[    3.935889]  [3:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: cs47l15 default codec configured
+[    3.936941]  [1:  kworker/u16:6:  259] sm5705_fg_test_read: 0xA0=0x1400, 0xAC=0x20c5, 0xAD=0x21a7, 0xAE=0x22cc, 0xAF=0x2400, 0x28=0x048c, 0x2F=0x021a, 0x01=0xc401, SM5705_ID=0x000b
+[    3.940610]  [1:  kworker/u16:6:  259] sm5705_fg_test_read: 0xB0=0x0000, 0xBC=0x186c, 0xBD=0x1ba0, 0xBE=0x1ecc, 0xBF=0x1ed4, 0x85=0x82f0, 0x86=0x812c, 0x87=0x00fa, 0x1F=0x0010, 0x94=0x0001
+[    3.941061]  [1:  kworker/u16:6:  259] sm5705_get_all_value: chg_h=1, chg_f=0, chg_s=1, is_chg=1, ta_exist=1, v=3539, v_avg=3549, i=248, i_avg=207, ocv=3591, fg_t=294, b_t=249, cycle=0, soc=31, state=0x2
+[    3.941166]  [1:  kworker/u16:6:  259] sm5705_fg_get_scaled_capacity: scaled capacity (3.1)
+[    3.941222]  [1:  kworker/u16:6:  259] sm5705_fg_get_atomic_capacity : NOW(3), OLD(3)
+[    3.941283]  [1:  kworker/u16:6:  259] sec-battery battery.119: sec_bat_get_battery_info:Vnow(3539mV),Inow(248mA),Imax(475mA),SOC(3%),Tbat(249),Tchg(273),Tschg(258),Twpc(0),sw_self_dis(0)
+[    3.941694]  [1:  kworker/u16:6:  259] sm5705-charger: psy_chg_get_charging_health: is_charging=1(1), cable_type=4, input_limit=475, chg_curr=475, REG_STATUS1=0x29
+[    3.941788]  [1:  kworker/u16:6:  259] sec-battery battery.119: sec_bat_monitor_work: Status(Charging), mode(Normal), Health(Good), Cable(4, 4, 1, 0), level(100%), HV(NONE), sleep_mode(0)
+[    3.942521]  [1:    kworker/1:1:   34] sec_bat_get_property cable type = 4 sleep_mode = 0
+[    3.971975]  [0:    kworker/0:2:  272] apr_tal:Q6 Is Up
+[    3.987098]  [4:           init:    1] init: property_set("ro.sf.lcd_density", "480") failed
+[    4.045587]  [0:  kworker/u16:9:  393] sysmon-qmi: sysmon_clnt_svc_arrive: Connection established between QMI handle and adsp's SSCTL service
+[    4.178687]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: msm8952_update_impedance_table 
+[    4.178877]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: ASoC: platform (null) not registered
+[    4.178963]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: snd_soc_register_card failed (-517)
+[    4.179111]  [0:  kworker/u16:7:  276] platform c051000.sound: Driver msm8952-asoc-cs47l15 requests probe deferral
+[    4.179665]  [0:  kworker/u16:7:  276] platform arizona-extcon: Driver arizona-extcon requests probe deferral
+[    4.182945]  [3:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: cs47l15 default codec configured
+[    4.183678]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: msm8952_update_impedance_table 
+[    4.190935]  [1:  kworker/u16:7:  276] msm-pcm-routing qcom,msm-pcm-routing.73: Control not supported for path HFP_AUX_UL_HL -> [NULL] -> INTHFP_UL_HL
+[    4.191020]  [1:  kworker/u16:7:  276] msm-pcm-routing qcom,msm-pcm-routing.73: ASoC: Failed to add route HFP_AUX_UL_HL -> NULL -> INTHFP_UL_HL
+[    4.191113]  [1:  kworker/u16:7:  276] msm-pcm-routing qcom,msm-pcm-routing.73: Control not supported for path HFP_INT_UL_HL -> [NULL] -> INTHFP_UL_HL
+[    4.191193]  [1:  kworker/u16:7:  276] msm-pcm-routing qcom,msm-pcm-routing.73: ASoC: Failed to add route HFP_INT_UL_HL -> NULL -> INTHFP_UL_HL
+[    4.216701]  [5:           init:    1] init: Service 'exec 1 (/init.qcom.early_boot.sh)' (pid 394) exited with status 0
+[    4.218102]  [4:  kworker/u16:7:  276] cs47l15_codec_probe111
+[    4.218152]  [4:  kworker/u16:7:  276] arizona spi3.0: Failed to get thermal warning IRQ: -22
+[    4.218206]  [4:  kworker/u16:7:  276] arizona spi3.0: Failed to get thermal shutdown IRQ: -22
+[    4.218313]  [4:  kworker/u16:7:  276] cs47l15-codec cs47l15-codec: ASoC: no sink widget found for IN1L
+[    4.218370]  [4:  kworker/u16:7:  276] cs47l15-codec cs47l15-codec: ASoC: Failed to add route MICVDD -> direct -> IN1L
+[    4.218521]  [4:  kworker/u16:7:  276] cs47l15_codec_probe222
+[    4.218585]  [4:  kworker/u16:7:  276] cs47l15_codec_probe333
+[    4.218707]  [4:  kworker/u16:7:  276] cs47l15_codec_probe444
+[    4.218779]  [4:  kworker/u16:7:  276] cs47l15_codec_probe555
+[    4.218822]  [4:  kworker/u16:7:  276] cs47l15_codec_probe666 ret= 0
+[    4.218861]  [4:  kworker/u16:7:  276] cs47l15_codec_probe777 finsih
+[    4.220687]  [5:           init:    1] volume_up wakeup status 0
+[    4.220730]  [5:           init:    1] home wakeup status 1
+[    4.307899]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> MultiMedia1 mapping ok
+[    4.308465]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> MultiMedia2 mapping ok
+[    4.308886]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> CS-VOICE mapping ok
+[    4.309343]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> VoIP mapping ok
+[    4.309888]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> MultiMedia3 mapping ok
+[    4.310330]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> PRI_MI2S_RX_HOSTLESS mapping ok
+[    4.310738]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> INT_FM_HOSTLESS mapping ok
+[    4.311113]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-rx <-> qcom,msm-dai-q6-afe-proxy-rx.21 mapping ok
+[    4.311519]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-tx <-> qcom,msm-dai-q6-afe-proxy-tx.21 mapping ok
+[    4.312134]  [4:  kworker/u16:7:  276] compress asoc: snd-soc-dummy-dai <-> MultiMedia4 mapping ok
+[    4.312563]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> AUXPCM_HOSTLESS mapping ok
+[    4.312980]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> TERT_MI2S_TX_HOSTLESS mapping ok
+[    4.313507]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> MultiMedia5 mapping ok
+[    4.313924]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> Voice2 mapping ok
+[    4.314433]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> MultiMedia9 mapping ok
+[    4.314833]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> VoLTE mapping ok
+[    4.315254]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> VoWLAN mapping ok
+[    4.315691]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> INT_HFP_BT_HOSTLESS mapping ok
+[    4.316208]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> MultiMedia6 mapping ok
+[    4.316642]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> LSM1 mapping ok
+[    4.317021]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> LSM2 mapping ok
+[    4.317391]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> LSM3 mapping ok
+[    4.317787]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> LSM4 mapping ok
+[    4.318198]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> LSM5 mapping ok
+[    4.318815]  [4:  kworker/u16:7:  276] compress asoc: snd-soc-dummy-dai <-> MultiMedia7 mapping ok
+[    4.319274]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> QUIN_MI2S_RX_HOSTLESS mapping ok
+[    4.319494]  [5:           init:    1] init: write_file: Unable to open '/sys/block/sda/queue/scheduler': No such file or directory
+[    4.319610]  [5:           init:    1] init: cannot find '/system/bin/sysmon', disabling 'sysmon'
+[    4.319664]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> qcom,msm-dai-q6-mi2s-senary.223 mapping ok
+[    4.319758]  [5:           init:    1] init: Starting service 'healthd'...
+[    4.320369]  [4:  kworker/u16:7:  276] compress asoc: snd-soc-dummy-dai <-> MultiMedia10 mapping ok
+[    4.320423]  [5:           init:    1] init: Starting service 'prepare_param'...
+[    4.321095]  [4:  kworker/u16:7:  276] compress asoc: snd-soc-dummy-dai <-> MultiMedia11 mapping ok
+[    4.321213]  [1:           vold:  426] fs_mgr: Warning : MF_CRYPT -> MF_FORCECRYPT
+[    4.321267]  [5:           init:    1] init: Starting service 'lmkd'...
+[    4.321758]  [3:           vold:  376] fs_mgr: Warning : MF_CRYPT -> MF_FORCECRYPT
+[    4.321909]  [4:  kworker/u16:7:  276] compress asoc: snd-soc-dummy-dai <-> MultiMedia12 mapping ok
+[    4.322075]  [5:           init:    1] init: Starting service 'servicemanager'...
+[    4.322630]  [4:  kworker/u16:7:  276] compress asoc: snd-soc-dummy-dai <-> MultiMedia13 mapping ok
+[    4.322880]  [5:           init:    1] init: Starting service 'surfaceflinger'...
+[    4.323284]  [4:  kworker/u16:7:  276] compress asoc: snd-soc-dummy-dai <-> MultiMedia14 mapping ok
+[    4.323503]  [5:           init:    1] init: Starting service 'qcom-c_core-sh'...
+[    4.324223]  [5:           init:    1] init: Starting service 'rmt_storage'...
+[    4.324273]  [4:  kworker/u16:7:  276] compress asoc: snd-soc-dummy-dai <-> MultiMedia15 mapping ok
+[    4.324816]  [5:           init:    1] init: cannot find '/system/bin/rfs_access', disabling 'rfs_access'
+[    4.325110]  [4:  kworker/u16:7:  276] compress asoc: snd-soc-dummy-dai <-> MultiMedia16 mapping ok
+[    4.325398]  [5:           init:    1] init: Starting service 'config_bt_addr'...
+[    4.325668]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> VoiceMMode1 mapping ok
+[    4.325975]  [5:           init:    1] init: Starting service 'config_bluetooth'...
+[    4.326791]  [5:           init:    1] init: Starting service 'cs-early-boot'...
+[    4.327109]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> VoiceMMode2 mapping ok
+[    4.327604]  [5:           init:    1] init: Starting service 'qseecomd'...
+[    4.327649]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> QUAT_MI2S_RX_HOSTLESS mapping ok
+[    4.328281]  [4:  kworker/u16:7:  276] snd-soc-dummy snd-soc-dummy: ASoC: unknown pin EAR
+[    4.328345]  [4:  kworker/u16:7:  276] snd-soc-dummy snd-soc-dummy: ASoC: unknown pin HEADPHONE
+[    4.328408]  [4:  kworker/u16:7:  276] snd-soc-dummy snd-soc-dummy: ASoC: unknown pin SPK_OUT
+[    4.328470]  [4:  kworker/u16:7:  276] snd-soc-dummy snd-soc-dummy: ASoC: unknown pin AMIC1
+[    4.328529]  [4:  kworker/u16:7:  276] snd-soc-dummy snd-soc-dummy: ASoC: unknown pin AMIC2
+[    4.328578]  [5:           init:    1] init: Starting service 'per_mgr'...
+[    4.328636]  [4:  kworker/u16:7:  276] snd-soc-dummy snd-soc-dummy: ASoC: unknown pin AMIC3
+[    4.328696]  [4:  kworker/u16:7:  276] snd-soc-dummy snd-soc-dummy: ASoC: unknown pin DMIC1
+[    4.328754]  [4:  kworker/u16:7:  276] snd-soc-dummy snd-soc-dummy: ASoC: unknown pin DMIC2
+[    4.328812]  [4:  kworker/u16:7:  276] snd-soc-dummy snd-soc-dummy: ASoC: unknown pin WSA_SPK OUT
+[    4.328897]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> qcom,msm-dai-q6-mi2s-prim.218 mapping ok
+[    4.329006]  [5:           init:    1] init: Starting service 'swapon'...
+[    4.329311]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> qcom,msm-dai-q6-mi2s-sec.219 mapping ok
+[    4.329681]  [5:           init:    1] init: property_set("ro.vold.forceencryption", "1") failed
+[    4.329879]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> qcom,msm-dai-q6-mi2s-tert.221 mapping ok
+[    4.329977]  [5:           init:    1] init: property_set("ro.vold.forceencryption", "1") failed
+[    4.330152]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> qcom,msm-dai-q6-mi2s-quat.220 mapping ok
+[    4.330406]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> qcom,msm-dai-q6-mi2s-quat.220 mapping ok
+[    4.330660]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-rx <-> qcom,msm-pri-auxpcm.92 mapping ok
+[    4.330921]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-tx <-> qcom,msm-pri-auxpcm.92 mapping ok
+[    4.331198]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-rx <-> qcom,msm-dai-q6-bt-sco-rx.206 mapping ok
+[    4.331645]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-tx <-> qcom,msm-dai-q6-bt-sco-tx.207 mapping ok
+[    4.332358]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-rx <-> qcom,msm-dai-q6-int-fm-rx.208 mapping ok
+[    4.332874]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-tx <-> qcom,msm-dai-q6-int-fm-tx.209 mapping ok
+[    4.333340]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-rx <-> qcom,msm-dai-q6-be-afe-pcm-rx.2 mapping ok
+[    4.334120]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-tx <-> qcom,msm-dai-q6-be-afe-pcm-tx.2 mapping ok
+[    4.334889]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-tx <-> qcom,msm-dai-q6-incall-record-t mapping ok
+[    4.335498]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-tx <-> qcom,msm-dai-q6-incall-record-r mapping ok
+[    4.336088]  [4:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-rx <-> qcom,msm-dai-q6-incall-music-rx mapping ok
+[    4.336247]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet0/accept_ra': No such file or directory
+[    4.336344]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet1/accept_ra': No such file or directory
+[    4.336439]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet2/accept_ra': No such file or directory
+[    4.336530]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet3/accept_ra': No such file or directory
+[    4.336605]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  msm-stub-rx <-> qcom,msm-dai-q6-incall-music-2- mapping ok
+[    4.336694]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet4/accept_ra': No such file or directory
+[    4.336787]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet5/accept_ra': No such file or directory
+[    4.336877]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet6/accept_ra': No such file or directory
+[    4.336952]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: msm_arizona_init: setup cs47l15-codec clocks
+[    4.337040]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet7/accept_ra': No such file or directory
+[    4.337115]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: ASoC: unknown pin HeadsetMic
+[    4.337190]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet_sdio0/accept_ra': No such file or directory
+[    4.337266]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: ASoC: unknown pin MainMic
+[    4.337344]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet_sdio1/accept_ra': No such file or directory
+[    4.337419]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: ASoC: unknown pin SubMic
+[    4.337491]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet_sdio2/accept_ra': No such file or directory
+[    4.337568]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  cs47l15-aif1 <-> qcom,msm-dai-q6-mi2s-quin.222 mapping ok
+[    4.337659]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet_sdio3/accept_ra': No such file or directory
+[    4.337758]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet_sdio4/accept_ra': No such file or directory
+[    4.337853]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet_sdio5/accept_ra': No such file or directory
+[    4.337944]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet_sdio6/accept_ra': No such file or directory
+[    4.338023]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: msm_arizona_init: setup cs47l15-codec clocks
+[    4.338313]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: ASoC: unknown pin HeadsetMic
+[    4.338465]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: ASoC: unknown pin MainMic
+[    4.338561]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: ASoC: unknown pin SubMic
+[    4.338744]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  cs47l15-aif1 <-> qcom,msm-dai-q6-mi2s-quin.222 mapping ok
+[    4.339891]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound:  snd-soc-dummy-dai <-> MultiMedia17 mapping ok
+[    4.340618]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: ASoC: no sink widget found for RX_BIAS
+[    4.340833]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: ASoC: Failed to add route MCLK -> direct -> RX_BIAS
+[    4.341091]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: ASoC: no sink widget found for SPK_RX_BIAS
+[    4.341166]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: ASoC: Failed to add route MCLK -> direct -> SPK_RX_BIAS
+[    4.341308]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: ASoC: no sink widget found for INT_LDO_H
+[    4.341379]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: ASoC: Failed to add route MCLK -> direct -> INT_LDO_H
+[    4.342915]  [4:          sswap:  443] Adding 1048572k swap on /dev/block/vnswap0.  Priority:-1 extents:1 across:1048572k SSFS
+[    4.343163]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: msm8952_cs47l15_late_probe 
+[    4.345892]  [5:           init:    1] init: Service 'cs-early-boot' (pid 440) exited with status 127
+[    4.347029]  [5:           init:    1] init: Service 'swapon' (pid 443) exited with status 0
+[    4.347402]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet_sdio7/accept_ra': No such file or directory
+[    4.347530]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet_usb0/accept_ra': No such file or directory
+[    4.347835]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet_usb1/accept_ra': No such file or directory
+[    4.347938]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet_usb2/accept_ra': No such file or directory
+[    4.348035]  [5:           init:    1] init: write_file: Unable to open '/proc/sys/net/ipv6/conf/rmnet_usb3/accept_ra': No such file or directory
+[    4.348113]  [0:  kworker/u16:7:  276] msm8952-asoc-cs47l15 c051000.sound: Sound card msm8952-cs47l15-snd-card registered
+[    4.348247]  [0:  kworker/u16:7:  276] msm8952_asoc_machine_probe: codec using audio-ext-clk driver
+[    4.348737]  [0:  kworker/u16:7:  276] ------------[ cut here ]------------
+[    4.348798]  [0:  kworker/u16:7:  276] WARNING: at /home/dpi/qb5_8814/workspace/C9LTE_CHN_HK/android/kernel/include/linux/of.h:692 arizona_extcon_probe+0x13a8/0x141c()
+[    4.348884]  [0:  kworker/u16:7:  276] Modules linked in: qdrbg_module(O)
+[    4.348945]  [0:  kworker/u16:7:  276] CPU: 0 PID: 276 Comm: kworker/u16:7 Tainted: G        W  O 3.10.84-10182499 #2
+[    4.349021]  [0:  kworker/u16:7:  276] Workqueue: deferwq deferred_probe_work_func
+[    4.349072]  [0:  kworker/u16:7:  276] Call trace:
+[    4.349128]  [0:  kworker/u16:7:  276] [<ffffffc000087cfc>] dump_backtrace+0x0/0x110
+[    4.349191]  [0:  kworker/u16:7:  276] [<ffffffc000087e1c>] show_stack+0x10/0x1c
+[    4.349245]  [0:  kworker/u16:7:  276] [<ffffffc000b8564c>] dump_stack+0x1c/0x28
+[    4.349325]  [0:  kworker/u16:7:  276] [<ffffffc00009da18>] warn_slowpath_common+0x74/0x9c
+[    4.349389]  [0:  kworker/u16:7:  276] [<ffffffc00009dc3c>] warn_slowpath_null+0x14/0x20
+[    4.349444]  [0:  kworker/u16:7:  276] [<ffffffc0007ba884>] arizona_extcon_probe+0x13a4/0x141c
+[    4.349528]  [0:  kworker/u16:7:  276] [<ffffffc0004a7188>] platform_drv_probe+0x14/0x20
+[    4.349593]  [0:  kworker/u16:7:  276] [<ffffffc0004a5e98>] driver_probe_device+0xd4/0x240
+[    4.349650]  [0:  kworker/u16:7:  276] [<ffffffc0004a602c>] __device_attach+0x28/0x4c
+[    4.349724]  [0:  kworker/u16:7:  276] [<ffffffc0004a4378>] bus_for_each_drv+0x70/0x90
+[    4.349781]  [0:  kworker/u16:7:  276] [<ffffffc0004a5d78>] device_attach+0x68/0x98
+[    4.349833]  [0:  kworker/u16:7:  276] [<ffffffc0004a52b8>] bus_probe_device+0x28/0xa0
+[    4.349888]  [0:  kworker/u16:7:  276] [<ffffffc0004a57a0>] deferred_probe_work_func+0x70/0xa0
+[    4.349947]  [0:  kworker/u16:7:  276] [<ffffffc0000b85a8>] process_one_work+0x2a4/0x41c
+[    4.350003]  [0:  kworker/u16:7:  276] [<ffffffc0000b989c>] worker_thread+0x1f8/0x348
+[    4.350063]  [0:  kworker/u16:7:  276] [<ffffffc0000bea08>] kthread+0xac/0xb8
+[    4.350113]  [0:  kworker/u16:7:  276] ---[ end trace da227214a82491be ]---
+[    4.350546]  [0:  kworker/u16:7:  276] arizona_enable_reset()!! 
+[    4.351191]  [5:           init:    1] init: write_file: Unable to open '/sys/devices/soc.0/78b8000.i2c/i2c-4/4-0020/input/input0/fw_name': No such file or directory
+[    4.351304]  [5:           init:    1] init: write_file: Unable to open '/sys/devices/soc.0/78b8000.i2c/i2c-4/4-0020/input/input0/update_fw': No such file or directory
+[    4.353993]  [5:           init:    1] init: write_file: Unable to open '/sys/kernel/debug/tracing/events/sync/kgsl_waittimestamp_entry/enable': No such file or directory
+[    4.354124]  [5:           init:    1] init: write_file: Unable to open '/sys/kernel/debug/tracing/events/sync/kgsl_waittimestamp_exit/enable': No such file or directory
+[    4.354255]  [5:           init:    1] init: write_file: Unable to open '/sys/kernel/debug/tracing/events/sync/kgsl_readtimestamp/enable': No such file or directory
+[    4.356258]  [5:           init:    1] init: Starting service 'defaultcrypto'...
+[    4.357870]  [5:           init:    1] init: Starting service 'per_proxy'...
+[    4.359114]  [5:           init:    1] init: Service 'config_bt_addr' (pid 438) exited with status 0
+[    4.359614]  [5:           init:    1] usb: enabled: 0, dev->enabled: 0
+[    4.359660]  [5:           init:    1] enable_store: android_usb: already disabled
+[    4.359853]  [5:           init:    1] usb: enabled: 1, dev->enabled: 0
+[    4.359894]  [5:           init:    1] usb: enable_store f_holder->f:mtp
+[    4.359935]  [5:           init:    1] usb: enable_store f_holder->f:acm
+[    4.359973]  [5:           init:    1] usb: acm is enabled. (bcdDevice=0x400)
+[    4.360018]  [5:           init:    1] usb: enable_store vendor=4e8,product=6860,bcdDevice=400
+[    4.360070]  [5:           init:    1] ,Class=0,SubClass=0,Protocol=0
+[    4.360108]  [5:           init:    1] usb: enable_store next cmd : usb_add_config
+[    4.360154]  [5:           init:    1] [mtpg_function_bind]	line = [1376]
+[    4.360213]  [5:           init:    1] dual speed mtp: IN/ep1in, OUT/ep1out
+[    4.360343]  [5:           init:    1] msm_hsusb msm_hsusb: CI13XXX_CONTROLLER_CONNECT_EVENT received
+[    4.377918]  [5:           vold:  446] fs_mgr: Warning : MF_CRYPT -> MF_FORCECRYPT
+[    4.378154]  [5:           init:    1] init: property_set("ro.vold.forceencryption", "1") failed
+[    4.389587]  [4:           vold:  446] QSEECOM: qseecom_load_app: App (tz_iccc) does'nt exist, loading apps for first time
+[    4.392505]  [0:  kworker/u16:7:  276] arizona_poll_reg()!reg = 6272, val = 128 
+[    4.394208]  [4:           vold:  446] QSEECOM: qseecom_load_app: App with id 8 (tz_iccc) now loaded
+[    4.397948]  [4:           vold:  446] QSEECOM: qseecom_unload_app: App id 8 now unloaded
+[    4.411660]  [4:irq/581-arizona:  268] msm8952-asoc-cs47l15 c051000.sound: msm8952_arizona_hpdet_cb(0) meas(2147483647)
+[    4.411730]  [4:irq/581-arizona:  268] arizona spi3.0: arizona_cs47l15_tune_headphone  reading =2147483647
+[    4.412801]  [5:       qseecomd:  441] warning: `qseecomd' uses 32-bit capabilities (legacy support in use)
+[    4.417371]  [0:           init:    1] init: Service 'qcom-c_core-sh' (pid 436) exited with status 0
+[    4.418542]  [4:irq/581-arizona:  268] msm8952-asoc-cs47l15 c051000.sound: msm8952_arizona_micd_cb: ear_mic = 0
+[    4.419523]  [3:  kworker/u16:7:  276] input: Headset as /devices/soc.0/78b7000.spi/spi_master/spi3/spi3.0/arizona-extcon/input/input6
+[    4.420919]  [4:irq/581-arizona:  268] arizona spi3.0: Spurious HPDET IRQ
+[    4.433653]  [1:           init:    1] init: Starting service 'tbaseLoader'...
+[    4.434967]  [1:           init:    1] init: Starting service 'cs_service'...
+[    4.436221]  [1:           init:    1] init: Starting service 'insthk'...
+[    4.462880] I[0:      swapper/0:    0] usb:: isr_reset_handler udc: ffffffc003148000
+[    4.463009] I[0:      swapper/0:    0] usb: composite_disconnect
+[    4.463179]  [0:    kworker/0:2:  272] android_work: android_work: did not send uevent (0 0           (null))
+[    4.465136] I[0:      swapper/0:    0] phy-msm-usb: portsc = 88000a05
+[    4.465186] I[0:      swapper/0:    0] phy-msm-usb: PORTSC : 3 3
+[    4.480450]  [2:           init:    1] init: Starting service 'run-mobicore'...
+[    4.483705]  [2:           init:    1] init: Service 'tbaseLoader' (pid 482) exited with status 0
+[    4.487984]  [0:    kworker/0:2:  272] Trustonic TEE: *** <t MTK, Build: Apr  6 2016, 16:52:46 ***
+[    4.488049]  [0:    kworker/0:2:  272] Trustonic TEE: t-base-QC-MSM8996-Android-310C-V002-20160406_164132_7469
+[    4.491777]  [4: mcDriverDaemon:  488] Trustonic TEE: mobicore_start: 
+[    4.491777]  [4: mcDriverDaemon:  488]     product_id        = t-base-QC-MSM8996-Android-310C-V002-20160406_164132_7469
+[    4.491777]  [4: mcDriverDaemon:  488]     version_mci       = 0x00010004
+[    4.491777]  [4: mcDriverDaemon:  488]     version_so        = 0x00020002
+[    4.491777]  [4: mcDriverDaemon:  488]     version_mclf      = 0x00020005
+[    4.491777]  [4: mcDriverDaemon:  488]     version_container = 0x00020001
+[    4.491777]  [4: mcDriverDaemon:  488]     version_mc_config = 0x00000002
+[    4.491777]  [4: mcDriverDaemon:  488]     version_tl_api    = 0x00010013
+[    4.491777]  [4: mcDriverDaemon:  488]     version_dr_api    = 0x00010004
+[    4.491777]  [4: mcDriverDaemon:  488]     version_nwd       = 0x00030000
+[    4.492175]  [5:    kworker/5:1:   39] Trustonic TEE: 201|[CR]: <t Crypto Driver, Build Apr  6 2016, 16:51:59
+[    4.492253]  [5:    kworker/5:1:   39] Trustonic TEE: 201|[CR]: t-base-QC-MSM8996-Android-310C-V002-20160406_164132_7469
+[    4.492316]  [5:    kworker/5:1:   39] Trustonic TEE: 201|[CR]: RPCH stack: [0x000310000002d000..0x0001600800000000].
+[    4.492434]  [4: mcDriverDaemon:  488] Trustonic TEE: mobicore_start: SWd uses LPAE MMU table format
+[    4.492634]  [4: mcDriverDaemon:  488] Trustonic TEE: admin_open: admin connection open, TGID 488
+[    4.531322] I[0:      swapper/0:    0] usb: count_multi_config ready multi
+[    4.531374] I[0:      swapper/0:    0] usb: GET_DES
+[    4.531570]  [0:    kworker/0:2:  272] android_work: android_work: sent uevent USB_STATE=CONNECTED
+[    4.536305] I[0:           init:    1] usb: set_config_number multi config_num=0(zero base)
+[    4.536365] I[0:           init:    1] usb: set_interface_count next_interface_id=1
+[    4.536622] I[0:      swapper/0:    0] usb: set_config_number multi config_num=0(zero base)
+[    4.536675] I[0:      swapper/0:    0] usb: set_interface_count next_interface_id=1
+[    4.536880] I[0:      swapper/0:    0] usb: set_config_number multi config_num=1(zero base)
+[    4.536936] I[0:      swapper/0:    0] usb: set_interface_count next_interface_id=3
+[    4.537178] I[0:             sh:  439] usb: set_config_number multi config_num=1(zero base)
+[    4.537233] I[0:             sh:  439] usb: set_interface_count next_interface_id=3
+[    4.567957]  [4:           init:    1] init: Service 'config_bluetooth' (pid 439) exited with status 0
+[    4.585082]  [5:  POSIX timer 0:  452] subsys-restart: __subsystem_get(): Changing subsys fw_name to modem
+[    4.585884]  [5:  POSIX timer 0:  452] IPA received MPSS BEFORE_POWERUP
+[    4.586194]  [5:  POSIX timer 0:  452] ipa ipa_uc_state_check:297 uC is not loaded
+[    4.586253]  [5:  POSIX timer 0:  452] ipa ipa_sps_irq_control_all:879 EP (5) not allocated.
+[    4.587053]  [5:  POSIX timer 0:  452] IPA BEFORE_POWERUP handling is complete
+[    4.590113]  [5:  POSIX timer 0:  452] pil-q6v5-mss 4080000.qcom,mss: modem: loading from 0x0000000086c00000 to 0x000000008d000000
+[    4.595148]  [5:  POSIX timer 0:  452] pil-q6v5-mss 4080000.qcom,mss: MBA: loading from 0x00000000f3a00000 to 0x00000000f3b00000
+[    4.596406]  [4:           vold:  446] QSEECOM: __qseecom_process_incomplete_cmd: fail:resp res= -65,app_id = 0,lstr = 12288
+[    4.596485]  [4:           vold:  446] get_ice_device_from_storage_type: found ice device ffffffc0b2a4da00
+[    4.597592]  [4:  POSIX timer 0:  452] pil-q6v5-mss 4080000.qcom,mss: MBA: Debug policy not present - msadp
+[    4.606030] I[0:    kworker/0:2:  272] android_usb gadget: high-speed config #2: 86000c8.android_usb
+[    4.606122] I[0:    kworker/0:2:  272] usb: SET_CON
+[    4.606158] I[0:    kworker/0:2:  272] usb: set_config_number multi config_num=1(zero base)
+[    4.668166]  [0:    kworker/0:1:   36] android_work: android_work: sent uevent USB_STATE=CONFIGURED
+[    4.677814]  [5: surfaceflinger:  435] mdss_fb_blank_sub: FB_NUM:0, MDSS_FB_UNBLANK ++ on=0
+[    4.678002]  [5: surfaceflinger:  435] mdss_fb_blank_sub: FB_NUM:0, MDSS_FB_UNBLANK -- 
+[    4.678097]  [5: surfaceflinger:  435] mdss_fb_blank_sub: FB_NUM:0, MDSS_FB_UNBLANK ++ on=1
+[    4.678145]  [5: surfaceflinger:  435] mdss_fb_blank_sub: FB_NUM:0, MDSS_FB_UNBLANK -- 
+[    4.695021]  [4:           vold:  446] get_ice_device_from_storage_type: found ice device ffffffc0b2a4da00
+[    4.696966]  [4:           vold:  446] QSEECOM: qseecom_create_key: Set the key successfully
+[    4.697082]  [3:         insthk:  484] QSEECOM: qseecom_load_app: App (sshdcpap) does'nt exist, loading apps for first time
+[    4.701773]  [4:           vold:  446] device-mapper: req-crypt: req_crypt_ctr: Apply ICE key index : 0
+[    4.701773]  [4:           vold:  446] 
+[    4.701890]  [4:           vold:  446] device-mapper: req-crypt: req_crypt_ctr: Mapping block_device /dev/block/bootdevice/by-name/userdata to dm-req-crypt ok!
+[    4.701890]  [4:           vold:  446] 
+[    4.702040]  [4:           vold:  446] bio: create slab <bio-1> at 1
+[    4.702442]  [2:           init:    1] init: Starting service 'bootanim'...
+[    4.704269]  [5: surfaceflinger:  435] mdss_fb_blank_sub: FB_NUM:0, MDSS_FB_UNBLANK ++ on=1
+[    4.704336]  [5: surfaceflinger:  435] mdss_fb_blank_sub: FB_NUM:0, MDSS_FB_UNBLANK -- 
+[    4.704501]  [2:           init:    1] init: Starting service 'powersnd'...
+[    4.705879]  [4:  POSIX timer 0:  452] pil-q6v5-mss 4080000.qcom,mss: MBA boot done
+[    4.710808]  [3:         insthk:  484] QSEECOM: qseecom_load_app: App with id 9 (sshdcpap) now loaded
+[    4.711231]  [5:    kworker/5:1:   39] Trustonic TEE: 401|TA SPT2 : Starting.
+[    4.711279]  [5:    kworker/5:1:   39] Trustonic TEE: 401|TA SPT2 : tbase info.
+[    4.711328]  [5:    kworker/5:1:   39] Trustonic TEE: 401|tlApi version    =  0x00010013
+[    4.711411]  [5:    kworker/5:1:   39] Trustonic TEE: 401|productId        = t-base-QC-MSM8996-Android-310C-V002-20160406_164132_7469
+[    4.711483]  [5:    kworker/5:1:   39] Trustonic TEE: 401|versionMci       = 0x00010004
+[    4.711535]  [5:    kworker/5:1:   39] Trustonic TEE: 401|versionSo        = 0x00020002
+[    4.711586]  [5:    kworker/5:1:   39] Trustonic TEE: 401|versionMclf      = 0x00020005
+[    4.711636]  [5:    kworker/5:1:   39] Trustonic TEE: 401|versionContainer = 0x00020001
+[    4.711685]  [5:    kworker/5:1:   39] Trustonic TEE: 401|versionMcConfig  = 0x00000002
+[    4.711735]  [5:    kworker/5:1:   39] Trustonic TEE: 401|versionTlApi     = 0x00010013
+[    4.711787]  [5:    kworker/5:1:   39] Trustonic TEE: 401|versionDrApi     = 0x00010004
+[    4.711838]  [5:    kworker/5:1:   39] Trustonic TEE: 401|versionCmp       = 0x00000000
+[    4.723434]  [4:         insthk:  484] QSEECOM: qseecom_unload_app: App id 9 now unloaded
+[    4.727625]  [4:             cs:  483] QSEECOM: qseecom_load_app: App (skm) does'nt exist, loading apps for first time
+[    4.754394]  [1:             cs:  483] QSEECOM: qseecom_load_app: App with id 10 (skm) now loaded
+[    4.810480]  [4:             cs:  483] QSEECOM: qseecom_unload_app: App id 10 now unloaded
+[    4.812489]  [4:           init:    1] init: Service 'insthk' (pid 484) exited with status 0
+[    4.943778]  [4:  kworker/u16:7:  276] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x0
+[    4.944902]  [4:  kworker/u16:7:  276] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x0
+[    4.945292]  [4:  kworker/u16:7:  276] sec_bat_get_temperature_by_adc channel = 2 
+[    4.945363]  [4:  kworker/u16:7:  276] sec_mpp_mux_control: [mux_sel_1] level : 0(0), adc_type : 2
+[    4.951937]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(249), Temp-ADC(33857)
+[    4.952005]  [4:  kworker/u16:7:  276] sec_bat_get_temperature_by_adc channel = 3 
+[    4.952052]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(290), Temp-ADC(33000)
+[    4.952116]  [4:  kworker/u16:7:  276] sec_bat_get_temperature_by_adc channel = 6 
+[    4.952164]  [4:  kworker/u16:7:  276] sec_mpp_mux_control: [mux_sel_2] level : 1(1), adc_type : 3
+[    4.958737]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(275), Temp-ADC(33184)
+[    4.958808]  [4:  kworker/u16:7:  276] sec_bat_get_temperature_by_adc channel = 11 
+[    4.958877]  [4:  kworker/u16:7:  276] sec_mpp_mux_control: [mux_sel_1] level : 1(1), adc_type : 6
+[    4.965650]  [4:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_temperature_by_adc: Temp(258), Temp-ADC(33563)
+[    4.966032]  [4:  kworker/u16:7:  276] sm5705-charger: psy_chg_get_charging_health: is_charging=1(1), cable_type=4, input_limit=475, chg_curr=475, REG_STATUS1=0x29
+[    4.968437]  [4:  kworker/u16:7:  276] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x0
+[    4.969618]  [4:  kworker/u16:7:  276] sm5705_vbatocv_check: mode change to mix RS auto mode
+[    4.971622]  [4:  kworker/u16:7:  276] sm5705_cal_carc: <1 6 1 11 -1 1 6 1 9 1>, temp_fg = 296 ,p_curr_cal = 0x94, n_curr_cal = 0x9f, curr_offset = 0x82, volt_cal = 0x8000 ,fg_delta_volcal = 0x0
+[    4.972317]  [4:  kworker/u16:7:  276] sm5705_cal_carc: <0 2 1 2 1 1 2 3 2 3>, p_curr_cal = 0x94, n_curr_cal = 0x9f, mix_factor=0x47a ,batt_temp = 249
+[    4.973510]  [4:  kworker/u16:7:  276] sm5705_fg_check_reg_init_need: SM5705_REG_FG_OP_STATUS : 0x10 , return 0
+[    4.976541]  [4:  kworker/u16:7:  276] sm5705_fg_test_read: 0xA0=0x1400, 0xAC=0x20c5, 0xAD=0x21a7, 0xAE=0x22cc, 0xAF=0x2400, 0x28=0x03f4, 0x2F=0x021a, 0x01=0xc401, SM5705_ID=0x000b
+[    4.980510]  [0:  kworker/u16:7:  276] sm5705_fg_test_read: 0xB0=0x0000, 0xBC=0x186c, 0xBD=0x1ba0, 0xBE=0x1ecc, 0xBF=0x1ed4, 0x85=0x8790, 0x86=0x0181, 0x87=0x00fa, 0x1F=0x0010, 0x94=0x0001
+[    4.981000]  [0:  kworker/u16:7:  276] sm5705_get_all_value: chg_h=1, chg_f=0, chg_s=1, is_chg=0, ta_exist=1, v=3472, v_avg=3510, i=-995, i_avg=-300, ocv=3591, fg_t=296, b_t=249, cycle=0, soc=31, state=0x2
+[    4.981103]  [0:  kworker/u16:7:  276] sm5705_fg_get_scaled_capacity: scaled capacity (3.1)
+[    4.981156]  [0:  kworker/u16:7:  276] sm5705_fg_get_atomic_capacity : NOW(3), OLD(3)
+[    4.981218]  [0:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_get_battery_info:Vnow(3472mV),Inow(-995mA),Imax(475mA),SOC(3%),Tbat(249),Tchg(275),Tschg(258),Twpc(0),sw_self_dis(0)
+[    4.981735]  [0:  kworker/u16:7:  276] sm5705-charger: psy_chg_get_charging_health: is_charging=1(1), cable_type=4, input_limit=475, chg_curr=475, REG_STATUS1=0x29
+[    4.981827]  [0:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_time_management: Safety Timer 36000 secs, Charging Time : 3 secs
+[    4.981923]  [0:  kworker/u16:7:  276] sec_bat_time_management: Total Charging time : 3, Expired Time : 3, LCD On total Time : 0
+[    4.981996]  [0:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_temperature: HLT(800) HLR(750) HT(500), HR(450), LT(0), LR(50)
+[    4.982360]  [0:  kworker/u16:7:  276] sec_bat_swelling_check: status(1), swell_mode(0:0), cv(0x10fe), temp(249)
+[    4.982424]  [0:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_fullcharged_check: Charging Mode : Normal
+[    4.982511]  [0:  kworker/u16:7:  276] sec_bat_set_current_event: clear current event(now=0x4, value=0x4)
+[    4.982581]  [0:  kworker/u16:7:  276] sec_bat_check_mix_temp: mix_limit(0), temp(249), chg_temp(275), input_current(475)
+[    4.982652]  [0:  kworker/u16:7:  276] sec_bat_set_charging_current: keep charging current(capacity=3, tc=5)
+[    4.982722]  [0:  kworker/u16:7:  276] sec-battery battery.119: sec_bat_monitor_work: Status(Charging), mode(Normal), Health(Good), Cable(4, 4, 1, 0), level(100%), HV(NONE), sleep_mode(0)
+[    4.983532]  [0:    kworker/0:2:  272] sec_bat_get_property cable type = 4 sleep_mode = 0
+[    4.988035]  [4:           vold:  446] e2fsck: e2fsck 1.42.9 (28-Dec-2013)
+[    4.988035]  [4:           vold:  446] 
+[    4.988147]  [4:           vold:  446] e2fsck: skipping journal recoverybecause INCOMPAT_RECOVER was clear.
+[    4.988147]  [4:           vold:  446] 
+[    4.988232]  [4:           vold:  446] e2fsck: check whether gdt & bitmap free count is vaild
+[    4.988232]  [4:           vold:  446] 
+[    4.988310]  [4:           vold:  446] e2fsck: superblock fsync before orphan cleanup!
+[    4.988310]  [4:           vold:  446] 
+[    4.988386]  [4:           vold:  446] e2fsck: Clearing orphaned inode 262673 (uid=10019, gid=10019, mode=040771, size=4096)
+[    4.988386]  [4:           vold:  446] 
+[    4.988480]  [4:           vold:  446] e2fsck: Clearing orphaned inode 262677 (uid=10019, gid=10019, mode=0100644, size=45736)
+[    4.988480]  [4:           vold:  446] 
+[    4.988573]  [4:           vold:  446] e2fsck: flush all filesystem after orphan cleanup!
+[    4.988573]  [4:           vold:  446] 
+[    4.988650]  [4:           vold:  446] e2fsck: ext2fs_write_bitmaps : do_inode = 1, do_block = 1
+[    4.988650]  [4:           vold:  446] 
+[    4.988728]  [4:           vold:  446] e2fsck: superblock fsync after orphan cleanup!
+[    4.988728]  [4:           vold:  446] 
+[    4.988800]  [4:           vold:  446] e2fsck: check whether gdt & bitmap free count is vaild after release orphan inode
+[    4.988800]  [4:           vold:  446] 
+[    4.988892]  [4:           vold:  446] e2fsck: /dev/block/dm-0: clean, 3647/1744896 files, 318242/13953014 blocks
+[    4.988892]  [4:           vold:  446] 
+[    4.988979]  [4:           vold:  446] e2fsck: ext2fs_close2 : normal operation, return 0
+[    4.988979]  [4:           vold:  446] 
+[    4.989557]  [0:    kworker/0:2:  272] abov-ft1604 4-0020: [sec_input] efs_read_light_table_version: table full version = T161115.12
+[    4.989651]  [0:    kworker/0:2:  272] abov-ft1604 4-0020: [sec_input] need_update_light_table: efs:161115, bin:161115
+[    4.990643]  [4:           vold:  446] fs_mgr: Running /system/bin/e2fsck on /dev/block/dm-0
+[    4.993580]  [0:    kworker/0:2:  272] abov-ft1604 4-0020: [sec_input] check_light_table_crc: efs:167568, bin:167568
+[    4.994327]  [0:    kworker/0:2:  272] [MDSS] mdss_samsung_disp_windowtype_show : ndx : 0 ff ff ff
+[    5.038156]  [4:    kworker/4:2:  180] mms_ts 7-0048: [sec_input] create_flash_count: read data: , copy value:0
+[    5.066377]  [4:  BootAnimation:  538] [MDSS] mdss_samsung_disp_windowtype_show : ndx : 0 ff ff ff
+[    5.066469]  [4:  BootAnimation:  538] !@BootAnimation : windowColor = WHITE(ff )
+[    5.069431]  [4:  BootAnimation:  538] !@BootAnimation : mps_code = TGY
+[    5.069515]  [4:  BootAnimation:  538] !@BootAnimation : Could not open '/sys/bus/w1/devices/w1_bus_master1/w1_master_check_model'
+[    5.078506]  [4:  BootAnimation:  538] !@BootAnimation : Load sequence resource = /system/media/bootsamsung.qmg
+[    5.078658]  [4:  BootAnimation:  538] !@BootAnimation : Load loop resource = /system/media/bootsamsungloop.qmg
+[    5.078751]  [4:  BootAnimation:  538] !@BootAnimation : [Encryption info]crypt_state = encrypted, crypt_input_window = 0, crypt_type = default
+[    5.089786]  [4:  BootAnimation:  538] !@BootAnimation : createSurface RGB565
+[    5.201678]  [0:           vold:  446] e2fsck: e2fsck 1.42.9 (28-Dec-2013)
+[    5.201678]  [0:           vold:  446] 
+[    5.202057]  [0:           vold:  446] e2fsck: skipping journal recoverybecause INCOMPAT_RECOVER was clear.
+[    5.202057]  [0:           vold:  446] 
+[    5.202169]  [0:           vold:  446] e2fsck: check whether gdt & bitmap free count is vaild
+[    5.202169]  [0:           vold:  446] 
+[    5.202269]  [0:           vold:  446] e2fsck: /dev/block/dm-0: clean, 3647/1744896 files, 318242/13953014 blocks
+[    5.202269]  [0:           vold:  446] 
+[    5.202416]  [0:           vold:  446] e2fsck: ext2fs_close2 : normal operation, return 0
+[    5.202416]  [0:           vold:  446] 
+[    5.216192]  [2:           vold:  446] EXT4-fs (dm-0): mounted filesystem with ordered data mode. Opts: noauto_da_alloc,discard,journal_async_commit,errors=panic
+[    5.216309]  [2:           vold:  446] SELinux: initialized (dev dm-0, type ext4), uses xattr
+[    5.216606]  [2:           vold:  446] fs_mgr: __mount(source=/dev/block/dm-0,target=/data,type=ext4)=0
+[    5.327931]  [3:  kworker/u16:7:  276] devfreq qcom,kgsl-busmon.36: Couldn't update frequency transition information.
+[    5.331517]  [0:  BootAnimation:  538] !@BootAnimation : Could not open '/sys/devices/w1_bus_master1/w1_master_verify_mac'
+[    5.331678]  [0:  BootAnimation:  538] !@BootAnimation : Could not open '/sys/devices/w1_bus_master1/w1_master_check_id'
+[    5.331822]  [0:  BootAnimation:  538] !@BootAnimation : BootAnimData_STATUS = 0x3
+[    5.335143]  [1:        healthd:  427] healthd: initial Capacity max: '1000'
+[    5.335311]  [1:        healthd:  427] sec-battery battery.119: sec_bat_store_attrs: BATT_CAPACITY_MAX(1000), fg_reset(0)
+[    5.335425]  [1:        healthd:  427] sm5705_fg_set_property: capacity_max changed, 1000 -> 1000
+[    5.335840]  [1:        healthd:  427] sm5705-charger: psy_chg_get_charging_health: is_charging=1(1), cable_type=4, input_limit=475, chg_curr=475, REG_STATUS1=0x29
+[    5.338271]  [1:        healthd:  427] sm5705_get_curr: <1 0 100 10> info.volt_cal = 0x8000, volt_slope = 0x8000, mohm_volt_cal = 0x0
+[    5.339456]  [1:        healthd:  427] sm5705_vbatocv_check: mode change to mix RS auto mode
+[    5.341442]  [1:        healthd:  427] sm5705_cal_carc: <1 6 1 11 -1 1 6 1 9 1>, temp_fg = 298 ,p_curr_cal = 0x94, n_curr_cal = 0x9f, curr_offset = 0x82, volt_cal = 0x8000 ,fg_delta_volcal = 0x0
+[    5.342209]  [1:        healthd:  427] sm5705_cal_carc: <0 2 1 2 1 1 2 3 2 3>, p_curr_cal = 0x94, n_curr_cal = 0x9f, mix_factor=0x47a ,batt_temp = 249
+[    5.343407]  [1:        healthd:  427] sm5705_fg_check_reg_init_need: SM5705_REG_FG_OP_STATUS : 0x10 , return 0
+[    5.346415]  [1:        healthd:  427] sm5705_fg_test_read: 0xA0=0x1400, 0xAC=0x20c5, 0xAD=0x21a7, 0xAE=0x22cc, 0xAF=0x2400, 0x28=0x03f4, 0x2F=0x021a, 0x01=0xc401, SM5705_ID=0x000b
+[    5.350370]  [5:        healthd:  427] sm5705_fg_test_read: 0xB0=0x0000, 0xBC=0x186c, 0xBD=0x1ba0, 0xBE=0x1ecc, 0xBF=0x1ed4, 0x85=0x8508, 0x86=0x0181, 0x87=0x00fa, 0x1F=0x0010, 0x94=0x0001
+[    5.350829]  [5:        healthd:  427] sm5705_get_all_value: chg_h=1, chg_f=0, chg_s=1, is_chg=0, ta_exist=1, v=3511, v_avg=3500, i=-767, i_avg=-590, ocv=3591, fg_t=298, b_t=249, cycle=0, soc=31, state=0x2
+[    5.350938]  [5:        healthd:  427] sm5705_fg_get_scaled_capacity: scaled capacity (3.1)
+[    5.351239]  [5:        healthd:  427] healthd: batteryPogoOnlnePath not found
+[    5.351312]  [5:        healthd:  427] healthd: batteryCisdCountCapPath not found
+[    5.351389]  [5:        healthd:  427] healthd: batteryCisdCountSocPath not found
+[    5.351461]  [5:        healthd:  427] healthd: batteryCisdFullcaprepMaxPath not found
+[    5.351536]  [5:        healthd:  427] healthd: batteryCisdBattTypePath not found
+[    5.351610]  [5:        healthd:  427] healthd: batteryCisdDataPath not found
+[    5.352620]  [5:        healthd:  427] sm5705-charger: sm5705_otg_get_property: POWER_SUPPLY_PROP_ONLINE - OFF
+[    5.352953]  [5:        healthd:  427] sm5705-charger: sm5705_otg_get_property: POWER_SUPPLY_PROP_ONLINE - OFF
+[    5.353349]  [5:        healthd:  427] sec_bat_get_property cable type = 4 sleep_mode = 0
+[    5.355117]  [5:        healthd:  427] healthd: battery l=3 v=3472 t=24.9 h=2 st=2 c=0 o=4 ca=-228 ct=1 ps=0 hv=0 sdc=0 sec=0 chg=u 2016-02-18 12:59:27.088681665 UTC
+[    5.355256]  [5:        healthd:  427] healthd-android: healthd_mode_android_battery_update
+[    5.355342]  [5:        healthd:  427] BatteryPropertiesRegistrar: notifyListeners : start
+[    5.355424]  [5:        healthd:  427] BatteryPropertiesRegistrar: notifyListeners : done
+[    5.433034]  [5:  POSIX timer 0:  452] pil-q6v5-mss 4080000.qcom,mss: modem: Brought out of reset
+[    5.503913]  [5:           init:    1] init: cannot find '/system/bin/sysmon', disabling 'sysmon'
+[    5.504521]  [5:           init:    1] usb: enabled: 0, dev->enabled: 1
+[    5.504574]  [5:           init:    1] usb: usb_remove_config cdev->config=ffffffc0b2541000, config=ffffffc0b2541000
+[    5.504641]  [5:           init:    1] [mtpg_function_disable]	line = [1547]
+[    5.504687]  [4:  BootAnimation:  538] sec led: store_sm5705_rgb_pattern: pattern mode=6 led_current=0xff(lowpower=0)
+[    5.504772]  [5:           init:    1] [mtpg_function_unbind]	line = [1349]
+[    5.505002]  [5:           init:    1] usb: enabled: 1, dev->enabled: 0
+[    5.505053]  [5:           init:    1] usb: enable_store f_holder->f:mtp
+[    5.505101]  [5:           init:    1] usb: enable_store f_holder->f:acm
+[    5.505148]  [5:           init:    1] usb: acm is enabled. (bcdDevice=0x400)
+[    5.505199]  [5:           init:    1] usb: enable_store f_holder->f:ffs
+[    5.505249]  [5:           init:    1] usb: enable_store vendor=4e8,product=6860,bcdDevice=400
+[    5.505309]  [5:           init:    1] ,Class=0,SubClass=0,Protocol=0
+[    5.505355]  [5:           init:    1] usb: enable_store next cmd : usb_add_config
+[    5.505576]  [5:           init:    1] init: Starting service 'adbd'...
+[    5.507990]  [4:  BootAnimation:  538] leds-sm5705-rgb leds-sm5705-rgb: sm5705_rgb_set_LEDx_slopemode: LED[1] slopemode (delay:0x0, tt1:0x2, tt2:0x2, dt1:0x3, dt2:0x3, dt3:0x3, dt4:0x3)
+[    5.509524]  [4:  BootAnimation:  538] leds-sm5705-rgb leds-sm5705-rgb: sm5705_rgb_set_LEDx_current: led current is 10
+[    5.510347]  [4:  BootAnimation:  538] leds-sm5705-rgb leds-sm5705-rgb: sm5705_rgb_set_LEDx_slopemode: LED[2] slopemode (delay:0x0, tt1:0x2, tt2:0x2, dt1:0x7, dt2:0x7, dt3:0x7, dt4:0x7)
+[    5.511869]  [4:  BootAnimation:  538] leds-sm5705-rgb leds-sm5705-rgb: sm5705_rgb_set_LEDx_current: led current is 65
+[    5.511934]  [4:  BootAnimation:  538] pcal6416a_gpio_direction_output(off=[8], val=[1])
+[    5.512282]  [5:           adbd:  555] read descriptors
+[    5.512320]  [5:           adbd:  555] read descriptors
+[    5.512355]  [5:           adbd:  555] read strings
+[    5.512397]  [5:           adbd:  555] functionfs_bind : first id = 0 , old string count = 0 , string count = 1
+[    5.512455]  [5:           adbd:  555] functionfs_bind : first id = 0 , old string count = 0 , string count = 1
+[    5.512518]  [5:           adbd:  555] [mtpg_function_bind]	line = [1376]
+[    5.512582]  [5:           adbd:  555] dual speed mtp: IN/ep1in, OUT/ep1out
+[    5.512642]  [5:           adbd:  555] msm_hsusb msm_hsusb: CI13XXX_CONTROLLER_CONNECT_EVENT received
+[    5.515746] I[0:      swapper/0:    0] msm_hsusb msm_hsusb: CI13XXX_CONTROLLER_SUSPEND_EVENT received
+[    5.515832]  [0:    kworker/0:2:  272] android_work: android_work: did not send uevent (1 1           (null))
+[    5.519466]  [5:           init:    1] init: Function: selinux_compare_spd_ram, index[0], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    5.520457]  [5:           init:    1] init: Function: selinux_compare_spd_ram, index[3], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    5.528666]  [4:  BootAnimation:  538] leds-sm5705-rgb leds-sm5705-rgb: sm5705_rgb_set_LEDx_enable: REG:SM5705_REG_CNTLMODEONOFF = 0x22
+[    5.528743]  [4:  BootAnimation:  538] pcal6416a_gpio_direction_output(off=[8], val=[1])
+[    5.530010]  [4:  irq/651-modem:  331] pil-q6v5-mss 4080000.qcom,mss: modem: Power/Clock ready interrupt received
+[    5.530113] I[0:      swapper/0:    0] pil-q6v5-mss 4080000.qcom,mss: Subsystem error monitoring/handling services are up
+[    5.531378]  [4:  irq/651-modem:  331] M-Notify: General: 7
+[    5.531424]  [4:  POSIX timer 0:  452] IPA received MPSS AFTER_POWERUP
+[    5.531464]  [4:  POSIX timer 0:  452] IPA AFTER_POWERUP handling is complete
+[    5.548673]  [4:  BootAnimation:  538] leds-sm5705-rgb leds-sm5705-rgb: sm5705_rgb_set_LEDx_enable: REG:SM5705_REG_CNTLMODEONOFF = 0x66
+[    5.550453]  [4:  BootAnimation:  538] !@BootAnimation : draw Start
+[    5.557732]  [5:           init:    1] init: SELinux: Loaded file_contexts contexts from /file_contexts.
+[    5.557856]  [5:           init:    1] init: Function: selinux_compare_spd_ram, index[2], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    5.559068]  [5:           init:    1] init: SELinux: Loaded property_contexts from /property_contexts.
+[    5.559166]  [5:           init:    1] init: Function: selinux_compare_spd_ram, index[6], priority [2], priority version is VE=SEPF_SECMOBILE_6.0.1_0033
+[    5.563368]  [5:           init:    1] init: Not bootcharting.
+[    5.577463]  [4:       mdss_fb0:  509] mdss_mdp_overlay_start: DPK !mdp5_data->mdata->idle_pc_enabled
+[    5.578152]  [4:       mdss_fb0:  509] [MDSS] esd_irq_enable : ESD irq already disabled
+[    5.598716]  [4:  kworker/u16:6:  259] sysmon-qmi: sysmon_clnt_svc_arrive: Connection established between QMI handle and modem's SSCTL service
+[    5.602543]  [0:    rmt_storage:  562] msm_sharedmem: status_read: sys_shutdown_status: 0
+[    5.603867]  [0:    rmt_storage:  559] msm_sharedmem: status_read: sys_shutdown_status: 0
+[    5.604535]  [0:    rmt_storage:  561] msm_sharedmem: status_read: sys_shutdown_status: 0
+[    5.613586]  [4:    rmt_storage:  559] msm_sharedmem: status_read: sys_shutdown_status: 0
+[    5.623370]  [5:           init:    1] init: SELinux: Skipping restorecon_recursive(/data)
+[    5.623855]  [5:           init:    1] init: Starting service 'exec 2 (/system/bin/tzdatacheck)'...
+[    5.632131]  [5:           init:    1] init: Service 'exec 2 (/system/bin/tzdatacheck)' (pid 564) exited with status 0
+[    5.670483]  [4:           init:    1] init: Starting service 'edmaudit'...
+[    5.671282]  [4:           init:    1] init: Starting service 'scs'...
+[    5.672024]  [4:           init:    1] init: Starting service 'netd'...
+[    5.672837]  [4:           init:    1] init: Starting service 'debuggerd'...
+[    5.673552]  [4:           init:    1] init: Starting service 'debuggerd64'...
+[    5.674141]  [4:           init:    1] init: Starting service 'icd'...
+[    5.675054]  [4:           init:    1] init: Starting service 'ril-daemon'...
+[    5.675833]  [4:           init:    1] init: Starting service 'drm'...
+[    5.676646]  [4:           init:    1] init: Starting service 'media'...
+[    5.677403]  [4:           init:    1] init: Starting service 'apaservice'...
+[    5.678165]  [4:           init:    1] init: Starting service 'jackservice'...
+[    5.678977]  [4:           init:    1] init: Starting service 'installd'...
+[    5.680031]  [4:           init:    1] init: Starting service 'flash_recovery'...
+[    5.680887]  [4:           init:    1] init: Starting service 'SIDESYNC_service'...
+[    5.681658]  [4:           init:    1] init: Starting service 'keystore'...
+[    5.682641]  [4:           init:    1] init: Starting service 'mobex-daemon'...
+[    5.683498]  [4:           init:    1] init: Starting service 'sensorhubservice'...
+[    5.684245]  [4:           init:    1] init: Starting service 'qcom-c_main-sh'...
+[    5.684766]  [4:           init:    1] init: cannot find '/system/bin/cnd', disabling 'cnd'
+[    5.685242]  [4:           init:    1] init: Starting service 'irsc_util'...
+[    5.686038]  [4:           init:    1] init: Starting service 'tftp_server'...
+[    5.686822]  [4:           init:    1] init: Starting service 'macloader'...
+[    5.701475]  [0:    kworker/0:2:  272] apr_tal:Modem Is Up
+[    5.708157] I[0:           rild:  571] usb:: isr_reset_handler udc: ffffffc003148000
+[    5.708231] I[0:           rild:  571] msm_hsusb msm_hsusb: CI13XXX_CONTROLLER_RESUME_EVENT received
+[    5.708312] I[0:           rild:  571] usb: composite_disconnect
+[    5.708524]  [0:    kworker/0:2:  272] android_work: android_work: sent uevent USB_STATE=DISCONNECTED
+[    5.710434] I[0:      swapper/0:    0] phy-msm-usb: portsc = 88000a05
+[    5.710491] I[0:      swapper/0:    0] phy-msm-usb: PORTSC : 3 3
+[    5.717558]  [4:           init:    1] init: cannot find '/system/bin/usb_uicc_client', disabling 'usb_uicc_daemon'
+[    5.717833]  [4:           init:    1] init: Starting service 'bms-sh'...
+[    5.718553]  [4:           init:    1] init: Starting service 'qcom-usb-sh'...
+[    5.719066]  [4:           init:    1] init: cannot find '/system/bin/qrngd', disabling 'qrngd'
+[    5.719409]  [2:  kworker/u16:8:  339] Sending QMI_IPA_INIT_MODEM_DRIVER_REQ_V01
+[    5.719525]  [1: kworker/u16:10:  396] ipa-wan handle_indication_req:133 not send indication
+[    5.721487]  [1: kworker/u16:11:  560] ipa ipa_uc_wdi_event_log_info_handler:322 WDI feature missing 0x1
+[    5.721569]  [1: kworker/u16:11:  560] ipa ipa_uc_response_hdlr:456 IPA uC loaded
+[    5.721763]  [1: kworker/u16:11:  560] ipa ipa_uc_response_hdlr:476 Expected cmd=4294967295 rcvd cmd=9
+[    5.722216]  [2:  kworker/u16:8:  339] QMI_IPA_INIT_MODEM_DRIVER_REQ_V01 response received
+[    5.722306]  [2:  kworker/u16:8:  339] ipa ipa_sps_irq_control_all:879 EP (5) not allocated.
+[    5.729181]  [4:           init:    1] init: Starting service 'thermal-engine'...
+[    5.730307]  [4:           init:    1] init: Starting service 'wcnss-service'...
+[    5.730756]  [4:           init:    1] init: cannot find '/system/bin/imsqmidaemon', disabling 'imsqmidaemon'
+[    5.731409]  [4:           init:    1] init: Starting service 'adsprpcd'...
+[    5.732464]  [4:           init:    1] init: Starting service 'TvoutService_C'...
+[    5.733247]  [4:           init:    1] init: Starting service 'imsd'...
+[    5.733730]  [4:           init:    1] init: cannot find '/system/bin/cellgeofenced', disabling 'cellgeofenced'
+[    5.734243]  [4:           init:    1] init: Starting service 'tunman'...
+[    5.735092]  [4:           init:    1] init: Starting service 'zygote'...
+[    5.735906]  [4:           init:    1] init: Starting service 'zygote_secondary'...
+[    5.736859]  [4:           init:    1] init: Starting service 'DR-daemon'...
+[    5.737637]  [4:           init:    1] init: Starting service 'BCS-daemon'...
+[    5.738847]  [4:       mdss_fb0:  509] mdss_dsi_panel_off:-
+[    5.738898]  [4:       mdss_fb0:  509] mdss_dsi_panel_power_ctrl: cur_power_state=1 req_power_state=0
+[    5.758145]  [4:       mdss_fb0:  509] [MDSS] mdss_samsung_panel_extra_power : ++ enable(0) ndx(0)
+[    5.759737]  [4:       mdss_fb0:  509] [MDSS] mdss_samsung_panel_extra_power : --
+[    5.764460]  [4:       mdss_fb0:  509] mdss_dsi_panel_power_ctrl: cur_power_state=0 req_power_state=1
+[    5.764523]  [4:       mdss_fb0:  509] [MDSS] mdss_samsung_panel_extra_power : ++ enable(1) ndx(0)
+[    5.765550]  [1:       adsprpcd:  594] 'opened /dev/adsprpc-smd c 224 0'
+[    5.766107]  [4:       mdss_fb0:  509] [MDSS] mdss_samsung_panel_extra_power : --
+[    5.775419]  [4:           init:    1] init: Starting service 'diag_uart_log'...
+[    5.775523] I[0:        mmcqd/0:  312] usb: GET_DES
+[    5.775844]  [0:    kworker/0:2:  272] android_work: android_work: sent uevent USB_STATE=CONNECTED
+[    5.776308]  [4:           init:    1] init: Starting service 'SMD-daemon'...
+[    5.777162]  [4:           init:    1] init: Starting service 'epmlogd'...
+[    5.777973]  [4:           init:    1] init: Starting service 'sdp_cryptod'...
+[    5.782430]  [4: ss_conn_daemon:  578] conn_gadget_open
+[    5.782477]  [4: ss_conn_daemon:  578] conn_gadget_flush
+[    5.782515]  [4: ss_conn_daemon:  578] conn_gadget_release
+[    5.783527]  [4: ss_conn_daemon:  578] conn_gadget_in_max_packet_size_show() _conn_gadget_dev is NULL
+[    5.783819]  [4: ss_conn_daemon:  578] conn_gadget_out_max_packet_size_show() _conn_gadget_dev is NULL
+[    5.784148]  [4: ss_conn_daemon:  578] conn_gadget_open
+[    5.786283]  [4: ss_conn_daemon:  606] conn_gadget_poll() _conn_gadget_dev is offlined
+[    5.786343]  [4: ss_conn_daemon:  606] conn_gadget_poll() _conn_gadget_dev is offlined
+[    5.787594]  [4:           init:    1] init: Starting service 'bootchecker'...
+[    5.799183]  [4: ss_conn_daemon:  606] conn_gadget_poll() _conn_gadget_dev is offlined
+[    5.799250]  [4: ss_conn_daemon:  606] conn_gadget_poll() _conn_gadget_dev is offlined
+[    5.799931]  [4:           init:    1] init: Starting service 'gatekeeperd'...
+[    5.803615]  [1:  wcnss_service:  593] wcnss_wlan triggered by userspace
+[    5.803958]  [1:  wcnss_service:  593] wcnss_pm_qos_add_request: add request
+[    5.804017]  [1:  wcnss_service:  593] wcnss_pm_qos_update_request: update request 80
+[    5.804276]  [1:  wcnss_service:  593] Couldn't get snoc_qosgen
+[    5.806079]  [2:  wcnss_service:  593] wcnss_notif_cb: wcnss notification event: 2
+[    5.810029]  [4:       mdss_fb0:  509] [MDSS] mdss_samsung_panel_on_pre : +: ndx=0
+[    5.810226]  [4:           init:    1] init: cannot find '/system/xbin/perfprofd', disabling 'perfprofd'
+[    5.810318]  [4:           init:    1] init: cannot find '/system/bin/dpmd', disabling 'dpmd'
+[    5.810484]  [4:           init:    1] init: cannot find '/system/bin/cnss_diag', disabling 'cnss_diag'
+[    5.810861]  [4:           init:    1] init: Starting service 'cnss-daemon'...
+[    5.812377]  [4:           init:    1] init: Starting service 'loc_launcher'...
+[    5.813496]  [4:           init:    1] init: Starting service 'qcom-sh'...
+[    5.813665]  [4:       mdss_fb0:  509] [MDSS] samsung_nv_read : mdss DSI0 read_reg : DA[1] : 41 .
+[    5.818145]  [5:  kworker/u16:9:  393] cma: dma_alloc_from_contiguous: alloc failed, in_system: 1, req-size: 24576 pages, reason ENOMEM (2)
+[    5.818313]  [5:  kworker/u16:9:  393] number of available pages: 8+16+3584=>3608 pages, total: 5120 pages
+[    5.818388]  [5:  kworker/u16:9:  393] allocation failed, 100663296
+[    5.818432]  [5:  kworker/u16:9:  393] In handle_alloc_generic_req,Unable to allocate memory for requested client
+[    5.821376]  [4:       mdss_fb0:  509] [MDSS] samsung_nv_read : mdss DSI0 read_reg : DB[1] : 00 .
+[    5.827730]  [4:       mdss_fb0:  509] [MDSS] samsung_nv_read : mdss DSI0 read_reg : DC[1] : 11 .
+[    5.828296]  [4:           init:    1] init: Starting service 'RIDL'...
+[    5.829460]  [4:       mdss_fb0:  509] [MDSS] mdss_samsung_panel_on_pre : DSI0 manufacture_id=0x410011
+[    5.829538]  [4:       mdss_fb0:  509] [MDSS] mdss_panel_attach_set : panel_attach_status : 1
+[    5.829607]  [4:       mdss_fb0:  509] [MDSS] mdss_samsung_panel_on_pre : DSI0 Panel_Revision = B 1
+[    5.829666]  [1:       adsprpcd:  594] allocating memory from audio ion size is 4096
+[    5.834192]  [4:           init:    1] init: Starting service 'qseeproxydaemon'...
+[    5.836192]  [4:       mdss_fb0:  509] [MDSS] samsung_nv_read : mdss DSI0 read_reg : C8[4] : 61 09 01 35 .
+[    5.839309]  [4:           init:    1] init: Starting service 'seemp_healthd'...
+[    5.841416]  [0:  wcnss_service:  593] subsys-pil-tz a21b000.qcom,pronto: wcnss: loading from 0x000000008e800000 to 0x000000008edfc000
+[    5.842731] I[0:         smdexe:  610] usb: set_config_number single config num=0
+[    5.842794] I[0:         smdexe:  610] usb: set_interface_count next_interface_id=4
+[    5.842961]  [0:  wcnss_service:  593] wcnss_notif_cb: wcnss notification event: 6
+[    5.843047] I[0:  wcnss_service:  593] usb: set_config_number single config num=0
+[    5.843099] I[0:  wcnss_service:  593] usb: set_interface_count next_interface_id=4
+[    5.843851]  [4:           init:    1] init: Starting service 'qcamerasvr'...
+[    5.837820]  [4:       mdss_fb0:  509] mdss_manufacture_date_read DSI0 manufacture_date = 20170109
+[    5.844305]  [4:       mdss_fb0:  509] [MDSS] samsung_nv_read : mdss DSI0 read_reg : D6[5] : 51 10 90 c8 ac .
+[    5.846356]  [4:           init:    1] init: cannot find '/system/bin/qfp-daemon', disabling 'qfp-daemon'
+[    5.846435]  [4:           init:    1] init: cannot find '/system/bin/seempd', disabling 'seempd'
+[    5.846500]  [4:       mdss_fb0:  509] mdss_ddi_id_read DSI0 : 51 10 90 c8 ac
+[    5.847085]  [0:  wcnss_service:  593] wcnss: IRIS Reg: 04000004
+[    5.847853]  [4:           init:    1] init: Starting service 'time_daemon'...
+[    5.851758]  [4:       mdss_fb0:  509] [MDSS] samsung_nv_read : mdss DSI0 read_reg : C8[7] : 61 09 01 35 19 20 88 .
+[    5.852977]  [4:       mdss_fb0:  509] mdss_cell_id_read: MDNIE X,Y Value is Zero 
+[    5.853031]  [4:       mdss_fb0:  509] mdss_cell_id_read DSI_0 cell_id: 61 09 01 35 19 20 88 00 20 5b 43
+[    5.857919]  [4:       mdss_fb0:  509] [MDSS] samsung_nv_read : mdss DSI0 read_reg : D6[5] : 00 00 00 00 00 .
+[    5.859906]  [4:       mdss_fb0:  509] [MDSS] mdss_octa_id_read : DSI0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+[    5.859978]  [4:       mdss_fb0:  509] [MDSS] mdss_samsung_panel_on_pre : DSI0 no samsung_elvss_read function
+[    5.864417]  [3:  kworker/u16:3:   53] diag: In diag_send_feature_mask_update, control channel is not open, p: 0, 0000000000000000
+[    5.864539]  [3:  kworker/u16:3:   53] diag: In diag_send_peripheral_buffering_mode, unable to send buffering mode packet to peripheral 0, err: -19
+[    5.864727]  [4:       mdss_fb0:  509] [MDSS] samsung_nv_read : mdss DSI0 read_reg : B4[4] : 6f 21 1b 27 .
+[    5.870043]  [4:           init:    1] init: Starting service 'audiod'...
+[    5.877910]  [4:       mdss_fb0:  509] [MDSS] samsung_nv_read : mdss DSI0 read_reg : B4[29] : 7b 7c 7a 7c 7d 7d 7b 7b 7b 7e .7f 7e 7e 7f 7e 7e 7e 7e 82 81 .81 79 79 79 00 00 00 00 00 .
+[    5.882456]  [4:           init:    1] init: cannot find '/system/bin/dts_configurator', disabling 'dts_configurator'
+[    5.882633]  [4:           init:    1] init: cannot find '/system/vendor/bin/mdtpd', disabling 'mdtpd'
+[    5.883385]  [4:           init:    1] init: Starting service 'fingerprintd'...
+[    5.883446]  [4:       mdss_fb0:  509] [MDSS] samsung_nv_read : mdss DSI0 read_reg : B6[2] : 11 04 .
+[    5.883500]  [1:       adsprpcd:  627] allocating memory from audio ion size is 8192
+[    5.884510]  [4:           init:    1] init: cannot find '/system/bin/TigerService', disabling 'TigerService'
+[    5.884588]  [4:           init:    1] init: cannot find '/system/bin/vcsFPService', disabling 'vcsFPService'
+[    5.889219]  [5:           init:    1] init: Starting service 'at_distributor'...
+[    5.898749]  [5:           init:    1] init: Service 'irsc_util' (pid 583) exited with status 0
+[    5.898804]  [4:       mdss_fb0:  509] [MDSS] samsung_nv_read : mdss DSI0 read_reg : A1[4] : 0b b1 0c 5a .
+[    5.899761]  [5:           init:    1] init: Service 'macloader' (pid 588) exited with status 0
+[    5.900211]  [4:       mdss_fb0:  509] mdss_mdnie_read DSI0 : X-2993 Y-3162 
+[    5.908757]  [5:           init:    1] init: Service 'bms-sh' (pid 589) exited with status 0
+[    5.909091]  [1:       adsprpcd:  627] allocating memory from audio ion size is 114688
+[    5.910086] I[0:            icd:  570] android_usb gadget: high-speed config #1: 86000c8.android_usb
+[    5.910200] I[0:            icd:  570] usb: SET_CON
+[    5.910236] I[0:            icd:  570] usb: set_config_number single config num=0
+[    5.912363]  [4:       mdss_fb0:  509] [MDSS] samsung_nv_read : mdss DSI0 read_reg : C8[35] : 00 1f 00 01 00 4f 5a 5a 5a 56 .55 55 41 3f 41 4a 47 4b 5b 56 .5c 58 52 58 3d 37 41 89 85 03 .00 00 00 23 02 .
+[    5.913656]  [4:       mdss_fb0:  509] gamma_cell_determine ldi_revision: 0x410011
+[    5.914174]  [4:       mdss_fb0:  509] smart_dimming_init done
+[    5.914212]  [4:       mdss_fb0:  509] mdss_smart_dimming_init DSI0 : --
+[    5.914253]  [4:       mdss_fb0:  509] mdss_panel_on_pre 0
+[    5.914290]  [4:       mdss_fb0:  509] [MDSS] mdss_panel_attach_set : panel_attach_status : 1
+[    5.914341]  [4:       mdss_fb0:  509] [MDSS] mdss_samsung_panel_on_pre : -: ndx=0
+[    5.931842]  [1:       adsprpcd:  627] allocating memory from audio ion size is 393216
+[    5.932958]  [5:           init:    1] init: Starting service 'config_bt_addr'...
+[    5.933951]  [5:           init:    1] init: Starting service 'config_bluetooth'...
+[    5.938880]  [5:           init:    1] init: Starting service 'qmuxd'...
+[    5.968250]  [0:    kworker/0:2:  272] android_work: android_work: sent uevent USB_STATE=CONFIGURED
+[    5.991467]  [5:           init:    1] init: Service 'scs' (pid 566) exited with status 0
+[    6.012320]  [5:           init:    1] init: cannot find '/system/bin/ipacm-diag', disabling 'ipacm-diag'
+[    6.017337]  [4:       mdss_fb0:  509] [MDSS] mdss_samsung_panel_on_post : +: ndx=0
+[    6.017388]  [4:       mdss_fb0:  509] mdss_panel_on_post 0
+[    6.017427]  [4:       mdss_fb0:  509] mdss_aid : level(255), aid(0 10)
+[    6.019008]  [4:       mdss_fb0:  509] [MDSS] mdss_samsung_brightness_dcs : DSI0 level : 255  candela : 420CD hbm : 0 (0)
+[    6.019078]  [4:       mdss_fb0:  509] [mdnie_mdss] SINGLE index : 0 hbm : 0 mdnie_bypass : 0 mdnie_accessibility : 0  mdnie_app: 0 mdnie_mode : 1
+[    6.020351]  [4:       mdss_fb0:  509] [MDSS] esd_irq_enable : ESD irq already enabled
+[    6.020401]  [4:       mdss_fb0:  509] [MDSS] mdss_samsung_panel_on_post : -: ndx=0
+[    6.033039]  [5:           init:    1] init: Service 'config_bt_addr' (pid 639) exited with status 0
+[    6.065858]  [4:       mdss_fb0:  509] [MDSS] mdss_samsung_event_frame_update : DISPLAY_ON
+[    6.088930]  [5:           init:    1] init: Starting service 'msm_irqbal_lb'...
+[    6.118955]  [5:           init:    1] init: cannot find '/system/bin/ipacm', disabling 'ipacm'
+[    6.224517]  [5:           init:    1] init: Starting service 'qti'...
+[    6.308289]  [5:           init:    1] init: Service 'qcom-sh' (pid 623) exited with status 0
+[    6.318878]  [4:  wcnss_service:  593] subsys-pil-tz a21b000.qcom,pronto: wcnss: Brought out of reset
+[    6.326257]  [5:           init:    1] init: Starting service 'netmgrd'...
+[    6.356058]  [5:           init:    1] init: Service 'qcom-usb-sh' (pid 590) exited with status 0
+[    6.422188]  [5:           init:    1] init: Service 'qcom-c_main-sh' (pid 582) exited with status 0
+[    6.479144]  [5:           init:    1] init: Service 'prepare_param' (pid 429) exited with status 0
+[    6.671349]  [5:           init:    1] init: Service 'defaultcrypto' (pid 448) exited with status 0
+[    6.680720]  [5:           init:    1] init: Starting service 'ril-daemon1'...
+[    6.759381]  [4:  irq/619-wcnss:  330] subsys-pil-tz a21b000.qcom,pronto: wcnss: Power/Clock ready interrupt received
+[    6.761317]  [4:  irq/619-wcnss:  330] wcnss_notif_cb: wcnss notification event: 7
+[    6.778317] I[0:     applypatch:  586] subsys-pil-tz a21b000.qcom,pronto: Subsystem error monitoring/handling services are up
+[    6.780214]  [4:  wcnss_service:  593] wcnss_notif_cb: wcnss notification event: 3
+[    6.780277]  [4:  wcnss_service:  593] wcnss_pm_qos_update_request: update request -1
+[    6.780330]  [4:  wcnss_service:  593] wcnss_pm_qos_remove_request: remove request
+[    6.781536]  [4:  kworker/u16:9:  393] diag: In diag_send_feature_mask_update, control channel is not open, p: 2, 0000000000000000
+[    6.791168]  [4:    time_daemon:  632] alarm_set_rtc : set rtc 1505263629 443000000 - rtc 00:47:09 09/13/2017
+[    6.791963]  [4:    kworker/4:2:  180] [SAPA] irq=0
+[    6.821121]  [5:           init:    1] init: Service 'epmlogd' (pid 611) exited with status 0
+[    6.851050]  [2: thermal-engine:  740] msm_thermal:set_enabled enabled = 0
+[    6.911129]  [0:    kworker/0:1:   36] wcnss_wlan_ctrl_probe: SMD ctrl channel up
+[    6.912301]  [0:    kworker/0:1:   36] wcnss: version 01050102
+[    6.912355]  [0:    kworker/0:1:   36] wcnss: schedule dnld work for pronto
+[    6.913587]  [0:    kworker/0:2:  272] wcnss: build version CNSS-PR-3-0-c2-1-48-77646-1
+[    6.912409]  [0:    kworker/0:1:   36] wcnss: NV download
+[    6.936364]  [0:    kworker/0:1:   36] wcnss: NV bin size: 29812, total_fragments: 10
+[    6.936453]  [0:    kworker/0:1:   36] wcnss: no space available for smd frame
+[    6.958209]  [0:    kworker/0:1:   36] wcnss: no space available for smd frame
+[    6.988192]  [0:    kworker/0:1:   36] wcnss: no space available for smd frame
+[    6.989360]  [0:    kworker/0:2:  272] abov-ft1604 4-0020: [sec_input] efs_read_light_table_version: table full version = T161115.12
+[    6.989445]  [0:    kworker/0:2:  272] abov-ft1604 4-0020: [sec_input] need_update_light_table: efs:161115, bin:161115
+[    6.989535]  [0:    kworker/0:2:  272] abov-ft1604 4-0020: [sec_input] check_light_table_crc: efs:167568, bin:167568
+[    6.990198]  [0:    kworker/0:2:  272] [MDSS] mdss_samsung_disp_windowtype_show : ndx : 0 41 00 11
+[    6.990264]  [0:    kworker/0:2:  272] [sec_input] touchkey read_window_type: 1
+[    6.990316]  [0:    kworker/0:2:  272] abov-ft1604 4-0020: [sec_input] efs_read_light_table: /efs/FactoryApp/tkey_light1
+[    6.990804]  [0:    kworker/0:2:  272] abov-ft1604 4-0020: [sec_input] change_touch_key_led_voltage: 3150mV
+[    6.990869]  [0:    kworker/0:2:  272] abov-ft1604 4-0020: [sec_input] touchkey_efs_open_work: read done for 1
+[    7.018485]  [0:    kworker/0:1:   36] wcnss: no space available for smd frame
+[    7.018674]  [5:           init:    1] init: property_set("ro.qualcomm.bluetooth.opp", "true") failed
+[    7.046755]  [5:           init:    1] init: property_set("ro.qualcomm.bluetooth.hfp", "true") failed
+[    7.129990]  [3:           imsd:  784] binder: 596:784 ioctl 40106134 7f86aff1d0 returned -22
+[    7.130064]  [3:           imsd:  784] binder: 596:784 ioctl 40106134 7f86aff1e0 returned -22
+[    7.138469]  [5:           init:    1] init: property_set("ro.qualcomm.bluetooth.hsp", "true") failed
+[    7.175340]  [5:           init:    1] init: property_set("ro.qualcomm.bluetooth.pbap", "true") failed
+[    7.217004]  [5:           init:    1] init: property_set("ro.qualcomm.bluetooth.ftp", "true") failed

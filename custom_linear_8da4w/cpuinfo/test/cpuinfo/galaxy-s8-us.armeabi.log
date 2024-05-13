@@ -1,0 +1,82 @@
+Processor	: AArch64 Processor rev 4 (aarch64)
+processor	: 0
+model name	: ARMv8 Processor rev 4 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x801
+CPU revision	: 4
+
+processor	: 1
+model name	: ARMv8 Processor rev 4 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x801
+CPU revision	: 4
+
+processor	: 2
+model name	: ARMv8 Processor rev 4 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x801
+CPU revision	: 4
+
+processor	: 3
+model name	: ARMv8 Processor rev 4 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x801
+CPU revision	: 4
+
+processor	: 4
+model name	: ARMv8 Processor rev 1 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x800
+CPU revision	: 1
+
+processor	: 5
+model name	: ARMv8 Processor rev 1 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x800
+CPU revision	: 1
+
+processor	: 6
+model name	: ARMv8 Processor rev 1 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x800
+CPU revision	: 1
+
+processor	: 7
+model name	: ARMv8 Processor rev 1 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x800
+CPU revision	: 1
+
+Hardware	: Qualcomm Technologies, Inc MSM8998

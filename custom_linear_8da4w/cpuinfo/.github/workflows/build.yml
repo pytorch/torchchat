@@ -1,0 +1,96 @@
+name: Build using CMake
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+jobs:
+  cmake-linux-local:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v2
+      - name: Update apt
+        run: sudo apt update
+      - name: Install ninja
+        run: sudo apt install ninja-build
+      - name: Configure and build
+        run: scripts/local-build.sh
+        working-directory: ${{ github.workspace }}
+  cmake-darwin:
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install ninja
+        run: brew install ninja
+      - name: Configure and build
+        run: scripts/local-build.sh
+        working-directory: ${{ github.workspace }}
+  cmake-windows:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install ninja
+        run: choco install ninja
+      - name: Configure and build
+        run: scripts/local-build.sh
+        shell: bash  # Specify bash so we can reuse the build script on Windows (runs on Git bash)
+        working-directory: ${{ github.workspace }}
+  cmake-uwp:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'x64-uwp(Debug)'
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'x64-uwp'
+          buildPreset: 'x64-uwp-dbg'
+      - name: 'x64-uwp(Release)'
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'x64-uwp'
+          buildPreset: 'x64-uwp-rel'
+      - name: 'arm64-uwp(Debug)'
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'arm64-uwp'
+          buildPreset: 'arm64-uwp-dbg'
+      - name: 'arm64-uwp(Release)'
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'arm64-uwp'
+          buildPreset: 'arm64-uwp-rel'
+  cmake-android:
+    strategy:
+      matrix:
+        script: [android-arm64-build.sh, android-armv7-build.sh, android-x86-build.sh]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v2
+      - name: Update apt
+        run: sudo apt update
+      - name: Install ninja
+        run: sudo apt install ninja-build
+      - name: Setup Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1.0.6
+        with:
+          ndk-version: r23b
+          add-to-path: false
+      - name: Configure and build
+        run: scripts/${{ matrix.script }}
+        working-directory: ${{ github.workspace }}
+        env:
+          ANDROID_NDK: ${{ steps.setup-ndk.outputs.ndk-path }}

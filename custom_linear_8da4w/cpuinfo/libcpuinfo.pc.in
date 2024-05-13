@@ -1,0 +1,12 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=@CMAKE_INSTALL_PREFIX@
+libdir=@libdir_for_pc_file@
+includedir=@includedir_for_pc_file@
+
+Name: lib@CMAKE_PROJECT_NAME@
+Description: Library to detect essential performance optimization information about host CPU.
+Version: 
+URL: @PROJECT_HOMEPAGE_URL@
+Libs: -L${libdir} -lcpuinfo
+Cflags: -I${includedir}
+

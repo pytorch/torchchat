@@ -1,0 +1,1473 @@
+[    0.000000] Initializing cgroup subsys cpu
+[    0.000000] Initializing cgroup subsys cpuacct
+[    0.000000] Linux version 3.10.103-gb7c30cdef95 (android-build@vpak3.mtv.corp.google.com) (gcc version 4.9.x-google 20140827 (prerelease) (GCC) ) #1 SMP PREEMPT Mon Apr 17 15:43:59 UTC 2017
+[    0.000000] CPU: NVIDIA Denver 1.0 [4e0f0000] revision 0
+[    0.000000] Machine: Flounder
+[    0.000000] No earlyprintk arguments passed.
+[    0.000000] Found tegra_fbmem: 00c20000@ac001000
+[    0.000000] Flounder hardware revision = 128, engineer id = 0
+[    0.000000] Tegra reserved memory:
+[    0.000000] LP0:                    f7fff000 - f7fff7ff
+[    0.000000] Bootloader framebuffer: ac001000 - acc20fff
+[    0.000000] Bootloader framebuffer2: 00000000 - 00000000
+[    0.000000] Framebuffer:            f5e00000 - f75fffff
+[    0.000000] 2nd Framebuffer:        00000000 - 00000000
+[    0.000000] Tsec:                   00000000 - 00000000
+[    0.000000] Tzram:               f7a00000 - f7dfffff
+[    0.000000] cma: CMA: reserved 100 MiB at ef800000
+[    0.000000] cma: CMA: reserved 16 MiB at ee800000
+[    0.000000] On node 0 totalpages: 488448
+[    0.000000]   DMA32 zone: 6685 pages used for memmap
+[    0.000000]   DMA32 zone: 0 pages reserved
+[    0.000000]   DMA32 zone: 488448 pages, LIFO batch:31
+[    0.000000] psci: probing function IDs from device-tree
+[    0.000000] DTS File Name: <unknown>
+[    0.000000] Tegra13: CPU Speedo ID 1, Soc Speedo ID 0, Gpu Speedo ID 1
+[    0.000000] Tegra13: CPU Process ID 0,Soc Process ID 1,Gpu Process ID 0
+[    0.000000] Tegra13: CPU Speedo value 2293, Soc Speedo value 2204, Gpu Speedo value 2067
+[    0.000000] Tegra Revision: A03 SKU: 0xf CPU Process: 0 Core Process: 1
+[    0.000000] tegra: PLLP fixed rate: 408000000
+[    0.000000] tegra_clk_shared_bus_user_init: c2bus client se left ON
+[    0.000000] Lowering sbus maximum rate from 420000000 to 372000000
+[    0.000000] Lowering vic03 maximum rate from 900000000 to 720000000
+[    0.000000] Lowering tsec maximum rate from 900000000 to 720000000
+[    0.000000] Lowering msenc maximum rate from 600000000 to 456000000
+[    0.000000] Lowering se maximum rate from 600000000 to 456000000
+[    0.000000] Lowering vde maximum rate from 600000000 to 456000000
+[    0.000000] Lowering host1x maximum rate from 500000000 to 408000000
+[    0.000000] Lowering vi maximum rate from 700000000 to 600000000
+[    0.000000] Lowering isp maximum rate from 700000000 to 600000000
+[    0.000000] Lowering c4bus maximum rate from 700000000 to 600000000
+[    0.000000] Lowering pll_c maximum rate from 1400000000 to 1066000000
+[    0.000000] Lowering pll_c2 maximum rate from 1200000000 to 1066000000
+[    0.000000] Lowering pll_c3 maximum rate from 1200000000 to 1066000000
+[    0.000000] Lowering hdmi maximum rate from 594000000 to 297000000
+[    0.000000] Lowering nor maximum rate from 127000000 to 102000000
+[    0.000000] Lowering sdmmc1 maximum rate from 208000000 to 204000000
+[    0.000000] Lowering sdmmc3 maximum rate from 208000000 to 204000000
+[    0.000000] Lowering gbus maximum rate from 1032000000 to 852000000
+[    0.000000] Lowering cpu_g maximum rate from 3000000000 to 2499000000
+[    0.000000] tegra dvfs: VDD_CPU nominal 1260mV, scaling enabled
+[    0.000000] tegra dvfs: VDD_CORE nominal 1150mV, scaling enabled
+[    0.000000] tegra dvfs: VDD_GPU nominal 1200mV, scaling enabled
+[    0.000000] ------------[ cut here ]------------
+[    0.000000] WARNING: at /usr/local/google/buildbot/src/partner-android/n-dev-tegra-flounder-3.10-nyc-mr1/private/flounder/drivers/platform/tegra/../../../arch/arm/mach-tegra/clock.c:968 tegra_common_init_clock+0x74/0x9c()
+[    0.000000] tegra: dsialp boot rate 408000000 exceeds max rate 156000000
+[    0.000000] CPU: 0 PID: 0 Comm: swapper Not tainted 3.10.103-gb7c30cdef95 #1
+[    0.000000] Call trace:
+[    0.000000] [<ffffffc000089ff4>] dump_backtrace+0x0/0x16c
+[    0.000000] [<ffffffc00008a174>] show_stack+0x14/0x1c
+[    0.000000] [<ffffffc0009cde78>] dump_stack+0x20/0x28
+[    0.000000] [<ffffffc0000acd8c>] warn_slowpath_common+0x74/0x9c
+[    0.000000] [<ffffffc0000ace30>] warn_slowpath_fmt+0x50/0x58
+[    0.000000] [<ffffffc000de28fc>] tegra_common_init_clock+0x74/0x9c
+[    0.000000] [<ffffffc000de213c>] tegra12x_init_early+0xa4/0x360
+[    0.000000] [<ffffffc000dae8b8>] tegra_flounder_init_early+0x10/0x18
+[    0.000000] [<ffffffc000da76e4>] setup_arch+0x7d0/0x7ec
+[    0.000000] [<ffffffc000da4528>] start_kernel+0x94/0x32c
+[    0.000000] ---[ end trace 1b75b31a2719ed1c ]---
+[    0.000000] tegra_powergate_init: DONE
+[    0.000000] Timed out waiting for pll_e lock bit ([0xec] = 0x4300)
+[    0.000000] PERCPU: Embedded 10 pages/cpu @ffffffc03ff4c000 s19584 r0 d21376 u40960
+[    0.000000] pcpu-alloc: s19584 r0 d21376 u40960 alloc=10*4096
+[    0.000000] pcpu-alloc: [0] 0 [0] 1 
+[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 481763
+[    0.000000] Kernel command line: no_console_suspend=1 tegra_wdt.enable_on_probe=1 tegra_wdt.heartbeat=120 androidboot.hardware=flounder tegraid=40.0.0.00.00 vmalloc=256M video=tegrafb console=ttyS0,115200n8 earlyprintk MTS Version=33985182 memtype=0 tzram=4M@3962M ddr_die=1024M@2048M ddr_die=1024M@3072M section=128M lp0_vec=2048@0xf7fff000 tegra_fbmem=12713984@0xac001000 nvdumper_reserved=0xf7800000 core_edp_mv=1150 core_edp_ma=4000 gpt gpt_sector=69631 watchdog=disable nck=1048576@0xf7900000 androidboot.hardware=flounder buildvariant=user androidboot.serialno=HT4CSJT01353 androidboot.baseband=N/A androidboot.mode=normal androidboot.bootloader=3.50.0.0143 swoff=0 flounder.wifimacaddr=B4:CE:F6:9D:4C:75 androidboot.wificountrycode=US androidboot.bootreason=reboot hw_revision=128 radioflag=0x0 androidboot.misc_pagesize=2048
+[    0.000000] PID hash table entries: 4096 (order: 3, 32768 bytes)
+[    0.000000] Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes)
+[    0.000000] Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes)
+[    0.000000] Sorting __ex_table...
+[    0.000000] Memory: 1884MB 24MB = 1908MB total
+[    0.000000] Memory: 1746776k/1746776k available, 207016k reserved
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]     vmalloc : 0xffffff8000000000 - 0xffffffbbffff0000   (245759 MB)
+[    0.000000]     vmemmap : 0xffffffbc01c00000 - 0xffffffbc0361d000   (    26 MB)
+[    0.000000]     modules : 0xffffffbffc000000 - 0xffffffc000000000   (    64 MB)
+[    0.000000]     memory  : 0xffffffc000000000 - 0xffffffc077600000   (  1910 MB)
+[    0.000000]       .init : 0xffffffc000da4000 - 0xffffffc000e18c80   (   468 kB)
+[    0.000000]       .text : 0xffffffc000080000 - 0xffffffc000da3024   ( 13453 kB)
+[    0.000000]       .data : 0xffffffc000e19000 - 0xffffffc001027f58   (  2108 kB)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=2, Nodes=1
+[    0.000000] Preemptible hierarchical RCU implementation.
+[    0.000000] NR_IRQS:960
+[    0.000000] the number of interrupt controllers found is 5
+[    0.000000] Architected local timer running at 12.00MHz (virt).
+[    0.000000] sched_clock: 56 bits at 12MHz, resolution 83ns, wraps every 2863311536128ns
+[    0.000669] Calibrating delay loop (skipped), value calculated using timer frequency.. lpj=40000
+[    0.000695] pid_max: default: 32768 minimum: 301
+[    0.001955] Security Framework initialized
+[    0.001985] SELinux:  Initializing.
+[    0.002273] SELinux:  Starting in permissive mode
+[    0.002458] Mount-cache hash table entries: 256
+[    0.042997] Initializing cgroup subsys debug
+[    0.043024] Initializing cgroup subsys freezer
+[    0.043520] hw perfevents: enabled with arm/armv8-pmuv3 PMU driver, 7 counters available
+[    0.072742] Brought up 2 CPUs
+[    0.072846] SMP: Total of 2 processors activated.
+[    0.093422] pinctrl core: initialized pinctrl subsystem
+[    0.094006] regulator-dummy: no parameters
+[    0.100021] NET: Registered protocol family 16
+[    0.107458] DMA: preallocated 256 KiB pool for atomic coherent allocations
+[    0.109598] console [pstore-1] enabled
+[    0.109862] ramoops: attached 0x200000@0xf5c00000, ecc: 0/0
+[    0.110447] Registered FIQ tty driver
+[    0.110503] cpuidle: using governor ladder
+[    0.110520] cpuidle: using governor menu
+[    0.113361] tegra_smmu tegra_smmu: Loaded Tegra IOMMU driver
+[    0.120629] tegra-gpio 6000d000.gpio: Initialising GPIO state 0: name default
+[    0.120829] gpiochip_add: registered GPIOs 0 to 255 on device: tegra-gpio
+[    0.136115] htc_reboot_params f7700000.htc_reboot_params: got reboot_params buffer at ffffff8000022000
+[    0.137378] tegra124-pinctrl tegra124-pinctrl: lookup the user state drive not found
+[    0.137410] tegra124-pinctrl tegra124-pinctrl: lookup the user state unused not found
+[    0.137725] tegra124-pinctrl tegra124-pinctrl: Config param 0005 not supported on group cam_mclk_pcc0
+[    0.137761] tegra124-pinctrl tegra124-pinctrl: Config param 0005 not supported on group pbb0
+[    0.138334] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pk0
+[    0.138368] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group gpio_x1_aud_px1
+[    0.138436] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group gpio_x4_aud_px4
+[    0.138470] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group gpio_x5_aud_px5
+[    0.138504] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row11_ps3
+[    0.138537] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row12_ps4
+[    0.138570] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group sdmmc1_wp_n_pv3
+[    0.138602] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ulpi_data7_po0
+[    0.138636] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_col3_pq3
+[    0.138670] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group gpio_x3_aud_px3
+[    0.138704] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pb1
+[    0.138737] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row7_pr7
+[    0.138770] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row9_ps1
+[    0.138803] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group sdmmc3_cmd_pa7
+[    0.138837] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_col0_pq0
+[    0.138870] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group sdmmc3_cd_n_pv2
+[    0.138903] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_col5_pq5
+[    0.138937] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pi3
+[    0.138970] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group gpio_w3_aud_pw3
+[    0.139037] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row10_ps2
+[    0.139076] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row11_ps3
+[    0.139136] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_col4_pq4
+[    0.139189] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group gpio_x6_aud_px6
+[    0.139222] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group gpio_x7_aud_px7
+[    0.139255] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group gpio_w2_aud_pw2
+[    0.139288] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pbb3
+[    0.139321] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pbb7
+[    0.139354] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pcc1
+[    0.139386] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pcc2
+[    0.139418] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ph2
+[    0.139451] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ph3
+[    0.139484] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ph6
+[    0.139516] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ph7
+[    0.139549] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ph5
+[    0.139581] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ph6
+[    0.139614] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ph7
+[    0.139647] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pk1
+[    0.139679] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pj0
+[    0.139712] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pk3
+[    0.139757] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pi6
+[    0.139815] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pi5
+[    0.139848] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pc7
+[    0.139881] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pi0
+[    0.139914] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group clk2_req_pcc5
+[    0.139947] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_col1_pq1
+[    0.139980] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_col2_pq2
+[    0.140015] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row0_pr0
+[    0.140048] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row1_pr1
+[    0.140081] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row2_pr2
+[    0.140123] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row4_pr4
+[    0.140200] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row5_pr5
+[    0.140242] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group clk3_req_pee1
+[    0.140277] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pu2
+[    0.140310] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pu3
+[    0.140342] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pu4
+[    0.140374] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pu5
+[    0.140406] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pu6
+[    0.140438] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group spdif_out_pk5
+[    0.140470] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pk2
+[    0.140502] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group sdmmc3_cd_n_pv2
+[    0.140535] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ulpi_data0_po1
+[    0.140567] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ulpi_data1_po2
+[    0.140598] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ulpi_data2_po3
+[    0.140630] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ulpi_data3_po4
+[    0.140661] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ulpi_data4_po5
+[    0.140693] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group ulpi_data5_po6
+[    0.140724] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pbb5
+[    0.140757] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_col7_pq7
+[    0.140789] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row8_ps0
+[    0.140821] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row13_ps5
+[    0.140853] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group kb_row14_ps6
+[    0.140884] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pcc2
+[    0.140916] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pv0
+[    0.140947] tegra124-pinctrl tegra124-pinctrl: Config param 0003 not supported on group pv1
+[    0.140976] tegra124-pinctrl tegra124-pinctrl: Config param 0009 not supported on group drive_sdio1
+[    0.141013] tegra124-pinctrl tegra124-pinctrl: Config param 0009 not supported on group drive_sdio3
+[    0.141321] of_get_named_gpio_flags exited with status 130
+[    0.141334] gpio pin = 130
+[    0.141357] of_get_named_gpio_flags exited with status 136
+[    0.141367] gpio pin = 136
+[    0.141389] of_get_named_gpio_flags exited with status 68
+[    0.141399] gpio pin = 68
+[    0.141420] of_get_named_gpio_flags exited with status 61
+[    0.141430] gpio pin = 61
+[    0.141446] disp1 pclk=247600000
+[    0.141460] disp2 pclk=297000000
+[    0.141473] Selecting UARTA as the debug console
+[    0.141601] The debug console clock name is uarta
+[    0.142405] flounder_audio_init: gpio_free for gpio[2] I2S1_LRCK
+[    0.142433] flounder_audio_init: gpio_free for gpio[3] I2S1_SCLK
+[    0.142457] flounder_audio_init: gpio_free for gpio[4] I2S1_SDATA_IN
+[    0.142478] flounder_audio_init: gpio_free for gpio[5] I2S1_SDATA_OUT
+[    0.142500] flounder_audio_init: gpio_free for gpio[120] I2S2_LRCK
+[    0.142520] flounder_audio_init: gpio_free for gpio[121] I2S2_SDATA_IN
+[    0.142542] flounder_audio_init: gpio_free for gpio[122] I2S2_SDATA_OUT
+[    0.142562] flounder_audio_init: gpio_free for gpio[123] I2S2_SCLK
+[    0.142582] flounder_audio_init: gpio_free for gpio[180] extperiph1_clk
+[    0.142603] flounder_audio_init: gpio_free for gpio[192] SPI_MOSI
+[    0.142623] flounder_audio_init: gpio_free for gpio[193] SPI_MISO
+[    0.142643] flounder_audio_init: gpio_free for gpio[194] SPI_SCLK
+[    0.142663] flounder_audio_init: gpio_free for gpio[195] SPI_CS
+[    0.142684] flounder_audio_init: gpio_request for gpio[2] I2S1_LRCK
+[    0.142702] flounder_audio_init: gpio_request for gpio[3] I2S1_SCLK
+[    0.145742] PMC dt information non-NULL tegra_init_suspend
+[    0.145765] PMC DT attribute sysclkreq_high=0, board value=1
+[    0.145782] PMC DT attribute corereq_high=0, board value=1
+[    0.145800] PMC DT attribute cpu_off_timer=-64, board value=300
+[    0.145817] PMC DT attribute cpu_timer=-64, board value=500
+[    0.145833] PMC DT attribute suspend_mode=0, board value=3
+[    0.146364] Clear bootloader IO dpd settings
+[    0.146575] Loading EMC tables from DeviceTree.
+[    0.148392] tegra: emc: Derated table is valid.
+[    0.148412] tegra: pll_m is selected as scalable EMC clock source
+[    0.148449] Lowering emc maximum rate from 1200000000 to 924000000
+[    0.148509] tegra: validated EMC DFS table
+[    0.148654] flounder_edp_init: CPU regulator 16800 mA
+[    0.255577] flounder_edp_init: GPU regulator 16800 mA
+[    0.256010] swapper/0 isomgr_init(): iso emc max clk=924000KHz
+[    0.256031] swapper/0 isomgr_init(): max_iso_bw=7392000KB<6>[    0.256521] flounder_touch_init init synaptics spi touch
+[    0.256600] [TP] synaptics device tree found
+[    0.256616] [HS]flounder_headset_init Headset device register enter
+[    0.256900] of_get_named_gpio_flags exited with status 130
+[    0.256911] gpio pin = 130
+[    0.256932] of_get_named_gpio_flags exited with status 136
+[    0.256942] gpio pin = 136
+[    0.256976] of_get_named_gpio_flags exited with status 68
+[    0.256986] gpio pin = 68
+[    0.257007] of_get_named_gpio_flags exited with status 61
+[    0.257051] gpio pin = 61
+[    0.257208] dma_declare_coherent_resizable_cma_memory:236: resizable heap=vpr, base=0x0x00000000ef800000, size=0x6400000
+[    0.257242]  dma-vpr: heap size is not multiple of cma_chunk_size heap_info->num_chunks (4) rem_chunk_size(0x400000)
+[    0.258141] cma: enabled page replacement for spfn=ef800, epfn=f5c00
+[    0.258166] dma_declare_coherent_resizable_cma_memory:292: resizable cma heap=vpr create successful
+[    0.276920] platform tegradc.0: IOVA linear map 0x00000000f5e00000(1800000)
+[    0.281829] platform tegradc.0: IOVA linear map 0x00000000ac001000(c20000)
+[    0.281973] platform tegradc.0: IOVA linear map 0x00000000ef800000(6400000)
+[    0.282421] [GPS]flounder_gps_init init gps onoff
+[    0.282764] GPS: init gps hostwake
+[    0.282987] flounder_sar_init: GPIO pin:23
+[    0.283080] flounder_sar1_init: GPIO pin:229
+[    0.283538] tegra11_soctherem_oc_int_init(): OC interrupts enabled successful
+[    0.284428] SET BD_ADDRESS=d4:0b:1a:1a:bf:bf
+[    0.284455] vdso: 2 pages (1 code, 1 data) at base ffffffc000e21000
+[    0.284602] hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
+[    0.284745] Denver: PMIC: type = TI TPS65913 2.3, voltage = 11, locked = 0
+[    0.285043] ------------[ cut here ]------------
+[    0.285079] WARNING: at /usr/local/google/buildbot/src/partner-android/n-dev-tegra-flounder-3.10-nyc-mr1/private/flounder/drivers/misc/qcom-mdm-9k/subsystem_restart.c:652 subsys_restart_init+0x88/0x98()
+[    0.285107] CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W    3.10.103-gb7c30cdef95 #1
+[    0.285125] Call trace:
+[    0.285154] [<ffffffc000089ff4>] dump_backtrace+0x0/0x16c
+[    0.285190] [<ffffffc00008a174>] show_stack+0x14/0x1c
+[    0.285214] [<ffffffc0009cde78>] dump_stack+0x20/0x28
+[    0.285239] [<ffffffc0000acd8c>] warn_slowpath_common+0x74/0x9c
+[    0.285263] [<ffffffc0000acea8>] warn_slowpath_null+0x18/0x20
+[    0.285320] [<ffffffc000dd6ab0>] subsys_restart_init+0x88/0x98
+[    0.285342] [<ffffffc000da4874>] do_one_initcall+0xb4/0x160
+[    0.285363] [<ffffffc000da4a68>] kernel_init_freeable+0x148/0x1e4
+[    0.285387] [<ffffffc0009c3eb8>] kernel_init+0x18/0x140
+[    0.285403] ---[ end trace 1b75b31a2719ed1d ]---
+[    0.285594] mc-err: Started MC error interface!
+[    0.302319] bio: create slab <bio-0> at 0
+[    0.304533] tegra-pwm: probe of 7000a000.pwm failed with error -2
+[    0.305067] reg-fixed-voltage 0.regulator: Consumer c1 does not have device name
+[    0.305092] of_get_named_gpio_flags: can't parse gpios property
+[    0.305286] vdd_ac_bat: 5000 mV 
+[    0.305463] of_get_named_gpio_flags: can't parse gpios property
+[    0.305594] vdd_hv_3v: 3000 mV 
+[    0.307597] vgaarb: loaded
+[    0.308513] SCSI subsystem initialized
+[    0.308741] usbcore: registered new interface driver usbfs
+[    0.308797] usbcore: registered new interface driver hub
+[    0.308995] usbcore: registered new device driver usb
+[    0.309281] of_get_named_gpio_flags exited with status 20
+[    0.309298] of_get_named_gpio_flags exited with status 21
+[    0.310729] of_get_named_gpio_flags exited with status 157
+[    0.310748] of_get_named_gpio_flags exited with status 158
+[    0.311903] of_get_named_gpio_flags exited with status 217
+[    0.311920] of_get_named_gpio_flags exited with status 218
+[    0.312566] of_get_named_gpio_flags exited with status 172
+[    0.312582] of_get_named_gpio_flags exited with status 173
+[    0.312903] of_get_named_gpio_flags exited with status 206
+[    0.312919] of_get_named_gpio_flags exited with status 207
+[    0.313528] palmas 4-0058: Irq flag is 0x00000000
+[    0.314649] palmas 4-0058: Internal DesignRev 0x04, SWRev 0xD9
+[    0.314678] palmas 4-0058: ES version 2.3: ChipRevision 0xB3D9
+[    0.319260] gpiochip_find_base: found new base at 1016
+[    0.319402] gpiochip_add: registered GPIOs 1016 to 1023 on device: gpio.11
+[    0.319443] palmas-gpio gpio.11: palmas_gpio_probe:Enabling boost bypass feature, set PMIC GPIO_4 as output high
+[    0.327959] palmas-pinctrl pinmux.13: Muxing GPIO dfdc, PWM 0, LED 0
+[    0.328963] palmas-pmic pmic.18: Consumer c1 does not have device name
+[    0.329042] palmas-pmic pmic.18: Consumer c1 does not have device name
+[    0.329084] palmas-pmic pmic.18: Consumer c1 does not have device name
+[    0.329153] palmas-pmic pmic.18: Consumer c7 does not have device name
+[    0.329173] palmas-pmic pmic.18: Consumer c8 does not have device name
+[    0.329194] palmas-pmic pmic.18: Consumer c9 does not have device name
+[    0.329214] palmas-pmic pmic.18: Consumer c10 does not have device name
+[    0.329237] palmas-pmic pmic.18: Consumer c12 does not have device name
+[    0.329257] palmas-pmic pmic.18: Consumer c14 does not have device name
+[    0.329290] palmas-pmic pmic.18: Consumer c20 does not have device name
+[    0.329310] palmas-pmic pmic.18: Consumer c21 does not have device name
+[    0.329330] palmas-pmic pmic.18: Consumer c22 does not have device name
+[    0.329350] palmas-pmic pmic.18: Consumer c23 does not have device name
+[    0.329369] palmas-pmic pmic.18: Consumer c24 does not have device name
+[    0.329389] palmas-pmic pmic.18: Consumer c25 does not have device name
+[    0.329409] palmas-pmic pmic.18: Consumer c26 does not have device name
+[    0.329429] palmas-pmic pmic.18: Consumer c27 does not have device name
+[    0.329454] palmas-pmic pmic.18: Consumer c30 does not have device name
+[    0.329478] palmas-pmic pmic.18: Consumer c35 does not have device name
+[    0.329498] palmas-pmic pmic.18: Consumer c36 does not have device name
+[    0.329574] palmas-pmic pmic.18: Consumer c1 does not have device name
+[    0.329594] palmas-pmic pmic.18: Consumer c2 does not have device name
+[    0.329614] palmas-pmic pmic.18: Consumer c3 does not have device name
+[    0.329697] palmas-pmic pmic.18: Consumer c1 does not have device name
+[    0.329718] palmas-pmic pmic.18: Consumer c2 does not have device name
+[    0.329738] palmas-pmic pmic.18: Consumer c3 does not have device name
+[    0.329758] palmas-pmic pmic.18: Consumer c4 does not have device name
+[    0.329777] palmas-pmic pmic.18: Consumer c5 does not have device name
+[    0.329797] palmas-pmic pmic.18: Consumer c6 does not have device name
+[    0.329817] palmas-pmic pmic.18: Consumer c7 does not have device name
+[    0.329837] palmas-pmic pmic.18: Consumer c8 does not have device name
+[    0.329856] palmas-pmic pmic.18: Consumer c9 does not have device name
+[    0.329972] palmas-pmic pmic.18: Consumer c8 does not have device name
+[    0.330003] palmas-pmic pmic.18: Consumer c9 does not have device name
+[    0.330022] palmas-pmic pmic.18: Consumer c10 does not have device name
+[    0.330042] palmas-pmic pmic.18: Consumer c11 does not have device name
+[    0.330130] palmas-pmic pmic.18: Consumer c1 does not have device name
+[    0.330169] palmas-pmic pmic.18: Consumer c1 does not have device name
+[    0.330255] palmas-pmic pmic.18: Consumer c1 does not have device name
+[    0.330303] palmas-pmic pmic.18: Consumer c1 does not have device name
+[    0.330344] of_get_named_gpio_flags: can't parse gpios property
+[    0.330363] of_get_named_gpio_flags: can't parse gpios property
+[    0.330380] of_get_named_gpio_flags: can't parse gpios property
+[    0.330397] of_get_named_gpio_flags: can't parse gpios property
+[    0.330413] of_get_named_gpio_flags: can't parse gpios property
+[    0.330429] of_get_named_gpio_flags: can't parse gpios property
+[    0.330444] of_get_named_gpio_flags: can't parse gpios property
+[    0.330460] of_get_named_gpio_flags: can't parse gpios property
+[    0.330476] of_get_named_gpio_flags: can't parse gpios property
+[    0.330491] of_get_named_gpio_flags: can't parse gpios property
+[    0.330507] of_get_named_gpio_flags: can't parse gpios property
+[    0.330523] of_get_named_gpio_flags: can't parse gpios property
+[    0.330538] of_get_named_gpio_flags: can't parse gpios property
+[    0.330554] of_get_named_gpio_flags: can't parse gpios property
+[    0.330569] of_get_named_gpio_flags: can't parse gpios property
+[    0.330586] of_get_named_gpio_flags: can't parse gpios property
+[    0.330601] of_get_named_gpio_flags: can't parse gpios property
+[    0.330617] of_get_named_gpio_flags: can't parse gpios property
+[    0.333537] vdd-cpu: 650 <--> 1400 mV at 1020 mV with ramp delay 5000 uV/us 
+[    0.336279] vdd-gpu: applied init 1000000uV constraint
+[    0.337726] vdd-gpu: 700 <--> 1400 mV at 1000 mV with ramp delay 5000 uV/us 
+[    0.339501] vdd-core: 700 <--> 1400 mV at 1100 mV with ramp delay 5000 uV/us 
+[    0.342688] vdd-1v8: 1800 mV with ramp delay 5000 uV/us 
+[    0.343848] vdd-1v2: 1200 mV 
+[    0.346243] vdd-out2-5v0: 5000 mV 
+[    0.347797] vdd-hdmi: 5000 mV 
+[    0.349262] avdd-pll: 1050 mV 
+[    0.351980] vdd-aud: 1200 mV 
+[    0.352221] vdd-aud: supplied by vdd-1v8
+[    0.355093] vdd-sensor-io: 1800 mV 
+[    0.357779] vdd-sensor-2v85: 2850 mV 
+[    0.360783] avdd-dsi-csi: 1200 mV 
+[    0.361060] avdd-dsi-csi: supplied by vdd-1v8
+[    0.362247] vdd-1v5-ldo6: 1500 <--> 1800 mV at 1500 mV 
+[    0.363389] v-slim-1v0: 1000 <--> 1100 mV at 2800 mV 
+[    0.363616] v-slim-1v0: supplied by vdd-1v8
+[    0.366446] vdd-rtc: 950 mV 
+[    0.367608] vdd-3p3-ldo9: 1800 <--> 3300 mV at 900 mV 
+[    0.368889] vddio-hv: 3300 mV 
+[    0.369127] vddio-hv: supplied by vdd-out2-5v0
+[    0.372869] avdd-usb: 3300 mV 
+[    0.373896] REGEN1: at 4300 mV 
+[    0.374070] REGEN2: at 4300 mV 
+[    0.374230] REGEN3: at 4300 mV 
+[    0.374399] SYSEN1: at 4300 mV 
+[    0.374579] SYSEN2: at 4300 mV 
+[    0.375022] of_get_named_gpio_flags: can't parse gpios property
+[    0.375037] of_get_named_gpio_flags: can't parse gpios property
+[    0.375745] Linux video capture interface: v2.00
+[    0.376224] data-charger: normal standby 
+[    0.376334] htc_battery_bq2419x htc_battery_bq2419x.9: Registering battery charger driver
+[    0.382711] trusty trusty.4: trusty version: Build: 3245488, Built: 00:17:06 Sep  3 2016
+[    0.384793] WDT heartbeat enabled on probe
+[    0.385100] tegra_wdt 60005100.watchdog: tegra_wdt_probe done
+[    0.387712] Advanced Linux Sound Architecture Driver Initialized.
+[    0.388976] cfg80211: Calling CRDA to update world regulatory domain
+[    0.390622] nfc: nfc_init: NFC Core ver 0.1
+[    0.390780] NET: Registered protocol family 39
+[    0.390983] of_get_named_gpio_flags: can't parse gpios property
+[    0.391128] usb0-vbus: 5000 mV 
+[    0.391301] of_get_named_gpio_flags: can't parse gpios property
+[    0.391484] usb1-vbus: 5000 mV 
+[    0.391570] usb1-vbus: supplied by vdd-out2-5v0
+[    0.391791] of_get_named_gpio_flags: can't parse gpios property
+[    0.391914] usb2-vbus: 5000 mV 
+[    0.391950] usb2-vbus: supplied by vdd-out2-5v0
+[    0.392155] reg-fixed-sync-voltage 4.regulator: Consumer c1 does not have device name
+[    0.392182] of_get_named_gpio_flags exited with status 1019
+[    0.392934] avdd-lcd: 3300 mV 
+[    0.393003] avdd-lcd: supplied by vdd-1v2
+[    0.393237] reg-fixed-sync-voltage 5.regulator: Consumer c1 does not have device name
+[    0.393258] of_get_named_gpio_flags: can't parse gpios property
+[    0.393395] vdd-lcd: 1200 mV 
+[    0.393430] vdd-lcd: supplied by vdd-1v8
+[    0.393630] of_get_named_gpio_flags exited with status 1022
+[    0.394458] ldoen: 1200 mV 
+[    0.394503] ldoen: supplied by vdd-1v8
+[    0.394722] reg-fixed-sync-voltage 7.regulator: Consumer c1 does not have device name
+[    0.394748] of_get_named_gpio_flags exited with status 1023
+[    0.395471] vpp-fuse: 1800 mV 
+[    0.395512] vpp-fuse: supplied by vdd-1v8
+[    0.395705] reg-fixed-sync-voltage 8.regulator: Consumer c1 does not have device name
+[    0.395725] of_get_named_gpio_flags: can't parse gpios property
+[    0.395858] en-lcd-bl: 5000 mV 
+[    0.396419] of_get_named_gpio_flags: can't parse gpios property
+[    0.397289] bq2419x 0-006b: chip type BQ24190 detected
+[    0.400308] htc_battery_bq2419x htc_battery_bq2419x.9: Charging enable with reason 0x0 (origin:0x0)
+[    0.400338] bq2419x 0-006b: charger configure, enable=1 is_otg=0
+[    0.400715] data-vbus: normal standby 
+[    0.404050] palmas-usb extcon.14: vbus-irq() INT3_LINE_STATE 0x80
+[    0.404149] palmas-usb extcon.14: USB cable is attached
+[    0.406830] tegra: started io power detection dynamic control
+[    0.406852] tegra: NO_IO_POWER setting 0x0
+[    0.406872] Switching to clocksource arch_sys_counter
+[    0.457037] nvmap_heap_init: nvmap_heap_init: created heap block cache
+[    0.457216] nvmap_page_pool_init: Total MB RAM: 1821
+[    0.457237] nvmap_page_pool_init: nvmap page pool size: 58272 pages (227 MB)
+[    0.457549] nvmap_background_zero_thread: PP zeroing thread starting.
+[    0.509577] nvmap_page_pool_init: highmem=0, pool_size=58272,totalram=466390, freeram=438512, totalhigh=0, freehigh=0
+[    0.509842]  iram: dma coherent mem declare 0x0000000040001000,258048
+[    0.510493] misc nvmap: created heap iram base 0x0000000040001000 size (252KiB)
+[    0.510866] misc nvmap: created heap vpr base 0x00000000ef800000 size (102400KiB)
+[    0.511085] nvmap:inner cache maint threshold=16777216
+[    0.513178] tegra-otg tegra-otg: otg transceiver registered
+[    0.529962] NET: Registered protocol family 2
+[    0.531434] TCP established hash table entries: 16384 (order: 6, 262144 bytes)
+[    0.532358] TCP bind hash table entries: 16384 (order: 6, 262144 bytes)
+[    0.532933] TCP: Hash tables configured (established 16384 bind 16384)
+[    0.533040] TCP: reno registered
+[    0.533063] UDP hash table entries: 1024 (order: 4, 65536 bytes)
+[    0.533157] UDP-Lite hash table entries: 1024 (order: 4, 65536 bytes)
+[    0.533785] NET: Registered protocol family 1
+[    0.533837] PCI: CLS 0 bytes, default 64
+[    0.534215] tegra-fuse tegra-fuse: Fuse driver initialized succesfully
+[    0.535390] Unpacking initramfs...
+[    0.662353] Freeing initrd memory: 1616K (ffffffc002a80000 - ffffffc002c14000)
+[    0.669526] host1x host1x: initialized
+[    0.671034] GPS: Init: Broadcom GPS HostWake Geofence Driver v1.01
+[    0.671390] GPS: misc register, name gps_geofence_wake, irq 278, host req pin num 69
+[    0.671570] Denver: backdoor interface is NOT available.
+[    0.681021] audit: initializing netlink socket (disabled)
+[    0.681083] type=2000 audit(0.673:1): initialized
+[    0.691897] Registering sdcardfs 0.1
+[    0.692226] fuse init (API version 7.22)
+[    0.693032] SELinux:  Registering netfilter hooks
+[    0.773030] io scheduler noop registered (default)
+[    0.774838] tsec tsec: initialized
+[    0.776348] isp isp.0: initialized
+[    0.777243] isp isp.1: initialized
+[    0.779077] falcon vic03.0: initialized
+[    0.780128] falcon msenc: initialized
+[    0.780949] tegradc tegradc.0: DSI: HS clock rate is 371500
+[    0.800528] tegradc tegradc.0: nominal-pclk:247600000 parent:371500000 div:1.5 pclk:247666666 245124000~269884000
+[    0.841154] tegradc tegradc.0: probed
+[    0.845570] tegradc tegradc.0: ADF initialized
+[    0.846039] tegradc tegradc.0: nominal-pclk:247600000 parent:371500000 div:1.5 pclk:247666666 245124000~269884000
+[    0.849776] tegra-apbdma tegra-apbdma: Tegra20 APB DMA driver register 32 channels
+[    0.850496] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[    0.851602] serial-tegra.0: ttyTHS0 at MMIO 0x70006000 (irq = 68) is a SERIAL_TEGRA
+[    0.851884] serial-tegra.1: ttyTHS1 at MMIO 0x70006040 (irq = 69) is a SERIAL_TEGRA
+[    0.852097] serial-tegra.2: ttyTHS2 at MMIO 0x70006200 (irq = 78) is a SERIAL_TEGRA
+[    0.852308] serial-tegra.3: ttyTHS3 at MMIO 0x70006300 (irq = 122) is a SERIAL_TEGRA
+[    0.854506] [USB] usb_diag_open: name: diag
+[    0.854963] [USB] usb_diag_open: name: diag_mdm
+[    0.855140] [USB] usb_diag_open: name: diag_mdm2
+[    0.855429] [USB] usb_diag_open: name: diag_qsc
+[    0.856384] diagchar initialized now
+[    0.886460] loop: module loaded
+[    0.886913] zram: Created 1 device(s)
+[    0.895040] nct1008_nct72 0-004c: nct1008_probe: initialized
+[    0.895744] thermal thermal_zone0: Registering thermal zone thermal_zone0 for type Tboard_tegra
+[    0.897013] thermal thermal_zone1: Registering thermal zone thermal_zone1 for type Tdiode_tegra
+[    0.898524] nct1008_nct72 0-004d: Error [-517] in getting the regulator handle for vdd
+[    0.898558] nct1008_nct72: probe of 0-004d failed with error -5
+[    0.899042] bluedroid_pm_probe: regulator avdd not available
+[    0.899073] bluedroid_pm_probe: regulator dvdd not available
+[    0.899363] tegra_profiler: Branch: Dev
+[    0.899380] tegra_profiler: Version: 1.81
+[    0.899407] tegra_profiler: Samples version: 30
+[    0.899421] tegra_profiler: IO version: 13
+[    0.899442] armv8_pmu: imp: 0x4e, idcode: 0x0
+[    0.899460] armv8_pmu: arch: AA64 PmuV3 NVIDIA (Denver), type: 5, ver: 1
+[    0.899477] tegra_profiler: PMU: amount of events: 6
+[    0.899526] tegra_profiler: PMU event: cpu-cycles
+[    0.899540] tegra_profiler: PMU event: instructions
+[    0.899553] tegra_profiler: PMU event: branch_misses
+[    0.899567] tegra_profiler: PMU event: l1_d_read
+[    0.899581] tegra_profiler: PMU event: l1_d_write
+[    0.899593] tegra_profiler: PMU event: l1_i
+[    0.899607] tegra_profiler: PL310 not found
+[    0.899698] tegra_profiler: power_clk: init
+[    0.899805] tegra_profiler: auth: init
+[    0.900098] GPS: mt3332_gps_mod_init: platform_driver_register ret = 0
+[    0.900681] bcm2079x-i2c 0-0077: bcm2079x_probe, pro bcm2079x driver flags = 0
+[    0.900794] bcm2079x-i2c 0-0077: bcm2079x_probe, saving address 0x77
+[    0.900816] bcm2079x-i2c 0-0077: requesting IRQ 352 with IRQF_NO_SUSPEND
+[    0.900899] bcm2079x-i2c 0-0077: bcm2079x_probe, probing bcm2079x driver exited successfully
+[    0.904903] tun: Universal TUN/TAP device driver, 1.6
+[    0.904926] tun: (C) 1999-2004 Max Krasnyansky <maxk@qualcomm.com>
+[    0.905060] PPP generic driver version 2.4.2
+[    0.905225] PPP BSD Compression module registered
+[    0.905241] PPP Deflate Compression module registered
+[    0.905321] PPP MPPE Compression module registered
+[    0.905338] NET: Registered protocol family 24
+[    0.905391] usbcore: registered new interface driver asix
+[    0.905433] usbcore: registered new interface driver ax88179_178a
+[    0.905479] usbcore: registered new interface driver cdc_ether
+[    0.905520] usbcore: registered new interface driver smsc95xx
+[    0.905562] usbcore: registered new interface driver cdc_subset
+[    0.905619] usbcore: registered new interface driver cdc_ncm
+[    0.905725] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+[    0.905901] tegra USB phy - inst[1] platform info:
+[    0.905915] port_otg: no
+[    0.905929] has_hostpc: yes
+[    0.905944] phy_interface: USB_PHY_INTF_UTMI
+[    0.905957] op_mode: TEGRA_USB_OPMODE_HOST
+[    0.905971] qc2_voltage: 0
+[    0.905985] vbus_gpio: -1
+[    0.905998] hot_plug: disabled
+[    0.906011] remote_wakeup: enabled
+[    0.907849] [USB] utmi_phy_power_on UTMIP_XCVR_CFG0:6002a0c xcvr_use_fuses:1 utmi_xcvr_setup:c
+[    0.907974] tegra-ehci tegra-ehci.1: Tegra EHCI Host Controller
+[    0.908018] tegra-ehci tegra-ehci.1: new USB bus registered, assigned bus number 1
+[    0.908271] tegra-ehci tegra-ehci.1: irq 53, io mem 0x7d004000
+[    0.917010] tegra-ehci tegra-ehci.1: USB 2.0 started, EHCI 1.10
+[    0.917126] usb usb1: New USB device found, idVendor=1d6b, idProduct=0002
+[    0.917150] usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+[    0.917170] usb usb1: Product: Tegra EHCI Host Controller
+[    0.917189] usb usb1: Manufacturer: Linux 3.10.103-gb7c30cdef95 ehci_hcd
+[    0.917208] usb usb1: SerialNumber: tegra-ehci.1
+[    0.917622] hub 1-0:1.0: USB hub found
+[    0.917656] hub 1-0:1.0: 1 port detected
+[    0.918104] tegra USB phy - inst[2] platform info:
+[    0.918124] port_otg: no
+[    0.918138] has_hostpc: yes
+[    0.918151] phy_interface: USB_PHY_INTF_UTMI
+[    0.918166] op_mode: TEGRA_USB_OPMODE_HOST
+[    0.918179] qc2_voltage: 0
+[    0.918192] vbus_gpio: -1
+[    0.918205] hot_plug: disabled
+[    0.918219] remote_wakeup: enabled
+[    0.919932] [USB] utmi_phy_power_on UTMIP_XCVR_CFG0:6002a0c xcvr_use_fuses:1 utmi_xcvr_setup:c
+[    0.920047] tegra-ehci tegra-ehci.2: Tegra EHCI Host Controller
+[    0.920086] tegra-ehci tegra-ehci.2: new USB bus registered, assigned bus number 2
+[    0.920305] tegra-ehci tegra-ehci.2: irq 129, io mem 0x7d008000
+[    0.930334] tegra-ehci tegra-ehci.2: USB 2.0 started, EHCI 1.10
+[    0.930437] usb usb2: New USB device found, idVendor=1d6b, idProduct=0002
+[    0.930459] usb usb2: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+[    0.930479] usb usb2: Product: Tegra EHCI Host Controller
+[    0.930498] usb usb2: Manufacturer: Linux 3.10.103-gb7c30cdef95 ehci_hcd
+[    0.930517] usb usb2: SerialNumber: tegra-ehci.2
+[    0.930890] hub 2-0:1.0: USB hub found
+[    0.930923] hub 2-0:1.0: 1 port detected
+[    0.931279] ehci-pci: EHCI PCI platform driver
+[    0.931635] usbcore: registered new interface driver cdc_acm
+[    0.931653] cdc_acm: USB Abstract Control Model driver for USB modems and ISDN adapters
+[    0.931702] usbcore: registered new interface driver cdc_wdm
+[    0.931828] usbcore: registered new interface driver usb-storage
+[    0.931970] usbcore: registered new interface driver usbserial
+[    0.932708] usbcore: registered new interface driver bb_usb_chr
+[    0.932753] usbcore: registered new interface driver option
+[    0.932796] usbserial: USB Serial support registered for GSM modem (1-port)
+[    0.933098] usbcore: registered new interface driver pl2303
+[    0.933139] usbserial: USB Serial support registered for pl2303
+[    0.933194] usbcore: registered new interface driver modem_boot_hsic
+[    0.933239] usbcore: registered new interface driver nvshieldled
+[    0.933390] Nvidia Tegra High-Speed USB Device Controller driver (Apr 30, 2012)
+[    0.933562] tegra USB phy - inst[0] platform info:
+[    0.933577] port_otg: yes
+[    0.933591] has_hostpc: yes
+[    0.933644] phy_interface: USB_PHY_INTF_UTMI
+[    0.933671] op_mode: TEGRA_USB_OPMODE_DEVICE
+[    0.933685] qc2_voltage: 0
+[    0.933698] vbus_pmu_irq: 0
+[    0.933711] vbus_gpio: -1
+[    0.933724] charging: enabled
+[    0.933775] remote_wakeup: disabled
+[    0.936057] [USB] utmi_phy_power_on UTMIP_XCVR_CFG0:6002a39 xcvr_use_fuses:1 utmi_xcvr_setup:9
+[    0.937452] ------------[ cut here ]------------
+[    0.937490] WARNING: at /usr/local/google/buildbot/src/partner-android/n-dev-tegra-flounder-3.10-nyc-mr1/private/flounder/drivers/base/core.c:579 device_create_file+0x78/0xac()
+[    0.937508] Attribute set_current: read permission without 'show'
+[    0.937532] CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W    3.10.103-gb7c30cdef95 #1
+[    0.937550] Call trace:
+[    0.937578] [<ffffffc000089ff4>] dump_backtrace+0x0/0x16c
+[    0.937615] [<ffffffc00008a174>] show_stack+0x14/0x1c
+[    0.937638] [<ffffffc0009cde78>] dump_stack+0x20/0x28
+[    0.937662] [<ffffffc0000acd8c>] warn_slowpath_common+0x74/0x9c
+[    0.937708] [<ffffffc0000ace30>] warn_slowpath_fmt+0x50/0x58
+[    0.937763] [<ffffffc000461f68>] device_create_file+0x78/0xac
+[    0.937788] [<ffffffc000dd9da8>] tegra_udc_probe+0x564/0x84c
+[    0.937811] [<ffffffc000467b24>] platform_drv_probe+0x1c/0x24
+[    0.937832] [<ffffffc00046603c>] driver_probe_device+0xb0/0x3d8
+[    0.937863] [<ffffffc000466454>] __driver_attach+0x9c/0xa0
+[    0.937883] [<ffffffc0004642bc>] bus_for_each_dev+0x58/0x98
+[    0.937902] [<ffffffc000465f2c>] driver_attach+0x20/0x28
+[    0.937921] [<ffffffc000464de4>] bus_add_driver+0x1cc/0x284
+[    0.937941] [<ffffffc000466f94>] driver_register+0x6c/0x174
+[    0.937962] [<ffffffc0004685d0>] platform_driver_register+0x5c/0x64
+[    0.937982] [<ffffffc000dd4c70>] platform_driver_probe+0x24/0x9c
+[    0.938004] [<ffffffc000dd977c>] udc_init+0x38/0x40
+[    0.938055] [<ffffffc000da4874>] do_one_initcall+0xb4/0x160
+[    0.938075] [<ffffffc000da4a68>] kernel_init_freeable+0x148/0x1e4
+[    0.938097] [<ffffffc0009c3eb8>] kernel_init+0x18/0x140
+[    0.938113] ---[ end trace 1b75b31a2719ed1e ]---
+[    0.939394] usbcore: registered new interface driver xpad
+[    0.939451] usbcore: registered new interface driver usb_acecad
+[    0.939498] usbcore: registered new interface driver aiptek
+[    0.939542] usbcore: registered new interface driver gtco
+[    0.939586] usbcore: registered new interface driver hanwang
+[    0.939631] usbcore: registered new interface driver kbtab
+[    0.939692] usbcore: registered new interface driver wacom
+[    0.939784] synaptics_rmi4_spi_probe
+[    0.939849] parse_dt
+[    0.939876] of_get_named_gpio_flags exited with status 82
+[    0.939900] of_get_named_gpio_flags exited with status 190
+[    0.939928]  parse_config
+[    0.940347]  synaptics_rmi4_probe
+[    1.083854] input: synaptics_dsx as /devices/platform/spi-tegra114.2/spi_master/spi2/spi2.0/input/input0
+[    1.085675] rmi4_fw_update_module_init
+[    1.085963] synaptics_dsx_spi spi2.0:  synaptics_rmi4_fwu_init
+[    1.090334] otg state changed: SUSPEND --> PERIPHERAL
+[    1.090453] [USB] utmi_phy_power_on UTMIP_XCVR_CFG0:6002a39 xcvr_use_fuses:1 utmi_xcvr_setup:9
+[    1.094653] synaptics_fw_updater
+[    1.094679] synaptics_dsx_spi spi2.0:  fwu_start_reflash
+[    1.094695] fwu_start_reflash: Start of reflash process
+[    1.147014] [SAR0] cy8c_check_sensor
+[    1.148101] [SAR0] CY8C_SAR_V1f
+[    1.171787] [SAR] active=0
+[    1.210328] [SAR1] cy8c_check_sensor
+[    1.210547] tegra-i2c tegra12-i2c.1: no acknowledge from address 0x5d
+[    1.220828] tegra-i2c tegra12-i2c.1: no acknowledge from address 0x5d
+[    1.231156] tegra-i2c tegra12-i2c.1: no acknowledge from address 0x5d
+[    1.241480] tegra-i2c tegra12-i2c.1: no acknowledge from address 0x5d
+[    1.251836] tegra-i2c tegra12-i2c.1: no acknowledge from address 0x5d
+[    1.261980] [SAR1] Retrieve chip ID under BL
+[    1.262182] tegra-i2c tegra12-i2c.1: no acknowledge from address 0x61
+[    1.272505] tegra-i2c tegra12-i2c.1: no acknowledge from address 0x61
+[    1.282807] tegra-i2c tegra12-i2c.1: no acknowledge from address 0x61
+[    1.293087] tegra-i2c tegra12-i2c.1: no acknowledge from address 0x61
+[    1.303370] tegra-i2c tegra12-i2c.1: no acknowledge from address 0x61
+[    1.313472] [SAR1][ERR] Chip not found
+[    1.313548] [SAR] active=0
+[    1.313590] CYPRESS_SAR: probe of 1-005d failed with error -1
+[    1.318507] palmas-rtc rtc.12: rtc core: registered rtc.12 as rtc0
+[    1.320119] i2c /dev entries driver
+[    1.321050] [S_HUB][CW_MCU] CWMCU_i2c_probe++: Report pending META when FW exceptions
+[    1.321245] of_get_named_gpio_flags exited with status 129
+[    1.321261] of_get_named_gpio_flags exited with status 140
+[    1.321317] of_get_named_gpio_flags exited with status 138
+[    1.321331] of_get_named_gpio_flags exited with status 164
+[    1.321345] [S_HUB][CW_MCU] mcu_parse_dt: acceleration axes = 6
+[    1.321363] [S_HUB][CW_MCU] mcu_parse_dt: Compass axes = 7
+[    1.321379] [S_HUB][CW_MCU] mcu_parse_dt: gyro axes = 6
+[    1.323144] input: CwMcuSensor as /devices/virtual/input/input1
+[    1.323261] [S_HUB][CW_MCU] CWMCU_i2c_probe success!
+[    1.323332] virtual_init
+[    1.323547] nvavp 60001000.nvavp: coherent DMA mask 0xffffffff is smaller than system GFP_DMA mask 0xffffffffffffffff
+[    1.323607] nvavp 60001000.nvavp: coherent DMA mask 0xffffffff is smaller than system GFP_DMA mask 0xffffffffffffffff
+[    1.323720] nvavp 60001000.nvavp: cannot allocate IOVA memory
+[    1.323742] nvavp 60001000.nvavp: allocated IOVA at ffffffffffffffff for AVP os
+[    1.323839] nvavp 60001000.nvavp: cannot get vde clock
+[    1.323868] nvavp: probe of 60001000.nvavp failed with error -2
+[    1.325808] nvavp nvavp: allocated IOVA at 8ff00000 for AVP os
+[    1.326506] i2c-core: driver [max77387] using legacy suspend method
+[    1.326524] i2c-core: driver [max77387] using legacy resume method
+[    1.326588] i2c-core: driver [as364x] using legacy suspend method
+[    1.326602] i2c-core: driver [as364x] using legacy resume method
+[    1.326755] mt9m114 sensor driver loading
+[    1.326883] [IMX219] sensor driver loading
+[    1.326987] [IMX219]: probing sensor.
+[    1.327393] ov9760 sensor driver loading
+[    1.327445] ov9760: probing sensor.
+[    1.327749] drv201: probing focuser.
+[    1.327867] drv201 2-000e: drv201_regulator_get avdd_cam1_cam ERR: -517
+[    1.327904] drv201 2-000e: drv201_regulator_get pwrdet_sdmmc3 ERR: -517
+[    1.328103] usbcore: registered new interface driver uvcvideo
+[    1.328118] USB Video Class driver (1.1.1)
+[    1.328131] gspca_main: v2.14.0 registered
+[    1.328497] cm3218 0-0048: Failed to get supply 'vdd': -517
+[    1.328521] cm3218 0-0048: idname:cm32181 func:cm3218_probe line:626 regulator not found.
+[    1.328521] Assuming regulator is not needed
+[    1.328547] cm3218 0-0048: idname:cm32181 func:cm3218_probe line:665 probe success
+[    1.330865] ashmem: initialized
+[    1.342235] thermal thermal_zone2: Registering thermal zone thermal_zone2 for type battery
+[    1.345294] device-mapper: uevent: version 1.0.3
+[    1.345584] device-mapper: ioctl: 4.24.0-ioctl (2013-01-15) initialised: dm-devel@redhat.com
+[    1.347386] sdhci: Secure Digital Host Controller Interface driver
+[    1.347405] sdhci: Copyright(c) Pierre Ossman
+[    1.347420] sdhci-pltfm: SDHCI platform and OF driver helper
+[    1.347771] sdhci-tegra sdhci-tegra.3: vddio_sd_slot regulator not found: -517. Assuming vddio_sd_slot is not required.
+[    1.347997] sdhci-tegra sdhci-tegra.3: Speedo value 2204
+[    1.348056] sdhci-tegra sdhci-tegra.3: Tuning constraints: nom_mv 1150, boot_mv 1150, min_or_mv 1100
+[    1.350202] mmc0: no vqmmc regulator found
+[    1.350236] mmc0: no vmmc regulator found
+[    1.350253] mmc0: Invalid maximum block size, assuming 512 bytes
+[    1.377024] mmc0: SDHCI controller on sdhci-tegra.3 [sdhci-tegra.3] using ADMA
+[    1.377502] sdhci-tegra sdhci-tegra.0: vddio_sd_slot regulator not found: -517. Assuming vddio_sd_slot is not required.
+[    1.377777] sdhci-tegra sdhci-tegra.0: Speedo value 2204
+[    1.377799] sdhci-tegra sdhci-tegra.0: Tuning constraints: nom_mv 1150, boot_mv 1150, min_or_mv 1100
+[    1.383255] mmc1: no vqmmc regulator found
+[    1.383292] mmc1: no vmmc regulator found
+[    1.383309] mmc1: Invalid maximum block size, assuming 512 bytes
+[    1.413658] mmc1: SDHCI controller on sdhci-tegra.0 [sdhci-tegra.0] using ADMA
+[    1.417521] tegra-se tegra12-se: tegra_se_probe: complete
+[    1.420096] usbcore: registered new interface driver usbhid
+[    1.420123] usbhid: USB HID core driver
+[    1.428526] console [ttyFIQ0] enabled
+[    1.428699] Registered fiq debugger ttyFIQ0
+[    1.429058] tegra_throttle : init passed
+[    1.429226] Tegra cpuquiet initialized: disabled
+[    1.429297] cpu-tegra: init EDP limit: 2193 MHz
+[    1.431205] thermal thermal_zone3: Registering thermal zone thermal_zone3 for type CPU-therm
+[    1.431707] thermal thermal_zone4: Registering thermal zone thermal_zone4 for type GPU-therm
+[    1.431975] thermal thermal_zone5: Registering thermal zone thermal_zone5 for type MEM-therm
+[    1.432254] thermal thermal_zone6: Registering thermal zone thermal_zone6 for type PLL-therm
+[    1.432273] soctherm: Suspend feature CANNOT be enabled when any OC alarm is enabled
+[    1.433791] usbcore: registered new interface driver snd-usb-audio
+[    1.437124] [AUD] snd_soc_rt5677: tfa9895_init
+[    1.437196] [AUD] snd_soc_rt5677: tfa9895_probe: tfa9895 power pin is enabled
+[    1.444633] mmc0: BKOPS_EN bit is not set
+[    1.450949] sdhci-tegra sdhci-tegra.3: Found T2T coeffs data
+[    1.450981] sdhci-tegra sdhci-tegra.3: 200MHz tap hole coeffs found
+[    1.726521] **********Auto tuning windows*************
+[    1.726541] WIN_ATTR legend: 0-BOUN_ST, 1-BOUN_END, 2-HOLE
+[    1.726561] win[0]: 0(0) - 50(1)
+[    1.726578] win[1]: 55(0) - 126(1)
+[    1.726595] win[2]: 131(0) - 203(1)
+[    1.726611] win[3]: 209(0) - 255(1)
+[    1.726623] ***************************************
+[    1.726645] ********tuning windows after inserting holes*****
+[    1.726659] WIN_ATTR legend: 0-BOUN_ST, 1-BOUN_END, 2-HOLE
+[    1.726677] win[0]:-21(0) - 38(2)
+[    1.726693] win[1]:40(2) - 50(1)
+[    1.726709] win[2]:55(0) - 114(2)
+[    1.726724] win[3]:116(2) - 126(1)
+[    1.726740] win[4]:131(0) - 190(2)
+[    1.726771] win[5]:192(2) - 203(1)
+[    1.726805] win[6]:209(0) - 255(1)
+[    1.726817] ***********************************************
+[    1.726832] **********Tuning values*********
+[    1.726845] **estimated values**
+[    1.726861] T2T_Vmax 58, T2T_Vmin 82, 1'st_hole_Vmax 46, UI_Vmax 86
+[    1.726874] **Calculated values**
+[    1.726889] T2T_Vmax 65, 1'st_hole_Vmax 39, UI_Vmax 76
+[    1.726904] T2T_Vmin 65, 1'st_hole_Vmin 39, UI_Vmin 76
+[    1.726916] ***********************************
+[    1.726962] ***********final tuning windows**********
+[    1.726978] win[0]: -6 - 31
+[    1.726993] win[1]: 48 - 35
+[    1.727008] win[2]: 70 - 101
+[    1.727022] win[3]: 130 - 111
+[    1.727037] win[4]: 146 - 172
+[    1.727051] win[5]: 211 - 188
+[    1.727065] win[6]: 224 - 240
+[    1.727076] ********************************
+[    1.727092] best tap win - (-6-31), best tap value 13
+[    1.727114] sdhci-tegra sdhci-tegra.3: sdhci_tegra_verify_best_tap: tuning freq 200000000hz, best tap 13
+[    1.727235] [AUD] snd_soc_rt5677: tfa9895_probe:i2c read successfully
+[    1.728608] mmc0: new HS200 MMC card at address 0001
+[    1.728919] mmcblk mmc0:0001: Card claimed for testing.
+[    1.729613] mmcblk0: mmc0:0001 BWBC3R 29.1 GiB 
+[    1.729948] i2c-core: driver [tfa9895] using legacy suspend method
+[    1.729967] i2c-core: driver [tfa9895] using legacy resume method
+[    1.729993] [AUD] snd_soc_rt5677: tfa9895l_init
+[    1.730225] mmcblk0rpmb: mmc0:0001 BWBC3R partition 3 4.00 MiB
+[    1.731250] [AUD] snd_soc_rt5677: tfa9895l_probe:i2c read successfully
+[    1.734289] Primary GPT is invalid, using alternate GPT.
+[    1.734773]  mmcblk0: p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12 p13 p14 p15 p16 p17 p18 p19 p20 p21 p22 p23 p24 p25 p26 p27 p28 p29 p30 p31 p32 p33
+[    1.735717] i2c-core: driver [tfa9895l] using legacy suspend method
+[    1.735739] i2c-core: driver [tfa9895l] using legacy resume method
+[    1.735801] rt5506_init
+[    1.735893] rt5506_probe
+[    1.735909] rt5506_parse_pfdata: dt is used
+[    1.735936] of_get_named_gpio_flags exited with status 185
+[    1.735950] of_get_named_gpio_flags exited with status 162
+[    1.735959] rt5506_parse_pfdata: gpio_rt5506_enable 185
+[    1.735973] rt5506_parse_pfdata: rt5506_power_enable 162
+[    1.735990] rt5506_power_enable=1
+[    1.742345] htc_battery_bq2419x htc_battery_bq2419x.9: Setting charging current 0
+[    1.746064] rt5506_probe: rt5506-enable=1
+[    1.747086] rt5506_probe:current gpio 185 value 1
+[    1.762760] rt5506_i2c_read_addr:i2c_read addr 0x1 value = 0xc7
+[    1.762779] rt5506_probe: rt5506 is connected
+[    1.762795] rt5506_probe: rt5506-enable=0
+[    1.762907] rt5506_probe: rt5506 is misc_registered
+[    1.763950] [HS_MGR] (headset_notifier_register) Register HS_INSERT notifier
+[    1.763964] [HS_MGR] (headset_notifier_update) HS_MGR driver is not ready
+[    1.764501] tegra_offload_platform probe successfull.
+[    1.768316] succefully registered offload opstegra30_avp_audio_platform_probe successful.
+[    1.775074] tegra_rt5677 power_on
+[    1.775114] _gpio_request: gpio-80 (rt5677-ldo-enable) status -16
+[    1.775126] Fail gpio_request gpio_ldo1_en, -16
+[    1.784238] Codec driver version 0.0.2 alsa 1.0.25
+[    1.816176] rt5677 1-002d: enter realtek_ce_init_hwdep
+[    1.818996] [HS_MGR] (headset_notifier_register) Register HS_INSERT notifier
+[    1.819010] [HS_MGR] (headset_notifier_update) HS_MGR driver is not ready
+[    1.841569] tegra-snd-rt5677 tegra-snd-rt5677.0:  rt5677-aif1 <-> tegra30-i2s.1 mapping ok
+[    1.841969] tegra-snd-rt5677 tegra-snd-rt5677.0:  dit-hifi <-> tegra30-i2s.2 mapping ok
+[    1.842418] tegra-snd-rt5677 tegra-snd-rt5677.0:  dit-hifi <-> tegra30-i2s.3 mapping ok
+[    1.842769] tegra-snd-rt5677 tegra-snd-rt5677.0:  dit-hifi <-> tegra30-i2s.2 mapping ok
+[    1.843229] tegra-snd-rt5677 tegra-snd-rt5677.0:  snd-soc-dummy-dai <-> tegra-offload-pcm mapping ok
+[    1.843428] compress asoc: snd-soc-dummy-dai <-> tegra-offload-compr mapping ok
+[    1.843548] tegra-snd-rt5677 tegra-snd-rt5677.0:  rt5677-aif1 <-> tegra30-i2s.1 mapping ok
+[    1.843735] tegra-snd-rt5677 tegra-snd-rt5677.0:  dit-hifi <-> tegra30-i2s.2 mapping ok
+[    1.844127] tegra-snd-rt5677 tegra-snd-rt5677.0:  snd-soc-dummy-dai <-> tegra-offload-pcm mapping ok
+[    1.844432] tegra-snd-rt5677 tegra-snd-rt5677.0:  snd-soc-dummy-dai <-> tegra-fast-pcm mapping ok
+[    1.847992] tegra_rt5677_driver_probe to close MCLK
+[    1.848261] GACT probability NOT on
+[    1.848284] Mirror/redirect action on
+[    1.848301] u32 classifier
+[    1.848315]     Actions configured
+[    1.848331] Netfilter messages via NETLINK v0.30.
+[    1.848444] nf_conntrack version 0.5.0 (16384 buckets, 65536 max)
+[    1.849697] ctnetlink v0.93: registering with nfnetlink.
+[    1.849844] NF_TPROXY: Transparent proxy support initialized, version 4.1.0
+[    1.849858] NF_TPROXY: Copyright (c) 2006-2007 BalaBit IT Ltd.
+[    1.850228] xt_time: kernel timezone is -0000
+[    1.851483] ip_tables: (C) 2000-2006 Netfilter Core Team
+[    1.851778] arp_tables: (C) 2002 David S. Miller
+[    1.852036] TCP: cubic registered
+[    1.852049] Initializing XFRM netlink socket
+[    1.852468] NET: Registered protocol family 10
+[    1.853565] mip6: Mobile IPv6
+[    1.853663] ip6_tables: (C) 2000-2006 Netfilter Core Team
+[    1.854202] sit: IPv6 over IPv4 tunneling driver
+[    1.855303] NET: Registered protocol family 17
+[    1.855348] NET: Registered protocol family 15
+[    1.855493] NET: Registered protocol family 37
+[    1.856752] Registering SWP/SWPB emulation handler
+[    1.892116] thermal thermal_zone7: Registering thermal zone thermal_zone7 for type therm_est
+[    1.892577] Denver: hardwood is NOT supported.
+[    1.893586] registered taskstats version 1
+[    1.897508] vi vi.0: vi_probe: ++
+[    1.899195] vi vi.0: initialized
+[    1.899456] vi vi.1: vi_probe: ++
+[    1.901251] vi vi.1: initialized
+[    1.901675] en-lcd-bl: incomplete constraints, leaving on
+[    1.901694] vpp-fuse: incomplete constraints, leaving on
+[    1.901708] ldoen: incomplete constraints, leaving on
+[    1.901721] vdd-lcd: incomplete constraints, leaving on
+[    1.901734] avdd-lcd: incomplete constraints, leaving on
+[    1.901748] usb0-vbus: incomplete constraints, leaving on
+[    1.943855] htc_battery_bq2419x htc_battery_bq2419x.9: Charging enable with reason 0x8 (origin:0x0)
+[    1.943883] bq2419x 0-006b: charger configure, enable=1 is_otg=0
+[    1.944374] data-charger: incomplete constraints, leaving on
+[    1.945425] REGEN1: incomplete constraints, leaving on
+[    1.945443] vddio-hv: incomplete constraints, leaving on
+[    1.946205] vdd-hdmi: incomplete constraints, leaving on
+[    1.946229] vdd-gpu: incomplete constraints, leaving on
+[    1.946245] regulator-dummy: incomplete constraints, leaving on
+[    1.947734] [HS_MGR] (htc_headset_mgr_probe) ++++++++++++++++++++
+[    1.948560] input: h2w headset as /devices/virtual/input/input2
+[    1.949020] [HS_MGR] (hs_notify_driver_ready) HS_MGR ready
+[    1.949198] [HS_MGR] (htc_headset_mgr_probe) --------------------
+[    1.949346] [HS_PMIC] (htc_headset_pmic_probe) ++++++++++++++++++++
+[    1.951490] [HS_BOARD] (headset_get_debug) AUD_DEBUG_EN=0
+[    1.951510] [HS_PMIC] (debug_irq_handler) HEADSET_DEBUG_EN off
+[    1.951597] Warning: enabling a non-LP0 wake source 85
+[    1.951621] [HS_PMIC] (htc_headset_pmic_probe) htc_headset_pmic_probe: iio_channel_get(hs_channel)
+[    1.951621] 
+[    1.951640] [HS_MGR] (headset_notifier_register) Register HPIN_GPIO notifier
+[    1.951650] [HS_MGR] (headset_notifier_register) Register REMOTE_ADC notifier
+[    1.951660] [HS_MGR] (headset_notifier_register) Register REMOTE_KEYCODE notifier
+[    1.951669] [HS_MGR] (headset_notifier_register) Register RPC_KEY notifier
+[    1.951678] [HS_MGR] (headset_notifier_register) Register MIC_STATUS notifier
+[    1.951687] [HS_MGR] (headset_notifier_register) Register KEY_INT_ENABLE notifier
+[    1.951696] [HS_MGR] (hs_notify_driver_ready) HS_PMIC ready
+[    1.951865] [HS_PMIC] (htc_headset_pmic_probe) --------------------
+[    1.952130] file system registered
+[    1.953413] android_usb gadget: Mass Storage Function, version: 2009/09/11
+[    1.953434] android_usb gadget: Number of LUNs=1
+[    1.953452]  lun0: LUN: removable file: (no medium)
+[    1.953841] serial_function_init: init string: hsic:modem,tty,tty,tty:serial
+[    1.953865] gserial_init_port, port:0, transport:HSIC, type:2
+[    1.953883] gserial_init_port, port:1, transport:TTY, type:0
+[    1.953899] gserial_init_port, port:2, transport:TTY, type:0
+[    1.953915] gserial_init_port, port:3, transport:TTY, type:1
+[    1.956270] android_maxim14675_set_voltage: max_voltage (vbus) = 5000
+[    1.956306] android_usb gadget: android_usb ready
+[    1.956322] tegra-udc: bind to driver android_usb
+[    1.956492] of_get_named_gpio_flags exited with status 128
+[    1.956512] of_get_named_gpio_flags exited with status 133
+[    1.956529] of_get_named_gpio_flags exited with status 170
+[    1.957084] input: gpio-keys.6 as /devices/platform/gpio-keys.6/input/input3
+[    1.958341] palmas-rtc rtc.12: setting system clock to 2017-09-13 00:31:33 UTC (1505262693)
+[    1.958571] power-supply-extcon power-supply-extcon: Extcon name tegra-udc
+[    1.958991] power-supply-extcon power-supply-extcon: Cable Y-cable registration failed: -22
+[    1.959013] power-supply-extcon power-supply-extcon: USB charger cable detected
+[    1.959102] power-supply-extcon power-supply-extcon: psy_extcon_probe() get success
+[    1.959234] last reset is due to software reset
+[    1.959234] 
+[    1.964254] Disabling clocks left on by bootloader:
+[    1.964271]    audio_2x
+[    1.964293]    audio
+[    1.964308]    audio4
+[    1.964323]    audio3
+[    1.964336]    audio2
+[    1.964348]    audio1
+[    1.964361]    audio0
+[    1.964467]    clk72mhz
+[    1.964484]    entropy
+[    1.964501]    dsialp
+[    1.964533]    dsi2-fixed
+[    1.964546]    dsi1-fixed
+[    1.964571]    uartd
+[    1.964591]    mipi-cal-fixed
+[    1.964604]    mipi-cal
+[    1.964665]    trace
+[    1.964687]    sdmmc4_ddr
+[    1.964757]    pll_x_out0
+[    1.964770]    pll_u_12M
+[    1.964800]    pll_m_out1
+[    1.965694] tegra_dvfs: vdd_cpu connected to regulator
+[    1.965818] tegra_dvfs: vdd_core connected to regulator
+[    1.965882] tegra_dvfs: vdd_gpu connected to regulator
+[    1.968828] tegra_cl_dvfs tegra_cl_dvfs: DT data retrieved successfully
+[    1.969301] tegra_dvfs: registered vdd_cpu simon notifier
+[    1.970071] cpu_cold cooling device is registered
+[    1.970249] cpu_hot cooling device is registered
+[    1.970463] Tegra CPU DFLL is initialized with use_dfll = 1
+[    1.971087] CPU rate: 684 MHz
+[    2.047352] tegra dvfs: tegra sysfs cap interface is initialized
+[    2.047498] tegra dvfs: tegra sysfs gpu & emc interface is initialized
+[    2.047516] tegra dvfs: registered vdd_gpu simon notifier
+[    2.047851] tegra_actmon.emc: Completed initialization (0)
+[    2.048190] tegra_actmon.avp: Completed initialization (0)
+[    2.048417] tegra_mon.cpu_emc: Completed initialization (0)
+[    2.049442] dhd_module_init in
+[    2.049570] found wifi platform device bcm4329_wlan
+[    2.049778] Power-up adapter 'DHD generic adapter'
+[    2.049828] wifi_platform_set_power = 1
+[    2.049888] flounder_wifi_power: 1
+[    2.353694] wifi_platform_bus_enumerate device present 1
+[    2.412237] sdhci-tegra sdhci-tegra.0: Found T2T coeffs data
+[    2.412266] sdhci-tegra sdhci-tegra.0: 204MHz tap hole coeffs found
+[    2.694137] **********Auto tuning windows*************
+[    2.694158] WIN_ATTR legend: 0-BOUN_ST, 1-BOUN_END, 2-HOLE
+[    2.694178] win[0]: 0(0) - 67(1)
+[    2.694194] win[1]: 74(0) - 147(1)
+[    2.694209] win[2]: 154(0) - 227(1)
+[    2.694263] win[3]: 235(0) - 255(1)
+[    2.694275] ***************************************
+[    2.694297] ********tuning windows after inserting holes*****
+[    2.694311] WIN_ATTR legend: 0-BOUN_ST, 1-BOUN_END, 2-HOLE
+[    2.694328] win[0]:-6(0) - 30(2)
+[    2.694344] win[1]:32(2) - 67(1)
+[    2.694359] win[2]:74(0) - 110(2)
+[    2.694373] win[3]:112(2) - 147(1)
+[    2.694388] win[4]:154(0) - 190(2)
+[    2.694401] win[5]:192(2) - 227(1)
+[    2.694415] win[6]:235(0) - 255(1)
+[    2.694426] ***********************************************
+[    2.694441] **********Tuning values*********
+[    2.694453] **estimated values**
+[    2.694470] T2T_Vmax 60, T2T_Vmin 83, 1'st_hole_Vmax 32, UI_Vmax 81
+[    2.694484] **Calculated values**
+[    2.694497] T2T_Vmax 61, 1'st_hole_Vmax 31, UI_Vmax 80
+[    2.694511] T2T_Vmin 61, 1'st_hole_Vmin 31, UI_Vmin 80
+[    2.694523] ***********************************
+[    2.694541] ***********final tuning windows**********
+[    2.694556] win[0]: 10 - 22
+[    2.694570] win[1]: 41 - 51
+[    2.694583] win[2]: 90 - 97
+[    2.694595] win[3]: 126 - 131
+[    2.694609] win[4]: 170 - 171
+[    2.694622] win[5]: 212 - 211
+[    2.694634] win[6]: 251 - 239
+[    2.694646] ********************************
+[    2.694660] best tap win - (10-22), best tap value 16
+[    2.694683] sdhci-tegra sdhci-tegra.0: sdhci_tegra_verify_best_tap: tuning freq 204000000hz, best tap 16
+[    2.700666] mmc1: queuing unknown CIS tuple 0x91 (3 bytes)
+[    2.700731] mmc1: new ultra high speed SDR104 SDIO card at address 0001
+[    2.718889] SDIO Vendor ID:02d0 and SDIO Device ID: 4354
+[    2.719176] F1 signature read @0x18000000=0x17214354
+[    2.728839] F1 signature OK, socitype:0x1 chip:0x4354 rev:0x1 pkg:0x2
+[    2.730117] DHD: dongle ram size is set to 786432(orig 786432) at 0x180000
+[    2.730421] wifi_platform_get_mac_addr
+[    2.730628] CFG80211-ERROR) wl_setup_wiphy : Registering Vendor80211
+[    2.731114] wl_create_event_handler(): thread:wl_event_handler:7c started
+[    2.731147] CFG80211-ERROR) wl_event_handler : tsk Enter, tsk = 0xffffffc066e61aa8
+[    2.731563] dhd_attach(): thread:dhd_watchdog_thread:7d started
+[    2.731692] dhd_attach(): thread:dhd_dpc:7e started
+[    2.732023] dhd_attach(): thread:dhd_rxf:7f started
+[    2.732162] [SAR] active=0
+[    2.732180] dhd_sar_callback Not ready, Bus state 0 firmware state 0
+[    2.732218] dhd_deferred_work_init: work queue initialized 
+[    2.732705] Dongle Host Driver, version 1.201.31 (r)
+[    2.732705] Compiled in drivers/net/wireless/bcmdhd on Apr 17 2017 at 15:43:38
+[    2.733536] Register interface [wlan0]  MAC: b4:ce:f6:9d:4c:75
+[    2.733536] 
+[    2.733561] dhd_prot_ioctl : bus is down. we have nothing to do
+[    2.734923] wifi_platform_set_power = 0
+[    2.734944] flounder_wifi_power: 0
+[    2.837587] ALSA device list:
+[    2.837610]   #0: tegra-rt5677
+[    2.838297] Freeing unused kernel memory: 464K (ffffffc000da4000 - ffffffc000e18000)
+[    2.843006] init: init first stage started!
+[    2.856271] SELinux: 2048 avtab hash slots, 6320 rules.
+[    2.863041] SELinux: 2048 avtab hash slots, 6320 rules.
+[    2.863159] SELinux:  1 users, 2 roles, 663 types, 0 bools, 1 sens, 1024 cats
+[    2.863185] SELinux:  63 classes, 6320 rules
+[    2.866979] SELinux:  Completing initialization.
+[    2.866991] SELinux:  Setting up existing superblocks.
+[    2.867032] SELinux: initialized (dev sysfs, type sysfs), uses genfs_contexts
+[    2.867086] SELinux: initialized (dev rootfs, type rootfs), uses genfs_contexts
+[    2.867264] SELinux: initialized (dev bdev, type bdev), not configured for labeling
+[    2.867293] SELinux: initialized (dev proc, type proc), uses genfs_contexts
+[    2.867335] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+[    2.867377] SELinux: initialized (dev debugfs, type debugfs), uses genfs_contexts
+[    2.914394] SELinux: initialized (dev sockfs, type sockfs), uses task SIDs
+[    2.914441] SELinux: initialized (dev pipefs, type pipefs), uses task SIDs
+[    2.914467] SELinux: initialized (dev anon_inodefs, type anon_inodefs), not configured for labeling
+[    2.914523] SELinux: initialized (dev devpts, type devpts), uses transition SIDs
+[    2.914601] SELinux: initialized (dev configfs, type configfs), uses genfs_contexts
+[    2.914639] SELinux: initialized (dev selinuxfs, type selinuxfs), uses genfs_contexts
+[    2.914711] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+[    2.914954] SELinux: initialized (dev sysfs, type sysfs), uses genfs_contexts
+[    2.939509] type=1403 audit(1505262694.476:2): policy loaded auid=4294967295 ses=4294967295
+[    2.940413] type=1404 audit(1505262694.480:3): enforcing=1 old_enforcing=0 auid=4294967295 ses=4294967295
+[    2.964050] init: (Initializing SELinux enforcing took 0.12s.)
+[    2.975310] init: init second stage started!
+[    2.985539] init: property_set("ro.boot.hardware", "flounder") failed
+[    2.991569] init: Running restorecon...
+[    3.178272] init: waitpid failed: No child processes
+[    3.179447] init: (Loading properties from /default.prop took 0.00s.)
+[    3.187591] init: (Parsing /init.environ.rc took 0.00s.)
+[    3.189738] init: (Parsing /init.usb.rc took 0.00s.)
+[    3.195470] init: (Parsing init.flounder.usb.rc took 0.00s.)
+[    3.195602] init: could not import file 'init.flounder_svelte.rc' from '/init.flounder.rc': No such file or directory
+[    3.195653] init: (Parsing /init.flounder.rc took 0.01s.)
+[    3.199151] init: (Parsing /init.usb.configfs.rc took 0.00s.)
+[    3.199903] init: (Parsing /init.zygote64_32.rc took 0.00s.)
+[    3.199962] init: (Parsing /init.rc took 0.02s.)
+[    3.201610] init: Starting service 'ueventd'...
+[    3.203187] init: Waiting for /dev/.coldboot_done...
+[    3.209536] ueventd: ueventd started!
+[    3.391699] htc_battery_bq2419x htc_battery_bq2419x.9: Battery id adc value is 384
+[    3.899284] ueventd: Coldboot took 0.68s.
+[    3.904576] init: Waiting for /dev/.coldboot_done took 0.70s.
+[    3.904755] init: /dev/hw_random not found
+[    3.907200] keychord: using input dev h2w headset for fevent
+[    3.907251] keychord: using input dev gpio-keys.6 for fevent
+[    3.908652] SELinux: initialized (dev cgroup, type cgroup), uses genfs_contexts
+[    3.911988] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+[    3.919931] init: write_file: Unable to open '/proc/cpu/alignment': No such file or directory
+[    3.922790] SELinux: initialized (dev cgroup, type cgroup), uses genfs_contexts
+[    3.930994] SELinux: initialized (dev pstore, type pstore), uses genfs_contexts
+[    3.931405] init: write_file: Unable to open '/proc/sys/abi/swp': No such file or directory
+[    5.140589] init: Starting service 'watchdogd'...
+[    5.144236] init: property 'ro.product.manufacturer' doesn't exist while expanding '${ro.product.manufacturer}'
+[    5.144287] init: write: cannot expand '${ro.product.manufacturer}'
+[    5.144399] init: property 'ro.product.model' doesn't exist while expanding '${ro.product.model}'
+[    5.144431] init: write: cannot expand '${ro.product.model}'
+[    5.144853] init: property 'ro.product.manufacturer' doesn't exist while expanding '${ro.product.manufacturer}'
+[    5.144891] init: write: cannot expand '${ro.product.manufacturer}'
+[    5.147809] SELinux: initialized (dev functionfs, type functionfs), uses genfs_contexts
+[    5.148169] init: /dev/hw_random not found
+[    5.151131] watchdogd: started (interval 10, margin 20)!
+[    6.459941] fs_mgr: Enabling dm-verity for system (mode 2)
+[    6.460027] fs_mgr: loading verity table: '1 /dev/block/platform/sdhci-tegra.3/by-name/APP /dev/block/platform/sdhci-tegra.3/by-name/APP 4096 4096 668817 668817 sha256 cecfa06fac96bfa8f9edad8c62a9ffcfa3f62d9689c433958857250a5deb5dc0 aee087a5be3b982978c923f566a94613496b417f2af592639bc80d141e34dfe7 10 restart_on_corruption use_fec_from_device /dev/block/platform/sdhci-tegra.3/by-name/APP fec_start 674093 fec_blocks 674093 fec_roots 2 ignore_zero_blocks'
+[    6.488402] bio: create slab <bio-1> at 1
+[    6.506442] EXT4-fs (dm-0): mounted filesystem with ordered data mode. Opts: (null)
+[    6.506524] SELinux: initialized (dev dm-0, type ext4), uses xattr
+[    6.506713] fs_mgr: __mount(source=/dev/block/dm-0,target=/system,type=ext4)=0
+[    7.136430] fs_mgr: Enabling dm-verity for vendor (mode 2)
+[    7.136525] fs_mgr: loading verity table: '1 /dev/block/platform/sdhci-tegra.3/by-name/VNR /dev/block/platform/sdhci-tegra.3/by-name/VNR 4096 4096 64504 64504 sha256 911c50393b95e20f965f51e80a3645e3af7e7cb7cc00478ad6680355041d8805 aee087a5be3b982978c923f566a94613496b417f2af592639bc80d141e34dfe7 10 restart_on_corruption use_fec_from_device /dev/block/platform/sdhci-tegra.3/by-name/VNR fec_start 65021 fec_blocks 65021 fec_roots 2 ignore_zero_blocks'
+[    7.180517] EXT4-fs (dm-1): mounted filesystem with ordered data mode. Opts: (null)
+[    7.180600] SELinux: initialized (dev dm-1, type ext4), uses xattr
+[    7.180779] fs_mgr: __mount(source=/dev/block/dm-1,target=/vendor,type=ext4)=0
+[    7.181826] EXT4-fs (mmcblk0p30): Ignoring removed nomblk_io_submit option
+[    7.185065] EXT4-fs (mmcblk0p30): mounted filesystem with ordered data mode. Opts: errors=remount-ro,nomblk_io_submit
+[    7.185119] SELinux: initialized (dev mmcblk0p30, type ext4), uses xattr
+[    7.185380] fs_mgr: check_fs(): mount(/dev/block/platform/sdhci-tegra.3/by-name/CAC,/cache,ext4)=0: Success
+[    7.188562] fs_mgr: check_fs(): unmount(/cache) succeeded
+[    7.189554] fs_mgr: Running /system/bin/e2fsck on /dev/block/platform/sdhci-tegra.3/by-name/CAC
+[    7.208412] synaptics_dsx_spi spi2.0: fwu_go_nogo: Device firmware ID = 1732172
+[    7.208458] synaptics_dsx_spi spi2.0: fwu_go_nogo: Image firmware ID = 1732172
+[    7.209152] synaptics_dsx_spi spi2.0: fwu_go_nogo: Device config ID = 0x33 0x32 0x30 0x13
+[    7.209178] synaptics_dsx_spi spi2.0: fwu_go_nogo: Image config ID = 0x33 0x32 0x30 0x13
+[    7.209198] synaptics_dsx_spi spi2.0: fwu_go_nogo: No need to do reflash
+[    7.214736] [S_HUB][CW_MCU] check_fw_version: Sensor HUB firmware is up-to-date
+[    7.218452] [S_HUB][CW_MCU] Firmware Architecture version 1, Sense version 0, Cywee lib version 16, Water number 40, Active Engine 2, Project Mapping 1
+[    7.223430] [S_HUB][CW_MCU] Sensor calibration matrix is (gs 1 gy 1 ls 1 bs 1)
+[    7.232333] [S_HUB][CW_MCU] cwmcu_irq_handler: MAGIC COVER = 0x0
+[    7.273790] [SAR0] update_firmware, 14594
+[    7.274380] [SAR] from FIRMWARE file = 1f, Chip FW ver: 1f
+[    7.274406] [SAR0] cy8c_check_sensor
+[    7.275594] [SAR0] CY8C_SAR_V1f
+[    7.299724] [SAR] active=0
+[    7.299771] dhd_sar_callback Not ready, Bus state 0 firmware state 0
+[    7.330344] fwu_start_reflash: End of reflash process
+[    7.330398] synaptics_dsx_spi spi2.0:  synaptics_config_updater
+[    7.331647] synaptics_dsx_spi spi2.0: synaptics_config_updater: Device config ID = 0x33 0x32 0x30 0x13
+[    7.331672] synaptics_config_updater: Start of write config process
+[    7.379424] synaptics_dsx_spi spi2.0:  fwu_get_tw_vendor: tw_vendor_pin = 5
+[    7.379476] synaptics_dsx_spi spi2.0: synaptics_config_updater: Image config ID = 0x33 0x32 0x30 0x13
+[    7.379555] synaptics_dsx_spi spi2.0:  synaptics_config_updater: crc_cksum = 790FAB4A
+[    7.392731] synaptics_dsx_spi spi2.0:  crc_comparison: config_crc = 790FAB4A, flash_crc = 790FAB4A
+[    7.392772] synaptics_dsx_spi spi2.0:  synaptics_config_updater: No need to update
+[    7.400977] e2fsck: e2fsck 1.42.9 (28-Dec-2013)
+[    7.400977] 
+[    7.401159] e2fsck: Pass 1: Checking inodes, blocks, and sizes
+[    7.401159] 
+[    7.401197] e2fsck: Pass 2: Checking directory structure
+[    7.401197] 
+[    7.401229] e2fsck: Pass 3: Checking directory connectivity
+[    7.401229] 
+[    7.401262] e2fsck: Pass 4: Checking reference counts
+[    7.401262] 
+[    7.401292] e2fsck: Pass 5: Checking group summary information
+[    7.401292] 
+[    7.401329] e2fsck: /dev/block/platform/sdhci-tegra.3/by-name/CAC: 35/16384 files (0.0% non-contiguous), 2475/65536 blocks
+[    7.401329] 
+[    7.403776] EXT4-fs (mmcblk0p30): Ignoring removed nomblk_io_submit option
+[    7.406261] EXT4-fs (mmcblk0p30): mounted filesystem with ordered data mode. Opts: nomblk_io_submit,discard,errors=panic
+[    7.406319] SELinux: initialized (dev mmcblk0p30, type ext4), uses xattr
+[    7.406459] fs_mgr: __mount(source=/dev/block/platform/sdhci-tegra.3/by-name/CAC,target=/cache,type=ext4)=0
+[    7.406619] fs_mgr: Running /system/bin/fsck.f2fs -a /dev/block/platform/sdhci-tegra.3/by-name/UDA
+[    7.451338] fsck.f2fs: Info: Fix the reported corruption.
+[    7.451338] 
+[    7.451495] fsck.f2fs: Info: sector size = 512
+[    7.451495] 
+[    7.451531] fsck.f2fs: Info: total sectors = 53714944 (in 512 bytes)
+[    7.451531] 
+[    7.451564] fsck.f2fs: 	Can't find a valid F2FS superblock at 0x0
+[    7.451564] 
+[    7.451595] fsck.f2fs: 	Can't find a valid F2FS superblock at 0x1
+[    7.451595] 
+[    7.451641] fsck.f2fs: fsck.f2fs terminated by exit(255)
+[    7.451641] 
+[    7.452340] F2FS-fs (mmcblk0p31): mounting..
+[    7.452739] F2FS-fs (mmcblk0p31): Magic Mismatch, valid(0xf2f52010) - read(0xfbd5b28a)
+[    7.452765] F2FS-fs (mmcblk0p31): Can't find valid F2FS filesystem in 1th superblock
+[    7.453076] F2FS-fs (mmcblk0p31): Magic Mismatch, valid(0xf2f52010) - read(0xd91f4c04)
+[    7.453098] F2FS-fs (mmcblk0p31): Can't find valid F2FS filesystem in 2th superblock
+[    7.453121] F2FS-fs (mmcblk0p31): Magic Mismatch, valid(0xf2f52010) - read(0xfbd5b28a)
+[    7.453139] F2FS-fs (mmcblk0p31): Can't find valid F2FS filesystem in 1th superblock
+[    7.453156] F2FS-fs (mmcblk0p31): Magic Mismatch, valid(0xf2f52010) - read(0xd91f4c04)
+[    7.453172] F2FS-fs (mmcblk0p31): Can't find valid F2FS filesystem in 2th superblock
+[    7.453188] F2FS-fs (mmcblk0p31): mount failed
+[    7.453315] fs_mgr: __mount(source=/dev/block/platform/sdhci-tegra.3/by-name/UDA,target=/data,type=f2fs)=-1
+[    7.453775] EXT4-fs (mmcblk0p31): VFS: Can't find ext4 filesystem
+[    7.453888] fs_mgr: check_fs(): mount(/dev/block/platform/sdhci-tegra.3/by-name/UDA,/data,ext4)=-1: Invalid argument
+[    7.453951] fs_mgr: Running /system/bin/e2fsck on /dev/block/platform/sdhci-tegra.3/by-name/UDA
+[    7.524520] synaptics_config_updater: End of write config process
+[    7.524575] synaptics_dsx_spi spi2.0:  synaptics_config_updater end
+[    7.527683] e2fsck: e2fsck 1.42.9 (28-Dec-2013)
+[    7.527683] 
+[    7.527807] e2fsck: ext2fs_open2: Bad magic number in super-block
+[    7.527807] 
+[    7.527844] e2fsck: /system/bin/e2fsck: Superblock invalid, trying backup blocks...
+[    7.527844] 
+[    7.527882] e2fsck: /system/bin/e2fsck: Bad magic number in super-block while trying to open /dev/block/platform/sdhci-tegra.3/by-name/UDA
+[    7.527882] 
+[    7.527911] e2fsck: 
+[    7.527911] 
+[    7.527942] e2fsck: The superblock could not be read or does not describe a correct ext2
+[    7.527942] 
+[    7.527974] e2fsck: filesystem.  If the device is valid and it really contains an ext2
+[    7.527974] 
+[    7.528006] e2fsck: filesystem (and not swap or ufs or something else), then the superblock
+[    7.528006] 
+[    7.528063] e2fsck: is corrupt, and you might try running e2fsck with an alternate superblock:
+[    7.528063] 
+[    7.528095] e2fsck:     e2fsck -b 8193 <device>
+[    7.528095] 
+[    7.528123] e2fsck: 
+[    7.528123] 
+[    7.528165] e2fsck: e2fsck terminated by exit(8)
+[    7.528165] 
+[    7.529481] EXT4-fs (mmcblk0p31): VFS: Can't find ext4 filesystem
+[    7.529627] fs_mgr: __mount(source=/dev/block/platform/sdhci-tegra.3/by-name/UDA,target=/data,type=ext4)=-1
+[    7.530803] fs_mgr: fs_mgr_mount_all(): possibly an encryptable blkdev /dev/block/platform/sdhci-tegra.3/by-name/UDA for mount /data type f2fs )
+[    7.531105] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+[    7.542424] init: (Parsing /system/etc/init/atrace.rc took 0.01s.)
+[    7.543431] init: (Parsing /system/etc/init/audioserver.rc took 0.00s.)
+[    7.546381] init: (Parsing /system/etc/init/bootanim.rc took 0.00s.)
+[    7.547440] init: (Parsing /system/etc/init/bootstat.rc took 0.00s.)
+[    7.548139] init: (Parsing /system/etc/init/cameraserver.rc took 0.00s.)
+[    7.548775] init: (Parsing /system/etc/init/debuggerd.rc took 0.00s.)
+[    7.549981] init: (Parsing /system/etc/init/debuggerd64.rc took 0.00s.)
+[    7.551419] init: (Parsing /system/etc/init/drmserver.rc took 0.00s.)
+[    7.552544] init: (Parsing /system/etc/init/dumpstate.rc took 0.00s.)
+[    7.553233] init: (Parsing /system/etc/init/gatekeeperd.rc took 0.00s.)
+[    7.554141] init: (Parsing /system/etc/init/installd.rc took 0.00s.)
+[    7.554863] init: (Parsing /system/etc/init/keystore.rc took 0.00s.)
+[    7.555494] init: (Parsing /system/etc/init/lmkd.rc took 0.00s.)
+[    7.556188] init: (Parsing /system/etc/init/logd.rc took 0.00s.)
+[    7.556903] init: (Parsing /system/etc/init/mdnsd.rc took 0.00s.)
+[    7.557616] init: (Parsing /system/etc/init/mediacodec.rc took 0.00s.)
+[    7.558299] init: (Parsing /system/etc/init/mediadrmserver.rc took 0.00s.)
+[    7.558913] init: (Parsing /system/etc/init/mediaextractor.rc took 0.00s.)
+[    7.559547] init: (Parsing /system/etc/init/mediaserver.rc took 0.00s.)
+[    7.560201] init: (Parsing /system/etc/init/mtpd.rc took 0.00s.)
+[    7.560910] init: (Parsing /system/etc/init/netd.rc took 0.00s.)
+[    7.561527] init: (Parsing /system/etc/init/racoon.rc took 0.00s.)
+[    7.562232] init: (Parsing /system/etc/init/servicemanager.rc took 0.00s.)
+[    7.562850] init: (Parsing /system/etc/init/surfaceflinger.rc took 0.00s.)
+[    7.565806] init: (Parsing /system/etc/init/uncrypt.rc took 0.00s.)
+[    7.566514] init: (Parsing /system/etc/init/vdc.rc took 0.00s.)
+[    7.567372] init: (Parsing /system/etc/init/vold.rc took 0.00s.)
+[    8.380174] type=1400 audit(1505262699.916:4): avc:  denied  { write } for  pid=1 comm="init" name="tracing_on" dev="debugfs" ino=457 scontext=u:r:init:s0 tcontext=u:object_r:debugfs:s0 tclass=file permissive=0
+[    8.380256] init: write_file: Unable to open '/sys/kernel/debug/tracing/tracing_on': Permission denied
+[    8.383114] init: Starting service 'logd'...
+[    8.477082] logd.auditd: start
+[    8.477281] logd.klogd: 8470256054
+[    8.983503] zram0: detected capacity change from 0 to 533413888
+[    9.058538] Adding 520908k swap on /dev/block/zram0.  Priority:-1 extents:1 across:520908k SS
+[    9.064778] init: (Loading properties from /system/build.prop took 0.01s.)
+[    9.065784] init: (Loading properties from /vendor/build.prop took 0.00s.)
+[    9.065883] init: (Loading properties from /factory/factory.prop took 0.00s.)
+[    9.069389] init: Starting service 'debuggerd'...
+[    9.071453] init: Starting service 'debuggerd64'...
+[    9.075191] init: Starting service 'vold'...
+[    9.079676] init: Not bootcharting.
+[    9.721030] init: Starting service 'exec 1 (/system/bin/tzdatacheck)'...
+[    9.819501] init: Service 'exec 1 (/system/bin/tzdatacheck)' (pid 193) exited with status 0
+[    9.823500] tmpfs: Bad mount option background_gc
+[    9.829650] init: Starting service 'logd-reinit'...
+[    9.836152] init: Starting service 'healthd'...
+[    9.839010] init: Starting service 'lmkd'...
+[    9.841049] init: Starting service 'servicemanager'...
+[    9.842728] init: Starting service 'surfaceflinger'...
+[    9.852179] init: write_file: Unable to open '/sys/module/tegra3_emc/parameters/emc_enable': No such file or directory
+[    9.876336] android_usb: already disabled
+[    9.876466] init: do_stop: Service ril-daemon not found
+[    9.879227] binder: 195:195 transaction failed 29189, size 0-0
+[    9.885441] init: Starting service 'exec 2 (/system/bin/vdc)'...
+[    9.895587] init: Service 'logd-reinit' (pid 194) exited with status 0
+[    9.897723] logd.daemon: reinit
+[    9.927294] init: Service 'exec 2 (/system/bin/vdc)' (pid 199) exited with status 0
+[    9.945960] android_usb: already disabled
+[    9.946146] android_usb: already disabled
+[   10.367038] tegra_simon_gpu_grading_cb: graded gpu: v = 800, t = 42500, grade = 1
+[   10.367301] tegra_dvfs: set vdd_gpu simon grade 1
+[   10.370014] OPEN_CLIENT_SESSION_COMPAT: 0x5f902ace 0x4cd85e5c 0xb88754ae 0xafdd228c
+[   10.378900] trusty: trusty: EKS data check PASS
+[   10.772032] bio: create slab <bio-2> at 2
+[   10.881469] healthd: BatteryHealthPath not found
+[   10.881490] healthd: BatteryFullChargePath not found
+[   10.881502] healthd: BatteryCycleCountPath not found
+[   11.197830] OPEN_CLIENT_SESSION_COMPAT: 0x5f902ace 0x4cd85e5c 0xb88754ae 0xafdd228c
+[   11.200055] fs_mgr: Running /system/bin/fsck.f2fs -a /dev/block/dm-2
+[   11.230406] fsck.f2fs: Info: Fix the reported corruption.
+[   11.230406] 
+[   11.230463] fsck.f2fs: Info: sector size = 512
+[   11.230463] 
+[   11.230491] fsck.f2fs: Info: total sectors = 53714944 (in 512 bytes)
+[   11.230491] 
+[   11.230505] fsck.f2fs: Info: MKFS version
+[   11.230505] 
+[   11.230517] fsck.f2fs:   ""
+[   11.230517] 
+[   11.230528] fsck.f2fs: Info: FSCK version
+[   11.230528] 
+[   11.230544] fsck.f2fs:   from "Linux version 3.10.103-gb7c30cdef95 (android-build@vpak3.mtv.corp.google.com) (gcc version 4.9.x-google 20140827 (prerelease) (GCC) ) #1 SMP PREEMPT Mon Apr 17 15:43:59 UTC 2017"
+[   11.230544] 
+[   11.230560] fsck.f2fs:     to "Linux version 3.10.103-gb7c30cdef95 (android-build@vpak3.mtv.corp.google.com) (gcc version 4.9.x-google 20140827 (prerelease) (GCC) ) #1 SMP PREEMPT Mon Apr 17 15:43:59 UTC 2017"
+[   11.230560] 
+[   11.230573] fsck.f2fs: 
+[   11.230573] 
+[   11.230585] fsck.f2fs: Done.
+[   11.230585] 
+[   11.230803] F2FS-fs (dm-2): mounting..
+[   11.411329] F2FS-fs (dm-2): mounted filesystem
+[   11.415711] F2FS-fs (dm-2): recovery did not fully complete
+[   11.416515] SELinux: initialized (dev dm-2, type f2fs), uses xattr
+[   11.416632] fs_mgr: __mount(source=/dev/block/dm-2,target=/data,type=f2fs)=0
+[   11.458625] init: Starting service 'logd-reinit'...
+[   11.462324] init: Not bootcharting.
+[   11.497298] logd.daemon: reinit
+[   11.498979] init: Service 'logd-reinit' (pid 231) exited with status 0
+[   11.577076] init: Starting service 'exec 3 (/system/bin/tzdatacheck)'...
+[   11.659639] init: Service 'exec 3 (/system/bin/tzdatacheck)' (pid 233) exited with status 0
+[   11.710121] init: cannot find '/system/bin/update_verifier' (No such file or directory), disabling 'exec 4 (/system/bin/update_verifier)'
+[   11.710463] init: Starting service 'flash_recovery'...
+[   11.711653] init: Starting service 'tlk_daemon'...
+[   11.713204] init: Starting service 'zygote'...
+[   11.714053] init: Starting service 'zygote_secondary'...
+[   11.714628] init: Starting service 'audioserver'...
+[   11.715159] init: Starting service 'cameraserver'...
+[   11.715733] init: Starting service 'drm'...
+[   11.716255] init: Starting service 'installd'...
+[   11.716761] init: Starting service 'keystore'...
+[   11.719333] init: Starting service 'mediacodec'...
+[   11.719908] init: Starting service 'mediadrm'...
+[   11.720472] init: Starting service 'mediaextractor'...
+[   11.720994] init: Starting service 'media'...
+[   11.721532] init: Starting service 'netd'...
+[   11.722080] init: Starting service 'gpsd'...
+[   11.722604] init: Starting service 'gatekeeperd'...
+[   11.727357] init: couldn't write 239 to /dev/cpuset/camera-daemon/tasks: No such file or directory
+[   11.953697] [HS_PMIC] (irq_init_work_func) Enable detect IRQ
+[   11.953714] [HS_PMIC] (irq_init_work_func) Setup button IRQ type
+[   11.953792] [HS_PMIC] (irq_init_work_func) Enable debug IRQ
+[   11.970715] OPEN_CLIENT_SESSION_COMPAT: 0x5286f1be 0x40be1cb4 0xbbb67aa7 0x8f761ee4
+[   12.111768] OPEN_CLIENT_SESSION_COMPAT: 0x5f902ace 0x4cd85e5c 0xb88754ae 0xafdd228c
+[   12.227368] OPEN_CLIENT_SESSION_COMPAT: 0x38ba0cdc 0x11e4df0e 0x3f236998 0x9547aeb6
+[   12.796906] init: Starting service 'bootanim'...
+[   12.877948] init: Service 'flash_recovery' (pid 234) exited with status 0
+[   13.105466] rt5506_ioctl: update rt5506 i2c commands #21 success.
+[   13.105480] update_amp_parameter: set mode 2
+[   13.105486] update_amp_parameter: set mode 1
+[   13.105491] update_amp_parameter: set mode 0
+[   13.165546] set_rt5506_hp_en: 0
+[   13.175578] set_rt5506_amp: 1
+[   13.175592] set_rt5506_amp: enable gpio 185
+[   13.177257] volume_ramp_func
+[   13.177267] volume_ramp_func:Not in STATUS_PLAYBACK
+[   13.179491] set_amp: 1
+[   13.181146] set_amp: ON
+[   13.207485] set_rt5506_amp: 0
+[   13.207499] set_amp: 0
+[   13.207727] set_amp: OFF
+[   13.207769] hs_imp_gpio_off: disable gpio 185
+[   13.213475] _gpio_request: gpio-2 (I2S1_LRCK) status -16
+[   13.213487] _gpio_request: gpio-3 (I2S1_SCLK) status -16
+[   13.222225] tegra_rt5677_spk_startup:mi2s amp on
+[   13.319852] rt5677 1-002d: rt_codec_hwdep_open()
+[   13.710308] tegra_rt5677 power_off
+[   13.713770] set_rt5506_hp_en: 0
+[   14.111099] tegra_rt5677_spk_shutdown:mi2s amp off
+[   14.201008] drv201 2-000e: drv201_param_rd CAPS
+[   14.201093] tps61310 0-0033: tps61310_param_rd unsupported parameter: 49
+[   14.202150] imx219_get_sensor_id
+[   14.202369] chip unique id 0x0 = 0x3a
+[   14.202561] chip unique id 0x1 = 0x22
+[   14.202752] chip unique id 0x2 = 0x07
+[   14.202943] chip unique id 0x3 = 0x05
+[   14.203134] chip unique id 0x4 = 0x09
+[   14.203376] chip unique id 0x5 = 0x7d
+[   14.209810] imx219_get_af_data
+[   14.246573] [0] x1 [1] x47 [2] x2 [3] x1 
+[   14.443545] nvmap_pgprot: PID 239: cameraserver: WARNING: NVMAP_HANDLE_WRITE_COMBINE should be used in place of NVMAP_HANDLE_UNCACHEABLE on ARM64
+[   14.680388] ov9760 2-0036: ov9760_get_sensor_id
+[   14.690077] ov9760 2-0036: ov9760_get_sensor_id 3d00 = 60
+[   14.691208] ov9760 2-0036: ov9760_get_sensor_id 3d01 = b2
+[   14.691513] ov9760 2-0036: ov9760_get_sensor_id 3d02 = 80
+[   14.691830] ov9760 2-0036: ov9760_get_sensor_id 3d03 = 1
+[   14.692024] ov9760 2-0036: ov9760_get_sensor_id 3d04 = 7
+[   14.692435] ov9760 2-0036: ov9760_get_sensor_id 3d05 = 1
+[   14.692631] ov9760 2-0036: ov9760_get_sensor_id 3d06 = 7f
+[   14.693261] ov9760 2-0036: ov9760_get_sensor_id 3d07 = bc
+[   14.807821] tegra-i2c tegra12-i2c.2: no acknowledge from address 0xe
+[   14.807888] drv201 2-000e: drv201_set_arc_mode: CONTROL reg write failed
+[   14.808201] drv201 2-000e: drv201_param_rd CAPS
+[   14.808294] tps61310 0-0033: tps61310_param_rd unsupported parameter: 49
+[   14.810820] imx219_get_sensor_id
+[   14.811191] imx219_get_af_data
+[   14.865450] ov9760 2-0036: ov9760_get_sensor_id
+[   16.322403] warning: `main' uses 32-bit capabilities (legacy support in use)
+[   18.486054] tegra_simon_cpu_grading_cb: graded cpu: v = 820, t = 61000, grade = 1
+[   18.488183] tegra_dvfs: set vdd_cpu simon grade 1
+[   18.592238] synaptics_dsx_spi spi2.0:  synaptics_rmi4_force_cal
+[   22.376722] healthd: battery l=2 v=3646 t=32.3 h=4 st=3 c=-70 chg=u
+[   23.780389] android_usb: already disabled
+[   23.781514] android_usb: already disabled
+[   23.781840] init: Starting service 'adbd'...
+[   23.787076] read descriptors
+[   23.787120] read descriptors
+[   23.787130] read strings
+[   23.787156] mtp_bind_config
+[   23.790866] htc_battery_bq2419x htc_battery_bq2419x.9: Setting charging current 2
+[   23.832278] acc_open
+[   23.832298] acc_release
+[   23.890814] android_work: did not send uevent (0 0           (null))
+[   23.959362] android_work: sent uevent USB_STATE=CONNECTED
+[   23.993830] htc_battery_bq2419x htc_battery_bq2419x.9: Charging enable with reason 0x8 (origin:0x0)
+[   23.993850] bq2419x 0-006b: charger configure, enable=1 is_otg=0
+[   23.997317] healthd: battery l=2 v=3624 t=32.4 h=4 st=2 c=-1190 chg=u
+[   24.009696] 
+[   24.009696] Dongle Host Driver, version 1.201.31 (r)
+[   24.009696] Compiled in drivers/net/wireless/bcmdhd on Apr 17 2017 at 15:43:38
+[   24.009716] wl_android_wifi_on in
+[   24.009723] wifi_platform_set_power = 1
+[   24.009765] flounder_wifi_power: 1
+[   24.031160] android_usb gadget: high-speed config #1: android
+[   24.031957] tegra-udc tegra-udc.0: connected to SDP
+[   24.031972] htc_battery_bq2419x htc_battery_bq2419x.9: Setting charging current 500
+[   24.032029] android_work: sent uevent USB_STATE=CONFIGURED
+[   24.070415] gk20a gk20a.0: unrecognized ioctl cmd: 0x8008486d
+[   24.086870] gk20a gk20a.0: unrecognized ioctl cmd: 0x8008486d
+[   24.190742] [USB] utmi_phy_power_on UTMIP_XCVR_CFG0:6002a0c xcvr_use_fuses:1 utmi_xcvr_setup:c
+[   24.191115] [USB] utmi_phy_power_on UTMIP_XCVR_CFG0:6002a0c xcvr_use_fuses:1 utmi_xcvr_setup:c
+[   24.235578] SELinux: initialized (dev fuse, type fuse), uses genfs_contexts
+[   24.236397] SELinux: initialized (dev fuse, type fuse), uses genfs_contexts
+[   24.236840] SELinux: initialized (dev fuse, type fuse), uses genfs_contexts
+[   24.237145] htc_battery_bq2419x htc_battery_bq2419x.9: Charging enable with reason 0x8 (origin:0x0)
+[   24.237158] bq2419x 0-006b: charger configure, enable=1 is_otg=0
+[   24.240727] healthd: battery l=2 v=3571 t=32.4 h=4 st=2 c=-1708 chg=u
+[   24.313642] sdio_reset_comm():
+[   24.398458] sdhci-tegra sdhci-tegra.0: sdhci_tegra_verify_best_tap: tuning freq 204000000hz, best tap 16
+[   24.399842] SDIO Vendor ID:02d0 and SDIO Device ID: 4354
+[   24.399984] F1 signature read @0x18000000=0x17214354
+[   24.406440] F1 signature OK, socitype:0x1 chip:0x4354 rev:0x1 pkg:0x2
+[   24.407137] DHD: dongle ram size is set to 786432(orig 786432) at 0x180000
+[   24.614887] dhdsdio_write_vars: Download, Upload and compare of NVRAM succeeded.
+[   24.656926] SDIO Vendor ID:02d0 and SDIO Device ID: 4354
+[   24.657145] dhd_bus_init: enable 0x06, ready 0x06 (waited 0us)
+[   24.658943] wifi_platform_get_mac_addr
+[   24.660877] Firmware up: op_mode=0x0005, MAC=b4:ce:f6:9d:4c:75
+[   24.702542] dhd_preinit_ioctls lpc fail WL_DOWN : 0, lpc = 1
+[   24.713076] Firmware version = wl0: Feb  3 2017 18:35:57 version 7.35.101.5 (r682980) FWID 01-860f3a7e
+[   24.714269] dhd_wlfc_init(): successfully enabled bdcv2 tlv signaling, 79
+[   24.715072] dhd_wlfc_init: query wlfc_mode succeed, fw_caps=0x1c
+[   24.715465] dhd_wlfc_init(): wlfc_mode=0x1c, ret=0
+[   24.777970] init: Starting service 'p2p_supplicant'...
+[   24.997472] htc_battery_bq2419x htc_battery_bq2419x.9: Battery charging state changed (0 -> 1)
+[   25.257643] CFGP2P-ERROR) wl_cfgp2p_add_p2p_disc_if : P2P interface registered
+[   25.268331] WLC_E_IF: NO_IF set, event Ignored
+[   25.296446] tegra_nvavp_video_open NVAVP_VIDEO_CHANNEL
+[   25.296466] nvavp nvavp: tegra_nvavp_open: ++
+[   25.296473] tegra_nvavp_open channel_id (0)
+[   25.296481] nvavp nvavp: using SMMU at 8ff00000 to load AVP kernel
+[   25.299002] nvavp nvavp: read firmware from 'nvavp_os_8ff00000.bin' (15900 bytes)
+[   25.299391] nvavp nvavp: entry=00000094 control=00004bf0 debug=000053f0 size=15876
+[   25.299406] nvavp nvavp: AVP os at vaddr=ffffff8002881000 paddr=8ff00000 reset_addr=8ff00094
+[   25.313936] nvavp nvavp: read ucode firmware from 'nvavp_vid_ucode_alt.bin' (41004 bytes)
+[   25.314266] nvavp: Process 246 accquired a reference.
+[   25.314505] nvavp: Process 246 has given up a reference
+[   25.314554] nvavp nvavp: tegra_nvavp_open: ++
+[   25.314560] tegra_nvavp_open channel_id (0)
+[   25.314572] nvavp nvavp: tegra_nvavp_release: ++
+[   26.035488] Random MAC OUI to be used - da:a1:19
+[   26.067844] WLDEV-ERROR) wldev_set_country : wldev_set_country: set country for US as US rev 0
+[   26.085677] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.085995] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.086316] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.086638] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.086967] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.087319] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.087645] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.087966] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.088313] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.089220] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.089559] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.089875] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.090195] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.091648] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.091978] dhd_dbg_set_event_log_tag set log tag iovar failed -23
+[   26.092461] dhd_dbg_set_event_log_tag set log tag iovar failed -23

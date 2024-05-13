@@ -1,0 +1,9 @@
+name: cpuinfo
+title: CPU information query
+license: Simplified BSD
+deps:
+  - name: googletest
+  - name: googlebenchmark
+  - name: clog
+    dir:  deps/clog
+

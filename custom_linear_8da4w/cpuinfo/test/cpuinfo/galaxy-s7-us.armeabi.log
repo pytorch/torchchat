@@ -1,0 +1,38 @@
+processor	: 0
+model name	: AArch64 Processor rev 2 (aarch64)
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0x211
+CPU revision	: 2
+
+processor	: 1
+model name	: AArch64 Processor rev 2 (aarch64)
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0x211
+CPU revision	: 2
+
+processor	: 2
+model name	: AArch64 Processor rev 2 (aarch64)
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0x205
+CPU revision	: 2
+
+processor	: 3
+model name	: AArch64 Processor rev 2 (aarch64)
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0x205
+CPU revision	: 2
+
+Hardware	: Qualcomm Technologies, Inc MSM8996
+Revision	: 000f

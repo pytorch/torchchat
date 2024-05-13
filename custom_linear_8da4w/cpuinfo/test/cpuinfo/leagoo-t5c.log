@@ -1,0 +1,219 @@
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 117
+model name	: Spreadtrum SC9853I-IA
+stepping	: 10
+microcode	: 0xa0a
+cpu MHz		: 624.000
+cache size	: 1024 KB
+physical id	: 0
+siblings	: 8
+core id		: 0
+cpu cores	: 8
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 23
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht nx rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology nonstop_tsc pni pclmulqdq monitor ssse3 cx16 xtpr pdcm sse4_1 sse4_2 movbe popcnt tsc_deadline_timer aes lahf_lm 3dnowprefetch arat tsc_adjust smep erms
+bugs		:
+bogomips	: 3744.19
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 117
+model name	: Spreadtrum SC9853I-IA
+stepping	: 10
+microcode	: 0xa0a
+cpu MHz		: 624.000
+cache size	: 1024 KB
+physical id	: 0
+siblings	: 8
+core id		: 1
+cpu cores	: 8
+apicid		: 2
+initial apicid	: 2
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 23
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht nx rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology nonstop_tsc pni pclmulqdq monitor ssse3 cx16 xtpr pdcm sse4_1 sse4_2 movbe popcnt tsc_deadline_timer aes lahf_lm 3dnowprefetch arat tsc_adjust smep erms
+bugs		:
+bogomips	: 3744.19
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 2
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 117
+model name	: Spreadtrum SC9853I-IA
+stepping	: 10
+microcode	: 0xa0a
+cpu MHz		: 624.000
+cache size	: 1024 KB
+physical id	: 0
+siblings	: 8
+core id		: 2
+cpu cores	: 8
+apicid		: 4
+initial apicid	: 4
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 23
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht nx rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology nonstop_tsc pni pclmulqdq monitor ssse3 cx16 xtpr pdcm sse4_1 sse4_2 movbe popcnt tsc_deadline_timer aes lahf_lm 3dnowprefetch arat tsc_adjust smep erms
+bugs		:
+bogomips	: 3744.19
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 3
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 117
+model name	: Spreadtrum SC9853I-IA
+stepping	: 10
+microcode	: 0xa0a
+cpu MHz		: 624.000
+cache size	: 1024 KB
+physical id	: 0
+siblings	: 8
+core id		: 3
+cpu cores	: 8
+apicid		: 6
+initial apicid	: 6
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 23
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht nx rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology nonstop_tsc pni pclmulqdq monitor ssse3 cx16 xtpr pdcm sse4_1 sse4_2 movbe popcnt tsc_deadline_timer aes lahf_lm 3dnowprefetch arat tsc_adjust smep erms
+bugs		:
+bogomips	: 3744.19
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 4
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 117
+model name	: Spreadtrum SC9853I-IA
+stepping	: 10
+microcode	: 0xa0a
+cpu MHz		: 624.000
+cache size	: 1024 KB
+physical id	: 0
+siblings	: 8
+core id		: 4
+cpu cores	: 8
+apicid		: 8
+initial apicid	: 8
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 23
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht nx rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology nonstop_tsc pni pclmulqdq monitor ssse3 cx16 xtpr pdcm sse4_1 sse4_2 movbe popcnt tsc_deadline_timer aes lahf_lm 3dnowprefetch arat tsc_adjust smep erms
+bugs		:
+bogomips	: 3744.19
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 5
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 117
+model name	: Spreadtrum SC9853I-IA
+stepping	: 10
+microcode	: 0xa0a
+cpu MHz		: 624.000
+cache size	: 1024 KB
+physical id	: 0
+siblings	: 8
+core id		: 5
+cpu cores	: 8
+apicid		: 10
+initial apicid	: 10
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 23
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht nx rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology nonstop_tsc pni pclmulqdq monitor ssse3 cx16 xtpr pdcm sse4_1 sse4_2 movbe popcnt tsc_deadline_timer aes lahf_lm 3dnowprefetch arat tsc_adjust smep erms
+bugs		:
+bogomips	: 3744.19
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 6
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 117
+model name	: Spreadtrum SC9853I-IA
+stepping	: 10
+microcode	: 0xa0a
+cpu MHz		: 624.000
+cache size	: 1024 KB
+physical id	: 0
+siblings	: 8
+core id		: 6
+cpu cores	: 8
+apicid		: 12
+initial apicid	: 12
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 23
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht nx rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology nonstop_tsc pni pclmulqdq monitor ssse3 cx16 xtpr pdcm sse4_1 sse4_2 movbe popcnt tsc_deadline_timer aes lahf_lm 3dnowprefetch arat tsc_adjust smep erms
+bugs		:
+bogomips	: 3744.19
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 7
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 117
+model name	: Spreadtrum SC9853I-IA
+stepping	: 10
+microcode	: 0xa0a
+cpu MHz		: 624.000
+cache size	: 1024 KB
+physical id	: 0
+siblings	: 8
+core id		: 7
+cpu cores	: 8
+apicid		: 14
+initial apicid	: 14
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 23
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht nx rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology nonstop_tsc pni pclmulqdq monitor ssse3 cx16 xtpr pdcm sse4_1 sse4_2 movbe popcnt tsc_deadline_timer aes lahf_lm 3dnowprefetch arat tsc_adjust smep erms
+bugs		:
+bogomips	: 3744.19
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+Hardware	: Spreadtrum SC9853I-IA
+
+

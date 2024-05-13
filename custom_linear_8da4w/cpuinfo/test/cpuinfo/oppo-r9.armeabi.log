@@ -1,0 +1,11 @@
+Processor	: AArch64 Processor rev 2 (aarch64)
+processor	: 0
+BogoMIPS	: 26.00
+Features	: fp asimd aes pmull sha1 sha2 crc32 wp half thumb fastmult vfp edsp neon vfpv3 tlsi vfpv4 idiva idivt 
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 2
+
+Hardware	: MT6755

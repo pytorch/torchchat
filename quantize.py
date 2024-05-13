@@ -169,10 +169,13 @@ class CustomHandler(QuantHandler):
 
     def quantized_model(self) -> nn.Module:
         self.model_ = self.model_.to(device=self.device)
+        from custom_linear_8da4w._custom_linear import (
+            _replace_linear_with_custom_linear,
+        )
 
-        from _custom_linear._custom_linear import _replace_linear_with_custom_linear
         _replace_linear_with_custom_linear(self.model_)
         return self.model_
+
 
 #########################################################################
 #####                     Quantization Primitives                  ######
@@ -658,7 +661,7 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
         if dtype is None:
             dtype = torch.float32
 
-        self.model_ = model
+        self.model_ = model.eval()
         self.device = device
         self.dtype = dtype
 
@@ -675,17 +678,13 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
         )
 
         for name, child in module.named_children():
-            # print(f"name: {name}")
             if isinstance(child, torch.nn.Linear):
                 out_features = child.out_features
                 in_features = child.in_features
                 weight = child.weight.data
                 assert not child.bias
                 assert out_features % 8 == 0, "require out_features % 8 == 0"
-                # print(f"linear: {fqn}, in={in_features}, out={out_features}")
 
-                # if self.padding_allowed:
-                #     padding_multiple=max(self.groupsize, 1024)
                 padding_multiple = self.groupsize
                 padded_in_features = find_multiple(in_features, padding_multiple)
                 weight = F.pad(weight, pad=(0, padded_in_features - in_features))
@@ -699,7 +698,6 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
                     self.groupsize,
                     self.scales_precision,
                 )
-
                 setattr(
                     module,
                     name,

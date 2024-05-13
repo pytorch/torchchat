@@ -1,0 +1,37 @@
+processor	: 0
+BogoMIPS	: 38.40
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0x201
+CPU revision	: 1
+
+processor	: 1
+BogoMIPS	: 38.40
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0x201
+CPU revision	: 1
+
+processor	: 2
+BogoMIPS	: 38.40
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0x205
+CPU revision	: 1
+
+processor	: 3
+BogoMIPS	: 38.40
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0x205
+CPU revision	: 1
+
+Hardware	: Qualcomm Technologies, Inc MSM8996pro

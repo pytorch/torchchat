@@ -449,6 +449,35 @@ def linear_8da4w(
     return c
 
 
+def custom_linear_8da4w_prepack(weight, scales):
+    # Modified from https://www.internalfb.com/code/fbsource/[f1458254b3caba86fb497abbfe15c74c4e8ca38d]/fbcode/executorch/backends/xnnpack/operators/node_visitor.py?lines=451
+    import torch.nn.functional as F
+
+    assert weight.min().item() >= -8
+    assert weight.max().item() <= 7
+    assert weight.ndim == 2
+
+    # pad ic
+    if weight.shape[-1] % 2 != 0:
+        weight = F.pad(input=weight, pad=(0, 1, 0, 0), mode="constant", value=0)
+    oc, ic = weight.shape
+    assert ic % 2 == 0
+
+    # Adjust inp tensor for zp
+    weight = weight.to(dtype=torch.uint8) + 8
+
+    # Prepare the packed tensor
+    weight = weight.contiguous().view(-1)
+    weight_packed = (weight[1::2] << 4 | weight[::2]).view(oc, int(ic / 2))
+
+    return torch.ops.torchchat.prepack.default(weight_packed, scales)
+
+
+def custom_linear_8da4w_forward(input, prepacked):
+    assert input.shape[0] == 1
+    return torch.ops.torchchat.run.default(prepacked, input.squeeze(0)).unsqueeze(0)
+
+
 class LinearAct8Int4DQ(torch.nn.Module):
     __constants__ = ["in_features", "origin_in_feature", "out_features"]
     in_features: int
@@ -523,7 +552,22 @@ class LinearAct8Int4DQ(torch.nn.Module):
             ),
         )
 
+        self.weight_prepacked = None
+        if not use_et_backend():
+            torch.ops.load_library(
+                "custom_linear_8da4w/build/libcustom_linear_8da4w.dylib"
+            )
+            self.weight_prepacked = custom_linear_8da4w_prepack(
+                self.weight, self.scales
+            )
+
     def forward(self, input: torch.Tensor) -> torch.Tensor:
+        if use_et_backend():
+            return self.et_forward(input)
+        else:
+            return self.custom_forward(input)
+
+    def et_forward(self, input: torch.Tensor) -> torch.Tensor:
         input = F.pad(input, pad=(0, self.in_features - self.origin_in_features))
         # This operator does not support anything but FP32, so we do the deed
         # Eventually push that into linear_8da4w
@@ -536,3 +580,6 @@ class LinearAct8Int4DQ(torch.nn.Module):
             self.groupsize,
             self.precision,
         ).to(dtype=input.dtype)
+
+    def custom_forward(self, input: torch.Tensor) -> torch.Tensor:
+        return custom_linear_8da4w_forward(input, self.weight_prepacked)

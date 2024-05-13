@@ -1,0 +1,1679 @@
+<3>[    8.012312]<6>.(2)[319:6620_launcher][WMT-DEV][I]WMT_unlocked_ioctl: get patch num from launcher = 2
+<7>[    8.012472]<6>.(7)[387:ta_sync_md][387:ta_sync_md] exit
+<7>[    8.012720]<6>.(1)[340:netd][340:netd] fork [444:netd]
+<7>[    8.013031]<6>-(7)[387:ta_sync_md][387:ta_sync_md] sig 17 to [1:init] stat=D
+<3>[    8.014809]<6>.(6)[337:mtk_wmtd][WMT-CTRL][I]wmt_ctrl_ul_cmd:str(srh_patch) result(0)
+<7>[    8.015676]<6>.(4)[444:ip6tables][444:ip6tables] exit
+<3>[    8.015794]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_sw_init:patch total num = [2]
+<7>[    8.015948]<6>-(4)[444:ip6tables][444:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.016574]<6>.(1)[340:netd][340:netd] fork [445:netd]
+<3>[    8.018566]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_patch_dwn:the 1 time valid patch found: (/system/etc/firmware//ROMv2_lm_patch_1_1_hdr.bin)
+<7>[    8.019648]<6>.(5)[445:iptables][445:iptables] exit
+<7>[    8.019870]<6>-(5)[445:iptables][445:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.020463]<6>.(7)[340:netd][340:netd] fork [446:netd]
+<3>[    8.020959]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_patch_dwn:===========================================
+<3>[    8.022180]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_patch_dwn:[Consys Patch] Built Time = 20151103131751a
+<7>[    8.023392]<6>.(7)[446:ip6tables][446:ip6tables] exit
+<3>[    8.023410]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_patch_dwn:[Consys Patch] Hw Ver = 0x8a00
+<7>[    8.023597]<6>-(7)[446:ip6tables][446:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.024140]<6>.(4)[340:netd][340:netd] fork [447:netd]
+<3>[    8.024499]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_patch_dwn:[Consys Patch] Sw Ver = 0x8a00
+<3>[    8.025572]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_patch_dwn:[Consys Patch] Ph Ver = 0x00fe
+<3>[    8.026657]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_patch_dwn:[Consys Patch] Platform = 1524
+<7>[    8.026924]<6>.(4)[447:iptables][447:iptables] exit
+<7>[    8.027120]<6>-(4)[447:iptables][447:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.027727]<6>.(7)[340:netd][340:netd] fork [448:netd]
+<3>[    8.027748]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_patch_dwn:===========================================
+<7>[    8.030660]<6>.(3)[448:ip6tables][448:ip6tables] exit
+<7>[    8.030868]<6>-(3)[448:ip6tables][448:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.031371]<6>.(4)[340:netd][340:netd] fork [449:netd]
+<7>[    8.034329]<6>.(4)[449:iptables][449:iptables] exit
+<7>[    8.034547]<6>-(4)[449:iptables][449:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.035106]<6>.(5)[340:netd][340:netd] fork [450:netd]
+<7>[    8.038094]<6>.(3)[450:ip6tables][450:ip6tables] exit
+<7>[    8.038308]<6>-(3)[450:ip6tables][450:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.038957]<6>.(5)[340:netd][340:netd] fork [451:netd]
+<7>[    8.042297]<6>.(1)[451:iptables][451:iptables] exit
+<7>[    8.042532]<6>-(1)[451:iptables][451:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.043009]<6>.(4)[340:netd][340:netd] fork [452:netd]
+<7>[    8.045823]<6>.(6)[452:ip6tables][452:ip6tables] exit
+<7>[    8.046022]<6>-(6)[452:ip6tables][452:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.046460]<6>.(4)[340:netd][340:netd] fork [453:netd]
+<7>[    8.049130]<6>.(5)[453:iptables][453:iptables] exit
+<7>[    8.049327]<6>-(5)[453:iptables][453:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.049798]<6>.(4)[340:netd][340:netd] fork [454:netd]
+<7>[    8.052883]<6>.(5)[454:ip6tables][454:ip6tables] exit
+<7>[    8.053123]<6>-(5)[454:ip6tables][454:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.053643]<6>.(6)[340:netd][340:netd] fork [455:netd]
+<7>[    8.056510]<6>.(4)[455:iptables][455:iptables] exit
+<7>[    8.056735]<6>-(4)[455:iptables][455:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.057243]<6>.(6)[340:netd][340:netd] fork [456:netd]
+<7>[    8.060065]<6>.(7)[456:ip6tables][456:ip6tables] exit
+<7>[    8.060285]<6>-(7)[456:ip6tables][456:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.060836]<6>.(2)[340:netd][340:netd] fork [457:netd]
+<7>[    8.063575]<6>.(2)[457:iptables][457:iptables] exit
+<7>[    8.063765]<6>-(2)[457:iptables][457:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.064224]<6>.(6)[340:netd][340:netd] fork [458:netd]
+<7>[    8.067019]<6>.(5)[458:ip6tables][458:ip6tables] exit
+<7>[    8.067211]<6>-(5)[458:ip6tables][458:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.067795]<6>.(2)[340:netd][340:netd] fork [459:netd]
+<7>[    8.070673]<6>.(5)[459:iptables][459:iptables] exit
+<7>[    8.070873]<6>-(5)[459:iptables][459:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.071366]<6>.(5)[340:netd][340:netd] fork [460:netd]
+<7>[    8.074100]<6>.(5)[460:ip6tables][460:ip6tables] exit
+<7>[    8.074281]<6>-(5)[460:ip6tables][460:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.074788]<6>.(4)[340:netd][340:netd] fork [461:netd]
+<7>[    8.077667]<6>.(4)[461:iptables][461:iptables] exit
+<7>[    8.077881]<6>-(4)[461:iptables][461:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.078364]<6>.(6)[340:netd][340:netd] fork [462:netd]
+<7>[    8.081466]<6>.(5)[462:ip6tables][462:ip6tables] exit
+<7>[    8.081708]<6>-(5)[462:ip6tables][462:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.082459]<6>.(6)[340:netd][340:netd] fork [463:netd]
+<3>[    8.029186]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_patch_dwn:4 bytes address command:0x00,0x00,0x0e,0xf0
+<3>[    8.083040]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_patch_dwn:wmt_core: patch dwn:0 frag(47, 692) ok
+<3>[    8.084402]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_patch_dwn:the 2 time valid patch found: (/system/etc/firmware//ROMv2_lm_patch_1_0_hdr.bin)
+<7>[    8.085301]<6>.(2)[463:iptables][463:iptables] exit
+<7>[    8.085490]<6>-(2)[463:iptables][463:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.086001]<6>.(4)[340:netd][340:netd] fork [464:netd]
+<7>[    8.088783]<6>.(4)[464:ip6tables][464:ip6tables] exit
+<7>[    8.088990]<6>-(4)[464:ip6tables][464:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.089487]<6>.(6)[340:netd][340:netd] fork [465:netd]
+<7>[    8.092198]<6>.(3)[465:iptables][465:iptables] exit
+<7>[    8.092392]<6>-(3)[465:iptables][465:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.092870]<6>.(6)[340:netd][340:netd] fork [466:netd]
+<7>[    8.092953]<6>.(3)[412:McDaemon.Server][412:McDaemon.Server] exit
+<7>[    8.095697]<6>.(6)[466:ip6tables][466:ip6tables] exit
+<7>[    8.095930]<6>-(6)[466:ip6tables][466:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.096463]<6>.(5)[340:netd][340:netd] fork [467:netd]
+<7>[    8.099284]<6>.(5)[467:iptables][467:iptables] exit
+<7>[    8.099469]<6>-(5)[467:iptables][467:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.099968]<6>.(4)[340:netd][340:netd] fork [468:netd]
+<7>[    8.102947]<6>.(5)[468:ip6tables][468:ip6tables] exit
+<7>[    8.103174]<6>-(5)[468:ip6tables][468:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.103729]<6>.(6)[340:netd][340:netd] fork [469:netd]
+<7>[    8.106637]<6>.(6)[469:iptables][469:iptables] exit
+<7>[    8.106843]<6>-(6)[469:iptables][469:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.107359]<6>.(4)[340:netd][340:netd] fork [470:netd]
+<7>[    8.109197]<6>.(5)[347:iddd][347:iddd] fork [471:iddd]
+<7>[    8.110470]<6>.(2)[470:ip6tables][470:ip6tables] exit
+<7>[    8.110728]<6>-(2)[470:ip6tables][470:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.111241]<6>.(1)[340:netd][340:netd] fork [472:netd]
+<7>[    8.114268]<6>.(2)[472:iptables][472:iptables] exit
+<7>[    8.114491]<6>-(2)[472:iptables][472:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.115078]<6>.(6)[340:netd][340:netd] fork [473:netd]
+<7>[    8.118371]<6>.(1)[473:ip6tables][473:ip6tables] exit
+<7>[    8.118612]<6>-(1)[473:ip6tables][473:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.119170]<6>.(5)[340:netd][340:netd] fork [474:netd]
+<4>[    8.120482]<6>.(1)[204:rpmb_open][emmcrpmb] emmc_rpmb_open_session, wait for 1 second and then open session
+<7>[    8.122842]<6>.(5)[474:iptables][474:iptables] exit
+<7>[    8.123157]<6>-(5)[474:iptables][474:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.123726]<6>.(7)[340:netd][340:netd] fork [475:netd]
+<4>[    8.124903]<6>.(1)[204:rpmb_open][emmcrpmb] emmc_rpmb_open_session, mc_open_session failed.(1)
+<4>[    8.125972]<6>.(1)[204:rpmb_open][emmcrpmb] emmc_rpmb_open_session, try free wsm and close device
+<7>[    8.126678]<6>.(5)[475:ip6tables][475:ip6tables] exit
+<7>[    8.126914]<6>-(5)[475:ip6tables][475:ip6tables] sig 17 to [340:netd] stat=S
+<4>[    8.127110]<6>.(1)[204:rpmb_open][emmcrpmb] emmc_rpmb_open_session, free wsm result (0)
+<7>[    8.127460]<6>.(6)[340:netd][340:netd] fork [476:netd]
+<4>[    8.128103]<6>.(1)[204:rpmb_open][emmcrpmb] emmc_rpmb_open_session, close device result (0)
+<4>[    8.129140]<6>.(1)[204:rpmb_open][emmcrpmb] emmc_rpmb_open_session, mc_open_device success.
+<4>[    8.130192]<6>.(1)[204:rpmb_open][emmcrpmb] emmc_rpmb_open_session, mc_malloc_wsm success.
+<7>[    8.130216]<6>.(4)[476:iptables][476:iptables] exit
+<4>[    8.130495]<6>.(7)[173:mmcqd/0][BLOCK_TAG] mmcqd:173 Workload < 1%, duty 0, period 500008769, req_cnt=0
+<7>[    8.130499]<6>-(6)[476:iptables]                                          
+<4>[    8.130502]<6>.(7)[173:mmcqd/0][BLOCK_TAG] vmstat (FP:64812)(FD:76)(ND:728)(WB:104)(NW:548)
+<7>[    8.130980]<6>.(5)[340:netd][340:netd] fork [477:netd]
+<7>[    8.132437]<6>.(2)[471:iddd][471:iddd] exit
+<4>[    8.133459]<6>.(1)[204:rpmb_open][emmcrpmb] uuid[0]=7, uuid[1]=5, uuid[2]=0, uuid[3]=0
+<7>[    8.134211]<6>.(5)[477:ip6tables][477:ip6tables] exit
+<7>[    8.134447]<6>-(5)[477:ip6tables][477:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.134929]<6>.(3)[340:netd][340:netd] fork [478:netd]
+<7>[    8.137861]<6>.(1)[478:iptables][478:iptables] exit
+<7>[    8.138078]<6>-(1)[478:iptables][478:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.138668]<6>.(2)[340:netd][340:netd] fork [479:netd]
+<7>[    8.141037]<6>.(1)[347:iddd][347:iddd] fork [480:iddd]
+<7>[    8.141301]<6>.(1)[347:iddd][347:iddd] fork [481:iddd]
+<7>[    8.141627]<6>.(3)[481:iddkb][481:iddkb] exit
+<7>[    8.142082]<6>.(2)[479:ip6tables][479:ip6tables] exit
+<7>[    8.142286]<6>-(2)[479:ip6tables][479:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.142813]<6>.(4)[340:netd][340:netd] fork [482:netd]
+<7>[    8.146002]<6>.(1)[482:iptables][482:iptables] exit
+<7>[    8.146229]<6>-(1)[482:iptables][482:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.146957]<6>.(5)[340:netd][340:netd] fork [483:netd]
+<7>[    8.150858]<6>.(5)[483:ip6tables][483:ip6tables] exit
+<7>[    8.151088]<6>-(5)[483:ip6tables][483:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.151639]<6>.(3)[340:netd][340:netd] fork [484:netd]
+<4>[    8.152004]<6>.(1)[315:boot_logo_updat][DISP]func|mtkfb_open
+<7>[    8.155039]<6>.(5)[484:iptables][484:iptables] exit
+<7>[    8.155309]<6>-(5)[484:iptables][484:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.155931]<6>.(2)[340:netd][340:netd] fork [485:netd]
+<7>[    8.159405]<6>.(4)[485:ip6tables][485:ip6tables] exit
+<7>[    8.159658]<6>-(4)[485:ip6tables][485:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.160205]<6>.(5)[340:netd][340:netd] fork [486:netd]
+<7>[    8.162247]<6>.(5)[314:surfaceflinger][314:surfaceflinger] fork [487:surfaceflinger]
+<7>[    8.162375]<6>.(5)[314:surfaceflinger][314:surfaceflinger] fork [488:surfaceflinger]
+<7>[    8.162825]<6>.(6)[487:Binder_1][487:Binder_1] fork [489:Binder_1]
+<7>[    8.163351]<6>.(4)[326:logd.reader][326:logd.reader] fork [490:logd.reader]
+<7>[    8.163921]<6>.(6)[486:iptables][486:iptables] exit
+<7>[    8.164169]<6>-(6)[486:iptables][486:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.164764]<6>.(2)[340:netd][340:netd] fork [491:netd]
+<7>[    8.167883]<6>.(4)[491:ip6tables][491:ip6tables] exit
+<7>[    8.168195]<6>-(4)[491:ip6tables][491:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.168719]<6>.(5)[340:netd][340:netd] fork [492:netd]
+<7>[    8.171849]<6>.(7)[492:iptables][492:iptables] exit
+<7>[    8.172114]<6>-(7)[492:iptables][492:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.172609]<6>.(6)[340:netd][340:netd] fork [493:netd]
+<7>[    8.175958]<6>.(5)[493:ip6tables][493:ip6tables] exit
+<7>[    8.176197]<6>-(5)[493:ip6tables][493:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.176753]<6>.(4)[340:netd][340:netd] fork [494:netd]
+<7>[    8.180074]<6>.(3)[494:iptables][494:iptables] exit
+<7>[    8.180283]<6>-(3)[494:iptables][494:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.180864]<6>.(5)[340:netd][340:netd] fork [495:netd]
+<7>[    8.181501]<6>.(5)[391:mtkbt][391:mtkbt] fork [496:mtkbt]
+<36>[    8.182058]<6>.(2)[331:logd.auditd]type=1400 audit(1484785236.480:5): avc: denied { module_request } for pid=391 comm="mtkbt" kmod="net-pf-16-proto-16-family-MTK_WIFI" scontext=u:r:mtkbt:s0 tcontext=u:r:kernel:s0 tclass=system permissive=0
+<7>[    8.184014]<6>.(6)[495:ip6tables][495:ip6tables] exit
+<7>[    8.184213]<6>-(6)[495:ip6tables][495:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.184717]<6>.(5)[340:netd][340:netd] fork [497:netd]
+<36>[    8.185322]<6>.(2)[331:logd.auditd]type=1400 audit(1484785236.480:6): avc: denied { module_request } for pid=391 comm="mtkbt" kmod="net-pf-16-proto-16-family-MTK_WIFI" scontext=u:r:mtkbt:s0 tcontext=u:r:kernel:s0 tclass=system permissive=0
+<7>[    8.187891]<6>.(4)[497:iptables][497:iptables] exit
+<36>[    8.188067]<6>.(2)[331:logd.auditd]type=1400 audit(1484785236.480:7): avc: denied { module_request } for pid=391 comm="mtkbt" kmod="net-pf-16-proto-16-family-MTK_WIFI" scontext=u:r:mtkbt:s0 tcontext=u:r:kernel:s0 tclass=system permissive=0
+<7>[    8.188107]<6>-(4)[497:iptables][497:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.188676]<6>.(6)[340:netd][340:netd] fork [498:netd]
+<36>[    8.190946]<6>.(2)[331:logd.auditd]type=1400 audit(1484785236.480:8): avc: denied { module_request } for pid=391 comm="mtkbt" kmod="net-pf-16-proto-16-family-MTK_WIFI" scontext=u:r:mtkbt:s0 tcontext=u:r:kernel:s0 tclass=system permissive=0
+<7>[    8.191986]<6>.(5)[498:ip6tables][498:ip6tables] exit
+<7>[    8.192218]<6>-(5)[498:ip6tables][498:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.192779]<6>.(6)[340:netd][340:netd] fork [499:netd]
+<36>[    8.193655]<6>.(2)[331:logd.auditd]type=1400 audit(1484785236.480:9): avc: denied { module_request } for pid=391 comm="mtkbt" kmod="net-pf-16-proto-16-family-MTK_WIFI" scontext=u:r:mtkbt:s0 tcontext=u:r:kernel:s0 tclass=system permissive=0
+<3>[    8.087283]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_patch_dwn:4 bytes address command:0x00,0x00,0x06,0x00
+<3>[    8.195246]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_patch_dwn:wmt_core: patch dwn:0 frag(97, 624) ok
+<7>[    8.195801]<6>.(6)[499:iptables][499:iptables] exit
+<7>[    8.196030]<6>-(6)[499:iptables][499:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.196538]<6>.(5)[340:netd][340:netd] fork [500:netd]
+<36>[    8.197559]<6>.(2)[331:logd.auditd]type=1400 audit(1484785236.480:10): avc: denied { module_request } for pid=391 comm="mtkbt" kmod="net-pf-16-proto-16-family-MTK_WIFI" scontext=u:r:mtkbt:s0 tcontext=u:r:kernel:s0 tclass=system permissive=0
+<7>[    8.199568]<6>.(4)[500:ip6tables][500:ip6tables] exit
+<7>[    8.199835]<6>-(4)[500:ip6tables][500:ip6tables] sig 17 to [340:netd] stat=S
+<36>[    8.200304]<6>.(2)[331:logd.auditd]type=1400 audit(1484785236.480:11): avc: denied { module_request } for pid=391 comm="mtkbt" kmod="net-pf-16-proto-16-family-MTK_WIFI" scontext=u:r:mtkbt:s0 tcontext=u:r:kernel:s0 tclass=system permissive=0
+<7>[    8.200465]<6>.(6)[340:netd][340:netd] fork [501:netd]
+<36>[    8.203095]<6>.(2)[331:logd.auditd]type=1400 audit(1484785236.480:12): avc: denied { module_request } for pid=391 comm="mtkbt" kmod="net-pf-16-proto-16-family-MTK_WIFI" scontext=u:r:mtkbt:s0 tcontext=u:r:kernel:s0 tclass=system permissive=0
+<7>[    8.203414]<6>.(5)[501:iptables][501:iptables] exit
+<7>[    8.203620]<6>-(5)[501:iptables][501:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.204164]<6>.(6)[340:netd][340:netd] fork [502:netd]
+<36>[    8.205812]<6>.(2)[331:logd.auditd]type=1400 audit(1484785236.480:13): avc: denied { module_request } for pid=391 comm="mtkbt" kmod="net-pf-16-proto-16-family-MTK_WIFI" scontext=u:r:mtkbt:s0 tcontext=u:r:kernel:s0 tclass=system permissive=0
+<7>[    8.207179]<6>.(6)[502:ip6tables][502:ip6tables] exit
+<3>[    8.207188]<6>.(5)[337:mtk_wmtd][WMT-IC][I]wmt_stp_wifi_lte_coex:ctrl GET_WMT_CONF ok(0xffffffc001124884)
+<7>[    8.207382]<6>-(6)[502:ip6tables][502:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.207931]<6>.(7)[340:netd][340:netd] fork [503:netd]
+<36>[    8.209718]<6>.(2)[331:logd.auditd]type=1400 audit(1484785236.480:14): avc: denied { module_request } for pid=391 comm="mtkbt" kmod="net-pf-16-proto-16-family-MTK_WIFI" scontext=u:r:mtkbt:s0 tcontext=u:r:kernel:s0 tclass=system permissive=0
+<7>[    8.210866]<6>.(7)[503:iptables][503:iptables] exit
+<7>[    8.211081]<6>-(7)[503:iptables][503:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.211623]<6>.(4)[340:netd][340:netd] fork [504:netd]
+<7>[    8.214601]<6>.(5)[504:ip6tables][504:ip6tables] exit
+<7>[    8.214846]<6>-(5)[504:ip6tables][504:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.215390]<6>.(6)[340:netd][340:netd] fork [505:netd]
+<7>[    8.218357]<6>.(4)[505:iptables][505:iptables] exit
+<7>[    8.218568]<6>-(4)[505:iptables][505:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.219193]<6>.(2)[340:netd][340:netd] fork [506:netd]
+<7>[    8.222303]<6>.(4)[506:ip6tables][506:ip6tables] exit
+<7>[    8.222560]<6>-(4)[506:ip6tables][506:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.223105]<6>.(7)[340:netd][340:netd] fork [507:netd]
+<3>[    8.223805]<6>.(5)[337:mtk_wmtd][WMT-IC][I]wmt_stp_wifi_lte_coex:wmt_core:set_wifi_lte_coex_table_6752 ok(0)
+<7>[    8.226207]<6>.(3)[507:iptables][507:iptables] exit
+<3>[    8.226307]<6>.(2)[337:mtk_wmtd][WMT-IC][I]wmt_stp_wifi_lte_coex:wmt_core:is_lte_project_table ok
+<7>[    8.226430]<6>-(3)[507:iptables][507:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.227015]<6>.(4)[340:netd][340:netd] fork [508:netd]
+<3>[    8.227412]<6>.(2)[337:mtk_wmtd][WMT-CTRL][I]wmt_ctrl_soc_paldo_ctrl:ept(0),epo(1)
+<5>[    8.228352]<6>.(2)[337:mtk_wmtd][hwPowerOn] acquire powerId:7 index:0 mod_name: wcn_drv powerVolt:3300
+
+<5>[    8.229519]<6>.(2)[337:mtk_wmtd][7] PMU LDO Enable
+
+<5>[    8.230127]<6>.(2)[337:mtk_wmtd]****[dct_pmic_VCN33_sel] value=3300 
+<7>[    8.230200]<6>.(7)[508:ip6tables][508:ip6tables] exit
+<7>[    8.230479]<6>-(7)[508:ip6tables][508:ip6tables] sig 17 to [340:netd] stat=W
+<5>[    8.230966]<6>.(2)[337:mtk_wmtd][dct_pmic_VCN33_enable] 1
+<3>[    8.231637]<6>.(2)[337:mtk_wmtd][WMT-CONSYS-HW][I]mtk_wcn_consys_hw_bt_paldo_ctrl:WMT do BT/WIFI v3.3 on
+<7>[    8.232539]<6>.(5)[393:program_binary_][393:program_binary_] fork [509:program_binary_]
+<7>[    8.232633]<6>.(5)[393:program_binary_][393:program_binary_] fork [510:program_binary_]
+<3>[    8.232817]<6>.(2)[337:mtk_wmtd][WMT-CTRL][I]wmt_ctrl_soc_paldo_ctrl:ept(1),epo(1)
+<7>[    8.233047]<6>.(6)[509:Binder_1][509:Binder_1] fork [511:Binder_1]
+<7>[    8.233408]<6>.(3)[340:netd][340:netd] fork [512:netd]
+<7>[    8.237314]<6>.(5)[512:iptables][512:iptables] exit
+<7>[    8.237564]<6>-(5)[512:iptables][512:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.238099]<6>.(6)[340:netd][340:netd] fork [513:netd]
+<7>[    8.241235]<6>.(7)[513:ip6tables][513:ip6tables] exit
+<7>[    8.241489]<6>-(7)[513:ip6tables][513:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.242143]<6>.(6)[340:netd][340:netd] fork [514:netd]
+<7>[    8.245498]<6>.(7)[514:iptables][514:iptables] exit
+<7>[    8.245763]<6>-(7)[514:iptables][514:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.246354]<6>.(3)[340:netd][340:netd] fork [515:netd]
+<7>[    8.249579]<6>.(7)[515:ip6tables][515:ip6tables] exit
+<7>[    8.249847]<6>-(7)[515:ip6tables][515:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.250575]<6>.(6)[340:netd][340:netd] fork [516:netd]
+<7>[    8.253705]<6>.(6)[516:iptables][516:iptables] exit
+<7>[    8.253945]<6>-(6)[516:iptables][516:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.254514]<6>.(7)[340:netd][340:netd] fork [517:netd]
+<7>[    8.257686]<6>.(6)[517:ip6tables][517:ip6tables] exit
+<7>[    8.257934]<6>-(6)[517:ip6tables][517:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.258523]<6>.(7)[340:netd][340:netd] fork [518:netd]
+<7>[    8.261714]<6>.(5)[518:iptables][518:iptables] exit
+<7>[    8.261959]<6>-(5)[518:iptables][518:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.262575]<6>.(7)[340:netd][340:netd] fork [519:netd]
+<7>[    8.265795]<6>.(3)[519:ip6tables][519:ip6tables] exit
+<7>[    8.266005]<6>-(3)[519:ip6tables][519:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.266699]<6>.(7)[340:netd][340:netd] fork [520:netd]
+<7>[    8.269866]<6>.(3)[520:iptables][520:iptables] exit
+<7>[    8.270090]<6>-(3)[520:iptables][520:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.270790]<6>.(4)[340:netd][340:netd] fork [521:netd]
+<7>[    8.274009]<6>.(2)[521:ip6tables][521:ip6tables] exit
+<7>[    8.274266]<6>-(2)[521:ip6tables][521:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.274940]<6>.(4)[340:netd][340:netd] fork [522:netd]
+<7>[    8.278318]<6>.(3)[522:iptables][522:iptables] exit
+<7>[    8.278589]<6>-(3)[522:iptables][522:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.279228]<6>.(7)[340:netd][340:netd] fork [523:netd]
+<7>[    8.282684]<6>.(7)[523:ip6tables][523:ip6tables] exit
+<7>[    8.282943]<6>-(7)[523:ip6tables][523:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.283539]<6>.(3)[340:netd][340:netd] fork [524:netd]
+<7>[    8.286934]<6>.(7)[524:iptables][524:iptables] exit
+<7>[    8.287214]<6>-(7)[524:iptables][524:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.287871]<6>.(4)[340:netd][340:netd] fork [525:netd]
+<7>[    8.291621]<6>.(4)[525:ip6tables][525:ip6tables] exit
+<7>[    8.291880]<6>-(4)[525:ip6tables][525:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.292420]<6>.(5)[340:netd][340:netd] fork [526:netd]
+<4>[    8.292740]<6>.(0)[155:kworker/0:1]WQ warning! work (md32_send_cust_pin_from_irq, ffffffc0011c1af0) execute more than 1 sec, time: 2000432308 ns
+<7>[    8.292944]<6>.(5)[383:suntrold][383:suntrold] fork [527:suntrold]
+<7>[    8.293028]<6>.(5)[383:suntrold][383:suntrold] exit
+<7>[    8.293375]<6>-(5)[383:suntrold][383:suntrold] sig 17 to [1:init] stat=D
+<4>[    8.294391]<6>-(0)[155:kworker/0:1]md32_ipi_handler 13
+<4>[    8.295026]<6>-(0)[155:kworker/0:1]                                
+<7>[    8.295030]<6>.(5)[384:suntrold_32][384:suntrold_32] fork [528:suntrold_32]
+<7>[    8.295099]<6>.(5)[384:suntrold_32][384:suntrold_32] exit
+<7>[    8.295485]<6>-(5)[384:suntrold_32][384:suntrold_32] sig 17 to [1:init] stat=D
+<3>[    8.295881]<6>.(0)[155:kworker/0:1][sensorHub] SCP_sensorHub_init_client 377 : obj->mapping = 00000000a4638000
+<7>[    8.296322]<6>.(3)[373:thermal_manager][373:thermal_manager] exit
+<7>[    8.296594]<6>-(3)[373:thermal_manager][373:thermal_manager] sig 17 to [1:init] stat=D
+<3>[    8.297206]<6>.(0)[155:kworker/0:1][sensorHub] SCP_sensorHub_init_client 383 : data.set_config_req.bufferBase = -1536983040
+<4>[    8.298639]<6>-(0)[4:kworker/0:0]md32_ipi_handler 12
+<3>[    8.299464]<6>.(0)[155:kworker/0:1][sensorHub] SCP_sensorHub_init_client 391 : SCP_sensorHub_init_client done
+<6>[    8.300751]<6>.(0)[155:kworker/0:1][Gsensor] gsensor_irq_work
+<4>[    8.300758]<6>.(0)[155:kworker/0:1]hwsize=40
+<4>[    8.301278]<6>.(0)[155:kworker/0:1]len=36,part=0
+<4>[    8.301893]<6>-(0)[4:kworker/0:0]md32_ipi_handler 12
+<7>[    8.302624]<6>.(3)[2:kthreadd][2:kthreadd] fork [529:kthreadd]
+<4>[    8.302780]<6>.(0)[155:kworker/0:1]len=4,part=1
+<4>[    8.303699]<6>-(0)[526:netd]md32_ipi_handler 12
+<4>[    8.307337]<6>.(1)[315:boot_logo_updat][DISPCHECK]AEE is not enabled, will disable layer 3
+<4>[    8.307394]<6>.(2)[113:display_idle_de][ddp_idle]ret=0
+<4>[    8.307397]<6>.(2)[113:display_idle_de][LP] end
+<5>[    8.307413]<6>.(1)[315:boot_logo_updat][DDP/OVL]ovl1, layer=0, source=memory, off(x=0, y=0), dst(0, 0, 1080, 1920),pitch=4352,fmt=eABGR8888, addr=af3e0000, keyEn=0, key=0, aen=1, alpha=0,sur_aen=0,sur_alpha=0x0, constant_color=0xff000000, yuv_range=0, sec=0,ovlsec=0
+<5>[    8.307464]<6>.(1)[315:boot_logo_updat][DDP/OVL]ovl1, layer=0, source=memory, off(x=0, y=0), dst(0, 0, 1080, 1920),pitch=4352,fmt=eRGBA8888, addr=af3e0000, keyEn=0, key=0, aen=0, alpha=255,sur_aen=0,sur_alpha=0x0, constant_color=0xff000000, yuv_range=0, sec=0,ovlsec=0
+<7>[    8.307496]<6>.(0)[526:iptables][526:iptables] exit
+<7>[    8.307751]<6>-(0)[526:iptables][526:iptables] sig 17 to [340:netd] stat=D
+<4>[    8.307804]<6>-(0)[529:kworker/0:2]md32_ipi_handler 12
+<6>[    8.307829]<6>.(0)[155:kworker/0:1][Gsensor] SCP_sensorHub_req_send, SCP_init_done!
+<7>[    8.308466]<6>.(1)[340:netd][340:netd] fork [530:netd]
+<2>[    8.311166]<6>.(6)[341:debuggerd][SPM] RGU iomap base: 0xffffff8005524000
+<2>[    8.311167]<6>.(6)[341:debuggerd][SPM] WDT_NORNRST_REG2 = 0x0
+<7>[    8.312038]<6>.(6)[341:debuggerd][341:debuggerd] fork [531:debuggerd]
+<7>[    8.312309]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [532:mtk_agpsd]
+<7>[    8.312376]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [533:mtk_agpsd]
+<7>[    8.312422]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [534:mtk_agpsd]
+<7>[    8.312465]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [535:mtk_agpsd]
+<7>[    8.312503]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [536:mtk_agpsd]
+<7>[    8.312541]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [537:mtk_agpsd]
+<7>[    8.312579]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [538:mtk_agpsd]
+<7>[    8.312605]<6>.(0)[531:debuggerd][531:debuggerd] exit
+<7>[    8.312616]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [539:mtk_agpsd]
+<7>[    8.312653]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [540:mtk_agpsd]
+<7>[    8.312693]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [541:mtk_agpsd]
+<7>[    8.312734]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [542:mtk_agpsd]
+<7>[    8.312775]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [543:mtk_agpsd]
+<7>[    8.312805]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [544:mtk_agpsd]
+<7>[    8.312834]<6>.(1)[406:mtk_agpsd][406:mtk_agpsd] fork [545:mtk_agpsd]
+<7>[    8.312931]<6>-(0)[531:debuggerd][531:debuggerd] sig 17 to [341:debuggerd] stat=S
+<7>[    8.313414]<6>.(1)[530:ip6tables][530:ip6tables] exit
+<7>[    8.313677]<6>-(1)[530:ip6tables][530:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.314267]<6>.(0)[340:netd][340:netd] fork [546:netd]
+<7>[    8.315720]<6>.(3)[284:McDaemon.Server][284:McDaemon.Server] fork [547:McDaemon.Server]
+<7>[    8.318257]<6>.(5)[546:iptables][546:iptables] exit
+<7>[    8.318498]<6>-(5)[546:iptables][546:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.319058]<6>.(0)[340:netd][340:netd] fork [548:netd]
+<7>[    8.319468]<6>-(0)[209:tad_static][PTP] [PTP_DET_MCUSYS]
+<7>[    8.319472]<6>-(0)[209:tad_static][PTP] PTPINTSTS = 0x00010000
+<7>[    8.319475]<6>-(0)[209:tad_static][PTP] PTP_PTPEN = 0x00000002
+<7>[    8.319480]<6>-(0)[209:tad_static][PTP] *(ffffff8003c74240) = 0x024CFC9C
+<7>[    8.319483]<6>-(0)[209:tad_static][PTP] *(ffffff8003c7427c) = 0x0249024C
+<2>[    8.319488]<6>-(0)[209:tad_static][PTP] @ handle_mon_mode_isr(PTP_DET_MCUSYS)
+<2>[    8.319493]<6>-(0)[209:tad_static][PTP] mon ptp_read(PTP_VOP30) = 0x20252A30
+<2>[    8.319496]<6>-(0)[209:tad_static][PTP] mon ptp_read(PTP_VOP74) = 0x1010131B
+<7>[    8.319501]<6>-(0)[209:tad_static][PTP] ptp_detectors[PTP_DET_MCUSYS].volt_tbl[0] = 0x00000040 (100000)
+<7>[    8.319505]<6>-(0)[209:tad_static][PTP] ptp_detectors[PTP_DET_MCUSYS].volt_tbl[1] = 0x0000003A (96250)
+<7>[    8.319509]<6>-(0)[209:tad_static][PTP] ptp_detectors[PTP_DET_MCUSYS].volt_tbl[2] = 0x00000035 (93125)
+<7>[    8.319514]<6>-(0)[209:tad_static][PTP] ptp_detectors[PTP_DET_MCUSYS].volt_tbl[3] = 0x00000030 (90000)
+<7>[    8.319518]<6>-(0)[209:tad_static][PTP] ptp_detectors[PTP_DET_MCUSYS].volt_tbl[4] = 0x0000002B (86875)
+<7>[    8.319522]<6>-(0)[209:tad_static][PTP] ptp_detectors[PTP_DET_MCUSYS].volt_tbl[5] = 0x00000023 (81875)
+<7>[    8.319526]<6>-(0)[209:tad_static][PTP] ptp_detectors[PTP_DET_MCUSYS].volt_tbl[6] = 0x00000020 (80000)
+<7>[    8.319530]<6>-(0)[209:tad_static][PTP] ptp_detectors[PTP_DET_MCUSYS].volt_tbl[7] = 0x00000020 (80000)
+<7>[    8.319533]<6>-(0)[209:tad_static][PTP] ptp_level = 0x00000000
+<7>[    8.319537]<6>-(0)[209:tad_static][PTP] ISR : TEMPSPARE1 = 0x00000000
+<7>[    8.319545]<6>-(0)[209:tad_static][PTP] ptp_set_ptp_volt cur_temp = 40000
+<7>[    8.320698]<6>.(2)[284:McDaemon.Server][284:McDaemon.Server] fork [549:McDaemon.Server]
+<7>[    8.322574]<6>.(5)[548:ip6tables][548:ip6tables] exit
+<7>[    8.322809]<6>-(5)[548:ip6tables][548:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.323355]<6>.(0)[340:netd][340:netd] fork [550:netd]
+<7>[    8.326510]<6>.(5)[550:iptables][550:iptables] exit
+<7>[    8.326712]<6>-(5)[550:iptables][550:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.327186]<6>.(7)[340:netd][340:netd] fork [551:netd]
+<4>[    8.329388]<6>.(1)[315:boot_logo_updat][DISP]func|mtkfb_release
+<7>[    8.330278]<6>.(5)[551:ip6tables][551:ip6tables] exit
+<7>[    8.330525]<6>-(5)[551:ip6tables][551:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.330573]<6>.(1)[315:boot_logo_updat][315:boot_logo_updat] exit
+<7>[    8.331026]<6>.(4)[340:netd][340:netd] fork [552:netd]
+<7>[    8.331241]<6>-(1)[315:boot_logo_updat][315:boot_logo_updat] sig 17 to [1:init] stat=D
+<7>[    8.331786]<6>.(0)[2:kthreadd][2:kthreadd] fork [553:kthreadd]
+<7>[    8.332096]<6>.(2)[2:kthreadd][2:kthreadd] fork [554:kthreadd]
+<7>[    8.333184]<6>.(4)[314:surfaceflinger][314:surfaceflinger] fork [555:surfaceflinger]
+<7>[    8.333194]<6>.(1)[510:program_binary_][510:program_binary_] fork [556:program_binary_]
+<7>[    8.333618]<6>.(4)[314:surfaceflinger][314:surfaceflinger] fork [557:surfaceflinger]
+<7>[    8.333661]<6>.(1)[510:program_binary_][510:program_binary_] fork [558:program_binary_]
+<7>[    8.333705]<6>.(4)[314:surfaceflinger][314:surfaceflinger] fork [559:surfaceflinger]
+<7>[    8.333735]<6>.(1)[510:program_binary_][510:program_binary_] fork [560:program_binary_]
+<7>[    8.333792]<6>.(4)[314:surfaceflinger][314:surfaceflinger] fork [561:surfaceflinger]
+<7>[    8.333808]<6>.(1)[510:program_binary_][510:program_binary_] fork [562:program_binary_]
+<7>[    8.333849]<6>.(1)[510:program_binary_][314:surfaceflinger] fork [5643:program_binary_]
+<7>[    8.333853]<6>.(4)[314:surfaceflinger][314:surfaceflinger] fork [564:surfaceflinger]
+<7>[    8.333897]<6>.(4)[314:surfaceflinger][314:surfaceflinger] fork [565:surfaceflinger]
+<7>[    8.333919]<6>.(1)[510:program_binary_][510:program_binary_] fork [566:program_binary_]
+<7>[    8.333941]<6>.(4)[314:surfaceflinger][314:surfaceflinger] fork [567:surfaceflinger]
+<7>[    8.334041]<6>.(1)[314:surfaceflinger][314:surfaceflinger] fork [568:surfaceflinger]
+<7>[    8.334099]<6>.(5)[510:program_binary_][510:program_binary_] fork [569:program_binary_]
+<7>[    8.334145]<6>.(1)[314:surfaceflinger][314:surfaceflinger] fork [570:surfaceflinger]
+<7>[    8.334153]<6>.(5)[510:program_binary_][510:program_binary_] fork [571:program_binary_]
+<7>[    8.334192]<6>.(5)[510:program_binary_][510:program_binary_] fork [572:program_binary_]
+<7>[    8.334210]<6>.(1)[314:surfaceflinger][314:surfaceflinger] fork [573:surfaceflinger]
+<7>[    8.334233]<6>.(5)[510:program_binary_][510:program_binary_] fork [574:program_binary_]
+<7>[    8.334257]<6>.(1)[314:surfaceflinger][314:surfaceflinger] fork [575:surfaceflinger]
+<7>[    8.334279]<6>.(5)[510:program_binary_][510:program_binary_] fork [576:program_binary_]
+<7>[    8.334709]<6>.(7)[552:iptables]      ptables] exit
+<7>[    8.334716]<6>.(1)[284:McDaemon.Server][284:McDaemon.Server] fork [577:McDaemon.Server]
+<7>[    8.334972]<6>-(7)[552:iptables][552:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.335478]<6>.(0)[340:netd][340:netd] fork [578:netd]
+<7>[    8.338093]<6>.(7)[510:program_binary_][510:program_binary_] fork [579:program_binary_]
+<7>[    8.338097]<6>.(4)[314:surfaceflinger][314:surfaceflinger] fork [580:surfaceflinger]
+<7>[    8.338763]<6>.(5)[578:ip6tables][578:ip6tables] exit
+<7>[    8.339044]<6>-(5)[578:ip6tables][578:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.339528]<6>.(4)[340:netd][340:netd] fork [581:netd]
+<7>[    8.340397]<6>.(4)[314:surfaceflinger][314:surfaceflinger] fork [582:surfaceflinger]
+<7>[    8.340407]<6>.(7)[510:program_binary_][510:program_binary_] fork [583:program_binary_]
+<4>[    8.340911]<6>.(4)[314:surfaceflinger][DISP]func|mtkfb_open
+<4>[    8.341616]<6>.(4)[314:surfaceflinger][DISPCHECK]AEE is not enabled, will disable layer 3
+<5>[    8.341650]<6>.(4)[314:surfaceflinger][DDP/OVL]ovl1, layer=0, source=memory, off(x=0, y=0), dst(0, 0, 1080, 1920),pitch=4352,fmt=eABGR8888, addr=af3e0000, keyEn=0, key=0, aen=1, alpha=0,sur_aen=0,sur_alpha=0x0, constant_color=0xff000000, yuv_range=0, sec=0,ovlsec=0
+<7>[    8.342726]<6>.(1)[581:iptables][581:iptables] exit
+<7>[    8.342994]<6>-(1)[581:iptables][581:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.343620]<6>.(7)[340:netd][340:netd] fork [584:netd]
+<7>[    8.346652]<6>.(1)[584:ip6tables][584:ip6tables] exit
+<7>[    8.346904]<6>-(1)[584:ip6tables][584:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.347428]<6>.(4)[340:netd][340:netd] fork [585:netd]
+<7>[    8.348546]<6>.(5)[577:McDaemon.Server][577:McDaemon.Server] exit
+<7>[    8.348640]<6>.(2)[284:McDaemon.Server][284:McDaemon.Server] fork [586:McDaemon.Server]
+<7>[    8.348866]<6>.(5)[586:McDaemon.Server][586:McDaemon.Server] exit
+<7>[    8.350515]<6>.(5)[585:iptables][585:iptables] exit
+<7>[    8.350758]<6>-(5)[585:iptables][585:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.351339]<6>.(7)[340:netd][340:netd] fork [587:netd]
+<7>[    8.354575]<6>.(1)[587:ip6tables][587:ip6tables] exit
+<7>[    8.354840]<6>-(1)[587:ip6tables][587:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.355393]<6>.(5)[340:netd][340:netd] fork [588:netd]
+<7>[    8.358423]<6>.(2)[588:iptables][588:iptables] exit
+<7>[    8.358640]<6>-(2)[588:iptables][588:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.359200]<6>.(7)[340:netd][340:netd] fork [589:netd]
+<7>[    8.362386]<6>.(7)[589:ip6tables][589:ip6tables] exit
+<7>[    8.362604]<6>-(7)[589:ip6tables][589:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.363115]<6>.(1)[340:netd][340:netd] fork [590:netd]
+<4>[    8.366178]<6>.(1)[173:mmcqd/0][BLOCK_TAG] MMC Queue Thread:173, 175, 174, 0, 0 
+<7>[    8.366182]<6>.(3)[590:iptables][590:iptables] exit
+<7>[    8.366380]<6>-(3)[590:iptables][590:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.366920]<6>.(7)[340:netd][340:netd] fork [591:netd]
+<4>[    8.367121]<6>.(1)[173:mmcqd/0][BLOCK_TAG] MMC CID: 0 0 0 0 
+<7>[    8.370058]<6>.(3)[591:ip6tables][591:ip6tables] exit
+<7>[    8.370297]<6>-(3)[591:ip6tables][591:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.371024]<6>.(4)[340:netd][340:netd] fork [592:netd]
+<7>[    8.372774]<6>.(2)[510:program_binary_][510:program_binary_] fork [593:program_binary_]
+<7>[    8.374294]<6>.(4)[592:iptables][592:iptables] exit
+<7>[    8.374529]<6>-(4)[592:iptables][592:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.375038]<6>.(6)[340:netd][340:netd] fork [594:netd]
+<7>[    8.378595]<6>.(3)[594:ip6tables][594:ip6tables] exit
+<7>[    8.378862]<6>-(3)[594:ip6tables][594:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.379399]<6>.(0)[340:netd][340:netd] fork [595:netd]
+<7>[    8.382439]<6>.(4)[406:mtk_agpsd][406:mtk_agpsd] fork [596:mtk_agpsd]
+<7>[    8.382620]<6>.(6)[406:mtk_agpsd][406:mtk_agpsd] fork [597:mtk_agpsd]
+<7>[    8.382682]<6>.(6)[406:mtk_agpsd][406:mtk_agpsd] fork [598:mtk_agpsd]
+<7>[    8.383089]<6>.(6)[406:mtk_agpsd][406:mtk_agpsd] fork [599:mtk_agpsd]
+<7>[    8.383152]<6>.(3)[595:iptables][595:iptables] exit
+<7>[    8.383162]<6>.(6)[406:mtk_agpsd][406:mtk_agpsd] fork [600:mtk_agpsd]
+<7>[    8.383210]<6>.(6)[406:mtk_agpsd][406:mtk_agpsd] fork [601:mtk_agpsd]
+<7>[    8.383294]<6>.(4)[406:mtk_agpsd][406:mtk_agpsd] fork [602:mtk_agpsd]
+<7>[    8.383342]<6>.(4)[406:mtk_agpsd][406:mtk_agpsd] fork [603:mtk_agpsd]
+<4>[    8.383427]<6>.(4)[406:mtk_agpsd]       1/chr]port ttyC2 open with flag 20802 by mtk_agpsd
+<7>[    8.383431]<6>-(3)[595:iptables][595:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.383965]<6>.(6)[340:netd][340:netd] fork [604:netd]
+<5>[    8.384534]<6>.(4)[406:mtk_agpsd][ccci1/chr]port ttyC2 write: md_s=1
+<7>[    8.386262]<6>.(4)[406:mtk_agpsd][406:mtk_agpsd] fork [605:mtk_agpsd]
+<7>[    8.386367]<6>.(4)[406:mtk_agpsd][406:mtk_agpsd] fork [606:mtk_agpsd]
+<7>[    8.386418]<6>.(4)[406:mtk_agpsd][406:mtk_agpsd] fork [607:mtk_agpsd]
+<7>[    8.386468]<6>.(4)[406:mtk_agpsd][406:mtk_agpsd] fork [608:mtk_agpsd]
+<7>[    8.386513]<6>.(4)[406:mtk_agpsd][406:mtk_agpsd] fork [609:mtk_agpsd]
+<7>[    8.386560]<6>.(4)[406:mtk_agpsd][406:mtk_agpsd] fork [610:mtk_agpsd]
+<7>[    8.387670]<6>.(6)[604:ip6tables][604:ip6tables] exit
+<7>[    8.387910]<6>-(6)[604:ip6tables][604:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.388524]<6>.(4)[340:netd][340:netd] fork [611:netd]
+<7>[    8.392082]<6>.(3)[611:iptables][611:iptables] exit
+<7>[    8.392366]<6>-(3)[611:iptables][611:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.393039]<6>.(6)[340:netd][340:netd] fork [612:netd]
+<7>[    8.396799]<6>.(6)[612:ip6tables][612:ip6tables] exit
+<7>[    8.397079]<6>-(6)[612:ip6tables][612:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.397713]<6>.(3)[340:netd][340:netd] fork [613:netd]
+<7>[    8.401216]<6>.(6)[613:iptables][613:iptables] exit
+<7>[    8.401471]<6>-(6)[613:iptables][613:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.402061]<6>.(4)[340:netd][340:netd] fork [614:netd]
+<3>[    8.402910]<6>.(6)[369:mnld][gps]null pointer!!
+<7>[    8.403398]<6>.(5)[284:McDaemon.Server][284:McDaemon.Server] fork [615:McDaemon.Server]
+<7>[    8.405589]<6>.(3)[614:ip6tables][614:ip6tables] exit
+<7>[    8.405819]<6>-(3)[614:ip6tables][614:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.406421]<6>.(4)[340:netd][340:netd] fork [616:netd]
+<7>[    8.409631]<6>.(6)[616:iptables][616:iptables] exit
+<7>[    8.409855]<6>-(6)[616:iptables][616:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.410549]<6>.(5)[340:netd][340:netd] fork [617:netd]
+<7>[    8.412644]<6>.(0)[284:McDaemon.Server][284:McDaemon.Server] fork [618:McDaemon.Server]
+<7>[    8.412956]<6>.(6)[618:McDaemon.Server][618:McDaemon.Server] exit
+<7>[    8.414590]<6>.(0)[617:ip6tables][617:ip6tables] exit
+<7>[    8.414884]<6>-(0)[617:ip6tables][617:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.415665]<6>.(6)[340:netd][340:netd] fork [619:netd]
+<7>[    8.419569]<6>.(5)[619:iptables][619:iptables] exit
+<7>[    8.419849]<6>-(5)[619:iptables][619:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.420663]<6>.(4)[340:netd][340:netd] fork [620:netd]
+<7>[    8.424314]<6>.(0)[620:ip6tables][620:ip6tables] exit
+<7>[    8.424609]<6>-(0)[620:ip6tables][620:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.425191]<6>.(4)[340:netd][340:netd] fork [621:netd]
+<7>[    8.428345]<6>.(5)[621:iptables][621:iptables] exit
+<7>[    8.428594]<6>-(5)[621:iptables][621:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.429261]<6>.(0)[340:netd][340:netd] fork [622:netd]
+<7>[    8.432711]<6>.(6)[622:ip6tables][622:ip6tables] exit
+<7>[    8.432964]<6>-(6)[622:ip6tables][622:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.433607]<6>.(4)[340:netd][340:netd] fork [623:netd]
+<7>[    8.436923]<6>.(4)[623:iptables][623:iptables] exit
+<7>[    8.437191]<6>-(4)[623:iptables][623:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.437827]<6>.(5)[340:netd][340:netd] fork [624:netd]
+<7>[    8.438997]<6>.(7)[343:drmserver][343:drmserver] fork [625:drmserver]
+<7>[    8.441192]<6>.(4)[624:ip6tables][624:ip6tables] exit
+<7>[    8.441464]<6>-(4)[624:ip6tables][624:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.442152]<6>.(3)[340:netd][340:netd] fork [626:netd]
+<7>[    8.445689]<6>.(3)[626:iptables][626:iptables] exit
+<7>[    8.445961]<6>-(3)[626:iptables][626:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.446614]<6>.(5)[340:netd][340:netd] fork [627:netd]
+<7>[    8.449984]<6>.(3)[627:ip6tables][627:ip6tables] exit
+<7>[    8.450224]<6>-(3)[627:ip6tables][627:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.450942]<6>.(5)[340:netd][340:netd] fork [628:netd]
+<7>[    8.451440]<6>.(7)[394:sdcard][394:sdcard] fork [629:sdcard]
+<7>[    8.451517]<6>.(7)[394:sdcard][394:sdcard] fork [630:sdcard]
+<7>[    8.454619]<6>.(5)[628:iptables][628:iptables] exit
+<7>[    8.454833]<6>-(5)[628:iptables][628:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.455514]<6>.(0)[340:netd][340:netd] fork [631:netd]
+<7>[    8.455553]<6>.(3)[615:McDaemon.Server][615:McDaemon.Server] exit
+<7>[    8.458746]<6>.(0)[631:ip6tables][631:ip6tables] exit
+<7>[    8.458962]<6>-(0)[631:ip6tables][631:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.459632]<6>.(5)[340:netd][340:netd] fork [632:netd]
+<7>[    8.463017]<6>.(5)[632:iptables][632:iptables] exit
+<7>[    8.463273]<6>-(5)[632:iptables][632:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.463853]<6>.(4)[340:netd][340:netd] fork [633:netd]
+<7>[    8.467010]<6>.(7)[633:ip6tables][633:ip6tables] exit
+<7>[    8.467252]<6>-(7)[633:ip6tables][633:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.467927]<6>.(6)[340:netd][340:netd] fork [634:netd]
+<7>[    8.471029]<6>.(6)[634:iptables][634:iptables] exit
+<7>[    8.471263]<6>-(6)[634:iptables][634:iptables] sig 17 to [340:netd] stat=R
+<7>[    8.471908]<6>.(5)[340:netd][340:netd] fork [635:netd]
+<7>[    8.474975]<6>.(5)[635:ip6tables][635:ip6tables] exit
+<7>[    8.475203]<6>-(5)[635:ip6tables][635:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.475745]<6>.(0)[340:netd][340:netd] fork [636:netd]
+<7>[    8.478866]<6>.(7)[636:iptables][636:iptables] exit
+<7>[    8.479104]<6>-(7)[636:iptables][636:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.479713]<6>.(5)[340:netd][340:netd] fork [637:netd]
+<7>[    8.482920]<6>.(3)[637:ip6tables][637:ip6tables] exit
+<7>[    8.483175]<6>-(3)[637:ip6tables][637:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.483713]<6>.(4)[340:netd][340:netd] fork [638:netd]
+<7>[    8.486732]<6>.(4)[638:iptables][638:iptables] exit
+<7>[    8.486931]<6>-(4)[638:iptables][638:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.487471]<6>.(0)[340:netd][340:netd] fork [639:netd]
+<7>[    8.490605]<6>.(5)[639:ip6tables][639:ip6tables] exit
+<7>[    8.490814]<6>-(5)[639:ip6tables][639:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.491298]<6>.(0)[340:netd][340:netd] fork [640:netd]
+<7>[    8.494482]<6>.(1)[640:iptables][640:iptables] exit
+<7>[    8.494716]<6>-(1)[640:iptables][640:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.495254]<6>.(4)[340:netd][340:netd] fork [641:netd]
+<7>[    8.498332]<6>.(6)[641:ip6tables][641:ip6tables] exit
+<7>[    8.498532]<6>-(6)[641:ip6tables][641:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.499030]<6>.(4)[340:netd][340:netd] fork [642:netd]
+<7>[    8.501758]<6>.(1)[284:McDaemon.Server][284:McDaemon.Server] fork [643:McDaemon.Server]
+<7>[    8.502133]<6>.(4)[642:iptables][642:iptables] exit
+<7>[    8.502373]<6>-(4)[642:iptables][642:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.502935]<6>.(1)[340:netd][340:netd] fork [644:netd]
+<7>[    8.505791]<6>.(4)[644:ip6tables][644:ip6tables] exit
+<7>[    8.506026]<6>-(4)[644:ip6tables][644:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.506489]<6>.(5)[340:netd][340:netd] fork [645:netd]
+<7>[    8.509253]<6>.(4)[645:iptables][645:iptables] exit
+<7>[    8.509473]<6>-(4)[645:iptables][645:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.509948]<6>.(4)[284:McDaemon.Server][284:McDaemon.Server] fork [646:McDaemon.Server]
+<7>[    8.509957]<6>.(5)[340:netd][340:netd] fork [647:netd]
+<7>[    8.510086]<6>.(6)[646:McDaemon.Server][646:McDaemon.Server] exit
+<7>[    8.512980]<6>.(4)[647:ip6tables][647:ip6tables] exit
+<7>[    8.513222]<6>-(4)[647:ip6tables][647:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.513711]<6>.(6)[340:netd][340:netd] fork [648:netd]
+<7>[    8.516503]<6>.(3)[648:iptables][648:iptables] exit
+<7>[    8.516748]<6>-(3)[648:iptables][648:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.517227]<6>.(5)[340:netd][340:netd] fork [649:netd]
+<7>[    8.519987]<6>.(6)[649:ip6tables][649:ip6tables] exit
+<7>[    8.520201]<6>-(6)[649:ip6tables][649:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.520806]<6>.(6)[340:netd][340:netd] fork [650:netd]
+<7>[    8.523617]<6>.(5)[650:iptables][650:iptables] exit
+<7>[    8.523817]<6>-(5)[650:iptables][650:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.524306]<6>.(6)[340:netd][340:netd] fork [651:netd]
+<7>[    8.527346]<6>.(5)[651:ip6tables][651:ip6tables] exit
+<7>[    8.527543]<6>-(5)[651:ip6tables][651:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.528039]<6>.(6)[340:netd][340:netd] fork [652:netd]
+<7>[    8.530813]<6>.(5)[652:iptables][652:iptables] exit
+<7>[    8.531010]<6>-(5)[652:iptables][652:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.531501]<6>.(6)[340:netd][340:netd] fork [653:netd]
+<7>[    8.534338]<6>.(5)[653:ip6tables][653:ip6tables] exit
+<7>[    8.534533]<6>-(5)[653:ip6tables][653:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.535081]<6>.(6)[340:netd][340:netd] fork [654:netd]
+<7>[    8.537393]<6>.(6)[643:McDaemon.Server][643:McDaemon.Server] exit
+<7>[    8.537992]<6>.(1)[654:iptables][654:iptables] exit
+<7>[    8.538252]<6>-(1)[654:iptables][654:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.538841]<6>.(6)[340:netd][340:netd] fork [655:netd]
+<14>[    8.541209]<6>.(1)[1:init]init: PropSet [persist.mtk.wcn.combo.chipid:0x6752] Done
+<14>[    8.541263]<6>.(1)[1:init]init: processing action 0x7faa0e7040 (property:ro.build.type=user)
+<14>[    8.541583]<6>.(1)[1:init]init: computing context for service '/system/bin/em_svr'
+<13>[    8.541771]<6>.(1)[1:init]init: starting 'emsvr_user'
+<7>[    8.541929]<6>.(4)[655:iptables][655:iptables] exit
+<7>[    8.542157]<6>-(4)[655:iptables][655:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.542603]<6>.(1)[1:init][1:init] fork [656:init]
+<14>[    8.542736]<6>.(1)[1:init]init: PropSet [init.svc.emsvr_user:running] Start>>
+<7>[    8.542766]<6>.(6)[340:netd][340:netd] fork [657:netd]
+<14>[    8.542845]<6>.(1)[1:init]init: PropSet [init.svc.emsvr_user:running] Done
+<14>[    8.542863]<6>.(1)[1:init]init: command 'start emsvr_user' action=property:ro.build.type=user status=0 (/init.mt6752.rc:1476)
+<14>[    8.543143]<6>.(1)[1:init]init: [PropSet]: pid:313 uid:0 gid:0 set vold.path.internal_sd=/storage/sdcard0
+<14>[    8.543156]<6>.(1)[1:init]init: PropSet [vold.path.internal_sd:/storage/sdcard0] Start>>
+<14>[    8.543232]<6>.(1)[1:init]init: PropSet [vold.path.internal_sd:/storage/sdcard0] Done
+<14>[    8.543403]<6>.(1)[1:init]init: waitpid returned pid 315, status = 00000000
+<13>[    8.543417]<6>.(1)[1:init]init: process 'bootlogoupdater', pid 315 exited
+<14>[    8.544276]<6>.(1)[1:init]init: PropSet [init.svc.bootlogoupdater:stopped] Start>>
+<14>[    8.544352]<6>.(1)[1:init]init: PropSet [init.svc.bootlogoupdater:stopped] Done
+<14>[    8.544642]<6>.(1)[1:init]init: waitpid returned pid 373, status = 00000000
+<13>[    8.544674]<6>.(1)[1:init]init: process 'thermal_manager', pid 373 exited
+<14>[    8.545540]<6>.(1)[1:init]init: PropSet [init.svc.thermal_manager:stopped] Start>>
+<14>[    8.545618]<6>.(1)[1:init]init: PropSet [init.svc.thermal_manager:stopped] Done
+<14>[    8.545803]<6>.(1)[1:init]init: waitpid returned pid 382, status = 00000000
+<13>[    8.545837]<6>.(1)[1:init]init: process 'updatemiscta', pid 382 exited
+<7>[    8.546287]<6>.(6)[657:iptables][657:iptables] exit
+<7>[    8.546655]<6>-(6)[657:iptables][657:iptables] sig 17 to [340:netd] stat=S
+<14>[    8.546696]<6>.(1)[1:init]init: PropSet [init.svc.updatemiscta:stopped] Start>>
+<14>[    8.546782]<6>.(1)[1:init]init: PropSet [init.svc.updatemiscta:stopped] Done
+<14>[    8.546915]<6>.(1)[1:init]init: waitpid returned pid 383, status = 00000000
+<13>[    8.546947]<6>.(1)[1:init]init: process 'suntrold', pid 383 exited
+<7>[    8.547564]<6>.(5)[340:netd][340:netd] fork [658:netd]
+<14>[    8.547730]<6>.(1)[1:init]init: PropSet [init.svc.suntrold:stopped] Start>>
+<14>[    8.547818]<6>.(1)[1:init]init: PropSet [init.svc.suntrold:stopped] Done
+<3>[    8.547872]<6>.(0)[337:mtk_wmtd][WMT-CTRL][I]wmt_ctrl_soc_paldo_ctrl:ept(0),epo(0)
+<14>[    8.547924]<6>.(1)[1:init]init: waitpid returned pid 384, status = 00000000
+<13>[    8.547942]<6>.(1)[1:init]init: process 'suntrold_32', pid 384 exited
+<14>[    8.547952]<6>.(1)[1:init]init: PropSet [init.svc.suntrold_32:stopped] Start>>
+<14>[    8.547986]<6>.(1)[1:init]init: PropSet [init.svc.suntrold_32:stopped] Done
+<14>[    8.548041]<6>.(1)[1:init]init: waitpid returned pid 387, status = 00000000
+<13>[    8.548052]<6>.(1)[1:init]init: process 'ta_sync_md', pid 387 exited
+<14>[    8.548070]<6>.(1)[1:init]init: PropSet [init.svc.ta_sync_md:stopped] Start>>
+<14>[    8.548095]<6>.(1)[1:init]init: PropSet [init.svc.ta_sync_md:stopped] Done
+<14>[    8.548146]<6>.(1)[1:init]init: waitpid returned pid 390, status = 00000000
+<13>[    8.548157]<6>.(1)[1:init]init: process 'permission_check', pid 390 exited
+<14>[    8.548165]<6>.(1)[1:init]init: PropSet [init.svc.permission_check:stopped] Start>>
+<14>[    8.548189]<6>.(1)[1:init]init: PropSet [init.svc.permission_check:stopped] Done
+<14>[    8.548264]<6>.(1)[1:init]init: processing action 0x7faa1098c0 (property:sys.usb.config=mtp,adb)
+<5>[    8.548367]<6>.(1)[1:init][g_android][USB]enable_store: device_attr->attr.name: enable
+<3>[    8.548373]<6>.(1)[1:init][g_android]android_usb: already disabled
+<7>[    8.548380]<6>.(1)[1:init][MUSB]usb_cable_connected 403: iddig_state = 1
+<14>[    8.548399]<6>.(1)[1:init]init: command 'write /sys/class/android_usb/android0/enable 0' action=property:sys.usb.config=mtp,adb status=0 (init.sony.usb.rc:57)
+<14>[    8.548718]<6>.(1)[1:init]init: [PropSet]: pid:350 uid:2000 gid:2000 set debug.mtklog.netlog.Running=0
+<14>[    8.548726]<6>.(1)[1:init]init: PropSet [debug.mtklog.netlog.Running:0] Start>>
+<14>[    8.548763]<6>.(1)[1:init]init: PropSet [debug.mtklog.netlog.Running:0] Done
+<14>[    8.548845]<6>.(1)[1:init]init: command 'write /sys/class/android_usb/android0/idVendor 0FCE' action=property:sys.usb.config=mtp,adb status=0 (init.sony.usb.rc:58)
+<14>[    8.549029]<6>.(1)[1:init]init: [PropSet]: pid:349 uid:2000 gid:1000 set debug.MB.running=0
+<14>[    8.549037]<6>.(1)[1:init]init: PropSet [debug.MB.running:0] Start>>
+<14>[    8.549069]<6>.(1)[1:init]init: PropSet [debug.MB.running:0] Done
+<14>[    8.549136]<6>.(1)[1:init]init: command 'write /sys/class/android_usb/android0/idProduct 51D2' action=property:sys.usb.config=mtp,adb status=0 (init.sony.usb.rc:59)
+<14>[    8.549310]<6>.(1)[1:init]init: [PropSet]: pid:315 uid:0 gid:0 set sys.boot.reason=0
+<14>[    8.549318]<6>.(1)[1:init]init: PropSet [sys.boot.reason:0] Start>>
+<14>[    8.549352]<6>.(1)[1:init]init: PropSet [sys.boot.reason:0] Done
+<5>[    8.549407]<6>.(1)[1:init][g_android][USB]functions_store: 
+<5>[    8.549412]<6>.(1)[1:init][g_android][USB]functions_store: name = mtp 
+<5>[    8.549417]<6>.(1)[1:init][g_android][USB]android_enable_function: name = mtp, f->name=ffs 
+<5>[    8.549422]<6>.(1)[1:init][g_android][USB]android_enable_function: name = mtp, f->name=adb 
+<5>[    8.549425]<6>.(1)[1:init][g_android][USB]android_enable_function: name = mtp, f->name=acm 
+<5>[    8.549429]<6>.(1)[1:init][g_android][USB]android_enable_function: name = mtp, f->name=mtp 
+<5>[    8.549432]<6>.(1)[1:init][g_android][USB]functions_store: name = adb 
+<5>[    8.549436]<6>.(1)[1:init][g_android][USB]android_enable_function: name = ffs, f->name=ffs 
+<14>[    8.549451]<6>.(1)[1:init]init: command 'write /sys/class/android_usb/android0/functions mtp,adb' action=property:sys.usb.config=mtp,adb status=0 (init.sony.usb.rc:60)
+<14>[    8.549607]<6>.(1)[1:init]init: [PropSet]: pid:356 uid:1000 gid:1000 set persist.sys.pq.shp.idx=2
+<14>[    8.549615]<6>.(1)[1:init]init: PropSet [persist.sys.pq.shp.idx:2] Start>>
+<7>[    8.550512]<6>.(4)[658:iptables][658:iptables] exit
+<7>[    8.550699]<6>-(4)[658:iptables][658:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.551203]<6>.(5)[340:netd][340:netd] fork [659:netd]
+<7>[    8.553919]<6>.(5)[659:iptables][659:iptables] exit
+<7>[    8.554099]<6>-(5)[659:iptables][659:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.554616]<6>.(4)[340:netd][340:netd] fork [660:netd]
+<7>[    8.557392]<6>.(6)[660:iptables][660:iptables] exit
+<7>[    8.557589]<6>-(6)[660:iptables][660:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.558091]<6>.(5)[340:netd][340:netd] fork [661:netd]
+<3>[    8.560844]<6>.(0)[337:mtk_wmtd][WMT-CTRL][I]wmt_ctrl_soc_paldo_ctrl:ept(1),epo(0)
+<7>[    8.560899]<6>.(7)[661:iptables][661:iptables] exit
+<7>[    8.561131]<6>-(7)[661:iptables][661:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.561633]<6>.(4)[340:netd][340:netd] fork [662:netd]
+<5>[    8.561919]<6>.(3)[337:mtk_wmtd][hwPowerDown] powerId:7 index:0 mod_name: wcn_drv
+
+<5>[    8.562859]<6>.(3)[337:mtk_wmtd][7] PMU LDO Disable
+
+<5>[    8.563470]<6>.(3)[337:mtk_wmtd][dct_pmic_VCN33_enable] 0
+<3>[    8.564150]<6>.(3)[337:mtk_wmtd][WMT-CONSYS-HW][I]mtk_wcn_consys_hw_bt_paldo_ctrl:WMT do BT/WIFI v3.3 off
+<7>[    8.564700]<6>.(7)[662:iptables][662:iptables] exit
+<7>[    8.564938]<6>-(7)[662:iptables][662:iptables] sig 17 to [340:netd] stat=S
+<3>[    8.565357]<6>.(3)[337:mtk_wmtd][WMT-IC][I]wmt_stp_init_coex:ctrl GET_WMT_CONF ok(0xffffffc001124884)
+<7>[    8.565550]<6>.(4)[340:netd][340:netd] fork [663:netd]
+<3>[    8.567289]<6>.(5)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_sw_init:init_coex ok
+<3>[    8.568154]<6>.(5)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_sw_init:co-clock disabled.
+<7>[    8.568771]<6>.(7)[663:iptables][663:iptables] exit
+<7>[    8.568994]<6>-(7)[663:iptables][663:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.569647]<6>.(3)[340:netd][340:netd] fork [664:netd]
+<3>[    8.569866]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_sw_init:set fm mode (2) ok
+<3>[    8.570896]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_sw_init:disable soc_consys firmware coredump
+<3>[    8.572015]<6>.(6)[337:mtk_wmtd][WMT-IC][I]mtk_wcn_soc_sw_init:current SOC chipid is 0x6752
+<7>[    8.572747]<6>.(0)[664:iptables][664:iptables] exit
+<7>[    8.572946]<6>-(0)[664:iptables][664:iptables] sig 17 to [340:netd] stat=S
+<4>[    8.573065]<6>.(6)[337:mtk_wmtd][STPDbg]stp_dbg_set_version_info: chipid(0x6752),wifiver(),romver(E1),patchver(20151103),branchver(1524)
+<7>[    8.573559]<6>.(1)[340:netd][340:netd] fork [665:netd]
+<7>[    8.574612]<6>.(6)[337:mtk_wmtd][STP] mtk_wcn_stp_psm_enable:[W] STP Not Ready, Dont do Sleep/Wakeup
+<7>[    8.574621]<6>.(6)[337:mtk_wmtd][STP] mtk_wcn_stp_ready:[I] set ready (1)
+<3>[    8.574634]<6>.(6)[337:mtk_wmtd][WMT-CORE][I]wmt_core_dump_func_state:[AF FUNC ON]status(b:0 f:0 g:0 w:0 lpbk:2 coredump:0 wmt:2 stp:0)
+<4>[    8.576178]<6>-(0)[401:pwr_on_conn][STP-PSM] [I]_stp_psm_put_op: opId(1) enqueue
+<7>[    8.576793]<6>.(5)[665:iptables][665:iptables] exit
+<7>[    8.577006]<6>-(5)[665:iptables][665:iptables] sig 17 to [340:netd] stat=S
+<3>[    8.577134]<6>.(0)[401:pwr_on_conn]                                                    
+<4>[    8.577137]<6>.(6)[335:mtk_stp_psm][STP-PSM] [I]_stp_psm_get_op: last_active_opId(1)
+<4>[    8.577144]<6>.(6)[335:mtk_stp_psm][STP-PSM] [I]_stp_psm_notify_wmt: In ACT state, dont do WAKEUP/HOST_AWAKE again
+<7>[    8.577570]<6>.(4)[340:netd][340:netd] fork [666:netd]
+<7>[    8.580218]<6>.(5)[666:iptables][666:iptables] exit
+<4>[    8.580403]<6>.(0)[401:pwr_on_conn][WMT-STP-EXP][I]mtk_wcn_wmt_func_on: mtk_wcn_wmt_func_on_f type(9)
+<7>[    8.580443]<6>-(5)[666:iptables][666:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.580952]<6>.(4)[340:netd][340:netd] fork [667:netd]
+<7>[    8.583963]<6>.(5)[667:iptables][667:iptables] exit
+<7>[    8.584200]<6>-(5)[667:iptables][667:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.584812]<6>.(6)[340:netd][340:netd] fork [668:netd]
+<7>[    8.588391]<6>.(0)[668:iptables][668:iptables] exit
+<7>[    8.588606]<6>-(0)[668:iptables][668:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.589178]<6>.(7)[340:netd][340:netd] fork [669:netd]
+<7>[    8.592290]<6>.(6)[669:iptables][669:iptables] exit
+<7>[    8.592536]<6>-(6)[669:iptables][669:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.593234]<6>.(7)[340:netd][340:netd] fork [670:netd]
+<7>[    8.596439]<6>.(6)[670:iptables][670:iptables] exit
+<7>[    8.596682]<6>-(6)[670:iptables][670:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.597215]<6>.(4)[340:netd][340:netd] fork [671:netd]
+<7>[    8.600297]<6>.(5)[671:ip6tables][671:ip6tables] exit
+<7>[    8.600694]<6>-(4)[671:ip6tables][671:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.601364]<6>.(6)[340:netd][340:netd] fork [672:netd]
+<14>[    8.602553]<6>.(0)[1:init]init: PropSet [persist.sys.pq.shp.idx:2] Done
+<5>[    8.602700]<6>.(0)[1:init][g_android][USB]enable_store: device_attr->attr.name: enable
+<5>[    8.603729]<6>.(0)[1:init][g_android][USB]enable function 'mtp'/ffffffc000ef85c0
+<7>[    8.604476]<6>.(7)[672:iptables][672:iptables] exit
+<5>[    8.604659]<6>.(0)[1:init][g_android][USB]enable function 'ffs'/ffffffc000ef7930
+<7>[    8.604671]<6>-(7)[672:iptables][672:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.605222]<6>.(5)[340:netd][340:netd] fork [673:netd]
+<5>[    8.605584]<6>.(0)[1:init][g_android][USB]enable_store: enable 0->1 case, device_desc.idVendor = 0xfce, device_desc.idProduct = 0x51d2
+<14>[    8.607159]<6>.(0)[1:init]init: command 'write /sys/class/android_usb/android0/enable 1' action=property:sys.usb.config=mtp,adb status=0 (init.sony.usb.rc:61)
+<14>[    8.607606]<6>.(0)[1:init]init: [PropSet]: pid:371 uid:0 gid:0 ctl.start akmd09911
+<14>[    8.607810]<6>.(0)[1:init]init: computing context for service '/system/bin/akmd09911'
+<13>[    8.607943]<6>.(0)[1:init]init: starting 'akmd09911'
+<7>[    8.608034]<6>.(5)[673:ip6tables][673:ip6tables] exit
+<7>[    8.608282]<6>-(5)[673:ip6tables][673:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.608882]<6>.(0)[1:init][1:init] fork [674:init]
+<7>[    8.608980]<6>.(4)[340:netd][340:netd] fork [675:netd]
+<14>[    8.609060]<6>.(0)[1:init]init: PropSet [init.svc.akmd09911:running] Start>>
+<14>[    8.609184]<6>.(0)[1:init]init: PropSet [init.svc.akmd09911:running] Done
+<13>[    8.609403]<6>.(0)[1:init]init: starting 'adbd'
+<7>[    8.610196]<6>.(0)[1:init][1:init] fork [676:init]
+<14>[    8.610311]<6>.(0)[1:init]init: PropSet [init.svc.adbd:running] Start>>
+<14>[    8.610404]<6>.(0)[1:init]init: PropSet [init.svc.adbd:running] Done
+<14>[    8.610498]<6>.(0)[1:init]init: command 'start adbd' action=property:sys.usb.config=mtp,adb status=0 (init.sony.usb.rc:62)
+<14>[    8.610960]<6>.(0)[1:init]init: [PropSet]: pid:390 uid:0 gid:1000 set persist.md.perm.checked=1
+<14>[    8.610972]<6>.(0)[1:init]init: PropSet [persist.md.perm.checked:1] Start>>
+<14>[    8.611037]<6>.(7)[676:init]init: Created socket '/dev/socket/adbd' with mode '660', user '1000', group '1000'
+<7>[    8.612352]<6>.(7)[675:iptables][675:iptables] exit
+<7>[    8.612574]<6>.(5)[676:adbd][676:adbd] fork [677:adbd]
+<7>[    8.612602]<6>-(7)[675:iptables][675:iptables] sig 17 to [340:netd] stat=S
+<6>[    8.612642]<6>.(4)[677:adbd][g_android]read descriptors
+<6>[    8.612653]<6>.(4)[677:adbd][g_android]read strings
+<7>[    8.613105]<6>.(0)[340:netd][340:netd] fork [678:netd]
+<5>[    8.612674]<6>.(4)[677:adbd][g_android][USB]android_bind_enabled_functions: 
+<5>[    8.613342]<6>.(4)[677:adbd][g_android][USB]bind_config function 'mtp'/ffffffc000ef85c0
+<6>[    8.614371]<6>.(4)[677:adbd]mtp_bind_config
+<6>[    8.614384]<6>.(4)[677:adbd]android_usb gadget: adding 'mtp'/ffffffc06460f800 to config 'android'/ffffffc000ef77e8
+<4>[    8.614390]<6>.(4)[677:adbd]mtp_function_bind dev: ffffffc06460f800
+<5>[    8.615181]<6>.(4)[677:adbd][g_android][USB]bind_config function 'ffs'/ffffffc000ef7930
+<7>[    8.615952]<6>.(6)[678:ip6tables][678:ip6tables] exit
+<7>[    8.616159]<6>-(6)[678:ip6tables][678:ip6tables] sig 17 to [340:netd] stat=S
+<6>[    8.616179]<6>.(4)[677:adbd]android_usb gadget: adding 'Function FS Gadget'/ffffffc05dc83a38 to config 'android'/ffffffc000ef77e8
+<6>[    8.616199]<6>.(4)[677:adbd]android_usb gadget: cfg 1/ffffffc000ef77e8 speeds: high full
+<7>[    8.616210]<6>.(4)[677:adbd][MUSB]musb_gadget_pullup 2585: is_on=1, softconnect=0 ++
+<7>[    8.616219]<6>.(4)[677:adbd][MUSB]usb_cable_connected 403: iddig_state = 1
+<7>[    8.616226]<6>.(4)[677:adbd][MUSB]musb_pullup 2538: MUSB: gadget pull up 1 start
+<7>[    8.616233]<6>.(4)[677:adbd][MUSB]musb_start 1242: start, is_host=0 is_active=1
+<7>[    8.616241]<6>.(4)[677:adbd][MUSB]mt_usb_enable 214: 0, 0
+<6>[    8.616251]<6>-(4)[677:adbd][mt_clkmgr][Power/clkmgr] [sdm_pll_enable_op]: pll->name=UNIVPLL
+<7>[    8.616286]<6>-(4)[677:adbd]enable(1), count(1) res1=0, res2=1
+<7>[    8.616293]<6>-(4)[677:adbd][MUSB]musb_readl 73: [MUSB]:access musb_readl function when usb clock is off 0xA4
+<6>[    8.616301]<6>-(4)[677:adbd][mt_clkmgr][Power/clkmgr] [sdm_pll_disable_op]: pll->name=UNIVPLL
+<7>[    8.616312]<6>-(4)[677:adbd]enable(0), count(0) res1=0, res2=1
+<6>[    8.616317]<6>-(4)[677:adbd][mt_clkmgr][Power/clkmgr] [sdm_pll_enable_op]: pll->name=UNIVPLL
+<7>[    8.616349]<6>-(4)[677:adbd]enable(1), count(1) res1=0, res2=1
+<7>[    8.616356]<6>-(4)[677:adbd][MUSB]musb_writel 105: [MUSB]:access musb_writel function when usb clock is off 0xA4
+<6>[    8.616362]<6>-(4)[677:adbd][mt_clkmgr][Power/clkmgr] [sdm_pll_disable_op]: pll->name=UNIVPLL
+<7>[    8.616371]<6>-(4)[677:adbd]enable(0), count(0) res1=0, res2=1
+<7>[    8.616377]<6>.(4)[677:adbd][MUSB]mt_usb_enable 237: enable UPLL before connect
+<7>[    8.616642]<6>.(5)[340:netd][340:netd] fork [679:netd]
+<7>[    8.619588]<6>.(7)[679:iptables][679:iptables] exit
+<7>[    8.619801]<6>-(7)[679:iptables][679:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.620294]<6>.(5)[340:netd][340:netd] fork [680:netd]
+<7>[    8.623323]<6>.(4)[680:ip6tables][680:ip6tables] exit
+<7>[    8.623521]<6>-(4)[680:ip6tables][680:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.623990]<6>.(7)[340:netd][340:netd] fork [681:netd]
+<6>[    8.626395]<6>-(5)[677:adbd][mt_clkmgr][Power/clkmgr] [sdm_pll_enable_op]: pll->name=UNIVPLL
+<7>[    8.626435]<6>.(5)[677:adbd]enable(1), count(1) res1=0, res2=1
+<7>[    8.626924]<6>.(7)[681:iptables][681:iptables] exit
+<7>[    8.627132]<6>-(7)[681:iptables][681:iptables] sig 17 to [340:netd] stat=S
+<4>[    8.627316]<6>.(5)[677:adbd][USBPHY]slew calibration:FM_OUT =296,x=4649,value=5
+<7>[    8.627670]<6>.(6)[340:netd][340:netd] fork [682:netd]
+<4>[    8.628227]<6>.(5)[677:adbd]usb recovery success
+<7>[    8.628773]<6>-(0)[0:swapper/0][PTP] [PTP_DET_GPUSYS]
+<7>[    8.628778]<6>-(0)[0:swapper/0][PTP] PTPINTSTS = 0x00020000
+<7>[    8.628781]<6>-(0)[0:swapper/0][PTP] PTP_PTPEN = 0x00000002
+<7>[    8.628786]<6>-(0)[0:swapper/0][PTP] *(ffffff8003c74240) = 0x0224FDF8
+<7>[    8.628789]<6>-(0)[0:swapper/0][PTP] *(ffffff8003c7427c) = 0x02290229
+<2>[    8.628794]<6>-(0)[0:swapper/0][PTP] @ handle_mon_mode_isr(PTP_DET_GPUSYS)
+<2>[    8.628807]<6>-(0)[0:swapper/0][PTP] mon ptp_read(PTP_VOP30) = 0x282B2E31
+<2>[    8.628811]<6>-(0)[0:swapper/0][PTP] mon ptp_read(PTP_VOP74) = 0x25252525
+<7>[    8.628816]<6>-(0)[0:swapper/0][PTP] ptp_detectors[PTP_DET_GPUSYS].volt_tbl[0] = 0x00000041 (100625)
+<7>[    8.628820]<6>-(0)[0:swapper/0][PTP] ptp_detectors[PTP_DET_GPUSYS].volt_tbl[1] = 0x0000003E (98750)
+<7>[    8.628824]<6>-(0)[0:swapper/0][PTP] ptp_detectors[PTP_DET_GPUSYS].volt_tbl[2] = 0x0000003B (96875)
+<7>[    8.628828]<6>-(0)[0:swapper/0][PTP] ptp_detectors[PTP_DET_GPUSYS].volt_tbl[3] = 0x00000038 (95000)
+<7>[    8.628833]<6>-(0)[0:swapper/0][PTP] ptp_detectors[PTP_DET_GPUSYS].volt_tbl[4] = 0x00000035 (93125)
+<7>[    8.628837]<6>-(0)[0:swapper/0][PTP] ptp_detectors[PTP_DET_GPUSYS].volt_tbl[5] = 0x00000035 (93125)
+<7>[    8.628841]<6>-(0)[0:swapper/0][PTP] ptp_detectors[PTP_DET_GPUSYS].volt_tbl[6] = 0x00000035 (93125)
+<7>[    8.628845]<6>-(0)[0:swapper/0][PTP] ptp_detectors[PTP_DET_GPUSYS].volt_tbl[7] = 0x00000035 (93125)
+<7>[    8.628848]<6>-(0)[0:swapper/0][PTP] ptp_level = 0x00000000
+<7>[    8.628851]<6>-(0)[0:swapper/0][PTP] ISR : TEMPSPARE1 = 0x00000000
+<7>[    8.628855]<6>-(0)[0:swapper/0][PTP] ptp_set_ptp_volt cur_temp = 36600
+<4>[    8.630577]<6>.(7)[173:mmcqd/0][BLOCK_TAG] mmcqd:173 Workload < 1%, duty 0, period 500077692, req_cnt=0
+<4>[    8.630585]<6>.(7)[173:mmcqd/0][BLOCK_TAG] vmstat (FP:102824)(FD:72)(ND:764)(WB:140)(NW:552)
+<7>[    8.630718]<6>.(6)[682:ip6tables][682:ip6tables] exit
+<7>[    8.630924]<6>-(6)[682:ip6tables][682:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.631404]<6>.(4)[340:netd][340:netd] fork [683:netd]
+<7>[    8.633763]<6>.(6)[677:adbd][MUSB]musb_pullup 2552: MUSB: gadget pull up 1 end
+<7>[    8.634083]<6>.(5)[676:adbd][676:adbd] fork [684:adbd]
+<7>[    8.634148]<6>.(5)[676:adbd][676:adbd] fork [685:adbd]
+<7>[    8.634441]<6>.(1)[683:iptables][683:iptables] exit
+<7>[    8.634682]<6>-(1)[683:iptables][683:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.635125]<6>.(6)[340:netd][340:netd] fork [686:netd]
+<7>[    8.638268]<6>.(1)[686:ip6tables][686:ip6tables] exit
+<7>[    8.638511]<6>-(1)[686:ip6tables][686:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.638969]<6>.(5)[340:netd][340:netd] fork [687:netd]
+<7>[    8.642006]<6>.(7)[687:iptables][687:iptables] exit
+<7>[    8.642220]<6>-(7)[687:iptables][687:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.642701]<6>.(4)[340:netd][340:netd] fork [688:netd]
+<7>[    8.645541]<6>.(5)[688:ip6tables][688:ip6tables] exit
+<7>[    8.645756]<6>-(5)[688:ip6tables][688:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.646274]<6>.(7)[340:netd][340:netd] fork [689:netd]
+<7>[    8.649155]<6>.(7)[689:iptables][689:iptables] exit
+<7>[    8.649373]<6>-(7)[689:iptables][689:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.649912]<6>.(5)[340:netd][340:netd] fork [690:netd]
+<7>[    8.652947]<6>.(4)[690:ip6tables][690:ip6tables] exit
+<7>[    8.653182]<6>-(4)[690:ip6tables][690:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.653649]<6>.(7)[340:netd][340:netd] fork [691:netd]
+<7>[    8.656349]<6>.(4)[371:msensord][371:msensord] exit
+<7>[    8.656648]<6>-(4)[371:msensord][371:msensord] sig 17 to [1:init] stat=D
+<7>[    8.656675]<6>.(5)[691:iptables][691:iptables] exit
+<7>[    8.656903]<6>-(5)[691:iptables][691:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.657418]<6>.(7)[340:netd][340:netd] fork [692:netd]
+<3>[    8.657464]<6>.(6)[674:akmd09911]layout=2
+
+<7>[    8.660328]<6>.(5)[692:ip6tables][692:ip6tables] exit
+<7>[    8.660603]<6>-(5)[692:ip6tables][692:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.661142]<6>.(4)[340:netd][340:netd] fork [693:netd]
+<7>[    8.664176]<6>.(4)[693:iptables][693:iptables] exit
+<7>[    8.664385]<6>-(4)[693:iptables][693:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.664937]<6>.(5)[340:netd][340:netd] fork [694:netd]
+<7>[    8.668113]<6>.(5)[694:ip6tables][694:ip6tables] exit
+<7>[    8.668338]<6>-(5)[694:ip6tables][694:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.668885]<6>.(4)[340:netd][340:netd] fork [695:netd]
+<14>[    8.671779]<6>.(0)[1:init]init: PropSet [persist.md.perm.checked:1] Done
+<14>[    8.671853]<6>.(0)[1:init]init: PropSet [sys.usb.state:mtp,adb] Start>>
+<14>[    8.671897]<6>.(0)[1:init]init: PropSet [sys.usb.state:mtp,adb] Done
+<14>[    8.671915]<6>.(0)[1:init]init: command 'setprop sys.usb.state ${sys.usb.config}' action=property:sys.usb.config=mtp,adb status=0 (init.sony.usb.rc:63)
+<7>[    8.672031]<6>.(4)[695:iptables][695:iptables] exit
+<7>[    8.672301]<6>-(4)[695:iptables][695:iptables] sig 17 to [340:netd] stat=S
+<14>[    8.672321]<6>.(0)[1:init]init: [PropSet]: pid:386 uid:0 gid:0 set ro.arima.imei_1=359099068776508
+<14>[    8.672333]<6>.(0)[1:init]init: PropSet [ro.arima.imei_1:359099068776508] Start>>
+<14>[    8.672391]<6>.(0)[1:init]init: PropSet [ro.arima.imei_1:359099068776508] Done
+<14>[    8.672506]<6>.(0)[1:init]init: waitpid returned pid 371, status = 0000fe00
+<13>[    8.672531]<6>.(0)[1:init]init: process 'msensord', pid 371 exited
+<7>[    8.672843]<6>.(5)[340:netd][340:netd] fork [696:netd]
+<14>[    8.673322]<6>.(0)[1:init]init: PropSet [init.svc.msensord:stopped] Start>>
+<14>[    8.673401]<6>.(0)[1:init]init: PropSet [init.svc.msensord:stopped] Done
+<14>[    8.673530]<6>.(0)[1:init]init: processing action 0x7faa0f3760 (property:init.svc.adbd=running)
+<14>[    8.673678]<6>.(0)[1:init]init: computing context for service '/system/bin/xlog'
+<13>[    8.673805]<6>.(0)[1:init]init: starting 'xlogdebugchanged'
+<7>[    8.674700]<6>.(0)[1:init][1:init] fork [697:init]
+<14>[    8.674838]<6>.(0)[1:init]init: PropSet [init.svc.xlogdebugchanged:running] Start>>
+<14>[    8.674940]<6>.(0)[1:init]init: PropSet [init.svc.xlogdebugchanged:running] Done
+<14>[    8.674959]<6>.(0)[1:init]init: command 'start xlogdebugchanged' action=property:init.svc.adbd=running status=0 (init.xlog.rc:27)
+<14>[    8.675231]<6>.(0)[1:init]init: [PropSet]: pid:387 uid:0 gid:1000 set arima.bk_nv=0
+<14>[    8.675242]<6>.(0)[1:init]init: PropSet [arima.bk_nv:0] Start>>
+<14>[    8.675323]<6>.(0)[1:init]init: PropSet [arima.bk_nv:0] Done
+<14>[    8.675669]<6>.(0)[1:init]init: [PropSet]: pid:352 uid:0 gid:1000 set arima.ftboot.ass=0
+<14>[    8.675681]<6>.(0)[1:init]init: PropSet [arima.ftboot.ass:0] Start>>
+<14>[    8.675745]<6>.(0)[1:init]init: PropSet [arima.ftboot.ass:0] Done
+<14>[    8.675899]<6>.(0)[1:init]init: [PropSet]: pid:313 uid:0 gid:0 set vold.path.external_sd=/storage/sdcard1
+<14>[    8.675910]<6>.(0)[1:init]init: PropSet [vold.path.external_sd:/storage/sdcard1] Start>>
+<14>[    8.675952]<6>.(0)[1:init]init: PropSet [vold.path.external_sd:/storage/sdcard1] Done
+<14>[    8.676052]<6>.(0)[1:init]init: [PropSet]: pid:356 uid:1000 gid:1000 set persist.sys.pq.adl.idx=0
+<14>[    8.676062]<6>.(0)[1:init]init: PropSet [persist.sys.pq.adl.idx:0] Start>>
+<7>[    8.676248]<6>.(5)[696:ip6tables][696:ip6tables] exit
+<7>[    8.676426]<6>.(4)[313:vold][313:vold] fork [698:vold]
+<7>[    8.676611]<6>-(5)[696:ip6tables][696:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.677250]<6>.(5)[340:netd][340:netd] fork [699:netd]
+<7>[    8.679669]<6>.(7)[697:xlog][697:xlog] exit
+<7>[    8.679929]<6>-(7)[697:xlog][697:xlog] sig 17 to [1:init] stat=D
+<7>[    8.680663]<6>.(5)[699:iptables][699:iptables] exit
+<7>[    8.680936]<6>-(4)[699:iptables][699:iptables] sig 17 to [340:netd] stat=S
+<14>[    8.681141]<6>.(5)[1:init]init: PropSet [persist.sys.pq.adl.idx:0] Done
+<14>[    8.681388]<6>.(5)[1:init]init: [PropSet]: pid:386 uid:0 gid:0 set ro.arima.imei_2=359099068776516
+<14>[    8.681397]<6>.(5)[1:init]init: PropSet [ro.arima.imei_2:359099068776516] Start>>
+<7>[    8.681405]<6>.(4)[356:pq]                                    
+<7>[    8.681406]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6700](0) = 0x0
+<7>[    8.681423]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6800](64) = 0x8020080
+<7>[    8.681439]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6900](128) = 0x10040100
+<7>[    8.681454]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6a00](192) = 0x18060180
+<7>[    8.681476]<6>.(4)[356:pq]it: PropSet fffff80003imei_2:35909900x20080200
+<14>[    8.681479]<6>.(5)[1:init]init: PropSet [ro.arima.imei_2:359099068776516] Done
+<7>[    8.681496]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6c00](320) = 0x280a0280
+<7>[    8.681511]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6d00](384) = 0x300c0300
+<7>[    8.681527]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6e00](448) = 0x380e0380
+<7>[    8.681549]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6efc](511) = 0x3feffbfe
+<7>[    8.681637]<6>.(7)[340:netd][340:netd] fork [700:netd]
+<14>[    8.681654]<6>.(5)[1:init]init: waitpid returned pid 697, status = 00000000
+<13>[    8.681693]<6>.(5)[1:init]init: process 'xlogdebugchanged', pid 697 exited
+<7>[    8.681852]<6>.(4)[356:pq][GAMMA] disp_gamma_set_lut(cmdq = 1)
+<7>[    8.681854]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6700](0) = 0x0
+<7>[    8.681867]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6800](64) = 0x8020080
+<7>[    8.681880]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6900](128) = 0x10040100
+<7>[    8.681893]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6a00](192) = 0x18060180
+<7>[    8.681905]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6b00](256) = 0x20080200
+<7>[    8.681918]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6c00](320) = 0x280a0280
+<7>[    8.681931]<6>.(4)[356:pq][GAMMA] [0xffffff80003a6d00](384) = 0x300c0300
+<3>[    8.681935]<6>.(0)[386:update_ta_info][GPIO]    26: GPIO82 HARDCODE warning!!! 
+<4>[    8.681943]<6>.(0)[386:update_ta_info]                                       Tainted: P        W  O 3.10.72+ #1
+<4>[    8.681948]<6>.(0)[386:update_ta_info]Call trace:
+<4>[    8.681959]<6>.(0)[386:update_ta_info]7[GAMMA] [0xffffff80003a6efc](race+0x0/0x130
+<4>[    8.681962]<6>.(4)[356:pq]                fff80003                         
+<7>[    8.681964]<6>.(4)[356:pq]                                              
+<4>[    8.681969]<6>.(0)[386:update_ta_info][<ffffffc000088cd8>] show_stack+0x10/0x1c
+<4>[    8.681977]<6>.(0)[386:update_ta_info][<ffffffc0009ae594>] dump_stack+0x1c/0x28
+<4>[    8.681988]<6>.(0)[386:update_ta_info][<ffffffc0005cdf20>] mt_gpio_pin_decrypt+0x3c/0x48
+<4>[    8.681995]<6>.(0)[386:update_ta_info][<ffffffc0005cc344>] mt_get_gpio_in+0x14/0x8c
+<4>[    8.682002]<6>.(0)[386:update_ta_info][<ffffffc0005cce4c>] mt_gpio_ioctl+0x2c4/0x3a8
+<4>[    8.682010]<6>.(0)[386:update_ta_info][<ffffffc0001a567c>] do_vfs_ioctl+0x354/0x584
+<4>[    8.682016]<6>.(0)[386:update_ta_info][<ffffffc0001a592c>] SyS_ioctl+0x80/0x98
+<3>[    8.682030]<6>.(0)[386:update_ta_info][GPIO]    26: GPIO78 HARDCODE warning!!! 
+<4>[    8.682036]<6>.(0)[386:update_ta_info]CPU: 0 PID: 386 Comm: update_ta_info Tainted: P        W  O 3.10.72+ #1
+<4>[    8.682038]<6>.(0)[386:update_ta_info]Call trace:
+<4>[    8.682046]<6>.(0)[386:update_ta_info][<ffffffc000088b98>] dump_backtrace+0x0/0x130
+<4>[    8.682052]<6>.(0)[386:update_ta_info][<ffffffc000088cd8>] show_stack+0x10/0x1c
+<4>[    8.682058]<6>.(0)[386:update_ta_info][<ffffffc0009ae594>] dump_stack+0x1c/0x28
+<4>[    8.682066]<6>.(0)[386:update_ta_info][<ffffffc0005cdf20>] mt_gpio_pin_decrypt+0x3c/0x48
+<4>[    8.682072]<6>.(0)[386:update_ta_info][<ffffffc0005cc344>] mt_get_gpio_in+0x14/0x8c
+<4>[    8.682079]<6>.(0)[386:update_ta_info][<ffffffc0005cce4c>] mt_gpio_ioctl+0x2c4/0x3a8
+<4>[    8.682086]<6>.(0)[386:update_ta_info][<ffffffc0001a567c>] do_vfs_ioctl+0x354/0x584
+<4>[    8.682092]<6>.(0)[386:update_ta_info][<ffffffc0001a592c>] SyS_ioctl+0x80/0x98
+<3>[    8.682104]<6>.(0)[386:update_ta_info][GPIO]    26: GPIO76 HARDCODE warning!!! 
+<4>[    8.682110]<6>.(0)[386:update_ta_info]CPU: 0 PID: 386 Comm: update_ta_info Tainted: P        W  O 3.10.72+ #1
+<4>[    8.682112]<6>.(0)[386:update_ta_info]Call trace:
+<4>[    8.682120]<6>.(0)[386:update_ta_info][<ffffffc000088b98>] dump_backtrace+0x0/0x130
+<4>[    8.682127]<6>.(0)[386:update_ta_info][<ffffffc000088cd8>] show_stack+0x10/0x1c
+<4>[    8.682133]<6>.(0)[386:update_ta_info][<ffffffc0009ae594>] dump_stack+0x1c/0x28
+<4>[    8.682141]<6>.(0)[386:update_ta_info][<ffffffc0005cdf20>] mt_gpio_pin_decrypt+0x3c/0x48
+<4>[    8.682147]<6>.(0)[386:update_ta_info][<ffffffc0005cc344>] mt_get_gpio_in+0x14/0x8c
+<4>[    8.682154]<6>.(0)[386:update_ta_info][<ffffffc0005cce4c>] mt_gpio_ioctl+0x2c4/0x3a8
+<4>[    8.682160]<6>.(0)[386:update_ta_info][<ffffffc0001a567c>] do_vfs_ioctl+0x354/0x584
+<4>[    8.682167]<6>.(0)[386:update_ta_info][<ffffffc0001a592c>] SyS_ioctl+0x80/0x98
+<3>[    8.682178]<6>.(0)[386:update_ta_info][GPIO]    26: GPIO75 HARDCODE warning!!! 
+<4>[    8.682184]<6>.(0)[386:update_ta_info]CPU: 0 PID: 386 Comm: update_ta_info Tainted: P        W  O 3.10.72+ #1
+<4>[    8.682186]<6>.(0)[386:update_ta_info]Call trace:
+<4>[    8.682194]<6>.(0)[386:update_ta_info][<ffffffc000088b98>] dump_backtrace+0x0/0x130
+<4>[    8.682201]<6>.(0)[386:update_ta_info][<ffffffc000088cd8>] show_stack+0x10/0x1c
+<4>[    8.682207]<6>.(0)[386:update_ta_info][<ffffffc0009ae594>] dump_stack+0x1c/0x28
+<4>[    8.682214]<6>.(0)[386:update_ta_info][<ffffffc0005cdf20>] mt_gpio_pin_decrypt+0x3c/0x48
+<4>[    8.682220]<6>.(0)[386:update_ta_info][<ffffffc0005cc344>] mt_get_gpio_in+0x14/0x8c
+<4>[    8.682227]<6>.(0)[386:update_ta_info][<ffffffc0005cce4c>] mt_gpio_ioctl+0x2c4/0x3a8
+<4>[    8.682233]<6>.(0)[386:update_ta_info][<ffffffc0001a567c>] do_vfs_ioctl+0x354/0x584
+<4>[    8.682240]<6>.(0)[386:update_ta_info][<ffffffc0001a592c>] SyS_ioctl+0x80/0x98
+<7>[    8.682246]<6>.(4)[356:pq][356:pq] exit
+<7>[    8.682750]<6>-(4)[356:pq][356:pq] sig 17 to [1:init] stat=R
+<7>[    8.685847]<6>.(4)[700:ip6tables][700:ip6tables] exit
+<7>[    8.686074]<6>-(4)[700:ip6tables][700:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.686666]<6>.(7)[340:netd][340:netd] fork [701:netd]
+<7>[    8.689745]<6>.(7)[701:iptables][701:iptables] exit
+<7>[    8.689956]<6>-(7)[701:iptables][701:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.690550]<6>.(4)[340:netd][340:netd] fork [702:netd]
+<7>[    8.693893]<6>.(4)[702:ip6tables][702:ip6tables] exit
+<7>[    8.694111]<6>-(4)[702:ip6tables][702:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.694700]<6>.(7)[340:netd][340:netd] fork [703:netd]
+<7>[    8.697899]<6>.(7)[703:iptables][703:iptables] exit
+<7>[    8.698105]<6>-(7)[703:iptables][703:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.698662]<6>.(4)[340:netd][340:netd] fork [704:netd]
+<7>[    8.701884]<6>.(4)[704:ip6tables][704:ip6tables] exit
+<7>[    8.702091]<6>-(4)[704:ip6tables][704:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.702659]<6>.(6)[340:netd][340:netd] fork [705:netd]
+<7>[    8.705483]<6>.(6)[705:iptables][705:iptables] exit
+<7>[    8.705680]<6>-(6)[705:iptables][705:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.706204]<6>.(7)[340:netd][340:netd] fork [706:netd]
+<7>[    8.709097]<6>.(6)[706:ip6tables][706:ip6tables] exit
+<7>[    8.709289]<6>-(6)[706:ip6tables][706:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.709834]<6>.(7)[340:netd][340:netd] fork [707:netd]
+<7>[    8.712664]<6>.(6)[707:iptables][707:iptables] exit
+<7>[    8.712852]<6>-(6)[707:iptables][707:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.713368]<6>.(7)[340:netd][340:netd] fork [708:netd]
+<7>[    8.716256]<6>.(6)[708:ip6tables][708:ip6tables] exit
+<7>[    8.716450]<6>-(6)[708:ip6tables][708:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.717015]<6>.(7)[340:netd][340:netd] fork [709:netd]
+<7>[    8.719893]<6>.(6)[709:iptables][709:iptables] exit
+<7>[    8.720080]<6>-(6)[709:iptables][709:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.720632]<6>.(7)[340:netd][340:netd] fork [710:netd]
+<7>[    8.723561]<6>.(6)[710:ip6tables][710:ip6tables] exit
+<7>[    8.723752]<6>-(6)[710:ip6tables][710:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.724279]<6>.(7)[340:netd][340:netd] fork [711:netd]
+<14>[    8.724897]<6>.(5)[1:init]init: PropSet [init.svc.xlogdebugchanged:stopped] Start>>
+<14>[    8.724984]<6>.(5)[1:init]init: PropSet [init.svc.xlogdebugchanged:stopped] Done
+<14>[    8.725057]<6>.(5)[1:init]init: waitpid returned pid 356, status = 00000000
+<13>[    8.725071]<6>.(5)[1:init]init: process 'pq', pid 356 exited
+<14>[    8.725778]<6>.(5)[1:init]init: PropSet [init.svc.pq:stopped] Start>>
+<14>[    8.725848]<6>.(5)[1:init]init: PropSet [init.svc.pq:stopped] Done
+<14>[    8.726327]<6>.(5)[1:init]init: [PropSet]: pid:344 uid:0 gid:1005 set persist.af.losslessbt.on=0
+<14>[    8.726342]<6>.(5)[1:init]init: PropSet [persist.af.losslessbt.on:0] Start>>
+<7>[    8.727241]<6>.(6)[711:iptables][711:iptables] exit
+<7>[    8.727636]<6>-(0)[711:iptables][711:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.728262]<6>.(4)[340:netd][340:netd] fork [712:netd]
+<14>[    8.728638]<6>.(6)[1:init]init: PropSet [persist.af.losslessbt.on:0] Done
+<14>[    8.729171]<6>.(6)[1:init]init: [PropSet]: pid:357 uid:1000 gid:1000 set persist.dm.lock=false
+<14>[    8.729190]<6>.(6)[1:init]init: PropSet [persist.dm.lock:false] Start>>
+<7>[    8.731864]<6>.(0)[712:iptables][712:iptables] exit
+<7>[    8.732097]<6>-(0)[712:iptables][712:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.732751]<6>.(4)[340:netd][340:netd] fork [713:netd]
+<7>[    8.735791]<6>.(4)[713:iptables][713:iptables] exit
+<7>[    8.736010]<6>-(4)[713:iptables][713:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.736593]<6>.(6)[340:netd][340:netd] fork [714:netd]
+<7>[    8.739540]<6>.(4)[714:iptables][714:iptables] exit
+<7>[    8.739794]<6>-(4)[714:iptables][714:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.740354]<6>.(7)[340:netd][340:netd] fork [715:netd]
+<14>[    8.742188]<6>.(4)[1:init]init: PropSet [persist.dm.lock:false] Done
+<7>[    8.742435]<6>.(0)[357:dm_agent_binder][357:dm_agent_binder] fork [716:dm_agent_binder]
+<14>[    8.742696]<6>.(4)[1:init]init: [PropSet]: pid:314 uid:1000 gid:1003 set debug.hwc.compose_level=0
+<14>[    8.742713]<6>.(4)[1:init]init: PropSet [debug.hwc.compose_level:0] Start>>
+<14>[    8.742808]<6>.(4)[1:init]init: PropSet [debug.hwc.compose_level:0] Done
+<4>[    8.742960]<6>.(0)[314:surfaceflinger]fence/new session:0x30002
+<14>[    8.742993]<6>.(4)[1:init]init: [PropSet]: pid:319 uid:1000 gid:1000 set service.wcn.driver.ready=yes
+<14>[    8.743001]<6>.(4)[1:init]init: PropSet [service.wcn.driver.ready:yes] Start>>
+<14>[    8.743056]<6>.(4)[1:init]init: PropSet [service.wcn.driver.ready:yes] Done
+<14>[    8.743156]<6>.(4)[1:init]init: [PropSet]: pid:352 uid:0 gid:1000 set arima.ftboot=0
+<7>[    8.743164]<6>.(1)[401:pwr_on_conn][401:pwr_on_conn] exit
+<14>[    8.743166]<6>.(4)[1:init]init: PropSet [arima.ftboot:0] Start>>
+<14>[    8.743200]<6>.(4)[1:init]init: PropSet [arima.ftboot:0] Done
+<14>[    8.743284]<6>.(4)[1:init]init: [PropSet]: pid:386 uid:0 gid:0 set ro.arima.model=5919
+<14>[    8.743291]<6>.(4)[1:init]init: PropSet [ro.arima.model:5919] Start>>
+<14>[    8.743324]<6>.(4)[1:init]init: PropSet [ro.arima.model:5919] Done
+<14>[    8.743532]<6>.(4)[1:init]init: [PropSet]: pid:386 uid:0 gid:0 set ro.arima.id.0=1
+<14>[    8.743540]<6>.(4)[1:init]init: PropSet [ro.arima.id.0:1] Start>>
+<14>[    8.743582]<6>.(4)[1:init]init: PropSet [ro.arima.id.0:1] Done
+<7>[    8.743730]<6>.(4)[715:iptables][715:iptables] exit
+<4>[    8.743798]<6>.(0)[314:surfaceflinger]fence/RL+/M2/L0/id0
+<14>[    8.743882]<6>.(1)[1:init]init: [PropSet]: pid:386 uid:0 gid:0 set ro.arima.id.1=0
+<14>[    8.743890]<6>.(1)[1:init]init: PropSet [ro.arima.id.1:0] Start>>
+<14>[    8.743964]<6>.(1)[1:init]init: PropSet [ro.arima.id.1:0] Done
+<7>[    8.744029]<6>-(4)[715:iptables][715:iptables] sig 17 to [340:netd] stat=S
+<14>[    8.744304]<6>.(1)[1:init]init: [PropSet]: pid:386 uid:0 gid:0 set ro.arima.id.2=0
+<14>[    8.744312]<6>.(1)[1:init]init: PropSet [ro.arima.id.2:0] Start>>
+<14>[    8.744393]<6>.(1)[1:init]init: PropSet [ro.arima.id.2:0] Done
+<4>[    8.744488]<6>.(0)[314:surfaceflinger]fence/RL+/M2/L1/id0
+<14>[    8.744574]<6>.(1)[1:init]init: [PropSet]: pid:386 uid:0 gid:0 set ro.arima.id.3=0
+<14>[    8.744581]<6>.(1)[1:init]init: PropSet [ro.arima.id.3:0] Start>>
+<14>[    8.744628]<6>.(1)[1:init]init: PropSet [ro.arima.id.3:0] Done
+<7>[    8.744705]<6>.(6)[340:netd][340:netd] fork [717:netd]
+<4>[    8.745170]<6>.(0)[314:surfaceflinger]fence/RL+/M2/L2/id0
+<4>[    8.745852]<6>.(0)[314:surfaceflinger]fence/RL+/M2/L3/id0
+<4>[    8.746518]<6>.(0)[314:surfaceflinger]fence/RL+/M2/L4/id0
+<4>[    8.747190]<6>.(0)[314:surfaceflinger]fence/RL+/M2/L5/id0
+<14>[    8.747305]<6>.(1)[1:init]init: [PropSet]: pid:386 uid:0 gid:0 set ro.arima.sw.pcba=0
+<14>[    8.747314]<6>.(1)[1:init]init: PropSet [ro.arima.sw.pcba:0] Start>>
+<14>[    8.747395]<6>.(1)[1:init]init: PropSet [ro.arima.sw.pcba:0] Done
+<4>[    8.747868]<6>.(0)[314:surfaceflinger]fence/RL+/M2/L6/id0
+<7>[    8.748323]<6>.(6)[717:iptables][717:iptables] exit
+<7>[    8.748538]<6>-(6)[717:iptables][717:iptables] sig 17 to [340:netd] stat=S
+<4>[    8.748594]<6>.(0)[314:surfaceflinger]fence/RL+/M2/L7/id0
+<7>[    8.749223]<6>.(4)[340:netd][340:netd] fork [718:netd]
+<4>[    8.749279]<6>.(0)[314:surfaceflinger]fence/RL+/M2/L8/id0
+<14>[    8.749563]<6>.(6)[1:init]init: [PropSet]: pid:386 uid:0 gid:0 set ro.arima.display.always=-1
+<14>[    8.749572]<6>.(6)[1:init]init: PropSet [ro.arima.display.always:-1] Start>>
+<14>[    8.749657]<6>.(6)[1:init]init: PropSet [ro.arima.display.always:-1] Done
+<4>[    8.749985]<6>.(0)[314:surfaceflinger]fence/destroy_session done
+<14>[    8.751279]<6>.(6)[1:init]init: [PropSet]: pid:314 uid:1000 gid:1003 set debug.hwc.bq_count=4
+<14>[    8.751296]<6>.(6)[1:init]init: PropSet [debug.hwc.bq_count:4] Start>>
+<14>[    8.751383]<6>.(6)[1:init]init: PropSet [debug.hwc.bq_count:4] Done
+<7>[    8.751675]<6>.(0)[314:surfaceflinger][314:surfaceflinger] fork [719:surfaceflinger]
+<14>[    8.751689]<6>.(6)[1:init]init: [PropSet]: pid:386 uid:0 gid:0 set ro.arima.startup.check=-2
+<14>[    8.751702]<6>.(6)[1:init]init: PropSet [ro.arima.startup.check:-2] Start>>
+<14>[    8.751804]<6>.(6)[1:init]init: PropSet [ro.arima.startup.check:-2] Done
+<4>[    8.751888]<6>.(0)[314:surfaceflinger]fence/new session:0x10000
+<7>[    8.752044]<6>.(4)[386:update_ta_info][386:update_ta_info] exit
+<7>[    8.752537]<6>-(4)[386:update_ta_info][386:update_ta_info] sig 17 to [1:init] stat=S
+<6>[    8.752677]<6>.(0)[314:surfaceflinger][mt_clkmgr][Power/clkmgr] [mt_enable_clock]: id=64, names=smi_common
+<4>[    8.752697]<6>.(0)[314:surfaceflinger][M4U] m4u_config_port: DISP_OVL0, m4u_tee_en:0, mmu_en: 0 -> 1, sec_en:0 -> 0
+<7>[    8.752714]<6>.(1)[718:iptables][718:iptables] exit
+<14>[    8.752757]<6>.(6)[1:init]init: waitpid returned pid 386, status = 00000000
+<13>[    8.752770]<6>.(6)[1:init]init: process 'update_ta_info', pid 386 exited
+<14>[    8.752785]<6>.(6)[1:init]init: PropSet [init.svc.update_ta_info:stopped] Start>>
+<14>[    8.752862]<6>.(6)[1:init]init: PropSet [init.svc.update_ta_info:stopped] Done
+<7>[    8.752958]<6>-(1)[718:iptables][718:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.753189]<6>.(7)[340:netd][340:netd] fork [720:netd]
+<6>[    8.754841]<6>.(0)[314:surfaceflinger][mt_clkmgr][Power/clkmgr] [mt_disable_clock]: id=64, names=smi_common
+<7>[    8.755004]<6>.(0)[314:surfaceflinger][314:surfaceflinger] fork [721:surfaceflinger]
+<7>[    8.755115]<6>.(0)[314:surfaceflinger][314:surfaceflinger] fork [722:surfaceflinger]
+<7>[    8.757422]<6>.(0)[314:surfaceflinger][COLOR] _color_io: msg 80047849
+<7>[    8.757422]<6>
+<7>[    8.757532]<6>.(0)[314:surfaceflinger][COLOR] _color_io: msg 8f907842
+<7>[    8.757532]<6>
+<7>[    8.757548]<6>.(0)[314:surfaceflinger][COLOR] _color_io: msg 8030783d
+<7>[    8.757548]<6>
+<7>[    8.757601]<6>.(0)[314:surfaceflinger][COLOR] _color_io: msg 892c783f
+<7>[    8.757601]<6>
+<7>[    8.757616]<6>.(0)[314:surfaceflinger][COLOR] _color_io: msg 8030783d
+<7>[    8.757616]<6>
+<7>[    8.757745]<6>.(0)[314:surfaceflinger][314:surfaceflinger] fork [723:surfaceflinger]
+<7>[    8.758736]<6>.(4)[720:iptables][720:iptables] exit
+<7>[    8.758961]<6>.(1)[314:surfaceflinger][314:surfaceflinger] fork [724:surfaceflinger]
+<7>[    8.758982]<6>-(4)[720:iptables][720:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.759569]<6>.(6)[340:netd][340:netd] fork [725:netd]
+<7>[    8.763186]<6>.(6)[725:iptables][725:iptables] exit
+<7>[    8.763463]<6>-(6)[725:iptables][725:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.764085]<6>.(4)[340:netd][340:netd] fork [726:netd]
+<7>[    8.767465]<6>.(4)[726:ip6tables][726:ip6tables] exit
+<7>[    8.767710]<6>-(4)[726:ip6tables][726:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.768316]<6>.(6)[340:netd][340:netd] fork [727:netd]
+<14>[    8.771241]<6>.(6)[1:init]init: [PropSet]: pid:352 uid:0 gid:1000 set arima.nvram.md.sync=1
+<14>[    8.771258]<6>.(6)[1:init]init: PropSet [arima.nvram.md.sync:1] Start>>
+<14>[    8.771338]<6>.(6)[1:init]init: PropSet [arima.nvram.md.sync:1] Done
+<14>[    8.771627]<6>.(6)[1:init]init: [PropSet]: pid:352 uid:0 gid:1000 set service.nvram_init=Ready
+<14>[    8.771638]<6>.(6)[1:init]init: PropSet [service.nvram_init:Ready] Start>>
+<14>[    8.771708]<6>.(6)[1:init]init: PropSet [service.nvram_init:Ready] Done
+<7>[    8.771875]<6>.(0)[352:nvram_daemon][352:nvram_daemon] fork [728:nvram_daemon]
+<7>[    8.771909]<6>.(3)[727:iptables][727:iptables] exit
+<7>[    8.771958]<6>.(0)[352:nvram_daemon][352:nvram_daemon] fork [729:nvram_daemon]
+<7>[    8.772071]<6>.(4)[352:nvram_daemon][352:nvram_daemon] fork [730:nvram_daemon]
+<7>[    8.772126]<6>.(4)[352:nvram_daemon][352:nvram_daemon] fork [731:nvram_daemon]
+<7>[    8.772163]<6>.(4)[352:nvram_daemon][352:nvram_daemon] fork [732:nvram_daemon]
+<7>[    8.772170]<6>-(3)[727:iptables][727:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.772210]<6>.(4)[352:nvram_daemon][352:nvram_daemon] fork [733:nvram_daemon]
+<7>[    8.772259]<6>.(4)[352:nvram_daemon][352:nvram_daemon] fork [734:nvram_daemon]
+<6>[    8.772306]<6>.(3)[733:nvram_daemon][ALS/PS] epl2182_open
+<7>[    8.772679]<6>.(3)[734:nvram_daemon][734:nvram_daemon] exit
+<7>[    8.772868]<6>.(4)[340:netd][340:netd] fork [735:netd]
+<7>[    8.773117]<6>.(7)[314:surfaceflinger][314:surfaceflinger] fork [736:surfaceflinger]
+<7>[    8.773227]<6>.(4)[732:nvram_daemon][732:nvram_daemon] exit
+<7>[    8.773239]<6>.(7)[314:surfaceflinger][314:surfaceflinger] fork [737:surfaceflinger]
+<7>[    8.773308]<6>.(7)[314:surfaceflinger][314:surfaceflinger] fork [738:surfaceflinger]
+<7>[    8.773377]<6>.(7)[314:surfaceflinger][314:surfaceflinger] fork [739:surfaceflinger]
+<7>[    8.773425]<6>.(7)[314:surfaceflinger][314:surfaceflinger] fork [740:surfaceflinger]
+<7>[    8.773783]<6>.(1)[314:surfaceflinger][314:surfaceflinger] fork [741:surfaceflinger]
+<14>[    8.774306]<6>.(7)[1:init]init: [PropSet]: pid:314 uid:1000 gid:1003 set service.bootanim.exit=0
+<14>[    8.774325]<6>.(7)[1:init]init: PropSet [service.bootanim.exit:0] Start>>
+<14>[    8.774407]<6>.(7)[1:init]init: PropSet [service.bootanim.exit:0] Done
+<3>[    8.774690]<6>.(1)[314:surfaceflinger]BOOTPROF:      8774.680615:BOOT_Animation:START
+<14>[    8.774797]<6>.(7)[1:init]init: [PropSet]: pid:314 uid:1000 gid:1003 ctl.start bootanim
+<14>[    8.774945]<6>.(7)[1:init]init: computing context for service '/system/bin/bootanimation'
+<13>[    8.775049]<6>.(7)[1:init]init: starting 'bootanim'
+<7>[    8.775205]<6>.(7)[1:init][1:init] fork [742:init]
+<14>[    8.775318]<6>.(7)[1:init]init: PropSet [init.svc.bootanim:running] Start>>
+<14>[    8.775397]<6>.(7)[1:init]init: PropSet [init.svc.bootanim:running] Done
+<3>[    8.776278]<6>.(1)[314:surfaceflinger]Original mtsched enabled = 0, on = 1.
+<7>[    8.776332]<6>.(6)[735:ip6tables][735:ip6tables] exit
+<7>[    8.776523]<6>-(6)[735:ip6tables][735:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.777028]<6>.(4)[340:netd][340:netd] fork [743:netd]
+<3>[    8.777147]<6>.(1)[314:surfaceflinger]update time is is 8756740
+<3>[    8.777878]<6>.(1)[314:surfaceflinger]update time is is 8757469
+<3>[    8.778611]<6>.(1)[314:surfaceflinger]update time is is 8758204
+<3>[    8.779348]<6>.(1)[314:surfaceflinger]update time is is 8758942
+<7>[    8.779816]<6>.(6)[743:iptables][743:iptables] exit
+<3>[    8.780088]<6>.(1)[314:surfaceflinger]update time is is 8759682
+<3>[    8.780846]<6>.(1)[314:surfaceflinger]update time is is 8760438
+<3>[    8.781574]<6>.(1)[314:surfaceflinger]update time is is 8761168
+<3>[    8.782311]<6>.(1)[314:surfaceflinger]update time is is 8761904
+<3>[    8.783506]<6>.(1)[314:surfaceflinger]Current mtsched enabled = 1
+<7>[    8.783764]<6>-(6)[743:iptables][743:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.784319]<6>.(4)[340:netd][340:netd] fork [744:netd]
+<7>[    8.787369]<6>.(4)[744:ip6tables][744:ip6tables] exit
+<7>[    8.787671]<6>-(4)[744:ip6tables][744:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.788264]<6>-(0)[340:netd][MUSB]musb_stage0_irq 1117: MUSB_INTR_RESET (b_idle)
+<7>[    8.788277]<6>-(0)[340:netd][MUSB]musb_sync_with_bat 460: BATTERY_SetUSBState, state=1
+<5>[    8.788283]<6>-(0)[340:netd][BATTERY] BAT_SetUSBState Success! Set 1
+
+<5>[    8.789074]<6>-(0)[340:netd][BATTERY] wake_up_bat. 
+
+<5>[    8.789712]<6>.(4)[170:bat_routine_thr][Battery] mt_battery_update_duration_time , last_time=7 current_time=8 duration=1
+<7>[    8.789844]<6>.(0)[340:netd][340:netd] fork [745:netd]
+<5>[    8.791166]<6>.(4)[170:bat_routine_thr][battery_meter_driver] malloc size=16
+<5>[    8.792117]<6>.(4)[170:bat_routine_thr][BAT_thread]Cable in, CHR_Type_num=1
+
+<5>[    8.792299]<6>.(6)[376:fuelgauged][fg_res] rtc_fg_soc = 23
+<5>[    8.792338]<6>.(6)[376:fuelgauged][fg_res] charger_exist = 1
+<5>[    8.792365]<6>.(6)[376:fuelgauged][fg_res] shutdown_system_voltage = 3400
+<5>[    8.792399]<6>.(6)[376:fuelgauged][fg_res] update = 1
+<7>[    8.792853]<6>.(0)[745:iptables][745:iptables] exit
+<7>[    8.793111]<6>-(0)[745:iptables][745:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.793660]<6>.(1)[340:netd][340:netd] fork [746:netd]
+<5>[    8.795749]<6>.(6)[376:fuelgauged]bat pack: 1, TemperatureR: 1227263
+
+<5>[    8.795754]<6>.(6)[376:fuelgauged][force_get_tbat] 1579,1580,0,179,10,26
+<5>[    8.795757]<6>.(6)[376:fuelgauged][fg_res] temperture = 26
+<5>[    8.796081]<6>.(6)[376:fuelgauged][fg_res] fg_current = 1795
+<5>[    8.796106]<6>.(6)[376:fuelgauged][fg_res] current_state = 0
+<5>[    8.796330]<6>.(6)[376:fuelgauged][dump_nter] mt6325_upmu_get_fg_nter_29_16 = 0x0
+
+<5>[    8.796338]<6>.(6)[376:fuelgauged][dump_nter] mt6325_upmu_get_fg_nter_15_00 = 0x5b
+
+<5>[    8.796344]<6>.(6)[376:fuelgauged][dump_car] upmu_get_fg_car_31_16 = 0x0
+
+<5>[    8.796351]<6>.(6)[376:fuelgauged][dump_car] upmu_get_fg_car_15_00 = 0x1367
+
+<5>[    8.796354]<6>.(6)[376:fuelgauged][fg_res] fg_coulomb = 0
+<7>[    8.796509]<6>.(1)[746:ip6tables][746:ip6tables] exit
+<5>[    8.796664]<6>.(6)[376:fuelgauged][fg_res] QMAX = 2589
+<5>[    8.796759]<6>.(6)[376:fuelgauged][fg_res] SOC = 23
+<5>[    8.796786]<6>.(6)[376:fuelgauged][746:ip6tables] sig 17
+<7>[    8.796790]<6>-(1)[746:ip6tables][746:ip6tables] sig 17 to [340:netd] stat=R
+<5>[    8.796809]<6>.(6)[376:fuelgauged][fg_res] gFG_DOD1 = 77
+<5>[    8.796832]<6>.(6)[376:fuelgauged][fg_res] tracking time = 0
+<5>[    8.796857]<6>.(6)[376:fuelgauged][fg_res] difference_voltage_update = 20
+<5>[    8.797034]<6>.(6)[376:fuelgauged][fg_res] duration_type = 0
+<5>[    8.797037]<6>.(6)[376:fuelgauged][fg_res] duration time = 1
+<5>[    8.797065]<6>.(6)[376:fuelgauged][fg_res] charger_exist = 1
+<5>[    8.797088]<6>.(6)[376:fuelgauged][fg_res] battery_full = 0
+<5>[    8.797111]<6>.(6)[376:fuelgauged][fg_res] update = 0
+<5>[    8.797115]<6>.(6)[376:fuelgauged][fg_res] voltage = 3760
+<5>[    8.797139]<6>.(6)[376:fuelgauged][fg_res] shutdown_gauge0 = 1
+<5>[    8.797164]<6>.(6)[376:fuelgauged][fg_res] shutdown_gauge1_xmins = 1
+<5>[    8.797189]<6>.(6)[376:fuelgauged][fg_res] shutdown_gauge1_mins = 60
+<5>[    8.797250]<6>.(6)[376:fuelgauged][fg_res] UI_SOC = 23
+<5>[    8.797273]<6>.(6)[376:fuelgauged][fg_res] UI_SOC2 = 20
+<5>[    8.797298]<6>.(5)[171:bat_update_thre][kernel][battery_update] SOC 23,UI_SOC2 20, status 1
+<5>[    8.797308]<6>.(5)[171:bat_update_thre]wait event 2
+<7>[    8.797388]<6>.(1)[340:netd][340:netd] fork [747:netd]
+<5>[    8.797569]<6>.(0)[376:fuelgauged][fg_res] set rtc = 23
+<14>[    8.797619]<6>.(6)[207:ueventd]init: restorecon_recursive: /sys/devices/platform/battery/power_supply/wireless
+<14>[    8.797867]<6>.(6)[207:ueventd]init: restorecon_recursive: /sys/devices/platform/battery/power_supply/battery
+<14>[    8.797979]<6>.(6)[207:ueventd]init: restorecon_recursive: /sys/devices/platform/battery/power_supply/ac
+<14>[    8.798068]<6>.(6)[207:ueventd]init: restorecon_recursive: /sys/devices/platform/battery/power_supply/usb
+<12>[    8.798089]<6>.(7)[310:healthd]healthd: battery p=-1 l=20 l2=50 v=3760 t=26.0 h=2 st=2 st2=4 ext=0 chg=u
+<14>[    8.798097]<6>.(7)[310:healthd]healthd: send_already = 0
+<12>[    8.798502]<6>.(7)[310:healthd]healthd: battery p=-1 l=20 l2=50 v=3760 t=26.0 h=2 st=2 st2=4 ext=0 chg=u
+<14>[    8.798509]<6>.(7)[310:healthd]healthd: send_already = 0
+<12>[    8.798867]<6>.(7)[310:healthd]healthd: battery p=-1 l=20 l2=50 v=3760 t=26.0 h=2 st=2 st2=4 ext=0 chg=u
+<14>[    8.798875]<6>.(7)[310:healthd]healthd: send_already = 0
+<12>[    8.799227]<6>.(7)[310:healthd]healthd: battery p=-1 l=20 l2=50 v=3760 t=26.0 h=2 st=2 st2=4 ext=0 chg=u
+<14>[    8.799235]<6>.(7)[310:healthd]healthd: send_already = 0
+<4>[    8.800528]<6>.(3)[724:VSyncThread_0][DISPCHECK]vsync signaled by unknow signal ret=1998
+<7>[    8.800664]<6>.(5)[747:iptables][747:iptables] exit
+<7>[    8.800933]<6>-(5)[747:iptables][747:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.801493]<6>.(1)[340:netd][340:netd] fork [748:netd]
+<7>[    8.804359]<6>.(6)[748:ip6tables][748:ip6tables] exit
+<7>[    8.804611]<6>-(6)[748:ip6tables][748:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.805168]<6>.(1)[340:netd][340:netd] fork [749:netd]
+<7>[    8.807996]<6>.(6)[749:iptables][749:iptables] exit
+<7>[    8.808255]<6>-(6)[749:iptables][749:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.808833]<6>.(1)[340:netd][340:netd] fork [750:netd]
+<4>[    8.810472]<6>.(5)[113:display_idle_de][DISPCHECK]primary_display_switch_mode sess_mode 2, session 0x0
+<5>[    8.810533]<6>.(5)[113:display_idle_de][DDP/WDMA]module wdma0 , src(w=1080,h=1920), clip(x=0,y=0,w=1080,h=1920),out_fmt=eRGB888,dst_address=0x20000000,dst_p=3240,spific_alfa=1,alpa=255,handle=0xffffffc0643be800,sec0
+<7>[    8.811809]<6>.(2)[750:ip6tables][750:ip6tables] exit
+<7>[    8.812089]<6>-(2)[750:ip6tables][750:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.812673]<6>.(5)[340:netd][340:netd] fork [751:netd]
+<7>[    8.815614]<6>.(2)[751:iptables][751:iptables] exit
+<7>[    8.815861]<6>-(2)[751:iptables][751:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.816428]<6>.(5)[340:netd][340:netd] fork [752:netd]
+<4>[    8.817931]<6>.(3)[724:VSyncThread_0][DISPCHECK]vsync signaled by unknow signal ret=1999
+<5>[    8.817997]<6>.(5)[113:display_idle_de][DDP/ddp_manager]modify handle ffffffc066564000 from primary_all to primary_rdma0_color0_disp
+<5>[    8.818002]<6>.(5)[113:display_idle_de][DDP/OVL]ovl1_clock_off
+<5>[    8.818012]<6>.(5)[113:display_idle_de][DDP/OVL]ovl0_clock_off
+<7>[    8.818018]<6>.(5)[113:display_idle_de][COLOR] color[0]_clock_off
+<7>[    8.818018]<6>
+<5>[    8.818029]<6>.(5)[113:display_idle_de][DDP/RDMA]rdma_0_clock_off CG 0xfffffffc 
+<5>[    8.818034]<6>.(5)[113:display_idle_de][DDP/UFOE]ufoe_clock off CG 0xfffffffc 
+<7>[    8.818037]<6>.(5)[113:display_idle_de][PWM] ddp_pwm_power_off: 11
+<7>[    8.818037]<6>
+<5>[    8.818048]<6>.(5)[113:display_idle_de][DDP/RDMA]rdma_0_clock_on CG 0xfffffffc 
+<7>[    8.818053]<6>.(5)[113:display_idle_de][COLOR] color[0]_clock_on CG 0xfffffffc 
+<7>[    8.818053]<6>
+<5>[    8.818060]<6>.(5)[113:display_idle_de][DDP/UFOE]ufoe_clock on CG 0xfffffffc 
+<7>[    8.818063]<6>.(5)[113:display_idle_de][PWM] ddp_pwm_power_on: 11
+<7>[    8.818063]<6>
+<5>[    8.818100]<6>.(5)[113:display_idle_de][DDP/RDMA]RDMAConfig idx 0, mode 1, address 0x20000000, inputformat eRGB888, pitch 3240, width 1080, height 1920,sec0
+<7>[    8.819274]<6>.(2)[752:ip6tables][752:ip6tables] exit
+<7>[    8.819513]<6>-(2)[752:ip6tables][752:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.819976]<6>.(5)[340:netd][340:netd] fork [753:netd]
+<7>[    8.820880]<6>.(3)[730:nvram_daemon][730:nvram_daemon] exit
+<7>[    8.822904]<6>.(2)[753:iptables][753:iptables] exit
+<7>[    8.823172]<6>-(2)[753:iptables][753:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.823748]<6>.(5)[340:netd][340:netd] fork [754:netd]
+<7>[    8.826796]<6>.(2)[754:ip6tables][754:ip6tables] exit
+<7>[    8.827056]<6>-(2)[754:ip6tables][754:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.827620]<6>.(1)[340:netd][340:netd] fork [755:netd]
+<7>[    8.830528]<6>.(2)[755:iptables][755:iptables] exit
+<7>[    8.830823]<6>-(2)[755:iptables][755:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.831417]<6>.(5)[340:netd][340:netd] fork [756:netd]
+<6>[    8.832694]<6>.(3)[733:nvram_daemon][ALS/PS] epl2182_release
+<7>[    8.832742]<6>.(3)[733:nvram_daemon][733:nvram_daemon] exit
+<3>[    8.773370]<6>.(1)[731:nvram_daemon]                            
+<6>[    8.833359]<6>.(1)[731:nvram_daemon][Gsensor]  GSENSOR_IOCTL_SET_CALI .(3)[731:nvram_daemon]that is MP format cali data .(3)[731:nvram_daemon]GSENSOR_IOCTL_SET_CALI data_len:8 data_str:10 -6 -9
+<4>[    8.834319]<6>.(3)[731:nvram_daemon]GSENSOR_IOCTL_SET_CALI x:10 y:-6 z:-9
+<4>[    8.834323]<6>.(3)[731:nvram_daemon]GSENSOR_IOCTL_SET_CALI x:10 y:-6 z:-9
+<6>[    8.834332]<6>.(3)[731:nvram_daemon][Gsensor]  BMA250_WriteCalibration OLDOFF: ( +0  +0  +0): ( +0  +0  +0) / ( +0  +0  +0)
+<4>[    8.834370]<6>-(0)[510:program_binary_]md32_ipi_handler 12
+<6>[    8.834391]<6>.(3)[731:nvram_daemon][Gsensor] SCP_sensorHub_req_send, BMA250_WriteCalibration!
+<6>[    8.834396]<6>.(3)[731:nvram_daemon][Gsensor] BMA250_WriteCalibration UPDATE: (+10  -6  -9)
+<7>[    8.834494]<6>.(3)[731:nvram_daemon][731:nvram_daemon] exit
+<7>[    8.834939]<6>.(2)[756:ip6tables][756:ip6tables] exit
+<7>[    8.835249]<6>-(2)[756:ip6tables][756:ip6tables] sig 17 to [340:netd] stat=S
+<5>[    8.835281]<6>.(7)[113:display_idle_de][DDP/ddp_manager]scenario primary_ovl_memout acquire mutex 1 , left mutex 0xc!
+<5>[    8.835286]<6>.(7)[113:display_idle_de][DDP/ddp_manager]assign default irqs table index 3
+<5>[    8.835290]<6>.(7)[113:display_idle_de][DDP/ddp_manager]create handle ffffffc05ddbd000 on scenario primary_ovl_memout
+<5>[    8.835295]<6>.(7)[113:display_idle_de][DDP/ddp_manager] scenario primary_ovl_memout include module ovl1 
+<5>[    8.835299]<6>.(7)[113:display_idle_de][DDP/ddp_manager] scenario primary_ovl_memout include module ovl0 
+<5>[    8.835302]<6>.(7)[113:display_idle_de][DDP/ddp_manager] scenario primary_ovl_memout include module wdma0 
+<4>[    8.835306]<6>.(7)[113:display_idle_de][DISPCHECK]dpmgr create ovl memout path SUCCESS(ffffffc05ddbd000)
+<5>[    8.835310]<6>.(7)[113:display_idle_de][DDP/ddp_manager]set scenario primary_ovl_memout mode: Cmd_Mode
+<5>[    8.835314]<6>.(7)[113:display_idle_de][DDP/ddp_manager]path init on scenario primary_ovl_memout
+<5>[    8.835332]<6>.(7)[113:display_idle_de][DDP/ddp_manager]scenario primary_ovl_memout init module  ovl1 
+<5>[    8.835336]<6>.(7)[113:display_idle_de][DDP/OVL]ovl1_clock_on
+<5>[    8.835344]<6>.(7)[113:display_idle_de][DDP/ddp_manager]scenario primary_ovl_memout init module  ovl0 
+<5>[    8.835347]<6>.(7)[113:display_idle_de][DDP/OVL]ovl0_clock_on
+<5>[    8.835351]<6>.(7)[113:display_idle_de][DDP/ddp_manager]scenario primary_ovl_memout init module  wdma0 
+<5>[    8.835365]<6>.(7)[113:display_idle_de][DDP/ddp_manager]path start on scenario primary_ovl_memout
+<5>[    8.835474]<6>.(1)[113:display_idle_de][DDP/ddp_manager]map event VSYNC to irq 0x2000004 on scenario primary_rdma0_color0_disp
+<5>[    8.835480]<6>.(1)[113:display_idle_de][DDP/ddp_manager]enable event VSYNC on scenario primary_rdma0_color0_disp, irtbit 0x2000004
+<5>[    8.835484]<6>.(1)[113:display_idle_de][DDP/ddp_manager]enable event FRAME_START on scenario primary_rdma0_color0_disp, irtbit 0x2000002
+<7>[    8.835814]<6>.(2)[729:nvram_daemon][729:nvram_daemon] exit
+<7>[    8.835899]<6>.(3)[340:netd][340:netd] fork [757:netd]
+<7>[    8.838277]<6>.(1)[728:nvram_daemon][728:nvram_daemon] exit
+<7>[    8.839248]<6>.(3)[757:iptables][757:iptables] exit
+<7>[    8.839538]<6>-(3)[757:iptables][757:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.840138]<6>.(1)[340:netd][340:netd] fork [758:netd]
+<5>[    8.840811]<6>.(7)[322:ccci_mdinit][ccci1/chr]port ccci_monitor open with flag 20002 by ccci_mdinit
+<7>[    8.843512]<6>.(1)[758:ip6tables][758:ip6tables] exit
+<7>[    8.843814]<6>-(1)[758:ip6tables][758:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.844516]<6>.(3)[340:netd][340:netd] fork [759:netd]
+<7>[    8.847720]<6>.(1)[759:iptables][759:iptables] exit
+<7>[    8.848012]<6>-(1)[759:iptables][759:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.848517]<6>.(7)[340:netd][340:netd] fork [760:netd]
+<7>[    8.851492]<6>.(7)[760:ip6tables][760:ip6tables] exit
+<7>[    8.851783]<6>-(7)[760:ip6tables][760:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.852370]<6>.(1)[340:netd][340:netd] fork [761:netd]
+<5>[    8.855242]<6>-(0)[510:program_binary_][g_android][USB]android_setup
+<6>[    8.855254]<6>-(0)[510:program_binary_]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.855260]<6>-(0)[510:program_binary_]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_DEVICE, value=18
+<7>[    8.855321]<6>.(0)[155:kworker/0:1][MUSB]usb_cable_connected 403: iddig_state = 1
+<5>[    8.855325]<6>.(0)[155:kworker/0:1][g_android][USB]android_work: is_hwconnected=1 
+<5>[    8.855392]<6>.(0)[155:kworker/0:1][g_android][USB]android_work: sent uevent USB_STATE=CONNECTED
+<5>[    8.855398]<6>.(0)[155:kworker/0:1][g_android][USB]android_work: did not send zero uevent
+<7>[    8.855433]<6>.(1)[761:iptables][761:iptables] exit
+<14>[    8.855488]<6>.(7)[207:ueventd]init: restorecon_recursive: /sys/devices/virtual/android_usb/android0
+<5>[    8.855495]<6>-(0)[510:program_binary_][g_android][USB]android_setup
+<6>[    8.855503]<6>-(0)[510:program_binary_]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.855511]<6>-(0)[510:program_binary_]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_STRING, value=2
+<7>[    8.855711]<6>-(1)[761:iptables][761:iptables] sig 17 to [340:netd] stat=S
+<5>[    8.855724]<6>-(0)[510:program_binary_][g_android][USB]android_setup
+<6>[    8.855729]<6>-(0)[510:program_binary_]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.855734]<6>-(0)[510:program_binary_]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_STRING, value=12
+<5>[    8.855969]<6>-(0)[510:program_binary_][g_android][USB]android_setup
+<6>[    8.855975]<6>-(0)[510:program_binary_]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.855980]<6>-(0)[510:program_binary_]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_STRING, value=2
+<5>[    8.856131]<6>-(0)[510:program_binary_][g_android][USB]android_setup
+<6>[    8.856137]<6>-(0)[510:program_binary_]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.856142]<6>-(0)[510:program_binary_]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_STRING, value=10
+<7>[    8.856274]<6>.(5)[340:netd][340:netd] fork [762:netd]
+<5>[    8.856298]<6>-(0)[510:program_binary_][g_android][USB]android_setup
+<6>[    8.856304]<6>-(0)[510:program_binary_]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.856309]<6>-(0)[510:program_binary_]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_STRING, value=2
+<5>[    8.856498]<6>-(0)[510:program_binary_][g_android][USB]android_setup
+<6>[    8.856504]<6>-(0)[510:program_binary_]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.856509]<6>-(0)[510:program_binary_]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_STRING, value=22
+<5>[    8.859071]<6>-(0)[510:program_binary_][g_android][USB]android_setup
+<6>[    8.859089]<6>-(0)[510:program_binary_]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.859097]<6>-(0)[510:program_binary_]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_CONFIG, value=9
+<5>[    8.859249]<6>-(0)[510:program_binary_][g_android][USB]android_setup
+<6>[    8.859255]<6>-(0)[510:program_binary_]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.859260]<6>-(0)[510:program_binary_]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_CONFIG, value=62
+<7>[    8.859266]<6>.(2)[762:ip6tables][762:ip6tables] exit
+<7>[    8.859512]<6>-(2)[762:ip6tables][762:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.860153]<6>.(5)[340:netd][340:netd] fork [763:netd]
+<7>[    8.863209]<6>.(2)[763:iptables][763:iptables] exit
+<7>[    8.863473]<6>-(2)[763:iptables][763:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.863983]<6>.(5)[340:netd][340:netd] fork [764:netd]
+<7>[    8.867126]<6>.(2)[764:ip6tables][764:ip6tables] exit
+<7>[    8.867395]<6>-(2)[764:ip6tables][764:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.867974]<6>.(5)[340:netd][340:netd] fork [765:netd]
+<7>[    8.871074]<6>.(2)[765:iptables][765:iptables] exit
+<7>[    8.871391]<6>-(2)[765:iptables][765:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.871954]<6>.(5)[340:netd][340:netd] fork [766:netd]
+<7>[    8.873481]<6>.(1)[349:mobile_log_d][349:mobile_log_d] fork [767:mobile_log_d]
+<7>[    8.875118]<6>.(2)[766:ip6tables][766:ip6tables] exit
+<7>[    8.875381]<6>-(2)[766:ip6tables][766:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.875632]<6>.(4)[340:netd][340:netd] fork [768:netd]
+<7>[    8.881520]<6>.(4)[768:iptables][768:iptables] exit
+<7>[    8.881825]<6>-(4)[768:iptables][768:iptables] sig 17 to [340:netd] stat=S
+<5>[    8.882280]<6>.(3)[170:bat_routine_thr][Power/PMIC] [ADCADC] PMIC_IMM_query_busy_bit on
+<7>[    8.882378]<6>.(5)[340:netd][340:netd] fork [769:netd]
+<5>[    8.882675]<6>.(4)[322:ccci_mdinit][ccci1/chr]CCCI_IOC_GET_MD_SBP_CFG: get config sbp code fail! ret:-22, Config val:
+<3>[    8.884167]<6>.(2)[322:ccci_mdinit][ccci\ssw] ssw_mode_show
+<4>[    8.884186]<6>.(2)[322:ccci_mdinit][ccci/ssw]SSW_GENERIC_V2
+<5>[    8.884202]<6>.(2)[322:ccci_mdinit][ccci1/ken]CCCI_IOC_SIM_SWITCH_TYPE:sim type(0x0)[ccci/ssw]SSW_GENERIC_V2
+<5>[    8.884207]<6>.(2)[322:ccci_mdinit][ccci1/chr]CCCI_IOC_UPDATE_SIM_SLOT_CFG get s0:0 s1:1 s2:0 s3:0
+<5>[    8.884210]<6>.(2)[322:ccci_mdinit][ccci1/chr]TODO: how to map slot1 mode & slot2_mode =>sim_mode
+<3>[    8.884215]<6>.(2)[322:ccci_mdinit][ccci\ssw] switch_sim_mode:mode=0x1, type=0
+<3>[    8.884218]<6>.(2)[322:ccci_mdinit][ccci\ssw] Internal sim switch: 1 --> 1
+<3>[    8.884221]<6>.(2)[322:ccci_mdinit][ccci\ssw] sim switch sim_mode_curr(1)OK
+<5>[    8.884362]<6>.(2)[322:ccci_mdinit][ccci1/chr]port ccci_ipc_5 open with flag 20002 by ccci_mdinit
+<5>[    8.884422]<6>.(2)[322:ccci_mdinit][ccci1/ipc]CCCI_IPC_UPDATE_TIMEZONE keep 0x0
+<7>[    8.884516]<6>.(2)[322:ccci_mdinit][322:ccci_mdinit] fork [770:ccci_mdinit]
+<5>[    8.884574]<6>.(2)[322:ccci_mdinit][ccci0/util]md1 get boot store
+<5>[    8.884578]<6>.(2)[322:ccci_mdinit][ccci0/cor]ccci core boot md1
+<4>[    8.884584]<6>.(2)[322:ccci_mdinit][ASF] 'CST 2013(ALPS.JB2)'
+<4>[    8.884597]<6>.(2)[322:ccci_mdinit][ASF.DEV] open /proc/partinfo
+<5>[    8.884619]<6>.(4)[770:ccci_mdinit][ccci1/ipc]CCCI_IPC_WAIT_TIME_UPDATE
+<5>[    8.884624]<6>.(4)[770:ccci_mdinit][ccci1/ipc]CCCI_IPC_WAIT_TIME_UPDATE wakeup
+<5>[    8.884630]<6>.(4)[770:ccci_mdinit][ccci1/ipc]CCCI_IPC_UPDATE_TIME 0x0(dummy)
+<5>[    8.884634]<6>.(4)[770:ccci_mdinit][ccci1/ipc]CCCI_IPC_WAIT_TIME_UPDATE
+<4>[    8.884721]<6>.(2)[322:ccci_mdinit]too many mtd partitions
+<4>[    8.884732]<6>.(2)[322:ccci_mdinit]search starts from '0x0'
+<7>[    8.885660]<6>.(5)[769:iptables][769:iptables] exit
+<4>[    8.885696]<6>.(4)[174:mmcqd/0boot0][BLOCK_TAG] mmcqd:174 Workload < 1%, duty 0, period 5493994693, req_cnt=0
+<4>[    8.885703]<6>.(4)[174:mmcqd/0boot0][BLOCK_TAG] vmstat (FP:116060)(FD:72)(ND:772)(WB:68)(NW:632)
+<7>[    8.885942]<6>-(5)[769:iptables][769:iptables] sig 17 to [340:netd] stat=S
+<4>[    8.886270]<6>.(5)[322:ccci_mdinit][ASF.DEV] ROM INFO ver '0x2', ID 'AND_ROMINFO_v', 0x11, 0x11
+<4>[    8.886274]<6>.(5)[322:ccci_mdinit][ASF] ROM INFO is found
+<4>[    8.886278]<6>.(5)[322:ccci_mdinit][ASF.DEV] SECRO v3 image len '0x3000'
+<4>[    8.886282]<6>.(5)[322:ccci_mdinit]dev 11, 0x00000000, 0x00000000
+<7>[    8.886549]<6>.(7)[340:netd][340:netd] fork [771:netd]
+<4>[    8.889977]<6>.(2)[322:ccci_mdinit][ASF.DEV] keep sro v3 off: 0x0
+<4>[    8.889995]<6>.(2)[322:ccci_mdinit][ASF.DEV] SECRO v3 img is found (lock)
+<4>[    8.890003]<6>.(2)[322:ccci_mdinit]NWD HACC: mc_open_device success: 0
+<7>[    8.890014]<6>.(4)[771:ip6tables][771:ip6tables] exit
+<7>[    8.890348]<6>-(4)[771:ip6tables][771:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.891024]<6>.(5)[340:netd][340:netd] fork [772:netd]
+<7>[    8.894238]<6>.(6)[772:iptables][772:iptables] exit
+<7>[    8.894507]<6>-(6)[772:iptables][772:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.895113]<6>.(5)[340:netd][340:netd] fork [773:netd]
+<7>[    8.896489]<6>.(4)[742:bootanimation][742:bootanimation] fork [774:bootanimation]
+<7>[    8.896999]<6>.(6)[774:Binder_1][774:Binder_1] fork [775:Binder_1]
+<7>[    8.897770]<6>.(4)[742:bootanimation][742:bootanimation] fork [776:bootanimation]
+<7>[    8.898877]<6>.(7)[773:ip6tables][773:ip6tables] exit
+<7>[    8.899143]<6>-(7)[773:ip6tables][773:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.899710]<6>.(5)[340:netd][340:netd] fork [777:netd]
+<7>[    8.902738]<6>.(6)[777:iptables][777:iptables] exit
+<7>[    8.903005]<6>-(6)[777:iptables][777:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.903561]<6>.(4)[340:netd][340:netd] fork [778:netd]
+<7>[    8.907094]<6>.(2)[778:ip6tables][778:ip6tables] exit
+<7>[    8.907391]<6>-(2)[778:ip6tables][778:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.907970]<6>.(4)[340:netd][340:netd] fork [779:netd]
+<7>[    8.911076]<6>.(6)[779:iptables][779:iptables] exit
+<7>[    8.911345]<6>-(6)[779:iptables][779:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.911873]<6>.(4)[340:netd][340:netd] fork [780:netd]
+<7>[    8.914955]<6>.(6)[780:ip6tables][780:ip6tables] exit
+<7>[    8.915233]<6>-(6)[780:ip6tables][780:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.915780]<6>.(4)[340:netd][340:netd] fork [781:netd]
+<7>[    8.918925]<6>.(7)[781:iptables][781:iptables] exit
+<7>[    8.919197]<6>-(7)[781:iptables][781:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.919729]<6>.(6)[340:netd][340:netd] fork [782:netd]
+<7>[    8.921015]<6>.(6)[348:vold][348:vold] exit
+<14>[    8.922092]<6>.(5)[1:init]init: [PropSet]: pid:349 uid:2000 gid:1000 set debug.MB.running=0
+<14>[    8.922111]<6>.(5)[1:init]init: PropSet [debug.MB.running:0] Start>>
+<14>[    8.922192]<6>.(5)[1:init]init: PropSet [debug.MB.running:0] Done
+<7>[    8.923146]<6>.(7)[782:ip6tables][782:ip6tables] exit
+<7>[    8.923424]<6>-(7)[782:ip6tables][782:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.924020]<6>.(5)[340:netd][340:netd] fork [783:netd]
+<5>[    8.924567]<6>-(0)[510:program_binary_][g_android][USB]android_setup
+<6>[    8.925362]<6>-(0)[510:program_binary_]android_usb gadget: composite_setup bRequest=0x9
+<6>[    8.925372]<6>-(0)[510:program_binary_]android_usb gadget: high-speed config #1: android
+<4>[    8.925380]<6>-(0)[510:program_binary_]mtp_function_set_alt intf: 0 alt: 0
+<5>[    8.925814]<6>.(3)[170:bat_routine_thr]bat pack: 1, TemperatureR: 1227263
+
+<5>[    8.925820]<6>.(3)[170:bat_routine_thr][force_get_tbat] 1581,1585,0,403,10,26
+<5>[    8.926904]<6>.(3)[170:bat_routine_thr][kernel]AvgVbat 3758,bat_vol 3680, AvgI 585, I 0, VChr 5014, AvgT 26, T 26, ZCV 3756
+<7>[    8.927085]<6>.(7)[783:iptables][783:iptables] exit
+<7>[    8.927338]<6>-(7)[783:iptables][783:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.927821]<6>.(4)[340:netd][340:netd] fork [784:netd]
+<7>[    8.929377]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1670: musb type=BULK
+<7>[    8.929385]<6>-(0)[510:program_binary_][MUSB]is_saving_mode 626: 0
+<7>[    8.929391]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1699: EP1 supports DBBUF
+<7>[    8.929400]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1711: fifo size is 22 after 512, fifo address is 512, epnum 1,hwepnum 1
+<7>[    8.929410]<6>-(0)[510:program_binary_][MUSB]musb_gadget_enable 1918: musb-hdrc periph: enabled ep1in for bulk IN, dma, maxpacket 512
+<7>[    8.929440]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1670: musb type=BULK
+<7>[    8.929448]<6>-(0)[510:program_binary_][MUSB]is_saving_mode 626: 0
+<7>[    8.929454]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1699: EP1 supports DBBUF
+<7>[    8.929462]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1711: fifo size is 22 after 512, fifo address is 1536, epnum 1,hwepnum 1
+<7>[    8.929471]<6>-(0)[510:program_binary_][MUSB]musb_gadget_enable 1918: musb-hdrc periph: enabled ep1out for bulk OUT, dma, maxpacket 512
+<7>[    8.929479]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1670: musb type=INT
+<7>[    8.929488]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1711: fifo size is 6 after 512, fifo address is 2560, epnum 2,hwepnum 2
+<7>[    8.929496]<6>-(0)[510:program_binary_][MUSB]musb_gadget_enable 1918: musb-hdrc periph: enabled ep2in for int IN, maxpacket 28
+<7>[    8.929506]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1670: musb type=BULK
+<7>[    8.929512]<6>-(0)[510:program_binary_][MUSB]is_saving_mode 626: 0
+<7>[    8.929518]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1699: EP2 supports DBBUF
+<7>[    8.929526]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1711: fifo size is 22 after 512, fifo address is 3072, epnum 2,hwepnum 2
+<7>[    8.929535]<6>-(0)[510:program_binary_][MUSB]musb_gadget_enable 1918: musb-hdrc periph: enabled ep2out for bulk OUT, dma, maxpacket 512
+<7>[    8.929553]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1670: musb type=BULK
+<7>[    8.929560]<6>-(0)[510:program_binary_][MUSB]is_saving_mode 626: 0
+<7>[    8.929566]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1699: EP3 supports DBBUF
+<7>[    8.929574]<6>-(0)[510:program_binary_][MUSB]fifo_setup 1711: fifo size is 22 after 512, fifo address is 4096, epnum 3,hwepnum 3
+<7>[    8.929583]<6>-(0)[510:program_binary_][MUSB]musb_gadget_enable 1918: musb-hdrc periph: enabled ep3in for bulk IN, dma, maxpacket 512
+<6>[    8.929594]<6>-(0)[510:program_binary_]android_usb gadget: [COM]USB_REQ_SET_CONFIGURATION: value=0
+<7>[    8.929606]<6>-(0)[510:program_binary_][MUSB]musb_sync_with_bat 460: BATTERY_SetUSBState, state=2
+<5>[    8.929612]<6>-(0)[510:program_binary_][BATTERY] BAT_SetUSBState Success! Set 2
+
+<5>[    8.930522]<6>-(0)[510:program_binary_][BATTERY] wake_up_bat. 
+
+<7>[    8.930859]<6>.(6)[784:ip6tables][784:ip6tables] exit
+<7>[    8.931107]<6>-(6)[784:ip6tables][784:ip6tables] sig 17 to [340:netd] stat=S
+<5>[    8.931301]<6>-(0)[510:program_binary_][g_android][USB]android_setup
+<7>[    8.931604]<6>.(4)[340:netd][340:netd] fork [785:netd]
+<6>[    8.932097]<6>-(0)[510:program_binary_]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.932109]<6>-(0)[510:program_binary_]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_STRING, value=2
+<7>[    8.932162]<6>.(0)[155:kworker/0:1][MUSB]usb_cable_connected 403: iddig_state = 1
+<5>[    8.932169]<6>.(0)[155:kworker/0:1][g_android][USB]android_work: is_hwconnected=1 
+<5>[    8.933111]<6>-(0)[155:kworker/0:1][g_android][USB]android_setup
+<6>[    8.933853]<6>-(0)[155:kworker/0:1]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.933864]<6>-(0)[155:kworker/0:1]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_STRING, value=8
+<5>[    8.933959]<6>.(0)[155:kworker/0:1][g_android][USB]android_work: sent uevent USB_STATE=CONFIGURED
+<14>[    8.934057]<6>.(7)[207:ueventd]init: restorecon_recursive: /sys/devices/virtual/android_usb/android0
+<7>[    8.934368]<6>.(4)[785:iptables][785:iptables] exit
+<7>[    8.934610]<6>-(4)[785:iptables][785:iptables] sig 17 to [340:netd] stat=S
+<5>[    8.935079]<6>-(0)[155:kworker/0:1][g_android][USB]android_setup
+<7>[    8.935094]<6>.(5)[340:netd][340:netd] fork [786:netd]
+<6>[    8.935832]<6>-(0)[155:kworker/0:1]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.935843]<6>-(0)[155:kworker/0:1]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_STRING, value=2
+<5>[    8.935860]<6>.(0)[155:kworker/0:1][g_android][USB]android_work: did not send zero uevent
+<5>[    8.936881]<6>-(0)[155:kworker/0:1][g_android][USB]android_setup
+<6>[    8.937623]<6>-(0)[155:kworker/0:1]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.937632]<6>-(0)[155:kworker/0:1]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_STRING, value=28
+<7>[    8.937790]<6>.(6)[786:ip6tables][786:ip6tables] exit
+<7>[    8.938046]<6>-(6)[786:ip6tables][786:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.938510]<6>.(4)[340:netd][340:netd] fork [787:netd]
+<7>[    8.941256]<6>.(6)[787:iptables][787:iptables] exit
+<7>[    8.941560]<6>-(6)[787:iptables][787:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.942137]<6>.(0)[340:netd][340:netd] fork [788:netd]
+<7>[    8.945045]<6>.(4)[788:ip6tables][788:ip6tables] exit
+<7>[    8.945304]<6>-(4)[788:ip6tables][788:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.945929]<6>.(5)[340:netd][340:netd] fork [789:netd]
+<5>[    8.948051]<6>-(0)[0:swapper/0][g_android][USB]android_setup
+<6>[    8.948766]<6>-(0)[0:swapper/0]android_usb gadget: composite_setup bRequest=0x6
+<6>[    8.948782]<6>-(0)[0:swapper/0]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_STRING, value=4
+<7>[    8.949250]<6>.(5)[789:iptables][789:iptables] exit
+<7>[    8.949515]<6>-(5)[789:iptables][789:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.950175]<6>.(4)[340:netd][340:netd] fork [790:netd]
+<7>[    8.953938]<6>.(4)[790:ip6tables][790:ip6tables] exit
+<7>[    8.954221]<6>-(4)[790:ip6tables][790:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.954812]<6>.(6)[340:netd][340:netd] fork [791:netd]
+<7>[    8.958091]<6>.(5)[791:iptables][791:iptables] exit
+<7>[    8.958364]<6>-(5)[791:iptables][791:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.958970]<6>.(4)[340:netd][340:netd] fork [792:netd]
+<7>[    8.962438]<6>.(4)[792:ip6tables][792:ip6tables] exit
+<7>[    8.962738]<6>-(4)[792:ip6tables][792:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.963306]<6>.(5)[340:netd][340:netd] fork [793:netd]
+<7>[    8.966281]<6>.(5)[793:iptables][793:iptables] exit
+<7>[    8.966542]<6>-(5)[793:iptables][793:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.967081]<6>.(4)[340:netd][340:netd] fork [794:netd]
+<7>[    8.970074]<6>.(4)[794:ip6tables][794:ip6tables] exit
+<7>[    8.970335]<6>-(4)[794:ip6tables][794:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.970994]<6>.(5)[340:netd][340:netd] fork [795:netd]
+<7>[    8.974034]<6>.(5)[795:iptables][795:iptables] exit
+<7>[    8.974305]<6>-(5)[795:iptables][795:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.974861]<6>.(4)[340:netd][340:netd] fork [796:netd]
+<7>[    8.977737]<6>.(6)[796:ip6tables][796:ip6tables] exit
+<7>[    8.977999]<6>-(6)[796:ip6tables][796:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.978537]<6>.(4)[340:netd][340:netd] fork [797:netd]
+<4>[    8.979671]<6>.(5)[322:ccci_mdinit]NWD HACC: mc_open_session success: 0
+<6>[    8.979685]<6>.(0)[279:mc_log]MobiCore mcd: c01|[<t Trustlet TlDAPCDriver], Build Dec 24 2014, 11:25:16
+<4>[    8.980878]<6>.(0)[322:ccci_mdinit]NWD HACC: prepare notify
+<7>[    8.981853]<6>.(5)[797:iptables][797:iptables] exit
+<7>[    8.982132]<6>-(5)[797:iptables][797:iptables] sig 17 to [340:netd] stat=S
+<7>[    8.982768]<6>.(4)[340:netd][340:netd] fork [798:netd]
+<4>[    8.983448]<6>.(5)[322:ccci_mdinit]NWD HACC Request Success!!!!!!!!
+<4>[    8.984222]<6>.(5)[322:ccci_mdinit]NWD HACC Request Success!!!!!!!!
+<4>[    8.985001]<6>.(5)[322:ccci_mdinit]NWD HACC Request Success!!!!!!!!
+<7>[    8.985831]<6>.(4)[798:ip6tables][798:ip6tables] exit
+<7>[    8.986119]<6>-(4)[798:ip6tables][798:ip6tables] sig 17 to [340:netd] stat=S
+<7>[    8.986712]<6>.(6)[340:netd][340:netd] fork [799:netd]
+<4>[    8.991149]<6>.(5)[322:ccci_mdinit]NWD HACC: mc_close_session success: 0
+<4>[    8.991987]<6>.(5)[322:ccci_mdinit]NWD HACC: mc_close_device success: 0
+<4>[    8.993217]<6>.(5)[322:ccci_mdinit][ASF] SECRO hash check pass
+<4>[    8.993940]<6>.(5)[322:ccci_mdinit]NWD HACC: mc_open_device success: 0
+<7>[    8.995759]<6>.(7)[799:ip][799:ip] exit
+<7>[    8.996018]<6>-(7)[799:ip][799:ip] sig 17 to [340:netd] stat=S
+<7>[    8.996544]<6>.(4)[340:netd][340:netd] fork [800:netd]
+<7>[    8.999216]<6>.(4)[800:ip][800:ip] exit
+<7>[    8.999481]<6>-(4)[800:ip][800:ip] sig 17 to [340:netd] stat=S
+<6>[    8.999838]<6>.(7)[279:mc_log]MobiCore mcd: c01|[<t Trustlet TlDAPCDriver], Build Dec 24 2014, 11:25:16
+<4>[    8.999858]<6>.(0)[322:ccci_mdinit]NWD HACC: mc_open_session success: 0
+<7>[    9.000469]<6>.(5)[340:netd][340:netd] fork [801:netd]
+<7>[    9.000607]<6>.(5)[340:netd][340:netd] fork [802:netd]
+<7>[    9.000689]<6>.(5)[340:netd][340:netd] fork [803:netd]
+<7>[    9.000771]<6>.(5)[340:netd][340:netd] fork [804:netd]
+<7>[    9.000864]<6>.(5)[340:netd][340:netd] fork [805:netd]
+<7>[    9.000986]<6>.(5)[340:netd][340:netd] fork [806:netd]
+<4>[    9.001000]<6>.(4)[322:ccci_mdinit]NWD HACC: prepare notify
+<7>[    9.001067]<6>.(5)[340:netd][340:netd] fork [807:netd]
+<7>[    9.001129]<6>.(5)[340:netd][340:netd] fork [808:netd]
+<4>[    9.003454]<6>.(6)[322:ccci_mdinit]NWD HACC Request Success!!!!!!!!
+<4>[    9.004228]<6>.(6)[322:ccci_mdinit]NWD HACC Request Success!!!!!!!!
+<4>[    9.005007]<6>.(6)[322:ccci_mdinit]NWD HACC Request Success!!!!!!!!
+<4>[    9.006530]<6>.(6)[322:ccci_mdinit]NWD HACC: mc_close_session success: 0
+<7>[    9.007310]<6>.(2)[2:kthreadd][2:kthreadd] fork [809:kthreadd]
+<4>[    9.007375]<6>.(6)[322:ccci_mdinit]NWD HACC: mc_close_device success: 0
+<7>[    9.007511]<6>.(1)[776:BootAnimation][776:BootAnimation] fork [810:BootAnimation]
+<7>[    9.007771]<6>.(1)[776:BootAnimation][776:BootAnimation] fork [811:BootAnimation]
+<7>[    9.007854]<6>.(1)[776:BootAnimation][776:BootAnimation] fork [812:BootAnimation]
+<7>[    9.007910]<6>.(1)[776:BootAnimation][776:BootAnimation] fork [813:BootAnimation]
+<7>[    9.007956]<6>.(1)[776:BootAnimation][776:BootAnimation] fork [814:BootAnimation]
+<7>[    9.008005]<6>.(1)[776:BootAnimation][776:BootAnimation] fork [815:BootAnimation]
+<7>[    9.008054]<6>.(1)[776:BootAnimation][776:BootAnimation] fork [816:BootAnimation]
+<7>[    9.008101]<6>.(1)[776:BootAnimation][776:BootAnimation] fork [817:BootAnimation]
+<7>[    9.008144]<6>.(1)[776:BootAnimation][776:BootAnimation] fork [818:BootAnimation]
+<7>[    9.008206]<6>.(1)[776:BootAnimation][776:BootAnimation] fork [819:BootAnimation]
+<7>[    9.008261]<6>.(1)[776:BootAnimation][776:BootAnimation] fork [820:BootAnimation]
+<4>[    9.008208]<6>.(6)[322:ccci_mdinit]0x41,0x33,0x31,0x32,
+<4>[    9.008592]<6>.(6)[322:ccci_mdinit]
+<4>[    9.008592]<6>[AES_EXPORT] SO
+<7>[    9.008635]<6>.(1)[776:BootAnimation][776:BootAnimation] fork [821:BootAnimation]
+<7>[    9.009302]<6>.(1)[776:BootAnimation][776:BootAnimation] fork [822:BootAnimation]
+<4>[    9.009408]<6>.(6)[322:ccci_mdinit]0x2b3112a3
+<4>[    9.009963]<6>.(6)[322:ccci_mdinit]0x6c8d3259
+<4>[    9.010660]<6>.(6)[322:ccci_mdinit]0x44,0x31,0x34,0x32,
+<5>[    9.011038]<6>.(6)[322:ccci_mdinit][ccci0/util]security is on!
+<5>[    9.011765]<6>.(6)[322:ccci_mdinit][ccci1/mcd]CLDMA modem is starting
+<5>[    9.012568]<6>.(6)[322:ccci_mdinit][ccci1/plat]Clear MD region protect...
+<5>[    9.013414]<6>.(6)[322:ccci_mdinit][ccci1/plat]Clear MPU protect MD ROM region<5>
+<5>[    9.014350]<6>.(6)[322:ccci_mdinit][ccci1/plat]Clear MPU protect MD R/W region<14>
+<5>[    9.015292]<6>.(6)[322:ccci_mdinit][ccci1/plat]Clear DSP region protect...
+<5>[    9.016147]<6>.(6)[322:ccci_mdinit][ccci1/plat]Clear MPU protect DSP ROM region<6>
+<3>[    9.017096]<6>.(6)[322:ccci_mdinit][ccci1/util]MD1 image postfix=1_lwg_n
+<3>[    9.017932]<6>.(6)[322:ccci_mdinit][ccci1/util]MD1 image postfix=1_lwg_n_E1
+<5>[    9.018795]<6>.(6)[322:ccci_mdinit][ccci1/util]Find img @CIP
+<5>[    9.019507]<6>.(6)[322:ccci_mdinit][ccci1/util]try to open modem_1_lwg_n.img
+<5>[    9.020392]<6>.(6)[322:ccci_mdinit][ccci1/util]try to open modem_1_lwg_n_E1.img
+<5>[    9.021313]<6>.(6)[322:ccci_mdinit][ccci1/util]try to open modem.img
+<5>[    9.022098]<6>.(6)[322:ccci_mdinit][ccci1/util]Find img @default
+<5>[    9.022841]<6>.(6)[322:ccci_mdinit][ccci1/util]try to open modem_1_lwg_n.img
+<7>[    9.023762]<6>.(6)[322:ccci_mdinit][ccci0/util]sec_open fd = (1)!
+<7>[    9.023769]<6>.(6)[322:ccci_mdinit][ccci0/util]sec_open file ptr = (ffffffc0641cd200)!
+<5>[    9.023775]<6>.(6)[322:ccci_mdinit][ccci1/util]open /etc/firmware/modem_1_lwg_n.img OK
+<4>[    9.035090]<6>.(4)[322:ccci_mdinit][AUTHEN] 0x53,0x53,0x53,0x53
+<4>[    9.035828]<6>.(4)[322:ccci_mdinit][AUTHEN] verify signature ... pass
+<4>[    9.036680]<6>.(4)[322:ccci_mdinit][SEC_CCCI] data_offset is 64
+<4>[    9.037407]<6>.(4)[322:ccci_mdinit][SEC_CCCI] data_sec_len is 300
+<5>[    9.038166]<6>.(4)[322:ccci_mdinit][ccci1/util]sign check ret value 0x40, 0x12c!
+<5>[    9.039087]<6>.(4)[322:ccci_mdinit][ccci1/util]sign check success(0x40, 0x12c)!
+<5>[    9.039999]<6>.(4)[322:ccci_mdinit][ccci1/util]signature_check offset:64, tail:236
+<5>[    9.041112]<6>.(4)[322:ccci_mdinit][ccci1/util]cipher image
+<4>[    9.041818]<6>.(4)[322:ccci_mdinit][CFMT_CORE] sec_cipherfmt_decrypted (DS lock) - start offset is 64 (0x40)
+<4>[    9.043033]<6>.(4)[322:ccci_mdinit][CFMT_CORE] sec_cipherfmt_decrypted (DS lock) - total buffer length 9413688 (0x8fa438)
+<4>[    9.044401]<6>.(4)[322:ccci_mdinit][CFMT_CORE] sec_cipherfmt_decrypted - cipher_offset is 0 (0x0)
+<4>[    9.045505]<6>.(4)[322:ccci_mdinit][CFMT_CORE] sec_cipherfmt_decrypted - cipher_length 102400 (0x19000)
+<4>[    9.046676]<6>.(4)[322:ccci_mdinit][SEC AES] reset aes vector
+<4>[    9.047391]<6>.(4)[322:ccci_mdinit][AES_EXPORT] SO(V)
+<4>[    9.048026]<6>.(4)[322:ccci_mdinit]0x2b3112a3
+<4>[    9.048562]<6>.(4)[322:ccci_mdinit]0x6c8d3259
+<5>[    9.053097]<6>-(0)[0:swapper/0][g_android][USB]android_setup
+<6>[    9.053803]<6>-(0)[0:swapper/0]android_usb gadget: composite_setup bRequest=0x6
+<6>[    9.053814]<6>-(0)[0:swapper/0]android_usb gadget: [COM]USB_REQ_GET_DESCRIPTOR: USB_DT_STRING, value=4
+<7>[    9.055137]<6>-(0)[0:swapper/0][MUSB]service_zero_data_request 327: restarting the request
+<7>[    9.070286]<6>.(6)[676:adbd][676:adbd] fork [823:adbd]
+<7>[    9.070514]<6>.(6)[676:adbd][676:adbd] fork [824:adbd]
+<7>[    9.091210]<6>.(7)[823:getprop][823:getprop] exit
+<7>[    9.091343]<6>-(2)[676:adbd][676:adbd] sig 1 to [823:getprop] stat=R
+<7>[    9.091357]<6>-(2)[676:adbd][676:adbd] sig 18 to [823:getprop] stat=R
+<7>[    9.091572]<6>-(7)[823:getprop][823:getprop] sig 1 to [823:getprop] stat=R
+<7>[    9.091582]<6>-(7)[823:getprop][823:getprop] sig 18 to [823:getprop] stat=R
+<7>[    9.091630]<6>-(7)[823:getprop][823:getprop] sig 17 to [676:adbd] stat=S
+<11>[    9.111514]<6>.(5)[353:modemsbp_con2]SBP: [SBP] OK, nvram is ready...
+<11>[    9.113791]<6>.(5)[353:modemsbp_con2]SBP: [SBP] MD  SBP read flag_updated=1,md_sbp_code=0
+
+<11>[    9.114865]<6>.(5)[353:modemsbp_con2]SBP: [SBP] SBP config main---
+<7>[    9.115697]<6>.(5)[353:modemsbp_con2][353:modemsbp_con2] exit
+<7>[    9.116136]<6>-(5)[353:modemsbp_con2][353:modemsbp_con2] sig 17 to [1:init] stat=S
+<14>[    9.116382]<6>.(4)[1:init]init: waitpid returned pid 353, status = 00000000
+<13>[    9.116395]<6>.(4)[1:init]init: process 'modemsbp2', pid 353 exited
+<14>[    9.117176]<6>.(4)[1:init]init: PropSet [init.svc.modemsbp2:stopped] Start>>
+<14>[    9.117275]<6>.(4)[1:init]init: PropSet [init.svc.modemsbp2:stopped] Done
+<7>[    9.123090]<6>.(5)[676:adbd][676:adbd] fork [825:adbd]
+<14>[    9.126103]<6>.(4)[1:init]init: [PropSet]: pid:393 uid:1000 gid:1003 set debug.program_binary.enable=1
+<14>[    9.126120]<6>.(4)[1:init]init: PropSet [debug.program_binary.enable:1] Start>>
+<14>[    9.126198]<6>.(4)[1:init]init: PropSet [debug.program_binary.enable:1] Done
+<4>[    9.126681]<6>.(0)[185:mtk-tpd][elan_dma] 78 78 78 78 ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+<7>[    9.127274]<6>.(1)[583:M:fence.swd][583:M:fence.swd] exit
+<7>[    9.127772]<6>.(3)[510:program_binary_][510:program_binary_] exit
+<4>[    9.130778]<6>.(0)[173:mmcqd/0][BLOCK_TAG] mmcqd:173 Workload < 1%, duty 0, period 500199616, req_cnt=0

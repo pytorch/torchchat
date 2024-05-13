@@ -1,0 +1,14 @@
+Processor	: ARMv7 Processor rev 0 (v7l)
+processor	: 0
+BogoMIPS	: 313.53
+
+Features	: swp half thumb fastmult vfp edsp thumbee neon vfpv3 tls 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x3
+CPU part	: 0xc09
+CPU revision	: 0
+
+Hardware	: PXA988
+Revision	: 0007
+Serial		: 4102dcf646581100

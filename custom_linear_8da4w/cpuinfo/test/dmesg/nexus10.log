@@ -1,0 +1,767 @@
+<6>[    0.000000] Booting Linux on physical CPU 0
+<6>[    0.000000] Initializing cgroup subsys cpu
+<5>[    0.000000] Linux version 3.4.67-g84ad5a4 (android-build@wpee22.hot.corp.google.com) (gcc version 4.7 (GCC) ) #1 SMP PREEMPT Fri Nov 13 21:33:05 UTC 2015
+<4>[    0.000000] CPU: ARMv7 Processor [410fc0f4] revision 4 (ARMv7), cr=10c5387d
+<4>[    0.000000] CPU: PIPT / VIPT nonaliasing data cache, PIPT instruction cache
+<4>[    0.000000] Machine: Manta
+<6>[    0.000000] Initialized persistent memory from a0000000-a01fffff
+<6>[    0.000000] ion_reserve: ion_chunk_heap reserved base 90000000 size 268435456
+<4>[    0.000000] Memory policy: ECC disabled, Data cache writealloc
+<4>[    0.000000] CPU EXYNOS5250 (id 0x43520210)
+<7>[    0.000000] exynos5_init_clocks: initializing clocks
+<6>[    0.000000] S3C24XX Clocks, Copyright 2004 Simtec Electronics
+<3>[    0.000000] clkout: bad source 0
+<7>[    0.000000] exynos5_setup_clocks: registering clocks
+<7>[    0.000000] exynos5_setup_clocks: xtal is 24000000
+<6>[    0.000000] EXYNOS5: PLL settings, A=1000000000, B=1333090909, C=333000000
+<6>[    0.000000] M=1600000000, E=96000000, V=300000000, G=533000000
+<6>[    0.000000] EXYNOS5: ARMCLK=1000000000, CDREX=800000000, ACLK400=533000000
+<6>[    0.000000] ACLK333=333000000, ACLK266=266666666, ACLK200=200000000
+<6>[    0.000000] ACLK166=166500000, ACLK66=66666666
+<6>[    0.000000] sclk_fimd: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_g3d: source is mout_mpll_user (0), rate is 800000000
+<6>[    0.000000] sclk_gscl_wrap0: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_gscl_wrap1: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_bayer: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_cam0: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_cam1: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_jpeg: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_usbdrd30: source is mout_mpll (0), rate is 66666666
+<7>[    0.000000] On node 0 totalpages: 524032
+<7>[    0.000000] free_area_init_node: node 0, pgdat c0914a40, node_mem_map c09fa000
+<7>[    0.000000]   Normal zone: 992 pages used for memmap
+<7>[    0.000000]   Normal zone: 0 pages reserved
+<7>[    0.000000]   Normal zone: 125984 pages, LIFO batch:31
+<7>[    0.000000]   HighMem zone: 3102 pages used for memmap
+<7>[    0.000000]   HighMem zone: 393954 pages, LIFO batch:31
+<6>[    0.000000] PERCPU: Embedded 7 pages/cpu @c1a07000 s12352 r0 d16320 u32768
+<7>[    0.000000] pcpu-alloc: s12352 r0 d16320 u32768 alloc=8*4096
+<7>[    0.000000] pcpu-alloc: [0] 0 [0] 1 
+<4>[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 519938
+<5>[    0.000000] Kernel command line: vmalloc=512M debug_core.break_on_panic=0 debug_core.break_on_exception=0 no_console_suspend s3c2410-wdt.tmr_atboot=1 s3c2410-wdt.tmr_margin=30 wire.search_count=5  s3cfb.bootloaderfb=0x60000000 androidboot.bootloader=MANTAMF01 androidboot.serialno=R32D303GS1H androidboot.wifimacaddr=A8:06:00:C5:16:21 androidboot.btmacaddr=A8:06:00:C5:16:20
+<6>[    0.000000] PID hash table entries: 2048 (order: 1, 8192 bytes)
+<6>[    0.000000] Dentry cache hash table entries: 65536 (order: 6, 262144 bytes)
+<6>[    0.000000] Inode-cache hash table entries: 32768 (order: 5, 131072 bytes)
+<6>[    0.000000] allocated 4192256 bytes of page_cgroup
+<6>[    0.000000] please try 'cgroup_disable=memory' option if you don't want memory cgroups
+<6>[    0.000000] Memory: 2047MB = 2047MB total
+<5>[    0.000000] Memory: 1124648k/1124648k available, 971480k reserved, 648576K highmem
+<5>[    0.000000] Virtual kernel memory layout:
+<5>[    0.000000]     vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+<5>[    0.000000]     fixmap  : 0xfff00000 - 0xfffe0000   ( 896 kB)
+<5>[    0.000000]     vmalloc : 0xdf800000 - 0xff000000   ( 504 MB)
+<5>[    0.000000]     lowmem  : 0xc0000000 - 0xdf000000   ( 496 MB)
+<5>[    0.000000]     pkmap   : 0xbfe00000 - 0xc0000000   (   2 MB)
+<5>[    0.000000]       .text : 0xc0008000 - 0xc084d000   (8468 kB)
+<5>[    0.000000]       .init : 0xc084d000 - 0xc088d040   ( 257 kB)
+<5>[    0.000000]       .data : 0xc088e000 - 0xc09296f0   ( 622 kB)
+<5>[    0.000000]        .bss : 0xc0929714 - 0xc09f9d00   ( 834 kB)
+<6>[    0.000000] SLUB: Genslabs=11, HWalign=64, Order=0-3, MinObjects=0, CPUs=2, Nodes=1
+<6>[    0.000000] Preemptible hierarchical RCU implementation.
+<6>[    0.000000] NR_IRQS:597
+<6>[    0.000000] sched_clock: 32 bits at 24MHz, resolution 41ns, wraps every 178956ms
+<6>[    0.000049] Calibrating delay loop... 997.78 BogoMIPS (lpj=2494464)
+<6>[    0.030033] pid_max: default: 32768 minimum: 301
+<6>[    0.030166] Security Framework initialized
+<6>[    0.030188] SELinux:  Initializing.
+<7>[    0.030220] SELinux:  Starting in permissive mode
+<6>[    0.030347] Mount-cache hash table entries: 512
+<6>[    0.031085] Initializing cgroup subsys debug
+<6>[    0.031096] Initializing cgroup subsys cpuacct
+<6>[    0.031105] Initializing cgroup subsys memory
+<6>[    0.031136] Initializing cgroup subsys freezer
+<6>[    0.031173] CPU: Testing write buffer coherency: ok
+<6>[    0.031300] CPU0: thread -1, cpu 0, socket 0, mpidr 80000000
+<6>[    0.031332] hw perfevents: enabled with ARMv7 Cortex-A15 PMU driver, 7 counters available
+<6>[    0.031375] Setting up static identity map for 0x40658f08 - 0x40658f60
+<4>[    0.085725] CPU1: Booted secondary processor
+<6>[    0.111319] CPU1: thread -1, cpu 1, socket 0, mpidr 80000001
+<2>[    0.111360] CPU1: Unknown IPI message 0x1
+<6>[    0.111471] Brought up 2 CPUs
+<6>[    0.111483] SMP: Total of 2 processors activated (1995.57 BogoMIPS).
+<6>[    0.122075] VFP support v0.3: implementor 41 architecture 4 part 30 variant f rev 0
+<6>[    0.122271] gpiochip_add: registered GPIOs 0 to 7 on device: GPA0
+<6>[    0.122283] gpiochip_add: registered GPIOs 9 to 14 on device: GPA1
+<6>[    0.122294] gpiochip_add: registered GPIOs 16 to 23 on device: GPA2
+<6>[    0.122304] gpiochip_add: registered GPIOs 25 to 29 on device: GPB0
+<6>[    0.122313] gpiochip_add: registered GPIOs 31 to 35 on device: GPB1
+<6>[    0.122323] gpiochip_add: registered GPIOs 37 to 40 on device: GPB2
+<6>[    0.122332] gpiochip_add: registered GPIOs 42 to 45 on device: GPB3
+<6>[    0.122341] gpiochip_add: registered GPIOs 47 to 53 on device: GPC0
+<6>[    0.122351] gpiochip_add: registered GPIOs 55 to 58 on device: GPC1
+<6>[    0.122360] gpiochip_add: registered GPIOs 60 to 66 on device: GPC2
+<6>[    0.122369] gpiochip_add: registered GPIOs 68 to 74 on device: GPC3
+<6>[    0.122379] gpiochip_add: registered GPIOs 76 to 79 on device: GPD0
+<6>[    0.122388] gpiochip_add: registered GPIOs 81 to 88 on device: GPD1
+<6>[    0.122397] gpiochip_add: registered GPIOs 90 to 95 on device: GPY0
+<6>[    0.122406] gpiochip_add: registered GPIOs 97 to 100 on device: GPY1
+<6>[    0.122416] gpiochip_add: registered GPIOs 102 to 107 on device: GPY2
+<6>[    0.122425] gpiochip_add: registered GPIOs 109 to 116 on device: GPY3
+<6>[    0.122435] gpiochip_add: registered GPIOs 118 to 125 on device: GPY4
+<6>[    0.122444] gpiochip_add: registered GPIOs 127 to 134 on device: GPY5
+<6>[    0.122453] gpiochip_add: registered GPIOs 136 to 143 on device: GPY6
+<6>[    0.122462] gpiochip_add: registered GPIOs 145 to 151 on device: GPC4
+<6>[    0.122472] gpiochip_add: registered GPIOs 153 to 160 on device: GPX0
+<6>[    0.122481] gpiochip_add: registered GPIOs 162 to 169 on device: GPX1
+<6>[    0.122490] gpiochip_add: registered GPIOs 171 to 178 on device: GPX2
+<6>[    0.122499] gpiochip_add: registered GPIOs 180 to 187 on device: GPX3
+<6>[    0.122515] gpiochip_add: registered GPIOs 189 to 196 on device: GPE0
+<6>[    0.122524] gpiochip_add: registered GPIOs 198 to 199 on device: GPE1
+<6>[    0.122533] gpiochip_add: registered GPIOs 201 to 204 on device: GPF0
+<6>[    0.122542] gpiochip_add: registered GPIOs 206 to 209 on device: GPF1
+<6>[    0.122551] gpiochip_add: registered GPIOs 211 to 218 on device: GPG0
+<6>[    0.122561] gpiochip_add: registered GPIOs 220 to 227 on device: GPG1
+<6>[    0.122570] gpiochip_add: registered GPIOs 229 to 230 on device: GPG2
+<6>[    0.122579] gpiochip_add: registered GPIOs 232 to 235 on device: GPH0
+<6>[    0.122588] gpiochip_add: registered GPIOs 237 to 244 on device: GPH1
+<6>[    0.122603] gpiochip_add: registered GPIOs 246 to 253 on device: GPV0
+<6>[    0.122612] gpiochip_add: registered GPIOs 255 to 262 on device: GPV1
+<6>[    0.122621] gpiochip_add: registered GPIOs 264 to 271 on device: GPV2
+<6>[    0.122630] gpiochip_add: registered GPIOs 273 to 280 on device: GPV3
+<6>[    0.122640] gpiochip_add: registered GPIOs 282 to 283 on device: GPV4
+<3>[    0.122652] gpio: GPZ has no PM function
+<6>[    0.122660] gpiochip_add: registered GPIOs 285 to 291 on device: GPZ
+<6>[    0.122874] dummy: 
+<6>[    0.123095] NET: Registered protocol family 16
+<6>[    0.123409] Registered FIQ tty driver
+<6>[    0.123443] Last reset was software reset (RST_STAT=0x20000000)
+<6>[    0.125575] Manta HW revision: 8, CPU EXYNOS5250 Rev1.0
+<6>[    0.129058] console [ttyFIQ2] enabled
+<6>[    0.129144] Registered fiq debugger ttyFIQ2
+<6>[    0.129421] persistent_ram: found existing buffer, size 36878, start 36878
+<6>[    0.218636] console [ram-1] enabled
+<6>[    0.220239] bootloader fb located at 60000000-60F9FFFF
+<6>[    0.220359] Registered chained gpio int handler for interrupt 77.
+<6>[    0.220445] Registered interrupt support for gpio group 19.
+<6>[    0.222554] hw-breakpoint: found 5 (+1 reserved) breakpoint and 4 watchpoint registers.
+<6>[    0.222671] hw-breakpoint: maximum watchpoint size is 8 bytes.
+<4>[    0.222854] S3C Power Management, Copyright 2004 Simtec Electronics
+<6>[    0.223180] EXYNOS5250 PMU Initialize
+<6>[    0.224031] EXYNOS: Initializing architecture
+<6>[    0.224426] s3c24xx-pwm s3c24xx-pwm.0: tin at 33333333, tdiv at 33333333, tin=divclk, base 0
+<6>[    0.224611] s3c24xx-pwm s3c24xx-pwm.1: tin at 16666666, tdiv at 16666666, tin=divclk, base 8
+<6>[    0.231763] bio: create slab <bio-0> at 0
+<6>[    0.232155] MXT_BOOSTER: 
+<6>[    0.232333] MXT_XVDD: 
+<6>[    0.232449] MXT_XVDD: supplied by MXT_BOOSTER
+<6>[    0.232676] VBATT: 3700 mV 
+<6>[    0.621776] ion_chunk_heap_create: base 2415919104 size 268435456 align 1048576
+<5>[    0.622327] SCSI subsystem initialized
+<6>[    0.623113] usbcore: registered new interface driver usbfs
+<6>[    0.623270] usbcore: registered new interface driver hub
+<6>[    0.623407] usbcore: registered new device driver usb
+<6>[    0.623709] wake enabled for irq 439
+<6>[    0.623819] wake enabled for irq 432
+<6>[    0.623926] wake enabled for irq 433
+<6>[    0.624037] GPIO Input Driver: Start gpio inputs for manta-keypad... in interrupt mode
+<6>[    0.624156] wake enabled for irq 427
+<6>[    0.624266] GPIO Input Driver: Start gpio inputs for manta-keypad... in interrupt mode
+<6>[    0.624454] input: manta-keypad as /devices/virtual/input/input0
+<6>[    0.624676] input: manta-switch as /devices/virtual/input/input1
+<6>[    0.625198] s3c-i2c s3c2440-i2c.0: i2c-0: S3C I2C adapter
+<6>[    0.625314] s3c-i2c s3c2440-i2c.0: slave address 0x10
+<6>[    0.625378] s3c-i2c s3c2440-i2c.0: bus frequency set to 65 KHz
+<6>[    0.625767] s3c-i2c s3c2440-i2c.1: i2c-1: S3C I2C adapter
+<6>[    0.625834] s3c-i2c s3c2440-i2c.1: slave address 0x10
+<6>[    0.625945] s3c-i2c s3c2440-i2c.1: bus frequency set to 378 KHz
+<6>[    0.626291] s3c-i2c s3c2440-i2c.2: i2c-2: S3C I2C adapter
+<6>[    0.626434] s3c-i2c s3c2440-i2c.2: slave address 0x10
+<6>[    0.626499] s3c-i2c s3c2440-i2c.2: bus frequency set to 378 KHz
+<6>[    0.626796] s3c-i2c s3c2440-i2c.3: i2c-3: S3C I2C adapter
+<6>[    0.626862] s3c-i2c s3c2440-i2c.3: slave address 0x10
+<6>[    0.626972] s3c-i2c s3c2440-i2c.3: bus frequency set to 378 KHz
+<6>[    0.627262] s3c-i2c s3c2440-i2c.4: i2c-4: S3C I2C adapter
+<6>[    0.627376] s3c-i2c s3c2440-i2c.4: slave address 0x10
+<6>[    0.627439] s3c-i2c s3c2440-i2c.4: bus frequency set to 378 KHz
+<6>[    0.627887] max77686 5-0009: device found
+<6>[    0.634709] max77686_pmic_probe: Device ID=0x09, (version:1, chip_rev:1)
+<6>[    0.634921] max77686-pmic max77686-pmic: Power on triggered by ACOKB=Low
+<6>[    0.638161] vdd_mif range: 850 <--> 1200 mV at 1037 mV 
+<6>[    0.638945] vdd_arm range: 850 <--> 1500 mV at 1075 mV 
+<6>[    0.639671] vdd_int range: 850 <--> 1300 mV at 1037 mV 
+<6>[    0.640412] vdd_g3d range: 850 <--> 1250 mV at 1200 mV 
+<6>[    0.641432] VCC_1.8V_AP: 1800 mV 
+<6>[    0.642409] VMIPI_1.0V: 1000 mV 
+<6>[    0.643145] TOUCH_VDD_1.8V: 1800 mV 
+<6>[    0.644171] VMIPI_1.8V: 1800 mV 
+<6>[    0.645131] VUOTG_3.0V: 3000 mV 
+<6>[    0.646095] VHSIC_1.0V: 1000 mV 
+<6>[    0.647131] VHSIC_1.8V: 1800 mV 
+<6>[    0.647841] 5M_CORE_1.5V: 1500 mV 
+<6>[    0.648558] CAM_IO_1.8V: 1800 mV 
+<6>[    0.649275] VT_CAM_1.8V: 1800 mV 
+<6>[    0.649988] TA_CHECK_1.35V: 1350 mV 
+<6>[    0.650701] TSP_AVDD_2.8V: 2800 mV 
+<6>[    0.651425] CAM_AF_2.8V: 2800 mV 
+<6>[    0.652439] VADC_3.3V: 3300 mV 
+<6>[    0.653023] 32KHZ_PMIC: 
+<6>[    0.653232] s3c-i2c s3c2440-i2c.5: i2c-5: S3C I2C adapter
+<6>[    0.653345] s3c-i2c s3c2440-i2c.5: slave address 0x10
+<6>[    0.653409] s3c-i2c s3c2440-i2c.5: bus frequency set to 378 KHz
+<6>[    0.653716] s3c-i2c s3c2440-i2c.7: i2c-7: S3C I2C adapter
+<6>[    0.653782] s3c-i2c s3c2440-i2c.7: slave address 0x10
+<6>[    0.653893] s3c-i2c s3c2440-i2c.7: bus frequency set to 378 KHz
+<6>[    0.654090] s3c-i2c s3c2440-i2c.8: i2c-8: S3C I2C adapter
+<6>[    0.654205] s3c-i2c s3c2440-i2c.8: slave address 0x10
+<6>[    0.654269] s3c-i2c s3c2440-i2c.8: bus frequency set to 378 KHz
+<6>[    0.654440] Linux media interface: v0.10
+<6>[    0.654536] Linux video capture interface: v2.00
+<6>[    0.655923] Advanced Linux Sound Architecture Driver Version 1.0.25.
+<6>[    0.656434] Bluetooth: Core ver 2.16
+<6>[    0.656531] NET: Registered protocol family 31
+<6>[    0.656642] Bluetooth: HCI device and connection manager initialized
+<6>[    0.656708] Bluetooth: HCI socket layer initialized
+<6>[    0.656819] Bluetooth: L2CAP socket layer initialized
+<6>[    0.656900] Bluetooth: SCO socket layer initialized
+<6>[    0.657235] cfg80211: Calling CRDA to update world regulatory domain
+<6>[    0.657585] wake enabled for irq 421
+<6>[    0.657713] wake enabled for irq 422
+<6>[    0.658132] Switching to clocksource mct-frc
+<6>[    0.674534] NET: Registered protocol family 2
+<6>[    0.674769] IP route cache hash table entries: 16384 (order: 4, 65536 bytes)
+<6>[    0.675249] TCP established hash table entries: 65536 (order: 7, 524288 bytes)
+<6>[    0.676348] TCP bind hash table entries: 65536 (order: 7, 786432 bytes)
+<6>[    0.677473] TCP: Hash tables configured (established 65536 bind 65536)
+<6>[    0.677587] TCP: reno registered
+<6>[    0.677653] UDP hash table entries: 256 (order: 1, 8192 bytes)
+<6>[    0.677778] UDP-Lite hash table entries: 256 (order: 1, 8192 bytes)
+<6>[    0.678024] NET: Registered protocol family 1
+<6>[    0.678382] Trying to unpack rootfs image as initramfs...
+<6>[    0.704568] Freeing initrd memory: 560K
+<6>[    0.706006] Exynos5 : ARM Clock down on idle mode is enabled
+<6>[    0.706162] EXYNOS5250 ASV(ARM : 7 MIF : 3) using fused group
+<6>[    0.706552] [BT] bcm_bt_lpm_init
+<6>[    0.706811] wake enabled for irq 438
+<6>[    0.707184] exynos_tmu exynos_tmu: Current auto refresh interval(3875 nsec), Normal auto refresh interval(3875 nsec), memory throttle auto refresh internal(1937 nsec)
+<6>[    0.708368] exynos_tmu exynos_tmu: Tmu Initialization is sucessful...!
+<3>[    0.708592] s3c-adc samsung-adc-v4: operating without regulator "vdd" .
+<6>[    0.708716] s3c-adc samsung-adc-v4: attached adc driver
+<6>[    0.709256] audit: initializing netlink socket (disabled)
+<5>[    0.709348] type=2000 audit(0.700:1): initialized
+<4>[    0.710123] highmem bounce pool size: 64 pages
+<6>[    0.715641] fuse init (API version 7.18)
+<7>[    0.715935] SELinux:  Registering netfilter hooks
+<6>[    0.717275] io scheduler noop registered
+<6>[    0.717343] io scheduler deadline registered
+<6>[    0.717537] io scheduler cfq registered (default)
+<6>[    0.920184] dma-pl330 dma-pl330.0: Loaded driver for PL330 DMAC-267056
+<6>[    0.920258] dma-pl330 dma-pl330.0: 	DBUFF-32x4bytes Num_Chans-8 Num_Peri-32 Num_Events-32
+<6>[    0.922424] dma-pl330 dma-pl330.1: Loaded driver for PL330 DMAC-267056
+<6>[    0.922544] dma-pl330 dma-pl330.1: 	DBUFF-32x4bytes Num_Chans-8 Num_Peri-32 Num_Events-32
+<6>[    0.923201] dma-pl330 dma-pl330.2: Loaded driver for PL330 DMAC-267056
+<6>[    0.923348] dma-pl330 dma-pl330.2: 	DBUFF-64x8bytes Num_Chans-8 Num_Peri-1 Num_Events-32
+<6>[    0.923574] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+<6>[    0.924257] exynos4210-uart.0: ttySAC0 at MMIO 0x12c00000 (irq = 83) is a S3C6400/10
+<6>[    0.924491] exynos4210-uart.1: ttySAC1 at MMIO 0x12c10000 (irq = 84) is a S3C6400/10
+<6>[    0.924673] exynos4210-uart.3: ttySAC3 at MMIO 0x12c30000 (irq = 86) is a S3C6400/10
+<6>[    0.925007] mali mali.0: Continuing without Mali clock control
+<6>[    0.926154] mali mali.0: GPU identified as 0x6956 r0p0 status 1
+<6>[    1.057213] mali mali.0: Probed as mali0
+<4>[    1.057490] mali mali.0: start latency exceeded, new value 875 ns
+<4>[    1.057767] mali mali.0: state restore latency exceeded, new value 208084 ns
+<4>[    1.057883] mali mali.0: stop latency exceeded, new value 875 ns
+<6>[    1.062661] brd: module loaded
+<6>[    1.065175] loop: module loaded
+<6>[    1.066014] WM1811 LDO1: 
+<6>[    1.066501] WM1811 LDO2: 
+<6>[    1.071007] wm8994 7-001a: WM1811 revision D CUST_ID 00
+<6>[    1.074950] bcm2079x-spi spi2.0: bcmspinfc_probe, probing bcmspinfc driver
+<6>[    1.075092] bcm2079x-spi spi2.0: requesting IRQ 430
+<6>[    1.075259] bcm2079x-spi spi2.0: bcmspinfc_probe, probing bcmspinfc driver exited successfully
+<6>[    1.075519] tun: Universal TUN/TAP device driver, 1.6
+<6>[    1.075584] tun: (C) 1999-2004 Max Krasnyansky <maxk@qualcomm.com>
+<6>[    1.075711] PPP generic driver version 2.4.2
+<6>[    1.075871] PPP BSD Compression module registered
+<6>[    1.075936] PPP Deflate Compression module registered
+<6>[    1.076319] PPP MPPE Compression module registered
+<6>[    1.076388] NET: Registered protocol family 24
+<6>[    1.076537] usbcore: registered new interface driver asix
+<6>[    1.076627] usbcore: registered new interface driver cdc_ether
+<6>[    1.076768] usbcore: registered new interface driver net1080
+<6>[    1.076858] usbcore: registered new interface driver cdc_subset
+<6>[    1.076994] usbcore: registered new interface driver zaurus
+<6>[    1.077095] usbcore: registered new interface driver cdc_ncm
+<6>[    1.077320] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+<6>[    1.077643] s5p-ehci s5p-ehci: S5P EHCI Host Controller
+<6>[    1.077874] s5p-ehci s5p-ehci: new USB bus registered, assigned bus number 1
+<6>[    1.077990] s5p-ehci s5p-ehci: irq 103, io mem 0x12110000
+<6>[    1.083262] s5p-ehci s5p-ehci: USB 0.0 started, EHCI 1.00
+<6>[    1.083396] usb usb1: New USB device found, idVendor=1d6b, idProduct=0002
+<6>[    1.083510] usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+<6>[    1.083575] usb usb1: Product: S5P EHCI Host Controller
+<6>[    1.083686] usb usb1: Manufacturer: Linux 3.4.67-g84ad5a4 ehci_hcd
+<6>[    1.083749] usb usb1: SerialNumber: s5p-ehci
+<6>[    1.084150] hub 1-0:1.0: USB hub found
+<6>[    1.084226] hub 1-0:1.0: 3 ports detected
+<6>[    1.084508] s5p-ehci s5p-ehci: remove, state 1
+<6>[    1.084627] usb usb1: USB disconnect, device number 1
+<6>[    1.085162] s5p-ehci s5p-ehci: USB bus 1 deregistered
+<6>[    1.085481] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
+<6>[    1.085751] exynos-ohci exynos-ohci: EXYNOS OHCI Host Controller
+<6>[    1.085980] exynos-ohci exynos-ohci: new USB bus registered, assigned bus number 1
+<6>[    1.086125] exynos-ohci exynos-ohci: irq 103, io mem 0x12120000
+<6>[    1.142342] usb usb1: New USB device found, idVendor=1d6b, idProduct=0001
+<6>[    1.142459] usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+<6>[    1.142524] usb usb1: Product: EXYNOS OHCI Host Controller
+<6>[    1.142635] usb usb1: Manufacturer: Linux 3.4.67-g84ad5a4 ohci_hcd
+<6>[    1.142697] usb usb1: SerialNumber: exynos-ohci
+<6>[    1.143091] hub 1-0:1.0: USB hub found
+<6>[    1.143167] hub 1-0:1.0: 3 ports detected
+<6>[    1.143455] exynos-ohci exynos-ohci: remove, state 1
+<6>[    1.143573] usb usb1: USB disconnect, device number 1
+<6>[    1.144044] exynos-ohci exynos-ohci: USB bus 1 deregistered
+<6>[    1.144369] usbcore: registered new interface driver usblp
+<6>[    1.144433] Initializing USB Mass Storage driver...
+<6>[    1.144572] usbcore: registered new interface driver usb-storage
+<6>[    1.144635] USB Mass Storage support registered.
+<6>[    1.145010] s3c-hsotg : S3C HS USB OTG Device Driver,(c) 2008-2009 Samsung Electronics
+<6>[    1.145017] s3c-hsotg : version 15 March 2009
+<6>[    1.145345] file system registered
+<6>[    1.146223]  gadget: Mass Storage Function, version: 2009/09/11
+<6>[    1.146339]  gadget: Number of LUNs=1
+<6>[    1.146405]  lun0: LUN: removable file: (no medium)
+<6>[    1.146643]  gadget: android_usb ready
+<6>[    1.146755] bound driver 'android_usb'
+<6>[    1.146932] mousedev: PS/2 mouse device common for all mice
+<6>[    1.147186] usbcore: registered new interface driver xpad
+<6>[    1.147326] usbcore: registered new interface driver usb_acecad
+<6>[    1.147414] usbcore: registered new interface driver aiptek
+<6>[    1.147552] usbcore: registered new interface driver gtco
+<6>[    1.147640] usbcore: registered new interface driver hanwang
+<6>[    1.147774] usbcore: registered new interface driver kbtab
+<6>[    1.147859] usbcore: registered new interface driver wacom
+<6>[    1.148396] input: Atmel maXTouch Touchscreen as /devices/platform/s3c2440-i2c.3/i2c-3/3-004a/input/input2
+<4>[    1.163421] mali mali.0: stop latency exceeded, new value 958 ns
+<4>[    1.163504] mali mali.0: state save latency exceeded, new value 7625 ns
+<4>[    1.163909] pd-g3d: Power-off latency exceeded, new value 287125 ns
+<6>[    1.258840] max77686-rtc max77686-rtc: max77686_rtc_enable_wtsr_smpl: WTSR: enable, SMPL: enable
+<6>[    1.358745] max77686-rtc max77686-rtc: rtc core: registered max77686-rtc as rtc0
+<6>[    1.359331] i2c /dev entries driver
+<6>[    1.360017] exynos-mdev.0: Media0[0xde133400] was registered successfully
+<6>[    1.360203] exynos-mdev.1: Media1[0xde133800] was registered successfully
+<6>[    1.360347] exynos-mdev.2: Media2[0xde133c00] was registered successfully
+<6>[    1.360958] [INFO]gsc_probe:1450: gsc-0 registered successfully
+<6>[    1.361406] [INFO]gsc_probe:1450: gsc-1 registered successfully
+<6>[    1.361894] [INFO]gsc_probe:1450: gsc-2 registered successfully
+<6>[    1.362324] [INFO]gsc_probe:1450: gsc-3 registered successfully
+<2>[    1.362440] Initialize JPEG driver
+<6>[    1.362671] s5p-jpeg s5p-jpeg: JPEG driver is registered to /dev/video12
+<6>[    1.362844] s5p-jpeg s5p-jpeg: JPEG driver is registered to /dev/video11
+<6>[    1.363284] Samsung Graphics 2D driver, (c) 2011 Samsung Electronics
+<6>[    1.363392] EXYNOS MFC V4L2 Driver, (c) 2010 Samsung Electronics
+<7>[    1.363556] s5p_mfc_probe++
+<7>[    1.363566] s5p-mfc s5p-mfc: Initialised spin lock
+<7>[    1.363575] s5p-mfc s5p-mfc: Getting clocks
+<6>[    1.363817] s5p-mfc s5p-mfc: decoder registered as /dev/video6
+<6>[    1.363955] s5p-mfc s5p-mfc: encoder registered as /dev/video7
+<7>[    1.364382] s5p_mfc_probe--
+<6>[    1.364519] i2c i2c-0: attached exynos hdcp into i2c adapter successfully
+<4>[    1.364616] i2c-core: driver [exynos_hdcp] using legacy suspend method
+<4>[    1.364728] i2c-core: driver [exynos_hdcp] using legacy resume method
+<6>[    1.364805] Samsung HDMI output driver, (c) 2010-2011 Samsung Electronics Co., Ltd.
+<6>[    1.365057] s5p-hdmi exynos5-hdmi: hdmiphy i2c bus number = 8
+<6>[    1.365248] s5p-hdmiphy 8-0038: hdmiphy_probe start
+<6>[    1.365315] s5p-hdmiphy 8-0038: probe successful
+<6>[    1.390901] s5p-hdmi exynos5-hdmi: probe sucessful
+<6>[    1.391121] i2c i2c-0: probed exynos edid
+<6>[    1.391228] Samsung TV Mixer driver, (c) 2010-2011 Samsung Electronics Co., Ltd.
+<6>[    1.391381] s5p-mixer s5p-mixer: probe start
+<6>[    1.391604] s5p-mixer s5p-mixer: resources acquired
+<6>[    1.391737] s5p-mixer s5p-mixer: added output 'S5P HDMI connector' from module 's5p-hdmi'
+<6>[    1.391921] s5p-mixer s5p-mixer: registered layer mxr0_graph0 as /dev/video16
+<6>[    1.392107] s5p-mixer s5p-mixer: registered layer mxr0_graph1 as /dev/video17
+<6>[    1.392290] s5p-mixer s5p-mixer: registered layer mxr1_graph2 as /dev/video18
+<6>[    1.392427] s5p-mixer s5p-mixer: registered layer mxr1_graph3 as /dev/video19
+<6>[    1.392542] s5p-mixer s5p-mixer: mixer0 create links
+<6>[    1.392612] s5p-mixer s5p-mixer: mixer1 create links
+<6>[    1.392732] s5p-mixer s5p-mixer: mixer links are created successfully
+<6>[    1.392810] s5p-mixer s5p-mixer: probe successful
+<6>[    1.393953] fimc_is_spi successfully probed
+<6>[    1.394040] Driver for 1-wire Dallas network protocol.
+<6>[    1.466826] wake enabled for irq 420
+<6>[    1.467192] s3c2410_wdt: S3C2410 Watchdog Timer, (c) 2004 Simtec Electronics
+<6>[    1.467461] s3c2410-wdt s3c2410-wdt: starting watchdog timer
+<6>[    1.467532] s3c2410-wdt s3c2410-wdt: watchdog active, reset enabled, irq disabled
+<6>[    1.468044] device-mapper: uevent: version 1.0.3
+<6>[    1.468318] device-mapper: ioctl: 4.22.0-ioctl (2011-10-19) initialised: dm-devel@redhat.com
+<6>[    1.468725] Bluetooth: HCI UART driver ver 2.2
+<6>[    1.468791] Bluetooth: HCI H4 protocol initialized
+<6>[    1.469000] cpuidle: using governor ladder
+<6>[    1.469197] cpuidle: using governor menu
+<6>[    1.469286] sdhci: Secure Digital Host Controller Interface driver
+<6>[    1.469398] sdhci: Copyright(c) Pierre Ossman
+<6>[    1.469549] Synopsys Designware Multimedia Card Interface Driver
+<6>[    1.469759] dw_mmc dw_mmc.0: Using internal DMA controller.
+<6>[    1.470133] mmc0: no vmmc regulator found
+<6>[    1.471945] dw_mmc dw_mmc.0: Version ID is 241a
+<6>[    1.472020] dw_mmc dw_mmc.0: DW MMC controller at irq 107, 32 bit host data width, 128 deep fifo
+<6>[    1.472220] dw_mmc dw_mmc.1: Using internal DMA controller.
+<6>[    1.472548] mmc1: no vmmc regulator found
+<6>[    1.473908] dw_mmc dw_mmc.1: Version ID is 241a
+<6>[    1.473977] dw_mmc dw_mmc.1: DW MMC controller at irq 108, 32 bit host data width, 128 deep fifo
+<6>[    1.474091] dw_mmc dw_mmc.1: Internal DMAC interrupt fix enabled.
+<7>[    1.479044] Registered led device: as3668
+<6>[    1.483544] usbcore: registered new interface driver usbhid
+<6>[    1.483717] usbhid: USB HID core driver
+<4>[    1.498257] mmc_host mmc0: device is being hw reset
+<6>[    1.658519] mmc_host mmc0: Bus speed (slot 0) = 50000000Hz (slot req 400000Hz, actual 396825HZ div = 63)
+<6>[    1.750930] mmc_host mmc0: Bus speed (slot 0) = 200000000Hz (slot req 200000000Hz, actual 200000000HZ div = 0)
+<3>[    1.751042] dw_mmc dw_mmc.0: cmd21 data error:-84 pending:184 status:a906 tcb:80 tbb:0
+<6>[    1.751594] mmc0: new HS200 MMC card at address 0001
+<6>[    1.752148] mmcblk0: mmc0:0001 MBG4GA 29.1 GiB 
+<6>[    1.752407] mmcblk0boot0: mmc0:0001 MBG4GA partition 1 4.00 MiB
+<6>[    1.752664] mmcblk0boot1: mmc0:0001 MBG4GA partition 2 4.00 MiB
+<6>[    1.758020]  mmcblk0: p1 p2 p3 p4 p5 p6 p7 p8 p9
+<6>[    1.759897]  mmcblk0boot1: unknown partition table
+<6>[    1.760672]  mmcblk0boot0: unknown partition table
+<6>[    1.839071] i2c i2c-1: MPU6050 is ready to go!
+<6>[    1.839388] bh1721fvc_i2c_probe: registering lightsensor-level input device
+<6>[    1.841117] ashmem: initialized
+<6>[    1.841389] Mobicore API module initialized!
+<6>[    1.842028] usbcore: registered new interface driver snd-usb-audio
+<4>[    1.843322] samsung-i2s samsung-i2s.0: start latency exceeded, new value 833 ns
+<4>[    1.843442] samsung-i2s samsung-i2s.0: state restore latency exceeded, new value 1042 ns
+<4>[    1.843558] samsung-i2s samsung-i2s.0: stop latency exceeded, new value 875 ns
+<4>[    1.843723] samsung-i2s samsung-i2s.0: state save latency exceeded, new value 958 ns
+<4>[    1.843999] pd-maudio: Power-off latency exceeded, new value 158417 ns
+<4>[    1.851441] pd-maudio: Power-on latency exceeded, new value 152792 ns
+<4>[    1.851514] samsung-i2s samsung-i2s.0: start latency exceeded, new value 917 ns
+<6>[    1.855075] asoc: wm8994-aif1 <-> samsung-i2s.0 mapping ok
+<6>[    1.855416] asoc: wm8994-aif1 <-> samsung-i2s.4 mapping ok
+<6>[    1.855788] asoc: wm8994-aif2 <-> manta-voice mapping ok
+<6>[    1.856101] asoc: wm8994-aif3 <-> manta-bt mapping ok
+<6>[    1.881154] input: Manta-I2S Headset as /devices/platform/manta-i2s/sound/card0/input3
+<6>[    1.882541] asoc: dit-hifi <-> samsung-spdif mapping ok
+<6>[    1.883066] GACT probability NOT on
+<6>[    1.883135] Mirror/redirect action on
+<6>[    1.883277] u32 classifier
+<6>[    1.883339]     Actions configured
+<6>[    1.883402] Netfilter messages via NETLINK v0.30.
+<6>[    1.883555] nf_conntrack version 0.5.0 (16384 buckets, 65536 max)
+<6>[    1.884018] ctnetlink v0.93: registering with nfnetlink.
+<6>[    1.884163] NF_TPROXY: Transparent proxy support initialized, version 4.1.0
+<6>[    1.884227] NF_TPROXY: Copyright (c) 2006-2007 BalaBit IT Ltd.
+<6>[    1.884556] xt_time: kernel timezone is -0000
+<6>[    1.884950] ip_tables: (C) 2000-2006 Netfilter Core Team
+<6>[    1.885235] arp_tables: (C) 2002 David S. Miller
+<6>[    1.885336] TCP: cubic registered
+<6>[    1.885398] Initializing XFRM netlink socket
+<6>[    1.886005] NET: Registered protocol family 10
+<6>[    1.886750] Mobile IPv6
+<6>[    1.886840] ip6_tables: (C) 2000-2006 Netfilter Core Team
+<6>[    1.887072] IPv6 over IPv4 tunneling driver
+<6>[    1.887961] NET: Registered protocol family 17
+<6>[    1.888048] NET: Registered protocol family 15
+<6>[    1.888308] Bluetooth: RFCOMM TTY layer initialized
+<6>[    1.888387] Bluetooth: RFCOMM socket layer initialized
+<6>[    1.888500] Bluetooth: RFCOMM ver 1.11
+<6>[    1.888562] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+<6>[    1.888674] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
+<6>[    1.888799] NET: Registered protocol family 35
+<5>[    1.889198] Registering SWP/SWPB emulation handler
+<4>[    1.889375] pd-gscl3: Power-off latency exceeded, new value 875 ns
+<4>[    1.889483] pd-isp: Power-off latency exceeded, new value 135333 ns
+<4>[    1.889604] pd-gscl2: Power-off latency exceeded, new value 750 ns
+<4>[    1.889685] pd-gscl1: Power-off latency exceeded, new value 666 ns
+<4>[    1.889815] pd-gscl0: Power-off latency exceeded, new value 709 ns
+<4>[    1.889996] pd-dp: Power-off latency exceeded, new value 833 ns
+<4>[    1.890098] pd-gscl: Power-off latency exceeded, new value 166000 ns
+<4>[    1.890228] pd-mixer: Power-off latency exceeded, new value 750 ns
+<4>[    1.890311] pd-hdmi: Power-off latency exceeded, new value 750 ns
+<4>[    1.890439] pd-fimd1: Power-off latency exceeded, new value 750 ns
+<4>[    1.890668] pd-disp1: Power-off latency exceeded, new value 158458 ns
+<4>[    1.890810] pd-mfc: Power-off latency exceeded, new value 234459 ns
+<6>[    1.891203] wake enabled for irq 424
+<6>[    1.891470] wake enabled for irq 426
+<6>[    2.118823] battery: charge source type was changed: usb
+<4>[    2.125253] pd-disp1: Power-on latency exceeded, new value 190250 ns
+<4>[    2.125326] pd-fimd1: Power-on latency exceeded, new value 875 ns
+<4>[    2.125444] s3c-fb exynos5-fb.1: start latency exceeded, new value 875 ns
+<4>[    2.125521] s3c-fb exynos5-fb.1: state restore latency exceeded, new value 10542 ns
+<4>[    2.125636] s3c-fb exynos5-fb.1: stop latency exceeded, new value 958 ns
+<6>[    2.159121] s3c-fb exynos5-fb.1: window 0: fb 
+<4>[    2.159507] pd-dp: Power-on latency exceeded, new value 958 ns
+<4>[    2.159578] s5p-dp s5p-dp: start latency exceeded, new value 875 ns
+<4>[    2.159693] s5p-dp s5p-dp: state restore latency exceeded, new value 1084 ns
+<4>[    2.159808] s5p-dp s5p-dp: stop latency exceeded, new value 833 ns
+<6>[    2.161483] s5p-dp s5p-dp: EDID data does not include any extensions.
+<3>[    2.174365] s5p-dp s5p-dp: EDID Read success!
+<6>[    2.186949] s5p-dp s5p-dp: Link Training Clock Recovery success
+<6>[    2.203464] s5p-dp s5p-dp: Link Training success!
+<4>[    2.352720] wifi_set_power = 1
+<4>[    2.708293] wifi_set_carddetect = 1
+<6>[    2.738293] mmc_host mmc1: Bus speed (slot 0) = 50000000Hz (slot req 400000Hz, actual 396825HZ div = 63)
+<6>[    2.748993] mmc_host mmc1: Bus speed (slot 0) = 200000000Hz (slot req 200000000Hz, actual 200000000HZ div = 0)
+<3>[    2.749225] dw_mmc dw_mmc.1: cmd19 data error:-84 pending:84 status:9906 tcb:40 tbb:0
+<6>[    2.751816] mmc1: new ultra high speed SDR104 SDIO card at address 0001
+<4>[    2.755968] F1 signature OK, socitype:0x1 chip:0x4324 rev:0x2 pkg:0xd
+<4>[    2.756563] DHD: dongle ram size is set to 589824(orig 589824) at 0x0
+<4>[    2.757665] wl_create_event_handler(): thread:wl_event_handler:60 started
+<6>[    2.757685] CFG80211-ERROR) wl_event_handler : tsk Enter, tsk = 0xddc413d8
+<4>[    2.758484] p2p0: P2P Interface Registered
+<4>[    2.758647] dhd_attach(): thread:dhd_watchdog_thread:61 started
+<4>[    2.758851] dhd_attach(): thread:dhd_dpc:62 started
+<4>[    2.759005] dhd_attach(): thread:dhd_rxf:63 started
+<4>[    2.759205] dhd_attach(): thread:dhd_sysioc:64 started
+<4>[    2.759390] wifi_get_mac_addr
+<4>[    2.759882] Broadcom Dongle Host Driver: register interface [wlan0] MAC: a8:06:00:c5:16:21
+<4>[    2.760042] 
+<4>[    2.760045] Dongle Host Driver, version 1.88.45 (r)
+<4>[    2.760049] Compiled in drivers/net/wireless/bcmdhd on Nov 13 2015 at 21:32:21
+<4>[    2.760275] wifi_set_power = 0
+<4>[    2.868271] =========== WLAN placed in RESET ========
+<6>[    2.893702] max77686-rtc max77686-rtc: setting system clock to 2018-01-05 02:31:36 UTC (1515119496)
+<6>[    2.896328] ALSA device list:
+<6>[    2.896406]   #0: Manta-I2S
+<6>[    2.896479]   #1: Manta-SPDIF
+<6>[    2.896937] Freeing init memory: 256K
+<6>[    2.897014] Write protecting the kernel text section c0008000 - c084d000
+<6>[    2.897527] rodata_test: attempting to write to read-only section:
+<6>[    2.897606] write to read-only section trapped, success
+<7>[    2.904341] SELinux: 2048 avtab hash slots, 4194 rules.
+<7>[    2.906510] SELinux: 2048 avtab hash slots, 4194 rules.
+<7>[    2.906544] SELinux:  1 users, 2 roles, 361 types, 0 bools, 1 sens, 1024 cats
+<7>[    2.906563] SELinux:  86 classes, 4194 rules
+<7>[    2.907853] SELinux:  Completing initialization.
+<7>[    2.907864] SELinux:  Setting up existing superblocks.
+<7>[    2.907888] SELinux: initialized (dev sysfs, type sysfs), uses genfs_contexts
+<7>[    2.907913] SELinux: initialized (dev rootfs, type rootfs), uses genfs_contexts
+<7>[    2.908008] SELinux: initialized (dev bdev, type bdev), not configured for labeling
+<7>[    2.908030] SELinux: initialized (dev proc, type proc), uses genfs_contexts
+<7>[    2.908061] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+<7>[    2.908089] SELinux: initialized (dev debugfs, type debugfs), uses genfs_contexts
+<7>[    2.912640] SELinux: initialized (dev sockfs, type sockfs), uses task SIDs
+<7>[    2.912666] SELinux: initialized (dev pipefs, type pipefs), uses task SIDs
+<7>[    2.912686] SELinux: initialized (dev anon_inodefs, type anon_inodefs), not configured for labeling
+<7>[    2.912710] SELinux: initialized (dev devpts, type devpts), uses transition SIDs
+<7>[    2.912743] SELinux: initialized (dev selinuxfs, type selinuxfs), uses genfs_contexts
+<7>[    2.912860] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+<7>[    2.912907] SELinux: initialized (dev sysfs, type sysfs), uses genfs_contexts
+<5>[    3.037015] type=1403 audit(1515119496.635:2): policy loaded auid=4294967295 ses=4294967295
+<5>[    3.039339] type=1404 audit(1515119496.640:3): enforcing=1 old_enforcing=0 auid=4294967295 ses=4294967295
+<3>[    3.378694] init: /dev/hw_random not found
+<6>[    3.378788] keychord: using input dev manta-keypad for fevent
+<6>[    3.378869] keychord: using input dev Manta-I2S Headset for fevent
+<7>[    3.398348] SELinux: initialized (dev cgroup, type cgroup), uses genfs_contexts
+<7>[    3.398616] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+<7>[    3.418355] SELinux: initialized (dev cgroup, type cgroup), uses genfs_contexts
+<7>[    3.419842] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+<7>[    3.419989] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+<7>[    3.443338] SELinux: initialized (dev cgroup, type cgroup), uses genfs_contexts
+<3>[    3.444911] init: /dev/hw_random not found
+<6>[    3.448380] EXT4-fs (mmcblk0p8): mounted filesystem without journal. Opts: (null)
+<7>[    3.448476] SELinux: initialized (dev mmcblk0p8, type ext4), uses xattr
+<6>[    3.448539] fs_mgr: __mount(source=/dev/block/platform/dw_mmc.0/by-name/system,target=/system,type=ext4)=0
+<6>[    3.460008] EXT4-fs (mmcblk0p7): mounted filesystem with ordered data mode. Opts: nomblk_io_submit,errors=remount-ro
+<7>[    3.460098] SELinux: initialized (dev mmcblk0p7, type ext4), uses xattr
+<6>[    3.460137] fs_mgr: check_fs(): mount(/dev/block/platform/dw_mmc.0/by-name/cache,/cache,ext4)=0
+<6>[    3.488819] fs_mgr: Running /system/bin/e2fsck on /dev/block/platform/dw_mmc.0/by-name/cache
+<6>[    3.508870] atmel_mxt_ts 3-004a: Skip writing Config:[CRC 0x997F60]
+<6>[    3.520916] e2fsck: e2fsck 1.42.9 (28-Dec-2013)
+<6>[    3.521128] e2fsck: /dev/block/platform/dw_mmc.0/by-name/cache: clean, 30/33840 files, 4429/135168 blocks
+<6>[    3.526137] EXT4-fs (mmcblk0p7): mounted filesystem with ordered data mode. Opts: nomblk_io_submit,errors=panic
+<7>[    3.526261] SELinux: initialized (dev mmcblk0p7, type ext4), uses xattr
+<6>[    3.526328] fs_mgr: __mount(source=/dev/block/platform/dw_mmc.0/by-name/cache,target=/cache,type=ext4)=0
+<7>[    3.534406] EXT4-fs (mmcblk0p9): ext4_orphan_cleanup: deleting unreferenced inode 57345
+<7>[    3.534908] EXT4-fs (mmcblk0p9): ext4_orphan_cleanup: deleting unreferenced inode 57347
+<7>[    3.537789] EXT4-fs (mmcblk0p9): ext4_orphan_cleanup: deleting unreferenced inode 49616
+<6>[    3.538405] EXT4-fs (mmcblk0p9): 3 orphan inodes deleted
+<6>[    3.538573] EXT4-fs (mmcblk0p9): recovery complete
+<6>[    3.562483] EXT4-fs (mmcblk0p9): mounted filesystem with ordered data mode. Opts: nomblk_io_submit,errors=remount-ro
+<7>[    3.562576] SELinux: initialized (dev mmcblk0p9, type ext4), uses xattr
+<6>[    3.562626] fs_mgr: check_fs(): mount(/dev/block/platform/dw_mmc.0/by-name/userdata,/data,ext4)=0
+<6>[    3.583310] fs_mgr: Running /system/bin/e2fsck on /dev/block/platform/dw_mmc.0/by-name/userdata
+<6>[    3.615114] e2fsck: e2fsck 1.42.9 (28-Dec-2013)
+<6>[    3.615196] e2fsck: /dev/block/platform/dw_mmc.0/by-name/userdata: clean, 1301/1818624 files, 298646/7271424 blocks
+<6>[    3.620984] EXT4-fs (mmcblk0p9): mounted filesystem with ordered data mode. Opts: nomblk_io_submit,errors=panic
+<7>[    3.621104] SELinux: initialized (dev mmcblk0p9, type ext4), uses xattr
+<6>[    3.621174] fs_mgr: __mount(source=/dev/block/platform/dw_mmc.0/by-name/userdata,target=/data,type=ext4)=0
+<6>[    3.626330] EXT4-fs (mmcblk0p1): mounted filesystem with ordered data mode. Opts: (null)
+<7>[    3.626442] SELinux: initialized (dev mmcblk0p1, type ext4), uses xattr
+<6>[    3.626496] fs_mgr: __mount(source=/dev/block/platform/dw_mmc.0/by-name/efs,target=/factory,type=ext4)=0
+<6>[    3.628311] EXT4-fs (mmcblk0p1): re-mounted. Opts: (null)
+<7>[    3.633054] SELinux: initialized (dev functionfs, type functionfs), uses genfs_contexts
+<4>[    3.683370] pd-g3d: Power-on latency exceeded, new value 1208708 ns
+<4>[    3.683546] mali mali.0: start latency exceeded, new value 1000 ns
+<6>[    3.685006] binder: 122:122 transaction failed 29189, size 0-0
+<4>[    3.686280] mali mali.0: state restore latency exceeded, new value 2670167 ns
+<3>[    3.688026] init: cannot find '/system/bin/debuggerd64', disabling 'debuggerd64'
+<3>[    3.688131] init: cannot find '/system/bin/rild', disabling 'ril-daemon'
+<3>[    3.694512] android_usb: already disabled
+<7>[    3.712296] SELinux: initialized (dev fuse, type fuse), uses genfs_contexts
+<6>[    3.712515] read descriptors
+<6>[    3.712571] read strings
+<6>[    3.712639] mtp_bind_config
+<38>[    3.743754] logd.auditd: start
+<4>[    3.783305] mali mali.0: state save latency exceeded, new value 11875 ns
+<6>[    3.843712] atmel_mxt_ts 3-004a: Family ID: 162 Variant ID: 0 Version: 18 Build: 170
+<6>[    3.843802] atmel_mxt_ts 3-004a: Matrix X Size: 32 Matrix Y Size: 52 Object Num: 29
+<6>[    3.852393] atmel_mxt_ts 3-004a: Mxt touch controller initialized
+<4>[    4.397617] ------------[ cut here ]------------
+<4>[    4.397711] WARNING: at /usr/local/google/buildbot/src/partner-android/l-mr1-dev-exynos-manta-3.4/private/manta/drivers/gpu/arm/midgard/mali_kbase_jd.c:228 jd_submit_atom+0x8fc/0xa08()
+<4>[    4.397792] sg list from dma_buf_map_attachment > dma_buf->size=16404480
+<4>[    4.397873] Backtrace: 
+<4>[    4.397971] [<c0012d0c>] (dump_backtrace+0x0/0x10c) from [<c064f0e8>] (dump_stack+0x18/0x1c)
+<4>[    4.398053]  r6:c0294af4 r5:00000009 r4:dd545b50 r3:c08d902c
+<4>[    4.398304] [<c064f0d0>] (dump_stack+0x0/0x1c) from [<c0037278>] (warn_slowpath_common+0x50/0x68)
+<4>[    4.398387] [<c0037228>] (warn_slowpath_common+0x0/0x68) from [<c00372fc>] (warn_slowpath_fmt+0x38/0x40)
+<4>[    4.398468]  r8:dd810780 r7:ddedf9f0 r6:00000fa5 r5:c09158cd r4:0000000f
+<4>[    4.398674] r3:00000009
+<4>[    4.398835] [<c00372c4>] (warn_slowpath_fmt+0x0/0x40) from [<c0294af4>] (jd_submit_atom+0x8fc/0xa08)
+<4>[    4.398880]  r3:00fa5000 r2:c07c4d18
+<4>[    4.399041] [<c02941f8>] (jd_submit_atom+0x0/0xa08) from [<c0294e84>] (kbase_jd_submit+0x284/0x388)
+<4>[    4.399126] [<c0294c00>] (kbase_jd_submit+0x0/0x388) from [<c02a40b8>] (kbase_ioctl+0x680/0xb24)
+<4>[    4.399176] [<c02a3a38>] (kbase_ioctl+0x0/0xb24) from [<c0126a8c>] (do_vfs_ioctl+0x8c/0x5b4)
+<4>[    4.399260] [<c0126a00>] (do_vfs_ioctl+0x0/0x5b4) from [<c0127028>] (sys_ioctl+0x74/0x84)
+<4>[    4.399345] [<c0126fb4>] (sys_ioctl+0x0/0x84) from [<c000f040>] (ret_fast_syscall+0x0/0x30)
+<4>[    4.399425]  r8:c000f1c4 r7:00000036 r6:b8196f14 r5:b81916a8 r4:0000021c
+<4>[    4.399675] Board Information: Manta HW revision: 8, CPU EXYNOS5250 Rev1.0
+<4>[    4.399758] ---[ end trace cec3b4ab4bca449c ]---
+<4>[    4.400125] mali mali.0: start latency exceeded, new value 1291 ns
+<4>[    4.687205] healthd: BatteryHealthPath not found
+<4>[    4.687263] healthd: BatteryPresentPath not found
+<6>[    4.709623] manta_otg manta_otg_work: UNDEFINED -> b_peripheral
+<4>[    4.748291] mali mali.0: state save latency exceeded, new value 15500 ns
+<6>[    4.980962] android_work: sent uevent USB_STATE=CONNECTED
+<6>[    5.050761] android_usb gadget: high-speed config #1: android
+<6>[    5.050994] android_work: sent uevent USB_STATE=CONFIGURED
+<7>[    5.059719] SELinux: initialized (dev tmpfs, type tmpfs), uses transition SIDs
+<4>[    5.233281] mali mali.0: stop latency exceeded, new value 1000 ns
+<4>[    5.233397] mali mali.0: state save latency exceeded, new value 21791 ns
+<6>[    6.461161] warning: `main' uses 32-bit capabilities (legacy support in use)
+<6>[    7.723818] SEC_DRIVER_2.1_2012.10.24
+<6>[    7.838493] iio-buffer, current state requested again
+<6>[    8.128687] inv_mpu_iio: firmware loaded CRC=0xd37d4599
+<6>[    8.129658] iio-buffer, current state requested again
+<36>[   11.474707] type=1400 audit(1515119505.070:4): avc: denied { getattr } for pid=408 comm="system_server" path="/data/app/tlcd_sock" dev="mmcblk0p9" ino=278530 scontext=u:r:system_server:s0 tcontext=u:object_r:drmserver_socket:s0 tclass=sock_file permissive=0
+<6>[   11.664664] healthd-manta: battery charge enable=1
+<4>[   11.671515] healthd: battery l=100 v=3943 t=28.0 h=2 st=2 c=-1035 chg=u
+<6>[   13.460858] acc_open
+<6>[   13.460958] acc_release
+<4>[   14.475508] 
+<4>[   14.475512] Dongle Host Driver, version 1.88.45 (r)
+<4>[   14.475516] Compiled in drivers/net/wireless/bcmdhd on Nov 13 2015 at 21:32:21
+<4>[   14.475680] wl_android_wifi_on in
+<4>[   14.475730] wifi_set_power = 1
+<6>[   14.646868] mtp_open
+<6>[   15.168536] +++fimc_is_sensor_open()
+<6>[   15.168587] ---fimc_is_sensor_open(0)
+<6>[   15.266574] +++fimc_is_ischain_open()
+<6>[   15.364256] fimc_is_fw2.bin version : 2 2869-2012/11/14 16:57:59]O05L00AFK01
+<6>[   15.364835] firmware is loaded successfully from fimc_is_fw2.bin
+<6>[   15.365480] fimc_is_ischain_power(1)
+<4>[   15.365863] pd-gscl: Power-on latency exceeded, new value 312250 ns
+<4>[   15.366300] pd-isp: Power-on latency exceeded, new value 338166 ns
+<4>[   15.366364] exynos5-fimc-is2 exynos5-fimc-is2: start latency exceeded, new value 833 ns
+<6>[   15.366448] FIMC_IS runtime resume
+<4>[   15.376597] exynos5-fimc-is2 exynos5-fimc-is2: state restore latency exceeded, new value 10144250 ns
+<4>[   15.376687] exynos5-fimc-is2 exynos5-fimc-is2: stop latency exceeded, new value 1125 ns
+<4>[   15.376786] exynos5-fimc-is2 exynos5-fimc-is2: start latency exceeded, new value 875 ns
+<6>[   15.377257] Manufacturer ID : 0x000000ef
+<6>[   15.377305] Device ID : 0x00000013
+<6>[   15.381340] sensor name : 4E5
+<6>[   15.381426] FROM DATA(0x1A): 0x0000000c
+<6>[   15.381469] FROM DATA(0x1B): 0x00000001
+<6>[   15.381555] ---fimc_is_ischain_open(0)
+<6>[   15.391189] IS version : 111.130
+<6>[   15.500177] setfile_4e5.bin version : 4E5_121115_V3 2012/11/15/15:57 E5250
+<6>[   15.500283] setfile is loaded successfully from setfile_4e5.bin
+<4>[   15.583277] =========== WLAN going back to live  ========
+<4>[   15.583370] sdio_reset_comm():
+<3>[   15.586505] dw_mmc dw_mmc.1: Actual clock is high than a reqeust clock.Source clock is needed to change
+<6>[   15.586602] mmc_host mmc1: Bus speed (slot 0) = 50000000Hz (slot req 98040Hz, actual 98039HZ div = 255)
+<6>[   15.599916] mmc_host mmc1: Bus speed (slot 0) = 200000000Hz (slot req 200000000Hz, actual 200000000HZ div = 0)
+<4>[   15.736766] dhdsdio_write_vars: Download, Upload and compare of NVRAM succeeded.
+<4>[   15.819251] dhd_bus_init: enable 0x06, ready 0x06 (waited 0us)
+<6>[   15.819667] wake enabled for irq 437
+<4>[   15.820788] wifi_get_mac_addr
+<4>[   15.822767] Firmware up: op_mode=0x0015, Broadcom Dongle Host Driver mac=a8:06:00:c5:16:21
+<4>[   15.831719] Firmware version = wl0: Sep  9 2014 10:45:13 version 6.10.197.41.200.16 (r501551) FWID 01-9b3a9b32
+<4>[   15.832155] dhd_wlfc_init(): successfully enabled bdcv2 tlv signaling, 79
+<6>[   15.833423] CFG80211-ERROR) wl_cfg80211_attach_post : p2p0: p2p_dev_addr=aa:06:00:c5:16:21
+<4>[   16.081843] dhd_set_suspend: Remove extra suspend setting 
+<3>[   16.608455] ERR:fimc_is_flite_stop:920: last capture timeout:fimc_is_flite_stop
+<3>[   16.608489] 
+<3>[   16.673454] ERR:fimc_is_sensor_back_stop:649: fimc_is_flite_stop is fail
+<3>[   16.683873] ERR:fimc_is_video_streamoff:411: vb2_streamoff is failed(-22)
+<4>[   16.684632] fimc_is_sensor_front_stop:726: already front stop
+<6>[   16.697530] fimc_is_bayer_video_close
+<6>[   16.697605] +++fimc_is_sensor_close
+<4>[   16.697722] fimc_is_sensor_back_stop:640: already back stop
+<4>[   16.697792] fimc_is_sensor_front_stop:726: already front stop
+<6>[   16.697911] ---fimc_is_sensor_close(0)
+<6>[   16.697998] fimc_is_isp_video_close
+<6>[   16.698066] +++fimc_is_ischain_close
+<4>[   16.698182] fimc_is_ischain_isp_stop:3120: already stop
+<6>[   16.797496] fimc_is_ischain_power(0)
+<6>[   16.797582] FIMC_IS runtime suspend
+<4>[   16.805306] exynos5-fimc-is2 exynos5-fimc-is2: state save latency exceeded, new value 7715542 ns
+<4>[   16.805530] pd-isp: Power-off latency exceeded, new value 144708 ns
+<6>[   16.809235] ---fimc_is_ischain_close(0)
+<6>[   16.809370] fimc_is_scalerc_video_close
+<6>[   16.809526] fimc_is_scalerp_video_close
+<4>[   16.810342] pd-gscl: Power-off latency exceeded, new value 337042 ns
+<6>[   16.864723] +++fimc_is_sensor_open()
+<6>[   16.864809] ---fimc_is_sensor_open(0)
+<6>[   16.880452] +++fimc_is_ischain_open()
+<6>[   16.947743] fimc_is_fw2.bin version : 2 2869-2012/11/14 16:57:59]O05L00AFK01
+<6>[   16.948042] firmware is loaded successfully from fimc_is_fw2.bin
+<6>[   16.948983] fimc_is_ischain_power(1)
+<4>[   16.949639] pd-isp: Power-on latency exceeded, new value 353334 ns
+<6>[   16.949734] FIMC_IS runtime resume
+<4>[   16.962189] exynos5-fimc-is2 exynos5-fimc-is2: state restore latency exceeded, new value 12449875 ns
+<6>[   16.962401] Manufacturer ID : 0x000000ef
+<6>[   16.962451] Device ID : 0x00000013
+<6>[   16.964207] sensor name : 6A3
+<6>[   16.964297] FROM DATA(0x1A): 0x00000000
+<6>[   16.964346] FROM DATA(0x1B): 0x00000000
+<6>[   16.964429] ---fimc_is_ischain_open(0)
+<6>[   16.973921] IS version : 111.130
+<6>[   17.008461] setfile_6a3.bin version : 1.23 2012/11/15/17:42 E5250
+<6>[   17.008534] setfile is loaded successfully from setfile_6a3.bin
+<3>[   18.015054] ERR:fimc_is_flite_stop:920: last capture timeout:fimc_is_flite_stop
+<3>[   18.015059] 
+<3>[   18.078278] ERR:fimc_is_sensor_back_stop:649: fimc_is_flite_stop is fail
+<3>[   18.078972] ERR:fimc_is_video_streamoff:411: vb2_streamoff is failed(-22)
+<4>[   18.079136] fimc_is_sensor_front_stop:726: already front stop
+<6>[   18.081333] fimc_is_bayer_video_close
+<6>[   18.081436] +++fimc_is_sensor_close
+<4>[   18.081483] fimc_is_sensor_back_stop:640: already back stop
+<4>[   18.081531] fimc_is_sensor_front_stop:726: already front stop
+<6>[   18.081611] ---fimc_is_sensor_close(0)
+<6>[   18.081670] fimc_is_isp_video_close
+<6>[   18.081749] +++fimc_is_ischain_close
+<4>[   18.081792] fimc_is_ischain_isp_stop:3120: already stop
+<6>[   18.082864] fimc_is_ischain_power(0)
+<6>[   18.082956] FIMC_IS runtime suspend
+<6>[   18.090324] ---fimc_is_ischain_close(0)
+<6>[   18.090387] fimc_is_scalerc_video_close
+<6>[   18.090471] fimc_is_scalerp_video_close
+<4>[   18.091630] pd-gscl: Power-off latency exceeded, new value 921042 ns
+<6>[   18.628420] iio-buffer, current state requested again
+<4>[   22.713528] mali mali.0: stop latency exceeded, new value 2542 ns
+<4>[   22.714073] mali mali.0: start latency exceeded, new value 2084 ns
+<4>[   22.714417] mali mali.0: state save latency exceeded, new value 42333 ns
+<4>[   22.718883] mali mali.0: start latency exceeded, new value 2250 ns
+<4>[   22.722110] mali mali.0: state restore latency exceeded, new value 2859752 ns
+<4>[   22.824251] mali mali.0: state save latency exceeded, new value 853625 ns
+<4>[   23.244767] mali mali.0: state save latency exceeded, new value 1255959 ns
+<4>[   23.454796] mali mali.0: state save latency exceeded, new value 1336621 ns
+<6>[   25.701205] binder: 842:1473 transaction failed 29189, size 168-0
+<7>[   25.998250] p2p0: no IPv6 routers present
+<4>[   26.899179] samsung-i2s samsung-i2s.0: state restore latency exceeded, new value 1375 ns
+<3>[   26.903177] wm8994-codec wm8994-codec: FIFO error
+<4>[   28.506014] wl_bss_connect_done succeeded with 18:64:72:df:03:61
+<4>[   28.581497] dhd_ndo_add_ip: ndo ipaddr entry added 
+<4>[   28.605427] wl_bss_connect_done succeeded with 18:64:72:df:03:61
+<4>[   28.679788] dhd_set_suspend: Remove extra suspend setting 
+<4>[   28.688068] dhd_pno_get_for_batch : wifi location service is not supported
+<4>[   28.688203] failed to getting batching results
+<4>[   28.688761] dhd_pno_stop_for_batch : wifi location service is not supported
+<4>[   28.688891] NULL POINTER (_dhd_pno_clear_all_batch_results) : head->next is NULL
+<4>[   28.689012] NULL POINTER (_dhd_pno_clear_all_batch_results) : head->next is NULL
+<4>[   28.689085] failed to stop batching scan
+<4>[   29.149839] mali mali.0: state save latency exceeded, new value 1377041 ns
+<4>[   29.535235] dhd_ndo_add_ip: ndo ipaddr entry added 
+<4>[   29.536485] dhd_ndo_add_ip: ndo ipaddr entry added 
+<4>[   29.658870] pd-g3d: Power-off latency exceeded, new value 476292 ns

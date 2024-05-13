@@ -1,0 +1,47 @@
+Processor	: AArch64 Processor rev 1 (aarch64)
+processor	: 0
+min_vddcx	: 400000
+min_vddmx	: 490000
+BogoMIPS	: 38.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0x201
+CPU revision	: 1
+
+processor	: 1
+min_vddcx	: 400000
+min_vddmx	: 490000
+BogoMIPS	: 38.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0x201
+CPU revision	: 1
+
+processor	: 2
+min_vddcx	: 400000
+min_vddmx	: 490000
+BogoMIPS	: 38.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0x205
+CPU revision	: 1
+
+processor	: 3
+min_vddcx	: 400000
+min_vddmx	: 490000
+BogoMIPS	: 38.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0x205
+CPU revision	: 1
+
+CPU param	: 321 487 487 679 976 319 464 464 697 1167 
+Hardware	: Qualcomm Technologies, Inc MSM8996pro

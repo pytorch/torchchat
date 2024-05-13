@@ -1,0 +1,650 @@
+<6>[    0.000000] Initializing cgroup subsys cpu
+<5>[    0.000000] Linux version 3.0.8-g6656123 (android-build@vpbs1.mtv.corp.google.com) (gcc version 4.4.3 (GCC) ) #1 PREEMPT Thu Feb 2 16:56:02 PST 2012
+<4>[    0.000000] CPU: ARMv7 Processor [412fc082] revision 2 (ARMv7), cr=10c53c7f
+<4>[    0.000000] CPU: VIPT nonaliasing data cache, VIPT aliasing instruction cache
+<4>[    0.000000] Machine: herring
+<6>[    0.000000] Partition (from atag)      bootloader -- Offset:0x00000000 Size:0x00200000
+<6>[    0.000000] Partition (from atag)            misc -- Offset:0x004c0000 Size:0x00140000
+<6>[    0.000000] Partition (from atag)            boot -- Offset:0x00600000 Size:0x00800000
+<6>[    0.000000] Partition (from atag)        recovery -- Offset:0x00e00000 Size:0x00800000
+<6>[    0.000000] Partition (from atag)           cache -- Offset:0x01600000 Size:0x1d580000
+<6>[    0.000000] Partition (from atag)           radio -- Offset:0x1eb80000 Size:0x00d80000
+<6>[    0.000000] Partition (from atag)             efs -- Offset:0x1f900000 Size:0x006c0000
+<4>[    0.000000] Memory policy: ECC disabled, Data cache writeback
+<4>[    0.000000] CPU S5PV210/S5PC110 (id 0x43110222)
+<7>[    0.000000] s5pv210_init_clocks: initializing clocks
+<6>[    0.000000] S3C24XX Clocks, Copyright 2004 Simtec Electronics
+<4>[    0.000000] s3c24xx_register_clock: new clock sclk_csis, id -1, dev   (null) uses same enable bit as mout_csis, id -1, dev   (null)
+<4>[    0.000000] s3c24xx_register_clock: new clock lcd, id -1, dev   (null) uses same enable bit as sclk_fimd, id -1, dev   (null)
+<4>[    0.000000] s3c24xx_register_clock: new clock mfc, id -1, dev   (null) uses same enable bit as sclk_mfc, id -1, dev   (null)
+<4>[    0.000000] s3c24xx_register_clock: new clock iis, id 0, dev   (null) uses same enable bit as i2s_v50, id 0, dev   (null)
+<7>[    0.000000] s5pv210_setup_clocks: registering clocks
+<7>[    0.000000] s5pv210_setup_clocks: clkdiv0 = 14131330, clkdiv1 = 00300400
+<7>[    0.000000] s5pv210_setup_clocks: xtal is 24000000
+<6>[    0.000000] S5PV210: PLL settings, A=800000000, M=667000000, E=96000000 V=54000000
+<6>[    0.000000] S5PV210: ARMCLK=800000000, HCLKM=200000000, HCLKD=166750000
+<6>[    0.000000] HCLKP=133400000, PCLKM=100000000, PCLKD=83375000, PCLKP=66700000
+<6>[    0.000000] sclk_dmc: source is mout_mpll (1), rate is 166750000
+<6>[    0.000000] sclk_onenand: source is hclk_dsys (1), rate is 166750000
+<6>[    0.000000] sclk: source is mout_mpll (6), rate is 133400000
+<6>[    0.000000] sclk: source is mout_mpll (6), rate is 66700000
+<6>[    0.000000] sclk: source is mout_mpll (6), rate is 66700000
+<6>[    0.000000] sclk: source is mout_mpll (6), rate is 66700000
+<6>[    0.000000] sclk_mixer: source is sclk_dac (0), rate is 54000000
+<6>[    0.000000] sclk_fimc: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_fimc: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_fimc: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_cam: source is xusbxti (1), rate is 24000000
+<6>[    0.000000] sclk_cam: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_fimd: source is mout_mpll (6), rate is 166750000
+<6>[    0.000000] sclk_mmc: source is mout_mpll (6), rate is 51307692
+<6>[    0.000000] sclk_mmc: source is mout_mpll (6), rate is 47642857
+<6>[    0.000000] sclk_mmc: source is mout_mpll (6), rate is 47642857
+<6>[    0.000000] sclk_mmc: source is mout_mpll (6), rate is 47642857
+<6>[    0.000000] sclk_mfc: source is sclk_a2m (0), rate is 200000000
+<6>[    0.000000] sclk_fimg2d: source is sclk_a2m (0), rate is 200000000
+<6>[    0.000000] sclk: source is mout_mpll (1), rate is 66700000
+<6>[    0.000000] sclk_csis: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_spi: source is mout_epll (7), rate is 96000000
+<6>[    0.000000] sclk_spi: source is mout_epll (7), rate is 96000000
+<6>[    0.000000] sclk_pwi: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_pwm: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] sclk_mdnie: source is mout_mpll (6), rate is 166750000
+<6>[    0.000000] sclk_mdnie_pwm: source is ext_xtal (0), rate is 24000000
+<6>[    0.000000] s5p: 37748736 bytes system memory reserved for mfc at 0x32c00000, 0-bank base(0x32c00000)
+<6>[    0.000000] s5p: 37748736 bytes system memory reserved for mfc at 0x4dc00000, 1-bank base(0x4dc00000)
+<6>[    0.000000] s5p: 6291456 bytes system memory reserved for fimc0 at 0x4d600000, 1-bank base(0x4d600000)
+<6>[    0.000000] s5p: 10137600 bytes system memory reserved for fimc1 at 0x4cc55000, 1-bank base(0x4cc55000)
+<6>[    0.000000] s5p: 6291456 bytes system memory reserved for fimc2 at 0x4c655000, 1-bank base(0x4c655000)
+<6>[    0.000000] s5p: 8388608 bytes system memory reserved for jpeg at 0x32400000, 0-bank base(0x32400000)
+<6>[    0.000000] s5p: 15360000 bytes system memory reserved for fimd at 0x4b7af000, 1-bank base(0x4b7af000)
+<7>[    0.000000] On node 0 totalpages: 88751
+<7>[    0.000000]   Normal zone: 1278 pages used for memmap
+<7>[    0.000000]   Normal zone: 0 pages reserved
+<7>[    0.000000]   Normal zone: 87473 pages, LIFO batch:15
+<7>[    0.000000] pcpu-alloc: s0 r0 d32768 u32768 alloc=1*32768
+<7>[    0.000000] pcpu-alloc: [0] 0 
+<4>[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 87473
+<5>[    0.000000] Kernel command line: console=ttyFIQ0 no_console_suspend androidboot.serialno=363581CC0B5F00EC androidboot.bootloader=D720SPRKE1 androidboot.baseband=D720SPRLC1 androidboot.info=0x1,0x0,0 androidboot.carrier=SPR gain_code=0 s3cfb.bootloaderfb=0x34a00000 mach-herring.lcd_type=0x00000000 oem_state=locked
+<6>[    0.000000] PID hash table entries: 2048 (order: 1, 8192 bytes)
+<6>[    0.000000] Dentry cache hash table entries: 65536 (order: 6, 262144 bytes)
+<6>[    0.000000] Inode-cache hash table entries: 32768 (order: 5, 131072 bytes)
+<6>[    0.000000] Memory: 36MB 183MB 127MB = 346MB total
+<5>[    0.000000] Memory: 342568k/461676k available, 12436k reserved, 0K highmem
+<5>[    0.000000] Virtual kernel memory layout:
+<5>[    0.000000]     vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+<5>[    0.000000]     fixmap  : 0xfff00000 - 0xfffe0000   ( 896 kB)
+<5>[    0.000000]     DMA     : 0xff000000 - 0xffe00000   (  14 MB)
+<5>[    0.000000]     vmalloc : 0xe8000000 - 0xfc000000   ( 320 MB)
+<5>[    0.000000]     lowmem  : 0xc0000000 - 0xe7f00000   ( 639 MB)
+<5>[    0.000000]     modules : 0xbf000000 - 0xc0000000   (  16 MB)
+<5>[    0.000000]       .init : 0xc0008000 - 0xc0032000   ( 168 kB)
+<5>[    0.000000]       .text : 0xc0032000 - 0xc065b000   (6308 kB)
+<5>[    0.000000]       .data : 0xc065c000 - 0xc06a2d80   ( 284 kB)
+<5>[    0.000000]        .bss : 0xc06a2da4 - 0xc07e1550   (1274 kB)
+<6>[    0.000000] SLUB: Genslabs=11, HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+<6>[    0.000000] Preemptible hierarchical RCU implementation.
+<6>[    0.000000] NR_IRQS:339
+<6>[    0.000000] VIC @fc000000: id 0x00041192, vendor 0x41
+<6>[    0.000000] VIC @fc010000: id 0x00041192, vendor 0x41
+<6>[    0.000000] VIC @fc020000: id 0x00041192, vendor 0x41
+<6>[    0.000000] VIC @fc030000: id 0x00041192, vendor 0x41
+<6>[    0.000000] mult[140737]
+<6>[    0.000000] max_delta_ns[2937815369]
+<6>[    0.000000] min_delta_ns[30517]
+<6>[    0.000000] rate[32768]
+<6>[    0.000000] HZ[256]
+<6>[    0.000082] Calibrating delay loop... 795.12 BogoMIPS (lpj=1554432)
+<6>[    0.027254] pid_max: default: 32768 minimum: 301
+<6>[    0.027422] Mount-cache hash table entries: 512
+<6>[    0.027727] Initializing cgroup subsys debug
+<6>[    0.027740] Initializing cgroup subsys cpuacct
+<6>[    0.027758] Initializing cgroup subsys freezer
+<6>[    0.027788] CPU: Testing write buffer coherency: ok
+<6>[    0.029931] print_constraints: dummy: 
+<6>[    0.030063] NET: Registered protocol family 16
+<4>[    0.032825] clk_get: could not find clock (null) for dev s5pv210_device_fiqdbg_uart2+0x8/0xd8 (fiq_debugger.2)
+<6>[    0.036305] console [ttyFIQ0] enabled
+<6>[    0.036382] Registered FIQ tty driver e7856cc0
+<6>[    0.038338] ram_console: got buffer at 57f00000, size ff000
+<6>[    0.038517] ram_console: uncorrectable error in header
+<6>[    0.038527] ram_console: no valid data in buffer (sig = 0xfffffffc)
+<6>[    0.049175] console [ram-1] enabled
+<6>[    0.049403] S5PC110 Hardware version : EVT1
+<6>[    0.049555] HWREV is 0x0
+<3>[    0.050273] invalid media device
+<3>[    0.050350] invalid media device
+<3>[    0.050488] invalid media device
+<3>[    0.050563] invalid media device
+<3>[    0.050637] invalid media device
+<3>[    0.050725] invalid media device
+<4>[    0.050955] S3C Power Management, Copyright 2004 Simtec Electronics
+<6>[    0.051037] pmstats at 57fff000
+<6>[    0.052111] S5PV210: Initializing architecture
+<6>[    0.052442] s3c24xx-pwm s3c24xx-pwm.0: tin at 66700000, tdiv at 66700000, tin=divclk, base 0
+<6>[    0.052619] s3c24xx-pwm s3c24xx-pwm.1: tin at 66700000, tdiv at 66700000, tin=divclk, base 8
+<6>[    0.052734] s3c24xx-pwm s3c24xx-pwm.2: tin at 66700000, tdiv at 66700000, tin=divclk, base 12
+<6>[    0.052910] s3c24xx-pwm s3c24xx-pwm.3: tin at 66700000, tdiv at 66700000, tin=divclk, base 16
+<6>[    0.053201] print_constraints: pd_audio_supply: 5000 mV normal 
+<6>[    0.053444] print_constraints: pd_cam_supply: 5000 mV normal 
+<6>[    0.053626] print_constraints: pd_tv_supply: 5000 mV normal 
+<6>[    0.053859] print_constraints: pd_lcd_supply: 5000 mV normal 
+<6>[    0.054029] print_constraints: pd_g3d_supply: 5000 mV normal 
+<6>[    0.054263] print_constraints: pd_mfc_supply: 5000 mV normal 
+<6>[    0.059056] bio: create slab <bio-0> at 0
+<5>[    0.059756] SCSI subsystem initialized
+<6>[    0.060018] usbcore: registered new interface driver usbfs
+<6>[    0.060175] usbcore: registered new interface driver hub
+<6>[    0.060414] usbcore: registered new device driver usb
+<6>[    0.060760] i2c-gpio i2c-gpio.4: using pins 247 (SDA) and 246 (SCL)
+<3>[    0.061095] max8998 6-0066: No interrupt base specified, no interrupts
+<3>[    0.062807] i2:10, buck2_idx:0
+<6>[    0.064303] print_constraints: VALIVE_1.2V: 1200 mV 
+<6>[    0.064928] print_constraints: VUSB_1.1V: 1100 mV 
+<6>[    0.065996] print_constraints: VADC_3.3V: 3300 mV 
+<6>[    0.067164] print_constraints: VLCD_1.8V: 1800 mV 
+<6>[    0.067790] print_constraints: VUSB_3.3V: 3300 mV 
+<6>[    0.068928] print_constraints: VCC_2.8V_PDA: 2800 mV 
+<6>[    0.069556] print_constraints: CAM_AF_3.0V: 3000 mV 
+<6>[    0.070269] print_constraints: VGA_VDDIO_2.8V: 2800 mV 
+<6>[    0.070899] print_constraints: VGA_DVDD_1.8V: 1800 mV 
+<6>[    0.071524] print_constraints: CAM_ISP_HOST_2.8V: 2800 mV 
+<6>[    0.072220] print_constraints: VGA_AVDD_2.8V: 2800 mV 
+<6>[    0.073303] print_constraints: VCC_3.0V_LCD: 3000 mV 
+<6>[    0.073807] print_constraints: VDD_ARM: 750 <--> 1500 mV at 1200 mV 
+<6>[    0.074263] print_constraints: VDD_INT: 750 <--> 1500 mV at 1100 mV 
+<6>[    0.075217] print_constraints: VCC_1.8V: 1800 mV 
+<6>[    0.075654] print_constraints: CAM_ISP_CORE_1.2V: 1200 mV 
+<3>[    0.075976] i2c i2c-6: Failed to register i2c client rtc_max8998 at 0x06 (-16)
+<3>[    0.076060] i2c i2c-6: Can't create device at 0x06
+<6>[    0.076146] i2c-gpio i2c-gpio.6: using pins 206 (SDA) and 209 (SCL)
+<6>[    0.076356] i2c-gpio i2c-gpio.7: using pins 201 (SDA) and 202 (SCL)
+<6>[    0.076577] i2c-gpio i2c-gpio.8: using pins 42 (SDA) and 43 (SCL)
+<6>[    0.076849] i2c-gpio i2c-gpio.9: using pins 245 (SDA) and 244 (SCL)
+<6>[    0.077063] i2c-gpio i2c-gpio.11: using pins 114 (SDA) and 98 (SCL)
+<6>[    0.077288] i2c-gpio i2c-gpio.12: using pins 173 (SDA) and 172 (SCL)
+<6>[    0.077497] i2c-gpio i2c-gpio.14: using pins 240 (SDA) and 239 (SCL)
+<6>[    0.077775] i2c-gpio i2c-gpio.10: using pins 197 (SDA) and 198 (SCL)
+<6>[    0.077943] i2c-gpio i2c-gpio.5: using pins 203 (SDA) and 204 (SCL)
+<6>[    0.078686] print_constraints: max8893_buck: 1200 mV 
+<6>[    0.079236] print_constraints: max8893_ldo1: 2800 mV 
+<6>[    0.079839] print_constraints: max8893_ldo2: 2800 mV 
+<6>[    0.080386] print_constraints: max8893_ldo3: 3300 mV 
+<6>[    0.080986] print_constraints: max8893_ldo4: 2900 mV 
+<6>[    0.081513] print_constraints: max8893_ldo5: 2800 mV 
+<6>[    0.081680] max8893 15-003e: Maxim 8893 regulator driver loaded
+<6>[    0.081769] i2c-gpio i2c-gpio.15: using pins 29 (SDA) and 31 (SCL)
+<6>[    0.082168] s3c-i2c s3c2440-i2c.0: i2c-0: S3C I2C adapter
+<6>[    0.082442] s3c-i2c s3c2440-i2c.1: i2c-1: S3C I2C adapter
+<6>[    0.082728] s3c-i2c s3c2440-i2c.2: i2c-2: S3C I2C adapter
+<6>[    0.083019] Advanced Linux Sound Architecture Driver Version 1.0.24.
+<6>[    0.083521] Bluetooth: Core ver 2.16
+<6>[    0.083636] NET: Registered protocol family 31
+<6>[    0.083716] Bluetooth: HCI device and connection manager initialized
+<6>[    0.083862] Bluetooth: HCI socket layer initialized
+<6>[    0.083942] Bluetooth: L2CAP socket layer initialized
+<6>[    0.084094] Bluetooth: SCO socket layer initialized
+<6>[    0.084271] Switching to clocksource clock_source_systimer
+<6>[    0.085188] NET: Registered protocol family 2
+<6>[    0.085422] IP route cache hash table entries: 4096 (order: 2, 16384 bytes)
+<6>[    0.085884] Switched to NOHz mode on CPU #0
+<6>[    0.086226] TCP established hash table entries: 16384 (order: 5, 131072 bytes)
+<6>[    0.086624] TCP bind hash table entries: 16384 (order: 4, 65536 bytes)
+<6>[    0.086850] TCP: Hash tables configured (established 16384 bind 16384)
+<6>[    0.086992] TCP reno registered
+<6>[    0.087074] UDP hash table entries: 256 (order: 0, 4096 bytes)
+<6>[    0.087227] UDP-Lite hash table entries: 256 (order: 0, 4096 bytes)
+<6>[    0.087561] NET: Registered protocol family 1
+<6>[    0.087864] Trying to unpack rootfs image as initramfs...
+<6>[    0.098882] Freeing initrd memory: 160K
+<6>[    0.099108] PMU: registered new PMU device of type 0
+<4>[    0.099522] clk_get: could not find clock emu_src_ck for dev s5pv210_etb_device+0x0/0x100 (etb)
+<6>[    0.256393] wake enabled for irq 165
+<6>[    0.256609] wake disabled for irq 165
+<6>[    0.256985] S5PV210 ADC driver, (c) 2010 Samsung Electronics
+<6>[    0.257394] Loaded driver for PL330 DMAC-0 s3c-pl330
+<6>[    0.257478] 	DBUFF-64x8bytes Num_Chans-8 Num_Peri-2 Num_Events-32
+<6>[    0.257685] Loaded driver for PL330 DMAC-1 s3c-pl330
+<6>[    0.257766] 	DBUFF-8x4bytes Num_Chans-8 Num_Peri-32 Num_Events-32
+<6>[    0.257972] Loaded driver for PL330 DMAC-2 s3c-pl330
+<6>[    0.258053] 	DBUFF-8x4bytes Num_Chans-8 Num_Peri-32 Num_Events-32
+<6>[    0.265485] ashmem: initialized
+<6>[    0.272892] ROMFS MTD (C) 2007 Red Hat, Inc.
+<7>[    0.273093] yaffs: yaffs built Feb  2 2012 16:55:41 Installing.
+<6>[    0.273258] msgmni has been set to 669
+<6>[    0.274370] io scheduler noop registered
+<6>[    0.274517] io scheduler deadline registered
+<6>[    0.274644] io scheduler cfq registered (default)
+<6>[    0.276079] s3cfb s3cfb: [fb2] dma: 0x4bc14000, cpu: 0xe9000000, size: 0x00a41000
+<6>[    0.307818] FIMD src sclk = 166750000
+<6>[    0.307905] s3cfb s3cfb: pixclock adjusted from 39019 to 41979
+<6>[    0.308076] s3cfb s3cfb: registered successfully
+<6>[    0.308449] s5pv210-uart.0: s3c2410_serial0 at MMIO 0xe2900000 (irq = 16) is a S3C6400/10
+<6>[    0.315018] s5pv210-uart.1: s3c2410_serial1 at MMIO 0xe2900400 (irq = 20) is a S3C6400/10
+<6>[    0.322846] s5pv210-uart.3: s3c2410_serial3 at MMIO 0xe2900c00 (irq = 28) is a S3C6400/10
+<4>[    0.331320] PA FB = 0x4BC14000, bits per pixel = 32
+<4>[    0.331467] screen width=480 height=800 va=0xdbc14000 pa=0x4bc14000
+<4>[    0.331549] xres_virtual = 480, yres_virtual = 5600, xoffset = 0, yoffset = 0
+<4>[    0.331691] fb_size=10752000
+<4>[    0.331772] Back frameBuffer[0].VAddr=dbd8b000 PAddr=4bd8b000 size=1536000
+<4>[    0.331917] Back frameBuffer[1].VAddr=dbf02000 PAddr=4bf02000 size=1536000
+<4>[    0.332013] Video Y Buffer[0].VAddr=dc079000 PAddr=4c079000 size=921600
+<4>[    0.332158] Video Y Buffer[1].VAddr=dc15a000 PAddr=4c15a000 size=921600
+<4>[    0.332302] Video Y Buffer[2].VAddr=dc23b000 PAddr=4c23b000 size=921600
+<4>[    0.332383] Video UV Buffer[0].VAddr=dc31c000 PAddr=4c31c000 size=462848
+<4>[    0.332527] Video UV Buffer[1].VAddr=dc38d000 PAddr=4c38d000 size=462848
+<4>[    0.332607] Video UV Buffer[2].VAddr=dc3fe000 PAddr=4c3fe000 size=462848
+<6>[    0.336607] brd: module loaded
+<6>[    0.338560] loop: module loaded
+<6>[    0.338750] pmem: 1 init
+<1>[    0.338826] Unable to register pmem driver!
+<4>[    0.338913] android_pmem: probe of android_pmem.0 failed with error -1
+<6>[    0.339066] pmem_gpu1: 1 init
+<4>[    0.339256] android_pmem: probe of android_pmem.1 failed with error -1
+<6>[    0.339410] pmem_adsp: 1 init
+<4>[    0.339578] android_pmem: probe of android_pmem.2 failed with error -1
+<6>[    0.339721] Android kernel panic handler initialized (bind=kpanic)
+<6>[    0.346879] Loading pn544 driver
+<6>[    0.347033] pn544_probe : requesting IRQ 44
+<6>[    0.347256] sec_jack_probe : Registering jack driver
+<6>[    0.347558] wake enabled for irq 38
+<6>[    0.348935] wake enabled for irq 167
+<6>[    0.349453] fsa9480 7-0025: dev1: 0x4, dev2: 0x0
+<4>[    0.349565] i2c-core: driver [fsa9480] using legacy resume method
+<6>[    0.350949] [MODEM] bp_irq() PHONE_ACTIVE_PIN=0
+<6>[    0.351051] wake enabled for irq 47
+<6>[    0.351130] wake enabled for irq 43
+<6>[    0.351857] Muxed OneNAND 512MB 1.8V 16-bit (0x50)
+<6>[    0.351938] OneNAND version = 0x0241
+<7>[    0.352015] Chip support all block unlock
+<7>[    0.352154] Chip has 4KiB pagesize
+<7>[    0.352230] Chip has cache program feature
+<6>[    0.352323] Scanning device for bad blocks
+<6>[    2.048537] OneNAND eraseblock 2047 is an initial bad block
+<5>[    2.048623] Creating 7 MTD partitions on "(null)":
+<5>[    2.048772] 0x000000000000-0x000000200000 : "bootloader"
+<5>[    2.049504] 0x0000004c0000-0x000000600000 : "misc"
+<5>[    2.050194] 0x000000600000-0x000000e00000 : "boot"
+<5>[    2.050838] 0x000000e00000-0x000001600000 : "recovery"
+<5>[    2.051399] 0x000001600000-0x00001eb80000 : "cache"
+<5>[    2.052966] 0x00001eb80000-0x00001f900000 : "radio"
+<5>[    2.053596] 0x00001f900000-0x00001ffc0000 : "efs"
+<6>[    2.147053] tl2796: c0, b-93b4111a, got v 1880054, factory wants 1925000
+<6>[    2.147141] tl2796: c1, b-97bd18b9, got v 1947186, factory wants 1939000
+<6>[    2.147288] tl2796: c2, b-7f02c214, got v 1717805, factory wants 1568000
+<6>[    2.291579] tl2796_probe successfully proved
+<6>[    2.291780] PPP generic driver version 2.4.2
+<6>[    2.291964] PPP Deflate Compression module registered
+<6>[    2.292107] PPP BSD Compression module registered
+<6>[    2.292752] PPP MPPE Compression module registered
+<6>[    2.292839] NET: Registered protocol family 24
+<6>[    2.294265] tun: Universal TUN/TAP device driver, 1.6
+<6>[    2.294348] tun: (C) 1999-2004 Max Krasnyansky <maxk@qualcomm.com>
+<6>[    3.115969] s3c-udc : S3C HS USB Device Controller Driver, (c) 2008-2009 Samsung Electronics
+<6>[    3.115978] s3c-udc : version 15 March 2009 (DMA Mode)
+<6>[    3.117121] android_usb gadget: Mass Storage Function, version: 2009/09/11
+<6>[    3.117269] android_usb gadget: Number of LUNs=1
+<6>[    3.117351]  lun0: LUN: removable file: (no medium)
+<6>[    3.117622] android_usb gadget: android_usb ready
+<7>[    3.132422] Registered gadget driver 'android_usb'
+<6>[    3.132588] usbcore: registered new interface driver xpad
+<6>[    3.132779] usbcore: registered new interface driver usb_acecad
+<6>[    3.132860] acecad: v3.2:USB Acecad Flair tablet driver
+<6>[    3.133040] usbcore: registered new interface driver aiptek
+<6>[    3.133120] aiptek: v2.3 (May 2, 2007):Aiptek HyperPen USB Tablet Driver (Linux 2.6.x)
+<6>[    3.133264] aiptek: Bryan W. Headley/Chris Atenasio/Cedric Brun/Rene van Paassen
+<6>[    3.133445] usbcore: registered new interface driver gtco
+<4>[    3.133525] GTCO usb driver version: 2.00.0006
+<6>[    3.133706] usbcore: registered new interface driver hanwang
+<6>[    3.133894] usbcore: registered new interface driver kbtab
+<6>[    3.134037] kbtab: v0.0.2:USB KB Gear JamStudio Tablet driver
+<6>[    3.134155] usbcore: registered new interface driver wacom
+<6>[    3.134235] wacom: v1.52:USB Wacom tablet driver
+<6>[    3.134517] input: mxt224_ts_input as /devices/virtual/input/input0
+<6>[    3.175205] Atmel MXT224 2-004a: family = 0x80, variant = 0x1, version = 0x16, build = 171
+<6>[    3.252886] input: gyro as /devices/virtual/input/input1
+<6>[    3.253298] wake enabled for irq 166
+<6>[    3.253401] wake enabled for irq 169
+<6>[    3.253500] wake enabled for irq 170
+<6>[    3.253643] GPIO Input Driver: Start gpio inputs for herring-keypad in interrupt mode
+<6>[    3.253872] input: herring-keypad as /devices/virtual/input/input2
+<6>[    3.254448] input: proximity as /devices/virtual/input/input3
+<6>[    3.254832] input: lightsensor-level as /devices/virtual/input/input4
+<6>[    3.255263] max8998-rtc max8998-rtc: RTC CHIP NAME: max8998-rtc
+<4>[    3.255371] S3C24XX RTC, (c) 2004,2006 Simtec Electronics
+<6>[    3.256286] s3c-rtc s3c2410-rtc: rtc disabled, re-enabling
+<6>[    3.256427] s3c-rtc s3c2410-rtc: rtc disabled, re-enabling
+<6>[    3.256579] s3c-rtc s3c2410-rtc: rtc disabled, re-enabling
+<6>[    3.256664] s3c-rtc s3c2410-rtc: rtc disabled, re-enabling
+<6>[    3.257039] using rtc device, s3c, for alarms
+<6>[    3.257142] s3c-rtc s3c2410-rtc: rtc core: registered s3c as rtc0
+<6>[    3.257404] i2c /dev entries driver
+<6>[    3.258492] lirc_dev: IR Remote Control driver registered, major 250 
+<6>[    3.258639] IR NEC protocol handler initialized
+<6>[    3.258717] IR RC5(x) protocol handler initialized
+<6>[    3.258796] IR RC6 protocol handler initialized
+<6>[    3.258937] IR JVC protocol handler initialized
+<6>[    3.259015] IR Sony protocol handler initialized
+<6>[    3.259156] IR RC5 (streamzap) protocol handler initialized
+<6>[    3.259235] IR LIRC bridge handler initialized
+<6>[    3.259375] Linux video capture interface: v2.00
+<6>[    3.259559] mfc_init: <6>S5PC110 MFC Driver, (c) 2009 Samsung Electronics
+<6>[    3.259566] 
+<6>[    3.262823] S3C JPEG Driver, (c) 2007 Samsung Electronics
+<6>[    3.262910] JPEG driver for S5PV210
+<6>[    3.264948] max17040 9-0036: MAX17040 Fuel-Gauge Ver 02
+<6>[    3.265905] device-mapper: uevent: version 1.0.3
+<6>[    3.266243] device-mapper: ioctl: 4.20.0-ioctl (2011-02-02) initialised: dm-devel@redhat.com
+<6>[    3.266415] Bluetooth: HCI UART driver ver 2.2
+<6>[    3.266497] Bluetooth: HCI H4 protocol initialized
+<6>[    3.266699] cpuidle: using governor ladder
+<6>[    3.266837] cpuidle: using governor menu
+<6>[    3.267011] sdhci: Secure Digital Host Controller Interface driver
+<6>[    3.267090] sdhci: Copyright(c) Pierre Ossman
+<6>[    3.267316] s3c-sdhci s3c-sdhci.0: clock source 0: hsmmc (133400000 Hz)
+<6>[    3.267413] s3c-sdhci s3c-sdhci.0: clock source 2: sclk_mmc (51307692 Hz)
+<4>[    3.267591] ------------[ cut here ]------------
+<4>[    3.267686] WARNING: at drivers/gpio/gpiolib.c:101 gpio_ensure_requested+0x54/0x110()
+<4>[    3.267830] autorequest GPIO-195
+<4>[    3.267906] Modules linked in:
+<4>[    3.268053] Backtrace: 
+<4>[    3.268283] [<c003c454>] (dump_backtrace+0x0/0x10c) from [<c04b3738>] (dump_stack+0x18/0x1c)
+<4>[    3.268366]  r7:00000009 r6:00000065 r5:c01eda48 r4:e7827d98
+<4>[    3.268803] [<c04b3720>] (dump_stack+0x0/0x1c) from [<c005ecfc>] (warn_slowpath_common+0x54/0x6c)
+<4>[    3.268959] [<c005eca8>] (warn_slowpath_common+0x0/0x6c) from [<c005edb8>] (warn_slowpath_fmt+0x38/0x40)
+<4>[    3.269042]  r9:00000000 r8:00000001 r7:000000c3 r6:00000000 r5:c06825b8
+<4>[    3.269471] r4:c06d40a4
+<4>[    3.269695] [<c005ed80>] (warn_slowpath_fmt+0x0/0x40) from [<c01eda48>] (gpio_ensure_requested+0x54/0x110)
+<4>[    3.269839]  r3:000000c3 r2:c05f4204
+<4>[    3.270066] [<c01ed9f4>] (gpio_ensure_requested+0x0/0x110) from [<c01edccc>] (gpio_direction_output+0xb8/0x158)
+<4>[    3.270210]  r7:60000013 r6:e7826000 r5:c06d40a4 r4:c06825b8
+<4>[    3.270651] [<c01edc14>] (gpio_direction_output+0x0/0x158) from [<c004cc40>] (s5pv210_setup_sdhci0_cfg_gpio+0x100/0x114)
+<4>[    3.270807] [<c004cb40>] (s5pv210_setup_sdhci0_cfg_gpio+0x0/0x114) from [<c04b2564>] (sdhci_s3c_probe+0x270/0x598)
+<4>[    3.270952]  r5:e7acde40 r4:00000000
+<4>[    3.271185] [<c04b22f4>] (sdhci_s3c_probe+0x0/0x598) from [<c023ccf4>] (platform_drv_probe+0x20/0x24)
+<4>[    3.271339] [<c023ccd4>] (platform_drv_probe+0x0/0x24) from [<c023b8b8>] (driver_probe_device+0x100/0x18c)
+<4>[    3.271491] [<c023b7b8>] (driver_probe_device+0x0/0x18c) from [<c023b9d8>] (__driver_attach+0x94/0x98)
+<4>[    3.271636]  r9:00000000 r8:00000000 r7:00000000 r6:c0671e84 r5:c0696334
+<4>[    3.272003] r4:c0671e50
+<4>[    3.272228] [<c023b944>] (__driver_attach+0x0/0x98) from [<c023afd4>] (bus_for_each_dev+0x68/0x94)
+<4>[    3.272372]  r7:00000000 r6:c023b944 r5:e7827ed0 r4:c0696334
+<4>[    3.272809] [<c023af6c>] (bus_for_each_dev+0x0/0x94) from [<c023b6a8>] (driver_attach+0x24/0x28)
+<4>[    3.272891]  r7:00000000 r6:e7ae4280 r5:c0685280 r4:c0696334
+<4>[    3.273327] [<c023b684>] (driver_attach+0x0/0x28) from [<c023a8f8>] (bus_add_driver+0x18c/0x264)
+<4>[    3.273480] [<c023a76c>] (bus_add_driver+0x0/0x264) from [<c023c01c>] (driver_register+0x80/0x14c)
+<4>[    3.273634] [<c023bf9c>] (driver_register+0x0/0x14c) from [<c023d164>] (platform_driver_register+0x4c/0x60)
+<4>[    3.273716]  r9:00000000 r8:00000000 r7:00000013 r6:00000000 r5:c06a2dc0
+<4>[    3.274145] r4:c002d090
+<4>[    3.274372] [<c023d118>] (platform_driver_register+0x0/0x60) from [<c0020bb4>] (sdhci_s3c_init+0x14/0x1c)
+<4>[    3.274529] [<c0020ba0>] (sdhci_s3c_init+0x0/0x1c) from [<c0032400>] (do_one_initcall+0x44/0x1a4)
+<4>[    3.274681] [<c00323bc>] (do_one_initcall+0x0/0x1a4) from [<c00083f0>] (kernel_init+0x7c/0x120)
+<4>[    3.274835] [<c0008374>] (kernel_init+0x0/0x120) from [<c00629b4>] (do_exit+0x0/0x734)
+<4>[    3.274916]  r5:c0008374 r4:00000000
+<4>[    3.275217] ---[ end trace def72bfc088655f8 ]---
+<6>[    3.275386] mmc0: no vmmc regulator found
+<6>[    3.275632] mmc0: SDHCI controller on samsung-hsmmc [s3c-sdhci.0] using ADMA
+<6>[    3.275844] s3c-sdhci s3c-sdhci.2: clock source 0: hsmmc (133400000 Hz)
+<6>[    3.276026] s3c-sdhci s3c-sdhci.2: clock source 2: sclk_mmc (47642857 Hz)
+<6>[    3.276146] mmc1: no vmmc regulator found
+<6>[    3.276378] mmc1: SDHCI controller on samsung-hsmmc [s3c-sdhci.2] using ADMA
+<6>[    3.276504] s3c-sdhci s3c-sdhci.3: clock source 0: hsmmc (133400000 Hz)
+<6>[    3.276661] s3c-sdhci s3c-sdhci.3: clock source 2: sclk_mmc (47642857 Hz)
+<6>[    3.276774] mmc2: no vmmc regulator found
+<6>[    3.276997] mmc2: SDHCI controller on samsung-hsmmc [s3c-sdhci.3] using ADMA
+<6>[    3.279049] usbcore: registered new interface driver usbhid
+<6>[    3.279195] usbhid: USB HID core driver
+<6>[    3.279552] logger: created 256K log 'log_main'
+<6>[    3.279773] logger: created 256K log 'log_events'
+<6>[    3.279948] logger: created 256K log 'log_radio'
+<6>[    3.280085] logger: created 256K log 'log_system'
+<6>[    3.281163] WM8994 Audio Codec 0.1
+<6>[    3.296362] s3c_idma_preallocate_buffer:  VA-e8080000  PA-C0000000  163840bytes
+<6>[    3.296789] asoc: WM8994 PAIFRX <-> samsung-i2s.0 mapping ok
+<6>[    3.297182] ALSA device list:
+<6>[    3.297262]   #0: smdkc110
+<6>[    3.297403] oprofile: hardware counters not available
+<6>[    3.297480] oprofile: using timer interrupt.
+<6>[    3.297856] GACT probability NOT on
+<6>[    3.297943] Mirror/redirect action on
+<6>[    3.298023] u32 classifier
+<6>[    3.298098]     Actions configured
+<6>[    3.298239] Netfilter messages via NETLINK v0.30.
+<6>[    3.298369] nf_conntrack version 0.5.0 (5355 buckets, 21420 max)
+<6>[    3.299275] ctnetlink v0.93: registering with nfnetlink.
+<6>[    3.299434] NF_TPROXY: Transparent proxy support initialized, version 4.1.0
+<6>[    3.299578] NF_TPROXY: Copyright (c) 2006-2007 BalaBit IT Ltd.
+<6>[    3.299851] xt_time: kernel timezone is -0000
+<6>[    3.301520] ip_tables: (C) 2000-2006 Netfilter Core Team
+<6>[    3.301830] arp_tables: (C) 2002 David S. Miller
+<6>[    3.302042] TCP cubic registered
+<6>[    3.302977] NET: Registered protocol family 10
+<6>[    3.311150] Mobile IPv6
+<6>[    3.311257] ip6_tables: (C) 2000-2006 Netfilter Core Team
+<6>[    3.311671] IPv6 over IPv4 tunneling driver
+<6>[    3.316332] NET: Registered protocol family 17
+<6>[    3.317550] NET: Registered protocol family 15
+<6>[    3.317732] Bluetooth: RFCOMM TTY layer initialized
+<6>[    3.319884] Bluetooth: RFCOMM socket layer initialized
+<6>[    3.320028] Bluetooth: RFCOMM ver 1.11
+<6>[    3.320108] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+<6>[    3.320251] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
+<6>[    3.320443] NET: Registered protocol family 35
+<6>[    3.320727] VFP support v0.3: implementor 41 architecture 3 part 30 variant c rev 2
+<6>[    3.320888] ThumbEE CPU extension supported.
+<6>[    3.321284] s5pv210_cpufreq_init: S5PV210 cpu-freq driver
+<6>[    3.326750] regulator_init_complete: pd_mfc_supply: disabling
+<6>[    3.326903] regulator_init_complete: pd_tv_supply: disabling
+<6>[    3.326986] regulator_init_complete: pd_cam_supply: disabling
+<6>[    3.382337] cypress_touchkey_driver 10-0020: cypress_touchkey_probe: hardware rev1 = 0xa, rev2 = 0x9
+<6>[    3.384057] input: cypress-touchkey as /devices/virtual/input/input5
+<6>[    3.387684] s3c-rtc s3c2410-rtc: rtc disabled, re-enabling
+<6>[    3.388860] s3c-rtc s3c2410-rtc: setting system clock to 2017-09-12 22:51:21 UTC (1505256681)
+<6>[    3.393219] FIMC0 registered successfully
+<6>[    3.396685] FIMC1 registered successfully
+<6>[    3.399860] FIMC2 registered successfully
+<6>[    3.401390] max8998_charger_probe : MAX8998 Charger Driver Loading
+<6>[    3.407445] max8998_charger_probe : pmic interrupt registered
+<6>[    3.413022] wake enabled for irq 39
+<6>[    3.415340] Freeing init memory: 168K
+<4>[    3.417835] init (1): /proc/1/oom_adj is deprecated, please use /proc/1/oom_score_adj instead.
+<6>[    3.479198] keychord: using input dev herring-keypad for fevent
+<6>[    3.495102] yaffs: dev is 32505860 name is "mtdblock4" rw
+<6>[    3.495225] yaffs: passed flags ""
+<7>[    3.495318] yaffs: Attempting MTD mount of 31.4,"mtdblock4"
+<7>[    3.505341] yaffs: yaffs_read_super: is_checkpointed 0
+<6>[    3.505685] yaffs: dev is 32505862 name is "mtdblock6" rw
+<6>[    3.505838] yaffs: passed flags ""
+<7>[    3.506104] yaffs: Attempting MTD mount of 31.6,"mtdblock6"
+<7>[    3.558297] yaffs: yaffs_read_super: is_checkpointed 0
+<6>[    3.617878] mmc0: new high speed MMC card at address 0001
+<6>[    3.620641] mmcblk0: mmc0:0001 SEM16G 14.8 GiB 
+<6>[    3.622287] mmcblk0boot0: mmc0:0001 SEM16G partition 1 1.00 MiB
+<6>[    3.623403] mmcblk0boot1: mmc0:0001 SEM16G partition 2 1.00 MiB
+<6>[    3.644810]  mmcblk0: p1 p2 p3
+<6>[    3.662875]  mmcblk0boot1: unknown partition table
+<6>[    3.680717]  mmcblk0boot0: unknown partition table
+<6>[    3.688224] EXT4-fs (mmcblk0p1): mounted filesystem with ordered data mode. Opts: (null)
+<6>[    3.712638] EXT4-fs (mmcblk0p2): mounted filesystem with ordered data mode. Opts: nomblk_io_submit
+<3>[    3.914605] android_usb: already disabled
+<6>[    3.914933] adb_bind_config
+<6>[    3.916490] warning: `adbd' uses 32-bit capabilities (legacy support in use)
+<6>[    3.918432] adb_open
+<6>[    3.922109] android_work: did not send uevent (0 0   (null))
+<7>[    4.066931] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.067431] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.068378] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.068856] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.071305] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.074539] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.074739] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.074934] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.076181] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.079709] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.079986] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.081376] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.083020] onenand_wait: correctable ECC error = 0x5555
+<6>[    4.085416] android_work: sent uevent USB_STATE=CONNECTED
+<7>[    4.087082] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.089523] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.092174] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.092881] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.093367] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.094340] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.094725] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.095365] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.096305] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.096835] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.099751] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.100651] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.103779] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.104064] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.105150] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.106705] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.107014] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.107608] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.110450] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.111255] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.111668] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.115268] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.116891] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.117385] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.118692] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.119222] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.122743] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.132697] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.133825] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.138619] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.138995] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.140519] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.141322] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.141733] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.142423] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.145802] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.146509] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.146706] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.151794] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.152922] onenand_wait: correctable ECC error = 0x5555
+<6>[    4.156161] android_usb gadget: high speed config #1: android
+<6>[    4.156363] android_work: sent uevent USB_STATE=CONFIGURED
+<7>[    4.161343] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.162840] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.165762] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.166404] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.182673] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.184789] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.186320] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.189326] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.195019] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.197580] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.197795] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.198254] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.198558] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.198923] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.199441] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.199695] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.200105] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.200840] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.209862] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.214959] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.215562] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.216206] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.219625] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.220267] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.221747] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.221930] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.222266] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.222870] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.223538] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.225749] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.228328] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.229312] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.229710] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.229997] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.230605] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.234382] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.234883] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.235786] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.244286] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.247527] onenand_wait: correctable ECC error = 0x5555
+<6>[    4.251049] PVR_K:(Warning): SysFinalise: Version string: SGX540 S5PC110 [529, drivers/gpu/pvr/s5pc110/sysconfig.c]
+<7>[    4.253046] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.253812] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.254521] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.254753] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.255144] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.256427] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.269687] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.270237] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.271811] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.272608] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.273162] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.273777] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.274631] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.275224] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.275868] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.276188] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.277185] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.277884] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.278846] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.279125] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.280370] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.281086] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.282184] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.282626] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.283218] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.300365] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.300976] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.301849] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.302900] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.303141] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.304099] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.304329] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.304728] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.305802] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.309700] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.310684] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.310980] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.311349] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.311746] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.312036] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.312471] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.313820] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.314160] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.314439] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.314994] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.315287] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.316152] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.317084] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.317526] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.317915] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.318461] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.323019] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.323378] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.325278] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.327520] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.327755] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.328576] onenand_wait: correctable ECC error = 0x5555
+<6>[    4.329424] [MODEM] modem_reset()
+<7>[    4.336289] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.336630] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.337141] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.337580] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.338274] onenand_wait: correctable ECC error = 0x5555
+<7>[    4.340298] onenand_wait: correctable ECC error = 0x5555
+<6>[    4.529738] [MODEM] bp_irq() PHONE_ACTIVE_PIN=1
+<6>[    4.990939] modemctl_ioctl() 0
+<6>[    5.329775] s3cfb s3cfb: [fb0] dma: 0x4b7af000, cpu: 0xeb800000, size: 0x00465000
+<6>[    5.391585] [MODEM] modem_start() normal
+<6>[    5.391875] [MODEM] modem_start() DONE
+<6>[    5.392023] modemctl_ioctl() 0
+<6>[   14.956155] wake enabled for irq 34
+<6>[   14.964007] input: compass as /devices/virtual/input/input6
+<6>[   15.027839] wake disabled for irq 34
+<6>[   20.604561] request_suspend_state: wakeup (3->0) at 20594375241 (2017-09-12 22:51:38.714914007 UTC)
+<6>[   20.881401] wake enabled for irq 165
+<6>[   21.250662] acc_open
+<6>[   21.250803] acc_release
+<6>[   23.922298] pn544_dev_ioctl power on
+<6>[   23.947776] pn544_dev_ioctl power off
+<6>[   24.014196] pn544_dev_ioctl power on
+<6>[   25.873966] s3c-rtc s3c2410-rtc: rtc disabled, re-enabling

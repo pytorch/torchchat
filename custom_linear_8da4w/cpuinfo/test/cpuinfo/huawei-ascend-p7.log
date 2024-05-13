@@ -1,0 +1,23 @@
+Processor	: ARMv7 Processor rev 1 (v7l)
+processor	: 0
+BogoMIPS	: 3577.00
+
+processor	: 1
+BogoMIPS	: 3577.00
+
+processor	: 2
+BogoMIPS	: 3577.00
+
+processor	: 3
+BogoMIPS	: 3577.00
+
+Features	: swp half thumb fastmult vfp edsp thumbee neon vfpv3 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x4
+CPU part	: 0xc09
+CPU revision	: 1
+
+Hardware	: hi6620oem
+Revision	: 0000
+Serial		: 0000000000000000

@@ -1,0 +1,46 @@
+processor	: 0
+model name	: ARMv7 Processor rev 1 (v7l)
+BogoMIPS	: 38.40
+Features	: swp half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt 
+CPU implementer	: 0x51
+CPU architecture: 7
+CPU variant	: 0x3
+CPU part	: 0x06f
+CPU revision	: 1
+
+processor	: 1
+model name	: ARMv7 Processor rev 1 (v7l)
+BogoMIPS	: 38.40
+Features	: swp half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt 
+CPU implementer	: 0x51
+CPU architecture: 7
+CPU variant	: 0x3
+CPU part	: 0x06f
+CPU revision	: 1
+
+processor	: 2
+model name	: ARMv7 Processor rev 1 (v7l)
+BogoMIPS	: 38.40
+Features	: swp half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt 
+CPU implementer	: 0x51
+CPU architecture: 7
+CPU variant	: 0x3
+CPU part	: 0x06f
+CPU revision	: 1
+
+processor	: 3
+model name	: ARMv7 Processor rev 1 (v7l)
+BogoMIPS	: 38.40
+Features	: swp half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt 
+CPU implementer	: 0x51
+CPU architecture: 7
+CPU variant	: 0x3
+CPU part	: 0x06f
+CPU revision	: 1
+
+Hardware	: Qualcomm APQ 8084 (Flattened Device Tree)
+Revision	: 83a0
+Serial		: 68123d0111000000
+Device		: shamu
+Radio		: 6
+MSM Hardware	: APQ8084 ES1.1

@@ -1,0 +1,8 @@
+name: pthreadpool
+title: pthread-based thread pool
+license: Simplified BSD
+deps:
+  - name: fxdiv
+    url:  https://github.com/Maratyszcza/FXdiv.git
+  - name: googletest
+  - name: googlebenchmark

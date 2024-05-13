@@ -1,0 +1,5 @@
+{
+    "linear:a8w4dq": {"groupsize" : 256},
+    "precision": {"dtype" : "float32"},
+    "executor": {"accelerator": "cpu"}
+}

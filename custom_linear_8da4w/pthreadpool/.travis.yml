@@ -1,0 +1,12 @@
+dist: xenial
+language: c
+script:
+ - mkdir build
+ - cd build
+ - cmake .. -G Ninja
+ - ninja
+ - ctest --verbose
+addons:
+  apt:
+    packages:
+    - ninja-build
