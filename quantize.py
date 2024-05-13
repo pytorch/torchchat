@@ -661,6 +661,7 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
         if dtype is None:
             dtype = torch.float32
 
+        self.model_ = model
         self.device = device
         self.dtype = dtype
 
