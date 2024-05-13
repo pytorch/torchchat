@@ -47,9 +47,8 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          pip list
+          ./install_requirements.sh
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
@@ -81,9 +80,8 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          pip list
+          ./install_requirements.sh
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
@@ -113,10 +111,12 @@ jobs:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     name: test-gpu (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
+    secrets: inherit
     strategy:
       matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
       fail-fast: false
     with:
+      secrets-env: "HF_TOKEN_PERIODIC"
       runner: ${{ matrix.runner }}
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
@@ -126,15 +126,24 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip install -r ./requirements.txt
-        pip list
+        ./install_requirements.sh cuda
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
         echo "::group::Download checkpoint"
-        export REPO_NAME=${{ matrix.repo_name }}
-        bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
+        export REPO_NAME="${{ matrix.repo_name }}"
+        case "${{ matrix.install_method }}" in
+          wget)
+            bash .ci/scripts/wget_checkpoint.sh "${REPO_NAME}" "${{ matrix.resources }}"
+            ;;
+          huggingface-cli)
+            (
+              set +x
+              HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" bash .ci/scripts/download_llama.sh
+            )
+            ;;
+        esac
         echo "::endgroup::"
 
         echo "::group::Convert checkpoint"

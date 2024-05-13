@@ -10,16 +10,17 @@ import subprocess
 import sys
 
 from cli import (
-    add_arguments,
     add_arguments_for_browser,
     add_arguments_for_chat,
     add_arguments_for_download,
     add_arguments_for_eval,
     add_arguments_for_export,
     add_arguments_for_generate,
+    add_arguments_for_list,
+    add_arguments_for_remove,
+    add_arguments_for_where,
     arg_init,
     check_args,
-    handle_common_args,
 )
 
 default_device = "cpu"
@@ -29,17 +30,14 @@ if __name__ == "__main__":
     # Initialize the top-level parser
     parser = argparse.ArgumentParser(
         prog="torchchat",
-        description="Welcome to the torchchat CLI!",
         add_help=True,
     )
-    # Default command is to print help
-    parser.set_defaults(func=lambda args: self._parser.print_help())
 
-    add_arguments(parser)
     subparsers = parser.add_subparsers(
         dest="command",
         help="The specific command to run",
     )
+    subparsers.required = True
 
     parser_chat = subparsers.add_parser(
         "chat",
@@ -77,19 +75,23 @@ if __name__ == "__main__":
     )
     add_arguments_for_export(parser_export)
 
-    # Move all flags to the front of sys.argv since we don't
-    # want to use the subparser syntax
-    flag_args = []
-    positional_args = []
-    i = 1
-    while i < len(sys.argv):
-        if sys.argv[i].startswith("-"):
-            flag_args += sys.argv[i : i + 2]
-            i += 2
-        else:
-            positional_args.append(sys.argv[i])
-            i += 1
-    sys.argv = sys.argv[:1] + flag_args + positional_args
+    parser_list = subparsers.add_parser(
+        "list",
+        help="List supported models",
+    )
+    add_arguments_for_list(parser_list)
+
+    parser_remove = subparsers.add_parser(
+        "remove",
+        help="Remove downloaded model artifacts",
+    )
+    add_arguments_for_remove(parser_remove)
+
+    parser_where = subparsers.add_parser(
+        "where",
+        help="Return directory containing downloaded model artifacts",
+    )
+    add_arguments_for_where(parser_where)
 
     # Now parse the arguments
     args = parser.parse_args()
@@ -97,8 +99,6 @@ if __name__ == "__main__":
     logging.basicConfig(
         format="%(message)s", level=logging.DEBUG if args.verbose else logging.INFO
     )
-
-    handle_common_args(args)
 
     if args.command == "chat":
         # enable "chat"
@@ -114,18 +114,15 @@ if __name__ == "__main__":
         check_args(args, "browser")
 
         # Look for port from cmd args. Default to 5000 if not found.
-        # The port args will be passed directly to the Flask app.
         port = 5000
         i = 2
         while i < len(sys.argv):
-            # Check if the current argument is '--port'
             if sys.argv[i] == "--port":
-                # Check if there's a value immediately following '--port'
                 if i + 1 < len(sys.argv):
                     # Extract the value and remove '--port' and the value from sys.argv
                     port = sys.argv[i + 1]
-                    del sys.argv[i : i + 2]  # Delete '--port' and the value
-                    break  # Exit loop since port is found
+                    del sys.argv[i : i + 2]
+                    break
             else:
                 i += 1
 
@@ -146,7 +143,7 @@ if __name__ == "__main__":
         subprocess.run(command)
     elif args.command == "download":
         check_args(args, "download")
-        from download import main as download_main
+        from download import download_main
 
         download_main(args)
     elif args.command == "generate":
@@ -163,5 +160,20 @@ if __name__ == "__main__":
         from export import main as export_main
 
         export_main(args)
+    elif args.command == "list":
+        check_args(args, "list")
+        from download import list_main
+
+        list_main(args)
+    elif args.command == "where":
+        check_args(args, "where")
+        from download import where_main
+
+        where_main(args)
+    elif args.command == "remove":
+        check_args(args, "remove")
+        from download import remove_main
+
+        remove_main(args)
     else:
         parser.print_help()

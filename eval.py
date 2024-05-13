@@ -10,7 +10,7 @@ from typing import Optional
 import torch
 import torch._dynamo.config
 import torch._inductor.config
-
+from utils.measure_time import measure_time
 from build.builder import (
     _initialize_model,
     _initialize_tokenizer,
@@ -20,7 +20,7 @@ from build.builder import (
 
 from build.model import Transformer
 from build.utils import set_precision
-from cli import add_arguments, add_arguments_for_eval, arg_init
+from cli import add_arguments_for_eval, arg_init
 from generate import encode_tokens, model_forward
 
 torch._dynamo.config.automatic_dynamic_shapes = True
@@ -29,26 +29,11 @@ torch._inductor.config.epilogue_fusion = False
 torch._inductor.config.triton.cudagraphs = True
 torch._dynamo.config.cache_size_limit = 100000
 
+import lm_eval
 
-try:
-    import lm_eval
-
-    lm_eval_available = True
-except:
-    lm_eval_available = False
-
-
-if lm_eval_available:
-    try:  # lm_eval version 0.4
-        from lm_eval.evaluator import evaluate
-        from lm_eval.models.huggingface import HFLM as eval_wrapper
-        from lm_eval.tasks import get_task_dict
-    except:  # lm_eval version 0.3
-        from lm_eval import base, evaluator, tasks
-
-        eval_wrapper = base.BaseLM
-        get_task_dict = tasks.get_task_dict
-        evaluate = evaluator.evaluate
+from lm_eval.evaluator import evaluate
+from lm_eval.models.huggingface import HFLM as eval_wrapper
+from lm_eval.tasks import get_task_dict
 
 
 def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
@@ -78,7 +63,8 @@ def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
         max_seq_length = min(T_new, model.config.block_size)
 
     device, dtype = prompt.device, prompt.dtype
-    # create an empty tensor of the expected final shape and fill in the current tokens
+    # create an empty tensor of the expected final shape and
+    # fill in the current tokens
     empty = torch.empty(T_new, dtype=dtype, device=device)
     empty[:T] = prompt
     seq = empty
@@ -107,6 +93,7 @@ class GPTFastEvalWrapper(eval_wrapper):
         self._tokenizer = tokenizer
         self._device = torch.device(device)
         self._max_seq_length = 2048 if max_seq_length is None else max_seq_length
+        self.times = []
 
     @property
     def eot_token_id(self):
@@ -154,7 +141,9 @@ class GPTFastEvalWrapper(eval_wrapper):
             )
         )
         x = seq.index_select(0, input_pos).view(1, -1)
-        logits = model_forward(self._model, x, input_pos)
+        with measure_time(message=None) as measure:
+            logits = model_forward(self._model, x, input_pos)
+        self.times.append(measure.get_time())
         return logits
 
     def _model_generate(self, context, max_length, eos_token_id):
@@ -205,6 +194,7 @@ def eval(
         task_dict,
         limit=limit,
     )
+    eval_results["times"] = model_eval_wrapper.times
     return eval_results
 
 
@@ -251,16 +241,23 @@ def main(args) -> None:
         )
         torch._inductor.config.coordinate_descent_tuning = True
 
-    t1 = time.time()
-    result = eval(
-        model.to(device),
-        tokenizer,
-        tasks,
-        limit,
-        max_seq_length,
-        device=builder_args.device,
+    with measure_time("Time to run eval: {time:.02f}s."):
+        result = eval(
+            model.to(device),
+            tokenizer,
+            tasks,
+            limit,
+            max_seq_length,
+            device=builder_args.device,
+        )
+
+    times = torch.tensor(result["times"])
+    print(
+        f"Time in model.forward: {times.sum():.02f}s, over {times.numel()} model evaluations"
     )
-    print(f"Time to run eval: {time.time() - t1:.02f} seconds.")
+    print(
+        f"forward run time stats - Median: {times.median():.02f}s Min: {times.min():.02f}s Max: {times.max():.02f}s"
+    )
     if builder_args.dso_path:
         print(f"For model {builder_args.dso_path}")
     elif builder_args.pte_path:
@@ -273,12 +270,14 @@ def main(args) -> None:
         raise RuntimeError("Well That's Fine. How did we get here")
 
     for task, res in result["results"].items():
-        print(f"{task}: {res}")
+        print(f"{task}:")
+        for metric, val in res.items():
+            if val != "N/A":
+                print(f" {metric}: {val if isinstance(val, str) else f'{val:0.4f}'}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="torchchat eval CLI")
-    add_arguments(parser)
     add_arguments_for_eval(parser)
     args = parser.parse_args()
     args = arg_init(args)

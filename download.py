@@ -5,12 +5,14 @@
 # LICENSE file in the root directory of this source tree.
 import os
 import shutil
+import sys
 import urllib.request
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Optional
 
 from build.convert_hf_checkpoint import convert_hf_checkpoint
 from config.model_config import (
+    load_model_configs,
     ModelConfig,
     ModelDistributionChannel,
     resolve_model_config,
@@ -24,7 +26,10 @@ def _download_hf_snapshot(
     from requests.exceptions import HTTPError
 
     # Download and store the HF model artifacts.
-    print(f"Downloading {model_config.name} from HuggingFace...")
+    print(
+        f"Downloading {model_config.name} from HuggingFace...",
+        file=sys.stderr
+    )
     try:
         snapshot_download(
             model_config.distribution_path,
@@ -34,15 +39,25 @@ def _download_hf_snapshot(
             ignore_patterns="*safetensors*",
         )
     except HTTPError as e:
-        if e.response.status_code == 401:
-            raise RuntimeError(
-                "Access denied. Run huggingface-cli login to authenticate."
+        if e.response.status_code == 401:  # Missing HuggingFace CLI login.
+            print(
+                "Access denied. Create a HuggingFace account and run 'pip3 install huggingface_hub' and 'huggingface-cli login' to authenticate.",
+                file=sys.stderr,
             )
+            exit(1)
+        elif e.response.status_code == 403:  # No access to the specific model.
+            # The error message includes a link to request access to the given model. This prints nicely and does not include
+            # a traceback.
+            print(str(e), file=sys.stderr)
+            exit(1)
         else:
             raise e
 
     # Convert the model to the torchchat format.
-    print(f"Converting {model_config.name} to torchchat format...")
+    print(
+        f"Converting {model_config.name} to torchchat format...",
+        file=sys.stderr
+    )
     convert_hf_checkpoint(
         model_dir=artifact_dir, model_name=model_config.name, remove_bin_files=True
     )
@@ -55,7 +70,7 @@ def _download_direct(
     for url in model_config.distribution_path:
         filename = url.split("/")[-1]
         local_path = artifact_dir / filename
-        print(f"Downloading {url}...")
+        print(f"Downloading {url}...", file=sys.stderr)
         urllib.request.urlretrieve(url, str(local_path.absolute()))
 
 
@@ -65,9 +80,10 @@ def download_and_convert(
     model_config = resolve_model_config(model)
     model_dir = models_dir / model_config.name
 
-    # Download into a temporary directory. We'll move to the final location once
-    # the download and conversion is complete. This allows recovery in the event
-    # that the download or conversion fails unexpectedly.
+    # Download into a temporary directory. We'll move to the final
+    # location once the download and conversion is complete. This
+    # allows recovery in the event that the download or conversion
+    # fails unexpectedly.
     temp_dir = models_dir / "downloads" / model_config.name
     if os.path.isdir(temp_dir):
         shutil.rmtree(temp_dir)
@@ -107,5 +123,86 @@ def is_model_downloaded(model: str, models_dir: Path) -> bool:
     return os.path.isdir(model_dir) and os.listdir(model_dir)
 
 
-def main(args):
+# Subcommand to list available models.
+def list_main(args) -> None:
+    # TODO It would be nice to have argparse validate this. However, we have
+    # model as an optional named parameter for all subcommands, so we'd
+    # probably need to move it to be registered per-command.
+    if args.model:
+        print("Usage: torchchat.py list")
+        return
+
+    model_configs = load_model_configs()
+
+    # Build the table in-memory so that we can align the text nicely.
+    name_col = []
+    aliases_col = []
+    installed_col = []
+
+    for name, config in model_configs.items():
+        is_downloaded = is_model_downloaded(name, args.model_directory)
+
+        name_col.append(name)
+        aliases_col.append(", ".join(config.aliases))
+        installed_col.append("Yes" if is_downloaded else "")
+
+    cols = {"Model": name_col, "Aliases": aliases_col, "Downloaded": installed_col}
+
+    # Find the length of the longest value in each column.
+    col_widths = {
+        key: max(*[len(s) for s in vals], len(key)) + 1 for (key, vals) in cols.items()
+    }
+
+    # Display header.
+    print()
+    print(*[val.ljust(width) for (val, width) in col_widths.items()])
+    print(*["-" * width for width in col_widths.values()])
+
+    for i in range(len(name_col)):
+        row = [col[i] for col in cols.values()]
+        print(*[val.ljust(width) for (val, width) in zip(row, col_widths.values())])
+    print()
+
+
+# Subcommand to remove downloaded model artifacts.
+def remove_main(args) -> None:
+    # TODO It would be nice to have argparse validate this. However, we have
+    # model as an optional named parameter for all subcommands, so we'd
+    # probably need to move it to be registered per-command.
+    if not args.model:
+        print("Usage: torchchat.py remove <model-or-alias>")
+        return
+
+    model_config = resolve_model_config(args.model)
+    model_dir = args.model_directory / model_config.name
+
+    if not os.path.isdir(model_dir):
+        print(f"Model {args.model} has no downloaded artifacts.")
+        return
+
+    print(f"Removing downloaded model artifacts for {args.model}...")
+    shutil.rmtree(model_dir)
+    print("Done.")
+
+# Subcommand to print downloaded model artifacts directory.
+# Asking for location will/should trigger download of model if not available.
+def where_main(args) -> None:
+    # TODO It would be nice to have argparse validate this. However, we have
+    # model as an optional named parameter for all subcommands, so we'd
+    # probably need to move it to be registered per-command.
+    if not args.model:
+        print("Usage: torchchat.py where <model-or-alias>")
+        return
+
+    model_config = resolve_model_config(args.model)
+    model_dir = args.model_directory / model_config.name
+
+    if not os.path.isdir(model_dir):
+        raise RuntimeError(f"Model {args.model} has no downloaded artifacts.")
+
+    print(str(os.path.abspath(model_dir)))
+    exit(0)
+
+# Subcommand to download model artifacts.
+def download_main(args) -> None:
     download_and_convert(args.model, args.model_directory, args.hf_token)

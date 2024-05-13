@@ -18,7 +18,7 @@ jobs:
           submodules: 'false'
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10.11'
       - name: Extract the list of models to run on CPU
         id: gather-models-cpu
         run: |
@@ -40,15 +40,14 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10.11'
       - name: Print machine info
         run: |
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          pip list
+          ./install_requirements.sh
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
@@ -59,6 +58,7 @@ jobs:
           pushd ${TORCHCHAT_ROOT}
           bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
           bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "compile"
+
   test-cpu-aoti:
     name: test-cpu-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-cpu
@@ -75,15 +75,14 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10.11'
       - name: Print machine info
         run: |
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          pip list
+          ./install_requirements.sh
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
         run: |
@@ -93,6 +92,112 @@ jobs:
           pushd ${TORCHCHAT_ROOT}
           bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
           bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "aoti"
+
+  test-cpu-eval-sanity-check:
+    name: test-cpu-eval-sanity-check (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.11'
+      - name: Print machine info
+        run: |
+          echo "$(uname -a)"
+      - name: Install dependencies
+        run: |
+          ./install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Download checkpoints
+        run: |
+          bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
+      - name: Run validation
+        run: |
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          pushd ${TORCHCHAT_ROOT}
+          bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check-bfloat16"
+
+  test-cpu-eval-sanity-check-float16:
+    name: test-cpu-eval-sanity-check-float16 (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.11'
+      - name: Print machine info
+        run: |
+          echo "$(uname -a)"
+      - name: Install dependencies
+        run: |
+          ./install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Download checkpoints
+        run: |
+          bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
+      - name: Run validation
+        run: |
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          pushd ${TORCHCHAT_ROOT}
+          bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check-float16"
+
+  test-cpu-eval-sanity-check-float32:
+    name: test-cpu-eval-sanity-check-float32 (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-cpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
+      fail-fast: false
+    runs-on: ${{ matrix.runner }}
+    env:
+      TORCHCHAT_ROOT: ${{ github.workspace }}
+      REPO_NAME: ${{ matrix.repo_name }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.11'
+      - name: Print machine info
+        run: |
+          echo "$(uname -a)"
+      - name: Install dependencies
+        run: |
+          ./install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Download checkpoints
+        run: |
+          bash ${TORCHCHAT_ROOT}/.ci/scripts/wget_checkpoint.sh ${{ matrix.repo_name }} "${{ matrix.resources }}"
+      - name: Run validation
+        run: |
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          pushd ${TORCHCHAT_ROOT}
+          bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+          bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check-float32"
+
   gather-models-gpu:
     runs-on: ubuntu-22.04
     outputs:
@@ -103,7 +208,7 @@ jobs:
           submodules: 'false'
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10.11'
       - name: Extract the list of models to run on GPU
         id: gather-models-gpu
         run: |
@@ -126,9 +231,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip install -r ./requirements.txt
-        pip list
+        ./install_requirements.sh cuda
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -144,9 +248,51 @@ jobs:
         echo "::group::Run inference"
         bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "compile"
         echo "::endgroup::"
-  test-gpu-aoti:
+
+  test-gpu-aoti-bfloat16:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
-    name: test-gpu-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
+    name: test-gpu-aoti-bfloat16 (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-gpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
+      fail-fast: false
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      timeout: 60
+      script: |
+        echo "::group::Print machine info"
+        nvidia-smi
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
+        echo "::group::Install required packages"
+        ./install_requirements.sh cuda
+        pip3 list
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoint"
+        export REPO_NAME=${{ matrix.repo_name }}
+        bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
+        echo "::endgroup::"
+
+        echo "::group::Convert checkpoint"
+        bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+        echo "::endgroup::"
+
+        echo "::group::Run inference"
+        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti-bfloat16"
+        echo "::endgroup::"
+
+  test-gpu-aoti-float32:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    name: test-gpu-aoti-float32 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
       matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
@@ -160,9 +306,13 @@ jobs:
         nvidia-smi
         echo "::endgroup::"
 
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
         echo "::group::Install required packages"
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cu121
-        pip install -r ./requirements.txt
+        ./install_requirements.sh cuda
         pip list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -177,12 +327,106 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run inference"
-        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti"
+        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti-float32"
         echo "::endgroup::"
+
+        echo "::group::Run inference with quantize file"
+        if [ $(uname -s) != Darwin ]; then
+          python3 generate.py --quantize config/data/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+        fi
+        echo "::endgroup::"
+
+  test-gpu-aoti-float16:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    name: test-gpu-aoti-float16 (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-gpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
+      fail-fast: false
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      script: |
+        echo "::group::Print machine info"
+        nvidia-smi
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
+        echo "::group::Install required packages"
+        ./install_requirements.sh cuda
+        pip list
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoint"
+        export REPO_NAME=${{ matrix.repo_name }}
+        bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
+        echo "::endgroup::"
+
+        echo "::group::Convert checkpoint"
+        bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+        echo "::endgroup::"
+
+        echo "::group::Run inference"
+        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "aoti-float16"
+        echo "::endgroup::"
+
+        echo "::group::Run inference with quantize file"
+        if [ $(uname -s) == Darwin ]; then
+          python3 export.py --output-dso-path /tmp/model.so --quantize config/data/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+             python3 generate.py --dso-path /tmp/model.so --checkpoint "./checkpoints/${REPO_NAME}/model.pth"~
+        fi
+        echo "::endgroup::"
+
+  test-gpu-eval-sanity-check:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    name: test-gpu-eval-sanity-check (${{ matrix.platform }}, ${{ matrix.model_name }})
+    needs: gather-models-gpu
+    strategy:
+      matrix: ${{ fromJSON(needs.gather-models-gpu.outputs.models) }}
+      fail-fast: false
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      script: |
+        echo "::group::Print machine info"
+        nvidia-smi
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
+        echo "::group::Install required packages"
+        ./install_requirements.sh cuda
+        pip3 list
+        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+        echo "::endgroup::"
+
+        echo "::group::Download checkpoint"
+        export REPO_NAME=${{ matrix.repo_name }}
+        bash .ci/scripts/wget_checkpoint.sh ${REPO_NAME} ${{ matrix.resources }}
+        echo "::endgroup::"
+
+        echo "::group::Convert checkpoint"
+        bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
+        echo "::endgroup::"
+
+        echo "::group::Run eval"
+        bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cuda" "eval_sanity_check"
+        echo "::endgroup::"
+
   test-tinystories-executorch:
     strategy:
       matrix:
-        runner: [32-core-ubuntu]
+        runner: [16-core-ubuntu, macos-14-xlarge]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -190,7 +434,12 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10.11
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
       - name: Print machine info
         run: |
           uname -a
@@ -200,27 +449,13 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          echo "Intalling pip packages"
-          pip install wheel
-          pip install cmake
-          pip install ninja
-          pip install zstd
-          pip install -r requirements.txt
+          echo "Intalling pip3 packages"
+          ./install_requirements.sh
 
-          echo "Executorch: cloning"
-          mkdir etorch
-          cd etorch
-          git clone https://github.com/pytorch/executorch.git
-          cd executorch
-          echo "Inside: ${PWD}"
+          export TORCHCHAT_ROOT=$PWD
+          ./scripts/install_et.sh
 
-          echo "Executorch: submodule update"
-          git submodule sync
-          git submodule update --init
-
-          echo "Executorch: installing python interface"
-          ./install_requirements.sh --pybind xnnpack
-
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
           python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
@@ -233,7 +468,6 @@ jobs:
           pushd checkpoints/stories15M
           wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
           wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
-          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
           popd
 
           mkdir gguf_files
@@ -247,12 +481,10 @@ jobs:
           export MODEL_PATH=${PWD}/checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
 
-          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 > ${PWD}/output_eager
-          cat ${PWD}/output_eager
+          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0
 
           python export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
-          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${PWD}/${MODEL_NAME}.pte  > ${PWD}/output_et
-          cat ${PWD}/output_et
+          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${PWD}/${MODEL_NAME}.pte
 
           echo "Tests complete."
 
@@ -261,44 +493,73 @@ jobs:
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
+
+          echo "******************************************"
+          echo "***               vanilla              ***"
+          echo "******************************************"
           python export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
-          cat ./output_et
+          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+
+          echo "******************************************"
+          echo "*** --quantize config/data/mobile.json ***"
+          echo "******************************************"
+          # python export.py --quantize config/data/mobile.json --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+
 
           echo "******************************************"
           echo "******* Emb: channel-wise quantized ******"
           echo "******************************************"
           python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
-          cat ./output_et
+          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******** Emb: group-wise quantized *******"
           echo "******************************************"
           python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
-          cat ./output_et
+          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+
+          echo "******************************************"
+          echo "**** Emb 4bit: channel-wise quantized ****"
+          echo "******************************************"
+          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+
+          echo "******************************************"
+          echo "****** Emb 4bit: group-wise quantized ****"
+          echo "******************************************"
+          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******* INT8 channel-wise quantized ******"
           echo "******************************************"
           python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
-          cat ./output_et
+          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******** INT8 group-wise quantized *******"
           echo "******************************************"
           python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
-          cat ./output_et
+          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******** ET: a8w4dq INT4 group-wise quantized *******"
           echo "******************************************"
           python export.py --quant '{"linear:a8w4dq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python generate.py --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte  > ./output_et
-          # cat ./output_et
+          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+
+          echo "******************************************"
+          echo "******** INT4 group-wise quantized *******"
+          echo "******************************************"
+          # python export.py --quant '{"linear:int4" : {"groupsize": 32}}' --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python3 torchchat.py generate --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+
+          echo "******************************************"
+          echo "******** HQQ group-wise quantized *******"
+          echo "******************************************"
+          # python export.py --quant '{"linear:hqq" : {"groupsize": 32}}' --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python3 torchchat.py generate --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "tests complete"
           echo "******************************************"
@@ -309,8 +570,7 @@ jobs:
           export GGUF_TOKENIZER_PATH=gguf_files/tokenizer.model
 
           python torchchat.py export --gguf-path ${GGUF_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
-          python torchchat.py generate --gguf-path ${GGUF_PATH} --pte-path ${PWD}/${MODEL_NAME}.pte --tokenizer-path ${GGUF_TOKENIZER_PATH} --temperature 0 --max-new-tokens 20 > ${PWD}/output_et
-          cat ${PWD}/output_et
+          python torchchat.py generate --gguf-path ${GGUF_PATH} --pte-path ${PWD}/${MODEL_NAME}.pte --tokenizer-path ${GGUF_TOKENIZER_PATH} --temperature 0 --max-new-tokens 20
 
           echo "Tests complete."
   torchchat-command-load-test:
@@ -324,7 +584,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10.11
       - name: Print machine info
         run: |
           uname -a
@@ -334,9 +594,9 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          echo "Installing pip packages"
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
+          echo "Installing pip3 packages"
+          ./install_requirements.sh
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
       - name: Download Stories files
@@ -355,107 +615,27 @@ jobs:
           export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
 
-          python generate.py --device cpu --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager1
-          python torchchat.py generate --device cpu --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager2
-          cat ./output_eager1
-          cat ./output_eager2
+          python3 torchchat.py generate --device cpu --checkpoint-path ${MODEL_PATH} --temperature 0
+          python torchchat.py generate --device cpu --checkpoint-path ${MODEL_PATH} --temperature 0
           echo "Tests complete."
 
       - name: Test download
         run: |
 
+          python torchchat.py list
+          python torchchat.py download stories15m
           python torchchat.py generate stories15M
+          python torchchat.py remove stories15m
 
-  test-tinystories-eager:
-    strategy:
-      matrix:
-        runner: [macos-12]
-    runs-on: ${{matrix.runner}}
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.11
-      - name: Print machine info
-        run: |
-          uname -a
-          if [ $(uname -s) == Darwin ]; then
-            sysctl machdep.cpu.brand_string
-            sysctl machdep.cpu.core_count
-          fi
-      - name: Install requirements
-        run: |
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
-      - name: Download checkpoints
-        run: |
-          mkdir -p checkpoints/stories15M
-          pushd checkpoints/stories15M
-          wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
-          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
-          popd
-      - name: Run inference
-        run: |
-          export MODEL_PATH=checkpoints/stories15M/stories15M.pt
-          export MODEL_NAME=stories15M
-          export MODEL_DIR=/tmp
-          for DTYPE in bfloat16 float16 float32; do
-            # if [ $(uname -s) == Darwin ]; then
-            #   export DTYPE=float16
-            # fi
-            python generate.py --dtype ${DTYPE} --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-            cat ./output_eager
-
-            echo "******************************************"
-            echo "******* Emb: channel-wise quantized ******"
-            echo "******************************************"
-            python generate.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-            cat ./output_eager
-
-            echo "******************************************"
-            echo "******** Emb: group-wise quantized *******"
-            echo "******************************************"
-            python generate.py --dtype ${DTYPE} --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-            cat ./output_eager
-
-            echo "******************************************"
-            echo "******* INT8 channel-wise quantized ******"
-            echo "******************************************"
-            python generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-            cat ./output_eager
-
-            echo "******************************************"
-            echo "******** INT8 group-wise quantized *******"
-            echo "******************************************"
-            python generate.py --dtype ${DTYPE} --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-            cat ./output_eager
-
-            echo "******************************************"
-            echo "******** INT4 group-wise quantized *******"
-            echo "******************************************"
-
-            echo "INT4 should work on MacOS on x86, but cannot be tested"
-            echo "because nightlies are too old!"
-
-            # python generate.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-            # cat ./output_eager
-
-            echo "tests complete for ${DTYPE}"
-            done
-
-            echo "tests complete for all dtypes!"
   test-mps:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-m1-stable
+      runner: macos-m1-stable  # neeps MPS, was macos-m1-stable
       script: |
         set -x
         # NS: Remove previous installation  of torch first
         # as this script does not isntall anything into conda env but rather as system dep
-        pip uninstall -y torch || true
+        pip3 uninstall -y torch || true
         set -eou pipefail
 
         echo "::group::Print machine info"
@@ -466,10 +646,10 @@ jobs:
 
         echo "::group::Install requirements"
         # Install requirements
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+        ./install_requirements.sh
         ls -la
         pwd
-        pip install -r requirements.txt
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -488,33 +668,27 @@ jobs:
         export MODEL_NAME=stories15M
         export MODEL_DIR=/tmp
 
-        python generate.py --device mps --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-        cat ./output_eager
+        python3 torchchat.py generate --device mps --checkpoint-path ${MODEL_PATH} --temperature 0
 
         echo "************************************************************"
         echo "*** embedding"
         echo "************************************************************"
 
-        python generate.py --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-        cat ./output_eager
-        python generate.py --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-        cat ./output_eager
+        python3 torchchat.py generate --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+        python3 torchchat.py generate --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
         echo "************************************************************"
         echo "*** linear int8"
         echo "************************************************************"
 
-        python generate.py --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-        cat ./output_eager
-        python generate.py --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-        cat ./output_eager
+        python3 torchchat.py generate --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+        python3 torchchat.py generate --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
         echo "************************************************************"
         echo "*** linear int4"
         echo "************************************************************"
 
-        PYTORCH_ENABLE_MPS_FALLBACK=1 python generate.py --device mps --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-        cat ./output_eager
+        PYTORCH_ENABLE_MPS_FALLBACK=1 python3 torchchat.py generate --device mps --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0
   test-gguf-util:
     strategy:
       matrix:
@@ -526,7 +700,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10.11
       - name: Print machine info
         run: |
           uname -a
@@ -536,10 +710,10 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          echo "Intalling pip packages"
-          pip install gguf
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
+          echo "Intalling pip3 packages"
+          pip3 install gguf
+          ./install_requirements.sh
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
           git clone https://github.com/ggerganov/llama.cpp.git
@@ -565,12 +739,12 @@ jobs:
   test-mps-dtype:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-m1-stable
+      runner: macos-m1-stable  # needs MPS, was macos-m1-stable
       script: |
         set -x
         # NS: Remove previous installation  of torch first
         # as this script does not isntall anything into conda env but rather as system dep
-        pip uninstall -y torch || true
+        pip3 uninstall -y torch || true
 
         set -eou pipefail
 
@@ -582,10 +756,10 @@ jobs:
 
         echo "::group::Install requirements"
         # Install requirements
-        pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
+        ./install_requirements.sh
         ls -la
         pwd
-        pip install -r requirements.txt
+        pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
@@ -608,23 +782,17 @@ jobs:
           #   export DTYPE=float16
           # fi
 
-          python generate.py --dtype ${DTYPE} --device mps --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-          cat ./output_eager
+          python3 torchchat.py generate --dtype ${DTYPE} --device mps --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          python generate.py --dtype ${DTYPE} --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-          cat ./output_eager
+          python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          python generate.py --dtype ${DTYPE} --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-          cat ./output_eager
+          python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          python generate.py --dtype ${DTYPE} --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-          cat ./output_eager
+          python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          python generate.py --dtype ${DTYPE} --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-          cat ./output_eager
+          python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          PYTORCH_ENABLE_MPS_FALLBACK=1 python generate.py --dtype ${DTYPE} --device mps --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-          cat ./output_eager
+          PYTORCH_ENABLE_MPS_FALLBACK=1 python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0
         done
   compile-gguf:
     strategy:
@@ -637,7 +805,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10.11
       - name: Print machine info
         run: |
           uname -a
@@ -647,9 +815,8 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          pip install gguf
-          pip install --pre torch  --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
+          ./install_requirements.sh
+          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download GGUF
         run: |
@@ -671,51 +838,52 @@ jobs:
           echo "******************************************"
 
           echo "Running eager"
-          python generate.py --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 > ./output_eager
-          cat ./output_eager
+          python3 torchchat.py generate --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0
 
           echo "Running compiled"
-          python generate.py --compile --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 > ./output_compiled
-          cat ./output_compiled
+          python3 torchchat.py generate --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --compile
 
           echo "******************************************"
           echo "******* Emb: channel-wise quantized ******"
           echo "******************************************"
 
           echo "Running eager"
-          python generate.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 > ./output_eager
-          cat ./output_eager
+          python3 torchchat.py generate --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0
 
           echo "Running compiled"
-          python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 > ./output_compiled
-          cat ./output_compiled
+          python3 torchchat.py generate --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --compile
 
           echo "******************************************"
           echo "******** Emb: group-wise quantized *******"
           echo "******************************************"
 
           echo "Running eager"
-          python generate.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 > ./output_eager
-          cat ./output_eager
+          python3 torchchat.py generate --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0
 
           echo "Running compiled"
-          python generate.py --compile --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 > ./output_compiled
-          cat ./output_compiled
+          python3 torchchat.py generate --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --compile
 
           echo "tests complete"
           echo "******************************************"
   runner-et:
     strategy:
       matrix:
-        runner: [macos-14-xlarge]
+        runner: [16-core-ubuntu, macos-14-xlarge]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          submodules: true
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11
+          python-version: 3.10.11
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
       - name: Print machine info
         run: |
           uname -a
@@ -723,74 +891,108 @@ jobs:
             sysctl machdep.cpu.brand_string
             sysctl machdep.cpu.core_count
           fi
-      - name: Install requirements
+      - name: Install torchchat
         run: |
-          echo "Intalling pip packages"
-          pip install -r requirements.txt
+          echo "Intalling pip3 packages"
+          ./install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Set ET git sha
+        id: setup-hash
+        run: |
+          export TORCHCHAT_ROOT=${PWD}
+          echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/.pins/et-pin.txt)" >> "$GITHUB_ENV"
+      - name: Load or install ET
+        id: install-et
+        uses: actions/cache@v3
+        env:
+          cache-key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}
+        with:
+          path: ./et-build
+          key: ${{env.cache-key}}
+          restore-keys: |
+            ${{env.cache-key}}
+      - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
+        continue-on-error: true
+        run: |
+          echo "Installing ExecuTorch"
+          bash scripts/build_native.sh et
+      - name: Install ET pip
+        run: |
+          echo "ET build directory"
+          ls et-build | cat
+
+          pushd et-build/src/executorch
+          if [ $(git rev-parse HEAD) != ${{env.et-git-hash}} ]; then
+            echo "Mismatched hash.  Make sure branch install_et.sh matches branch from Github cache."
+            echo "On commit $(git rev-parse HEAD)"
+            echo "Expected commit ${{env.et-git-hash}}"
+            exit 1
+          fi
+          pip install .
+          popd
+      - name: Install runner
+        run: |
+          # Pull submodules (re2, abseil) for Tiktoken
+          git submodule sync
+          git submodule update --init
 
           export TORCHCHAT_ROOT=${PWD}
-          export ENABLE_ET_PYBIND=false
-          ./scripts/install_et.sh $ENABLE_ET_PYBIND
-          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
-          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
-          python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
-          cmake -S ./runner-et -B ./runner-et/cmake-out -G Ninja
-          cmake --build ./runner-et/cmake-out
-      - name: Download checkpoints
-        run: |
+          cmake -S . -B ./cmake-out -G Ninja
+          cmake --build ./cmake-out --target et_run
 
       - name: Run inference
         run: |
           python torchchat.py download stories15M
-          wget -O ./tokenizer.bin https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
+          wget -O ./tokenizer.model https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
 
           export PRMT="Once upon a time in a land far away"
 
-          python torchchat.py generate stories15M --temperature 0 --prompt "${PRMT}"  > ./output_eager
-          cat ./output_eager
+          python torchchat.py generate stories15M --temperature 0 --prompt "${PRMT}"
 
           python torchchat.py export stories15M --output-pte-path ./model.pte
-          ./runner-et/cmake-out/run ./model.pte -z ./tokenizer.bin -t 0 -i "${PRMT}" > ./output_et
-          cat ./output_et
+          ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
+
+          for dtype in fp32 fp16; do   # bf16 needs to be supported
+            echo "Testing export + runner with dtype=$dtype"
+            python torchchat.py export stories15M --dtype $dtype --output-pte-path ./model.pte
+            ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
+          done
 
           echo "Tests complete."
   runner-aoti:
-    name: test-runner-aoti (${{ matrix.platform }}, ${{ matrix.model_name }})
-    needs: gather-models-cpu
     strategy:
-      matrix: ${{ fromJSON(needs.gather-models-cpu.outputs.models) }}
-      fail-fast: false
-    runs-on: ${{ matrix.runner }}
+      matrix:
+        runner: [16-core-ubuntu, macos-14-xlarge]
+    runs-on: ${{matrix.runner}}
     env:
       TORCHCHAT_ROOT: ${{ github.workspace }}
-      REPO_NAME: ${{ matrix.repo_name }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+        with:
+          submodules: true
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10.11'
       - name: Print machine info
         run: |
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
-          pip install -r requirements.txt
-          pip list
+          ./install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
-          cd ${TORCHCHAT_ROOT}/runner-aoti
-          cmake -Bbuild -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'`
-          cmake --build build
-          cd ..
+          bash scripts/build_native.sh aoti
+
       - name: Download checkpoint
         run: |
           mkdir -p checkpoints/stories15M
           pushd checkpoints/stories15M
           wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
           wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
-          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
           popd
       - name: Run inference
         run: |
@@ -799,12 +1001,39 @@ jobs:
           export MODEL_DIR=${PWD}/checkpoints/stories15M
           export PROMPT="Once upon a time in a land far away"
 
-          python torchchat.py generate --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}"  > ${PWD}/output_eager
-          cat ${PWD}/output_eager
+          python torchchat.py generate --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}"
 
-          python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-dso-path /tmp/model.so
+          for dtype in fp32 fp16 bf16 fast fast16; do
+            echo "Running export + runner with dtype=$dtype"
+            python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --dtype $dtype --output-dso-path /tmp/model.so
+            ./cmake-out/aoti_run /tmp/model.so -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}"
+          done
 
-          ./runner-aoti/build/run /tmp/model.so -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}" > ${PWD}/output_aoti
-          cat ${PWD}/output_aoti
+          echo "Tests complete."
 
+  test-build-runner-et-android:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.4xlarge
+      script: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+          ./install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+
+          export TORCHCHAT_ROOT=${PWD}
+          pushd /tmp
+          wget https://dl.google.com/android/repository/android-ndk-r26c-linux.zip
+          unzip android-ndk-r26c-linux.zip
+          popd
+          export ANDROID_NDK=/tmp/android-ndk-r26c
+
+          # Pull submodules (re2, abseil) for Tiktoken
+          git submodule sync
+          git submodule update --init
+          ./runner/build_android.sh
           echo "Tests complete."

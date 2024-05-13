@@ -53,31 +53,36 @@ model_aliases: Dict[str, str] = None
 model_configs: Dict[str, ModelConfig] = None
 
 
-def resolve_model_config(model: str) -> ModelConfig:
+def load_model_configs() -> Dict[str, ModelConfig]:
     global model_aliases
     global model_configs
 
-    model = model.lower()
+    model_aliases = {}
+    model_configs = {}
 
+    with open(
+        Path(__file__).parent.parent / "config" / "data" / "models.json", "r"
+    ) as f:
+        model_config_dict = json.load(f)
+
+    for key, value in model_config_dict.items():
+        config = ModelConfig(**value)
+        config.name = key
+
+        key = key.lower()
+        model_configs[key] = config
+
+        for alias in config.aliases:
+            model_aliases[alias.lower()] = key
+
+    return model_configs
+
+
+def resolve_model_config(model: str) -> ModelConfig:
+    model = model.lower()
     # Lazy load model config from JSON.
     if not model_configs:
-        model_aliases = {}
-        model_configs = {}
-
-        with open(
-            Path(__file__).parent.parent / "config" / "data" / "models.json", "r"
-        ) as f:
-            model_config_dict = json.load(f)
-
-        for key, value in model_config_dict.items():
-            config = ModelConfig(**value)
-            config.name = key
-
-            key = key.lower()
-            model_configs[key] = config
-
-            for alias in config.aliases:
-                model_aliases[alias.lower()] = key
+        load_model_configs()
 
     if model in model_aliases:
         model = model_aliases[model]

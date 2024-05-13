@@ -7,22 +7,17 @@
 
 import copy
 import logging
-import sys
-from pathlib import Path
 from typing import Any
 
 import gguf
 
 import torch
 
-wd = Path(__file__).parent.resolve()
-sys.path.append(str(wd))
-
 from gguf import GGUFValueType
-from model import ModelArgs, Transformer
 from quantize import pack_scales_and_zeros, WeightOnlyInt4Linear
 
 from build.gguf_util import Q4_0, to_float
+from build.model import ModelArgs, Transformer
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -186,10 +181,10 @@ def load_model_and_state_dict(
                 parent,
                 _fqn_last(fqn),
                 WeightOnlyInt4Linear(
-                    "meta",
-                    in_features,
-                    out_features,
+                    in_features=in_features,
+                    out_features=out_features,
                     bias=False,
+                    device="meta",
                     groupsize=Q4_0.groupsize,
                     inner_k_tiles=inner_k_tiles,
                 ),

@@ -1,0 +1,5 @@
+{
+    "executor": {"accelerator": "cuda"},
+    "precision": {"dtype": "bf16"},
+    "linear:int4": {"groupsize" : 256}
+}

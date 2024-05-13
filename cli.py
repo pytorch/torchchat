@@ -5,27 +5,34 @@
 # LICENSE file in the root directory of this source tree.
 
 import json
+import logging
+import os
+import sys
 from pathlib import Path
-
-from build.utils import allowable_dtype_names, allowable_params_table
-from download import download_and_convert, is_model_downloaded
 
 import torch
 
-# CPU is always available and also exportable to ExecuTorch
-default_device = "cpu"  # 'cuda' if torch.cuda.is_available() else 'cpu'
+from build.utils import allowable_dtype_names, allowable_params_table, get_device_str
+from download import download_and_convert, is_model_downloaded
 
+FORMAT = (
+    "%(levelname)s: %(asctime)-15s: %(filename)s: %(funcName)s: %(module)s: %(message)s"
+)
+logging.basicConfig(filename="/tmp/torchchat.log", level=logging.INFO, format=FORMAT)
+logger = logging.getLogger(__name__)
 
-def check_args(args, name: str) -> None:
-    pass
+default_device = os.getenv("TORCHCHAT_DEVICE", "fast")
+default_model_dir = Path(
+    os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")
+).expanduser()
 
 
 # Handle CLI arguments that are common to a majority of subcommands.
-def handle_common_args(args) -> None:
+def check_args(args, name: str) -> None:
     # Handle model download. Skip this for download, since it has slightly
     # different semantics.
     if (
-        args.command != "download"
+        name not in ["download", "list", "remove"]
         and args.model
         and not is_model_downloaded(args.model, args.model_directory)
     ):
@@ -39,10 +46,6 @@ def add_arguments_for_chat(parser):
 
 def add_arguments_for_browser(parser):
     # Only browser specific options should be here
-    _add_arguments_common(parser)
-    parser.add_argument(
-        "--port", type=int, default=5000, help="Port for the web server in browser mode"
-    )
     _add_arguments_common(parser)
 
 
@@ -66,6 +69,20 @@ def add_arguments_for_export(parser):
     _add_arguments_common(parser)
 
 
+def add_arguments_for_list(parser):
+    # Only list specific options should be here
+    _add_arguments_common(parser)
+
+
+def add_arguments_for_remove(parser):
+    # Only remove specific options should be here
+    _add_arguments_common(parser)
+
+def add_arguments_for_where(parser):
+    # Only remove specific options should be here
+    _add_arguments_common(parser)
+
+
 def _add_arguments_common(parser):
     # Model specification. TODO Simplify this.
     # A model can be specified using a positional model name or HuggingFace
@@ -78,12 +95,6 @@ def _add_arguments_common(parser):
         default=None,
         help="Model name for well-known models",
     )
-
-
-def add_arguments(parser):
-    # TODO: Refactor this so that only common options are here
-    # and command-specific options are inside individual
-    # add_arguments_for_generate, add_arguments_for_export etc.
 
     parser.add_argument(
         "--chat",
@@ -111,11 +122,6 @@ def add_arguments(parser):
         type=int,
         default=None,
         help="Initialize torch seed",
-    )
-    parser.add_argument(
-        "--tiktoken",
-        action="store_true",
-        help="Whether to use tiktoken tokenizer",
     )
     parser.add_argument(
         "--num-samples",
@@ -146,12 +152,12 @@ def add_arguments(parser):
     parser.add_argument(
         "--compile-prefill",
         action="store_true",
-        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times. (Requires `--parallel-prefill`)",
+        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times.",
     )
     parser.add_argument(
-        "--parallel-prefill",
+        "--sequential-prefill",
         action="store_true",
-        help="Whether to perform prefill in parallel, or one token at a time. Improves prefill perf. DSO and PTE models presently do not support parallel prefill.",
+        help="Whether to perform prefill sequentially. Only used for model debug.",
     )
     parser.add_argument(
         "--profile",
@@ -220,11 +226,10 @@ def add_arguments(parser):
         help="Use the specified ExecuTorch .pte model file",
     )
     parser.add_argument(
-        "-d",
         "--dtype",
-        default="float32",
-        choices = allowable_dtype_names(),
-        help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32",
+        default="fast",
+        choices=allowable_dtype_names(),
+        help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32, fast16, fast",
     )
     parser.add_argument(
         "-v",
@@ -262,7 +267,7 @@ def add_arguments(parser):
         "--device",
         type=str,
         default=default_device,
-        choices=["cpu", "cuda", "mps"],
+        choices=["fast", "cpu", "cuda", "mps"],
         help="Hardware device to use. Options: cpu, cuda, mps",
     )
     parser.add_argument(
@@ -293,16 +298,53 @@ def add_arguments(parser):
     parser.add_argument(
         "--model-directory",
         type=Path,
-        default=".model-artifacts",
-        help="The directory to store downloaded model artifacts",
+        default=default_model_dir,
+        help=f"The directory to store downloaded model artifacts. Default: {default_model_dir}",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=5000,
+        help="Port for the web server in browser mode",
     )
 
 
 def arg_init(args):
-    if Path(args.quantize).is_file():
+    if not (torch.__version__ > "2.3"):
+        raise RuntimeError(
+            f"You are using PyTorch {torch.__version__}. At this time, torchchat uses the latest PyTorch technology with high-performance kernels only available in PyTorch nightly until the PyTorch 2.4 release"
+        )
+
+    if sys.version_info.major != 3 or sys.version_info.minor < 10:
+        raise RuntimeError("Please use Python 3.10 or later.")
+
+    if hasattr(args, "quantize") and Path(args.quantize).is_file():
         with open(args.quantize, "r") as f:
             args.quantize = json.loads(f.read())
 
-    if args.seed:
+    if isinstance(args.quantize, str):
+        args.quantize = json.loads(args.quantize)
+
+    # if we specify dtype in quantization recipe, replicate it as args.dtype
+    args.dtype = args.quantize.get("precision", {}).get("dtype", args.dtype)
+
+    if args.output_pte_path:
+        if args.device not in ["cpu", "fast"]:
+            raise RuntimeError("Device not supported by ExecuTorch")
+        args.device = "cpu"
+    else:
+        args.device = get_device_str(
+            args.quantize.get("executor", {}).get("accelerator", args.device)
+        )
+
+    if "mps" in args.device:
+        if args.compile or args.compile_prefill:
+            print(
+                "Warning: compilation is not available with device MPS, ignoring option to engage compilation"
+            )
+            args.compile = False
+            args.compile_prefill = False
+
+    if hasattr(args, "seed") and args.seed:
         torch.manual_seed(args.seed)
     return args

@@ -10,6 +10,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
+from utils.measure_time import measure_time
 
 import torch
 import torch._dynamo.config
@@ -19,7 +20,7 @@ from config.model_config import resolve_model_config
 from quantize import quantize_model
 
 from build.model import Transformer
-from build.utils import device_sync, name_to_dtype
+from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
 
 
 @dataclass
@@ -32,13 +33,17 @@ class BuilderArgs:
     gguf_kwargs: Optional[Dict[str, Any]] = None
     dso_path: Optional[Union[Path, str]] = None
     pte_path: Optional[Union[Path, str]] = None
-    device: str = "cpu"
+    device: Optional[str] = None
     precision: torch.dtype = torch.float32
     setup_caches: bool = False
     use_tp: bool = False
     is_chat_model: bool = False
+    prefill_possible: bool = False
 
     def __post_init__(self):
+        if self.device is None:
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+
         if not (
             (self.checkpoint_path and self.checkpoint_path.is_file())
             or (self.checkpoint_dir and self.checkpoint_dir.is_dir())
@@ -65,6 +70,8 @@ class BuilderArgs:
             print(
                 "Warning: GGUF path ignored because an exported DSO or PTE path specified"
             )
+        if not (self.dso_path) and not (self.pte_path):
+            self.prefill_possible = True
 
     @classmethod
     def from_args(cls, args):  # -> BuilderArgs:
@@ -94,7 +101,7 @@ class BuilderArgs:
             is_chat_model = True
         else:
             for path in [
-                args.checkpoint_path,
+                checkpoint_path,
                 checkpoint_dir,
                 args.dso_path,
                 args.pte_path,
@@ -104,9 +111,23 @@ class BuilderArgs:
                     path = str(path)
                     if path.endswith("/"):
                         path = path[:-1]
-                    path_basename = os.path.basename(path)
-                    if "chat" in path_basename:
+                    if os.path.isfile(path):
+                        path = os.path.dirname(path)
+
+                    path_basename = os.path.basename(path).lower()
+                    if "chat" in path_basename or "instruct" in path_basename:
                         is_chat_model = True
+
+        if args.output_pte_path and args.dtype.startswith("fast"):
+            if args.dtype == "fast":
+                # As per Kimish, float32 should be faster on ET XNNPACK
+                # (because fp16 is implemented as upcast to fp32 for several
+                # operators, and in particular a8w4dq and ET's sdpa+kv)
+                dtype = torch.float32
+            else:
+                dtype = torch.float16
+        else:
+            dtype = name_to_dtype(args.dtype, args.device)
 
         return cls(
             checkpoint_dir=checkpoint_dir,
@@ -118,7 +139,7 @@ class BuilderArgs:
             dso_path=args.dso_path,
             pte_path=args.pte_path,
             device=args.device,
-            precision=name_to_dtype(args.dtype),
+            precision=dtype,
             setup_caches=(args.output_dso_path or args.output_pte_path),
             use_tp=False,
             is_chat_model=is_chat_model,
@@ -139,30 +160,61 @@ class BuilderArgs:
 @dataclass
 class TokenizerArgs:
     tokenizer_path: Optional[Union[Path, str]] = None
-    is_sentencepiece: bool = True
+    is_sentencepiece: bool = False
     is_tiktoken: bool = False
+    t: Optional[Any] = None
+
+    def __post_init__(self):
+        try:
+            from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
+
+            self.t = TiktokenTokenizer(model_path=str(self.tokenizer_path))
+            self.is_tiktoken = True
+            self.is_sentencepiece = False
+            return
+        except:
+            pass
+
+        try:
+            from sentencepiece import SentencePieceProcessor
+
+            self.t = SentencePieceProcessor(model_file=str(self.tokenizer_path))
+            self.is_tiktoken = False
+            self.is_sentencepiece = True
+            return
+        except:
+            pass
+
+        self.is_tiktoken = False
+        self.is_sentencepiece = False
+        self.t = None
+        return
 
     def validate_model(
         self,
         model: Transformer,
         model_description: str = "model",
-    ):
+    ) -> None:
         if model is None:
             return
 
-        use_tiktoken = model.config.use_tiktoken
-        is_tiktoken = self.is_tiktoken
+        if self.is_tiktoken == self.is_sentencepiece:
+            raise RuntimeError(f"no tokenizer was found at {self.tokenizer_path}")
 
-        if use_tiktoken is None:
-            model.config.use_tiktoken = is_tiktoken
-        elif use_tiktoken != is_tiktoken:
+        is_tiktoken = self.is_tiktoken
+        is_sentencepiece = self.is_sentencepiece
+        use_tiktoken = model.config.use_tiktoken
+
+        if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
             raise RuntimeError(
-                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)} does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)} for {model_description}"
+                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)}) does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}) for {model_description}"
             )
+
+        return
 
     @classmethod
     def from_args(cls, args):  # -> TokenizerArgs:
-        is_sentencepiece = True
+        is_sentencepiece = False
         is_tiktoken = False
 
         if args.tokenizer_path:
@@ -185,28 +237,16 @@ class TokenizerArgs:
         if not tokenizer_path.is_file():
             raise RuntimeError(f"did not find tokenizer at {tokenizer_path}")
 
-        if args.tiktoken:
-            is_sentencepiece = False
-            is_tiktoken = True
-
         return cls(
             tokenizer_path=tokenizer_path,
             is_sentencepiece=is_sentencepiece,
             is_tiktoken=is_tiktoken,
+            t=None,
         )
 
 
 def _initialize_tokenizer(tokenizer_args: TokenizerArgs):
-    if tokenizer_args.is_sentencepiece:
-        from sentencepiece import SentencePieceProcessor
-
-        return SentencePieceProcessor(model_file=str(tokenizer_args.tokenizer_path))
-    elif tokenizer_args.is_tiktoken:
-        from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
-
-        return TiktokenTokenizer(model_path=str(tokenizer_args.tokenizer_path))
-    else:
-        raise RuntimeError("must specify a valid tokenizer in TokenizerArgs")
+    return tokenizer_args.t
 
 
 torch._inductor.config.coordinate_descent_tuning = True
@@ -237,7 +277,7 @@ def _unset_gguf_kwargs(builder_args):
     builder_args.gguf_kwargs = None
 
 
-def _load_model_gguf(builder_args):
+def _load_model_gguf(builder_args, only_config=False):
     assert builder_args.gguf_path
     if builder_args.gguf_kwargs is None:
         kwargs = {}
@@ -247,7 +287,7 @@ def _load_model_gguf(builder_args):
     return model
 
 
-def _load_model_default(builder_args):
+def _load_model_default(builder_args, only_config=False):
     assert not builder_args.gguf_path
 
     with torch.device("meta"):
@@ -300,7 +340,7 @@ def _load_model_default(builder_args):
     return model
 
 
-def _load_model(builder_args):
+def _load_model(builder_args, only_config=False):
     if builder_args.gguf_path:
         model = _load_model_gguf(builder_args)
     else:
@@ -321,8 +361,7 @@ def _initialize_model(
     quantize,
     tokenizer=None,
 ):
-    print("Loading model ...")
-    t0 = time.time()
+    print("Loading model...")
 
     if builder_args.gguf_path and (builder_args.dso_path or builder_args.pte_path):
         print("Setting gguf_kwargs for generate.")
@@ -335,16 +374,22 @@ def _initialize_model(
         #   (no unpack available)
         _set_gguf_kwargs(builder_args, is_et=is_pte, context="generate")
 
-    model_ = _load_model(builder_args)
-    device_sync(device=builder_args.device)
-    print(f"Time to load model: {time.time() - t0:.02f} seconds")
-
     if builder_args.dso_path:
-        assert (
-            quantize is None or quantize == "{ }"
-        ), "quantize not valid for exported DSO model. Specify quantization during export."
+        if not is_cuda_or_cpu_device(builder_args.device):
+            print(
+                f"Cannot load specified DSO to {builder_args.device}. Attempting to load model to CPU instead"
+            )
+            builder_args.device = "cpu"
+
+        # assert (
+        #     quantize is None or quantize == "{ }"
+        # ), "quantize not valid for exported DSO model. Specify quantization during export."
+
+        with measure_time("Time to load model: {time:.02f} seconds"):
+            model = _load_model(builder_args, only_config=True)
+            device_sync(device=builder_args.device)
+
         try:
-            model = model_
             # Replace model forward with the AOT-compiled forward
             # This is a hacky way to quickly demo AOTI's capability.
             # model is still a Python object, and any mutation to its
@@ -357,29 +402,42 @@ def _initialize_model(
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {builder_args.dso_path}")
     elif builder_args.pte_path:
-        assert (
-            quantize is None or quantize == "{ }"
-        ), "quantize not valid for exported PTE model. Specify quantization during export."
+        if not is_cpu_device(builder_args.device):
+            print(
+                f"Cannot load specified PTE to {builder_args.device}. Attempting to load model to CPU instead"
+            )
+            builder_args.device = "cpu"
+
+        # assert (
+        #     quantize is None or quantize == "{ }"
+        # ), "quantize not valid for exported PTE model. Specify quantization during export."
+
+        with measure_time("Time to load model: {time:.02f} seconds"):
+            model = _load_model(builder_args, only_config=True)
+            device_sync(device=builder_args.device)
+
         try:
             from build.model_et import PTEModel
 
-            model = PTEModel(model_.config, builder_args.pte_path)
+            model = PTEModel(model.config, builder_args.pte_path)
         except Exception:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
     else:
-        model = model_
+        with measure_time("Time to load model: {time:.02f} seconds"):
+            model = _load_model(builder_args)
+            device_sync(device=builder_args.device)
 
         if quantize:
-            t0q = time.time()
             print(f"Quantizing the model with: {quantize}")
-            quantize_model(model, builder_args.device, quantize, tokenizer)
-            device_sync(device=builder_args.device)
-            print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
+            with measure_time("Time to quantize model: {time:.02f} seconds"):
+                quantize_model(model, builder_args.device, quantize, tokenizer)
+                device_sync(device=builder_args.device)
 
         if builder_args.setup_caches:
-            max_seq_length = 350
             with torch.device(builder_args.device):
-                model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+                model.setup_caches(
+                    max_batch_size=1, max_seq_length=model.config.max_seq_length
+                )
 
         model.to(dtype=builder_args.precision)
 
@@ -388,11 +446,3 @@ def _initialize_model(
 
 def tokenizer_setting_to_name(tiktoken: bool = False) -> str:
     return "TikToken" if tiktoken else "SentencePiece"
-
-
-def resolve_model_name(model: str) -> str:
-    # If the provided model name is an alias, retrieve the full path.
-    if model in model_aliases:
-        return model_aliases[model]
-    else:
-        return model

@@ -1,0 +1,4 @@
+{
+    "embedding": {"bitwidth": 4, "groupsize" : 32},
+    "linear:a8w4dq": {"groupsize" : 256}
+}

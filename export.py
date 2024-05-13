@@ -18,8 +18,8 @@ from build.builder import (
     TokenizerArgs,
 )
 
-from build.utils import set_backend, set_precision, use_aoti_backend, use_et_backend
-from cli import add_arguments, add_arguments_for_export, arg_init, check_args
+from build.utils import set_backend, set_precision
+from cli import add_arguments_for_export, arg_init, check_args
 from export_aoti import export_model as export_model_aoti
 
 try:
@@ -47,6 +47,15 @@ def main(args):
 
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
+
+    if output_pte_path and builder_args.device != "cpu":
+        print(
+            f"Warning! ExecuTorch export target is controlled by export recipe, not device setting. Ignoring device={builder_args.device} setting."
+        )
+        builder_args.device = "cpu"
+    elif "mps" in builder_args.device:
+        print("Warning! Device MPS not supported for export. Exporting for device CPU.")
+        builder_args.device = "cpu"
 
     # TODO: clean this up
     # This mess is because ET does not support _weight_int4pack_mm right now
@@ -85,7 +94,6 @@ def main(args):
     with torch.no_grad():
         if output_pte_path:
             output_pte_path = str(os.path.abspath(output_pte_path))
-            print(f">{output_pte_path}<")
             if executorch_export_available:
                 print(f"Exporting model using ExecuTorch to {output_pte_path}")
                 export_model_et(
@@ -104,7 +112,6 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="torchchat export CLI")
-    add_arguments(parser)
     add_arguments_for_export(parser)
     args = parser.parse_args()
     check_args(args, "export")

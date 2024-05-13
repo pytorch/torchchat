@@ -19,11 +19,14 @@ MODEL_REPOS = {
     "mistralai/Mistral-7B-v0.1": "https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/config.json,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/generation_config.json,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/pytorch_model-00001-of-00002.bin,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/pytorch_model-00002-of-00002.bin,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/pytorch_model.bin.index.json,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/special_tokens_map.json,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/tokenizer.json,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/tokenizer.model,https://huggingface.co/mistralai/Mistral-7B-v0.1/resolve/main/tokenizer_config.json",
     "mistralai/Mistral-7B-Instruct-v0.1": "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/config.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/generation_config.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/pytorch_model-00001-of-00002.bin,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/pytorch_model-00002-of-00002.bin,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/pytorch_model.bin.index.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/special_tokens_map.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/tokenizer.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/tokenizer.model,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1/resolve/main/tokenizer_config.json",
     "mistralai/Mistral-7B-Instruct-v0.2": "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/config.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/generation_config.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/pytorch_model-00001-of-00003.bin,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/pytorch_model-00002-of-00003.bin,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/pytorch_model-00003-of-00003.bin,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/pytorch_model.bin.index.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/special_tokens_map.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/tokenizer.json,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/tokenizer.model,https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2/resolve/main/tokenizer_config.json",
+    # huggingface-cli prefixed Models will download using the huggingface-cli tool
+    # TODO: Convert all of the MODEL_REPOS with a NamedTuple that includes the install_method
+    "huggingface-cli/meta-llama/Meta-Llama-3-8B": "",
 }
 
 JOB_RUNNERS = {
     "cpu": {
-        "32-core-ubuntu": "x86_64",
+        "8-core-ubuntu": "x86_64",
         # "macos-12": "x86_64", # not working for complie and ExecuTorch yet
         "macos-14": "aarch64",
     },
@@ -57,7 +60,7 @@ def parse_args() -> Any:
     return parser.parse_args()
 
 
-def model_should_run_on_event(model: str, event: str) -> bool:
+def model_should_run_on_event(model: str, event: str, backend: str) -> bool:
     """
     A helper function to decide whether a model should be tested on an event (pull_request/push)
     We put higher priority and fast models to pull request and rest to push.
@@ -67,7 +70,14 @@ def model_should_run_on_event(model: str, event: str) -> bool:
     elif event == "push":
         return model in []
     elif event == "periodic":
-        return model in ["openlm-research/open_llama_7b"]
+        # test llama3 on gpu only, see description in https://github.com/pytorch/torchchat/pull/399 for reasoning
+        if backend == "gpu":
+            return model in [
+                "openlm-research/open_llama_7b",
+                "huggingface-cli/meta-llama/Meta-Llama-3-8B",
+            ]
+        else:
+            return model in ["openlm-research/open_llama_7b"]
     else:
         return False
 
@@ -102,15 +112,25 @@ def export_models_for_ci() -> dict[str, dict]:
         MODEL_REPOS.keys(),
         JOB_RUNNERS[backend].items(),
     ):
-        if not model_should_run_on_event(repo_name, event):
+        if not model_should_run_on_event(repo_name, event, backend):
             continue
 
+        # This is mostly temporary to get this finished quickly while
+        # doing minimal changes, see TODO at the top of the file to
+        # see how this should probably be done
+        install_method = "wget"
+        final_repo_name = repo_name
+        if repo_name.startswith("huggingface-cli"):
+            install_method = "huggingface-cli"
+            final_repo_name = repo_name.replace("huggingface-cli/", "")
+
         record = {
-            "repo_name": repo_name,
-            "model_name": repo_name.split("/")[-1],
+            "repo_name": final_repo_name,
+            "model_name": final_repo_name.split("/")[-1],
             "resources": MODEL_REPOS[repo_name],
             "runner": runner[0],
             "platform": runner[1],
+            "install_method": install_method,
             "timeout": 90,
         }
 

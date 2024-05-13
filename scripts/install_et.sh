@@ -5,7 +5,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-set -ex
+set -ex pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/install_utils.sh"
 
@@ -19,6 +19,5 @@ pushd ${TORCHCHAT_ROOT}
 find_cmake_prefix_path
 install_pip_dependencies
 clone_executorch
-install_executorch_python_libs $ENABLE_ET_PYBIND
-install_executorch
+install_executorch_libs $ENABLE_ET_PYBIND
 popd

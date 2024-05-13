@@ -8,8 +8,10 @@ __pycache__/
 
 .model-artifacts/
 .venv
+.torchchat
 
 # Build directories
+build/android/*
 et-build/*
 runner-et/cmake-out/*
 runner-aoti/cmake-out/*

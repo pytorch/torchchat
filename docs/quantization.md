@@ -1,279 +1,158 @@
 
 # Quantization
 
+<!--
+[shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
+[shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
+-->
+
 ## Introduction
-Quantization focuses on reducing the precision of model parameters and computations from floating-point to lower-bit integers, such as 8-bit integers. This approach aims to minimize memory requirements, accelerate inference speeds, and decrease power consumption, making models more feasible for deployment on edge devices with limited computational resources. While quantization can potentially degrade the model's performance, the methods supported by torchchat are designed to mitigate this effect, maintaining a balance between efficiency and accuracy.
+Quantization focuses on reducing the precision of model parameters and computations from floating-point to lower-bit integers, such as 8-bit integers. This approach aims to minimize memory requirements, accelerate inference speeds, and decrease power consumption, making models more feasible for deployment on edge devices with limited computational resources. For high-performance devices such as GPUs, quantization provides a way to reduce the required memory bandwidth and take advantage of the massive compute capabilities provided by today's server-based accelerators such as GPUs.
 
-## Supported quantization techniques
+While quantization can potentially degrade the model's performance, the methods supported by torchchat are designed to mitigate this effect, maintaining a balance between efficiency and accuracy. In this document we provide details on the supported quantization schemes, how to quantize models with these schemes and a few example of running such quantized models on supported backends.
 
-| compression | FP precision |  weight quantization | dynamic activation quantization |
-|--|--|--|--|
-embedding table (symmetric) | fp32, fp16, bf16 | 8b (group/channel), 4b (group/channel) | n/a |
-linear operator (symmetric) | fp32, fp16, bf16 | 8b (group/channel) | n/a |
-linear operator (asymmetric) | n/a | 4b (group), a6w4dq | a8w4dq (group) |
-linear operator (asymmetric) with GPTQ | n/a | 4b (group) | n/a |
-linear operator (asymmetric) with HQQ | n/a |  work in progress | n/a |
+## Supported Quantization Schemes
+### Weight Quantization
+| compression | bitwidth| group size | dynamic activation quantization | Eager | AOTI | ExecuTorch |
+|--|--|--|--|--|--|--|--|
+| linear (asymmetric) | [8, 4]* | [32, 64, 128, 256]** | | ✅ | ✅ | 🚧 |
+| linear with GPTQ*** (asymmetric) | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
+| linear with HQQ*** (asymmetric) | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
+| linear with dynamic activations (symmetric) | | [32, 64, 128, 256]* | a8w4dq | 🚧 |🚧 | ✅ |
 
-## Model precision (dtype precision setting)
-You can generate models (for both export and generate, with eager, torch.compile, AOTI, ET, for all backends - mobile at present will primarily support fp32, with all options) specify the precision of the model with
+### Embedding Quantization
 
-TODO: These need to be commands that can be copy paste
-```
-python3 generate.py --dtype [bf16 | fp16 | fp32] ...
-python3 export.py --dtype [bf16 | fp16 | fp32] ...
-```
+Due to the larger vocabulary size of llama3, we also recommend
+quantizing the embeddings to further reduce the model size for
+on-device usecases.
 
-Unlike gpt-fast which uses bfloat16 as default, torchchat uses float32 as the default. As a consequence you will have to set to --dtype bf16 or --dtype fp16 on server / desktop for best performance.
-Support for FP16 and BF16 is limited in many embedded processors.  Additional executorch support for 16-bit floating point types may be added in the future based on hardware support.
+| compression | weight quantization (bitwidth)| weight quantization (group size) | dynamic activation quantization | Eager | AOTI | ExecuTorch |
+|--|--|--|--|--|--|--|--|
+| embedding (symmetric) | [8, 4]* | [32, 64, 128, 256]+ | | ✅ | ✅ | ✅ |
 
-## Making your models fit and execute fast!
 
-Next, we'll show you how to optimize your model for mobile execution (for ET) or get the most from your server or desktop hardware (with AOTI). The basic model build for mobile surfaces two issues: Models quickly run out of memory and execution can be slow. In this section, we show you how to fit your models in the limited memory of a mobile device, and optimize execution speed -- both using quantization. This is the torchchat repo after all!
-For high-performance devices such as GPUs, quantization provides a way to reduce the memory bandwidth required to and take advantage of the massive compute capabilities provided by today's server-based accelerators such as GPUs. In addition to reducing the memory bandwidth required to compute a result faster by avoiding stalls, quantization allows accelerators (which usually have a limited amount of memory) to store and process larger models than they would otherwise be able to.
-We can specify quantization parameters with the --quantize option. The quantize option takes a JSON/dictionary with quantizers and quantization options.
-generate and export (for both ET and AOTI) can both accept quantization options. We only show a subset of the combinations to avoid combinatorial explosion.
+
+* These are the only valid bitwidth options.
+
+** There are many valid group size options, including 512, 1024,
+   etc. Note that smaller groupsize tends to be better for preserving
+   model quality and accuracy, and larger groupsize for further
+   improving performance. Set 0 for channelwise quantization.
+
+*** [GPTQ](https://arxiv.org/abs/2210.17323) and
+    [HQQ](https://mobiusml.github.io/hqq_blog/) are two different
+    algorithms to address accuracy loss when using lower bit
+    quantization. Due to HQQ relying on data/calibration free
+    quantization, it tends to take less time to quantize model.
+    HQQ is currently enabled with axis=1 configuration. 
+    
+    Presently, torchchat includes a subset of the HQQ distribution in 
+    the hqq subdirectory, but HQQ is not installed by default with torchchat,
+    due to dependence incompatibilities between torchchat and the hqq
+    project.  We may integrate hqq via requirements.txt in the future. 
+    (As a result, there's presently no upstream path for changes and/or
+    improvements to HQQ.)
+
++ Should support non-power-of-2-groups as well.
+
+## Quantization Profiles
+
+Torchchat quantization supports profiles with multiple settings such
+as accelerator, dtype, and quantization specified in a JSON file.
+Four sample profiles are included wwith the torchchat distributin in
+config/data: `cuda.json`, `desktop.json`, `mobile.json`, `pi5.json`
+with profiles optimizing for execution on cuda, desktop, mobile and
+raspberry Pi devices.
+
+In addition to quantization recipes described below, the profiles also
+enable developers to specify the accelerator and dtype to be used.
+
+At present torchchat supports the fast, cuda, mps, and cpu devices.
+The default device in torchchat is "fast". The "fast" device is a
+virtual device that defaults to the fastest executor available in the
+system, selecting cuda, mps, and cpu in this order.
+
+At present torchchat supports the fast16, fast, bf16, fp16 and fp32
+data types. The default data type for models is "fast16".  The
+"fast16" data type is a virtual data type that defaults to the best
+16-bit floating point data type available on the selected device. The
+"fast" data type is a virtual data type that defaults to the best
+floating point data type available on the selected device.  ("Best"
+tangibly representing a combination of speed and accuracy.)
+
 
 ## Quantization API
 
-Model quantization recipes are specified by a JSON file / dict describing the quantizations to perform.  Each quantization step consists of a quantization higher-level operator, and a dict with any parameters:
+Quantization options are passed in json format either as a config file
+(see [cuda.json](../config/data/cuda.json) and
+[mobile.json](../config/data/mobile.json)) or a JSON string.
 
-```
-{
-  "<quantizer1>: {
-                    <quantizer1_option1>" : value,
-                    <quantizer1_option2>" : value,
-                    ...
-                  },
-  "<quantizer2>: {
-                    <quantizer2_option1>" : value,
-                    <quantizer2_option2>" : value,
-                    ...
-                  },
-  ...
-}
-```
-
-The quantization recipe may be specified either on the commandline as a single running string with `--quantize "<json string>"`, or by specifying a filename containing the recipe as a JSON structure with `--quantize filename.json`. It is recommended to store longer recipes as a JSON file, while the CLI variant may be more suitable for quick ad-hoc experiments.
-
-
-## 8-Bit Embedding Quantization (channelwise & groupwise)
-The simplest way to quantize embedding tables is with int8 "channelwise" (symmetric) quantization, where each value is represented by an 8 bit integer, and a floating point scale per embedding (channelwise quantization) or one scale for each group of values in an embedding (groupwise quantization).
-
-*Channelwise quantization:*
-
-We can do this in eager mode (optionally with torch.compile), we use the embedding quantizer with groupsize set to 0 which uses channelwise quantization:
-
-TODO: Write this so that someone can copy paste
-```
-python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quantize '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
-
-```
-
-Then, export as follows with ExecuTorch:
-```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"embedding": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
-```
-
-Now you can run your model with the same command as before:
-```
-python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --prompt "Hello my name is"
-```
-
-*Groupwise quantization:*
-We can do this in eager mode (optionally with torch.compile), we use the embedding quantizer by specifying the group size:
-
-```
-python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quantize '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
-
-```
-Then, export as follows:
-
-```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"embedding": {"bitwidth": 8, "groupsize": 8} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
-
-```
-
-Now you can run your model with the same command as before:
-```
-python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
-```
-
-## 4-Bit Embedding Quantization (channelwise & groupwise)
-Quantizing embedding tables with int4 provides even higher compression of embedding tables, potentially at the cost of embedding quality and model outcome quality. In 4-bit embedding table quantization, each value is represented by a 4 bit integer with two values packed into each byte to provide greater compression efficiency (potentially at the cost of model quality) over int8 embedding quantization.
-
-*Channelwise quantization:*
-We can do this in eager mode (optionally with torch.compile), we use the embedding quantizer with groupsize set to 0 which uses channelwise quantization:
-
-```
-python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quantize '{"embedding" : {"bitwidth": 4, "groupsize": 0}}' --device cpu
-```
-
-Then, export as follows:
-```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"embedding": {"bitwidth": 4, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
-```
-
-Now you can run your model with the same command as before:
-
-```
-python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --prompt "Hello my name is"
-```
-
-*Groupwise quantization:*
-We can do this in eager mode (optionally with torch.compile), we use the embedding quantizer by specifying the group size:
-
-```
-python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quantize '{"embedding" : {"bitwidth": 4, "groupsize": 8}}' --device cpu
-```
-
-Then, export as follows:
-```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"embedding": {"bitwidth": 4, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte
-```
-
-Now you can run your model with the same command as before:
-```
-python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_emb8b-gw256.pte --prompt "Hello my name is"
-```
-
-## 8-Bit Integer Linear Quantization (linear operator, channel-wise and groupwise)
-
-The simplest way to quantize linear operators is with int8 quantization, where each value is represented by an 8-bit integer, and a floating point scale:
-
-*Channelwise quantization:*
-
-The simplest way to quantize embedding tables is with int8 groupwise quantization, where each value is represented by an 8 bit integer, and a floating point scale per group.
-
-We can do this in eager mode (optionally with torch.compile), we use the linear:int8 quantizer with groupsize set to 0 which uses channelwise quantization:
-
-```
-python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quantize '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
-```
-
-Then, export as follows using ExecuTorch for mobile backends:
-
-```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte
-```
-
-Now you can run your model with the same command as before:
-
-```
-python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.pte --checkpoint-path ${MODEL_PATH}  --prompt "Hello my name is"
-```
-
-Or, export as follows for server/desktop deployments:
-
-```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8.so
-```
-
-Now you can run your model with the same command as before:
-
-```
-python3 generate.py --dso-path ${MODEL_OUT}/${MODEL_NAME}_int8.so --checkpoint-path ${MODEL_PATH}  --prompt "Hello my name is"
-```
-
-*Groupwise quantization:*
-We can do this in eager mode (optionally with torch.compile), we use the linear:int8 quantizer by specifying the group size:
-
-```
-python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quantize '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --device cpu
-```
-Then, export as follows using ExecuTorch:
-
-```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte
-```
-
-**Now you can run your model with the same command as before:**
-
-```
-python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.pte --checkpoint-path ${MODEL_PATH} --prompt "Hello my name is"
-```
-*Or, export*
-```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize '{"linear:int8": {"bitwidth": 8, "groupsize": 0} }' --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.so
-```
-
-Now you can run your model with the same command as before:
-```
-python3 generate.py --pte-path ${MODEL_OUT}/${MODEL_NAME}_int8-gw256.so --checkpoint-path ${MODEL_PATH} -d fp32 --prompt "Hello my name is"
-```
-
-Please note that group-wise quantization works functionally, but has not been optimized for CUDA and CPU targets where the best performnance requires a group-wise quantized mixed dtype linear operator.
-
+The expected JSON format is described below. Refer to the tables above
+for valid `bitwidth` and `groupsize` values.
 
-## 4-Bit Integer Linear Quantization (int4)
-To compress your model even more, 4-bit integer quantization may be used. To achieve good accuracy, we recommend the use of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale.
-
-We can do this in eager mode (optionally with torch.compile), we use the linear:int8 quantizer by specifying the group size:
-
-```
-python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quantize '{"linear:int4" : {"groupsize": 32}}' --device [ cpu | cuda | mps ]
-```
-
-```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize "{'linear:int4': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --output-dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]
-```
-Now you can run your model with the same command as before:
+| compression | JSON string |
+|--|--|
+| linear (asymmetric) | `'{"linear:int<bitwidth>" : {"groupsize" : <groupsize>}}'` |
+| linear with dynamic activations (symmetric) | `'{"linear:a8w4dq" : {"groupsize" : <groupsize>}}'`|
+| linear with GPTQ (asymmetric) | `'{"linear:int4-gptq" : {"groupsize" : <groupsize>}}'`|
+| linear with HQQ (asymmetric) |`'{"linear:hqq" : {"groupsize" : <groupsize>}}'`|
+| embedding | `'{"embedding": {"bitwidth": <bitwidth>, "groupsize":<groupsize>}}'` |
 
-```
-python3 generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.pte | --dso-path ${MODEL_OUT}/${MODEL_NAME}_int4-gw32.dso]  --prompt "Hello my name is"
-```
+See the available quantization schemes [here](https://github.com/pytorch/torchchat/blob/main/quantize.py#L1260-L1266).
 
-## 4-Bit Integer Linear Quantization  (a8w4dq)
-To compress your model even more, 4-bit integer quantization may be used. To achieve good accuracy, we recommend the use of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale. We also quantize activations to 8-bit, giving this scheme its name (a8w4dq = 8-bit dynamically quantized activations with 4b weights), and boost performance.
+## Examples
+We can mix and match weight quantization with embedding quantization.
 
-**TODO (Digant): a8w4dq eager mode support [#335](https://github.com/pytorch/torchchat/issues/335) **
-```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize "{'linear:a8w4dq': {'groupsize' : 7} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_8da4w.pte | ...dso... ]
-```
+[skip default]: begin
+* Config file
+  ```
+  --quantize quant_config.json
+  ```
+* Only quantize linear layers
+  ```
+  --quantize '{"linear:a8w4dq": {"groupsize" : 256}}'
+  ```
+* Quantize linear layers and embedding lookup
+  ```
+  --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}'
+  ```
+[skip default]: end
 
-Now you can run your model with the same command as before:
+Quantization recipes can be applied in conjunction with any of the
+`chat`, `generate`, `browser` and `export` commands. Below are
+examples showcasing eager mode with `generate` and AOTI and ExecuTorch
+with `export`.
 
-```
-python3 generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_a8w4dq.pte | ...dso...]  --prompt "Hello my name is"
+### Eager mode
 ```
-
-## 4-bit Integer Linear Quantization with GPTQ (gptq)
-Compression offers smaller memory footprints (to fit on memory-constrained accelerators and mobile/edge devices) and reduced memory bandwidth (for better performance), but often at the  price of quality degradation.  GPTQ 4-bit integer quantization may be used to reduce the quality impact. To achieve good accuracy, we recommend the use of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale. 
-
-**TODO (Jerry): GPTQ quantization documentation [#336](https://github.com/pytorch/torchchat/issues/336) **
-
-We can use GPTQ with eager execution, optionally in conjunction with torch.compile:
+python3 generate.py [--compile] llama3 --prompt "Hello, my name is" --quantize '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
 ```
-python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quantize '{"linear:int4" : {"groupsize": 32}}' --device [ cpu | cuda | mps ]
+### AOTI
 ```
+python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:int4": {"groupsize" : 256}}' --output-dso-path llama3.so
 
+python3 generate.py llama3 --dso-path llama3.so  --prompt "Hello my name is"
 ```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize "{'linear:gptq': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ] 
+### ExecuTorch
 ```
-Now you can run your model with the same command as before:
+python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}' --output-pte-path llama3.pte
 
-```
-python3 generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso...]  --prompt "Hello my name is"
+python3 generate.py llama3 --pte-path llama3.pte  --prompt "Hello my name is"
 ```
-
-## 4-bit Integer Linear Quantization with HQQ (hqq)
-
-Compression offers smaller memory footprints (to fit on memory-constrained accelerators and mobile/edge devices) and reduced memory bandwidth (for better performance), but often at the  price of quality degradation.  GPTQ 4-bit integer quantization may be used to reduce the quality impact, but at the cost of significant additional computation time. HQQ Quantization balances performance, accuracy, and runtime, we recommend the use of groupwise quantization where (small to mid-sized) groups of int4 weights share a scale. 
 
-**TODO (Zhengxu): HQQ quantization documentation [#337](https://github.com/pytorch/torchchat/issues/336) **
+## Model precision (dtype precision setting)
+On top of quantizing models with integer quantization schemes mentioned above, models can be converted to lower bit floating point precision to reduce the memory bandwidth requirement and take advantage of higher density compute available. For example, many GPUs and some of the CPUs have good support for BFloat16 and Float16. This can be taken advantage of via `--dtype` arg as shown below.
 
-We can use HQQ with eager execution, optionally in conjunction with torch.compile:
+[skip default]: begin
 ```
-python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --quantize '{"linear:hqq" : {"groupsize": 32}}' --device [ cpu | cuda | mps ]
+python3 generate.py --dtype [ fast16 | fast | bf16 | fp16 | fp32] ...
+python3 export.py --dtype [ fast16 | fast | bf16 | fp16 | fp32] ...
 ```
+[skip default]: end
 
-```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quantize "{'linear:hqq': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_hqq.pte | ...dso... ] 
-```
-Now you can run your model with the same command as before:
-
-```
-python3 generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_hqq.pte | ...dso...]  --prompt "Hello my name is"
+Unlike gpt-fast which uses bfloat16 as default, torchchat uses the dtype "fast16" as the default. Torchchat will pick the appropriate 16-bit floating point type available and offering the best performance (for execution with Executorch, macOS/ARM and Linux/x86 platforms).  For macOS, support depends on the OS version, with versions starting with 14.0 supporting bfloat16 as support, and float16 for earlier OS version based on system support for these data types.  
 
+Support for FP16 and BF16 is limited in many embedded processors and -dtype fp32 may be required in some environments. Additional ExecuTorch support for 16-bit floating point types may be added in the future based on hardware support.
 
 ## Adding additional quantization schemes
 We invite contributors to submit established quantization schemes, with accuracy and performance results demonstrating soundness.
@@ -284,4 +163,6 @@ We invite contributors to submit established quantization schemes, with accuracy
 - Describe how to choose a quantization scheme. Which factors should they take into account? Concrete recommendations for use cases, esp. mobile.
 - Quantization reference, describe options for --quantize parameter
 - Show a table with performance/accuracy metrics
-- Quantization support matrix? torchat Quantization Support Matrix
+- Quantization support matrix? torchchat Quantization Support Matrix
+
+[end default]: end

@@ -1,0 +1,91 @@
+name: Run the README instructions - with stories - on MPS/MacOS
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  test-readme-mps-macos:
+    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
+    secrets: inherit
+    with:
+      runner: macos-m1-14
+      secrets-env: "HF_TOKEN_PERIODIC"
+      script: |
+          conda create -y -n test-readme-mps-macos python=3.10.11
+          conda activate test-readme-mps-macos
+          set -x
+          # NS: Remove previous installation  of torch first
+          # as this script does not isntall anything into conda env but rather as system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
+
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+          echo "::endgroup::"
+
+          # echo "::group::Install newer objcopy that supports --set-section-alignment"
+          # yum install -y  devtoolset-10-binutils
+          # export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+          # echo "::endgroup::"
+  
+          echo "::group::Create script to run README"
+          python3 scripts/updown.py --file README.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-readme.sh
+          # for good measure, if something happened to updown processor,
+          # and it did not error out, fail with an exit 1
+          echo "exit 1" >> ./run-readme.sh
+          echo "::endgroup::"
+  
+          echo "::group::Run README"
+          echo "*******************************************"
+          cat ./run-readme.sh
+          echo "*******************************************"
+          bash -x ./run-readme.sh
+          echo "::endgroup::"
+	  
+  test-quantization-mps-macos:
+    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
+    with:
+      runner: macos-m1-stable  # neeps MPS, was macos-m1-stable
+      script: |
+          set -x
+          conda create -y -n test-quantization-mps-macos python=3.10.11
+          conda activate test-quantization-mps-macos
+          # NS: Remove previous installation  of torch first
+          # as this script does not isntall anything into conda env
+          #but rather  system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
+
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+          echo "::endgroup::"
+
+          # echo "::group::Install newer objcopy that supports --set-section-algnment"
+          # yum install -y  devtoolset-10-binutils
+          # export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+          # echo "::endgroup::"
+  
+          echo "::group::Create script to run quantization"
+          python3 scripts/updown.py --file docs/quantization.md --replace llama3:stories15M --suppress huggingface-cli,HF_TOKEN > ./run-quantization.sh
+          # for good measure, if something happened to updown processor,
+          # and it did not error out, fail with an exit 1
+          echo "exit 1" >> ./run-quantization.sh
+          echo "::endgroup::"
+  
+          echo "::group::Run quantization"
+          echo "*******************************************"
+          cat ./run-quantization.sh
+          echo "*******************************************"
+          bash -x ./run-quantization.sh
+          echo "::endgroup::"
+  
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"

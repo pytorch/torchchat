@@ -15,7 +15,7 @@ import torch.nn as nn
 from torch import Tensor
 from torch.nn import functional as F
 
-from build.utils import find_multiple, get_precision, use_aoti_backend
+from build.utils import find_multiple, get_precision
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
@@ -36,7 +36,8 @@ class ModelArgs:
     norm_eps: float = 1e-5
     multiple_of: int = 256
     ffn_dim_multiplier: Optional[int] = None
-    use_tiktoken: Optional[bool] = None
+    use_tiktoken: bool = False
+    max_seq_length: int = 8192
 
     def __post_init__(self):
         if self.n_local_heads == -1:
@@ -68,7 +69,6 @@ class ModelArgs:
 
     @classmethod
     def from_table(cls, name: str):
-        print(f"name {name}")
         json_path = config_path / f"{name}.json"
         if json_path.is_file():
             return ModelArgs.from_params(json_path)
@@ -82,7 +82,6 @@ class ModelArgs:
 
     @classmethod
     def from_name(cls, name: str):
-        print(f"name {name}")
         json_path = config_path / f"{name}.json"
         if Path(json_path).is_file():
             return ModelArgs.from_params(json_path)
@@ -125,8 +124,10 @@ class KVCache(nn.Module):
         dtype=None,
     ):
         super().__init__()
+        # print(f"dtype on entry {dtype}")
         if not dtype:
             dtype = get_precision()
+        # print(f"dtype on get_prec {dtype}")
         cache_shape = (max_batch_size, n_heads, max_seq_length, head_dim)
         self.register_buffer("k_cache", torch.zeros(cache_shape, dtype=dtype))
         self.register_buffer("v_cache", torch.zeros(cache_shape, dtype=dtype))
