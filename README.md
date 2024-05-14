@@ -89,7 +89,12 @@ View available models with:
 python3 torchchat.py list
 ```
 
-You can also remove downloaded models with the remove command:
+Query the location of a particular model -- this is particularly useful in scripts when you do not want to hard-code paths:
+```
+python3 torchchat.py where llama3
+```
+
+Finally, you can also remove downloaded models with the remove command:
 `python3 torchchat.py remove llama3`
 
 
@@ -159,7 +164,7 @@ NOTE: If your machine has cuda add this flag for performance
 
 ### Running native using our C++ Runner
 
-The end-to-end C++ [runner](runner/run.cpp) runs an `*.so` file
+The end-to-end C++ [runner](runner/run.cpp) runs a [DSO](https://en.wikipedia.org/wiki/Shared_library)  model (represented by a file with extension `.so`)
 exported in the previous step.
 
 To build the runner binary on your Mac or Linux:
@@ -170,7 +175,7 @@ scripts/build_native.sh aoti
 [skip default]: begin
 Execute
 ```bash
-cmake-out/aoti_run exportedModels/llama3.so -z ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time"
 ```
 [skip default]: end
 
@@ -250,9 +255,19 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
 
 ### Deploy and run on Android
 
+**This section is copied from the original REAMDE and may require additional integration work**
 
+Please refer to our [tutorial on how to build an Android app running
+your PyTorch models with
+Executorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html)
+to for an example on how to run your torchchat models on Android.
 
-MISSING. TBD.
+![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png
+ "Android app running Llama model")
+
+Detailed step by step in conjunction with ET Android build, to run on
+simulator for Android. `scripts/android_example.sh` for running a
+model on an Android simulator (on Mac), and in `docs/Android.md`.
 
 
 

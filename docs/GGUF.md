@@ -1,16 +1,27 @@
 # Using GGUF Models
-We support parsing [GGUF](https://github.com/ggerganov/ggml/blob/master/docs/gguf.md) files with the following tensor types:
+
+[shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
+
+[shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
+
+We support parsing [GGUF](https://github.com/ggerganov/ggml/blob/master/docs/gguf.md) files with
+the following tensor types:
 - F16
 - F32
 - Q4_0
 - Q6_K
 
-If an unsupported type is encountered while parsing a GGUF file, an exception is raised.
+If an unsupported type is encountered while parsing a GGUF file, an
+exception is raised.
 
 We now go over an example of using GGUF files in the torchchat flow.
 
 ### Download resources
-First download a GGUF model and tokenizer.  In this example, we use a Q4_0 GGUF file.  (Note that Q4_0 is only the dominant tensor type in the file, but the file also contains GGUF tensors of types Q6_K, F16, and F32.)
+
+First download a GGUF model and tokenizer.  In this example, we use a
+Q4_0 GGUF file.  (Note that Q4_0 is only the dominant tensor type in
+the file, but the file also contains GGUF tensors of types Q6_K, F16,
+and F32.)
 
 ```
 # Download resources
@@ -55,3 +66,5 @@ python3 torchchat.py export --gguf-path ${GGUF_MODEL_PATH} --output-pte-path ${G
 # Generate using the PTE model that was created by the export command
 python3 torchchat.py generate --gguf-path ${GGUF_MODEL_PATH} --pte-path ${GGUF_PTE_PATH} --tokenizer-path ${GGUF_TOKENIZER_PATH} --temperature 0 --prompt "Once upon a time" --max-new-tokens 15
 ```
+
+[end default]: end
