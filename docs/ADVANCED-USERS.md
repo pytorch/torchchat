@@ -132,21 +132,9 @@ GGUF model with the option `--load-gguf ${MODELNAME}.gguf`. Presently,
 the F16, F32, Q4_0, and Q6_K formats are supported and converted into
 native torchchat models.
 
-You may also dequantize GGUF models with the GGUF quantize tool, and
-then load and requantize with torchchat native quantization options.
-
 | GGUF Model | Tested | Eager | torch.compile | AOT Inductor | ExecuTorch | Fits on Mobile |
 |-----|--------|-------|-----|-----|-----|-----|
 | llama-2-7b.Q4_0.gguf |  🚧 | 🚧 | 🚧 | 🚧 | 🚧 |
-
-You may also dequantize GGUF models with the GGUF quantize tool, and
-then load and requantize with torchchat native quantization options.
-
-**Please note that quantizing and dequantizing is a lossy process, and
-you will get the best results by starting with the original
-unquantized model checkpoint, not a previously quantized and then
-dequantized model.**
-
 
 ## Conventions used in this document
 
@@ -232,7 +220,7 @@ submission guidelines.)
 
 Torchchat supports several devices.  You may also let torchchat use
 heuristics to select the best device from available devices using
-torchchat's virtual device named `fast`. 
+torchchat's virtual device named `fast`.
 
 Torchchat supports execution using several floating-point datatypes.
 Please note that the selection of execution floating point type may
@@ -398,9 +386,9 @@ linear operator (asymmetric) with GPTQ | n/a | 4b (group) | n/a |
 linear operator (asymmetric) with HQQ | n/a |  work in progress | n/a |
 
 ## Model precision (dtype precision setting)
-On top of quantizing models with quantization schemes mentioned above, models can be converted 
-to lower precision floating point representations to reduce the memory bandwidth requirement and 
-take advantage of higher density compute available. For example, many GPUs and some of the CPUs 
+On top of quantizing models with quantization schemes mentioned above, models can be converted
+to lower precision floating point representations to reduce the memory bandwidth requirement and
+take advantage of higher density compute available. For example, many GPUs and some of the CPUs
 have good support for bfloat16 and float16. This can be taken advantage of via `--dtype arg` as shown below.
 
 [skip default]: begin
@@ -437,30 +425,6 @@ embedding table quantization as described under quantization. (You
 cannot directly requantize already quantized formats. However, you
 may dequantize them using GGUF tools, and then laod the model into
 torchchat to quantize with torchchat's quantization workflow.)
-
-
-## Loading unsupported GGUF formats in torchchat
-
-GGUF formats not presently supported natively in torchchat may be
-converted to one of the supported formats with GGUF's
-`${GGUF}/quantize` utility to be loaded in torchchat. If you convert
-to the FP16 or FP32 formats with GGUF's `quantize` utility, you may
-then requantize these models with torchchat's quantization workflow.
-
-**Note that quantizing and dequantizing is a lossy process, and you will
-get the best results by starting with the original unquantized model
-checkpoint, not a previously quantized and then dequantized
-model.** Thus, while you can convert your q4_1 model to FP16 or FP32
-GGUF formats and then requantize, you might get better results if you
-start with the original FP16 or FP32 GGUF format.
-
-To use the quantize tool, install the GGML tools at ${GGUF} . Then,
-you can, for example, convert a quantized model to f16 format:
-
-[end default]: end
-```
-${GGUF}/quantize --allow-requantize your_quantized_model.gguf fake_unquantized_model.gguf f16
-```
 
 
 ## Optimizing your model for server, desktop and mobile devices

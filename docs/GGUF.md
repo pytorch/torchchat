@@ -56,7 +56,6 @@ python3 torchchat.py generate --gguf-path ${GGUF_MODEL_PATH} --dso-path ${GGUF_S
 
 ```
 
-
 ### ExecuTorch export + generate
 Before running this example, you must first [Set-up ExecuTorch](executorch_setup.md).
 ```
@@ -66,5 +65,29 @@ python3 torchchat.py export --gguf-path ${GGUF_MODEL_PATH} --output-pte-path ${G
 # Generate using the PTE model that was created by the export command
 python3 torchchat.py generate --gguf-path ${GGUF_MODEL_PATH} --pte-path ${GGUF_PTE_PATH} --tokenizer-path ${GGUF_TOKENIZER_PATH} --temperature 0 --prompt "Once upon a time" --max-new-tokens 15
 ```
+
+### Advanced: loading unsupported GGUF formats in torchchat
+GGUF formats not presently supported natively in torchchat can be
+converted to one of the supported formats with GGUF's
+[quantize](https://github.com/ggerganov/llama.cpp/tree/master/examples/quantize) utility.
+If you convert to the FP16 or FP32 formats with GGUF's quantize utility, you can
+then requantize these models with torchchat's native quantization workflow.
+
+**Please note that quantizing and dequantizing is a lossy process, and
+you will get the best results by starting with the original
+unquantized model, not a previously quantized and then
+dequantized model.**
+
+As an example, suppose you have [llama.cpp cloned and installed](https://github.com/ggerganov/llama.cpp) at ~/repos/llama.cpp.
+You can then convert a model to FP16 with the following command:
+
+[skip default]: begin
+```
+~/repos/llama.cpp/quantize --allow-requantize path_of_model_you_are_converting_from.gguf path_for_model_you_are_converting_to.gguf fp16
+```
+[skip default]: end
+
+After the model is converted to a supported format like FP16, you can proceed using the instructions above.
+
 
 [end default]: end
