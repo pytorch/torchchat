@@ -83,31 +83,6 @@ class QuantHandler:
 
 
 #########################################################################
-###          QuantHandler wrapper for a8w4dq from torchao             ###
-#
-#
-# class Int8DynActInt4WeightQuantizer(QuantHandler):
-#    def __init__(self, model: nn.Module, device="cpu", tokenizer=None, **kwargs):
-#        import torchao.quantization.quant_api as quant_api
-#
-#        self.model_ = model
-#        self.device = device
-#        self.tokenizer = tokenizer
-#        self.quantizer = quant_api.Int8DynActInt4WeightQuantizer(
-#            **kwargs, precision=get_precision(), scales_precision=get_precision()
-#        )
-#
-#    def create_quantized_state_dict(self) -> Dict:  # "StateDict"
-#        pass
-#
-#    def convert_for_runtime(self) -> nn.Module:
-#        pass
-#
-#    def quantized_model(self) -> nn.Module:
-#        return self.quantizer.quantize(self.model_)
-#
-#
-#########################################################################
 ###           wrapper for setting precision as a QuantHandler         ###
 
 
@@ -118,7 +93,7 @@ class PrecisionHandler(QuantHandler):
         self.tokenizer = tokenizer
 
         if isinstance(dtype, str):
-            dtype = name_to_dtype(dtype)
+            dtype = name_to_dtype(dtype, device)
         self.dtype = dtype
 
     def create_quantized_state_dict(self) -> Dict:  # "StateDict"
@@ -457,8 +432,8 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
                             groupsize=self.groupsize,
                         ),
                     )
-                else:
-                    self.quantize(child)
+            else:
+                self.quantize(child)
 
         return module
 

@@ -130,13 +130,15 @@ def get_precision():
 ###               dtype name to torch.dtype mapping                    ###
 
 
-def name_to_dtype(name):
+def name_to_dtype(name, device):
     if (name == "fast") or (name == "fast16"):
         # MacOS now supports bfloat16
         import platform
 
         if platform.processor() == "arm":
-            if int(platform.mac_ver()[0].split(".")[0]) < 14:
+            device=get_device_str(device)
+            # ARM CPU is faster with float16, MPS with bf16 if supported
+            if device == "cpu" or int(platform.mac_ver()[0].split(".")[0]) < 14:
                 return torch.float16
         return torch.bfloat16
 
@@ -227,8 +229,8 @@ def is_mps_available() -> bool:
     # out system says mps is available, but it's not on VMs
     # so let's set up some memry, and see if that work:
     try:
-        mps_tensor = torch.zero(1024, dtype=torch.float16, device="mps")
-    except:
+        mps_tensor = torch.zeros(1024, dtype=torch.float16, device="mps")
+    except RuntimeError:
         return False
 
     # MPS, is that you?
@@ -237,11 +239,12 @@ def is_mps_available() -> bool:
 
 def get_device_str(device) -> str:
     if isinstance(device, str) and device == "fast":
-        return (
+        device = (
             "cuda"
             if torch.cuda.is_available()
             else "mps" if is_mps_available() else "cpu"
         )
+        return device
     else:
         return str(device)
 
@@ -254,3 +257,11 @@ def get_device(device) -> str:
             else "mps" if is_mps_available() else "cpu"
         )
     return torch.device(device)
+
+
+def is_cuda_or_cpu_device(device) -> bool:
+    return device == "" or str(device) == "cpu" or ("cuda" in str(device))
+
+
+def is_cpu_device(device) -> bool:
+    return device == "" or str(device) == "cpu"

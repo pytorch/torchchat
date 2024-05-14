@@ -10,6 +10,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
+from utils.measure_time import measure_time
 
 import torch
 import torch._dynamo.config
@@ -19,7 +20,7 @@ from config.model_config import resolve_model_config
 from quantize import quantize_model
 
 from build.model import Transformer
-from build.utils import device_sync, name_to_dtype
+from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
 
 
 @dataclass
@@ -119,11 +120,14 @@ class BuilderArgs:
 
         if args.output_pte_path and args.dtype.startswith("fast"):
             if args.dtype == "fast":
+                # As per Kimish, float32 should be faster on ET XNNPACK
+                # (because fp16 is implemented as upcast to fp32 for several
+                # operators, and in particular a8w4dq and ET's sdpa+kv)
                 dtype = torch.float32
             else:
                 dtype = torch.float16
         else:
-            dtype = name_to_dtype(args.dtype)
+            dtype = name_to_dtype(args.dtype, args.device)
 
         return cls(
             checkpoint_dir=checkpoint_dir,
@@ -195,7 +199,7 @@ class TokenizerArgs:
             return
 
         if self.is_tiktoken == self.is_sentencepiece:
-            raise RuntimeError("no tokenizer was found")
+            raise RuntimeError(f"no tokenizer was found at {self.tokenizer_path}")
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
@@ -371,14 +375,19 @@ def _initialize_model(
         _set_gguf_kwargs(builder_args, is_et=is_pte, context="generate")
 
     if builder_args.dso_path:
+        if not is_cuda_or_cpu_device(builder_args.device):
+            print(
+                f"Cannot load specified DSO to {builder_args.device}. Attempting to load model to CPU instead"
+            )
+            builder_args.device = "cpu"
+
         # assert (
         #     quantize is None or quantize == "{ }"
         # ), "quantize not valid for exported DSO model. Specify quantization during export."
 
-        t0 = time.time()
-        model = _load_model(builder_args, only_config=True)
-        device_sync(device=builder_args.device)
-        print(f"Time to load model: {time.time() - t0:.02f} seconds")
+        with measure_time("Time to load model: {time:.02f} seconds"):
+            model = _load_model(builder_args, only_config=True)
+            device_sync(device=builder_args.device)
 
         try:
             # Replace model forward with the AOT-compiled forward
@@ -393,14 +402,19 @@ def _initialize_model(
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {builder_args.dso_path}")
     elif builder_args.pte_path:
+        if not is_cpu_device(builder_args.device):
+            print(
+                f"Cannot load specified PTE to {builder_args.device}. Attempting to load model to CPU instead"
+            )
+            builder_args.device = "cpu"
+
         # assert (
         #     quantize is None or quantize == "{ }"
         # ), "quantize not valid for exported PTE model. Specify quantization during export."
 
-        t0 = time.time()
-        model = _load_model(builder_args, only_config=True)
-        device_sync(device=builder_args.device)
-        print(f"Time to load model: {time.time() - t0:.02f} seconds")
+        with measure_time("Time to load model: {time:.02f} seconds"):
+            model = _load_model(builder_args, only_config=True)
+            device_sync(device=builder_args.device)
 
         try:
             from build.model_et import PTEModel
@@ -409,17 +423,15 @@ def _initialize_model(
         except Exception:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
     else:
-        t0 = time.time()
-        model = _load_model(builder_args)
-        device_sync(device=builder_args.device)
-        print(f"Time to load model: {time.time() - t0:.02f} seconds")
+        with measure_time("Time to load model: {time:.02f} seconds"):
+            model = _load_model(builder_args)
+            device_sync(device=builder_args.device)
 
         if quantize:
-            t0q = time.time()
             print(f"Quantizing the model with: {quantize}")
-            quantize_model(model, builder_args.device, quantize, tokenizer)
-            device_sync(device=builder_args.device)
-            print(f"Time to quantize model: {time.time() - t0q:.02f} seconds")
+            with measure_time("Time to quantize model: {time:.02f} seconds"):
+                quantize_model(model, builder_args.device, quantize, tokenizer)
+                device_sync(device=builder_args.device)
 
         if builder_args.setup_caches:
             with torch.device(builder_args.device):

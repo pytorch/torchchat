@@ -1,4 +1,4 @@
-name: Run the README instructions - with stories 
+name: Run the README instructions - with stories
 
 on:
   pull_request:
@@ -10,6 +10,57 @@ on:
 jobs:
   test-readme-any:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    secrets: inherit
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      secrets-env: "HF_TOKEN_PERIODIC"
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      timeout: 60
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
+        .ci/scripts/run-docs readme
+
+        echo "::group::Completion"
+        echo "tests complete"
+        echo "*******************************************"
+        echo "::endgroup::"
+
+  test-readme-cpu:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      secrets-env: "HF_TOKEN_PERIODIC"
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      timeout: 60
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
+        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
+
+        echo "::group::Completion"
+        echo "tests complete"
+        echo "*******************************************"
+        echo "::endgroup::"
+
+  test-quantization-any:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
@@ -20,24 +71,140 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        # echo "::group::Install newer objcopy that supports --set-section-alignment"
-        # yum install -y  devtoolset-10-binutils
-        # export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        # echo "::endgroup::"
-
-        echo "::group::Create script"
-        python3 scripts/updown.py --file README.md --replace llama3:stories15M --suppress huggingface-cli,HF_TOKEN > ./we-run-this.sh
-        # for good measure, if something happened to updown processor,
-        # and it did not error out, fail with an exit 1
-        echo "exit 1" >> ./we-run-this.sh
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
-        echo "::group::Run This"
-        echo "*******************************************"
-        cat ./we-run-this.sh
-        echo "*******************************************"
-        bash -x ./we-run-this.sh
-        
+        .ci/scripts/run-docs quantization
+
+        echo "::group::Completion"
         echo "tests complete"
         echo "*******************************************"
         echo "::endgroup::"
+
+  test-quantization-cpu:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      timeout: 60
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
+        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
+
+  test-gguf-any:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    secrets: inherit
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      secrets-env: "HF_TOKEN_PERIODIC"
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      timeout: 60
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
+        .ci/scripts/run-docs gguf
+
+        echo "::group::Completion"
+        echo "tests complete"
+        echo "*******************************************"
+        echo "::endgroup::"
+
+  test-gguf-cpu:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    secrets: inherit
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      secrets-env: "HF_TOKEN_PERIODIC"
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      timeout: 60
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
+        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs gguf
+
+        echo "::group::Completion"
+        echo "tests complete"
+        echo "*******************************************"
+        echo "::endgroup::"
+
+
+  test-advanced-any:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    secrets: inherit
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      secrets-env: "HF_TOKEN_PERIODIC"
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      timeout: 60
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
+        .ci/scripts/run-docs advanced
+
+        echo "::group::Completion"
+        echo "tests complete"
+        echo "*******************************************"
+        echo "::endgroup::"
+
+
+  test-advanced-cpu:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    secrets: inherit
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      secrets-env: "HF_TOKEN_PERIODIC"
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      timeout: 60
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
+        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
+
+        echo "::group::Completion"
+        echo "tests complete"
+        echo "*******************************************"
+        echo "::endgroup::"
+

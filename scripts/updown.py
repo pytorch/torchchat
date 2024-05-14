@@ -53,6 +53,14 @@ def output(*args, **kwargs):
 ###
 
 
+def select_first_option_between_brackets(text):
+    return re.sub(r"\[([^]|]*?)\|[^]]*]", r"\1", text)
+
+
+def select_last_option_between_brackets(text):
+    return re.sub(r"\[[^]]*\|([^]|]*)\]", r"\1", text)
+
+
 def remove_text_between_brackets(text):
     return re.sub(r"\[.*?\]", "", text)
 
@@ -75,6 +83,15 @@ def updown_process_line(
     line, lineno, filename, replace_list, suppress_list, expand_options
 ):
     if not expand_options:
+        # [ x1 | c2 | x3 ] means "pick one", so we may have to check that and pick one
+        # of the options.  Probably pick the last option because testing has more likely
+        # been performed with the first option!
+        last=True
+        if last:
+            line=select_last_option_between_brackets(line)
+        else:
+            line=select_first_option_between_brackets(line)
+            
         output(
             remove_text_between_brackets(line),
             replace_list=replace_list,
@@ -111,7 +128,7 @@ def updown_process_line(
 
 
 def process_command(
-    line, lineno, filename, predicate_list, replace_list, suppress_list
+    line, lineno, filename, predicate_list, replace_list, suppress_list, create_sections
 ) -> bool:
 
     command = r"^\[\s*(\w+)\s+(\w+)\s*\]\s*:\s*(.*)"
@@ -137,7 +154,7 @@ def process_command(
         )
     elif keyword == "prefix":
         output(
-            trailing_command[:-1],
+            trailing_command,
             end="",
             replace_list=replace_list,
             suppress_list=suppress_list,
@@ -163,12 +180,31 @@ def process_command(
             )
             exit(1)
     elif keyword == "end":
+        if create_sections:
+            output(
+                "echo '::endgroup::'",
+                suppress_list=None,
+                replace_list=None,
+            )
         output(
             "exit 0",
             replace_list=replace_list,
             suppress_list=suppress_list,
         )
         exit(0)
+    elif keyword == "comment":
+        output(
+            "# " + trailing_command,
+            suppress_list=None,
+            replace_list=None,
+        )
+    else:
+        output(
+            "echo 'unknown updown command'\nexit 1",
+            suppress_list=None,
+            replace_list=None,
+        )
+        exit(1)
 
     # We have processed this line as a command
     return True
@@ -181,7 +217,12 @@ def process_command(
 
 
 def updown_processor(
-    filename, predicate_list, replace_list, suppress_list, expand_options
+    filename,
+    predicate_list,
+    replace_list,
+    suppress_list,
+    expand_options,
+    create_sections,
 ):
     """
     Processes a file based on the given predicates, replacements, and suppressions.
@@ -199,6 +240,12 @@ def updown_processor(
 
     output("set -eou pipefail", replace_list=None, suppress_list=None)
 
+    if create_sections:
+        output(
+            "echo '::group::start-of-document'",
+            suppress_list=None,
+            replace_list=None,
+        )
     for lineno, line in enumerate(lines):
         # clip trailing newline
         if line.endswith("\n"):
@@ -211,10 +258,33 @@ def updown_processor(
             predicate_list=predicate_list,
             replace_list=replace_list,
             suppress_list=suppress_list,
+            create_sections=create_sections,
         ):
             pass
-        elif line.startswith("```"):
+        elif re.search(r"^\s*```", line):
             print_flag = not print_flag
+        elif (match := re.search(r"^#\s+([\w\s]+)", line)) and create_sections:
+            output(
+                f"echo '::endgroup::'",
+                suppress_list=None,
+                replace_list=None,
+            )
+            output(
+                f"echo '::group::{match.group(0)}'",
+                suppress_list=None,
+                replace_list=None,
+            )
+        elif (match := re.search(r"^##\s+([\w\s]+)", line)) and create_sections:
+            output(
+                f"echo '::endgroup::'",
+                suppress_list=None,
+                replace_list=None,
+            )
+            output(
+                f"echo '::group::{match.group(0)}'",
+                suppress_list=None,
+                replace_list=None,
+            )
         elif print_flag:
             updown_process_line(
                 line=line,
@@ -249,6 +319,9 @@ def main():
     parser.add_argument(
         "-e", "--expand-options", action="store_true", help="Expand options flag"
     )
+    parser.add_argument(
+        "-g", "--create-sections", action="store_true", help="Expand options flag"
+    )
     args = parser.parse_args()
     # Get filename
     filename = args.filename
@@ -269,7 +342,12 @@ def main():
     suppress_list = args.suppress.split(",") if args.suppress else []
     # Call updown_processor function
     updown_processor(
-        filename, predicate_list, replace_list, suppress_list, args.expand_options
+        filename,
+        predicate_list,
+        replace_list,
+        suppress_list,
+        args.expand_options,
+        args.create_sections,
     )
 
 
