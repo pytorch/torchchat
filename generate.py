@@ -752,12 +752,12 @@ def _main(
             # Don't continue here.... because we need to report and reset
             # continue
 
-        print(
+        logging.info(
             f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_sec:.02f} tokens/sec"
         )
-        print(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
+        logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
         if i == 0:
-            print(
+            logging.info(
                 f"*** This first iteration will include cold start effects for dynamic import, hardware caches{', JIT compilation' if jit_compile else ''}. ***"
             )
         if start_pos >= max_seq_length:
