@@ -35,7 +35,7 @@ def create_app(*args):
             except:
                 continue
 
-            if decoded.startswith("System Prompt") and decoded.endswith(": "):
+            if decoded.endswith("Do you want to enter a system prompt? Enter y for yes and anything else for no. \n"):
                 print(f"| {decoded}")
                 proc.stdin.write("\n".encode("utf-8"))
                 proc.stdin.flush()
@@ -93,6 +93,8 @@ def create_app(*args):
         model_prefix = "Model: "
         if output.startswith(model_prefix):
             output = output[len(model_prefix) :]
+        else:
+            print("But output is", output)
 
         global convo
 
