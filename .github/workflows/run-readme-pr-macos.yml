@@ -49,7 +49,7 @@ jobs:
   
   
   test-quantization-macos:
-    runs-on: macos-14-xlarge 
+    runs-on: [macos-14-xlarge macos-m1-14]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -96,8 +96,7 @@ jobs:
 
 
   test-gguf-macos:
-    runs-on: macos-14-xlarge
-    secrets: inherit
+    runs-on: [macos-14-xlarge macos-m1-14]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -110,7 +109,6 @@ jobs:
         with:
           xcode-version: '15.3'
       - name: Run script
-        secrets-env: "HF_TOKEN_PERIODIC"		
         run: |
           set -x
           # NS: Remove previous installation  of torch first
