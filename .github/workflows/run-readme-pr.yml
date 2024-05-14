@@ -174,7 +174,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Create script to run advanced"
-        python3 scripts/updown.py --file docs/ADVANCED-USERS.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-advanced.sh
+        python3 scripts/updown.py --file docs/ADVANCED-USERS.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-advanced.sh
         # for good measure, if something happened to updown processor,
         # and it did not error out, fail with an exit 1
         echo "exit 1" >> ./run-advanced.sh
@@ -212,7 +212,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Create script to run torchtune"
-        python3 scripts/updown.py --file docs/torchtune.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-torchtune.sh
+        python3 scripts/updown.py --file docs/torchtune.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-torchtune.sh
         # for good measure, if something happened to updown processor,
         # and it did not error out, fail with an exit 1
         echo "exit 1" >> ./run-torchtune.sh

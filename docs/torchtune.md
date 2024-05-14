@@ -5,9 +5,17 @@
 [comment default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
 -->
 
+torchtune is a pytorch application for configuration-controlled finetuning
+of large-language models such as llama3 and llama2, and many
+more. torchtune can be configured to operate with a variety of
+corpora.  The default config fine-tunes on alpaca, which is pulled
+from HF Hub. When you install torchtune, this is part of the
+dependencies.
+
 torchchat supports running inference with models fine-tuned using
 [torchtune](https://github.com/pytorch/torchtune). To do so, we first
 need to convert the checkpoints into a format supported by torchchat.
+
 
 Below is a simple workflow to run inference on a fine-tuned Llama3
 model. For more details on how to fine-tune Llama3, see the
