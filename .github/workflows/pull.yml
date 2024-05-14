@@ -426,7 +426,7 @@ jobs:
   test-tinystories-executorch:
     strategy:
       matrix:
-        runner: [16-core-ubuntu, macos-14-xlarge]
+        runner: [16-core, macos-14-xlarge]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -868,7 +868,7 @@ jobs:
   runner-et:
     strategy:
       matrix:
-        runner: [16-core-ubuntu, macos-14-xlarge]
+        runner: [16-core, macos-14-xlarge]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -963,7 +963,7 @@ jobs:
   runner-aoti:
     strategy:
       matrix:
-        runner: [16-core-ubuntu, macos-14-xlarge]
+        runner: [16-core, macos-14-xlarge]
     runs-on: ${{matrix.runner}}
     env:
       TORCHCHAT_ROOT: ${{ github.workspace }}
