@@ -1,8 +1,5 @@
 package org.pytorch.torchchat;
 
-import android.content.Context;
-
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Test;
@@ -24,11 +21,20 @@ public class LlamaModuleTest {
         LlamaModule module = new LlamaModule("/data/local/tmp/llm/model.pte", "/data/local/tmp/llm/tokenizer.bin", 0.8f);
         assertEquals(module.load(), 0);
         MyLlamaCallback callback = new MyLlamaCallback();
+        // Note: module.generate() is synchronous. Callback happens within the same thread as
+        // generate() so when generate() returns, all callbacks are invoked.
         assertEquals(module.generate("Hey", callback), 0);
         assertNotEquals("", callback.result);
     }
 }
 
+/**
+ * LlamaCallback for testing.
+ *
+ * Note: onResult() and onStats() are invoked within the same thread as LlamaModule.generate()
+ *
+ * @see <a href="https://github.com/pytorch/executorch/blob/main/extension/android/src/main/java/org/pytorch/executorch/LlamaCallback.java">LlamaCallback interface guide</a>
+ */
 class MyLlamaCallback implements LlamaCallback {
     String result = "";
     @Override
