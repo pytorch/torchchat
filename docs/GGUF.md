@@ -1,8 +1,10 @@
 # Using GGUF Models
 
+<!--
 [shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
 
 [shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
+-->
 
 We support parsing [GGUF](https://github.com/ggerganov/ggml/blob/master/docs/gguf.md) files with
 the following tensor types:
@@ -78,16 +80,25 @@ you will get the best results by starting with the original
 unquantized model, not a previously quantized and then
 dequantized model.**
 
-As an example, suppose you have [llama.cpp cloned and installed](https://github.com/ggerganov/llama.cpp) at ~/repos/llama.cpp.
+As an example, suppose you have [llama.cpp cloned and installed](https://github.com/ggerganov/llama.cpp) at ${GGUF}.
 You can then convert a model to FP16 with the following command:
+
+<!--
+[shell command]: export GGUF=`pwd`/llama.cpp; git clone https://github.com/ggerganov/llama.cpp.git
+[shell command]: cd llama.cpp ; make
+-->
 
 [skip default]: begin
 ```
-~/repos/llama.cpp/quantize --allow-requantize path_of_model_you_are_converting_from.gguf path_for_model_you_are_converting_to.gguf fp16
+${GGUF}/quantize --allow-requantize path_of_model_you_are_converting_from.gguf path_for_model_you_are_converting_to.gguf fp16
 ```
 [skip default]: end
 
-After the model is converted to a supported format like FP16, you can proceed using the instructions above.
+For example, to convert the quantized model you downloaded above to an FP16 model, you would execute:
+```
+${GGUF}/quantize --allow-requantize ${GGUF_MODEL_PATH} ./open_orca_fp16.gguf fp16   
+```
 
+After the model is converted to a supported format like FP16, you can proceed using the instructions above.
 
 [end default]: end
