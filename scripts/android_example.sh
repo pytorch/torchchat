@@ -77,15 +77,13 @@ setup_android_sdk() {
 }
 
 download_aar_library() {
-  mkdir -p ${TORCHCHAT_ROOT}/build/android/libs
-  curl "${LLAMA_AAR_URL}" -o ${TORCHCHAT_ROOT}/build/android/libs/executorch.aar
-  echo "${LLAMA_AAR_SHASUM}  ${TORCHCHAT_ROOT}/build/android/libs/executorch.aar" | shasum --check --status
+  mkdir -p ${TORCHCHAT_ROOT}/android/Torchchat/app/libs
+  curl "${LLAMA_AAR_URL}" -o ${TORCHCHAT_ROOT}/android/Torchchat/app/libs/executorch.aar
+  echo "${LLAMA_AAR_SHASUM}  ${TORCHCHAT_ROOT}/android/Torchchat/app/libs/executorch.aar" | shasum --check --status
 }
 
 build_app() {
   pushd android/Torchchat
-  mkdir -p app/libs
-  cp ${TORCHCHAT_ROOT}/build/android/executorch.aar app/libs
   ./gradlew :app:build
   popd
 }
