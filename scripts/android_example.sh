@@ -138,9 +138,15 @@ push_files_to_android() {
   echo "sdk/emulator/emulator @torchchat > /dev/null 2>&1 &"
   adb wait-for-device
   adb shell mkdir -p /data/local/tmp/llama
-  adb push stories15M.pte /data/local/tmp/llama
+  adb push stories15M.pte /data/local/tmp/llama/model.pte
   adb push checkpoints/stories15M/tokenizer.bin /data/local/tmp/llama
   adb install -t android/Torchchat/app/build/outputs/apk/debug/app-debug.apk
+}
+
+run_android_instrumented_test() {
+  pushd android/Torchchat
+  ./gradlew connectedAndroidTest
+  popd
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

@@ -1037,3 +1037,11 @@ jobs:
           git submodule update --init
           ./runner/build_android.sh
           echo "Tests complete."
+
+  test-build-runner-et-android:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.4xlarge
+      script: |
+          export TORCHCHAT_ROOT=${PWD}
+          yes | scripts/android_example.sh
