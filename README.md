@@ -255,20 +255,35 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
 
 ### Deploy and run on Android
 
-**This section is copied from the original REAMDE and may require additional integration work**
+#### Approach 1: Android Studio
 
-Please refer to our [tutorial on how to build an Android app running
-your PyTorch models with
-Executorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html)
-to for an example on how to run your torchchat models on Android.
+If you have Android Studio set up, and you have Java 17 and Android SDK 34 configured, you can follow this step.
 
-![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png
- "Android app running Llama model")
+First, you need to download the following AAR file which contains the required Java library and its corresponding JNI library, for the app to build and run. You need to put the file to `android/Torchchat/app/libs/executorch.aar`
 
-Detailed step by step in conjunction with ET Android build, to run on
-simulator for Android. `scripts/android_example.sh` for running a
-model on an Android simulator (on Mac), and in `docs/Android.md`.
+[executorch-llama.aar](https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar) (SHASUM: 09d17f7bc59589b581e45bb49511d19196d0297d)
 
+```
+curl https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
+echo "09d17f7bc59589b581e45bb49511d19196d0297d  android/Torchchat/app/libs/executorch.aar" | shasum --check
+```
+
+Now, you can open the torchchat app skeleton, which is located at `android/Torchchat`. Use Android Studio to open this directory.
+
+Then, click the Play button (^R) to launch it to emulator/device.
+
+Now, follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem and issue a prompt.
+
+<img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
+
+#### Approach 2: E2E Script
+
+Alternatively, you can run `scripts/android_example.sh` which sets up Java, Android SDK Manager, Android SDK, Android emulator, builds the app, and launches it for you.
+
+```
+export TORCHCHAT_ROOT=$(pwd)
+sh scripts/android_example.sh
+```
 
 
 ### Eval
