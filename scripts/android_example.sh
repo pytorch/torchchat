@@ -36,7 +36,7 @@ LLAMA_JAR_SHASUM="fb9ee00d028ef23a48cb8958638a5010ba849ccf"
 mkdir -p ${TORCHCHAT_ROOT}/build/android
 
 setup_java() {
-  if [ -x $(command -v javac ) ] && [[ $(javac -version | cut -d' ' -f2 | cut -d'.' -f1) -ge 17 ]]; then
+  if [ -x "$(command -v javac )" ] && [[ $(javac -version | cut -d' ' -f2 | cut -d'.' -f1) -ge 17 ]]; then
     echo "Java 17 is set up"
     return
   fi
@@ -58,7 +58,7 @@ setup_java() {
 }
 
 setup_android_sdk_manager() {
-  if [ -x $(command -v sdkmanager ) ]; then
+  if [ -x "$(command -v sdkmanager )" ]; then
     echo "Android sdkmanager is set up"
     return
   fi
