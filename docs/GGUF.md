@@ -79,7 +79,7 @@ unquantized model, not a previously quantized and then
 dequantized model.**
 
 As an example, suppose you have [llama.cpp cloned and installed](https://github.com/ggerganov/llama.cpp) at ~/repos/llama.cpp.
-You can then convert a model to FP16 with the following command:
+You can then convert a model to FP16 with the following command: 
 
 [skip default]: begin
 ```
