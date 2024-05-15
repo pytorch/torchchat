@@ -259,16 +259,16 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
 
 If you have Android Studio set up, and you have Java 17 and Android SDK 34 configured, you can follow this step.
 
-The torchchat app skeleton is located at `android/Torchchat`. Use Android Studio to open this directory.
-
-You may notice that the project is missing a file `app/libs/executorch.aar`. Please download our prebuilt archive.
+First, you need to download the following AAR file which contains the required Java library and its corresponding JNI library, for the app to build and run. You need to put the file to `android/Torchchat/app/libs/executorch.aar`
 
 [executorch-llama.aar](https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar) (SHASUM: 09d17f7bc59589b581e45bb49511d19196d0297d)
 
 ```
-curl https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar -o android/Torchchat/app/libs/executorch.aar
+curl https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
 echo "09d17f7bc59589b581e45bb49511d19196d0297d  android/Torchchat/app/libs/executorch.aar" | shasum --check
 ```
+
+Now, you can open the torchchat app skeleton, which is located at `android/Torchchat`. Use Android Studio to open this directory.
 
 Then, click the Play button (^R) to launch it to emulator/device.
 
