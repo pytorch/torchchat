@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 public class LlamaModuleTest {
     @Test
     public void LlamaModule() {
-        LlamaModule module = new LlamaModule("/data/local/tmp/llm/model.pte", "/data/local/tmp/llm/tokenizer.bin", 0.8f);
+        LlamaModule module = new LlamaModule("/data/local/tmp/llama/model.pte", "/data/local/tmp/llama/tokenizer.bin", 0.8f);
         assertEquals(module.load(), 0);
         MyLlamaCallback callback = new MyLlamaCallback();
         // Note: module.generate() is synchronous. Callback happens within the same thread as
