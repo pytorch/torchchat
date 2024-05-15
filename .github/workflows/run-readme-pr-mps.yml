@@ -1,4 +1,4 @@
-name: Run the README instructions - with stories - on MacOS
+name: Run the README instructions - with stories - on MPS/MacOS
 on:
   pull_request:
   push:
@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:
 jobs:
-  test-readme-macos:
+  test-readme-mps-macos:
     runs-on: macos-m1-14
     steps:
       - name: Checkout code
@@ -48,7 +48,7 @@ jobs:
           echo "::endgroup::"
   
   
-  test-quantization-macos:
+  test-quantization-mps-macos:
     runs-on: macos-m1-14
     steps:
       - name: Checkout code
@@ -95,7 +95,7 @@ jobs:
           echo "::endgroup::"
 
 
-  test-gguf-macos:
+  test-gguf-mps-macos:
     runs-on: macos-m1-14
     steps:
       - name: Checkout code
