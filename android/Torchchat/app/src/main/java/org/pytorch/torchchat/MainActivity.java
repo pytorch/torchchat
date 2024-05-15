@@ -17,6 +17,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import java.io.File;
 import org.pytorch.executorch.LlamaCallback;
 import org.pytorch.executorch.LlamaModule;
@@ -120,6 +122,12 @@ public class MainActivity extends Activity implements Runnable, LlamaCallback {
         String[] pteFiles = listLocalFile("/data/local/tmp/llama/", ".pte");
         String[] binFiles = listLocalFile("/data/local/tmp/llama/", ".bin");
         String[] modelFiles = listLocalFile("/data/local/tmp/llama/", ".model");
+        if (pteFiles == null || binFiles == null || modelFiles == null) {
+            Toast.makeText(this,
+                    "Please create directory /data/local/tmp/llama/ first",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
         String[] tokenizerFiles = new String[binFiles.length + modelFiles.length];
         System.arraycopy(binFiles, 0, tokenizerFiles, 0, binFiles.length);
         System.arraycopy(modelFiles, 0, tokenizerFiles, binFiles.length, modelFiles.length);

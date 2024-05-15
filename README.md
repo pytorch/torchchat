@@ -268,6 +268,14 @@ curl https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/exe
 echo "09d17f7bc59589b581e45bb49511d19196d0297d  android/Torchchat/app/libs/executorch.aar" | shasum --check
 ```
 
+You also need to push the model and tokenizer file to your device. Please refer to the docs above on generating the pte and bin file, or use E2E script (see section below) to generate and push the file.
+
+```
+adb shell mkdir -p /data/local/tmp/llama
+adb push build/android/model.pte /data/local/tmp/llama
+adb push build/android/tokenizer.bin /data/local/tmp/llama
+```
+
 Now, you can open the torchchat app skeleton, which is located at `android/Torchchat`. Use Android Studio to open this directory.
 
 Then, click the Play button (^R) to launch it to emulator/device.
