@@ -1038,7 +1038,7 @@ jobs:
           ./runner/build_android.sh
           echo "Tests complete."
 
-  test-build-runner-et-android:
+  test-android-app-e2e:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       runner: linux.4xlarge
