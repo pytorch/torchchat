@@ -1,11 +1,10 @@
 #include <ATen/native/xnnpack/Common.h>
-// #include <caffe2/utils/threadpool/pthreadpool-cpp.h>
-#include <torchchat/custom_linear_8da4w/threadpool/threadpool.h>
+#include <caffe2/utils/threadpool/pthreadpool-cpp.h>
 #include <torch/library.h>
 #include <torch/script.h>
 
 
-#define CUSTOM_LINEAR_THREAD_POOL torchchat::threadpool::get_pthreadpool()
+const int N_THREADS = 8;
 
 at::native::xnnpack::Operator create_fully_connected_nc_qd8_f32_qb4w(
     at::Tensor weight,
@@ -102,6 +101,10 @@ at::Tensor run_linear_qd8_f32_qb4w(
   std::vector<xnn_dynamic_quantization_params> quantization_params(
       batch_size + XNN_EXTRA_QUANTIZATION_PARAMS);
 
+  auto threadpool = caffe2::pthreadpool_();
+  TORCH_CHECK(threadpool != nullptr);
+  TORCH_CHECK(pthreadpool_get_threads_count(threadpool) == N_THREADS);
+
   // Run input convert
   status = xnn_reshape_convert_nc_f32_qd8(
       convert_op, /*xnn_operator_t convert_op*/
@@ -109,7 +112,7 @@ at::Tensor run_linear_qd8_f32_qb4w(
       input_channels, /*size_t channels*/
       input_channels, /*size_t input_stride*/
       input_channels, /*size_t output_stride*/
-      CUSTOM_LINEAR_THREAD_POOL /*pthreadpool_t threadpool*/
+      threadpool /*pthreadpool_t threadpool*/
   );
   TORCH_CHECK(
       status == xnn_status_success,
@@ -131,7 +134,7 @@ at::Tensor run_linear_qd8_f32_qb4w(
       ".");
 
   status =
-      xnn_run_operator(convert_op, /*threadpool=*/CUSTOM_LINEAR_THREAD_POOL);
+      xnn_run_operator(convert_op, /*threadpool=*/threadpool);
   TORCH_CHECK(
       status == xnn_status_success,
       "Running convert_op failed with status ",
@@ -146,7 +149,7 @@ at::Tensor run_linear_qd8_f32_qb4w(
   status = xnn_reshape_fully_connected_nc_qd8_f32_qb4w(
       fc_op, /*xnn_operator_t fully_connected_op*/
       batch_size, /*size_t batch_size*/
-      CUSTOM_LINEAR_THREAD_POOL /*pthreadpool_t threadpool*/ // TODO: set to
+      threadpool /*pthreadpool_t threadpool*/ // TODO: set to
                                                              // something
                                                              // sensible
   );
@@ -169,7 +172,7 @@ at::Tensor run_linear_qd8_f32_qb4w(
       status,
       ".");
 
-  status = xnn_run_operator(fc_op, /*threadpool=*/CUSTOM_LINEAR_THREAD_POOL);
+  status = xnn_run_operator(fc_op, /*threadpool=*/threadpool);
   TORCH_CHECK(
       status == xnn_status_success,
       "Running fc_op failed with status ",
@@ -219,7 +222,9 @@ c10::intrusive_ptr<PrepackedContext> prepack(
 
   // auto status = xnn_initialize(/*allocator=*/nullptr);
   // TORCH_CHECK(status == xnn_status_success);
-  bool is_initialized = at::native::xnnpack::available();
+  bool is_initialized = at::native::xnnpack::available(); // calls xnn_initialize
+  caffe2::pthreadpool()->set_thread_count(N_THREADS);
+
   TORCH_CHECK(is_initialized, "XNNPACK is not initialized");
   auto convert_op = create_convert_nc_f32_qd8();
   auto fc_op = create_fully_connected_nc_qd8_f32_qb4w(weight, weight_scales);

@@ -1,11 +1,11 @@
-# Build pthreadpool
-rm -rf pthreadpool/build
-cmake -S pthreadpool -B pthreadpool/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DPTHREADPOOL_SYNC_PRIMITIVE=condvar -DPTHREADPOOL_BUILD_BENCHMARKS=OFF -DPTHREADPOOL_BUILD_TESTS=OFF
-pushd pthreadpool/build
-cmake --build .
-mkdir install
-cmake --install . --prefix install
-popd
+# # Build pthreadpool
+# rm -rf pthreadpool/build
+# cmake -S pthreadpool -B pthreadpool/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DPTHREADPOOL_SYNC_PRIMITIVE=condvar -DPTHREADPOOL_BUILD_BENCHMARKS=OFF -DPTHREADPOOL_BUILD_TESTS=OFF
+# pushd pthreadpool/build
+# cmake --build .
+# mkdir install
+# cmake --install . --prefix install
+# popd
 
 # Build custom_linear_8da4w
 rm -rf build
