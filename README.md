@@ -49,12 +49,13 @@ cd torchchat
 # set up a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-```
-[skip default]: end
-```
+
 # install dependencies
 ./install_requirements.sh
 ```
+[skip default]: end
+
+[shell default]: ./install_requirements.sh 
 
 Installations can be tested by
 
