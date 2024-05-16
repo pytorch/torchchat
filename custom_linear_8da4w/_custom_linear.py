@@ -15,6 +15,7 @@ class _CustomLinear(nn.Module):
         super().__init__()
         self.weight = weight
         assert bias is None
+        torch.set_num_threads(8)
 
         self.group_size = 256
         w_int, s, z = group_quantize_tensor_symmetric(
@@ -23,11 +24,13 @@ class _CustomLinear(nn.Module):
         w_packed = convert_to_qc4w(w_int)
         self.s = s
         self.w_packed = w_packed
+        torch.set_num_threads(8)
         self.prepacked = torch.ops.torchchat.prepack.default(w_packed, s)
 
     def forward(self, x):
         assert x.shape[0] == 1
         x = x.squeeze(0)
+        torch.set_num_threads(8)
         return torch.ops.torchchat.run.default(self.prepacked, x).unsqueeze(0)
 
 

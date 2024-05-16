@@ -2,9 +2,10 @@
 #include <caffe2/utils/threadpool/pthreadpool-cpp.h>
 #include <torch/library.h>
 #include <torch/script.h>
+#include <torch/torch.h>
 
 
-const int N_THREADS = 8;
+const int N_THREADS = 6;
 
 at::native::xnnpack::Operator create_fully_connected_nc_qd8_f32_qb4w(
     at::Tensor weight,
@@ -220,9 +221,8 @@ c10::intrusive_ptr<PrepackedContext> prepack(
     at::Tensor weight,
     at::Tensor weight_scales) {
 
-  // auto status = xnn_initialize(/*allocator=*/nullptr);
-  // TORCH_CHECK(status == xnn_status_success);
   bool is_initialized = at::native::xnnpack::available(); // calls xnn_initialize
+  // torch::set_num_threads(N_THREADS); // does not seem to do anything
   caffe2::pthreadpool()->set_thread_count(N_THREADS);
 
   TORCH_CHECK(is_initialized, "XNNPACK is not initialized");
