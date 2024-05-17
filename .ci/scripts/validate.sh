@@ -113,6 +113,8 @@ function generate_aoti_model_output() {
     local DTYPES="${3:-default}"
     local MODEL_DIR="${CHECKPOINT_PATH%/*}"
     local MODEL_NAME=$(basename "$CHECKPOINT_PATH" | sed 's/\.[^.]*$//')
+    # TODO: Removeme once Triton is updated past https://github.com/triton-lang/triton/pull/3564
+    export TORCHINDUCTOR_COMPILE_THREADS=1
 
     echo "Local DTYPES=$DTYPES"
 
