@@ -1,5 +1,7 @@
 # /bin/bash -x
 
+export TORCHINDUCTOR_COMPILE_THREADS=1
+
 if [ "X$1" == "X" ]; then
   echo "Must specify document to run"
   exit 1
