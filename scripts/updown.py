@@ -239,7 +239,16 @@ def updown_processor(
     print_flag = False
 
     output("set -eou pipefail", replace_list=None, suppress_list=None)
-
+    output(
+        "# THIS IS NOT GOOD. WORKAROUND FOR TRITON BUG.",
+        replace_list=None,
+        suppress_list=None,
+    )
+    output(
+        "export TORCHINDUCTOR_COMPILE_THREADS=1", 
+        replace_list=None,
+        suppress_list=None,
+    )
     if create_sections:
         output(
             "echo '::group::start-of-document'",

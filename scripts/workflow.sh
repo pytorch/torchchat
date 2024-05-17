@@ -16,6 +16,9 @@
 
 set -eu
 
+### THIS IS NOT GOOD: TRITON BUG WORKAROUND, REMOVE WHEN FIX AVAILABLE
+export TORCHINDUCTOR_COMPILE_THREADS=1
+
 function download_tinyllamas() {
     local MODEL_REPO="$1"
     local FORCE_DOWNLOAD="${2:-false}"
