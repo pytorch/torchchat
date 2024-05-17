@@ -12,7 +12,7 @@ impossible (devices with limited functionality and memory capacity).
 The 'llama runner' is a native standalone application capable of
 running a model exported and compiled ahead-of-time with either
 Executorch (ET) or AOT Inductor (AOTI). Which model format to use
-depends on your requirements and preferences.  Executorch modelsare
+depends on your requirements and preferences.  Executorch models are
 optimized for portability across a range of decices, including mobile
 and edge devices.  AOT Inductor models are optimized for a particular
 target architecture, which may result in better performance and
