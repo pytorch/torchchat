@@ -24,7 +24,9 @@
 
 #ifdef __AOTI_MODEL__
 #include <torch/csrc/inductor/aoti_runner/model_container_runner_cpu.h>
+#ifdef USE_CUDA
 #include <torch/csrc/inductor/aoti_runner/model_container_runner_cuda.h>
+#endif
 torch::Device aoti_device(torch::kCPU);
 
 #else // __ET_MODEL__
@@ -133,10 +135,14 @@ void build_transformer(
   malloc_run_state(&t->state, &t->config);
 
 #ifdef __AOTI_MODEL__
+#ifdef USE_CUDA
   try {
     t->runner = new torch::inductor::AOTIModelContainerRunnerCuda(model_path);
     aoti_device = torch::Device(torch::kCUDA);
   } catch (std::runtime_error& e) {
+#else
+  {
+#endif
     t->runner = new torch::inductor::AOTIModelContainerRunnerCpu(model_path);
   }
 #else //__ET_MODEL__
