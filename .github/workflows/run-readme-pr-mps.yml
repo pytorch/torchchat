@@ -27,10 +27,10 @@ jobs:
 
           .ci/scripts/run-docs readme
 
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"
 
   test-quantization-mps-macos:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
