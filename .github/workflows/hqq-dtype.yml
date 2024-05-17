@@ -44,6 +44,7 @@ jobs:
         export MODEL_PATH=checkpoints/stories15M/stories15M.pt
         export MODEL_NAME=stories15M
         export MODEL_DIR=/tmp
+        export TORCHINDUCTOR_COMPILE_THREADS=1
 
         for DTYPE in bfloat16 float16 float32; do
 
