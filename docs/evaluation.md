@@ -24,12 +24,12 @@ python3 torchchat.py eval stories15M --tasks wikitext --limit 10
 Running an exported model
 ```
 python3 torchchat.py export stories15M --output-pte-path stories15M.pte
-python3 torchchat.py eval --pte-path stories15M.pte
+python3 torchchat.py eval stories15M --pte-path stories15M.pte
 ```
 
 Running multiple tasks and calling eval.py directly:
 ```
-python3 eval.py --pte-path stories15M.pte --tasks wikitext hellaswag
+python3 eval.py stories15M --pte-path stories15M.pte --tasks wikitext hellaswag
 ```
 
 For more information and a list of tasks/metrics see [lm-evaluation-harness](https://github.com/facebookresearch/lm_eval).
