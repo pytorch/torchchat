@@ -1,0 +1,12 @@
+#! /bin/bash
+
+#!/bin/bash
+# Check the spelling of the specified file
+aspell -c --lang=en_US --add-extra-dicts=american-english --output=2 "$1"
+# Exit with a non-zero status code if there were any spelling errors
+if [ $? -ne 0 ]; then
+  echo "Spelling errors found; might indicate garbage output. Failing."
+  exit 1
+fi
+echo "No spelling errors found; likely correct operation. Success."
+exit 0
