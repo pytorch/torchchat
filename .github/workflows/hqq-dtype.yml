@@ -28,8 +28,11 @@ jobs:
         echo "::group::Download checkpoints"
         # Install requirements
         ./install_requirements.sh cuda
+        bash scripts/build_native.sh aoti
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+        yum install -y aspell
+        alias check_gibberish 'aspell -c --lang=en_US --add-extra-dicts=american-english'
         echo "::endgroup::"
 
         echo "::group::Download checkpoints"
@@ -38,13 +41,6 @@ jobs:
         wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
         wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
         popd
-        echo "::endgroup::"
-
-        echo "::group::Build aoti runner"
-        ./install_requirements.sh cuda
-        bash scripts/build_native.sh aoti
-        pip3 list
-        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
 
         echo "::group::Run inference"
@@ -58,29 +54,29 @@ jobs:
          for DTYPE in bfloat16 float16 float32; do
 
           python generate.py --dtype ${DTYPE} --device ${DEVICE} --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-          cat ./output_eager
+          check_gibberish ./output_eager
           python generate.py --dtype ${DTYPE} --device ${DEVICE} --compile --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
-          cat ./output_compiled
+          check_gibberish ./output_compiled
           python export.py --dtype ${DTYPE} --device ${DEVICE} --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
           python generate.py --dtype ${DTYPE} --device ${DEVICE} --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
-          cat ./output_aoti
+          check_gibberish ./output_aoti
 
           ./cmake-out/aoti_run ${MODEL_DIR}/${MODEL_NAME}.so  -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}" > ./output_runner_aoti
-          cat ./output_runner_aoti
+          check_gibberish ./output_runner_aoti
 
           echo "**********************************************"
           echo "******** INT4 HQQ group-wise quantized *******"
           echo "**********************************************"
           python generate.py --dtype ${DTYPE} --device ${DEVICE} --quant '{"linear:hqq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_eager
-          cat ./output_eager
+          check_gibberish ./output_eager
           python generate.py --dtype ${DTYPE} --device ${DEVICE} --compile --quant '{"linear:hqq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0 > ./output_compiled
-          cat ./output_compiled
+          check_gibberish ./output_compiled
           python export.py --dtype ${DTYPE} --device ${DEVICE} --quant '{"linear:hqq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so
           python generate.py --dtype ${DTYPE} --device ${DEVICE} --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
-          cat ./output_aoti
+          check_gibberish ./output_aoti
 
           ./cmake-out/aoti_run ${MODEL_DIR}/${MODEL_NAME}.so  -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}" > ./output_runner_aoti
-          cat ./output_runner_aoti
+          check_gibberish ./output_runner_aoti
 
          done
         done
