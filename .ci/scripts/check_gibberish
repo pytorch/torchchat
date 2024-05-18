@@ -3,8 +3,8 @@
 #!/bin/bash
 # Check the spelling of the specified file
 cat "$1"
-# We exclude the "Using device=" line because device names are not necessarily English words
-grep -v "Using device=" "$1" | aspell -a -c  | grep '^[\&#]' >/tmp/out.$$
+# We exclude the "Using device=", "JIT compilation time" lines because device names are not necessarily English words, neither is JIT
+grep -v "Using device=" "$1" | grep -v "JIT compilation time" | aspell -a -c  | grep '^[\&#]' >/tmp/out.$$
 # Exit with a non-zero status code if there were any spelling errors because:
 # * Finding one or more lines with & or # means we found a spelling error, might be gibberish
 if [ $? -ne 0 ]; then
