@@ -413,22 +413,6 @@ third-party models, weights, data, or other technologies, and you are
 solely responsible for complying with all such obligations.
 
 
-### Disclaimer
-The torchchat Repository Content is provided without any guarantees about
-performance or compatibility. In particular, torchchat makes available
-model architectures written in Python for PyTorch that may not perform
-in the same manner or meet the same standards as the original versions
-of those models. When using the torchchat Repository Content, including
-any model architectures, you are solely responsible for determining the
-appropriateness of using or redistributing the torchchat Repository Content
-and assume any risks associated with your use of the torchchat Repository Content
-or any models, outputs, or results, both alone and in combination with
-any other technologies. Additionally, you may have other legal obligations
-that govern your use of other content, such as the terms of service for
-third-party models, weights, data, or other technologies, and you are
-solely responsible for complying with all such obligations.
-
-
 ## Acknowledgements
 Thank you to the [community](docs/ACKNOWLEDGEMENTS.md) for all the
 awesome libraries and tools you've built around local LLM inference.
