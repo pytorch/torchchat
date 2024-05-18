@@ -63,7 +63,7 @@ python3 torchchat.py export stories15M --output-dso-path ./model.so
 We can now execute the runner with:
 
 ```
-curl -o ./tokenizer.model https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+curl -OL https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
 ./cmake-out/aoti_run ./model.so -z ./tokenizer.model -l 2 -i "Once upon a time"
 ```
 
