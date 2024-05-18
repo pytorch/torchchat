@@ -2,11 +2,14 @@
 
 #!/bin/bash
 # Check the spelling of the specified file
-aspell -c --lang=en_US --add-extra-dicts=american-english --output=2 "$1"
-# Exit with a non-zero status code if there were any spelling errors
+cat "$1"
+aspell -a -c --lang=en_US  < "$1" | grep '^[\&#]' >/tmp/out.$$
+# Exit with a non-zero status code if there were any spelling errors because:
+# * Finding one or more lines with & or # means we found a spelling error, might be gibberish
 if [ $? -ne 0 ]; then
-  echo "Spelling errors found; might indicate garbage output. Failing."
-  exit 1
+    echo "No spelling errors found; likely correct operation. Success."
+    exit 0
 fi
-echo "No spelling errors found; likely correct operation. Success."
-exit 0
+cat /tmp/out.$$
+echo "Spelling errors found; might indicate garbage output. Failing."
+exit 1
