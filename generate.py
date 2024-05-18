@@ -24,7 +24,7 @@ from build.builder import (
 )
 from build.model import Transformer
 from build.utils import device_sync, set_precision
-from cli import add_arguments_for_generate, arg_init, check_args, logger
+from cli import add_arguments_for_verb, arg_init, check_args, logger
 
 B_INST, E_INST = "[INST]", "[/INST]"
 B_SYS, E_SYS = "<<SYS>>", "<</SYS>>"
@@ -752,12 +752,12 @@ def _main(
             # Don't continue here.... because we need to report and reset
             # continue
 
-        print(
+        logging.info(
             f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_sec:.02f} tokens/sec"
         )
-        print(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
+        logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
         if i == 0:
-            print(
+            logging.info(
                 f"*** This first iteration will include cold start effects for dynamic import, hardware caches{', JIT compilation' if jit_compile else ''}. ***"
             )
         if start_pos >= max_seq_length:
@@ -801,8 +801,9 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="torchchat generate CLI")
-    add_arguments_for_generate(parser)
+    verb = "generate"
+    add_arguments_for_verb(parser, verb)
     args = parser.parse_args()
-    check_args(args, "generate")
+    check_args(args, verb)
     args = arg_init(args)
     main(args)

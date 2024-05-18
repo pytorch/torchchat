@@ -42,10 +42,6 @@ jobs:
         bash -x ./run-readme.sh
         echo "::endgroup::"
 
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
 
   test-quantization-any:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
@@ -77,6 +73,39 @@ jobs:
         cat ./run-quantization.sh
         echo "*******************************************"
         bash -x ./run-quantization.sh
+        echo "::endgroup::"
+
+  test-gguf-any:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    secrets: inherit
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      secrets-env: "HF_TOKEN_PERIODIC"
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.1"
+      timeout: 60
+      script: |
+        echo "::group::Print machine info"
+        uname -a
+        echo "::endgroup::"
+
+        echo "::group::Install newer objcopy that supports --set-section-alignment"
+        yum install -y  devtoolset-10-binutils
+        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        echo "::endgroup::"
+
+        echo "::group::Create script to run gguf"
+        python3 scripts/updown.py --file docs/GGUF.md > ./run-gguf.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-gguf.sh
+        echo "::endgroup::"
+
+        echo "::group::Run gguf"
+        echo "*******************************************"
+        cat ./run-gguf.sh
+        echo "*******************************************"
+        bash -x ./run-gguf.sh
         echo "::endgroup::"
 
         echo "::group::Completion"

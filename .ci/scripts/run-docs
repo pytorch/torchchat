@@ -1,0 +1,77 @@
+# /bin/bash -x
+
+if [ "X$1" == "X" ]; then
+  echo "Must specify document to run"
+  exit 1
+fi
+
+if [ "$1" == "readme" ]; then
+        echo "::group::Create script to run README"
+        python3 scripts/updown.py --create-sections --file README.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-readme.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-readme.sh
+        echo "::endgroup::"
+
+        echo "::group::Run README"
+        echo "*******************************************"
+        cat ./run-readme.sh
+        echo "*******************************************"
+        bash -x ./run-readme.sh
+        echo "::endgroup::"
+
+        exit 0
+fi
+
+if [ "$1" == "quantization" ]; then
+        echo "::group::Create script to run quantization"
+        python3 scripts/updown.py --create-sections --file docs/quantization.md --replace llama3:stories15M --suppress huggingface-cli,HF_TOKEN > ./run-quantization.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-quantization.sh
+        echo "::endgroup::"
+
+        echo "::group::Run quantization"
+        echo "*******************************************"
+        cat ./run-quantization.sh
+        echo "*******************************************"
+        bash -x ./run-quantization.sh
+        echo "::endgroup::"
+
+        exit 0
+fi
+
+if [ "$1" == "gguf" ]; then
+        echo "::group::Create script to run gguf"
+        python3 scripts/updown.py --file docs/GGUF.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-gguf.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-gguf.sh
+        echo "::endgroup::"
+
+        echo "::group::Run gguf"
+        echo "*******************************************"
+        cat ./run-gguf.sh
+        echo "*******************************************"
+        bash -x ./run-gguf.sh
+        echo "::endgroup::"
+fi
+
+
+if [ "$1" == "advanced" ]; then
+        echo "::group::Create script to run advanced"
+        python3 scripts/updown.py --file docs/ADVANCED-USERS.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-advanced.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-advanced.sh
+        echo "::endgroup::"
+
+        echo "::group::Run advanced"
+        echo "*******************************************"
+        cat ./run-advanced.sh
+        echo "*******************************************"
+        bash -x ./run-advanced.sh
+        echo "::endgroup::"
+   echo "TBD"
+fi            
+

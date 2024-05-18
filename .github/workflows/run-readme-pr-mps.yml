@@ -44,11 +44,6 @@ jobs:
           bash -x ./run-readme.sh
           echo "::endgroup::"
   
-          echo "::group::Completion"
-          echo "tests complete"
-          echo "*******************************************"
-          echo "::endgroup::"
-
   test-quantization-mps-macos:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
@@ -59,7 +54,7 @@ jobs:
           conda activate test-quantization-mps-macos
           # NS: Remove previous installation  of torch first
           # as this script does not isntall anything into conda env
-	  #but rather  system dep
+          #but rather  system dep
           pip3 uninstall -y torch || true
           set -eou pipefail
 
