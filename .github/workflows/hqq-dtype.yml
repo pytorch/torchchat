@@ -45,6 +45,7 @@ jobs:
 
         echo "::group::Run inference"
         export MODEL_PATH=checkpoints/stories15M/stories15M.pt
+        export TOKENIZER_PATH=checkpoints/stories15M/tokenizer.model
         export MODEL_NAME=stories15M
         export MODEL_DIR=/tmp
 
@@ -61,7 +62,7 @@ jobs:
           python generate.py --dtype ${DTYPE} --device ${DEVICE} --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
           .ci/scripts/check_gibberish ./output_aoti
 
-          ./cmake-out/aoti_run ${MODEL_DIR}/${MODEL_NAME}.so  -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}" > ./output_runner_aoti
+          ./cmake-out/aoti_run ${MODEL_DIR}/${MODEL_NAME}.so  -z ${TOKENIZER_PATH} -i "${PROMPT}" > ./output_runner_aoti
           .ci/scripts/check_gibberish ./output_runner_aoti
 
           echo "**********************************************"
@@ -75,7 +76,7 @@ jobs:
           python generate.py --dtype ${DTYPE} --device ${DEVICE} --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
           .ci/scripts/check_gibberish ./output_aoti
 
-          ./cmake-out/aoti_run ${MODEL_DIR}/${MODEL_NAME}.so  -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}" > ./output_runner_aoti
+          ./cmake-out/aoti_run ${MODEL_DIR}/${MODEL_NAME}.so  -z ${TOKENIZER_PATH} -i "${PROMPT}" > ./output_runner_aoti
           .ci/scripts/check_gibberish ./output_runner_aoti
 
          done
