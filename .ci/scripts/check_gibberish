@@ -3,7 +3,7 @@
 #!/bin/bash
 # Check the spelling of the specified file
 cat "$1"
-aspell -a -c --lang=en_US  < "$1" | grep '^[\&#]' >/tmp/out.$$
+aspell -a -c  < "$1" | grep '^[\&#]' >/tmp/out.$$
 # Exit with a non-zero status code if there were any spelling errors because:
 # * Finding one or more lines with & or # means we found a spelling error, might be gibberish
 if [ $? -ne 0 ]; then
