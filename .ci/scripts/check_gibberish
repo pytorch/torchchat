@@ -6,7 +6,7 @@ cat "$1"
 
 TMPFILE=/tmp/`basename "$1"`-sequence
 
-if [ "X$2" == "X--no-extract"]; then
+if [ "X$2" == "X--no-extract" ]; then
     cp "$1" $TMPFILE
 else
     # We extract only the sequence output and don't spell check status and performance stats
