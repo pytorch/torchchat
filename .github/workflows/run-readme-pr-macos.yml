@@ -97,7 +97,6 @@ jobs:
 
   test-gguf-macos:
     runs-on: macos-14-xlarge
-    secrets: inherit
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -110,7 +109,6 @@ jobs:
         with:
           xcode-version: '15.3'
       - name: Run script
-        secrets-env: "HF_TOKEN_PERIODIC"		
         run: |
           set -x
           # NS: Remove previous installation  of torch first
@@ -124,11 +122,6 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
-          # echo "::group::Install newer objcopy that supports --set-section-alignment"
-          # yum install -y  devtoolset-10-binutils
-          # export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-          # echo "::endgroup::"
-  
           echo "::group::Create script to run gguf"
           python3 scripts/updown.py --file docs/GGUF.md > ./run-gguf.sh
           # for good measure, if something happened to updown processor,
