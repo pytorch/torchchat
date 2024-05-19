@@ -13,7 +13,7 @@ def print_until_equals(filename):
                     exit(1)
                 past_output = True
                 output = False
-            if output = True
+            if output:
                 print(line)
 
         if not past_output:
