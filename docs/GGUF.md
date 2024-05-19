@@ -30,11 +30,12 @@ and F32.)
 ```
 # Download resources
 mkdir -p ggufs/open_orca
-cd ggufs/open_orca
-wget -O open_orca.Q4_0.gguf "https://huggingface.co/TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF/resolve/main/tinyllama-1.1b-1t-openorca.Q4_0.gguf?download=true"
+pushd ggufs/open_orca
 
-wget -O tokenizer.model "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
-cd ../..
+curl -o open_orca.Q4_0.gguf "https://huggingface.co/TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF/resolve/main/tinyllama-1.1b-1t-openorca.Q4_0.gguf?download=true"
+curl -o ./tokenizer.model https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+
+popd
 
 export GGUF_MODEL_PATH=ggufs/open_orca/open_orca.Q4_0.gguf
 export GGUF_TOKENIZER_PATH=ggufs/open_orca/tokenizer.model
