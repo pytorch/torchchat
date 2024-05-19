@@ -3,13 +3,19 @@
 #!/bin/bash
 # Check the spelling of the specified file
 cat "$1"
-# We extract only the sequence output and don't spell check status and performance stats
-TMPFILE=/tmp/`basename "$1"`-sequence
-python3 .ci/scripts/extract-sequence.py "$1" >$TMPFILE
 
-if [ $? -ne 0 ]; then
-    echo "Sequence extraction failed. Exiting."
-    exit 1
+TMPFILE=/tmp/`basename "$1"`-sequence
+
+if [ "X$2" == "X--no-extract"]; then
+    cp "$1" $TMPFILE
+else
+    # We extract only the sequence output and don't spell check status and performance stats
+    python3 .ci/scripts/extract-sequence.py "$1" >$TMPFILE
+
+    if [ $? -ne 0 ]; then
+        echo "Sequence extraction failed. Exiting."
+        exit 1
+    fi
 fi
 
 cat ${TMPFILE} |  aspell -a -c  | grep '^[\&#]' >/tmp/out.$$
