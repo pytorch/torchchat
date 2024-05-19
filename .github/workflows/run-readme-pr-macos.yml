@@ -123,7 +123,7 @@ jobs:
           echo "::endgroup::"
 
           echo "::group::Create script to run gguf"
-          python3 scripts/updown.py --file docs/GGUF.md > ./run-gguf.sh
+          python3 scripts/updown.py --file docs/GGUF.md  --suppress huggingface-cli,HF_TOKEN  > ./run-gguf.sh
           # for good measure, if something happened to updown processor,
           # and it did not error out, fail with an exit 1
           echo "exit 1" >> ./run-gguf.sh
