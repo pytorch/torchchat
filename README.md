@@ -1,6 +1,9 @@
 # Chat with LLMs Everywhere
 
-torchchat is a small codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
+torchchat is a small codebase showcasing the ability to run large
+language models (LLMs) seamlessly. With torchchat, you can run LLMs
+using Python, within your own (C/C++) application (desktop or server)
+and on iOS and Android.
 
 
 ## What can you do with torchchat?
@@ -38,7 +41,10 @@ torchchat is a small codebase showcasing the ability to run large language model
 - Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
 ## Installation
-The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
+
+The following steps require that you have [Python
+3.10](https://www.python.org/downloads/release/python-3100/)
+installed.
 
 [skip default]: begin
 ```bash
@@ -65,7 +71,9 @@ python3 torchchat.py --help
 ```
 
 ### Download Weights
-Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace account.
+
+Most models use HuggingFace as the distribution channel, so you will
+need to create a HuggingFace account.
 
 [prefix default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}"
 Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens).
@@ -90,7 +98,9 @@ View available models with:
 python3 torchchat.py list
 ```
 
-Query the location of a particular model -- this is particularly useful in scripts when you do not want to hard-code paths:
+Query the location of a particular model -- this is particularly
+useful in scripts when you do not want to hard-code paths:
+
 ```
 python3 torchchat.py where llama3
 ```
@@ -165,8 +175,12 @@ NOTE: If your machine has cuda add this flag for performance
 
 ### Running native using our C++ Runner
 
-The end-to-end C++ [runner](runner/run.cpp) runs a [DSO](https://en.wikipedia.org/wiki/Shared_library)  model (represented by a file with extension `.so`)
-exported in the previous step.
+The end-to-end C++ [runner](runner/run.cpp) runs a 'DSO model'
+exported in the previous step and saved as a [shared
+library](https://en.wikipedia.org/wiki/Shared_library) (also known as
+dynamically shared obkect DSO) that can be loaded dynamically by the
+application.  On Linux and macOS, shared libraries represented by a
+file with extension `.so`.
 
 To build the runner binary on your Mac or Linux:
 ```bash
@@ -212,7 +226,7 @@ python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-p
 
 Execute using the runner
 ```bash
-cmake-out/et_run llama3.pte -z ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -i "Once upon a time"
+cmake-out/et_run llama3.pte -z `python3 torchchat.py where llama3`/tokenizer.model -i "Once upon a time"
 ```
 
 ### Export for mobile
@@ -254,13 +268,18 @@ entitlement. Just change the app's bundle identifier to whatever
 matches your provisioning profile with the aforementioned capability
 enabled.
 
-After the app launched successfully, copy an exported ExecuTorch model (`.pte`) and tokenizer (`.bin`) files to the iLLaMA folder.
+After the app launched successfully, copy an exported ExecuTorch model
+(`.pte`) and tokenizer (`.bin`) files to the iLLaMA folder.
 
-For the Simulator, just drag&drop both files onto the Simulator window and save at `On My iPhone > iLLaMA` folder.
+For the Simulator, just drag&drop both files onto the Simulator window
+and save at `On My iPhone > iLLaMA` folder.
 
-For a device, open it in a separate Finder window, navigate to the Files tab, drag&drop both files to the iLLaMA folder and wait till the copying finishes.
+For a device, open it in a separate Finder window, navigate to the
+Files tab, drag&drop both files to the iLLaMA folder and wait till the
+copying finishes.
 
-Now, follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem and issue a prompt.
+Now, follow the app's UI guidelines to pick the model and tokenizer
+files from the local filesystem and issue a prompt.
 
 *Click the image below to see it in action!*
 <a href="https://pytorch.org/executorch/main/_static/img/llama_ios_app.mp4">
@@ -272,9 +291,13 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
 
 #### Approach 1: Android Studio
 
-If you have Android Studio set up, and you have Java 17 and Android SDK 34 configured, you can follow this step.
+If you have Android Studio set up, and you have Java 17 and Android
+SDK 34 configured, you can follow this step.
 
-First, you need to download the following AAR file which contains the required Java library and its corresponding JNI library, for the app to build and run. You need to put the file to `android/Torchchat/app/libs/executorch.aar`
+First, you need to download the following AAR file which contains the
+required Java library and its corresponding JNI library, for the app
+to build and run. You need to put the file to
+`android/Torchchat/app/libs/executorch.aar`
 
 [executorch-llama.aar](https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar) (SHASUM: 09d17f7bc59589b581e45bb49511d19196d0297d)
 
@@ -283,7 +306,10 @@ curl https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/exe
 echo "09d17f7bc59589b581e45bb49511d19196d0297d  android/Torchchat/app/libs/executorch.aar" | shasum --check
 ```
 
-You also need to push the model and tokenizer file to your device. Please refer to the docs above on generating the pte and bin file, or use E2E script (see section below) to generate and push the file.
+You also need to push the model and tokenizer file to your
+device. Please refer to the docs above on generating the pte and bin
+file, or use E2E script (see section below) to generate and push the
+file.
 
 ```
 adb shell mkdir -p /data/local/tmp/llama
