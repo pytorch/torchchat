@@ -72,6 +72,23 @@ if [ "$1" == "advanced" ]; then
         echo "*******************************************"
         bash -x ./run-advanced.sh
         echo "::endgroup::"
-   echo "TBD"
 fi            
+
+if [ "$1" == "evaluation" ]; then
+
+    exit 0
+    
+        echo "::group::Create script to run evaluation"
+        python3 scripts/updown.py --file docs/evaluation.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-evaluation.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-evaluation.sh
+        echo "::endgroup::"
+
+        echo "::group::Run evaluation"
+        echo "*******************************************"
+        cat ./run-evaluation.sh
+        echo "*******************************************"
+        bash -x ./run-evaluation.sh
+fi
 

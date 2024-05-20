@@ -3,6 +3,8 @@
 <!--
 [shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
 
+[shell default]: ./install_requirements.sh
+
 [shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
 -->
 
