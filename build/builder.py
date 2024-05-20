@@ -417,6 +417,7 @@ def _initialize_model(
             device_sync(device=builder_args.device)
 
         try:
+            from executorch.extension.pybindings import portable_lib as exec_lib
             setattr(
                 model,
                 'model_',
