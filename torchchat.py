@@ -106,6 +106,7 @@ if __name__ == "__main__":
 
         generate_main(args)
     elif args.command == "eval":
+        check_args(args, "eval")
         from eval import main as eval_main
 
         eval_main(args)
