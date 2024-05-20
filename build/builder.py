@@ -423,8 +423,8 @@ def _initialize_model(
                 'model_',
                 exec_lib._load_for_executorch(str(builder_args.pte_path)),
             )
-            def new_forward(self, x):
-                forward_inputs = (x.to(torch.long), input_pos.to(torch.long))
+            def new_forward(self, idx: torch.Tensor, input_pos: Optional[torch.Tensor]=None):
+                forward_inputs = (idx.to(torch.long), input_pos.to(torch.long))
                 logits = self.model_.forward(forward_inputs)
                 assert len(logits) == 1
                 logits = logits[0]
