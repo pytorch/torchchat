@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 jobs:
   test-readme-macos:
-    runs-on: macos-14-xlarge 
+    runs-on: macos-14-xlarge
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -33,24 +33,42 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
-          # echo "::group::Install newer objcopy that supports --set-section-alignment"
-          # yum install -y  devtoolset-10-binutils
-          # export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-          # echo "::endgroup::"
+          .ci/scripts/run-docs readme
   
-          echo "::group::Create script to run README"
-          python3 scripts/updown.py --file README.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-readme.sh
-          # for good measure, if something happened to updown processor,
-          # and it did not error out, fail with an exit 1
-          echo "exit 1" >> ./run-readme.sh
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
           echo "::endgroup::"
+
   
-          echo "::group::Run README"
-          echo "*******************************************"
-          cat ./run-readme.sh
-          echo "*******************************************"
-          bash -x ./run-readme.sh
+  test-quantization-macos:
+    runs-on: macos-14-xlarge
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.11'
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
+      - name: Run script
+        run: |
+          set -x
+          # NS: Remove previous installation  of torch first
+          # as this script does not isntall anything into conda env but rather as system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
+
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
           echo "::endgroup::"
+
+          .ci/scripts/run-docs quantization
   
           echo "::group::Completion"
           echo "tests complete"
@@ -58,8 +76,8 @@ jobs:
           echo "::endgroup::"
 
 
-  test-quantization-macos:
-    runs-on: macos-14-xlarge 
+  test-gguf-macos:
+    runs-on: macos-14-xlarge
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -85,25 +103,42 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
-          # echo "::group::Install newer objcopy that supports --set-section-alignment"
-          # yum install -y  devtoolset-10-binutils
-          # export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-          # echo "::endgroup::"
-  
-          echo "::group::Create script to run quantization"
-          python3 scripts/updown.py --file docs/quantization.md --replace llama3:stories15M --suppress huggingface-cli,HF_TOKEN > ./run-quantization.sh
-          # for good measure, if something happened to updown processor,
-          # and it did not error out, fail with an exit 1
-          echo "exit 1" >> ./run-quantization.sh
-          echo "::endgroup::"
-  
-          echo "::group::Run quantization"
+          .ci/scripts/run-docs gguf
+
+          echo "::group::Completion"
+          echo "tests complete"
           echo "*******************************************"
-          cat ./run-quantization.sh
-          echo "*******************************************"
-          bash -x ./run-quantization.sh
           echo "::endgroup::"
-  
+
+  test-advanced-macos:
+    runs-on: macos-14-xlarge
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.11'
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
+      - name: Run script
+        run: |
+          set -x
+          # NS: Remove previous installation  of torch first
+          # as this script does not isntall anything into conda env but rather as system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
+
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+          echo "::endgroup::"
+
+          .ci/scripts/run-docs advanced
+
           echo "::group::Completion"
           echo "tests complete"
           echo "*******************************************"

@@ -93,7 +93,7 @@ class PrecisionHandler(QuantHandler):
         self.tokenizer = tokenizer
 
         if isinstance(dtype, str):
-            dtype = name_to_dtype(dtype)
+            dtype = name_to_dtype(dtype, device)
         self.dtype = dtype
 
     def create_quantized_state_dict(self) -> Dict:  # "StateDict"
@@ -410,8 +410,8 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
                             groupsize=self.groupsize,
                         ),
                     )
-                else:
-                    self.quantize(child)
+            else:
+                self.quantize(child)
 
         return module
 

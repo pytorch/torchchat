@@ -3,6 +3,7 @@
 
 <!--
 [shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
+[shell default]: ./install_requirements.sh
 [shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
 -->
 
@@ -13,12 +14,12 @@ While quantization can potentially degrade the model's performance, the methods 
 
 ## Supported Quantization Schemes
 ### Weight Quantization
-| compression | FP Precision | bitwidth| group size | dynamic activation quantization | Eager | AOTI | ExecuTorch |
+| compression | bitwidth| group size | dynamic activation quantization | Eager | AOTI | ExecuTorch |
 |--|--|--|--|--|--|--|--|
-| linear (asymmetric) | fp32, fp16, bf16 | [8, 4]* | [32, 64, 128, 256]** | | ✅ | ✅ | 🚧 |
-| linear with GPTQ*** (asymmetric) | | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
-| linear with HQQ*** (asymmetric) | | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
-| linear with dynamic activations (symmetric) | fp32^ | | [32, 64, 128, 256]* | a8w4dq | 🚧 |🚧 | ✅ |
+| linear (asymmetric) | [8, 4]* | [32, 64, 128, 256]** | | ✅ | ✅ | 🚧 |
+| linear with GPTQ*** (asymmetric) | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
+| linear with HQQ*** (asymmetric) | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
+| linear with dynamic activations (symmetric) | | [32, 64, 128, 256]* | a8w4dq | 🚧 |🚧 | ✅ |
 
 ### Embedding Quantization
 
@@ -26,13 +27,11 @@ Due to the larger vocabulary size of llama3, we also recommend
 quantizing the embeddings to further reduce the model size for
 on-device usecases.
 
-| compression | FP Precision | weight quantization (bitwidth)| weight quantization (group size) | dynamic activation quantization | Eager | AOTI | ExecuTorch |
+| compression | weight quantization (bitwidth)| weight quantization (group size) | dynamic activation quantization | Eager | AOTI | ExecuTorch |
 |--|--|--|--|--|--|--|--|
-| embedding (symmetric) | fp32, fp16, bf16 | [8, 4]* | [ any > 1 ] | | ✅ | ✅ | ✅ |
+| embedding (symmetric) | [8, 4]* | [32, 64, 128, 256]+ | | ✅ | ✅ | ✅ |
 
-^ a8w4dq quantization scheme requires model to be converted to fp32,
-  due to lack of support for fp16 and bf16 in the kernels provided with
-  ExecuTorch.
+
 
 * These are the only valid bitwidth options.
 
@@ -46,6 +45,16 @@ on-device usecases.
     algorithms to address accuracy loss when using lower bit
     quantization. Due to HQQ relying on data/calibration free
     quantization, it tends to take less time to quantize model.
+    HQQ is currently enabled with axis=1 configuration. 
+    
+    Presently, torchchat includes a subset of the HQQ distribution in 
+    the hqq subdirectory, but HQQ is not installed by default with torchchat,
+    due to dependence incompatibilities between torchchat and the hqq
+    project.  We may integrate hqq via requirements.txt in the future. 
+    (As a result, there's presently no upstream path for changes and/or
+    improvements to HQQ.)
+
++ Should support non-power-of-2-groups as well.
 
 ## Quantization Profiles
 
@@ -71,6 +80,7 @@ data types. The default data type for models is "fast16".  The
 "fast" data type is a virtual data type that defaults to the best
 floating point data type available on the selected device.  ("Best"
 tangibly representing a combination of speed and accuracy.)
+
 
 ## Quantization API
 
@@ -126,7 +136,7 @@ python3 generate.py llama3 --dso-path llama3.so  --prompt "Hello my name is"
 ```
 ### ExecuTorch
 ```
-python3 torchchat.py export llama3 --dtype fp32 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}' --output-pte-path llama3.pte
+python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}' --output-pte-path llama3.pte
 
 python3 generate.py llama3 --pte-path llama3.pte  --prompt "Hello my name is"
 ```

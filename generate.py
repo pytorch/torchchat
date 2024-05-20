@@ -24,7 +24,7 @@ from build.builder import (
 )
 from build.model import Transformer
 from build.utils import device_sync, set_precision
-from cli import add_arguments_for_generate, arg_init, check_args, logger
+from cli import add_arguments_for_verb, arg_init, check_args, logger
 
 B_INST, E_INST = "[INST]", "[/INST]"
 B_SYS, E_SYS = "<<SYS>>", "<</SYS>>"
@@ -726,9 +726,10 @@ def _main(
             )
             aggregate_metrics["accept_counts"].append(metrics["accept_counts"])
             start_pos += y.size(0)
-        if i == -1:
-            logging.info(f"Compilation time: {time.perf_counter() - t0:.2f} seconds")
-            continue
+        jit_compile = (i == 0) and (
+            generator_args.compile or generator_args.compile_prefill
+        )
+        compilation_time = time.perf_counter() - t0
         if hasattr(prof, "export_chrome_trace"):
             if use_tp:
                 prof.export_chrome_trace(f"{profile}_rank_{rank}.json")
@@ -738,18 +739,28 @@ def _main(
         t = time.perf_counter() - t0
 
         print()
+        if start_pos >= max_seq_length:
+            print(f"[Max Sequence Length Reached. Ending Conversation.]")
+            print(f"---------------------------------------------------")
 
         tokens_generated = y.size(0) - prompt_length
         tokens_sec = tokens_generated / t
         aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-        print(
+
+        if jit_compile:
+            print(f"JIT compilation time (incl runtime): {compilation_time:.2} seconds")
+            # Don't continue here.... because we need to report and reset
+            # continue
+
+        logging.info(
             f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_sec:.02f} tokens/sec"
         )
-        print(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
-
+        logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
+        if i == 0:
+            logging.info(
+                f"*** This first iteration will include cold start effects for dynamic import, hardware caches{', JIT compilation' if jit_compile else ''}. ***"
+            )
         if start_pos >= max_seq_length:
-            print(f"[Max Sequence Length Reached. Ending Conversation.]")
-            print(f"---------------------------------------------------")
             if generator_args.chat_mode:
                 break
 
@@ -790,8 +801,9 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="torchchat generate CLI")
-    add_arguments_for_generate(parser)
+    verb = "generate"
+    add_arguments_for_verb(parser, verb)
     args = parser.parse_args()
-    check_args(args, "generate")
+    check_args(args, verb)
     args = arg_init(args)
     main(args)

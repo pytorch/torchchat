@@ -7,6 +7,7 @@
 import json
 import logging
 import os
+import sys
 from pathlib import Path
 
 import torch
@@ -14,72 +15,30 @@ import torch
 from build.utils import allowable_dtype_names, allowable_params_table, get_device_str
 from download import download_and_convert, is_model_downloaded
 
-FORMAT = (
-    "%(levelname)s: %(asctime)-15s: %(filename)s: %(funcName)s: %(module)s: %(message)s"
-)
-logging.basicConfig(filename="/tmp/torchchat.log", level=logging.INFO, format=FORMAT)
+logging.basicConfig(level=logging.INFO,format="%(message)s")
 logger = logging.getLogger(__name__)
 
-
-default_device = "fast"
+default_device = os.getenv("TORCHCHAT_DEVICE", "fast")
 default_model_dir = Path(
     os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")
 ).expanduser()
 
 
+KNOWN_VERBS = ["chat", "browser", "download", "generate", "eval", "export", "list", "remove", "where"]
+
 # Handle CLI arguments that are common to a majority of subcommands.
-def check_args(args, name: str) -> None:
+def check_args(args, verb: str) -> None:
     # Handle model download. Skip this for download, since it has slightly
     # different semantics.
     if (
-        name not in ["download", "list", "remove"]
+        verb not in ["download", "list", "remove"]
         and args.model
         and not is_model_downloaded(args.model, args.model_directory)
     ):
         download_and_convert(args.model, args.model_directory, args.hf_token)
 
 
-def add_arguments_for_chat(parser):
-    # Only chat specific options should be here
-    _add_arguments_common(parser)
-
-
-def add_arguments_for_browser(parser):
-    # Only browser specific options should be here
-    _add_arguments_common(parser)
-
-
-def add_arguments_for_download(parser):
-    # Only download specific options should be here
-    _add_arguments_common(parser)
-
-
-def add_arguments_for_generate(parser):
-    # Only generate specific options should be here
-    _add_arguments_common(parser)
-
-
-def add_arguments_for_eval(parser):
-    # Only eval specific options should be here
-    _add_arguments_common(parser)
-
-
-def add_arguments_for_export(parser):
-    # Only export specific options should be here
-    _add_arguments_common(parser)
-
-
-def add_arguments_for_list(parser):
-    # Only list specific options should be here
-    _add_arguments_common(parser)
-
-
-def add_arguments_for_remove(parser):
-    # Only remove specific options should be here
-    _add_arguments_common(parser)
-
-
-def _add_arguments_common(parser):
+def add_arguments_for_verb(parser, verb: str):
     # Model specification. TODO Simplify this.
     # A model can be specified using a positional model name or HuggingFace
     # path. Alternatively, the model can be specified via --gguf-path or via
@@ -310,6 +269,9 @@ def arg_init(args):
         raise RuntimeError(
             f"You are using PyTorch {torch.__version__}. At this time, torchchat uses the latest PyTorch technology with high-performance kernels only available in PyTorch nightly until the PyTorch 2.4 release"
         )
+
+    if sys.version_info.major != 3 or sys.version_info.minor < 10:
+       raise RuntimeError("Please use Python 3.10 or later.")
 
     if hasattr(args, "quantize") and Path(args.quantize).is_file():
         with open(args.quantize, "r") as f:
