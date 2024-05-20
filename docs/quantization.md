@@ -15,7 +15,7 @@ While quantization can potentially degrade the model's performance, the methods 
 ## Supported Quantization Schemes
 ### Weight Quantization
 | compression | bitwidth| group size | dynamic activation quantization | Eager | AOTI | ExecuTorch |
-|--|--|--|--|--|--|--|--|
+|--|--|--|--|--|--|--|
 | linear (asymmetric) | [8, 4]* | [32, 64, 128, 256]** | | ✅ | ✅ | 🚧 |
 | linear with GPTQ*** (asymmetric) | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
 | linear with HQQ*** (asymmetric) | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
@@ -28,7 +28,7 @@ quantizing the embeddings to further reduce the model size for
 on-device usecases.
 
 | compression | weight quantization (bitwidth)| weight quantization (group size) | dynamic activation quantization | Eager | AOTI | ExecuTorch |
-|--|--|--|--|--|--|--|--|
+|--|--|--|--|--|--|--|
 | embedding (symmetric) | [8, 4]* | [32, 64, 128, 256]+ | | ✅ | ✅ | ✅ |
 
 
