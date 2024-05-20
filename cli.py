@@ -15,10 +15,7 @@ import torch
 from build.utils import allowable_dtype_names, allowable_params_table, get_device_str
 from download import download_and_convert, is_model_downloaded
 
-FORMAT = (
-    "%(levelname)s: %(asctime)-15s: %(filename)s: %(funcName)s: %(module)s: %(message)s"
-)
-logging.basicConfig(filename="/tmp/torchchat.log", level=logging.INFO, format=FORMAT)
+logging.basicConfig(level=logging.INFO,format="%(message)s")
 logger = logging.getLogger(__name__)
 
 default_device = os.getenv("TORCHCHAT_DEVICE", "fast")

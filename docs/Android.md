@@ -19,35 +19,35 @@ We provide a Java library for you to integrate LLM runner to your own app.
 See [this file](https://github.com/pytorch/executorch/blob/main/extension/android/src/main/java/org/pytorch/executorch/LlamaModule.java)
 for Java APIs.
 
-To add the Java library to your app, use helper functions `download_jar_library`
-and `download_jni_library` from `scripts/android_example.sh` to download the
-prebuilt libraries.
+To add the Java library to your app, use helper functions `download_aar_library`
+from `scripts/android_example.sh` to download the prebuilt libraries.
 
 ```bash
 # my_build_script.sh
 source scripts/android_example.sh
-download_jar_library
-download_jni_library
+download_aar_library
 ```
 
+This will download the AAR to android/Torchchat/app/libs/executorch.aar.
+
 In your app working directory (for example executorch/examples/demo-apps/android/LlamaDemo),
-copy the jar to your app libs:
+copy the AAR to your app libs:
 ```bash
 mkdir -p app/libs
-cp ${TORCHCHAT_ROOT}/build/android/executorch.jar app/libs/executorch.jar
+cp ${TORCHCHAT_ROOT}/android/Torchchat/app/libs/executorch.aar ${YOUR_APP_ROOT}/app/libs/executorch.jar
 ```
 
 In your Java app, add the jar file path to your gradle build rule.
 ```
 # app/build.grardle.kts
 dependencies {
-    implementation(files("libs/executorch.jar"))
+    implementation(files("libs/executorch.aar"))
 }
 ```
 
-Then copy the corresponding JNI library to your app:
+In your Java app, you need to implement [LlamaCallback](https://github.com/pytorch/executorch/blob/main/extension/android/src/main/java/org/pytorch/executorch/LlamaCallback.java).
 
-```bash
-mkdir -p app/src/main/jniLibs/arm64-v8a
-cp ${TORCHCHAT_ROOT}/build/android/arm64-v8a/libexecutorch_llama_jni.so app/src/main/jniLibs/arm64-v8a
-```
+- `onResult()` is invoked when a token is generated
+- `onStats()` is invoked when the `generate()` is done and the tokens/sec is calculated.
+- `LlamaModule.generate()` is synchronous. Both are invoked within the same thread as `LlamaModule.generate()`.
+  -  You need to run `generate()` in worker thread and handle synchronization within your app.
