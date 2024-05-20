@@ -417,9 +417,21 @@ def _initialize_model(
             device_sync(device=builder_args.device)
 
         try:
-            from build.model_et import PTEModel
+            setattr(
+                model,
+                'model_',
+                exec_lib._load_for_executorch(str(path)),
+            )
+            def new_forward(self, x):
+                forward_inputs = (x.to(torch.long), input_pos.to(torch.long))
+                logits = self.model_.forward(forward_inputs)
+                assert len(logits) == 1
+                logits = logits[0]
+                return logits    
+    
+            from types import MethodType
+            model.forward = MethodType(new_forward, obj)
 
-            model = PTEModel(model.config, builder_args.pte_path)
         except Exception:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
     else:
