@@ -421,7 +421,7 @@ def _initialize_model(
             setattr(
                 model,
                 'model_',
-                exec_lib._load_for_executorch(str(path)),
+                exec_lib._load_for_executorch(builder_args.pte_path),
             )
             def new_forward(self, x):
                 forward_inputs = (x.to(torch.long), input_pos.to(torch.long))
