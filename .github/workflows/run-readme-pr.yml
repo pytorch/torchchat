@@ -244,4 +244,3 @@ jobs:
         echo "tests complete"
         echo "*******************************************"
         echo "::endgroup::"
-
