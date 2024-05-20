@@ -453,6 +453,7 @@ def _initialize_model(
 
         model.to(dtype=builder_args.precision)
 
+    print("-----------------------------------------------------------")
     return model
 
 

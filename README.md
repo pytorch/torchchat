@@ -49,12 +49,13 @@ cd torchchat
 # set up a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-```
-[skip default]: end
-```
+
 # install dependencies
 ./install_requirements.sh
 ```
+[skip default]: end
+
+[shell default]: ./install_requirements.sh 
 
 Installations can be tested by
 
@@ -172,12 +173,10 @@ To build the runner binary on your Mac or Linux:
 scripts/build_native.sh aoti
 ```
 
-[skip default]: begin
 Execute
 ```bash
 cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time"
 ```
-[skip default]: end
 
 ## Mobile Execution
 
@@ -198,6 +197,22 @@ root directory*.  This will download the ExecuTorch repo to
 ```
 export TORCHCHAT_ROOT=${PWD}
 ./scripts/install_et.sh
+```
+
+### Test it out using our Executorch runner
+Build the runner
+```bash
+scripts/build_native.sh et
+```
+
+**Get a PTE file if you don't have one already**
+```
+python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
+```
+
+Execute using the runner
+```bash
+cmake-out/et_run llama3.pte -z ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -i "Once upon a time"
 ```
 
 ### Export for mobile
@@ -408,22 +423,6 @@ use of the torchchat Repository Content or any models, outputs, or
 results, both alone and in combination with any other
 technologies. Additionally, you may have other legal obligations that
 govern your use of other content, such as the terms of service for
-third-party models, weights, data, or other technologies, and you are
-solely responsible for complying with all such obligations.
-
-
-### Disclaimer
-The torchchat Repository Content is provided without any guarantees about
-performance or compatibility. In particular, torchchat makes available
-model architectures written in Python for PyTorch that may not perform
-in the same manner or meet the same standards as the original versions
-of those models. When using the torchchat Repository Content, including
-any model architectures, you are solely responsible for determining the
-appropriateness of using or redistributing the torchchat Repository Content
-and assume any risks associated with your use of the torchchat Repository Content
-or any models, outputs, or results, both alone and in combination with
-any other technologies. Additionally, you may have other legal obligations
-that govern your use of other content, such as the terms of service for
 third-party models, weights, data, or other technologies, and you are
 solely responsible for complying with all such obligations.
 

@@ -550,9 +550,9 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
                     inner_k_tiles=self.inner_k_tiles,
                 ):
                     if self.padding_allowed:
-                        print(
-                            f"warning: {name} is padded to satisfy in_features % 1024 == 0"
-                        )
+                        # print(
+                        #     f"warning: {name} is padded to satisfy in_features % 1024 == 0"
+                        # )
                         padded_in_features = find_multiple(in_features, 1024)
                         weight = F.pad(
                             weight, pad=(0, padded_in_features - in_features)
