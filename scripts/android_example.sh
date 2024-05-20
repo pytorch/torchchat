@@ -25,18 +25,14 @@ else
   exit -1
 fi
 
-LLAMA_JNI_ARM64_URL="https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/arm64-v8a/libexecutorch_llama_jni.so"
-LLAMA_JNI_X86_64_URL="https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/x86_64/libexecutorch_llama_jni.so"
-LLAMA_JAR_URL="https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch.jar"
+LLAMA_AAR_URL="https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar"
 
-LLAMA_JNI_ARM64_SHASUM="38788e2a3318075ccdd6e337e4c56f82bbbce06f"
-LLAMA_JNI_X86_64_SHASUM="cdc98d468b8e48c8784408fcada8177e6bc5f981"
-LLAMA_JAR_SHASUM="fb9ee00d028ef23a48cb8958638a5010ba849ccf"
+LLAMA_AAR_SHASUM="09d17f7bc59589b581e45bb49511d19196d0297d"
 
 mkdir -p ${TORCHCHAT_ROOT}/build/android
 
 setup_java() {
-  if [ -x $(command -v javac ) ] && [[ $(javac -version | cut -d' ' -f2 | cut -d'.' -f1) -ge 17 ]]; then
+  if [ -x "$(command -v javac )" ] && [[ $(javac -version | cut -d' ' -f2 | cut -d'.' -f1) -ge 17 ]]; then
     echo "Java 17 is set up"
     return
   fi
@@ -58,7 +54,7 @@ setup_java() {
 }
 
 setup_android_sdk_manager() {
-  if [ -x $(command -v sdkmanager ) ]; then
+  if [ -x "$(command -v sdkmanager )" ]; then
     echo "Android sdkmanager is set up"
     return
   fi
@@ -80,42 +76,14 @@ setup_android_sdk() {
   sdkmanager "platform-tools"
 }
 
-download_jar_library() {
-  mkdir -p ${TORCHCHAT_ROOT}/build/android/libs
-  curl "${LLAMA_JAR_URL}" -o ${TORCHCHAT_ROOT}/build/android/libs/executorch.jar
-  echo "${LLAMA_JAR_SHASUM}  ${TORCHCHAT_ROOT}/build/android/libs/executorch.jar" | shasum --check --status
-}
-
-download_jni_library() {
-  mkdir -p ${TORCHCHAT_ROOT}/build/android/jni/arm64-v8a
-  mkdir -p ${TORCHCHAT_ROOT}/build/android/jni/x86_64
-  if [ ! -f ${TORCHCHAT_ROOT}/build/android/jni/arm64-v8a/libexecutorch_llama_jni.so ]; then
-    curl "${LLAMA_JNI_ARM64_URL}" -o ${TORCHCHAT_ROOT}/build/android/jni/arm64-v8a/libexecutorch_llama_jni.so
-    echo "${LLAMA_JNI_ARM64_SHASUM}  ${TORCHCHAT_ROOT}/build/android/jni/arm64-v8a/libexecutorch_llama_jni.so" | shasum --check --status
-  fi
-  if [ ! -f ${TORCHCHAT_ROOT}/build/android/jni/x86_64/libexecutorch_llama_jni.so ]; then
-    curl "${LLAMA_JNI_X86_64_URL}" -o ${TORCHCHAT_ROOT}/build/android/jni/x86_64/libexecutorch_llama_jni.so
-    echo "${LLAMA_JNI_X86_64_SHASUM}  ${TORCHCHAT_ROOT}/build/android/jni/x86_64/libexecutorch_llama_jni.so" | shasum --check --status
-  fi
-}
-
-make_executorch_aar() {
-  if [ -f ${TORCHCHAT_ROOT}/build/android/executorch.aar ]; then
-    return
-  fi
-  pushd ${TORCHCHAT_ROOT}/build/android
-  echo \<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" \
-   package=\"org.pytorch.executorch\"\> \
-   \<uses-sdk android:minSdkVersion=\"19\" /\> \
-   \</manifest\> > AndroidManifest.xml
-  zip -r executorch.aar libs jni AndroidManifest.xml
-  popd
+download_aar_library() {
+  mkdir -p ${TORCHCHAT_ROOT}/android/Torchchat/app/libs
+  curl "${LLAMA_AAR_URL}" -o ${TORCHCHAT_ROOT}/android/Torchchat/app/libs/executorch.aar
+  echo "${LLAMA_AAR_SHASUM}  ${TORCHCHAT_ROOT}/android/Torchchat/app/libs/executorch.aar" | shasum --check --status
 }
 
 build_app() {
   pushd android/Torchchat
-  mkdir -p app/libs
-  cp ${TORCHCHAT_ROOT}/build/android/executorch.aar app/libs
   ./gradlew :app:build
   popd
 }
@@ -130,7 +98,12 @@ setup_avd() {
   if ! avdmanager list avd | grep -q "torchchat"; then
     avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
   fi
-  sdk/emulator/emulator @torchchat > /dev/null 2>&1 &
+}
+
+export_model() {
+  python torchchat.py export stories15M --output-pte-path ./build/android/model.pte
+  curl -fsSL https://github.com/karpathy/llama2.c/raw/master/tokenizer.model -o ./build/android/tokenizer.model
+  python ./unsupported/llama2.c/runner-utils/tokenizer.py --tokenizer-model=./build/android/tokenizer.model
 }
 
 push_files_to_android() {
@@ -138,19 +111,25 @@ push_files_to_android() {
   echo "sdk/emulator/emulator @torchchat > /dev/null 2>&1 &"
   adb wait-for-device
   adb shell mkdir -p /data/local/tmp/llama
-  adb push stories15M.pte /data/local/tmp/llama
-  adb push checkpoints/stories15M/tokenizer.bin /data/local/tmp/llama
+  adb push build/android/model.pte /data/local/tmp/llama
+  adb push build/android/tokenizer.bin /data/local/tmp/llama
   adb install -t android/Torchchat/app/build/outputs/apk/debug/app-debug.apk
+}
+
+run_android_instrumented_test() {
+  pushd android/Torchchat
+  ./gradlew connectedAndroidTest
+  popd
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   setup_java
   setup_android_sdk_manager
   setup_android_sdk
-  download_jni_library
-  download_jar_library
-  make_executorch_aar
+  download_aar_library
   build_app
   setup_avd
+  export_model
   push_files_to_android
+  run_android_instrumented_test
 fi

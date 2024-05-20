@@ -24,7 +24,10 @@
 
 #ifdef __AOTI_MODEL__
 #include <torch/csrc/inductor/aoti_runner/model_container_runner_cpu.h>
-torch::Device cpu_device(torch::kCPU);
+#ifdef USE_CUDA
+#include <torch/csrc/inductor/aoti_runner/model_container_runner_cuda.h>
+#endif
+torch::Device aoti_device(torch::kCPU);
 
 #else // __ET_MODEL__
 #include <executorch/extension/module/module.h>
@@ -82,7 +85,7 @@ typedef struct {
   RunState state; // buffers for the "wave" of activations in the forward pass
 
 #ifdef __AOTI_MODEL__
-  torch::inductor::AOTIModelContainerRunnerCpu* runner;
+  torch::inductor::AOTIModelContainerRunner* runner;
 #else // __ET_MODEL__
   Module* runner;
 #endif
@@ -132,9 +135,16 @@ void build_transformer(
   malloc_run_state(&t->state, &t->config);
 
 #ifdef __AOTI_MODEL__
-  t->runner = new torch::inductor::AOTIModelContainerRunnerCpu(
-      /* path to model DSO */ model_path,
-      /* thread pool size  */ 1);
+#ifdef USE_CUDA
+  try {
+    t->runner = new torch::inductor::AOTIModelContainerRunnerCuda(model_path);
+    aoti_device = torch::Device(torch::kCUDA);
+  } catch (std::runtime_error& e) {
+#else
+  {
+#endif
+    t->runner = new torch::inductor::AOTIModelContainerRunnerCpu(model_path);
+  }
 #else //__ET_MODEL__
   t->runner = new Module(
       /* path to PTE model */ model_path,
@@ -186,11 +196,11 @@ float* forward(Transformer* transformer, int token, int pos) {
   torch::Tensor token_tensor =
       torch::from_blob(token_buffer, {1, 1}, torch::kLong);
   torch::Tensor pos_tensor = torch::from_blob(pos_buffer, {1}, torch::kLong);
-  std::vector<torch::Tensor> inputs{token_tensor, pos_tensor};
+  std::vector<torch::Tensor> inputs{token_tensor.to(aoti_device), pos_tensor.to(aoti_device)};
 
   torch::Tensor result = transformer->runner->run(inputs)[0]
                              .to(torch::dtype(torch::kFloat32))
-                             .to(cpu_device);
+                             .to(torch::kCPU);
   auto logits = result[0].data_ptr();
 #else // __ET_MODEL__
   ManagedTensor pos_managed(pos_buffer, sizeof(int64_t), {1}, ScalarType::Long);

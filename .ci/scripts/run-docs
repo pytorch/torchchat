@@ -40,3 +40,55 @@ if [ "$1" == "quantization" ]; then
 
         exit 0
 fi
+
+if [ "$1" == "gguf" ]; then
+        echo "::group::Create script to run gguf"
+        python3 scripts/updown.py --file docs/GGUF.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-gguf.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-gguf.sh
+        echo "::endgroup::"
+
+        echo "::group::Run gguf"
+        echo "*******************************************"
+        cat ./run-gguf.sh
+        echo "*******************************************"
+        bash -x ./run-gguf.sh
+        echo "::endgroup::"
+fi
+
+
+if [ "$1" == "advanced" ]; then
+        echo "::group::Create script to run advanced"
+        python3 scripts/updown.py --file docs/ADVANCED-USERS.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B-Instruct:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-advanced.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-advanced.sh
+        echo "::endgroup::"
+
+        echo "::group::Run advanced"
+        echo "*******************************************"
+        cat ./run-advanced.sh
+        echo "*******************************************"
+        bash -x ./run-advanced.sh
+        echo "::endgroup::"
+fi            
+
+if [ "$1" == "evaluation" ]; then
+
+    exit 0
+    
+        echo "::group::Create script to run evaluation"
+        python3 scripts/updown.py --file docs/evaluation.md --replace 'llama3:stories15M,-l 3:-l 2,meta-llama/Meta-Llama-3-8B:stories15M' --suppress huggingface-cli,HF_TOKEN > ./run-evaluation.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-evaluation.sh
+        echo "::endgroup::"
+
+        echo "::group::Run evaluation"
+        echo "*******************************************"
+        cat ./run-evaluation.sh
+        echo "*******************************************"
+        bash -x ./run-evaluation.sh
+fi
+
