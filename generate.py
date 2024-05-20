@@ -748,7 +748,7 @@ def _main(
         aggregate_metrics["tokens_per_sec"].append(tokens_sec)
 
         if jit_compile:
-            print(f"JIT compilation time (incl runtime): {compilation_time:.2} seconds")
+            print(f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds")
             # Don't continue here.... because we need to report and reset
             # continue
 
