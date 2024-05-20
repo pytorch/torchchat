@@ -212,7 +212,7 @@ python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-p
 
 Execute using the runner
 ```bash
-cmake-out/et_run llama3.pte -z ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.model -i "Once upon a time"
+cmake-out/et_run llama3.pte -z `python3 torchchat.py where llama3`/tokenizer.model -i "Once upon a time"
 ```
 
 ### Export for mobile
