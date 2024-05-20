@@ -1071,4 +1071,4 @@ jobs:
           pushd ${TORCHCHAT_ROOT}
           bash .ci/scripts/convert_checkpoint.sh ${REPO_NAME}
           bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "aoti"
-          bash -x scripts/android_example.sh
+          echo Y | bash -x scripts/android_example.sh
