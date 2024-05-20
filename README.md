@@ -49,12 +49,13 @@ cd torchchat
 # set up a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-```
-[skip default]: end
-```
+
 # install dependencies
 ./install_requirements.sh
 ```
+[skip default]: end
+
+[shell default]: ./install_requirements.sh 
 
 Installations can be tested by
 
@@ -255,20 +256,43 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
 
 ### Deploy and run on Android
 
-**This section is copied from the original REAMDE and may require additional integration work**
+#### Approach 1: Android Studio
 
-Please refer to our [tutorial on how to build an Android app running
-your PyTorch models with
-Executorch](https://pytorch.org/executorch/main/llm/llama-demo-android.html)
-to for an example on how to run your torchchat models on Android.
+If you have Android Studio set up, and you have Java 17 and Android SDK 34 configured, you can follow this step.
 
-![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png
- "Android app running Llama model")
+First, you need to download the following AAR file which contains the required Java library and its corresponding JNI library, for the app to build and run. You need to put the file to `android/Torchchat/app/libs/executorch.aar`
 
-Detailed step by step in conjunction with ET Android build, to run on
-simulator for Android. `scripts/android_example.sh` for running a
-model on an Android simulator (on Mac), and in `docs/Android.md`.
+[executorch-llama.aar](https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar) (SHASUM: 09d17f7bc59589b581e45bb49511d19196d0297d)
 
+```
+curl https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
+echo "09d17f7bc59589b581e45bb49511d19196d0297d  android/Torchchat/app/libs/executorch.aar" | shasum --check
+```
+
+You also need to push the model and tokenizer file to your device. Please refer to the docs above on generating the pte and bin file, or use E2E script (see section below) to generate and push the file.
+
+```
+adb shell mkdir -p /data/local/tmp/llama
+adb push build/android/model.pte /data/local/tmp/llama
+adb push build/android/tokenizer.bin /data/local/tmp/llama
+```
+
+Now, you can open the torchchat app skeleton, which is located at `android/Torchchat`. Use Android Studio to open this directory.
+
+Then, click the Play button (^R) to launch it to emulator/device.
+
+Now, follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem and issue a prompt.
+
+<img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
+
+#### Approach 2: E2E Script
+
+Alternatively, you can run `scripts/android_example.sh` which sets up Java, Android SDK Manager, Android SDK, Android emulator, builds the app, and launches it for you.
+
+```
+export TORCHCHAT_ROOT=$(pwd)
+sh scripts/android_example.sh
+```
 
 
 ### Eval
@@ -385,22 +409,6 @@ use of the torchchat Repository Content or any models, outputs, or
 results, both alone and in combination with any other
 technologies. Additionally, you may have other legal obligations that
 govern your use of other content, such as the terms of service for
-third-party models, weights, data, or other technologies, and you are
-solely responsible for complying with all such obligations.
-
-
-### Disclaimer
-The torchchat Repository Content is provided without any guarantees about
-performance or compatibility. In particular, torchchat makes available
-model architectures written in Python for PyTorch that may not perform
-in the same manner or meet the same standards as the original versions
-of those models. When using the torchchat Repository Content, including
-any model architectures, you are solely responsible for determining the
-appropriateness of using or redistributing the torchchat Repository Content
-and assume any risks associated with your use of the torchchat Repository Content
-or any models, outputs, or results, both alone and in combination with
-any other technologies. Additionally, you may have other legal obligations
-that govern your use of other content, such as the terms of service for
 third-party models, weights, data, or other technologies, and you are
 solely responsible for complying with all such obligations.
 

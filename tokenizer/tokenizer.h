@@ -50,7 +50,7 @@ class Tokenizer {
   }
 
  protected:
-  bool initialized_;
+  bool initialized_ = false;
   int32_t vocab_size_;
   uint64_t bos_tok_, eos_tok_;
 };

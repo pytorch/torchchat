@@ -1,4 +1,4 @@
-name: Run runner-aoti CUDA tests
+name: Run the aoti runner with CUDA using stories
 
 on:
   pull_request:
@@ -8,12 +8,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-cuda:
+  test-runner-aot-cuda:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
+      secrets-env: "HF_TOKEN_PERIODIC"
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
+      timeout: 60
       script: |
         echo "::group::Print machine info"
         uname -a
@@ -29,6 +31,7 @@ jobs:
         # Install requirements
 
         ./install_requirements.sh cuda
+        bash scripts/build_native.sh aoti
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -46,35 +49,16 @@ jobs:
         export MODEL_NAME=stories15M
         export MODEL_DIR=/tmp
 
-      - name: Install dependencies
-        run: |
-          ./install_requirements.sh
-          pip3 list
-          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
-          bash scripts/build_native.sh aoti
+        set -eou pipefail
+        export MODEL_DIR=${PWD}/checkpoints/stories15M
+        export PROMPT="Once upon a time in a land far away"
 
-      - name: Download checkpoint
-        run: |
-          mkdir -p checkpoints/stories15M
-          pushd checkpoints/stories15M
-          wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
-          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
-          wget https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin
-          popd
-      - name: Run inference
-        run: |
-          set -eou pipefail
-
-
-          export MODEL_DIR=${PWD}/checkpoints/stories15M
-          export PROMPT="Once upon a time in a land far away"
-
-          for DTYPE in bfloat16; do
+        for DTYPE in bfloat16; do
             python torchchat.py generate --dtype ${DTYPE} --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}" --device cuda
 
             python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-dso-path /tmp/model.so
 
-            ./cmake-out/aoti_run /tmp/model.so -z ${MODEL_DIR}/tokenizer.bin -i "${PROMPT}"
+            ./cmake-out/aoti_run /tmp/model.so -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}"
 
             echo "**********************************************"
             echo "******** INT4 HQQ group-wise quantized *******"
@@ -87,8 +71,8 @@ jobs:
             python generate.py --dtype ${DTYPE} --device cuda --checkpoint-path ${MODEL_PATH} --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so  > ./output_aoti
             cat ./output_aoti
 
-          done
+        done
 
-          echo "tests complete"
-          echo "******************************************"
-          echo "::endgroup::"
+        echo "tests complete"
+        echo "******************************************"
+        echo "::endgroup::"
