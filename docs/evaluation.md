@@ -2,7 +2,11 @@
 
 # Evaluation Features
 
+<!--
+[shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
 [shell default]: ./install_requirements.sh
+[shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
+-->
 
 
 Torchchat provides evaluation functionality for your language model on
