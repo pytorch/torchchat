@@ -173,12 +173,10 @@ To build the runner binary on your Mac or Linux:
 scripts/build_native.sh aoti
 ```
 
-[skip default]: begin
 Execute
 ```bash
 cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time"
 ```
-[skip default]: end
 
 ## Mobile Execution
 
