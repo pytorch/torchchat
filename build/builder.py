@@ -431,7 +431,7 @@ def _initialize_model(
                 return logits    
     
             from types import MethodType
-            model.forward = MethodType(new_forward, obj)
+            model.forward = MethodType(new_forward, model)
 
         except Exception:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
