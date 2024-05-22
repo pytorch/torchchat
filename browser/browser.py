@@ -3,6 +3,10 @@ import sys
 
 
 def main(args):
+
+    # Directory Containing the server file "chat_in_browser.py"
+    server_dir = "browser"
+
     # Look for port from cmd args. Default to 5000 if not found.
     port = 5000
     i = 2
@@ -25,7 +29,7 @@ def main(args):
     command = [
         "flask",
         "--app",
-        "browser/chat_in_browser:create_app(" + formatted_args + ")",
+        f"{server_dir}/chat_in_browser:create_app(" + formatted_args + ")",
         "run",
         "--port",
         f"{port}",
