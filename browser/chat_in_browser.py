@@ -5,15 +5,19 @@
 # LICENSE file in the root directory of this source tree.
 
 import subprocess
+import os
 
 from flask import Flask, render_template, request
 
 convo = ""
 disable_input = False
 
+# Flask html Template Path
+#template_dir = os.path.abspath('browser/templates')
 
 def create_app(*args):
     app = Flask(__name__)
+    # app = Flask(__name__, template_folder=template_dir)
 
     # create a new process and set up pipes for communication
     proc = subprocess.Popen(
