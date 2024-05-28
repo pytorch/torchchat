@@ -28,6 +28,7 @@ zstd
 
 # Browser mode
 flask
+websockets
 
 # HQQ pulls down the version
 # hqq
