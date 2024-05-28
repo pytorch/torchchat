@@ -25,9 +25,10 @@ else
   exit -1
 fi
 
-LLAMA_AAR_URL="https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar"
+# TODO(hsz): Update this once we upload to persistent storage
+LLAMA_AAR_URL="https://gha-artifacts.s3.amazonaws.com/pytorch/executorch/9197967593/artifact/executorch-llama.aar"
 
-LLAMA_AAR_SHASUM="09d17f7bc59589b581e45bb49511d19196d0297d"
+LLAMA_AAR_SHASUM="e19ffb15aa3f1b1281de66dd6f71c9a332a82b92"
 
 mkdir -p ${TORCHCHAT_ROOT}/build/android
 
@@ -98,22 +99,23 @@ setup_avd() {
   if ! avdmanager list avd | grep -q "torchchat"; then
     avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
   fi
+  export ANDROID_SDK_ROOT=$(realpath ./build/android/)
+  ./build/android/sdk/emulator/emulator @torchchat &
 }
 
 export_model() {
   python torchchat.py export stories15M --output-pte-path ./build/android/model.pte
   curl -fsSL https://github.com/karpathy/llama2.c/raw/master/tokenizer.model -o ./build/android/tokenizer.model
-  python ./unsupported/llama2.c/runner-utils/tokenizer.py --tokenizer-model=./build/android/tokenizer.model
+  python ./unsupported/llama2.c/tokenizer.py --tokenizer-model=./build/android/tokenizer.model
 }
 
 push_files_to_android() {
   echo "If you need to use emulator, please use a separate window and run"
   echo "sdk/emulator/emulator @torchchat > /dev/null 2>&1 &"
-  adb wait-for-device
+  adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
   adb shell mkdir -p /data/local/tmp/llama
   adb push build/android/model.pte /data/local/tmp/llama
   adb push build/android/tokenizer.bin /data/local/tmp/llama
-  adb install -t android/Torchchat/app/build/outputs/apk/debug/app-debug.apk
 }
 
 run_android_instrumented_test() {
@@ -133,3 +135,5 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   push_files_to_android
   run_android_instrumented_test
 fi
+
+adb install -t android/Torchchat/app/build/outputs/apk/debug/app-debug.apk
