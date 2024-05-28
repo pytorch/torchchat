@@ -69,6 +69,7 @@ setup_android_sdk_manager() {
   unzip commandlinetools.zip
   mv cmdline-tools/* sdk/cmdline-tools/latest
   export PATH="$(realpath sdk/cmdline-tools/latest/bin):$PATH"
+  export PATH="$(realpath sdk/platform-tools):$PATH"
   popd
 }
 
