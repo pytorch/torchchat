@@ -697,16 +697,16 @@ def _main(
                     is_llama3_model=is_llama3_model,
                 )
 
-        t0 = time.perf_counter()
-        import contextlib
 
         if (i != generator_args.num_samples - 1 or not profile) or (
             use_tp and rank != 0
         ):
+            import contextlib
             prof = contextlib.nullcontext()
         else:
             torch.profiler._utils._init_for_cuda_graphs()
             prof = torch.profiler.profile()
+        t0 = time.perf_counter()
         with prof:
             y, metrics = generate(
                 model,
