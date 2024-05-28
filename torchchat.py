@@ -8,6 +8,7 @@ import argparse
 import logging
 import subprocess
 import sys
+import webbrowser as wb
 
 from cli import (
     add_arguments_for_verb,
@@ -67,34 +68,19 @@ if __name__ == "__main__":
         args.gui = True
         check_args(args, "browser")
 
-        # Look for port from cmd args. Default to 5000 if not found.
-        port = 5000
-        i = 2
-        while i < len(sys.argv):
-            if sys.argv[i] == "--port":
-                if i + 1 < len(sys.argv):
-                    # Extract the value and remove '--port' and the value from sys.argv
-                    port = sys.argv[i + 1]
-                    del sys.argv[i : i + 2]
-                    break
-            else:
-                i += 1
+        subprocess.Popen("python -m http.server 8000", cwd="browser/build/", shell=True)
 
-        # Construct arguments for the flask app minus 'browser' command
-        # plus '--chat'
-        args_plus_chat = ["'{}'".format(s) for s in sys.argv[1:] if s != "browser"] + [
-            '"--chat"'
-        ]
-        formatted_args = ", ".join(args_plus_chat)
-        command = [
-            "flask",
-            "--app",
-            "chat_in_browser:create_app(" + formatted_args + ")",
-            "run",
-            "--port",
-            f"{port}",
-        ]
-        subprocess.run(command)
+        wb.open_new_tab('http://localhost:8000')
+
+        from generate import main as generate_main
+        generate_main(args)
+
+
+
+
+
+
+
     elif args.command == "download":
         check_args(args, "download")
         from download import download_main

@@ -1,0 +1,122 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+#input-container {
+  bottom: 0.5rem;
+  left: auto;
+  right: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: linear-gradient(#ffffff, #f2f2f2);;
+  border-top: 1px solid #e5e5e5;
+  z-index: 100; /* ensure the input container is always on top */
+  border-radius: 1.25rem;
+}
+#input-box {
+  flex-grow: 1;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: 1px rgb(204, 204, 204) solid;
+  border-radius: 0.25rem;
+}
+#send-btn {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: #4CAF50; /* green */
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+#send-btn:hover {
+  background-color: #3e8e41; /* darker green */
+}
+
+
+#chat-window {
+  top: -200px;
+  max-width: 50rem;
+  width: 50%;
+  height: 80vh;
+  overflow-y: scroll;
+}
+
+#chat-background {
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  background: linear-gradient(#b8ecff, #bbbbbb);
+  display: flex;
+  justify-content: center;
+}
+
+.message {
+  box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
+  padding: 4%;
+  border-radius: 1.5rem;
+  margin: 4%;
+  background: linear-gradient(#ffffff, #f2f2f2);
+  display: block;
+}
+
+
+.model {
+  background: linear-gradient(#b5d4fa, #ffffff);
+  margin-left: 10% !important;
+}
+
+.user {
+  background: linear-gradient(#ffeded, #ffffff);
+  margin-right: 10% !important;
+}
+
+
+
+.spinner {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/1/10/PyTorch_logo_icon.svg');
+  display: inline-block;
+  width: 18px;
+  height: 21px;
+  animation: spin 1s linear infinite;
+  margin-top: 12px;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+button:disabled {
+  background-color: #ccc !important;
+  border-color: #ccc !important;
+  cursor: not-allowed !important;
+}
+
+.input-div{
+  max-width: 50rem;
+  text-align: center;
+  width: 50%;
+  position: fixed;
+  bottom: 0;
+
+}
+
+div#watermark {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 99999;
+  background: url('https://upload.wikimedia.org/wikipedia/commons/1/10/PyTorch_logo_icon.svg') center center no-repeat;
+  pointer-events: none;
+}

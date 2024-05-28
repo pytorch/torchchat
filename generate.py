@@ -8,9 +8,17 @@ import itertools
 import logging
 import sys
 import time
+import asyncio
+import websockets
+import json
+import threading
+import queue
+
+
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Tuple
+from datetime import datetime
 
 import torch
 import torch._dynamo.config
@@ -25,9 +33,121 @@ from build.builder import (
 from build.model import Transformer
 from build.utils import device_sync, set_precision
 from cli import add_arguments_for_verb, arg_init, check_args, logger
+import asyncio
+from websockets.server import serve
 
 B_INST, E_INST = "[INST]", "[/INST]"
 B_SYS, E_SYS = "<<SYS>>", "<</SYS>>"
+
+
+class ChatInterface:
+    def output_system_message(self, part_message: str) -> None: ...
+    def output_model_message(self, part_message: str, end: bool) -> None: ...
+    def get_user_input(self, question: str) -> str: ...
+
+class TerminalChatInterface:
+
+    def output_system_message(self, message: str) -> None:
+        print(message)
+
+    def output_model_message(self, part_message: str, end: bool = False) -> None:
+        end = "\n" if end else ""
+        print(part_message, end=end)
+
+    def get_user_input(self, question: str = None) -> str:
+        return input(question)
+
+class SocketChatInterface:
+
+    def output_system_message(self, message: str) -> None:
+        formated_message = {
+            "role": "system",
+            "timestamp": datetime.now().isoformat(),
+            "content": message,
+            "ended": True
+        }
+
+        message_out_buffer.put(formated_message)
+
+    def output_model_message(self, message: str, end: bool = False) -> None:
+        formated_message = {
+            "role": "model",
+            "timestamp": datetime.now().isoformat(),
+            "content": message,
+            "ended": end
+        }
+
+        message_out_buffer.put(formated_message)
+
+    def get_user_input(self, question: str = None) -> str:
+        if question:
+            self.output_system_message(question)
+
+        while message_in_queue.empty():
+            time.sleep(0.1)
+
+        message =  message_in_queue.get()
+
+        if "content" in message:
+            return message["content"]
+        else:
+            return ""
+
+
+message_in_queue = queue.Queue()
+message_out_buffer = queue.Queue()
+message_log = []
+
+async def message_in_handler(websocket):
+    async for messageStr in websocket:
+        message = json.loads(messageStr)
+        message_log.append(message)
+        message_in_queue.put(message)
+
+current_message = ""
+
+async def message_out_handler(websocket):
+    global current_message
+    while True:
+        while message_out_buffer.empty():
+            await asyncio.sleep(0)
+
+        message = message_out_buffer.get()
+
+        current_message += message["content"]
+
+        if message['ended']:
+            message["content"] = current_message
+            message_log.append(message)
+            current_message = ""
+        await websocket.send(json.dumps(message))
+
+running_session = None
+
+
+async def handler(websocket: websockets.legacy.server.WebSocketServerProtocol):
+    global running_session
+    if running_session is not None:
+        running_session.cancel()
+
+    await websocket.send(json.dumps({"message_hist": message_log}))
+    await websocket.send(json.dumps({"message_curr": current_message}))
+
+    running_session = asyncio.gather(message_in_handler(websocket), message_out_handler(websocket))
+    await running_session
+
+
+def boot_messaging_loop():
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    loop = asyncio.get_event_loop()
+    try:
+        start_server = websockets.serve(handler, "localhost", 8001)
+        print("Starting model output server")
+        loop.run_until_complete(start_server)
+        loop.run_forever()
+    finally:
+        loop.close()
+        print("Model output server stopped")
 
 
 class ChatFormat:
@@ -460,21 +580,25 @@ def get_device_info(name: str) -> str:
     return ""
 
 
-def _callback(x, buffer, period_id, done_generating, tokenizer, is_llama3_model):
+def _callback(x, chat_interface: ChatInterface, period_id, done_generating, tokenizer, is_llama3_model):
     if done_generating:
         return
-    buffer.append(
-        tokenizer.decode([period_id] + x.tolist())[1:]
-    )  # I think this results in the first output token being dropped from the display which is wrong.
+
     if x.item() == tokenizer.eos_id():
-        done_generating = True
-    if is_llama3_model and x.item() == tokenizer.special_tokens["<|eot_id|>"]:
-        done_generating = True
-        buffer = buffer[:-1]  # drop the eot_id from the output buffer
-    if len(buffer) == 4 or done_generating:
-        print("".join(buffer), end="", flush=True)
-        buffer.clear()
-    # print(, end='', flush=True)
+        chat_interface.output_model_message(
+            "",
+            True
+        )
+
+    elif is_llama3_model and x.item() == tokenizer.special_tokens["<|eot_id|>"]:
+        chat_interface.output_model_message(
+            "",
+            True
+        )
+    else:
+        chat_interface.output_model_message(
+            tokenizer.decode([period_id] + x.tolist())[1:]
+        )
 
 
 def _main(
@@ -503,6 +627,12 @@ def _main(
     print(f"Using device={builder_args.device} {get_device_info(builder_args.device)}")
     set_precision(builder_args.precision)
     is_speculative = speculative_builder_args.checkpoint_path is not None
+
+
+    chat_interface = TerminalChatInterface()
+
+    if builder_args.is_chat_model:
+        chat_interface = SocketChatInterface()
 
     if generator_args.chat_mode and not builder_args.is_chat_model:
         print(
@@ -615,12 +745,16 @@ def _main(
     # arbitrarily large number as chat mode goes until max_seq length
     # or user exits
     num_samples = generator_args.num_samples if not generator_args.chat_mode else 100000
+    chat_interface.output_system_message("Ready")
+
     for i in range(num_samples):
         device_sync(device=builder_args.device)
+        # I think i will always be greater than zero
         if i >= 0 and generator_args.chat_mode:
-            prompt = input("User: ")
+            prompt = chat_interface.get_user_input()
             if prompt == "/bye":
-                print("Exiting Chat.\n")
+                chat_interface.output_system_message("Exiting Chat. Please close the window.")
+                print("Chat ended.")
                 break
             if not is_llama3_model:
                 if system_prompt:
@@ -665,8 +799,6 @@ def _main(
                 break
 
         if generator_args.chat_mode and i >= 0:
-            print("Model: ", end="")
-
             buffer = []
             period_id = tokenizer.encode(".")[0]
             done_generating = False
@@ -674,7 +806,7 @@ def _main(
             def callback(x):
                 return _callback(
                     x,
-                    buffer=buffer,
+                    chat_interface=chat_interface,
                     period_id=period_id,
                     done_generating=done_generating,
                     tokenizer=tokenizer,
@@ -690,7 +822,7 @@ def _main(
             def callback(x):
                 return _callback(
                     x,
-                    buffer=buffer,
+                    chat_interface=TerminalChatInterface(),
                     period_id=period_id,
                     done_generating=done_generating,
                     tokenizer=tokenizer,
@@ -783,6 +915,10 @@ def _main(
 
 
 def main(args):
+
+    server = threading.Thread(target=boot_messaging_loop, daemon=True)
+    server.start()
+
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
@@ -797,6 +933,10 @@ def main(args):
         args.quantize,
         args.draft_quantize,
     )
+
+    # Wait for mesages to be flushed to the chat
+    while message_out_buffer.empty():
+        time.sleep(0.1)
 
 
 if __name__ == "__main__":
