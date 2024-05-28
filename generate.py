@@ -753,7 +753,7 @@ def _main(
             # continue
 
         logging.info(
-            f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_sec:.02f} tokens/sec"
+            f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_generated} tokens, {tokens_sec:.02f} tokens/sec, {1000 / tokens_sec:.02f} ms/token"
         )
         logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
         if i == 0:
