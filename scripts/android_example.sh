@@ -101,7 +101,7 @@ setup_avd() {
     avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
   fi
   export ANDROID_SDK_ROOT=$(realpath ./build/android/)
-  ./build/android/sdk/emulator/emulator @torchchat &
+  ./build/android/sdk/emulator/emulator @torchchat > /dev/null 2>&1 &
 }
 
 export_model() {
@@ -111,8 +111,6 @@ export_model() {
 }
 
 push_files_to_android() {
-  echo "If you need to use emulator, please use a separate window and run"
-  echo "sdk/emulator/emulator @torchchat > /dev/null 2>&1 &"
   adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
   adb shell mkdir -p /data/local/tmp/llama
   adb push build/android/model.pte /data/local/tmp/llama
@@ -138,3 +136,5 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 fi
 
 adb install -t android/Torchchat/app/build/outputs/apk/debug/app-debug.apk
+
+trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
