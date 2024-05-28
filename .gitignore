@@ -32,3 +32,10 @@ client/.env
 # Operating System
 .DS_Store
 Thumbs.db
+
+# dependencies
+/.pnp
+.pnp.js
+
+# testing
+/coverage
