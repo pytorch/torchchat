@@ -84,6 +84,7 @@ setup_android_sdk() {
   else
     yes | sdkmanager "platforms;android-34" "platform-tools"
   fi
+  export ANDROID_HOME="$(realpath build/android/sdk)"
 }
 
 download_aar_library() {
