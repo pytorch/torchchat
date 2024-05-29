@@ -1,0 +1,40 @@
+#! /bin/bash
+
+# Check the spelling of the specified file as an indicator of
+# whether the model produced gibberish - this doesn't catch low quality
+# output, just utter garbage as a basic backstop
+
+cat "$1"
+
+########################################################################
+#
+# extract sequence from other output
+
+TMPFILE=/tmp/`basename "$1"`-sequence
+
+if [ "X$2" == "X--no-extract" ]; then
+    cp "$1" $TMPFILE
+else
+    # We extract only the sequence output and don't spell check status and performance stats
+    python3 .ci/scripts/extract-sequence.py "$1" >$TMPFILE
+
+    if [ $? -ne 0 ]; then
+        echo "Sequence extraction failed. Exiting."
+        exit 1
+    fi
+fi
+
+#######################################################################
+#
+# run spell check on the extracted sequence
+
+cat ${TMPFILE} |  aspell -a -c  | grep '^[\&#]' >/tmp/out.$$
+# Exit with a non-zero status code if there were any spelling errors because:
+# * Finding one or more lines with & or # means we found a spelling error, might be gibberish
+if [ $? -ne 0 ]; then
+    echo "No spelling errors found; likely correct operation. Success."
+    exit 0
+fi
+cat /tmp/out.$$
+echo "Spelling errors found; might indicate garbage output. Failing."
+exit 1

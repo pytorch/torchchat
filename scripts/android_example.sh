@@ -7,6 +7,11 @@
 
 set -eux
 
+# In CI environment, we accept SDK license and return automatically
+if [ "${1:-}" == "--ci" ]; then
+  export CI_ENV=1
+fi
+
 cd ${TORCHCHAT_ROOT}
 echo "Inside: $TORCHCHAT_ROOT"
 
@@ -25,9 +30,9 @@ else
   exit -1
 fi
 
-LLAMA_AAR_URL="https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar"
+LLAMA_AAR_URL="https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama-torchchat.aar"
 
-LLAMA_AAR_SHASUM="09d17f7bc59589b581e45bb49511d19196d0297d"
+LLAMA_AAR_SHASUM="e19ffb15aa3f1b1281de66dd6f71c9a332a82b92"
 
 mkdir -p ${TORCHCHAT_ROOT}/build/android
 
@@ -68,12 +73,17 @@ setup_android_sdk_manager() {
   unzip commandlinetools.zip
   mv cmdline-tools/* sdk/cmdline-tools/latest
   export PATH="$(realpath sdk/cmdline-tools/latest/bin):$PATH"
+  export PATH="$(realpath sdk/platform-tools):$PATH"
   popd
 }
 
 setup_android_sdk() {
-  sdkmanager "platforms;android-34"
-  sdkmanager "platform-tools"
+  if [ -z "${CI_ENV:-}" ]; then
+    sdkmanager "platforms;android-34" "platform-tools"
+  else
+    yes | sdkmanager "platforms;android-34" "platform-tools"
+  fi
+  export ANDROID_HOME="$(realpath build/android/sdk)"
 }
 
 download_aar_library() {
@@ -93,27 +103,36 @@ setup_avd() {
     echo "adb device detected, skipping avd setup"
     return
   fi
-  sdkmanager "emulator"
-  sdkmanager "system-images;android-34;google_apis;${ANDROID_ABI}"
+  if [ -z "${CI_ENV:-}" ]; then
+    sdkmanager "emulator" \
+        "system-images;android-34;google_apis;${ANDROID_ABI}"
+  else
+    yes | sdkmanager "emulator" \
+        "system-images;android-34;google_apis;${ANDROID_ABI}"
+  fi
   if ! avdmanager list avd | grep -q "torchchat"; then
-    avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
+    echo no | avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
+  fi
+  export ANDROID_SDK_ROOT=$(realpath ./build/android/)
+  trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+  if [ -z "${CI_ENV:-}" ]; then
+    ./build/android/sdk/emulator/emulator @torchchat &
+  else
+    ./build/android/sdk/emulator/emulator -no-audio -no-window -gpu swiftshader_indirect @torchchat &
   fi
 }
 
 export_model() {
   python torchchat.py export stories15M --output-pte-path ./build/android/model.pte
   curl -fsSL https://github.com/karpathy/llama2.c/raw/master/tokenizer.model -o ./build/android/tokenizer.model
-  python ./unsupported/llama2.c/runner-utils/tokenizer.py --tokenizer-model=./build/android/tokenizer.model
+  python ./et-build/src/executorch/examples/models/llama2/tokenizer/tokenizer.py -t ./build/android/tokenizer.model -o build/android/tokenizer.bin
 }
 
 push_files_to_android() {
-  echo "If you need to use emulator, please use a separate window and run"
-  echo "sdk/emulator/emulator @torchchat > /dev/null 2>&1 &"
-  adb wait-for-device
+  adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
   adb shell mkdir -p /data/local/tmp/llama
   adb push build/android/model.pte /data/local/tmp/llama
   adb push build/android/tokenizer.bin /data/local/tmp/llama
-  adb install -t android/Torchchat/app/build/outputs/apk/debug/app-debug.apk
 }
 
 run_android_instrumented_test() {
@@ -133,3 +152,9 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   push_files_to_android
   run_android_instrumented_test
 fi
+
+adb install -t android/Torchchat/app/build/outputs/apk/debug/app-debug.apk
+
+if [ -z "${CI_ENV:-}" ]; then
+  read -p "Press enter to exit emulator and finish"
+else

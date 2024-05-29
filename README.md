@@ -173,12 +173,10 @@ To build the runner binary on your Mac or Linux:
 scripts/build_native.sh aoti
 ```
 
-[skip default]: begin
 Execute
 ```bash
 cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time"
 ```
-[skip default]: end
 
 ## Mobile Execution
 
@@ -199,6 +197,22 @@ root directory*.  This will download the ExecuTorch repo to
 ```
 export TORCHCHAT_ROOT=${PWD}
 ./scripts/install_et.sh
+```
+
+### Test it out using our Executorch runner
+Build the runner
+```bash
+scripts/build_native.sh et
+```
+
+**Get a PTE file if you don't have one already**
+```
+python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
+```
+
+Execute using the runner
+```bash
+cmake-out/et_run llama3.pte -z `python3 torchchat.py where llama3`/tokenizer.model -i "Once upon a time"
 ```
 
 ### Export for mobile
@@ -262,11 +276,11 @@ If you have Android Studio set up, and you have Java 17 and Android SDK 34 confi
 
 First, you need to download the following AAR file which contains the required Java library and its corresponding JNI library, for the app to build and run. You need to put the file to `android/Torchchat/app/libs/executorch.aar`
 
-[executorch-llama.aar](https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar) (SHASUM: 09d17f7bc59589b581e45bb49511d19196d0297d)
+[executorch-llama-torchchat.aar](https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama-torchchat.aar) (SHASUM: e19ffb15aa3f1b1281de66dd6f71c9a332a82b92)
 
 ```
-curl https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
-echo "09d17f7bc59589b581e45bb49511d19196d0297d  android/Torchchat/app/libs/executorch.aar" | shasum --check
+curl https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama-torchchat.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
+echo "e19ffb15aa3f1b1281de66dd6f71c9a332a82b92  android/Torchchat/app/libs/executorch.aar" | shasum --check
 ```
 
 You also need to push the model and tokenizer file to your device. Please refer to the docs above on generating the pte and bin file, or use E2E script (see section below) to generate and push the file.

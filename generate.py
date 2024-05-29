@@ -697,16 +697,16 @@ def _main(
                     is_llama3_model=is_llama3_model,
                 )
 
-        t0 = time.perf_counter()
-        import contextlib
 
         if (i != generator_args.num_samples - 1 or not profile) or (
             use_tp and rank != 0
         ):
+            import contextlib
             prof = contextlib.nullcontext()
         else:
             torch.profiler._utils._init_for_cuda_graphs()
             prof = torch.profiler.profile()
+        t0 = time.perf_counter()
         with prof:
             y, metrics = generate(
                 model,
@@ -748,12 +748,12 @@ def _main(
         aggregate_metrics["tokens_per_sec"].append(tokens_sec)
 
         if jit_compile:
-            print(f"JIT compilation time (incl runtime): {compilation_time:.2} seconds")
+            print(f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds")
             # Don't continue here.... because we need to report and reset
             # continue
 
         logging.info(
-            f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_sec:.02f} tokens/sec"
+            f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_generated} tokens, {tokens_sec:.02f} tokens/sec, {1000 / tokens_sec:.02f} ms/token"
         )
         logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
         if i == 0:
