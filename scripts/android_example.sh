@@ -120,7 +120,7 @@ setup_avd() {
   if [ -z "${CI_ENV:-}" ]; then
     ./build/android/sdk/emulator/emulator @torchchat &
   else
-    ./build/android/sdk/emulator/emulator @torchchat -no-audio -no-window &
+    ./build/android/sdk/emulator/emulator -no-audio -no-window @torchchat &
   fi
 }
 
