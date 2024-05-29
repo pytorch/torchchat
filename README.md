@@ -276,11 +276,11 @@ If you have Android Studio set up, and you have Java 17 and Android SDK 34 confi
 
 First, you need to download the following AAR file which contains the required Java library and its corresponding JNI library, for the app to build and run. You need to put the file to `android/Torchchat/app/libs/executorch.aar`
 
-[executorch-llama.aar](https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar) (SHASUM: e19ffb15aa3f1b1281de66dd6f71c9a332a82b92)
+[executorch-llama.aar](https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama-torchchat.aar) (SHASUM: e19ffb15aa3f1b1281de66dd6f71c9a332a82b92)
 
 ```
-curl https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
-echo "09d17f7bc59589b581e45bb49511d19196d0297d  android/Torchchat/app/libs/executorch.aar" | shasum --check
+curl https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama-torchchat.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
+echo "e19ffb15aa3f1b1281de66dd6f71c9a332a82b92  android/Torchchat/app/libs/executorch.aar" | shasum --check
 ```
 
 You also need to push the model and tokenizer file to your device. Please refer to the docs above on generating the pte and bin file, or use E2E script (see section below) to generate and push the file.

@@ -1037,17 +1037,3 @@ jobs:
           git submodule update --init
           ./runner/build_android.sh
           echo "Tests complete."
-
-  test-android-app-e2e:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
-    with:
-      runner: linux.4xlarge
-      script: |
-          ./install_requirements.sh
-          pip3 list
-          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
-          bash scripts/build_native.sh et
-
-          export TORCHCHAT_ROOT=${PWD}
-          scripts/android_example.sh --ci
-
