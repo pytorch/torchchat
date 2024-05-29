@@ -7,6 +7,10 @@
 
 set -eux
 
+# In CI environment, we accept SDK license and return automatically
+if [ "${1:-}" == "--ci" ]; then
+  export CI_ENV=1
+fi
 
 cd ${TORCHCHAT_ROOT}
 echo "Inside: $TORCHCHAT_ROOT"
@@ -75,8 +79,11 @@ setup_android_sdk_manager() {
 }
 
 setup_android_sdk() {
-  sdkmanager "platforms;android-34"
-  sdkmanager "platform-tools"
+  if [ -z "${CI_ENV:-}" ]; then
+    sdkmanager "platforms;android-34" "platform-tools"
+  else
+    yes | sdkmanager "platforms;android-34" "platform-tools"
+  fi
 }
 
 download_aar_library() {
@@ -96,8 +103,13 @@ setup_avd() {
     echo "adb device detected, skipping avd setup"
     return
   fi
-  sdkmanager "emulator"
-  sdkmanager "system-images;android-34;google_apis;${ANDROID_ABI}"
+  if [ -z "${CI_ENV:-}" ]; then
+    sdkmanager "emulator" \
+        "system-images;android-34;google_apis;${ANDROID_ABI}"
+  else
+    yes | sdkmanager "emulator" \
+        "system-images;android-34;google_apis;${ANDROID_ABI}"
+  fi
   if ! avdmanager list avd | grep -q "torchchat"; then
     avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
   fi
@@ -139,3 +151,6 @@ fi
 
 adb install -t android/Torchchat/app/build/outputs/apk/debug/app-debug.apk
 
+if [ -z "${CI_ENV:-}" ]; then
+  read -p "Press enter to exit emulator and finish"
+else

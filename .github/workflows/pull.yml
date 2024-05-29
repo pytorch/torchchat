@@ -1037,3 +1037,12 @@ jobs:
           git submodule update --init
           ./runner/build_android.sh
           echo "Tests complete."
+
+  test-android-app-e2e:
+    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    with:
+      runner: linux.4xlarge
+      script: |
+          export TORCHCHAT_ROOT=${PWD}
+          scripts/android_example.sh --ci
+
