@@ -120,7 +120,7 @@ setup_avd() {
   if [ -z "${CI_ENV:-}" ]; then
     ./build/android/sdk/emulator/emulator @torchchat &
   else
-    ./build/android/sdk/emulator/emulator -no-audio -no-window @torchchat &
+    ./build/android/sdk/emulator/emulator -no-audio -no-window -gpu swiftshader_indirect @torchchat &
   fi
 }
 
