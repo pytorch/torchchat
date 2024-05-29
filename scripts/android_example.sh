@@ -7,6 +7,7 @@
 
 set -eux
 
+
 cd ${TORCHCHAT_ROOT}
 echo "Inside: $TORCHCHAT_ROOT"
 
@@ -101,13 +102,14 @@ setup_avd() {
     avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
   fi
   export ANDROID_SDK_ROOT=$(realpath ./build/android/)
-  ./build/android/sdk/emulator/emulator @torchchat > /dev/null 2>&1 &
+  trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+  ./build/android/sdk/emulator/emulator @torchchat &
 }
 
 export_model() {
   python torchchat.py export stories15M --output-pte-path ./build/android/model.pte
   curl -fsSL https://github.com/karpathy/llama2.c/raw/master/tokenizer.model -o ./build/android/tokenizer.model
-  python ./unsupported/llama2.c/tokenizer.py --tokenizer-model=./build/android/tokenizer.model
+  python ./et-build/src/executorch/examples/models/llama2/tokenizer/tokenizer.py -t ./build/android/tokenizer.model -o build/android/tokenizer.bin
 }
 
 push_files_to_android() {
@@ -137,4 +139,3 @@ fi
 
 adb install -t android/Torchchat/app/build/outputs/apk/debug/app-debug.apk
 
-trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
