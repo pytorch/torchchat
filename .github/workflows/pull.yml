@@ -1044,4 +1044,4 @@ jobs:
       runner: linux.4xlarge
       script: |
           export TORCHCHAT_ROOT=${PWD}
-          yes | scripts/android_example.sh
+          scripts/android_example.sh --ci
