@@ -30,7 +30,6 @@ else
   exit -1
 fi
 
-# TODO(hsz): Update this once we upload to persistent storage
 LLAMA_AAR_URL="https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama-torchchat.aar"
 
 LLAMA_AAR_SHASUM="e19ffb15aa3f1b1281de66dd6f71c9a332a82b92"
