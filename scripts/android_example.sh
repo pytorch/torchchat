@@ -112,7 +112,7 @@ setup_avd() {
         "system-images;android-34;google_apis;${ANDROID_ABI}"
   fi
   if ! avdmanager list avd | grep -q "torchchat"; then
-    avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
+    echo no | avdmanager create avd --name "torchchat" --package "system-images;android-34;google_apis;${ANDROID_ABI}"
   fi
   export ANDROID_SDK_ROOT=$(realpath ./build/android/)
   trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
