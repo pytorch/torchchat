@@ -117,6 +117,11 @@ setup_avd() {
   export ANDROID_SDK_ROOT=$(realpath ./build/android/)
   trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
   ./build/android/sdk/emulator/emulator @torchchat &
+  if [ -z "${CI_ENV:-}" ]; then
+    ./build/android/sdk/emulator/emulator @torchchat &
+  else
+    ./build/android/sdk/emulator/emulator @torchchat -no-audio -no-window &
+  fi
 }
 
 export_model() {
