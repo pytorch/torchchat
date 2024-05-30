@@ -37,7 +37,7 @@ fi
 # newer version of torch nightly installed later in this script.
 #
 
-$PIP_EXECUTABLE install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cu121
+$PIP_EXECUTABLE install --force-reinstall -r requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cu121
 
 # Since torchchat often uses main-branch features of pytorch, only the nightly
 # pip versions will have the required features. The NIGHTLY_VERSION value should
@@ -67,7 +67,7 @@ REQUIREMENTS_TO_INSTALL=(
 
 # Install the requirements. `--extra-index-url` tells pip to look for package
 # versions on the provided URL if they aren't available on the default URL.
-$PIP_EXECUTABLE install --extra-index-url "${TORCH_NIGHTLY_URL}" \
+$PIP_EXECUTABLE install --force-reinstall --extra-index-url "${TORCH_NIGHTLY_URL}" \
     "${REQUIREMENTS_TO_INSTALL[@]}"
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   $PYTHON_EXECUTABLE scripts/patch_triton.py
