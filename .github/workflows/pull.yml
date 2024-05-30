@@ -70,6 +70,7 @@ jobs:
       TORCHCHAT_ROOT: ${{ github.workspace }}
       REPO_NAME: ${{ matrix.repo_name }}
     steps:
+      - uses: ./.github/workflows/actions/ssh
       - name: Checkout repo
         uses: actions/checkout@v3
       - name: Setup Python
