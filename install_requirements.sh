@@ -46,7 +46,7 @@ $PIP_EXECUTABLE install -r requirements.txt --extra-index-url https://download.p
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-NIGHTLY_VERSION=dev20240529
+NIGHTLY_VERSION=dev20240530
 
 # The pip repository that hosts nightly torch packages. cpu by default.
 # If cuda is available, based on presence of nvidia-smi, install the pytorch nightly
