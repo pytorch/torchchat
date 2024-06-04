@@ -254,7 +254,7 @@ The following assumes you've completed the steps for [Setting up Executorch](#se
 
 3. To run on a device, ensure you have it set up for development and a provisioning profile with the `increased-memory-limit` entitlement. Update the app's bundle identifier to match your provisioning profile with the required capability.
 
-4. After successfully launching the app, copy the exported ExecuTorch model (`.pte`) and tokenizer (`.bin` or `.model`) files to the iLLaMA folder.
+4. After successfully launching the app, copy the exported ExecuTorch model (`.pte`) and tokenizer (`.model`) files to the iLLaMA folder. You can find the model file called `llama3.pte` in the current `torchchat` directory and the tokenizer file at `$(python3 torchchat.py where llama3)/tokenizer.model` path.
 
     - **For the Simulator:** Drag and drop both files onto the Simulator window and save them in the `On My iPhone > iLLaMA` folder.
     - **For a device:** Open a separate Finder window, navigate to the Files tab, drag and drop both files into the iLLaMA folder, and wait for the copying to finish.
