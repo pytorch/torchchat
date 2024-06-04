@@ -46,7 +46,7 @@ $PIP_EXECUTABLE install -r requirements.txt --extra-index-url https://download.p
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-NIGHTLY_VERSION=dev20240508
+NIGHTLY_VERSION=dev20240520
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 $PIP_EXECUTABLE uninstall -y triton
