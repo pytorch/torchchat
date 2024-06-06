@@ -811,7 +811,7 @@ void error_usage() {
       "  -v <int>    (optional) vocab size, default is model-specific.\n");
   fprintf(
       stderr, "  -l <int>    (optional) llama version (2 or 3), default 2.\n");
-  fprintf(stderr, "  -d <string> (optional) device DSO was exported to\n");
+  fprintf(stderr, "  -d <string> (optional) device(CUDA or CPU)  model was exported for\n");
   exit(EXIT_FAILURE);
 }
 
@@ -884,14 +884,14 @@ int main(int argc, char* argv[]) {
 #ifdef __AOTI_MODEL__
     } else if (argv[i][1] == 'd') {
 #ifdef USE_CUDA
-       if (strcasecmp(argv[i+1], "CUDA") == 0) {
+       if (strcasecmp(argv[i + 1], "CUDA") == 0) {
           aoti_device = torch::Device(torch::kCUDA);
        } else
 #endif
-       if (strcasecmp(argv[i+1], "CPU") == 0) {
+       if (strcasecmp(argv[i + 1], "CPU") == 0) {
           aoti_device = torch::Device(torch::kCPU);
        } else {
-         fprintf(stderr, "Unknown device %s", argv[i+1]);
+         fprintf(stderr, "Unknown device %s", argv[i + 1]);
          exit(1);
        }
 #endif
