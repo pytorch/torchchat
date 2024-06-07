@@ -58,7 +58,7 @@ jobs:
 
             python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-dso-path /tmp/model.so
 
-            ./cmake-out/aoti_run /tmp/model.so -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}"
+            ./cmake-out/aoti_run /tmp/model.so -d CUDA -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}"
 
             echo "**********************************************"
             echo "******** INT4 HQQ group-wise quantized *******"

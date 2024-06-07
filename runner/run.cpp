@@ -136,10 +136,10 @@ void build_transformer(
 
 #ifdef __AOTI_MODEL__
 #ifdef USE_CUDA
-  try {
+  if (aoti_device.type() == torch::kCUDA) {
     t->runner = new torch::inductor::AOTIModelContainerRunnerCuda(model_path);
     aoti_device = torch::Device(torch::kCUDA);
-  } catch (std::runtime_error& e) {
+  } else {
 #else
   {
 #endif
@@ -811,6 +811,7 @@ void error_usage() {
       "  -v <int>    (optional) vocab size, default is model-specific.\n");
   fprintf(
       stderr, "  -l <int>    (optional) llama version (2 or 3), default 2.\n");
+  fprintf(stderr, "  -d <string> (optional) device(CUDA or CPU)  model was exported for\n");
   exit(EXIT_FAILURE);
 }
 
@@ -880,6 +881,20 @@ int main(int argc, char* argv[]) {
       system_prompt = argv[i + 1];
     } else if (argv[i][1] == 'l') {
       llama_ver = atoi(argv[i + 1]);
+#ifdef __AOTI_MODEL__
+    } else if (argv[i][1] == 'd') {
+#ifdef USE_CUDA
+       if (strcasecmp(argv[i + 1], "CUDA") == 0) {
+          aoti_device = torch::Device(torch::kCUDA);
+       } else
+#endif
+       if (strcasecmp(argv[i + 1], "CPU") == 0) {
+          aoti_device = torch::Device(torch::kCPU);
+       } else {
+         fprintf(stderr, "Unknown device %s", argv[i + 1]);
+         exit(1);
+       }
+#endif
     } else {
       error_usage();
     }
