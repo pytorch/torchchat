@@ -227,7 +227,7 @@ def decode_n_tokens(
             )
             input_pos += 1
             new_tokens.append(next_token.clone())
-            callback(new_tokens[-1])
+            callback(new_tokens[-1], done_generating=_i==num_new_tokens-2)
             if need_probs:
                 new_probs.append(next_prob.clone())
             cur_token = next_token.view(1, -1)
@@ -367,6 +367,7 @@ def generate(
     seq = empty
     input_pos = torch.arange(start_pos, T + start_pos, device=device, dtype=torch.int)
 
+    prefill_t0 = time.perf_counter()
     next_token = prefill(
         model,
         prompt.view(1, -1),
@@ -382,9 +383,10 @@ def generate(
             sequential_prefill=sequential_prefill,
             **sampling_kwargs,
         )
-    # print(f"sizes: {T} {seq[T].shape} {seq.shape} {next_token.shape}")
+    time_to_first_token = time.perf_counter() - prefill_t0
     seq[T] = next_token
-    callback(next_token.clone().view(-1))
+    # max_new_tokens <= 2 means we are effectively not calling decode_n_tokens().
+    callback(next_token.clone().view(-1), done_generating=max_new_tokens<=2)
 
     num_tokens_generated = 0
     input_pos = torch.tensor([start_pos + T], device=device, dtype=torch.int)
@@ -425,7 +427,7 @@ def generate(
             : T + 1 + len(generated_tokens)
         ]  # If we dont generate all the way to max_new_tokens slice off the extra space we allocated.
 
-    generate_stats = {"accept_counts": accept_counts}
+    generate_stats = {"accept_counts": accept_counts, "time_to_first_token": time_to_first_token}
     return seq, generate_stats
 
 
@@ -460,9 +462,7 @@ def get_device_info(name: str) -> str:
     return ""
 
 
-def _callback(x, buffer, period_id, done_generating, tokenizer, is_llama3_model):
-    if done_generating:
-        return
+def _callback(x, *, buffer, period_id, done_generating, tokenizer, is_llama3_model):
     buffer.append(
         tokenizer.decode([period_id] + x.tolist())[1:]
     )  # I think this results in the first output token being dropped from the display which is wrong.
@@ -669,9 +669,8 @@ def _main(
 
             buffer = []
             period_id = tokenizer.encode(".")[0]
-            done_generating = False
 
-            def callback(x):
+            def callback(x, *, done_generating=False):
                 return _callback(
                     x,
                     buffer=buffer,
@@ -685,9 +684,8 @@ def _main(
             assert not generator_args.chat_mode
             buffer = [generator_args.prompt]
             period_id = tokenizer.encode(".")[0]
-            done_generating = False
 
-            def callback(x):
+            def callback(x, *, done_generating=False):
                 return _callback(
                     x,
                     buffer=buffer,
@@ -753,7 +751,7 @@ def _main(
             # continue
 
         logging.info(
-            f"Time for inference {i + 1}: {t:.02f} sec total, {tokens_generated} tokens, {tokens_sec:.02f} tokens/sec, {1000 / tokens_sec:.02f} ms/token"
+            f"Time for inference {i + 1}: {t:.02f} sec total, time to first token {metrics['time_to_first_token']:.02f}, {tokens_generated} tokens, {tokens_sec:.02f} tokens/sec, {1000 / tokens_sec:.02f} ms/token"
         )
         logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
         if i == 0:
