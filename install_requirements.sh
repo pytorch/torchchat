@@ -46,7 +46,10 @@ $PIP_EXECUTABLE install -r requirements.txt --extra-index-url https://download.p
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-NIGHTLY_VERSION=dev20240507
+NIGHTLY_VERSION=dev20240604
+
+# Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
+$PIP_EXECUTABLE uninstall -y triton
 
 # The pip repository that hosts nightly torch packages. cpu by default.
 # If cuda is available, based on presence of nvidia-smi, install the pytorch nightly
@@ -54,8 +57,6 @@ NIGHTLY_VERSION=dev20240507
 if [[ -x "$(command -v nvidia-smi)" ]];
 then
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu121"
-  # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
-  $PIP_EXECUTABLE uninstall -y triton
 else
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
 fi
