@@ -227,7 +227,7 @@ def decode_n_tokens(
             )
             input_pos += 1
             new_tokens.append(next_token.clone())
-            callback(new_tokens[-1], done_generating=_i==num_new_tokens-2)
+            callback(new_tokens[-1], done_generating=_i == num_new_tokens - 2)
             if need_probs:
                 new_probs.append(next_prob.clone())
             cur_token = next_token.view(1, -1)
@@ -386,7 +386,7 @@ def generate(
     time_to_first_token = time.perf_counter() - prefill_t0
     seq[T] = next_token
     # max_new_tokens <= 2 means we are effectively not calling decode_n_tokens().
-    callback(next_token.clone().view(-1), done_generating=max_new_tokens<=2)
+    callback(next_token.clone().view(-1), done_generating=max_new_tokens <= 2)
 
     num_tokens_generated = 0
     input_pos = torch.tensor([start_pos + T], device=device, dtype=torch.int)
@@ -427,7 +427,10 @@ def generate(
             : T + 1 + len(generated_tokens)
         ]  # If we dont generate all the way to max_new_tokens slice off the extra space we allocated.
 
-    generate_stats = {"accept_counts": accept_counts, "time_to_first_token": time_to_first_token}
+    generate_stats = {
+        "accept_counts": accept_counts,
+        "time_to_first_token": time_to_first_token,
+    }
     return seq, generate_stats
 
 
@@ -695,11 +698,11 @@ def _main(
                     is_llama3_model=is_llama3_model,
                 )
 
-
         if (i != generator_args.num_samples - 1 or not profile) or (
             use_tp and rank != 0
         ):
             import contextlib
+
             prof = contextlib.nullcontext()
         else:
             torch.profiler._utils._init_for_cuda_graphs()
@@ -746,12 +749,14 @@ def _main(
         aggregate_metrics["tokens_per_sec"].append(tokens_sec)
 
         if jit_compile:
-            print(f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds")
+            print(
+                f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds"
+            )
             # Don't continue here.... because we need to report and reset
             # continue
 
         logging.info(
-            f"Time for inference {i + 1}: {t:.02f} sec total, time to first token {metrics['time_to_first_token']:.02f}, {tokens_generated} tokens, {tokens_sec:.02f} tokens/sec, {1000 / tokens_sec:.02f} ms/token"
+            f"Time for inference {i + 1}: {t:.02f} sec total, time to first token {metrics['time_to_first_token']:.02f} sec with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill, {tokens_generated} tokens, {tokens_sec:.02f} tokens/sec, {1000 / tokens_sec:.02f} ms/token"
         )
         logging.info(f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s")
         if i == 0:
