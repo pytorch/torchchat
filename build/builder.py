@@ -17,7 +17,7 @@ import torch._dynamo.config
 import torch._inductor.config
 
 from config.model_config import resolve_model_config
-from quantize import quantize_model
+from quantization.quantize import quantize_model
 
 from build.model import Transformer
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype

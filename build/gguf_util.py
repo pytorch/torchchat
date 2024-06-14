@@ -6,7 +6,7 @@
 
 import gguf
 import torch
-from quantize import group_dequantize_tensor_from_qparams
+from quantization.quantize import group_dequantize_tensor_from_qparams
 
 
 def to_float(t: gguf.gguf_reader.ReaderTensor):
