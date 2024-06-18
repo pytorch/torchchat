@@ -395,15 +395,9 @@ class LinearInt4(torch.nn.Module):
         weight_int32, scales_and_zeros = group_quantize_tensor(
             weight_bf16, n_bit=4, groupsize=groupsize
         )
-        if weight_bf16.device.type == "mps":
-            # There are still no MPS-accelerated conversion OP
-            weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
-                weight_int32.cpu(), inner_k_tiles
-            ).to("mps")
-        else:
-            weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
-                weight_int32, inner_k_tiles
-            )
+        weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
+            weight_int32, inner_k_tiles
+        )
         return weight_int4pack, scales_and_zeros
 
     @classmethod
