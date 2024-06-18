@@ -15,7 +15,7 @@ tiktoken
 # Miscellaneous
 snakeviz
 sentencepiece
-numpy
+numpy < 2.0
 gguf
 lm-eval==0.4.2
 blobfile
