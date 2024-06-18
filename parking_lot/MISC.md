@@ -3,7 +3,6 @@
 embedding table (symmetric) | fp32, fp16, bf16 | 8b (group/channel), 4b (group/channel) | n/a |
 linear operator (symmetric) | fp32, fp16, bf16 | 8b (group/channel) | n/a |
 linear operator (asymmetric) | n/a | 4b (group), a6w4dq | a8w4dq (group) |
-linear operator (asymmetric) with GPTQ | n/a | 4b (group) | n/a |
 linear operator (asymmetric) with HQQ | n/a |  work in progress | n/a |
 
 ## Model precision (dtype precision setting)
@@ -18,22 +17,4 @@ python3 export.py --dtype [bf16 | fp16 | fp32] ...
   float32 as the default. As a consequence you will have to set to
   `--dtype bf16` or `--dtype fp16` on server / desktop for best
   performance.**
-
-
-
-
-#### Quantization with GPTQ (gptq)
-
-```
-python3 export.py --checkpoint-path ${MODEL_PATH} -d fp32 --quant "{'linear:gptq': {'groupsize' : 32} }" [ --output-pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso... ] # may require additional options, check with AO team
-```
-
-Now you can run your model with the same command as before:
-```
-python3 generate.py [ --pte-path ${MODEL_OUT}/${MODEL_NAME}_gptq.pte | ...dso...]  --prompt "Hello my name is"
-```
-
-#### Adding additional quantization schemes (hqq)
-We invite contributors to submit established quantization schemes, with accuracy and performance results demonstrating soundness.
-
 

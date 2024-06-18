@@ -17,7 +17,6 @@ While quantization can potentially degrade the model's performance, the methods 
 | compression | bitwidth| group size | dynamic activation quantization | Eager | AOTI | ExecuTorch |
 |--|--|--|--|--|--|--|--|
 | linear (asymmetric) | [8, 4]* | [32, 64, 128, 256]** | | ✅ | ✅ | 🚧 |
-| linear with GPTQ*** (asymmetric) | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
 | linear with HQQ*** (asymmetric) | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
 | linear with dynamic activations (symmetric) | | [32, 64, 128, 256]* | a8w4dq | 🚧 |🚧 | ✅ |
 
@@ -40,9 +39,8 @@ on-device usecases.
    model quality and accuracy, and larger groupsize for further
    improving performance. Set 0 for channelwise quantization.
 
-*** [GPTQ](https://arxiv.org/abs/2210.17323) and
-    [HQQ](https://mobiusml.github.io/hqq_blog/) are two different
-    algorithms to address accuracy loss when using lower bit
+*** [HQQ](https://mobiusml.github.io/hqq_blog/) is an
+    algorithm to address accuracy loss when using lower bit
     quantization. Due to HQQ relying on data/calibration free
     quantization, it tends to take less time to quantize model.
     HQQ is currently enabled with axis=1 configuration. 
@@ -95,7 +93,6 @@ for valid `bitwidth` and `groupsize` values.
 |--|--|
 | linear (asymmetric) | `'{"linear:int<bitwidth>" : {"groupsize" : <groupsize>}}'` |
 | linear with dynamic activations (symmetric) | `'{"linear:a8w4dq" : {"groupsize" : <groupsize>}}'`|
-| linear with GPTQ (asymmetric) | `'{"linear:int4-gptq" : {"groupsize" : <groupsize>}}'`|
 | linear with HQQ (asymmetric) |`'{"linear:hqq" : {"groupsize" : <groupsize>}}'`|
 | embedding | `'{"embedding": {"bitwidth": <bitwidth>, "groupsize":<groupsize>}}'` |
 
