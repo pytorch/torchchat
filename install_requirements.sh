@@ -46,7 +46,7 @@ $PIP_EXECUTABLE install -r requirements.txt --extra-index-url https://download.p
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-NIGHTLY_VERSION=dev20240604
+NIGHTLY_VERSION=dev20240613
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 $PIP_EXECUTABLE uninstall -y triton
@@ -63,7 +63,7 @@ fi
 
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
-  torch=="2.4.0.${NIGHTLY_VERSION}"
+  torch=="2.5.0.${NIGHTLY_VERSION}"
 )
 
 # Install the requirements. `--extra-index-url` tells pip to look for package
