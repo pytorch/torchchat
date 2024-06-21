@@ -679,42 +679,6 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
         return self.quantize(self.model_)
 
 
-##################################################################
-###                             HQQ                            ###
-
-
-class WeightOnlyInt4HqqQuantHandler:
-    def __init__(self, model: nn.Module, device, tokenizer=None, *, groupsize):
-        self.model_ = model
-        self.device = device
-        self.groupsize = groupsize
-
-    @torch.no_grad()
-    def quantize(self, module):
-        from hqq.core.quantize import Quantizer
-
-        for m in self.model_.modules():
-            for _name, child in m.named_children():
-                if isinstance(child, torch.nn.Linear):
-                    child.weight = torch.nn.Parameter(
-                        Quantizer.dequantize(
-                            *Quantizer.quantize(
-                                child.weight,
-                                nbits=4,
-                                group_size=self.groupsize,
-                                axis=1,
-                            )
-                        )
-                    )
-
-        return WeightOnlyInt4QuantHandler(
-            model=self.model_, device=self.device, groupsize=self.groupsize
-        ).quantize(self.model_)
-
-    def quantized_model(self) -> nn.Module:
-        return self.quantize(self.model_)
-
-
 ##########################################################################
 ###                       quantization dictionary                      ###
 
@@ -726,7 +690,6 @@ quantizer_class_dict = {
     "linear:int8": WeightOnlyInt8QuantHandler,
     "linear:int4": WeightOnlyInt4QuantHandler,
     "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
-    "linear:hqq": WeightOnlyInt4HqqQuantHandler,
     "precision": PrecisionHandler,
     "executor": ExecutorHandler,
 }

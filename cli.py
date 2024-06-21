@@ -198,7 +198,7 @@ def add_arguments_for_verb(parser, verb: str):
         default="{ }",
         help=(
             'Quantization options. pass in as \'{"<mode>" : {"<argname1>" : <argval1>, "<argname2>" : <argval2>,...},}\' '
-            + "modes are: embedding, linear:int8, linear:int4, linear:hqq, linear:a8w4dq, precision."
+            + "modes are: embedding, linear:int8, linear:int4, linear:a8w4dq, precision."
         ),
     )
     parser.add_argument(

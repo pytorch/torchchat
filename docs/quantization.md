@@ -17,7 +17,6 @@ While quantization can potentially degrade the model's performance, the methods 
 | compression | bitwidth| group size | dynamic activation quantization | Eager | AOTI | ExecuTorch |
 |--|--|--|--|--|--|--|--|
 | linear (asymmetric) | [8, 4]* | [32, 64, 128, 256]** | | ✅ | ✅ | 🚧 |
-| linear with HQQ*** (asymmetric) | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
 | linear with dynamic activations (symmetric) | | [32, 64, 128, 256]* | a8w4dq | 🚧 |🚧 | ✅ |
 
 ### Embedding Quantization
@@ -38,19 +37,6 @@ on-device usecases.
    etc. Note that smaller groupsize tends to be better for preserving
    model quality and accuracy, and larger groupsize for further
    improving performance. Set 0 for channelwise quantization.
-
-*** [HQQ](https://mobiusml.github.io/hqq_blog/) is an
-    algorithm to address accuracy loss when using lower bit
-    quantization. Due to HQQ relying on data/calibration free
-    quantization, it tends to take less time to quantize model.
-    HQQ is currently enabled with axis=1 configuration. 
-    
-    Presently, torchchat includes a subset of the HQQ distribution in 
-    the hqq subdirectory, but HQQ is not installed by default with torchchat,
-    due to dependence incompatibilities between torchchat and the hqq
-    project.  We may integrate hqq via requirements.txt in the future. 
-    (As a result, there's presently no upstream path for changes and/or
-    improvements to HQQ.)
 
 + Should support non-power-of-2-groups as well.
 
@@ -93,7 +79,6 @@ for valid `bitwidth` and `groupsize` values.
 |--|--|
 | linear (asymmetric) | `'{"linear:int<bitwidth>" : {"groupsize" : <groupsize>}}'` |
 | linear with dynamic activations (symmetric) | `'{"linear:a8w4dq" : {"groupsize" : <groupsize>}}'`|
-| linear with HQQ (asymmetric) |`'{"linear:hqq" : {"groupsize" : <groupsize>}}'`|
 | embedding | `'{"embedding": {"bitwidth": <bitwidth>, "groupsize":<groupsize>}}'` |
 
 See the available quantization schemes [here](https://github.com/pytorch/torchchat/blob/main/quantization/quantize.py#L1260-L1266).

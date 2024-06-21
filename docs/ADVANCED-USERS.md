@@ -376,15 +376,11 @@ To compress models, torchchat offers a variety of strategies:
 
 * dynamic activation quantization with weight quantization: a8w4dq
 
-In addition, we support HQQ for improving the quality of 4b
-weight-only quantization. Support for HQQ is a work in progress.
-
 | compression | FP precision |  weight quantization | dynamic activation quantization |
 |--|--|--|--|
 embedding table (symmetric) | fp32, fp16, bf16 | 8b (group/channel), 4b (group/channel) | n/a |
 linear operator (symmetric) | fp32, fp16, bf16 | 8b (group/channel) | n/a |
 linear operator (asymmetric) | n/a | 4b (group), a6w4dq | a8w4dq (group) |
-linear operator (asymmetric) with HQQ | n/a |  work in progress | n/a |
 
 ## Model precision (dtype precision setting)
 On top of quantizing models with quantization schemes mentioned above, models can be converted
@@ -448,9 +444,6 @@ strategies:
   quantization
 
 * dynamic activation quantization with weight quantization: a8w4dq
-
-In addition, we support HQQ for improving the quality of 4b
-weight-only quantization. Support for HQQ is a work in progress.
 
 You can find instructions for quantizing models in
 [docs/quantization.md](file:///./quantization.md).  Advantageously,
