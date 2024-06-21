@@ -28,6 +28,3 @@ zstd
 
 # Browser mode
 flask
-
-# HQQ pulls down the version
-# hqq

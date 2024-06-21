@@ -458,9 +458,6 @@ awesome libraries and tools you've built around local LLM inference.
   Fast!](https://github.com/pytorch-labs/gpt-fast), which we have
   directly adopted (both ideas and code) from his repo.
 
-* Mobius Labs as the authors of the HQQ quantization algorithms
-  included in this distribution.
-
 
 ## License
 
