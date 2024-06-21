@@ -382,6 +382,7 @@ embedding table (symmetric) | fp32, fp16, bf16 | 8b (group/channel), 4b (group/c
 linear operator (symmetric) | fp32, fp16, bf16 | 8b (group/channel) | n/a |
 linear operator (asymmetric) | n/a | 4b (group), a6w4dq | a8w4dq (group) |
 
+
 ## Model precision (dtype precision setting)
 On top of quantizing models with quantization schemes mentioned above, models can be converted
 to lower precision floating point representations to reduce the memory bandwidth requirement and
