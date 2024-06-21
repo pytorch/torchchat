@@ -390,7 +390,7 @@ class LinearInt4(torch.nn.Module):
     def _prepare_weight_and_scales_and_zeros(
         cls, weight_bf16, groupsize, inner_k_tiles
     ):
-        from quantize import group_quantize_tensor
+        from quantization.quantize import group_quantize_tensor
 
         weight_int32, scales_and_zeros = group_quantize_tensor(
             weight_bf16, n_bit=4, groupsize=groupsize
