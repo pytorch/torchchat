@@ -83,7 +83,7 @@ for valid `bitwidth` and `groupsize` values.
 | linear with GPTQ (asymmetric) | `'{"linear:int4-gptq" : {"groupsize" : <groupsize>}}'`|
 | embedding | `'{"embedding": {"bitwidth": <bitwidth>, "groupsize":<groupsize>}}'` |
 
-See the available quantization schemes [here](https://github.com/pytorch/torchchat/blob/main/quantize.py#L1260-L1266).
+See the available quantization schemes [here](https://github.com/pytorch/torchchat/blob/main/quantization/quantize.py#L1260-L1266).
 
 ## Examples
 We can mix and match weight quantization with embedding quantization.

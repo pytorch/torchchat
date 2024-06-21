@@ -23,7 +23,7 @@ from build.utils import (
     state_dict_device,
 )
 
-from qops import (
+from quantization.qops import (
     LinearAct8Int4DQ,
     LinearInt4 as WeightOnlyInt4Linear,
     LinearInt8 as WeightOnlyInt8Linear,
