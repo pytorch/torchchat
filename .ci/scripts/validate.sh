@@ -99,10 +99,6 @@ function generate_compiled_model_output() {
             .ci/scripts/check_gibberish "$MODEL_DIR/output_eager"
             python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
             .ci/scripts/check_gibberish "$MODEL_DIR/output_compiled"
-            if [ "$TARGET_DEVICE" == "cuda" ]; then
-                python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4-gptq" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-                .ci/scripts/check_gibberish "$MODEL_DIR/output_compiled"
-            fi
         fi
     done
 }
@@ -181,14 +177,10 @@ function generate_aoti_model_output() {
             python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
             .ci/scripts/check_gibberish "$MODEL_DIR/output_aoti"
         fi
-
         echo "******************************************"
         echo "******** INT4 group-wise quantized *******"
         echo "******************************************"
         if [ "$TARGET_DEVICE" == "cuda" ]; then
-            python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4-gptq" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-            python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-            .ci/scripts/check_gibberish "$MODEL_DIR/output_aoti"
             if [ "$DTYPE" != "float16" ]; then
                 python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
                 python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1

@@ -381,7 +381,7 @@ To compress models, torchchat offers a variety of strategies:
 embedding table (symmetric) | fp32, fp16, bf16 | 8b (group/channel), 4b (group/channel) | n/a |
 linear operator (symmetric) | fp32, fp16, bf16 | 8b (group/channel) | n/a |
 linear operator (asymmetric) | n/a | 4b (group), a6w4dq | a8w4dq (group) |
-linear operator (asymmetric) with GPTQ | n/a | 4b (group) | n/a |
+
 
 ## Model precision (dtype precision setting)
 On top of quantizing models with quantization schemes mentioned above, models can be converted

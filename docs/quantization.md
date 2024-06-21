@@ -17,7 +17,6 @@ While quantization can potentially degrade the model's performance, the methods 
 | compression | bitwidth| group size | dynamic activation quantization | Eager | AOTI | ExecuTorch |
 |--|--|--|--|--|--|--|--|
 | linear (asymmetric) | [8, 4]* | [32, 64, 128, 256]** | | ✅ | ✅ | 🚧 |
-| linear with GPTQ*** (asymmetric) | |[32, 64, 128, 256]**  | | ✅ | ✅ | ❌ |
 | linear with dynamic activations (symmetric) | | [32, 64, 128, 256]* | a8w4dq | 🚧 |🚧 | ✅ |
 
 ### Embedding Quantization
@@ -80,7 +79,6 @@ for valid `bitwidth` and `groupsize` values.
 |--|--|
 | linear (asymmetric) | `'{"linear:int<bitwidth>" : {"groupsize" : <groupsize>}}'` |
 | linear with dynamic activations (symmetric) | `'{"linear:a8w4dq" : {"groupsize" : <groupsize>}}'`|
-| linear with GPTQ (asymmetric) | `'{"linear:int4-gptq" : {"groupsize" : <groupsize>}}'`|
 | embedding | `'{"embedding": {"bitwidth": <bitwidth>, "groupsize":<groupsize>}}'` |
 
 See the available quantization schemes [here](https://github.com/pytorch/torchchat/blob/main/quantization/quantize.py#L1260-L1266).
