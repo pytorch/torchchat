@@ -215,8 +215,8 @@ adapted to support other models, either by extending the model
 description in `model.py` or by initializing a completely different
 model.  *We invite and welcome community contributions of open-source
 model enablement to torchchat, as well as to our related open source
-projects PyTorch, ExecuTorch (for mobile/edge models), torchtune (for
-model finetuning), torchao (for architecture optimization) and other
+projects PyTorch, ExecuTorch (for mobile/edge models), torchao 
+(for architecture optimization) and other
 PyTorch projects.* (Please refer to individual projects for specific
 submission guidelines.)
 

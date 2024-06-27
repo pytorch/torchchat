@@ -19,7 +19,6 @@ torchchat is a small codebase showcasing the ability to run large language model
   - [Deploy and run on iOS](#deploy-and-run-on-ios)
   - [Deploy and run on Android](#deploy-and-run-on-android)
 - [Evaluate a mode](#eval)
-- [Fine-tuned models from torchtune](docs/torchtune.md)
 - [Supported Models](#models)
 - [Troubleshooting](#troubleshooting)
 
