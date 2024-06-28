@@ -1,3 +1,9 @@
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+
 from typing import Tuple
 from torch.distributed.tensor.parallel import (
     ColwiseParallel,
@@ -86,6 +92,7 @@ def apply_tp(model, world_mesh, parallel_dims, config: ParallelConfig):
         # Adjust attention module to use the local number of heads
         attn_layer = transformer_block.attention
         attn_layer.n_heads = attn_layer.n_heads // tp_mesh.size()
+        attn_layer.n_local_heads = attn_layer.n_local_heads // tp_mesh.size()
         attn_layer.n_kv_heads = attn_layer.n_kv_heads // tp_mesh.size()
 
         parallelize_module(
@@ -96,8 +103,6 @@ def apply_tp(model, world_mesh, parallel_dims, config: ParallelConfig):
 
     logger.info("Applied Tensor Parallelism to the model")
     return model
-
-
 
 
 def parallelize_llama(model, world_mesh, parallel_dims, config: ParallelConfig):
