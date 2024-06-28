@@ -21,6 +21,7 @@ from quantization.quantize import quantize_model
 
 from build.model import Transformer
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
+from distributed import parallelize_llama, ParallelDims, ParallelConfig
 
 
 @dataclass
@@ -36,7 +37,7 @@ class BuilderArgs:
     device: Optional[str] = None
     precision: torch.dtype = torch.float32
     setup_caches: bool = False
-    use_tp: bool = False
+    use_distributed: bool = False
     is_chat_model: bool = False
     prefill_possible: bool = False
 
@@ -141,7 +142,7 @@ class BuilderArgs:
             device=args.device,
             precision=dtype,
             setup_caches=(args.output_dso_path or args.output_pte_path),
-            use_tp=False,
+            use_distributed=False,
             is_chat_model=is_chat_model,
         )
 
@@ -346,11 +347,21 @@ def _load_model(builder_args, only_config=False):
     else:
         model = _load_model_default(builder_args)
 
-    if builder_args.use_tp:
-        from tp import apply_tp
+    if builder_args.use_distributed:
+        # init distributed
+        world_size = int(os.environ["WORLD_SIZE"])
+        parallel_config = ParallelConfig()
+        parallel_dims = ParallelDims(
+            tp=parallel_config.tp_degree,
+            pp=parallel_config.pp_degree,
+            world_size=world_size,
+        )
+        device = torch.device(f"cuda:{int(os.environ['LOCAL_RANK'])}")
+        torch.cuda.set_device(device)
+        init_distributed(job_config)
 
-        print("Applying tensor parallel to model ...")
-        apply_tp(model)
+        print("Applying model parallel to model ...")
+        parallelize_llama(model)
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
