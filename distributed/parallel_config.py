@@ -8,14 +8,6 @@ from dataclasses import dataclass, field
 from torch.distributed.device_mesh import init_device_mesh
 
 @dataclass
-class ParallelConfig:
-    name: str = field(default="")
-    fp8_linear: str = field(default="")
-    tp_degree: int = field(default=1)
-    pp_degree: int = field(default=1)
-
-
-@dataclass
 class ParallelDims:
     tp: int
     pp: int

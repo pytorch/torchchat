@@ -5,4 +5,4 @@
 # LICENSE file in the root directory of this source tree.
 
 from distributed.parallelize_llama import parallelize_llama
-from distributed.parallel_config import ParallelConfig, ParallelDims
+from distributed.parallel_config import ParallelDims

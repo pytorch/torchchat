@@ -21,7 +21,7 @@ from quantization.quantize import quantize_model
 
 from build.model import Transformer
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
-from distributed import parallelize_llama, ParallelDims, ParallelConfig
+from distributed import parallelize_llama, ParallelDims
 
 
 @dataclass
@@ -351,10 +351,10 @@ def _load_model(builder_args, only_config=False):
     if builder_args.use_distributed:
         # init distributed
         world_size = int(os.environ["WORLD_SIZE"])
-        parallel_config = ParallelConfig()
+        # TODO: To make tp, pp degree configurable
         parallel_dims = ParallelDims(
-            tp=parallel_config.tp_degree,
-            pp=parallel_config.pp_degree,
+            tp=8,
+            pp=1,
             world_size=world_size,
         )
         device = torch.device(f"cuda:{int(os.environ['LOCAL_RANK'])}")

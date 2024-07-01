@@ -13,39 +13,35 @@ from torch.distributed.tensor.parallel import (
     SequenceParallel,
 )
 
-from distributed.parallel_config import ParallelConfig
+import torch.nn as nn
+from distributed.parallel_config import ParallelDims
+from torch.distributed.device_mesh import DeviceMesh
 
 
-def get_tp_parallel_strategy(
-    config: ParallelConfig,
-) -> Tuple[RowwiseParallel, ColwiseParallel, PrepareModuleInput]:
-    """Get the parallel strategy for the transformer model.
-
-    This function handles the special case of using float8 with tensor parallelism.
+def apply_tp(
+    model: nn.Module,
+    world_mesh: DeviceMesh,
+) -> nn.Module:
     """
-    if config.fp8_linear == "dynamic":
-        from float8_experimental.float8_tensor_parallel import (
-            Float8ColwiseParallel,
-            Float8RowwiseParallel,
-            PrepareFloat8ModuleInput,
-        )
+    Apply tensor parallelism to the given model. More details can be
+    found in https://pytorch.org/tutorials/intermediate/TP_tutorial.html.
 
-        return Float8RowwiseParallel, Float8ColwiseParallel, PrepareFloat8ModuleInput
-    return RowwiseParallel, ColwiseParallel, PrepareModuleInput
+    NOTE: The way we apply tp is based on the assumption that the model is a LLaMA model.
+    One needs to change the ``parallelize_plan`` we pass in to the TP api if the model
+    is not a LLaMA model.
 
 
-def apply_tp(model, world_mesh, parallel_dims, config: ParallelConfig):
-    """
-    Apply tensor parallelism.
+    Args:
+        module (:class:`nn.Module`):
+            Module to be parallelized.
+        world_mesh (:class:`DeviceMesh`):
+            Object which describes the mesh topology
+            of devices for the DTensor.
+    Return:
+        A :class:`nn.Module` object tensor-parallelized.
     """
 
     tp_mesh = world_mesh["tp"]
-    (
-        row_parallel_strategy,
-        col_parallel_strategy,
-        prepare_module_input,
-    ) = get_tp_parallel_strategy(config)
-    loss_parallel = parallel_dims.loss_parallel_enabled
 
     # 1. Parallelize the first embedding and the last linear proj layer
     # 2. Parallelize the root norm layer over the sequence dim
@@ -58,10 +54,10 @@ def apply_tp(model, world_mesh, parallel_dims, config: ParallelConfig):
                 input_layouts=Replicate(),
                 output_layouts=Shard(1),
             ),
-            "output": col_parallel_strategy(
+            "output": ColwiseParallel(
                 input_layouts=Shard(1),
-                output_layouts=Shard(-1) if loss_parallel else Replicate(),
-                use_local_output=not loss_parallel,
+                output_layouts=Replicate(),
+                use_local_output=True,
             ),
             "norm": SequenceParallel(),
         },
@@ -74,18 +70,18 @@ def apply_tp(model, world_mesh, parallel_dims, config: ParallelConfig):
                 input_layouts=(Shard(1), None),
                 desired_input_layouts=(Replicate(), None),
             ),
-            "attention.wq": col_parallel_strategy(),
-            "attention.wk": col_parallel_strategy(),
-            "attention.wv": col_parallel_strategy(),
-            "attention.wo": row_parallel_strategy(output_layouts=Shard(1)),
+            "attention.wq": ColwiseParallel(),
+            "attention.wk": ColwiseParallel(),
+            "attention.wv": ColwiseParallel(),
+            "attention.wo": RowwiseParallel(output_layouts=Shard(1)),
             "attention_norm": SequenceParallel(),
             "feed_forward": prepare_module_input(
                 input_layouts=(Shard(1),),
                 desired_input_layouts=(Replicate(),),
             ),
-            "feed_forward.w1": col_parallel_strategy(),
-            "feed_forward.w2": row_parallel_strategy(output_layouts=Shard(1)),
-            "feed_forward.w3": col_parallel_strategy(),
+            "feed_forward.w1": ColwiseParallel(),
+            "feed_forward.w2": RowwiseParallel(output_layouts=Shard(1)),
+            "feed_forward.w3": ColwiseParallel(),
             "ffn_norm": SequenceParallel(),
         }
 
@@ -105,20 +101,31 @@ def apply_tp(model, world_mesh, parallel_dims, config: ParallelConfig):
     return model
 
 
-def parallelize_llama(model, world_mesh, parallel_dims, config: ParallelConfig):
+def parallelize_llama(
+    model: nn.Module,
+    world_mesh: DeviceMesh,
+    parallel_dims: ParallelDims,
+) -> nn.Module:
     """
     Apply tensor parallelism, activation checkpointing, torch.compile, and data
     parallelism to the model.
 
     NOTE: The passed-in model preferably should be on meta device. Otherwise,
     the model must fit on GPU or CPU memory.
+
+    Args:
+        module (:class:`nn.Module`):
+            Module to be parallelized.
+        world_mesh (:class:`DeviceMesh`):
+            Object which describes the mesh topology
+            of devices for the DTensor.
+        parallel_dims (:class:`ParallelDims`):
+            The object of the util class which contains the degree for each parallelism.
+    Return:
+        A :class:`nn.Module` object parallelized.
     """
 
     if parallel_dims.tp_enabled:
-        model = apply_tp(model, world_mesh, parallel_dims, job_config)
-
-    # only enable TP for now.
-    # if job_config.training.compile:
-    #     model = apply_compile(model, job_config)
+        model = apply_tp(model, world_mesh, parallel_dims)
 
     return model
