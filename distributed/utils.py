@@ -18,33 +18,6 @@ def _warn_overwrite_env(env, val):
     os.environ[env] = val
 
 
-def set_pg_timeouts(timeout, world_mesh):
-    """
-    Sets the timeout for all PGs in the provided mesh, and the default (world) group.
-
-    Note: synchronizes via a barrier, before changing the timeouts. This is important, becuase
-    otherwise you may face a race where the slow rank has not reached the timeout reduction point
-    yet due to slow operations permitted under the old timeout value, but other faster ranks may
-    start issueing collectives under the new shorter timeout and then immediately timeout.
-    """
-    logger.info(
-        f"Synchronizing and adjusting timeout for all ProcessGroups to {timeout}"
-    )
-    # Ensure that all the ranks have reached the point of setting the new timeout-
-    # otherwise, some ranks may issue collectives with the new/shorter timeout and
-    # those may time out, before other ranks have finished with initialization done
-    # under the old/slow timeout.
-    torch.distributed.barrier()
-    torch.cuda.synchronize()
-
-    groups = [world_mesh.get_group(mesh_dim) for mesh_dim in range(world_mesh.ndim)]
-
-    # None represents the 'default' PG, not part of the mesh
-    groups.append(None)
-    for group in groups:
-        torch.distributed.distributed_c10d._set_pg_timeout(timeout, group)
-
-
 TRACE_BUFFER_SIZE = "TORCH_NCCL_TRACE_BUFFER_SIZE"
 TRACE_FILE = "TORCH_NCCL_DEBUG_INFO_TEMP_FILE"
 DUMP_ON_TIMEOUT = "TORCH_NCCL_DUMP_ON_TIMEOUT"
