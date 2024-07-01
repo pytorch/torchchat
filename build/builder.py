@@ -142,7 +142,7 @@ class BuilderArgs:
             device=args.device,
             precision=dtype,
             setup_caches=(args.output_dso_path or args.output_pte_path),
-            use_distributed=False,
+            use_distributed=args.distributed,
             is_chat_model=is_chat_model,
         )
 
@@ -347,6 +347,7 @@ def _load_model(builder_args, only_config=False):
     else:
         model = _load_model_default(builder_args)
 
+    # TODO: ongoing work to support loading model from checkpoint
     if builder_args.use_distributed:
         # init distributed
         world_size = int(os.environ["WORLD_SIZE"])
