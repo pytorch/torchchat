@@ -57,6 +57,11 @@ def add_arguments_for_verb(parser, verb: str):
         help="Whether to start an interactive chat session",
     )
     parser.add_argument(
+        "--distributed",
+        action="store_true",
+        help="Whether to enable distributed inference",
+    )
+    parser.add_argument(
         "--gui",
         action="store_true",
         help="Whether to use a web UI for an interactive chat session",
