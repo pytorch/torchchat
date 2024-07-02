@@ -107,8 +107,7 @@ def parallelize_llama(
     parallel_dims: ParallelDims,
 ) -> nn.Module:
     """
-    Apply tensor parallelism, activation checkpointing, torch.compile, and data
-    parallelism to the model.
+    Apply tensor parallelism and other parallelism(TODO) to the model for inference.
 
     NOTE: The passed-in model preferably should be on meta device. Otherwise,
     the model must fit on GPU or CPU memory.
