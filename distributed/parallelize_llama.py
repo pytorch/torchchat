@@ -10,12 +10,13 @@ from torch.distributed.tensor.parallel import (
     parallelize_module,
     PrepareModuleInput,
     RowwiseParallel,
-    SequenceParallel,
 )
 
 import torch.nn as nn
+from torch.distributed._tensor import Replicate, Shard
 from distributed.parallel_config import ParallelDims
 from torch.distributed.device_mesh import DeviceMesh
+from distributed.utils import logger
 
 
 def apply_tp(
@@ -43,53 +44,55 @@ def apply_tp(
 
     tp_mesh = world_mesh["tp"]
 
-    # 1. Parallelize the first embedding and the last linear proj layer
-    # 2. Parallelize the root norm layer over the sequence dim
-    # 3. Shard the first transformer block's inputs
-    model = parallelize_module(
-        model,
-        tp_mesh,
-        {
-            "tok_embeddings": RowwiseParallel(
-                input_layouts=Replicate(),
-                output_layouts=Shard(1),
-            ),
-            "output": ColwiseParallel(
-                input_layouts=Shard(1),
-                output_layouts=Replicate(),
-                use_local_output=True,
-            ),
-            "norm": SequenceParallel(),
-        },
-    )
+    # TODO: To figure out the TP for the tok_embedding and the linear proj layer.
+    # # 1. Parallelize the first embedding and the last linear proj layer
+    # # 2. Shard the first transformer block's inputs
+    # model = parallelize_module(
+    #     model,
+    #     tp_mesh,
+    #     {
+    #         "tok_embeddings": RowwiseParallel(
+    #             input_layouts=Replicate(),
+    #             output_layouts=Replicate(),
+    #         ),
+    #         "output": ColwiseParallel(
+    #             input_layouts=Shard(1),
+    #             output_layouts=Replicate(),
+    #             use_local_output=True,
+    #         ),
+    #     },
+    # )
 
-    # Apply tensor + sequence parallelism to every transformer block
-    for layer_id, transformer_block in model.layers.items():
+    # Apply tensor parallelism to every transformer block
+    for transformer_block in model.layers:
         layer_plan = {
-            "attention": prepare_module_input(
-                input_layouts=(Shard(1), None),
+            "attention": PrepareModuleInput(
+                input_layouts=(Replicate(), None),
                 desired_input_layouts=(Replicate(), None),
             ),
             "attention.wq": ColwiseParallel(),
             "attention.wk": ColwiseParallel(),
             "attention.wv": ColwiseParallel(),
-            "attention.wo": RowwiseParallel(output_layouts=Shard(1)),
-            "attention_norm": SequenceParallel(),
-            "feed_forward": prepare_module_input(
-                input_layouts=(Shard(1),),
+            "attention.wo": RowwiseParallel(
+                output_layouts=Replicate(),
+                use_local_output=True,
+            ),
+            "feed_forward": PrepareModuleInput(
+                input_layouts=(Replicate(),),
                 desired_input_layouts=(Replicate(),),
             ),
             "feed_forward.w1": ColwiseParallel(),
-            "feed_forward.w2": RowwiseParallel(output_layouts=Shard(1)),
+            "feed_forward.w2": RowwiseParallel(
+                output_layouts=Replicate(),
+                use_local_output=True
+            ),
             "feed_forward.w3": ColwiseParallel(),
-            "ffn_norm": SequenceParallel(),
         }
 
         # Adjust attention module to use the local number of heads
         attn_layer = transformer_block.attention
         attn_layer.n_heads = attn_layer.n_heads // tp_mesh.size()
         attn_layer.n_local_heads = attn_layer.n_local_heads // tp_mesh.size()
-        attn_layer.n_kv_heads = attn_layer.n_kv_heads // tp_mesh.size()
 
         parallelize_module(
             module=transformer_block,
@@ -125,6 +128,6 @@ def parallelize_llama(
     """
 
     if parallel_dims.tp_enabled:
-        model = apply_tp(model, world_mesh, parallel_dims)
+        model = apply_tp(model, world_mesh)
 
     return model
