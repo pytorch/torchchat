@@ -46,8 +46,7 @@ def apply_tp(
 
     # TODO: To figure out the TP for the tok_embedding and the linear proj layer.
     # # 1. Parallelize the first embedding and the last linear proj layer
-    # # 2. Parallelize the root norm layer over the sequence dim
-    # # 3. Shard the first transformer block's inputs
+    # # 2. Shard the first transformer block's inputs
     # model = parallelize_module(
     #     model,
     #     tp_mesh,
@@ -64,7 +63,7 @@ def apply_tp(
     #     },
     # )
 
-    # Apply tensor + sequence parallelism to every transformer block
+    # Apply tensor parallelism to every transformer block
     for transformer_block in model.layers:
         layer_plan = {
             "attention": PrepareModuleInput(
