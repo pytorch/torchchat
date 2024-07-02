@@ -6,3 +6,4 @@
 
 from distributed.parallelize_llama import parallelize_llama
 from distributed.parallel_config import ParallelDims
+from distributed.utils import init_distributed
