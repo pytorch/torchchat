@@ -8,6 +8,7 @@ import itertools
 import logging
 import sys
 import time
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -504,6 +505,12 @@ def _main(
     #            print = lambda *args, **kwargs: None
 
     print(f"Using device={builder_args.device} {get_device_info(builder_args.device)}")
+    # If using distributed inference we cannot just assign device to be cuda
+    # because it will be assigned to cuda:0 by default. We need explicitely set
+    # the device to be the local rank.
+    if builder_args.use_distributed:
+        device = torch.device(f"cuda:{int(os.environ['LOCAL_RANK'])}")
+        torch.cuda.set_device(device)
     set_precision(builder_args.precision)
     is_speculative = speculative_builder_args.checkpoint_path is not None
 

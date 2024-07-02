@@ -21,7 +21,7 @@ from quantization.quantize import quantize_model
 
 from build.model import Transformer
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
-from distributed import parallelize_llama, ParallelDims
+from distributed import parallelize_llama, ParallelDims, init_distributed
 
 
 @dataclass
@@ -278,6 +278,15 @@ def _unset_gguf_kwargs(builder_args):
     builder_args.gguf_kwargs = None
 
 
+def _init_model_on_meta_device(builder_args):
+    with torch.device("meta"):
+        if builder_args.params_path:
+            return Transformer.from_params(builder_args.params_path)
+        elif builder_args.params_table:
+            return Transformer.from_table(builder_args.params_table)
+        else:
+            return Transformer.from_name(builder_args.checkpoint_path.parent.name)
+
 def _load_model_gguf(builder_args, only_config=False):
     assert builder_args.gguf_path
     if builder_args.gguf_kwargs is None:
@@ -291,14 +300,7 @@ def _load_model_gguf(builder_args, only_config=False):
 def _load_model_default(builder_args, only_config=False):
     assert not builder_args.gguf_path
 
-    with torch.device("meta"):
-        if builder_args.params_path:
-            model = Transformer.from_params(builder_args.params_path)
-        elif builder_args.params_table:
-            model = Transformer.from_table(builder_args.params_table)
-        else:
-            model = Transformer.from_name(builder_args.checkpoint_path.parent.name)
-
+    model = _init_model_on_meta_device(builder_args)
     # checkpoint = torch.load(str(builder_args.checkpoint_path), mmap=True, weights_only=True)
     cps = []
     if builder_args.checkpoint_dir is not None:
@@ -357,12 +359,11 @@ def _load_model(builder_args, only_config=False):
             pp=1,
             world_size=world_size,
         )
-        device = torch.device(f"cuda:{int(os.environ['LOCAL_RANK'])}")
-        torch.cuda.set_device(device)
-        init_distributed(job_config)
+        init_distributed()
+        world_mesh = parallel_dims.build_mesh(device_type="cuda")
 
         print("Applying model parallel to model ...")
-        parallelize_llama(model)
+        parallelize_llama(model, world_mesh, parallel_dims)
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
