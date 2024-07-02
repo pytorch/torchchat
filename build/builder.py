@@ -278,6 +278,15 @@ def _unset_gguf_kwargs(builder_args):
     builder_args.gguf_kwargs = None
 
 
+def _init_model_on_meta_device(builder_args):
+    with torch.device("meta"):
+        if builder_args.params_path:
+            return Transformer.from_params(builder_args.params_path)
+        elif builder_args.params_table:
+            return Transformer.from_table(builder_args.params_table)
+        else:
+            return Transformer.from_name(builder_args.checkpoint_path.parent.name)
+
 def _load_model_gguf(builder_args, only_config=False):
     assert builder_args.gguf_path
     if builder_args.gguf_kwargs is None:
@@ -291,14 +300,7 @@ def _load_model_gguf(builder_args, only_config=False):
 def _load_model_default(builder_args, only_config=False):
     assert not builder_args.gguf_path
 
-    with torch.device("meta"):
-        if builder_args.params_path:
-            model = Transformer.from_params(builder_args.params_path)
-        elif builder_args.params_table:
-            model = Transformer.from_table(builder_args.params_table)
-        else:
-            model = Transformer.from_name(builder_args.checkpoint_path.parent.name)
-
+    model = _init_model_on_meta_device(builder_args)
     # checkpoint = torch.load(str(builder_args.checkpoint_path), mmap=True, weights_only=True)
     cps = []
     if builder_args.checkpoint_dir is not None:
