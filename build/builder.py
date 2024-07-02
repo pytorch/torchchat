@@ -21,7 +21,7 @@ from quantization.quantize import quantize_model
 
 from build.model import Transformer
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
-from distributed import parallelize_llama, ParallelDims
+from distributed import parallelize_llama, ParallelDims, init_distributed
 
 
 @dataclass
@@ -359,12 +359,11 @@ def _load_model(builder_args, only_config=False):
             pp=1,
             world_size=world_size,
         )
-        device = torch.device(f"cuda:{int(os.environ['LOCAL_RANK'])}")
-        torch.cuda.set_device(device)
-        init_distributed(job_config)
+        init_distributed()
+        world_mesh = parallel_dims.build_mesh(device_type="cuda")
 
         print("Applying model parallel to model ...")
-        parallelize_llama(model)
+        parallelize_llama(model, world_mesh, parallel_dims)
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()

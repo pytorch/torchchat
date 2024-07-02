@@ -6,6 +6,7 @@
 
 from dataclasses import dataclass, field
 from torch.distributed.device_mesh import init_device_mesh
+from distributed.utils import logger
 
 @dataclass
 class ParallelDims:

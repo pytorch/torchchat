@@ -8,6 +8,8 @@ import os
 from datetime import timedelta
 
 import torch
+import logging
+logger = logging.getLogger()
 
 
 def _warn_overwrite_env(env, val):
@@ -25,24 +27,15 @@ ASYNC_ERROR_HANDLING = "TORCH_NCCL_ASYNC_ERROR_HANDLING"
 SKIP_CLEANUP = "3"
 
 
-def init_distributed(job_config):
+def init_distributed(init_timeout_seconds: int = 120):
     # FlightRecorder is incompatible with =1 mode where watchdog aborts work, must use =3 (skipcleanup)
     # to get flight recorder dumps. See https://github.com/pytorch/pytorch/issues/121055
     # This could be done only when flight recorder is enabled, but its nice to be consistent to avoid subtle
     # behavior differences
     _warn_overwrite_env(ASYNC_ERROR_HANDLING, SKIP_CLEANUP)
 
-    # enable torch nccl flight recorder in the mode that would dump files if timeout is detected
-    _warn_overwrite_env(TRACE_BUFFER_SIZE, str(job_config.comm.trace_buf_size))
-    if job_config.comm.trace_buf_size > 0:
-        # dump on timeout by default if trace buffer is enabled
-        _warn_overwrite_env(DUMP_ON_TIMEOUT, "1")
-        dump_dir = f"{job_config.job.dump_folder}/comm_trace"
-        os.makedirs(dump_dir, exist_ok=True)
-        _warn_overwrite_env(TRACE_FILE, f"{dump_dir}/rank_")
-
     torch.distributed.init_process_group(
-        "nccl", timeout=timedelta(seconds=job_config.comm.init_timeout_seconds)
+        "nccl", timeout=timedelta(seconds=init_timeout_seconds)
     )
 
     # to mitigate the memory issue that collectives using
