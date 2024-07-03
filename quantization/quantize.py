@@ -23,11 +23,11 @@ from build.utils import (
     state_dict_device,
 )
 
-from quantization.qops import (
-    LinearAct8Int4DQ,
-    LinearInt4 as WeightOnlyInt4Linear,
-    LinearInt8 as WeightOnlyInt8Linear,
-    QuantizedEmbedding,
+from quantization.qops import LinearAct8Int4DQ, QuantizedEmbedding
+from torch.ao.quantization.fx._decomposed import quantized_decomposed_lib # noqa
+from torchao.quantization.GPTQ import (
+    Int4WeightOnlyQuantizer,
+    Int8DynActInt4WeightQuantizer,
 )
 
 
@@ -50,12 +50,35 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
         quantize_options = json.loads(quantize_options)
 
     for quantizer, q_kwargs in quantize_options.items():
-        if quantizer not in quantizer_class_dict:
+        if (
+            quantizer not in quantizer_class_dict
+            and quantizer not in ao_quantizer_class_dict
+        ):
             raise RuntimeError(f"unknown quantizer {quantizer} specified")
-
-        model = quantizer_class_dict[quantizer](
-            model, device=device, tokenizer=tokenizer, **q_kwargs
-        ).quantized_model()
+        if quantizer in ao_quantizer_class_dict:
+            dtype = quantize_options.get("precision", {}).get("dtype", "float16")
+            precision = name_to_dtype(dtype, device)
+            try:
+                # Easier to ask forgiveness than permission
+                quant_handler = ao_quantizer_class_dict[quantizer](
+                    groupsize=q_kwargs["groupsize"], device=device, precision=precision
+                )
+            except TypeError as e:
+                if "unexpected keyword argument 'device'" in str(e):
+                    quant_handler = ao_quantizer_class_dict[quantizer](
+                        groupsize=q_kwargs["groupsize"], precision=precision
+                    )
+                elif "unexpected keyword argument 'precision'" in str(e):
+                    quant_handler = ao_quantizer_class_dict[quantizer](
+                        groupsize=q_kwargs["groupsize"], device=device
+                    )
+                else:
+                    raise e
+            model = quant_handler.quantize(model)
+        else:
+            model = quantizer_class_dict[quantizer](
+                model, device=device, tokenizer=tokenizer, **q_kwargs
+            ).quantized_model()
 
 
 #########################################################################
@@ -509,176 +532,6 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
         return self.quantize(self.model_)
 
 
-#########################################################################
-#####     weight only int4 per channel groupwise quantized code    ######
-
-
-class WeightOnlyInt4QuantHandler(QuantHandler):
-    def __init__(
-        self,
-        model: nn.Module,
-        device=None,
-        *,
-        tokenizer=None,
-        groupsize=128,
-        inner_k_tiles=8,
-        padding_allowed=True,
-    ):
-        self.model_ = model
-        self.device = device
-        self.groupsize = groupsize
-        self.inner_k_tiles = inner_k_tiles
-        self.padding_allowed = padding_allowed
-        assert groupsize in [32, 64, 128, 256]
-        assert inner_k_tiles in [2, 4, 8]
-
-    @torch.no_grad()
-    def quantize(self, module):
-        for name, child in module.named_children():
-            # print(f"name: {name}")
-            if isinstance(child, torch.nn.Linear):
-                assert not child.bias
-                out_features = child.out_features
-                in_features = child.in_features
-                assert out_features % 8 == 0, "require out_features % 8 == 0"
-                # print(f"linear: {fqn}, in={in_features}, out={out_features}")
-
-                weight = child.weight.data
-                if not WeightOnlyInt4Linear._check_k(
-                    k=in_features,
-                    groupsize=self.groupsize,
-                    inner_k_tiles=self.inner_k_tiles,
-                ):
-                    if self.padding_allowed:
-                        # print(
-                        #     f"warning: {name} is padded to satisfy in_features % 1024 == 0"
-                        # )
-                        padded_in_features = find_multiple(in_features, 1024)
-                        weight = F.pad(
-                            weight, pad=(0, padded_in_features - in_features)
-                        )
-                    else:
-                        print(
-                            f"warning: {name} is skipped, int4 requires that in_features is 32, 64, or is divisible by 1024, "
-                            + "and that groupsize and inner_k_tiles*16 evenly divide into it"
-                        )
-                        continue
-                weight_int4pack, scales_and_zeros = (
-                    WeightOnlyInt4Linear._prepare_weight_and_scales_and_zeros(
-                        weight.to(torch.float), self.groupsize, self.inner_k_tiles
-                    )
-                )
-                weight_int4pack = weight_int4pack.to(device=self.device)
-                scales_and_zeros = scales_and_zeros.to(device=self.device)
-
-                setattr(
-                    module,
-                    name,
-                    WeightOnlyInt4Linear(
-                        child.in_features,
-                        child.out_features,
-                        bias=False,
-                        device=self.device,
-                        groupsize=self.groupsize,
-                        inner_k_tiles=self.inner_k_tiles,
-                        weight=weight_int4pack,
-                        scales_and_zeros=scales_and_zeros,
-                    ),
-                )
-            else:
-                self.quantize(child)
-
-        return module
-
-    def quantized_model(self) -> nn.Module:
-        return self.quantize(self.model_)
-
-
-#########################################################################
-#####     weight only int4 per channel groupwise quantized code    ######
-
-
-class Int8DynActInt4WeightQuantizer(QuantHandler):
-    def __init__(
-        self,
-        model: nn.Module,
-        device=None,
-        dtype=None,
-        *,
-        tokenizer=None,
-        groupsize=128,
-        padding_allowed=True,
-        precision=torch.float32,
-        scales_precision=torch.float32,
-    ):
-        if dtype is None:
-            dtype = torch.float32
-
-        self.model_ = model
-        self.device = device
-        self.dtype = dtype
-
-        self.groupsize = groupsize
-        self.padding_allowed = padding_allowed
-        self.precision = precision
-        self.scales_precision = scales_precision
-        assert groupsize in [32, 64, 128, 256]
-
-    @torch.no_grad()
-    def quantize(self, module):
-        from torchao.quantization.quant_primitives import (
-            group_quantize_tensor_symmetric,
-        )
-
-        for name, child in module.named_children():
-            # print(f"name: {name}")
-            if isinstance(child, torch.nn.Linear):
-                out_features = child.out_features
-                in_features = child.in_features
-                weight = child.weight.data
-                assert not child.bias
-                assert out_features % 8 == 0, "require out_features % 8 == 0"
-                # print(f"linear: {fqn}, in={in_features}, out={out_features}")
-
-                # if self.padding_allowed:
-                #     padding_multiple=max(self.groupsize, 1024)
-                padding_multiple = self.groupsize
-                padded_in_features = find_multiple(in_features, padding_multiple)
-                weight = F.pad(weight, pad=(0, padded_in_features - in_features))
-                (
-                    weight_int8,
-                    scales,
-                    zeros,
-                ) = group_quantize_tensor_symmetric(
-                    weight.float(),
-                    4,  # n_bit
-                    self.groupsize,
-                    self.scales_precision,
-                )
-
-                setattr(
-                    module,
-                    name,
-                    LinearAct8Int4DQ(
-                        child.in_features,
-                        child.out_features,
-                        bias=False,
-                        device=self.device,
-                        dtype=self.dtype,
-                        groupsize=self.groupsize,
-                        weight=weight_int8.to(device=self.device),
-                        scales=scales.to(device=self.device),
-                    ),
-                )
-            else:
-                self.quantize(child)
-
-        return module
-
-    def quantized_model(self) -> nn.Module:
-        return self.quantize(self.model_)
-
-
 ##########################################################################
 ###                       quantization dictionary                      ###
 
@@ -688,8 +541,11 @@ class Int8DynActInt4WeightQuantizer(QuantHandler):
 quantizer_class_dict = {
     "embedding": EmbeddingOnlyQuantHandler,
     "linear:int8": WeightOnlyInt8QuantHandler,
-    "linear:int4": WeightOnlyInt4QuantHandler,
-    "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
     "precision": PrecisionHandler,
     "executor": ExecutorHandler,
+}
+
+ao_quantizer_class_dict = {
+    "linear:int4": Int4WeightOnlyQuantizer,
+    "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
 }

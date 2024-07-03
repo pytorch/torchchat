@@ -64,6 +64,7 @@ fi
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
   torch=="2.5.0.${NIGHTLY_VERSION}"
+  torchao-nightly=="2024.6.29"
 )
 
 # Install the requirements. `--extra-index-url` tells pip to look for package
