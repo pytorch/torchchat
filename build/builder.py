@@ -22,6 +22,7 @@ from utils.measure_time import measure_time
 
 from build.model import Transformer
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
+from distributed import parallelize_llama, ParallelDims, init_distributed, load_checkpoints_to_model
 
 
 @dataclass
@@ -304,6 +305,7 @@ def _load_model_default(builder_args, only_config=False):
     model = _init_model_on_meta_device(builder_args)
     # checkpoint = torch.load(str(builder_args.checkpoint_path), mmap=True, weights_only=True)
     cps = []
+    print(f"Loading {builder_args.checkpoint_path} dir: {builder_args.checkpoint_dir}")
     if builder_args.checkpoint_dir is not None:
         # Load multiple checkpoint; ignore the single path.
         builder_args.checkpoint_path = None
@@ -344,27 +346,41 @@ def _load_model_default(builder_args, only_config=False):
     return model
 
 
+def _maybe_init_distributed(builder_args):
+    if not builder_args.use_distributed:
+        return None, None
+    # TODO: ongoing work to support loading model from checkpoint
+    # init distributed
+    world_size = int(os.environ["WORLD_SIZE"])
+    # TODO: To make tp, pp degree configurable
+    parallel_dims = ParallelDims(
+        tp=8,
+        pp=1,
+        world_size=world_size,
+    )
+    init_distributed()
+    world_mesh = parallel_dims.build_mesh(device_type="cuda")
+    return world_mesh, parallel_dims
+
+
+def _maybe_parellelize_model(model, builder_args, world_mesh, parallel_dims):
+    if world_mesh is None:
+        return model
+    assert parallel_dims is not None
+    print("Applying model parallel to model ...")
+    parallelize_llama(model, world_mesh, parallel_dims)
+    return load_checkpoints_to_model(model, builder_args, world_mesh)
+
+
 def _load_model(builder_args, only_config=False):
+    world_mesh, parallel_dims = _maybe_init_distributed(builder_args)
     if builder_args.gguf_path:
         model = _load_model_gguf(builder_args)
+    elif builder_args.use_distributed:
+        model = _init_model_on_meta_device(builder_args)
     else:
         model = _load_model_default(builder_args)
-
-    # TODO: ongoing work to support loading model from checkpoint
-    if builder_args.use_distributed:
-        # init distributed
-        world_size = int(os.environ["WORLD_SIZE"])
-        # TODO: To make tp, pp degree configurable
-        parallel_dims = ParallelDims(
-            tp=8,
-            pp=1,
-            world_size=world_size,
-        )
-        init_distributed()
-        world_mesh = parallel_dims.build_mesh(device_type="cuda")
-
-        print("Applying model parallel to model ...")
-        parallelize_llama(model, world_mesh, parallel_dims)
+    model = _maybe_parellelize_model(model, builder_args, world_mesh, parallel_dims)
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
