@@ -44,55 +44,48 @@ def apply_tp(
 
     tp_mesh = world_mesh["tp"]
 
-    # TODO: To figure out the TP for the tok_embedding and the linear proj layer.
-    # # 1. Parallelize the first embedding and the last linear proj layer
-    # # 2. Shard the first transformer block's inputs
+    # TODO: The commented part can further help with scaling but it will
+    # make inference very slow so we disable it for now.
+    # Parallelize the token embedding and the last linear proj layer
     # model = parallelize_module(
     #     model,
     #     tp_mesh,
     #     {
-    #         "tok_embeddings": RowwiseParallel(
-    #             input_layouts=Replicate(),
+    #         "tok_embeddings": ColwiseParallel(
     #             output_layouts=Replicate(),
     #         ),
     #         "output": ColwiseParallel(
-    #             input_layouts=Shard(1),
     #             output_layouts=Replicate(),
-    #             use_local_output=True,
     #         ),
     #     },
     # )
 
+    # NOTE: This is indeed a hack because it assumes that we create cache
+    # after we apply TP to the model. Because we don't want to change model code 
+    # when applying TP. We need to have change to ensure KVCache has the correct
+    # size as k and v.
+    model.config.n_local_heads = model.config.n_local_heads // tp_mesh.size()
+
     # Apply tensor parallelism to every transformer block
     for transformer_block in model.layers:
         layer_plan = {
-            "attention": PrepareModuleInput(
-                input_layouts=(Replicate(), None),
-                desired_input_layouts=(Replicate(), None),
-            ),
             "attention.wq": ColwiseParallel(),
             "attention.wk": ColwiseParallel(),
             "attention.wv": ColwiseParallel(),
-            "attention.wo": RowwiseParallel(
-                output_layouts=Replicate(),
-                use_local_output=True,
-            ),
-            "feed_forward": PrepareModuleInput(
-                input_layouts=(Replicate(),),
-                desired_input_layouts=(Replicate(),),
-            ),
+            "attention.wo": RowwiseParallel(),
             "feed_forward.w1": ColwiseParallel(),
-            "feed_forward.w2": RowwiseParallel(
-                output_layouts=Replicate(),
-                use_local_output=True
-            ),
+            "feed_forward.w2": RowwiseParallel(),
             "feed_forward.w3": ColwiseParallel(),
         }
 
         # Adjust attention module to use the local number of heads
         attn_layer = transformer_block.attention
+        assert attn_layer.n_heads % tp_mesh.size() == 0
+        assert attn_layer.n_local_heads % tp_mesh.size() == 0
+        assert attn_layer.dim % tp_mesh.size() == 0
         attn_layer.n_heads = attn_layer.n_heads // tp_mesh.size()
         attn_layer.n_local_heads = attn_layer.n_local_heads // tp_mesh.size()
+        attn_layer.dim = attn_layer.dim // tp_mesh.size()
 
         parallelize_module(
             module=transformer_block,
