@@ -23,9 +23,13 @@ from build.utils import (
     state_dict_device,
 )
 
-from quantization.qops import LinearAct8Int4DQ, QuantizedEmbedding
+from quantization.qops import (
+    LinearAct8Int4DQ,
+    LinearInt8 as WeightOnlyInt8Linear,
+    QuantizedEmbedding,
+)
 from torch.ao.quantization.fx._decomposed import quantized_decomposed_lib # noqa
-from torchao.quantization.GPTQ import (
+from torchao.quantization.quant_api import (
     Int4WeightOnlyQuantizer,
     Int8DynActInt4WeightQuantizer,
 )
