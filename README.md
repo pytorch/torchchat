@@ -183,7 +183,7 @@ ExecuTorch enables you to optimize your model for execution on a
 mobile or embedded device, but can also be used on desktop for
 testing.
 
-### Set Up Executorch
+### Set Up ExecuTorch
 
 Before running any commands in torchchat that require ExecuTorch, you
 must first install ExecuTorch.
@@ -198,7 +198,7 @@ export TORCHCHAT_ROOT=${PWD}
 ./scripts/install_et.sh
 ```
 
-### Test it out using our Executorch runner
+### Test it out using our ExecuTorch runner
 Build the runner
 ```bash
 scripts/build_native.sh et
@@ -237,7 +237,7 @@ run `python3 torchchat.py export`
 
 ### Deploy and run on iOS
 
-The following assumes you've completed the steps for [Setting up Executorch](#set-up-executorch).
+The following assumes you've completed the steps for [Setting up ExecuTorch](#set-up-executorch).
 
 #### Requirements
 - Xcode 15.0 or later
