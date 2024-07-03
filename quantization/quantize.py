@@ -15,20 +15,11 @@ from typing import Dict, Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from build.utils import (
-    find_multiple,
-    get_device_str,
-    get_precision,
-    name_to_dtype,
-    state_dict_device,
-)
+from build.utils import get_device_str, name_to_dtype, state_dict_device
 
-from quantization.qops import (
-    LinearAct8Int4DQ,
-    LinearInt8 as WeightOnlyInt8Linear,
-    QuantizedEmbedding,
-)
-from torch.ao.quantization.fx._decomposed import quantized_decomposed_lib # noqa
+from quantization.qops import LinearInt8 as WeightOnlyInt8Linear, QuantizedEmbedding
+# AttributeError: '_OpNamespace' 'quantized_decomposed' object has no attribute 'quantize_per_channel_group'
+from torch.ao.quantization.fx._decomposed import quantized_decomposed_lib  # noqa
 from torchao.quantization.quant_api import (
     Int4WeightOnlyQuantizer,
     Int8DynActInt4WeightQuantizer,
