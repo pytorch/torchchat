@@ -64,7 +64,6 @@ fi
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
   torch=="2.5.0.${NIGHTLY_VERSION}"
-  torchao-nightly=="2024.6.29"
 )
 
 # Install the requirements. `--extra-index-url` tells pip to look for package
@@ -74,7 +73,7 @@ $PIP_EXECUTABLE install --extra-index-url "${TORCH_NIGHTLY_URL}" \
 
 # For torchao need to install from github since nightly build doesn't have macos build.
 # TODO: Remove this and install nightly build, once it supports macos
-$PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@v0.3.0
+$PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@a35a1cd7b250df471fca49852f7e8b69cbbf38bf
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   $PYTHON_EXECUTABLE scripts/patch_triton.py
 fi
