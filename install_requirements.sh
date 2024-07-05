@@ -73,7 +73,7 @@ $PIP_EXECUTABLE install --extra-index-url "${TORCH_NIGHTLY_URL}" \
 
 # For torchao need to install from github since nightly build doesn't have macos build.
 # TODO: Remove this and install nightly build, once it supports macos
-$PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@a35a1cd7b250df471fca49852f7e8b69cbbf38bf
+$PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@df3b18ace9815c977e3a25bde09b3310e0a243b9
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   $PYTHON_EXECUTABLE scripts/patch_triton.py
 fi
