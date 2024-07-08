@@ -9,9 +9,12 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Tuple, Union
+from utils.measure_time import measure_time
 
 import torch
+import torch.nn as nn
+from torch.distributed.device_mesh import DeviceMesh
 import torch._dynamo.config
 import torch._inductor.config
 
@@ -305,7 +308,6 @@ def _load_model_default(builder_args, only_config=False):
     model = _init_model_on_meta_device(builder_args)
     # checkpoint = torch.load(str(builder_args.checkpoint_path), mmap=True, weights_only=True)
     cps = []
-    print(f"Loading {builder_args.checkpoint_path} dir: {builder_args.checkpoint_dir}")
     if builder_args.checkpoint_dir is not None:
         # Load multiple checkpoint; ignore the single path.
         builder_args.checkpoint_path = None
@@ -346,7 +348,23 @@ def _load_model_default(builder_args, only_config=False):
     return model
 
 
-def _maybe_init_distributed(builder_args):
+def _maybe_init_distributed(
+    builder_args: BuilderArgs,
+) -> Tuple[Optional[DeviceMesh], Optional[ParallelDims]]:
+    """
+    Initialize distributed related setups if the user specified 
+    using distributed inference. If not, this is a no-op.
+
+    Args:
+        builder_args (:class:`BuilderArgs`):
+            Command args for model building.
+    Returns:
+        Tuple[Optional[DeviceMesh], Optional[ParallelDims]]: 
+            - The first element is an optional DeviceMesh object, 
+            which which describes the mesh topology of devices for the DTensor.
+            - The second element is an optional ParallelDims object, 
+            which represents the parallel dimensions configuration.
+    """
     if not builder_args.use_distributed:
         return None, None
     # TODO: ongoing work to support loading model from checkpoint
@@ -363,7 +381,30 @@ def _maybe_init_distributed(builder_args):
     return world_mesh, parallel_dims
 
 
-def _maybe_parellelize_model(model, builder_args, world_mesh, parallel_dims):
+def _maybe_parellelize_model(
+    model: nn.Module,
+    builder_args: BuilderArgs,
+    world_mesh: DeviceMesh,
+    parallel_dims: ParallelDims,
+) -> nn.Module:
+    """
+    We parallelize the module and load the distributed checkpoint to the model
+    if the user specifies using distributed inference. If not, this is a no-op.
+
+    Args:
+        module (:class:`nn.Module`):
+            Module to be parallelized.
+        builder_args (:class:`BuilderArgs`):
+            Command args for model building.
+        world_mesh (:class:`DeviceMesh`):
+            Object which describes the mesh topology
+            of devices for the DTensor.
+        parallel_dims (:class:`ParallelDims`):
+            Object which represents the parallel dimensions configuration.
+    Returns:
+        A :class:`nn.Module` object which is parallelized and checkpoint loaded
+        if the user specifies using distributed inference.
+    """
     if world_mesh is None:
         return model
     assert parallel_dims is not None
