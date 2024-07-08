@@ -52,6 +52,7 @@ def materialze_broadcast_of_rope_freq_cis(
     return module
 
 
+# Note: args param is not being used 
 def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
 
     input = (

@@ -12,6 +12,7 @@ from torch.export import Dim
 default_device = "cpu"
 
 
+# Note: args param is not being used 
 def export_model(model: nn.Module, device, output_path, args=None):
     max_seq_length = 350
 

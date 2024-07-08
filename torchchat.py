@@ -23,7 +23,6 @@ if __name__ == "__main__":
     # Initialize the top-level parser
     parser = argparse.ArgumentParser(
         prog="torchchat",
-        add_help=True,
     )
 
     subparsers = parser.add_subparsers(
@@ -32,6 +31,7 @@ if __name__ == "__main__":
     )
     subparsers.required = True
 
+    # Top Level Command List
     VERB_HELP = {
        "chat": "Chat interactively with a model",
        "browser": "Chat interactively in a browser",
@@ -43,6 +43,8 @@ if __name__ == "__main__":
        "remove": "Remove downloaded model artifacts",
        "where": "Return directory containing downloaded model artifacts",
     }
+    
+    # Add subparsers for each verb
     for verb in KNOWN_VERBS:
        subparser = subparsers.add_parser(verb, help=VERB_HELP[verb])
        add_arguments_for_verb(subparser, verb)
@@ -55,6 +57,7 @@ if __name__ == "__main__":
     )
 
     if args.command == "chat":
+        # BuilderArgs, Speculative, Tokenizer, Generator, profile, quantize, draft_quantize, chat
         # enable "chat"
         args.chat = True
         check_args(args, "chat")
@@ -70,36 +73,43 @@ if __name__ == "__main__":
         from browser.browser import main as browser_main 
 
         browser_main(args)
-    elif args.command == "download":
-        check_args(args, "download")
-        from download import download_main
-
-        download_main(args)
     elif args.command == "generate":
+        # BuilderArgs, TokenizerArgs, Speculative, Generator, profile, quantize, draft_quantize
         check_args(args, "generate")
         from generate import main as generate_main
 
         generate_main(args)
     elif args.command == "eval":
+        # BuilderArgs, TokenizerArgs, quantize, tasks, limit, compile, max_seq_length
         from eval import main as eval_main
 
         eval_main(args)
     elif args.command == "export":
+        # BuilderArgs, TokenizerArgs, quantize
         check_args(args, "export")
         from export import main as export_main
 
         export_main(args)
+    elif args.command == "download":
+        # model_directory, model, hf_token
+        check_args(args, "download")
+        from download import download_main
+
+        download_main(args)
     elif args.command == "list":
+        # model_directory
         check_args(args, "list")
         from download import list_main
 
         list_main(args)
     elif args.command == "where":
+        # model_directory, model
         check_args(args, "where")
         from download import where_main
 
         where_main(args)
     elif args.command == "remove":
+        # model_directory, model 
         check_args(args, "remove")
         from download import remove_main
 
