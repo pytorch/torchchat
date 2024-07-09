@@ -18,7 +18,7 @@ then
 fi
 
 # Check python version. Expect 3.10.x or 3.11.x
-printf "import sys\nif sys.version_info.major != 3 or sys.version_info.minor < 10 :\n\tprint('Please use Python >=3.10');sys.exit(1)\n" | python3
+printf "import sys\nif sys.version_info.major != 3 or sys.version_info.minor < 10 :\n\tprint('Please use Python >=3.10');sys.exit(1)\n" | $PYTHON_EXECUTABLE
 if [[ $? -ne 0 ]]
 then
   exit 1
