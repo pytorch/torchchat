@@ -265,7 +265,7 @@ def add_arguments_for_verb(parser, verb: str) -> None:
 
 # Configure CLI Args specific to Model Artifact Management
 def _configure_artifact_inventory_args(parser, verb: str) -> None:
-    if verb != "list":
+    if verb in ['where', "download"]:
         parser.add_argument(
             "model",
             type=str,
@@ -274,12 +274,13 @@ def _configure_artifact_inventory_args(parser, verb: str) -> None:
             help="Model name for well-known models",
         )
         
-    parser.add_argument(
-        "--model-directory",
-        type=Path,
-        default=default_model_dir,
-        help=f"The directory to store downloaded model artifacts. Default: {default_model_dir}",
-    )
+    if verb in ['list', 'where', "download"]:
+        parser.add_argument(
+            "--model-directory",
+            type=Path,
+            default=default_model_dir,
+            help=f"The directory to store downloaded model artifacts. Default: {default_model_dir}",
+        )
     
     if verb == "download":
         parser.add_argument(
