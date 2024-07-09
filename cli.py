@@ -230,6 +230,31 @@ def add_arguments_for_verb(parser, verb: str):
         choices=["fast", "cpu", "cuda", "mps"],
         help="Hardware device to use. Options: cpu, cuda, mps",
     )
+    
+    if verb == "eval":
+        _add_evaluation_args(parser)
+    
+    parser.add_argument(
+        "--hf-token",
+        type=str,
+        default=None,
+        help="A HuggingFace API token to use when downloading model artifacts",
+    )
+    parser.add_argument(
+        "--model-directory",
+        type=Path,
+        default=default_model_dir,
+        help=f"The directory to store downloaded model artifacts. Default: {default_model_dir}",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=5000,
+        help="Port for the web server in browser mode",
+    )
+
+# Add CLI Args specific to Model Evaluation
+def _add_evaluation_args(parser) -> None:
     parser.add_argument(
         "--tasks",
         nargs="+",
@@ -248,24 +273,6 @@ def add_arguments_for_verb(parser, verb: str):
         type=int,
         default=None,
         help="Maximum length sequence to evaluate",
-    )
-    parser.add_argument(
-        "--hf-token",
-        type=str,
-        default=None,
-        help="A HuggingFace API token to use when downloading model artifacts",
-    )
-    parser.add_argument(
-        "--model-directory",
-        type=Path,
-        default=default_model_dir,
-        help=f"The directory to store downloaded model artifacts. Default: {default_model_dir}",
-    )
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=5000,
-        help="Port for the web server in browser mode",
     )
 
 
