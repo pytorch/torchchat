@@ -49,8 +49,9 @@ def add_arguments_for_verb(parser, verb: str) -> None:
     # an explicit --checkpoint-dir, --checkpoint-path, or --tokenizer-path.
     
     if verb in INVENTORY_VERBS:
-       _configure_artifact_inventory_args(parser, verb)
-       return  
+        _configure_artifact_inventory_args(parser, verb)
+        _add_cli_metadata_args(parser)
+        return  
 
     parser.add_argument(
         "model",
@@ -201,12 +202,6 @@ def add_arguments_for_verb(parser, verb: str) -> None:
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32, fast16, fast",
     )
     parser.add_argument(
-        "-v",
-        "--verbose",
-        action="store_true",
-        help="Verbose output",
-    )
-    parser.add_argument(
         "--quantize",
         type=str,
         default="{ }",
@@ -261,7 +256,17 @@ def add_arguments_for_verb(parser, verb: str) -> None:
         default=5000,
         help="Port for the web server in browser mode",
     )
+    _add_cli_metadata_args(parser)
 
+
+# Add CLI Args that are relevant to any subcommand execution
+def _add_cli_metadata_args(parser) -> None:
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Verbose output",
+    )
 
 # Configure CLI Args specific to Model Artifact Management
 def _configure_artifact_inventory_args(parser, verb: str) -> None:
@@ -314,6 +319,7 @@ def _add_evaluation_args(parser) -> None:
     )
 
 
+# TODO: Refactor arg_init to be more modular
 def arg_init(args):
     if not (torch.__version__ > "2.3"):
         raise RuntimeError(
@@ -322,6 +328,11 @@ def arg_init(args):
 
     if sys.version_info.major != 3 or sys.version_info.minor < 10:
        raise RuntimeError("Please use Python 3.10 or later.")
+
+    # TODO: Don't initialize for Inventory management subcommands
+    # Remove when arg_init is refactored
+    if args.command in INVENTORY_VERBS:
+        return args
 
     if hasattr(args, "quantize") and Path(args.quantize).is_file():
         with open(args.quantize, "r") as f:
