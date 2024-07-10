@@ -319,7 +319,6 @@ def _add_evaluation_args(parser) -> None:
     )
 
 
-# TODO: Refactor arg_init to be more modular
 def arg_init(args):
     if not (torch.__version__ > "2.3"):
         raise RuntimeError(
@@ -328,11 +327,6 @@ def arg_init(args):
 
     if sys.version_info.major != 3 or sys.version_info.minor < 10:
        raise RuntimeError("Please use Python 3.10 or later.")
-
-    # TODO: Don't initialize for Inventory management subcommands
-    # Remove when arg_init is refactored
-    if args.command in INVENTORY_VERBS:
-        return args
 
     if hasattr(args, "quantize") and Path(args.quantize).is_file():
         with open(args.quantize, "r") as f:

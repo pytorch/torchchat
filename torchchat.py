@@ -12,6 +12,7 @@ import sys
 from cli import (
     add_arguments_for_verb,
     KNOWN_VERBS,
+    INVENTORY_VERBS,
     arg_init,
     check_args,
 )
@@ -49,7 +50,11 @@ if __name__ == "__main__":
 
     # Now parse the arguments
     args = parser.parse_args()
-    args = arg_init(args)
+
+    # Don't initialize for Inventory management subcommands
+    # TODO: Remove when arg_init is refactored
+    if args.command not in INVENTORY_VERBS:
+        args = arg_init(args)
     logging.basicConfig(
         format="%(message)s", level=logging.DEBUG if args.verbose else logging.INFO
     )
