@@ -263,55 +263,55 @@ def _configure_artifact_inventory_args(parser, verb: str) -> None:
 
 # Add CLI Args specific to user prompted generation
 def _add_generation_args(parser) -> None:
-    generater_parser = parser.add_argument_group("Generation Args", "Configs for generating output based on provided prompt")
-    generater_parser.add_argument(
+    generator_parser = parser.add_argument_group("Generation Args", "Configs for generating output based on provided prompt")
+    generator_parser.add_argument(
         "--prompt",
         type=str,
         default="Hello, my name is",
         help="Input prompt for manual output generation",
     )
-    generater_parser.add_argument(
+    generator_parser.add_argument(
         "--chat",
         action="store_true",
         help="Whether to start an interactive chat session",
     )
-    generater_parser.add_argument(
+    generator_parser.add_argument(
         "--gui",
         action="store_true",
         help="Whether to use a web UI for an interactive chat session",
     )
-    generater_parser.add_argument(
+    generator_parser.add_argument(
         "--num-samples",
         type=int,
         default=1,
         help="Number of samples",
     )
-    generater_parser.add_argument(
+    generator_parser.add_argument(
         "--max-new-tokens",
         type=int,
         default=200,
         help="Maximum number of new tokens",
     )
-    generater_parser.add_argument(
+    generator_parser.add_argument(
         "--top-k",
         type=int,
         default=200,
         help="Top-k for sampling",
     )
-    generater_parser.add_argument(
+    generator_parser.add_argument(
         "--temperature", type=float, default=0.8, help="Temperature for sampling"
     )
-    generater_parser.add_argument(
+    generator_parser.add_argument(
         "--compile-prefill",
         action="store_true",
         help="Whether to compile the prefill. Improves prefill perf, but has higher compile times.",
     )
-    generater_parser.add_argument(
+    generator_parser.add_argument(
         "--sequential-prefill",
         action="store_true",
         help="Whether to perform prefill sequentially. Only used for model debug.",
     )
-    generater_parser.add_argument(
+    generator_parser.add_argument(
         "--speculate-k",
         type=int,
         default=5,
