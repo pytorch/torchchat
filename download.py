@@ -125,13 +125,6 @@ def is_model_downloaded(model: str, models_dir: Path) -> bool:
 
 # Subcommand to list available models.
 def list_main(args) -> None:
-    # TODO It would be nice to have argparse validate this. However, we have
-    # model as an optional named parameter for all subcommands, so we'd
-    # probably need to move it to be registered per-command.
-    if args.model:
-        print("Usage: torchchat.py list")
-        return
-
     model_configs = load_model_configs()
 
     # Build the table in-memory so that we can align the text nicely.
