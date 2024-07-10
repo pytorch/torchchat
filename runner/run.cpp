@@ -203,9 +203,9 @@ float* forward(Transformer* transformer, int token, int pos) {
                              .to(torch::kCPU);
   auto logits = result[0].data_ptr();
 #else // __ET_MODEL__
-  ManagedTensor pos_managed(pos_buffer, sizeof(int64_t), {1}, ScalarType::Long);
+  ManagedTensor pos_managed(pos_buffer, {1}, ScalarType::Long);
   ManagedTensor tokens_managed(
-      token_buffer, sizeof(int64_t), {1, 1}, ScalarType::Long);
+      token_buffer, {1, 1}, ScalarType::Long);
   std::vector<EValue> inputs;
   auto tmp1 = EValue(tokens_managed.get_aliasing_tensor());
   auto tmp2 = EValue(pos_managed.get_aliasing_tensor());
