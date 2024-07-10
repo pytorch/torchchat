@@ -24,25 +24,35 @@ default_model_dir = Path(
 ).expanduser()
 
 
-KNOWN_VERBS = ["chat", "browser", "download", "generate", "eval", "export", "list", "remove", "where"]
+# Subcommands related to downloading and managing model artifacts 
+INVENTORY_VERBS = ["download", "list", "remove", "where"]
+
+# List of all supported subcommands in torchchat
+KNOWN_VERBS = ["chat", "browser", "generate", "eval", "export"] + INVENTORY_VERBS
 
 # Handle CLI arguments that are common to a majority of subcommands.
 def check_args(args, verb: str) -> None:
     # Handle model download. Skip this for download, since it has slightly
     # different semantics.
     if (
-        verb not in ["download", "list", "remove"]
+        verb not in INVENTORY_VERBS         
         and args.model
         and not is_model_downloaded(args.model, args.model_directory)
     ):
         download_and_convert(args.model, args.model_directory, args.hf_token)
 
 
-def add_arguments_for_verb(parser, verb: str):
+def add_arguments_for_verb(parser, verb: str) -> None:
     # Model specification. TODO Simplify this.
     # A model can be specified using a positional model name or HuggingFace
     # path. Alternatively, the model can be specified via --gguf-path or via
     # an explicit --checkpoint-dir, --checkpoint-path, or --tokenizer-path.
+    
+    if verb in INVENTORY_VERBS:
+        _configure_artifact_inventory_args(parser, verb)
+        _add_cli_metadata_args(parser)
+        return 
+
     parser.add_argument(
         "model",
         type=str,
@@ -192,12 +202,6 @@ def add_arguments_for_verb(parser, verb: str):
         help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32, fast16, fast",
     )
     parser.add_argument(
-        "-v",
-        "--verbose",
-        action="store_true",
-        help="Verbose output",
-    )
-    parser.add_argument(
         "--quantize",
         type=str,
         default="{ }",
@@ -252,6 +256,46 @@ def add_arguments_for_verb(parser, verb: str):
         default=5000,
         help="Port for the web server in browser mode",
     )
+    _add_cli_metadata_args(parser)
+
+
+# Add CLI Args that are relevant to any subcommand execution
+def _add_cli_metadata_args(parser) -> None:
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Verbose output",
+    )
+
+
+# Configure CLI Args specific to Model Artifact Management
+def _configure_artifact_inventory_args(parser, verb: str) -> None:
+    if verb in ["download", "remove", "where"]:
+        parser.add_argument(
+            "model",
+            type=str,
+            nargs="?",
+            default=None,
+            help="Model name for well-known models",
+        )
+
+    if verb in INVENTORY_VERBS:
+        parser.add_argument(
+            "--model-directory",
+            type=Path,
+            default=default_model_dir,
+            help=f"The directory to store downloaded model artifacts. Default: {default_model_dir}",
+        )
+
+    if verb == "download":
+        parser.add_argument(
+            "--hf-token",
+            type=str,
+            default=None,
+            help="A HuggingFace API token to use when downloading model artifacts",
+        )
+
 
 # Add CLI Args specific to Model Evaluation
 def _add_evaluation_args(parser) -> None:
