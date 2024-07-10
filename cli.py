@@ -80,7 +80,7 @@ def add_arguments_for_verb(parser, verb: str) -> None:
         default=None,
         help="Initialize torch seed",
     )
-    generater_parser.add_argument(
+    parser.add_argument(
         "--compile",
         action="store_true",
         help="Whether to compile the model with torch.compile",
