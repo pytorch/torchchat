@@ -80,6 +80,11 @@ def add_arguments_for_verb(parser, verb: str) -> None:
         default=None,
         help="Initialize torch seed",
     )
+    generater_parser.add_argument(
+        "--compile",
+        action="store_true",
+        help="Whether to compile the model with torch.compile",
+    )
     parser.add_argument(
         "--profile",
         type=Path,
@@ -295,11 +300,6 @@ def _add_generation_args(parser) -> None:
     )
     generater_parser.add_argument(
         "--temperature", type=float, default=0.8, help="Temperature for sampling"
-    )
-    generater_parser.add_argument(
-        "--compile",
-        action="store_true",
-        help="Whether to compile the model with torch.compile",
     )
     generater_parser.add_argument(
         "--compile-prefill",
