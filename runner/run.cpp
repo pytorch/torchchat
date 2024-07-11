@@ -196,7 +196,8 @@ float* forward(Transformer* transformer, int token, int pos) {
   torch::Tensor token_tensor =
       torch::from_blob(token_buffer, {1, 1}, torch::kLong);
   torch::Tensor pos_tensor = torch::from_blob(pos_buffer, {1}, torch::kLong);
-  std::vector<torch::Tensor> inputs{token_tensor.to(aoti_device), pos_tensor.to(aoti_device)};
+  std::vector<torch::Tensor> inputs{
+      token_tensor.to(aoti_device), pos_tensor.to(aoti_device)};
 
   torch::Tensor result = transformer->runner->run(inputs)[0]
                              .to(torch::dtype(torch::kFloat32))
@@ -204,8 +205,7 @@ float* forward(Transformer* transformer, int token, int pos) {
   auto logits = result[0].data_ptr();
 #else // __ET_MODEL__
   ManagedTensor pos_managed(pos_buffer, {1}, ScalarType::Long);
-  ManagedTensor tokens_managed(
-      token_buffer, {1, 1}, ScalarType::Long);
+  ManagedTensor tokens_managed(token_buffer, {1, 1}, ScalarType::Long);
   std::vector<EValue> inputs;
   auto tmp1 = EValue(tokens_managed.get_aliasing_tensor());
   auto tmp2 = EValue(pos_managed.get_aliasing_tensor());
@@ -811,7 +811,9 @@ void error_usage() {
       "  -v <int>    (optional) vocab size, default is model-specific.\n");
   fprintf(
       stderr, "  -l <int>    (optional) llama version (2 or 3), default 2.\n");
-  fprintf(stderr, "  -d <string> (optional) device(CUDA or CPU)  model was exported for\n");
+  fprintf(
+      stderr,
+      "  -d <string> (optional) device(CUDA or CPU)  model was exported for\n");
   exit(EXIT_FAILURE);
 }
 
@@ -884,16 +886,16 @@ int main(int argc, char* argv[]) {
 #ifdef __AOTI_MODEL__
     } else if (argv[i][1] == 'd') {
 #ifdef USE_CUDA
-       if (strcasecmp(argv[i + 1], "CUDA") == 0) {
-          aoti_device = torch::Device(torch::kCUDA);
-       } else
+      if (strcasecmp(argv[i + 1], "CUDA") == 0) {
+        aoti_device = torch::Device(torch::kCUDA);
+      } else
 #endif
-       if (strcasecmp(argv[i + 1], "CPU") == 0) {
-          aoti_device = torch::Device(torch::kCPU);
-       } else {
-         fprintf(stderr, "Unknown device %s", argv[i + 1]);
-         exit(1);
-       }
+          if (strcasecmp(argv[i + 1], "CPU") == 0) {
+        aoti_device = torch::Device(torch::kCPU);
+      } else {
+        fprintf(stderr, "Unknown device %s", argv[i + 1]);
+        exit(1);
+      }
 #endif
     } else {
       error_usage();

@@ -11,10 +11,10 @@ import sys
 
 from cli import (
     add_arguments_for_verb,
-    KNOWN_VERBS,
-    INVENTORY_VERBS,
     arg_init,
     check_args,
+    INVENTORY_VERBS,
+    KNOWN_VERBS,
 )
 
 default_device = "cpu"
@@ -34,19 +34,19 @@ if __name__ == "__main__":
     subparsers.required = True
 
     VERB_HELP = {
-       "chat": "Chat interactively with a model",
-       "browser": "Chat interactively in a browser",
-       "download": "Download a model from Hugging Face or others",
-       "generate": "Generate responses from a model given a prompt",
-       "eval": "Evaluate a model given a prompt",
-       "export": "Export a model for AOT Inductor or ExecuTorch",
-       "list": "List supported models",
-       "remove": "Remove downloaded model artifacts",
-       "where": "Return directory containing downloaded model artifacts",
+        "chat": "Chat interactively with a model",
+        "browser": "Chat interactively in a browser",
+        "download": "Download a model from Hugging Face or others",
+        "generate": "Generate responses from a model given a prompt",
+        "eval": "Evaluate a model given a prompt",
+        "export": "Export a model for AOT Inductor or ExecuTorch",
+        "list": "List supported models",
+        "remove": "Remove downloaded model artifacts",
+        "where": "Return directory containing downloaded model artifacts",
     }
     for verb in KNOWN_VERBS:
-       subparser = subparsers.add_parser(verb, help=VERB_HELP[verb])
-       add_arguments_for_verb(subparser, verb)
+        subparser = subparsers.add_parser(verb, help=VERB_HELP[verb])
+        add_arguments_for_verb(subparser, verb)
 
     # Now parse the arguments
     args = parser.parse_args()
@@ -72,7 +72,7 @@ if __name__ == "__main__":
         args.gui = True
         check_args(args, "browser")
 
-        from browser.browser import main as browser_main 
+        from browser.browser import main as browser_main
 
         browser_main(args)
     elif args.command == "generate":
