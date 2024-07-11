@@ -9,9 +9,11 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 import torch
+import torch.nn as nn
+from torch.distributed.device_mesh import DeviceMesh
 import torch._dynamo.config
 import torch._inductor.config
 
@@ -22,12 +24,14 @@ from utils.measure_time import measure_time
 
 from build.model import Transformer
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
+from distributed import parallelize_llama, ParallelDims, init_distributed, load_checkpoints_to_model
 
 
 @dataclass
 class BuilderArgs:
     checkpoint_path: Optional[Union[Path, str]] = None
     checkpoint_dir: Optional[Union[Path, str]] = None
+    dcp_dir: Optional[Union[Path, str]] = None
     params_path: Optional[Union[Path, str]] = None
     params_table: Optional[str] = None
     gguf_path: Optional[Union[Path, str]] = None
@@ -80,6 +84,8 @@ class BuilderArgs:
         checkpoint_dir = None
         if hasattr(args, "checkpoint_dir"):
             checkpoint_dir = args.checkpoint_dir
+        if hasattr(args, "dcp_dir"):
+            dcp_dir = args.dcp_dir
 
         checkpoint_path = args.checkpoint_path
         params_table = args.params_table
@@ -133,6 +139,7 @@ class BuilderArgs:
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
+            dcp_dir=dcp_dir,
             params_path=args.params_path,
             params_table=params_table,
             gguf_path=args.gguf_path,
@@ -344,27 +351,80 @@ def _load_model_default(builder_args, only_config=False):
     return model
 
 
+def _maybe_init_distributed(
+    builder_args: BuilderArgs,
+) -> Tuple[Optional[DeviceMesh], Optional[ParallelDims]]:
+    """
+    Initialize distributed related setups if the user specified 
+    using distributed inference. If not, this is a no-op.
+
+    Args:
+        builder_args (:class:`BuilderArgs`):
+            Command args for model building.
+    Returns:
+        Tuple[Optional[DeviceMesh], Optional[ParallelDims]]: 
+            - The first element is an optional DeviceMesh object, 
+            which which describes the mesh topology of devices for the DTensor.
+            - The second element is an optional ParallelDims object, 
+            which represents the parallel dimensions configuration.
+    """
+    if not builder_args.use_distributed:
+        return None, None
+    # TODO: ongoing work to support loading model from checkpoint
+    # init distributed
+    world_size = int(os.environ["WORLD_SIZE"])
+    # TODO: To make tp, pp degree configurable
+    parallel_dims = ParallelDims(
+        tp=8,
+        pp=1,
+        world_size=world_size,
+    )
+    init_distributed()
+    world_mesh = parallel_dims.build_mesh(device_type="cuda")
+    return world_mesh, parallel_dims
+
+
+def _maybe_parellelize_model(
+    model: nn.Module,
+    builder_args: BuilderArgs,
+    world_mesh: DeviceMesh,
+    parallel_dims: ParallelDims,
+) -> nn.Module:
+    """
+    We parallelize the module and load the distributed checkpoint to the model
+    if the user specifies using distributed inference. If not, this is a no-op.
+
+    Args:
+        module (:class:`nn.Module`):
+            Module to be parallelized.
+        builder_args (:class:`BuilderArgs`):
+            Command args for model building.
+        world_mesh (:class:`DeviceMesh`):
+            Object which describes the mesh topology
+            of devices for the DTensor.
+        parallel_dims (:class:`ParallelDims`):
+            Object which represents the parallel dimensions configuration.
+    Returns:
+        A :class:`nn.Module` object which is parallelized and checkpoint loaded
+        if the user specifies using distributed inference.
+    """
+    if world_mesh is None:
+        return model
+    assert parallel_dims is not None
+    print("Applying model parallel to model ...")
+    parallelize_llama(model, world_mesh, parallel_dims)
+    return load_checkpoints_to_model(model, builder_args, world_mesh)
+
+
 def _load_model(builder_args, only_config=False):
+    world_mesh, parallel_dims = _maybe_init_distributed(builder_args)
     if builder_args.gguf_path:
         model = _load_model_gguf(builder_args)
+    elif builder_args.use_distributed:
+        model = _init_model_on_meta_device(builder_args)
     else:
         model = _load_model_default(builder_args)
-
-    # TODO: ongoing work to support loading model from checkpoint
-    if builder_args.use_distributed:
-        # init distributed
-        world_size = int(os.environ["WORLD_SIZE"])
-        # TODO: To make tp, pp degree configurable
-        parallel_dims = ParallelDims(
-            tp=8,
-            pp=1,
-            world_size=world_size,
-        )
-        init_distributed()
-        world_mesh = parallel_dims.build_mesh(device_type="cuda")
-
-        print("Applying model parallel to model ...")
-        parallelize_llama(model, world_mesh, parallel_dims)
+    model = _maybe_parellelize_model(model, builder_args, world_mesh, parallel_dims)
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
