@@ -27,7 +27,7 @@ if [ $# -ne 0 ]; then
     overrides="$*"
 fi
 
-CONFIG_FILE=${CONFIG_FILE:-"./inference_configs/llama2_7B.toml"}
+CONFIG_FILE=${CONFIG_FILE:-"./inference_configs/llama3_8B.toml"}
 
 torchrun --nproc_per_node=${NGPU} --rdzv_backend c10d --rdzv_endpoint="localhost:0" \
 --local-ranks-filter ${LOG_RANK} --role rank --tee 3 \
