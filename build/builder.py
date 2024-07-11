@@ -10,18 +10,18 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
-from utils.measure_time import measure_time
 
 import torch
 import torch._dynamo.config
 import torch._inductor.config
 
 from config.model_config import resolve_model_config
+from distributed import init_distributed, ParallelDims, parallelize_llama
 from quantization.quantize import quantize_model
+from utils.measure_time import measure_time
 
 from build.model import Transformer
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
-from distributed import parallelize_llama, ParallelDims, init_distributed
 
 
 @dataclass
@@ -286,6 +286,7 @@ def _init_model_on_meta_device(builder_args):
             return Transformer.from_table(builder_args.params_table)
         else:
             return Transformer.from_name(builder_args.checkpoint_path.parent.name)
+
 
 def _load_model_gguf(builder_args, only_config=False):
     assert builder_args.gguf_path

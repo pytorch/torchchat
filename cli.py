@@ -15,7 +15,7 @@ import torch
 from build.utils import allowable_dtype_names, allowable_params_table, get_device_str
 from download import download_and_convert, is_model_downloaded
 
-logging.basicConfig(level=logging.INFO,format="%(message)s")
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
 default_device = os.getenv("TORCHCHAT_DEVICE", "fast")
@@ -24,18 +24,19 @@ default_model_dir = Path(
 ).expanduser()
 
 
-# Subcommands related to downloading and managing model artifacts 
+# Subcommands related to downloading and managing model artifacts
 INVENTORY_VERBS = ["download", "list", "remove", "where"]
 
 # List of all supported subcommands in torchchat
 KNOWN_VERBS = ["chat", "browser", "generate", "eval", "export"] + INVENTORY_VERBS
+
 
 # Handle CLI arguments that are common to a majority of subcommands.
 def check_args(args, verb: str) -> None:
     # Handle model download. Skip this for download, since it has slightly
     # different semantics.
     if (
-        verb not in INVENTORY_VERBS         
+        verb not in INVENTORY_VERBS
         and args.model
         and not is_model_downloaded(args.model, args.model_directory)
     ):
@@ -47,11 +48,11 @@ def add_arguments_for_verb(parser, verb: str) -> None:
     # A model can be specified using a positional model name or HuggingFace
     # path. Alternatively, the model can be specified via --gguf-path or via
     # an explicit --checkpoint-dir, --checkpoint-path, or --tokenizer-path.
-    
+
     if verb in INVENTORY_VERBS:
         _configure_artifact_inventory_args(parser, verb)
         _add_cli_metadata_args(parser)
-        return 
+        return
 
     parser.add_argument(
         "model",
@@ -164,10 +165,10 @@ def add_arguments_for_verb(parser, verb: str) -> None:
         choices=["fast", "cpu", "cuda", "mps"],
         help="Hardware device to use. Options: cpu, cuda, mps",
     )
-    
+
     if verb == "eval":
         _add_evaluation_args(parser)
-    
+
     parser.add_argument(
         "--hf-token",
         type=str,
@@ -350,7 +351,7 @@ def arg_init(args):
         )
 
     if sys.version_info.major != 3 or sys.version_info.minor < 10:
-       raise RuntimeError("Please use Python 3.10 or later.")
+        raise RuntimeError("Please use Python 3.10 or later.")
 
     if hasattr(args, "quantize") and Path(args.quantize).is_file():
         with open(args.quantize, "r") as f:
