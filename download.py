@@ -26,10 +26,7 @@ def _download_hf_snapshot(
     from requests.exceptions import HTTPError
 
     # Download and store the HF model artifacts.
-    print(
-        f"Downloading {model_config.name} from HuggingFace...",
-        file=sys.stderr
-    )
+    print(f"Downloading {model_config.name} from HuggingFace...", file=sys.stderr)
     try:
         snapshot_download(
             model_config.distribution_path,
@@ -54,10 +51,7 @@ def _download_hf_snapshot(
             raise e
 
     # Convert the model to the torchchat format.
-    print(
-        f"Converting {model_config.name} to torchchat format...",
-        file=sys.stderr
-    )
+    print(f"Converting {model_config.name} to torchchat format...", file=sys.stderr)
     convert_hf_checkpoint(
         model_dir=artifact_dir, model_name=model_config.name, remove_bin_files=True
     )
@@ -177,6 +171,7 @@ def remove_main(args) -> None:
     shutil.rmtree(model_dir)
     print("Done.")
 
+
 # Subcommand to print downloaded model artifacts directory.
 # Asking for location will/should trigger download of model if not available.
 def where_main(args) -> None:
@@ -195,6 +190,7 @@ def where_main(args) -> None:
 
     print(str(os.path.abspath(model_dir)))
     exit(0)
+
 
 # Subcommand to download model artifacts.
 def download_main(args) -> None:

@@ -6,9 +6,9 @@
 import argparse
 import itertools
 import logging
+import os
 import sys
 import time
-import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Tuple

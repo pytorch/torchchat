@@ -136,7 +136,7 @@ def name_to_dtype(name, device):
         import platform
 
         if platform.processor() == "arm":
-            device=get_device_str(device)
+            device = get_device_str(device)
             # ARM CPU is faster with float16, MPS with bf16 if supported
             if device == "cpu" or int(platform.mac_ver()[0].split(".")[0]) < 14:
                 return torch.float16

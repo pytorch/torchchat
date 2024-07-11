@@ -1,5 +1,6 @@
 import sys
 
+
 def print_until_equals(filename):
     output = False
     past_output = False
