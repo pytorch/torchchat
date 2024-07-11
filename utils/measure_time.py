@@ -1,15 +1,13 @@
 from time import perf_counter
 from typing import Optional
 
+
 class measure_time:
-    def __init__(
-            self,
-            message: Optional[str] = 'Time: {time:.3f} seconds'
-    ):
+    def __init__(self, message: Optional[str] = "Time: {time:.3f} seconds"):
         self.message = message
 
     def __enter__(
-            self,
+        self,
     ):
         self.start = perf_counter()
         self.message

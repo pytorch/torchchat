@@ -86,12 +86,12 @@ def updown_process_line(
         # [ x1 | c2 | x3 ] means "pick one", so we may have to check that and pick one
         # of the options.  Probably pick the last option because testing has more likely
         # been performed with the first option!
-        last=True
+        last = True
         if last:
-            line=select_last_option_between_brackets(line)
+            line = select_last_option_between_brackets(line)
         else:
-            line=select_first_option_between_brackets(line)
-            
+            line = select_first_option_between_brackets(line)
+
         output(
             remove_text_between_brackets(line),
             replace_list=replace_list,
