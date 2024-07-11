@@ -37,4 +37,3 @@ pipeline_parallel_split_points= "layers.4"  # string list of placements
 pipeline_parallel_schedule="gpipe"  # TODO - what is best inference schedule for continous batching
 pipeline_parallel_split_mode = "manual"
 pipeline_parallel_microbatches=1  # TODO - continuous batching
-fp8_linear=""

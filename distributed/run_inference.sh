@@ -15,7 +15,7 @@ export USE_LIBUV=1
 # e.g.
 # LOG_RANK=0,1 NGPU=4 ./run_dist_inference.sh
 
-NGPU=${NGPU:-"8"}
+NGPU=${NGPU:-"2"}
 
 # TODO: We need to decide how to log for inference.
 # by default log just rank 0 output,
@@ -27,7 +27,7 @@ if [ $# -ne 0 ]; then
     overrides="$*"
 fi
 
-CONFIG_FILE=${CONFIG_FILE:-"./inference_configs/llama3_8B.toml"}
+CONFIG_FILE=${CONFIG_FILE:-"./daylight/inference_configs/llama3_8B.toml"}
 
 torchrun --nproc_per_node=${NGPU} --rdzv_backend c10d --rdzv_endpoint="localhost:0" \
 --local-ranks-filter ${LOG_RANK} --role rank --tee 3 \
