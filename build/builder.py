@@ -32,6 +32,7 @@ from distributed import parallelize_llama, ParallelDims, init_distributed, load_
 class BuilderArgs:
     checkpoint_path: Optional[Union[Path, str]] = None
     checkpoint_dir: Optional[Union[Path, str]] = None
+    dcp_dir: Optional[Union[Path, str]] = None
     params_path: Optional[Union[Path, str]] = None
     params_table: Optional[str] = None
     gguf_path: Optional[Union[Path, str]] = None
@@ -84,6 +85,8 @@ class BuilderArgs:
         checkpoint_dir = None
         if hasattr(args, "checkpoint_dir"):
             checkpoint_dir = args.checkpoint_dir
+        if hasattr(args, "dcp_dir"):
+            dcp_dir = args.dcp_dir
 
         checkpoint_path = args.checkpoint_path
         params_table = args.params_table
@@ -137,6 +140,7 @@ class BuilderArgs:
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
+            dcp_dir=dcp_dir,
             params_path=args.params_path,
             params_table=params_table,
             gguf_path=args.gguf_path,

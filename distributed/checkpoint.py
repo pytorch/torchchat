@@ -84,13 +84,13 @@ def _load_checkpoints_from_storage(
     Returns:
         A dict of state_dict loaded from local disk.
     """
-    assert builder_args.checkpoint_dir is not None, "One needs to specify --checkpoint-path to load from storage"
+    assert builder_args.dcp_dir is not None, "One needs to specify --dcp-dir to load from storage"
     # NOTE: We made a couple assumptions here:
     # The download.py in TorchChat changed the name of `consolidated.00.pth` to `model.pth`
     # so that we have this hacky logic here. We need to revisit this logic once we can better
     # support large model checkpointing downloading in TorchChat.
     cp_name = "model.pth" if local_rank == 0 else f"consolidated.0{local_rank}.pth"
-    checkpoint_path = str(builder_args.checkpoint_path) if local_rank == 0 else os.path.join(builder_args.checkpoint_dir, cp_name)
+    checkpoint_path = str(builder_args.checkpoint_path) if local_rank == 0 else os.path.join(builder_args.dcp_dir, cp_name)
     print(f"Loading {cp_name} on rank {local_rank}")
     return torch.load(
         checkpoint_path,
@@ -125,7 +125,7 @@ def load_checkpoints_to_model(
     # The format of the state_dict loaded from disk is different from 
     # what we are going to use it for inference. As long as we can represent it 
     # using DTensor, we can leverage DCP for the resharding and materialization.
-    CHECKPOINT_DIR="converted_checkpoints"
+    CHECKPOINT_DIR = builder_args.dcp_dir / "converted_checkpoints"
     dist_cp.save(
         state_dict=dist_state_dict,
         storage_writer=dist_cp.FileSystemWriter(CHECKPOINT_DIR),

@@ -110,7 +110,7 @@ def add_arguments_for_verb(parser, verb: str) -> None:
         help="Use the specified model checkpoint path",
     )
     parser.add_argument(
-        "--checkpoint-dir",
+        "--dcp-dir",
         type=Path,
         default=None,
         help="Use the specified model checkpoint directory",
