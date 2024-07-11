@@ -87,6 +87,11 @@ def add_arguments_for_verb(parser, verb: str) -> None:
         help="Whether to compile the model with torch.compile",
     )
     parser.add_argument(
+        "--compile-prefill",
+        action="store_true",
+        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times.",
+    )
+    parser.add_argument(
         "--profile",
         type=Path,
         default=None,
@@ -301,11 +306,6 @@ def _add_generation_args(parser) -> None:
     )
     generator_parser.add_argument(
         "--temperature", type=float, default=0.8, help="Temperature for sampling"
-    )
-    generator_parser.add_argument(
-        "--compile-prefill",
-        action="store_true",
-        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times.",
     )
     generator_parser.add_argument(
         "--sequential-prefill",
