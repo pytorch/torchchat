@@ -34,6 +34,12 @@
         "distribution_path": "meta-llama/Meta-Llama-3-8B-Instruct",
         "transformer_params_key": "Meta-Llama-3-8B"
     },
+    "meta-llama/Meta-Llama-3-70B-Instruct": {
+        "aliases": ["llama3-70b"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/Meta-Llama-3-70B-Instruct",
+        "transformer_params_key": "Meta-Llama-3-70B"
+    },
     "meta-llama/CodeLlama-7b-Python-hf": {
         "aliases": ["codellama", "codellama-7b"],
         "distribution_channel": "HuggingFaceSnapshot",
