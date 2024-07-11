@@ -54,7 +54,7 @@ source .venv/bin/activate
 ```
 [skip default]: end
 
-[shell default]: ./install_requirements.sh 
+[shell default]: ./install_requirements.sh
 
 Installations can be tested by
 
@@ -269,17 +269,33 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 ### Deploy and run on Android
 
-#### Approach 1: Android Studio
+#### Approach 1 (Recommended): Android Studio
 
 If you have Android Studio set up, and you have Java 17 and Android SDK 34 configured, you can follow this step.
 
-First, you need to download the following AAR file which contains the required Java library and its corresponding JNI library, for the app to build and run. You need to put the file to `android/Torchchat/app/libs/executorch.aar`
+First, you need to download the ones of the following AAR files which contains the required Java library and its corresponding JNI library, for the app to build and run. You need to put the file to `android/Torchchat/app/libs/executorch.aar`
 
-[executorch-llama-torchchat.aar](https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama-torchchat.aar) (SHASUM: e19ffb15aa3f1b1281de66dd6f71c9a332a82b92)
+If your model uses BPE tokenizer (llama2 model for example), download `executorch-llama-torchchat-bpe.aar`.
 
+If your model uses tiktoken tokenizer (llama3 model for example), download `executorch-llama-torchchat-tiktoken.aar`.
+
+Currently the tokenizer is built at compile time, so you need to re-build the app when you need to use a different tokenizer for different model.
+
+NOTE: The script to build the AAR can be found [here](https://github.com/pytorch/executorch/blob/main/build/build_android_library.sh). If you need to tweak with the tokenizer or runtime (for example use your own tokenizer or runtime library), you can modify the ExecuTorch code and use that script to build the AAR library.
+
+[executorch-llama-torchchat-bpe.aar](https://ossci-android.s3.amazonaws.com/executorch/release/0.3/executorch-llama-bpe-rc1.aar) (SHASUM: 673af4a1338a93d47369b68ec0d52b8ea7f983a2)
+[executorch-llama-torchchat-tiktoken.aar](https://ossci-android.s3.amazonaws.com/executorch/release/0.3/executorch-llama-tiktoken-rc1.aar) (SHASUM: 575190205dbb1ee932a277b50520dc4260a9a9cf)
+
+For BPE tokenizer:
 ```
-curl https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama-torchchat.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
-echo "e19ffb15aa3f1b1281de66dd6f71c9a332a82b92  android/Torchchat/app/libs/executorch.aar" | shasum --check
+curl https://ossci-android.s3.amazonaws.com/executorch/release/0.3/executorch-llama-bpe-rc1.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
+echo "673af4a1338a93d47369b68ec0d52b8ea7f983a2  android/Torchchat/app/libs/executorch.aar" | shasum --check
+```
+
+For tiktoken tokenizer:
+```
+curl https://ossci-android.s3.amazonaws.com/executorch/release/0.3/executorch-llama-tiktoken-rc1.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
+echo "575190205dbb1ee932a277b50520dc4260a9a9cf  android/Torchchat/app/libs/executorch.aar" | shasum --check
 ```
 
 You also need to push the model and tokenizer file to your device. Please refer to the docs above on generating the pte and bin file, or use E2E script (see section below) to generate and push the file.
@@ -300,10 +316,11 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
 
 #### Approach 2: E2E Script
 
-Alternatively, you can run `scripts/android_example.sh` which sets up Java, Android SDK Manager, Android SDK, Android emulator, builds the app, and launches it for you.
+Alternatively, you can run `scripts/android_example.sh` which sets up Java, Android SDK Manager, Android SDK, Android emulator (if no physical device is found), builds the app, and launches it for you. It can be used if you don't have a GUI.
 
 ```
 export TORCHCHAT_ROOT=$(pwd)
+export USE_TIKTOKEN=ON # Set this only for tiktoken tokenizer
 sh scripts/android_example.sh
 ```
 
