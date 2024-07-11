@@ -85,7 +85,7 @@ def add_arguments_for_verb(parser, verb: str) -> None:
         action="store_true",
         help="Whether to compile the model with torch.compile",
     )
-    generator_parser.add_argument(
+    parser.add_argument(
         "--compile-prefill",
         action="store_true",
         help="Whether to compile the prefill. Improves prefill perf, but has higher compile times.",
