@@ -30,9 +30,13 @@ else
   exit -1
 fi
 
-LLAMA_AAR_URL="https://ossci-android.s3.us-west-1.amazonaws.com/executorch/release/0.2/executorch-llama-torchchat.aar"
-
-LLAMA_AAR_SHASUM="e19ffb15aa3f1b1281de66dd6f71c9a332a82b92"
+if [ "${USE_TIKTOKEN:-OFF}" == "ON" ]; then
+LLAMA_AAR_URL="https://ossci-android.s3.amazonaws.com/executorch/release/0.3/executorch-llama-tiktoken-rc1.aar"
+LLAMA_AAR_SHASUM="575190205dbb1ee932a277b50520dc4260a9a9cf"
+else
+LLAMA_AAR_URL="https://ossci-android.s3.amazonaws.com/executorch/release/0.3/executorch-llama-bpe-rc1.aar"
+LLAMA_AAR_SHASUM="673af4a1338a93d47369b68ec0d52b8ea7f983a2"
+fi
 
 mkdir -p ${TORCHCHAT_ROOT}/build/android
 
@@ -65,6 +69,7 @@ setup_android_sdk_manager() {
   fi
   pushd ${TORCHCHAT_ROOT}/build/android
   mkdir -p sdk/cmdline-tools/latest
+  rm -r sdk/cmdline-tools/latest/*
 
   echo "Download Android SDK Manager"
   curl "${SDK_MANAGER_URL}" -o commandlinetools.zip
