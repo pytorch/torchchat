@@ -19,8 +19,6 @@ try:
 except ModuleNotFoundError:
     import tomli as tomllib
 
-#from daylight.logging_utils import logger
-
 
 TORCH_DTYPE_MAP = {
     "float16": torch.float16,

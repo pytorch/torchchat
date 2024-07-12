@@ -26,10 +26,12 @@ import torch.nn as nn
 from torch.distributed._tensor import Replicate, Shard
 from distributed.parallel_config import ParallelDims
 from torch.distributed.device_mesh import DeviceMesh
-from distributed.utils import logger
 
 
 from .config_manager import InferenceConfig
+from distributed.logging_utils import init_logger, logger
+
+
 
 def launch_distributed(
     toml_config: str,
@@ -48,11 +50,13 @@ def launch_distributed(
             - The second element is an optional ParallelDims object, 
             which represents the parallel dimensions configuration.
     """
-
+    init_logger()
     world_size = int(os.environ["WORLD_SIZE"])
     config = InferenceConfig()
     config.parse_args(toml_config)
-    print(f"{config=}")
+    
+    print(f"logging here...")
+    logger.info(f"***************** from logger")
 
     assert False, "check"
 
