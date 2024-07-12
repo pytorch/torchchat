@@ -9,6 +9,8 @@ from datetime import timedelta
 
 import torch
 from dataclasses import dataclass, field
+import logging
+logger = logging.getLogger()
 
 def _warn_overwrite_env(env, val):
     if env in os.environ:

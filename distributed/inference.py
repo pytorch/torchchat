@@ -56,9 +56,23 @@ def main(job_config: JobConfig):
     logger.info(
         f"{color.blue}Model {job_config.model.name} {job_config.model.flavor} {Color.reset} ")
 
+    # init distributed
+    world_size = int(os.environ["WORLD_SIZE"])
+    parallel_dims = ParallelDims(
+        dp=job_config.training.data_parallel_degree,
+        tp=job_config.training.tensor_parallel_degree,
+        pp=job_config.experimental.pipeline_parallel_degree,
+        world_size=world_size,
+        enable_loss_parallel=job_config.training.enable_loss_parallel,
+    )
+    device = torch.device(f"cuda:{int(os.environ['LOCAL_RANK'])}")
+    torch.cuda.set_device(device)
+    init_distributed(job_config)
+
+
 if __name__ == "__main__":
     print(f"Daylight starting...")
     config = JobConfig()
     config.parse_args()
     main(config)
-    #destroy_process_group()
+    destroy_process_group()
