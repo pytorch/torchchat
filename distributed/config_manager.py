@@ -9,6 +9,8 @@ import sys
 from collections import defaultdict
 from typing import Tuple, Union
 import os
+from distributed.utils import logger
+from pathlib import Path
 
 import torch
 
@@ -62,22 +64,25 @@ class InferenceConfig:
         args_dict = defaultdict(defaultdict)
         local_path = "inference_configs/"+ config_file
         full_path = os.path.join(os.getcwd(), local_path)
-        print(f"Loading config file {full_path}...")
+        file_path = Path(full_path)
 
-        if not os.path.exists(full_path):
+        print(f"Loading config file {file_path}")
+
+        if not file_path.is_file():
             raise FileNotFoundError(f"Config file {full_path} does not exist")
 
-            try:
-                with open(config_file, "rb") as f:
-                    for k, v in tomllib.load(f).items():
-                        # to prevent overwrite of non-specified keys
-                        args_dict[k] |= v
-            except (FileNotFoundError, tomllib.TOMLDecodeError) as e:
-                logger.exception(
-                    f"Error while loading the configuration file: {config_file}"
-                )
-                logger.exception(f"Error details: {str(e)}")
-                raise e
+        try:
+            with open(file_path, "rb") as f:
+                for k, v in tomllib.load(f).items():
+                    # to prevent overwrite of non-specified keys
+                    print(f"{k} {v}")
+                    args_dict[k] |= v
+        except (FileNotFoundError, tomllib.TOMLDecodeError) as e:
+            logger.exception(
+                f"Error while loading the configuration file: {config_file}"
+            )
+            logger.exception(f"Error details: {str(e)}")
+            raise e
 
         # override args dict with cmd_args
         # cmd_args_dict = self._args_to_two_level_dict(cmd_args)
