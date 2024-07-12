@@ -67,7 +67,7 @@ python3 torchchat.py --help
 Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace account.
 
 [prefix default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}"
-Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens).
+Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens) with the `write` role. .
 Log into huggingface:
 ```
 huggingface-cli login
