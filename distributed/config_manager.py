@@ -9,7 +9,7 @@ import sys
 from collections import defaultdict
 from typing import Tuple, Union
 import os
-from distributed.utils import logger
+from distributed.logging_utils import logger
 from pathlib import Path
 
 import torch
@@ -64,7 +64,7 @@ class InferenceConfig:
         full_path = os.path.join(os.getcwd(), local_path)
         file_path = Path(full_path)
 
-        print(f"Loading config file {file_path}")
+        logger.info(f"Loading config file {config_file}")
 
         if not file_path.is_file():
             raise FileNotFoundError(f"Config file {full_path} does not exist")
@@ -87,8 +87,7 @@ class InferenceConfig:
         # for section, section_args in cmd_args_dict.items():
         #     for k, v in section_args.items():
         #         args_dict[section][k] = v
-        print(f"args_dict: {args_dict}")
-
+        
         for k, v in args_dict.items():
             class_type = type(k.title(), (), v)
             setattr(self, k, class_type())

@@ -16,7 +16,7 @@ import torch.nn as nn
 from torch.distributed._tensor import Replicate, Shard
 from distributed.parallel_config import ParallelDims
 from torch.distributed.device_mesh import DeviceMesh
-from distributed.utils import logger
+from distributed.logging_utils import logger
 
 
 def apply_tp(

@@ -50,16 +50,15 @@ def launch_distributed(
             - The second element is an optional ParallelDims object, 
             which represents the parallel dimensions configuration.
     """
-    init_logger()
+    #init_logger()  TODO - do we want formatted logging? 
     world_size = int(os.environ["WORLD_SIZE"])
     config = InferenceConfig()
     config.parse_args(toml_config)
+
     
-    print(f"logging here...")
-    logger.info(f"***************** from logger")
+    logger.info(f"toml parsing completed.  Launching with {world_size} GPUs")
 
-    assert False, "check"
-
+    
     parallel_dims = ParallelDims(
         tp=8,
         pp=1,
@@ -67,3 +66,4 @@ def launch_distributed(
     )
     init_distributed()
     world_mesh = parallel_dims.build_mesh(device_type="cuda")
+    assert False, "--- function end"
