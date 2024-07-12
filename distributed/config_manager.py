@@ -5,14 +5,14 @@
 # LICENSE file in the root directory of this source tree.
 
 import argparse
-import sys
-from collections import defaultdict
-from typing import Tuple, Union
 import os
-from distributed.logging_utils import logger
+from collections import defaultdict
 from pathlib import Path
+from typing import Tuple
 
 import torch
+
+from distributed.logging_utils import logger
 
 try:
     import tomllib

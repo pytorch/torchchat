@@ -4,29 +4,17 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-import contextlib
 import os
-import time
-
-from dataclasses import dataclass, field
-from datetime import timedelta
-from io import BytesIO
-from timeit import default_timer as timer
-from typing import Any, Dict, List
-
-import numpy as np
 
 import torch
-import torch.nn.functional as F
-from torch.distributed import destroy_process_group
-from torch.distributed.checkpoint.stateful import Stateful
-from torch.distributed.elastic.multiprocessing.errors import record
-from torch.distributed.tensor.parallel import loss_parallel
-
 from daylight.config_manager import JobConfig
 #from daylight.datasets import build_hf_data_loader, create_tokenizer
 #from daylight.float8_linear import build_fp8_linear
 from daylight.logging_utils import init_logger, logger
+#from daylight.parallelisms.pipelining_utils import build_pipeline_schedule
+#from daylight.profiling import maybe_enable_memory_snapshot, maybe_enable_profiling
+from daylight.utils import Color, NoColor, init_distributed
+from torch.distributed import destroy_process_group
 
 #from daylight.metrics import build_gpu_memory_monitor, build_metric_logger
 #from daylight.models import model_name_to_cls, model_name_to_tokenizer, models_config
@@ -36,14 +24,6 @@ from daylight.logging_utils import init_logger, logger
 #    ParallelDims,
 #)
 
-#from daylight.parallelisms.pipelining_utils import build_pipeline_schedule
-#from daylight.profiling import maybe_enable_memory_snapshot, maybe_enable_profiling
-from daylight.utils import (
-    Color,
-    init_distributed,
-    NoColor,
-    set_pg_timeouts,
-)
 
 def main(job_config: JobConfig):
     init_logger()
@@ -71,7 +51,7 @@ def main(job_config: JobConfig):
 
 
 if __name__ == "__main__":
-    print(f"Daylight starting...")
+    print("Daylight starting...")
     config = JobConfig()
     config.parse_args()
     main(config)

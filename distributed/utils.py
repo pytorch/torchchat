@@ -5,11 +5,13 @@
 # LICENSE file in the root directory of this source tree.
 
 import os
+from dataclasses import dataclass
 from datetime import timedelta
 
 import torch
-from dataclasses import dataclass, field
+
 from distributed.logging_utils import logger
+
 
 def _warn_overwrite_env(env, val):
     if env in os.environ:

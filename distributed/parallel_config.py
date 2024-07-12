@@ -4,8 +4,11 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+
 from torch.distributed.device_mesh import init_device_mesh
+
+from distributed.logging_utils import logger
 
 
 @dataclass
