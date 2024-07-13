@@ -4,19 +4,14 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-from typing import Tuple
-from torch.distributed.tensor.parallel import (
-    ColwiseParallel,
-    parallelize_module,
-    PrepareModuleInput,
-    RowwiseParallel,
-)
-
 import torch.nn as nn
-from torch.distributed._tensor import Replicate, Shard
-from distributed.parallel_config import ParallelDims
 from torch.distributed.device_mesh import DeviceMesh
-from distributed.utils import logger
+from torch.distributed.tensor.parallel import (ColwiseParallel,
+                                               RowwiseParallel,
+                                               parallelize_module)
+
+from distributed.logging_utils import logger
+from distributed.parallel_config import ParallelDims
 
 
 def apply_tp(
