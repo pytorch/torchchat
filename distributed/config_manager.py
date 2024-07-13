@@ -82,17 +82,10 @@ class InferenceConfig:
             logger.exception(f"Error details: {str(e)}")
             raise e
 
-        # override args dict with cmd_args
-        # cmd_args_dict = self._args_to_two_level_dict(cmd_args)
-        # for section, section_args in cmd_args_dict.items():
-        #     for k, v in section_args.items():
-        #         args_dict[section][k] = v
-        
         for k, v in args_dict.items():
             class_type = type(k.title(), (), v)
             setattr(self, k, class_type())
 
-        #self._validate_config()
 
     def _args_to_two_level_dict(self, args: argparse.Namespace) -> defaultdict:
         args_dict = defaultdict(defaultdict)
