@@ -24,7 +24,7 @@ from utils.measure_time import measure_time
 
 from build.model import Transformer
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
-from distributed import launch_distributed
+from distributed import launch_distributed, parallelize_and_load_model
 
 
 @dataclass
@@ -413,9 +413,8 @@ def _maybe_parallelize_model(
         return model
     assert parallel_dims is not None
     print("Applying model parallel to model ...")
-    parallelize_llama(model, world_mesh, parallel_dims)
-    return load_checkpoints_to_model(model, builder_args, world_mesh)
-
+    return parallelize_and_load_model(model, builder_args, world_mesh, parallel_dims)
+    
 
 def _load_model(builder_args, only_config=False):
     world_mesh, parallel_dims = _maybe_init_distributed(builder_args)

@@ -9,4 +9,4 @@ from distributed.logging_utils import logger
 from distributed.parallel_config import ParallelDims
 from distributed.parallelize_llama import parallelize_llama
 from distributed.utils import init_distributed
-from distributed.world_maker import launch_distributed
+from distributed.world_maker import launch_distributed, parallelize_and_load_model
