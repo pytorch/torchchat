@@ -15,7 +15,7 @@ from typing import Dict, Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from build.utils import get_device_str, name_to_dtype, state_dict_device
+from build.utils import get_device_str, get_precision, name_to_dtype, state_dict_device
 
 from quantization.qops import LinearInt8 as WeightOnlyInt8Linear, QuantizedEmbedding
 # AttributeError: '_OpNamespace' 'quantized_decomposed' object has no attribute 'quantize_per_channel_group'
@@ -51,8 +51,12 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
         ):
             raise RuntimeError(f"unknown quantizer {quantizer} specified")
         if quantizer in ao_quantizer_class_dict:
-            dtype = quantize_options.get("precision", {}).get("dtype", "float16")
-            precision = name_to_dtype(dtype, device)
+            # Use dtype precision specified in user config, else fallback on global precision.
+            if "precision" in quantize_options:
+                dtype = quantize_options.get("precision", {}).get("dtype", name_to_dtype(get_precision()))
+                precision = name_to_dtype(dtype, device)
+            else:
+                precision = get_precision()
             try:
                 # Easier to ask forgiveness than permission
                 quant_handler = ao_quantizer_class_dict[quantizer](
