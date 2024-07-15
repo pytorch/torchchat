@@ -102,7 +102,7 @@ Finally, you can also remove downloaded models with the remove command:
 [Follow the installation steps if you haven't.](#installation)
 
 ### Chat
-This mode allows you to chat with an LLM in an interactive fashion. 
+This mode allows you to chat with an LLM in an interactive fashion.
 [skip default]: begin
 ```bash
 # Llama 3 8B Instruct
@@ -120,6 +120,32 @@ python3 torchchat.py generate llama3 --prompt "write me a story about a boy and 
 
 For more information run `python3 torchchat.py generate --help`
 
+### Server
+Start the server to send requests and receive the responses.
+[skip default]: begin
+```bash
+python3 torchchat.py server llama3
+```
+[skip default]: end
+
+Sample curl request sent to the server looks like:
+```
+curl http://127.0.0.1:5000/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "llama3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful assistant."
+      },
+      {
+        "role": "user",
+        "content": "Hello!"
+      }
+    ]
+  }'
+```
 
 ### Browser
 This mode provides access to the model via the browser's localhost.
