@@ -1,0 +1,42 @@
+# torchchat Distributed Config.toml
+
+[job]
+dump_folder = "./outputs"
+description = "Llama 3 distributed inference"
+use_for_integration_test = true
+
+[profiling]
+enable_profiling = false
+save_traces_folder = "profile_trace"
+profile_freq = 10
+enable_memory_snapshot = false
+save_memory_snapshot_folder = "memory_snapshot"
+
+[metrics]
+enable_color_printing = true
+enable_tensorboard = true
+save_tb_folder = "tb"
+
+[model]
+name = "llama3"
+flavor = "8B"
+tokenizer_path = "./test/assets/test_tiktoken.model"
+dtype = "bfloat16"
+
+[parallel]
+pipeline_parallel_degree = 1
+tensor_parallel_degree = 2
+enable_async_tensor_parallel=false
+
+[inference]
+batch_size = 8
+seq_len = 2048
+reps=1  # for profiling inference runs, can run repeatedly
+fp8_linear = ""
+compile = false
+
+[pipelining]
+pipeline_parallel_split_points= "layers.4"  # string list of placements
+pipeline_parallel_schedule="gpipe"  # TODO - what is best inference schedule for continous batching
+pipeline_parallel_split_mode = "manual"
+pipeline_parallel_microbatches=1  # TODO - continuous batching

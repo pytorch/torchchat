@@ -15,7 +15,7 @@ export USE_LIBUV=1
 # e.g.
 # LOG_RANK=0,1 NGPU=4 ./run_dist_inference.sh
 
-NGPU=${NGPU:-"8"}
+NGPU=${NGPU:-"2"}
 
 # TODO: We need to decide how to log for inference.
 # by default log just rank 0 output,
@@ -28,4 +28,4 @@ fi
 
 torchrun --nproc_per_node=${NGPU} --rdzv_backend c10d --rdzv_endpoint="localhost:0" \
 --local-ranks-filter ${LOG_RANK} --role rank --tee 3 \
-torchchat.py chat llama3-70b --distributed $overrides --dcp-dir ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-70B-Instruct/original
+../torchchat.py chat llama3 --distributed $overrides --dcp-dir ~/.torchchat/model-cache/meta-llama/Meta-Llama-3-70B-Instruct/original
