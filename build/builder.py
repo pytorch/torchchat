@@ -24,7 +24,7 @@ from utils.measure_time import measure_time
 
 from build.model import Transformer
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
-from distributed import parallelize_llama, ParallelDims, init_distributed, load_checkpoints_to_model
+from distributed import launch_distributed
 
 
 @dataclass
@@ -370,17 +370,12 @@ def _maybe_init_distributed(
     """
     if not builder_args.use_distributed:
         return None, None
-    # TODO: ongoing work to support loading model from checkpoint
-    # init distributed
-    world_size = int(os.environ["WORLD_SIZE"])
-    # TODO: To make tp, pp degree configurable
-    parallel_dims = ParallelDims(
-        tp=8,
-        pp=1,
-        world_size=world_size,
-    )
-    init_distributed()
-    world_mesh = parallel_dims.build_mesh(device_type="cuda")
+    dist_config = 'llama3_8B.toml'  # TODO - integrate with chat cmd line
+    
+    world_mesh, parallel_dims = launch_distributed(dist_config) 
+    
+    assert world_mesh is not None and parallel_dims is not None, f"failed to launch distributed using {dist_config}"
+    
     return world_mesh, parallel_dims
 
 

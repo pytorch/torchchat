@@ -5,12 +5,12 @@
 # LICENSE file in the root directory of this source tree.
 
 import os
+from dataclasses import dataclass
 from datetime import timedelta
 
 import torch
-import logging
-logger = logging.getLogger()
 
+from distributed.logging_utils import logger
 
 def _warn_overwrite_env(env, val):
     if env in os.environ:
@@ -18,7 +18,6 @@ def _warn_overwrite_env(env, val):
             f"ENV[{env}] = {os.environ[env]} will be overridden to {val} based on job config"
         )
     os.environ[env] = val
-
 
 TRACE_BUFFER_SIZE = "TORCH_NCCL_TRACE_BUFFER_SIZE"
 TRACE_FILE = "TORCH_NCCL_DEBUG_INFO_TEMP_FILE"
@@ -42,3 +41,36 @@ def init_distributed(init_timeout_seconds: int = 120):
     # async_op=True hold memory longer than they should
     # such as those in tensor parallelism
     os.environ["TORCH_NCCL_AVOID_RECORD_STREAMS"] = "1"
+
+
+def get_num_params(model: torch.nn.Module, exclude_embedding: bool = False) -> int:
+    num_params = sum(p.numel() for p in model.parameters())
+    if exclude_embedding:
+        num_params -= model.tok_embeddings.weight.numel()
+    return num_params
+
+
+@dataclass(frozen=True)
+class Color:
+    black = "\033[30m"
+    red = "\033[31m"
+    green = "\033[32m"
+    yellow = "\033[33m"
+    blue = "\033[34m"
+    magenta = "\033[35m"
+    cyan = "\033[36m"
+    white = "\033[37m"
+    reset = "\033[39m"
+
+
+@dataclass(frozen=True)
+class NoColor:
+    black = ""
+    red = ""
+    green = ""
+    yellow = ""
+    blue = ""
+    magenta = ""
+    cyan = ""
+    white = ""
+    reset = ""
