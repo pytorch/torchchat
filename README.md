@@ -118,7 +118,6 @@ python3 torchchat.py generate llama3 --prompt "write me a story about a boy and 
 
 For more information run `python3 torchchat.py generate --help`
 
-
 ### Browser
 
 [skip default]: begin
