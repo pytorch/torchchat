@@ -53,7 +53,7 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
         if quantizer in ao_quantizer_class_dict:
             # Use dtype precision specified in user config, else fallback on global precision.
             if "precision" in quantize_options:
-                dtype = quantize_options["precision"]
+                dtype = quantize_options["precision"].get("dtype", str(get_precision()))
                 precision = name_to_dtype(dtype, device)
             else:
                 precision = get_precision()
