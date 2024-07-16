@@ -3,8 +3,10 @@
 
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+import argparse
 import itertools
 import logging
+import os
 import textwrap
 import time
 from dataclasses import dataclass
@@ -23,6 +25,7 @@ from build.builder import (
 )
 from build.model import Transformer
 from build.utils import device_sync, set_precision
+from cli import add_arguments_for_verb, arg_init, check_args
 from utils.device_info import get_device_info
 
 B_INST, E_INST = "[INST]", "[/INST]"
@@ -168,6 +171,9 @@ class Generator:
             f"Using device={self.builder_args.device} {get_device_info(self.builder_args.device)}"
         )
         set_precision(self.builder_args.precision)
+        if builder_args.use_distributed:
+            device = torch.device(f"cuda:{int(os.environ['LOCAL_RANK'])}")
+            torch.cuda.set_device(device)
         self.is_speculative = self.speculative_builder_args.checkpoint_path is not None
 
         if generator_args.chat_mode and not self.builder_args.is_chat_model:
@@ -770,12 +776,12 @@ class Generator:
             device_sync(device=self.builder_args.device)
             t = time.perf_counter() - t0
 
-            print("aggregate_metrics")
             if start_pos >= max_seq_length:
                 print(
                     f"[Max Sequence Length {max_seq_length} Reached. Ending Conversation.]"
                 )
                 print("---------------------------------------------------")
+                print("aggregate_metrics")
 
             tokens_sec = num_tokens_generated / t
             aggregate_metrics["tokens_per_sec"].append(tokens_sec)
@@ -839,3 +845,13 @@ def main(args):
         torch.cuda.reset_peak_memory_stats()
     for _ in gen.chat(generator_args):
         pass
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="torchchat generate CLI")
+    verb = "generate"
+    add_arguments_for_verb(parser, verb)
+    args = parser.parse_args()
+    check_args(args, verb)
+    args = arg_init(args)
+    main(args)
