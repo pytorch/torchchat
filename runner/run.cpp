@@ -1,3 +1,11 @@
+/*
+Copyright (c) Meta Platforms, Inc. and affiliates.
+All rights reserved.
+
+This source code is licensed under the license found in the
+LICENSE file in the root directory of this source tree.
+*/
+
 /* Inference for Llama-2 Transformer model in pure C++ */
 #include <ctype.h>
 #include <math.h>
