@@ -122,23 +122,22 @@ For more information run `python3 torchchat.py generate --help`
 
 
 ### Browser
-This mode provides access to the model via the browser's localhost.
+
+Launch an interactive chat with your model. Running the command will automatically open a tab in your browser. [Streamlit](https://streamlit.io/) should already be installed by the `install_requirements.sh` script.
+```
+streamlit run torchchat.py -- browser <model_name> <model_args>
+```
+
+For example, to quantize and chat with LLaMA3:
 [skip default]: begin
 ```
-python3 torchchat.py browser llama3
+streamlit run torchchat.py -- browser llama3 --quantize '{"precision": {"dtype":"float16"}, "executor":{"accelerator":"cpu"}}' --max-new-tokens 256 --compile
 ```
 [skip default]: end
 
 
-*Running on http://127.0.0.1:5000* should be printed out on the
- terminal. Click the link or go to
- [http://127.0.0.1:5000](http://127.0.0.1:5000) on your browser to
- start interacting with it.
 
-Enter some text in the input box, then hit the enter key or click the
-“SEND” button. After a second or two, the text you entered together
-with the generated text will be displayed. Repeat to have a
-conversation.
+
 
 
 
