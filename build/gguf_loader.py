@@ -14,8 +14,8 @@ import gguf
 import torch
 
 from gguf import GGUFValueType
-from quantization.quantize import pack_scales_and_zeros, WeightOnlyInt4Linear
-
+from quantization.qops import LinearInt4 as WeightOnlyInt4Linear
+from quantization.quantize import pack_scales_and_zeros
 from build.gguf_util import Q4_0, to_float
 from build.model import ModelArgs, Transformer
 
