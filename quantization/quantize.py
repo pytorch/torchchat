@@ -23,6 +23,7 @@ from torch.ao.quantization.fx._decomposed import quantized_decomposed_lib  # noq
 from torchao.quantization.quant_api import (
     quantize_,
     int4_weight_only,
+    Int4WeightOnlyQuantizer,
     Int8DynActInt4WeightQuantizer,
 )
 
@@ -49,7 +50,6 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
         if (
             quantizer not in quantizer_class_dict
             and quantizer not in ao_quantizer_class_dict
-            and quantizer not in ao_quant_api_dict
         ):
             raise RuntimeError(f"unknown quantizer {quantizer} specified")
         if quantizer in ao_quantizer_class_dict:
@@ -59,6 +59,12 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
                 precision = name_to_dtype(dtype, device)
             else:
                 precision = get_precision()
+
+            # Only use quant API for dtype bf16 and CUDA
+            if precision == torch.bfloat16 and device == "cuda":
+                quantize_(model, int4_weight_only(group_size=q_kwargs["groupsize"]))
+                continue
+            
             try:
                 # Easier to ask forgiveness than permission
                 quant_handler = ao_quantizer_class_dict[quantizer](
@@ -76,8 +82,6 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
                 else:
                     raise e
             model = quant_handler.quantize(model)
-        elif quantizer in ao_quant_api_dict:
-            quantize_(model, ao_quant_api_dict[quantizer](group_size=q_kwargs["groupsize"]))
         else:
             model = quantizer_class_dict[quantizer](
                 model, device=device, tokenizer=tokenizer, **q_kwargs
@@ -549,9 +553,6 @@ quantizer_class_dict = {
 }
 
 ao_quantizer_class_dict = {
+    "linear:int4": Int4WeightOnlyQuantizer,
     "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
-}
-
-ao_quant_api_dict = {
-    "linear:int4": int4_weight_only,
 }
