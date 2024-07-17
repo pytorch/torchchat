@@ -28,4 +28,4 @@ ninja
 zstd
 
 # Browser mode
-flask
+streamlit

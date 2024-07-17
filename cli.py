@@ -71,7 +71,7 @@ def add_arguments_for_verb(parser, verb: str) -> None:
 
     # Add thematic argument groups based on the subcommand
     if verb in ["browser", "chat", "generate"]:
-        _add_generation_args(parser) 
+        _add_generation_args(parser)
     if verb == "eval":
         _add_evaluation_args(parser)
 
@@ -134,12 +134,6 @@ def add_arguments_for_verb(parser, verb: str) -> None:
         default=None,
         help="Profile path.",
     )
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=5000,
-        help="Port for the web server in browser mode",
-    )
     _add_cli_metadata_args(parser)
 
     # WIP Features (suppressed from --help)
@@ -150,7 +144,10 @@ def add_arguments_for_verb(parser, verb: str) -> None:
 
 # Add CLI Args representing user provided exported model files
 def _add_export_output_path_args(parser) -> None:
-    output_path_parser = parser.add_argument_group("Export Output Path Args", "Specify the output path for the exported model files")
+    output_path_parser = parser.add_argument_group(
+        "Export Output Path Args",
+        "Specify the output path for the exported model files",
+    )
     output_path_parser.add_argument(
         "--output-pte-path",
         type=str,
@@ -167,7 +164,10 @@ def _add_export_output_path_args(parser) -> None:
 
 # Add CLI Args representing user provided exported model files
 def _add_exported_input_path_args(parser) -> None:
-    exported_model_path_parser = parser.add_argument_group("Exported Model Path Args", "Specify the path of the exported model files to ingest")
+    exported_model_path_parser = parser.add_argument_group(
+        "Exported Model Path Args",
+        "Specify the path of the exported model files to ingest",
+    )
     exported_model_path_parser.add_argument(
         "--dso-path",
         type=Path,
@@ -181,7 +181,7 @@ def _add_exported_input_path_args(parser) -> None:
         help="Use the specified ExecuTorch .pte model file",
     )
 
-    
+
 # Add CLI Args that are general to subcommand cli execution
 def _add_cli_metadata_args(parser) -> None:
     parser.add_argument(
@@ -228,7 +228,9 @@ def _configure_artifact_inventory_args(parser, verb: str) -> None:
 
 # Add CLI Args specific to user prompted generation
 def _add_generation_args(parser) -> None:
-    generator_parser = parser.add_argument_group("Generation Args", "Configs for generating output based on provided prompt")
+    generator_parser = parser.add_argument_group(
+        "Generation Args", "Configs for generating output based on provided prompt"
+    )
     generator_parser.add_argument(
         "--prompt",
         type=str,
@@ -275,7 +277,9 @@ def _add_generation_args(parser) -> None:
 
 # Add CLI Args specific to Model Evaluation
 def _add_evaluation_args(parser) -> None:
-    eval_parser = parser.add_argument_group("Evaluation Args", "Configs for evaluating model performance")
+    eval_parser = parser.add_argument_group(
+        "Evaluation Args", "Configs for evaluating model performance"
+    )
     eval_parser.add_argument(
         "--tasks",
         nargs="+",
