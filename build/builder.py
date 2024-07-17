@@ -24,7 +24,7 @@ from utils.measure_time import measure_time
 
 from build.model import Transformer
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
-from distributed import launch_distributed
+from distributed import launch_distributed, parallelize_and_load_model
 
 
 @dataclass
@@ -42,6 +42,7 @@ class BuilderArgs:
     precision: torch.dtype = torch.float32
     setup_caches: bool = False
     use_distributed: bool = False
+    dist_config: Optional[str] = None
     is_chat_model: bool = False
     prefill_possible: bool = False
 
@@ -86,6 +87,8 @@ class BuilderArgs:
             checkpoint_dir = args.checkpoint_dir
         if hasattr(args, "dcp_dir"):
             dcp_dir = args.dcp_dir
+        if hasattr(args, "dist_config"):
+            dist_config = args.dist_config
 
         checkpoint_path = args.checkpoint_path
         params_table = args.params_table
@@ -370,7 +373,10 @@ def _maybe_init_distributed(
     """
     if not builder_args.use_distributed:
         return None, None
-    dist_config = 'llama3_8B.toml'  # TODO - integrate with chat cmd line
+    print(f"===>>> {builder_args=}")
+    dist_config = "default.toml"
+    if builder_args.dist_config:
+        dist_config = builder_args.dist_config
     
     world_mesh, parallel_dims = launch_distributed(dist_config) 
     
@@ -379,7 +385,7 @@ def _maybe_init_distributed(
     return world_mesh, parallel_dims
 
 
-def _maybe_parellelize_model(
+def _maybe_parallelize_model(
     model: nn.Module,
     builder_args: BuilderArgs,
     world_mesh: DeviceMesh,
@@ -407,9 +413,8 @@ def _maybe_parellelize_model(
         return model
     assert parallel_dims is not None
     print("Applying model parallel to model ...")
-    parallelize_llama(model, world_mesh, parallel_dims)
-    return load_checkpoints_to_model(model, builder_args, world_mesh)
-
+    return parallelize_and_load_model(model, builder_args, world_mesh, parallel_dims)
+    
 
 def _load_model(builder_args, only_config=False):
     world_mesh, parallel_dims = _maybe_init_distributed(builder_args)
@@ -419,7 +424,7 @@ def _load_model(builder_args, only_config=False):
         model = _init_model_on_meta_device(builder_args)
     else:
         model = _load_model_default(builder_args)
-    model = _maybe_parellelize_model(model, builder_args, world_mesh, parallel_dims)
+    model = _maybe_parallelize_model(model, builder_args, world_mesh, parallel_dims)
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()

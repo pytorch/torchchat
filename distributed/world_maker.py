@@ -8,10 +8,13 @@ import os
 from typing import Optional, Tuple
 
 from torch.distributed.device_mesh import DeviceMesh
+import torch.nn as nn
 
 from distributed.logging_utils import logger
 from distributed.parallel_config import ParallelDims
 from distributed.utils import init_distributed
+from distributed.parallelize_llama import parallelize_llama
+from distributed.checkpoint import load_checkpoints_to_model
 
 from .config_manager import InferenceConfig
 
@@ -53,3 +56,24 @@ def launch_distributed(
     world_mesh = parallel_dims.build_mesh(device_type="cuda")
     logger.info(f"world_mesh created: {world_mesh}")
     return world_mesh, parallel_dims
+
+def parallelize_and_load_model (model, builder_args, world_mesh, parallel_dims: ParallelDims)->nn.Module:
+    '''We parallelize the module and load the distributed checkpoint to the model
+    if the user specifies using distributed inference. If not, this is a no-op.
+
+    Args:
+        module (:class:`nn.Module`):
+            Module to be parallelized.
+        builder_args (:class:`BuilderArgs`):
+            Command args for model building.
+        world_mesh (:class:`DeviceMesh`):
+            Object which describes the mesh topology
+            of devices for the DTensor.
+        parallel_dims (:class:`ParallelDims`):
+            Object which represents the parallel dimensions configuration.
+    Returns:
+        A :class:`nn.Module` object which is parallelized and checkpoint loaded
+        if the user specifies using distributed inference.
+    '''
+    parallelize_llama(model, world_mesh, parallel_dims)
+    return load_checkpoints_to_model(model, builder_args, world_mesh)
