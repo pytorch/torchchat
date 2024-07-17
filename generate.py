@@ -560,7 +560,7 @@ class Generator:
             "accept_counts": accept_counts,
             "time_to_first_token": time_to_first_token,
         }
-        yield seq, generate_stats
+        return seq, generate_stats
 
     def encode_tokens(self, string, bos=True, device="cpu"):
         tokens = self.tokenizer.encode(string)
@@ -713,20 +713,22 @@ class Generator:
             if generator_args.chat_mode and i >= 0:
                 print("Model: ", end="")
 
+                buffer = []
                 def callback(x, *, done_generating=False):
                     return self._callback(
                         x,
-                        buffer=[],
+                        buffer=buffer,
                         done_generating=done_generating,
                     )
 
             else:
                 assert not generator_args.chat_mode
 
+                buffer = [generator_args.prompt]
                 def callback(x, *, done_generating=False):
                     return self._callback(
                         x,
-                        buffer=[generator_args.prompt],
+                        buffer=buffer,
                         done_generating=done_generating,
                     )
 
@@ -781,7 +783,6 @@ class Generator:
                     f"[Max Sequence Length {max_seq_length} Reached. Ending Conversation.]"
                 )
                 print("---------------------------------------------------")
-                print("aggregate_metrics")
 
             tokens_sec = num_tokens_generated / t
             aggregate_metrics["tokens_per_sec"].append(tokens_sec)
@@ -792,9 +793,9 @@ class Generator:
                 )
                 # Don't continue here.... because we need to report and reset
                 # continue
-
+            
             logging.info(
-                f"Time for inference {i + 1}: {t:.02f} sec total, time to first token {metrics.get('time_to_first_token', 0.0):.02f} sec with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill, {num_tokens_generated} tokens, {tokens_sec:.02f} tokens/sec, {1000 / tokens_sec:.02f} ms/token"
+                f"\nTime for inference {i + 1}: {t:.02f} sec total, time to first token {metrics.get('time_to_first_token', 0.0):.02f} sec with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill, {num_tokens_generated} tokens, {tokens_sec:.02f} tokens/sec, {1000 / tokens_sec:.02f} ms/token"
             )
             logging.info(
                 f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s"
