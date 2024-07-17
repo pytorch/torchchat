@@ -4,7 +4,8 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 import argparse
-from typing import Callable, Optional
+import time
+from typing import Optional
 
 import torch
 import torch._dynamo.config
@@ -19,6 +20,7 @@ from build.builder import (
 from build.model import Transformer
 from build.utils import set_precision
 from cli import add_arguments_for_verb, arg_init
+from generate import encode_tokens, model_forward
 from utils.measure_time import measure_time
 
 torch._dynamo.config.automatic_dynamic_shapes = True
@@ -83,17 +85,11 @@ class GPTFastEvalWrapper(eval_wrapper):
         self,
         model: Transformer,
         tokenizer,
-        model_forward: Optional[Callable] = None,
         max_seq_length: Optional[int] = None,
         device="cpu",
     ):
         super().__init__(device=device)
         self._model = model
-        self._model_forward = (
-            model_forward
-            if model_forward is not None
-            else lambda x, input_pos: model(x, input_pos)
-        )
         self._tokenizer = tokenizer
         self._device = torch.device(device)
         self._max_seq_length = 2048 if max_seq_length is None else max_seq_length
@@ -120,8 +116,11 @@ class GPTFastEvalWrapper(eval_wrapper):
         return self._device
 
     def tok_encode(self, string: str, **kwargs):
-        bos_id = self._tokenizer.bos_id()
-        encoded = [bos_id] + self._tokenizer.encode(string)
+        encoded = encode_tokens(self._tokenizer, string, bos=True, device=self._device)
+        # encoded is a pytorch tensor, but some internal logic in the
+        # eval harness expects it to be a list instead
+        # TODO: verify this for multi-batch as well
+        encoded = encoded.tolist()
         return encoded
 
     def tok_decode(self, tokens):
@@ -143,7 +142,7 @@ class GPTFastEvalWrapper(eval_wrapper):
         )
         x = seq.index_select(0, input_pos).view(1, -1)
         with measure_time(message=None) as measure:
-            logits = self._model_forward(x, input_pos)
+            logits = model_forward(self._model, x, input_pos)
         self.times.append(measure.get_time())
         return logits
 
@@ -154,7 +153,6 @@ class GPTFastEvalWrapper(eval_wrapper):
 @torch.no_grad()
 def eval(
     model: Transformer,
-    model_forward: Callable,
     tokenizer,
     tasks: Optional[list] = None,
     limit: Optional[int] = None,
@@ -178,11 +176,7 @@ def eval(
         tasks = ["wikitext"]
 
     model_eval_wrapper = GPTFastEvalWrapper(
-        model,
-        tokenizer,
-        model_forward=model_forward,
-        max_seq_length=max_seq_length,
-        device=device,
+        model, tokenizer, max_seq_length, device=device
     )
 
     try:
@@ -237,12 +231,11 @@ def main(args) -> None:
     )
     tokenizer_args.validate_model(model)
 
-    model_forward = lambda x, input_pos: model(x, input_pos)  # noqa
-
     if compile:
         assert not (
             builder_args.dso_path or builder_args.pte_path
         ), "cannot compile exported model"
+        global model_forward
         model_forward = torch.compile(
             model_forward, mode="reduce-overhead", dynamic=True, fullgraph=True
         )
@@ -251,7 +244,6 @@ def main(args) -> None:
     with measure_time("Time to run eval: {time:.02f}s."):
         result = eval(
             model.to(device),
-            model_forward,
             tokenizer,
             tasks,
             limit,
