@@ -61,7 +61,7 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
                 precision = get_precision()
 
             # Only use quant API for dtype bf16 and CUDA
-            if precision == torch.bfloat16 and device == "cuda":
+            if quantizer == "linear:int4" and precision == torch.bfloat16 and device == "cuda":
                 quantize_(model, int4_weight_only(group_size=q_kwargs["groupsize"]))
                 continue
             
