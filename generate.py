@@ -323,9 +323,10 @@ class Generator:
             # Actually better for Inductor to codegen attention here
             with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]):
 
+                out_token = cur_token.clone()
                 next_token, next_prob = self.decode_one_token(
                     model,
-                    cur_token.clone(),
+                    out_token,
                     input_pos,
                     need_probs=need_probs,
                     **sampling_kwargs,
@@ -334,10 +335,10 @@ class Generator:
                 new_tokens.append(next_token.clone())
                 callback(new_tokens[-1], done_generating=_i == num_new_tokens - 2)
                 if need_probs or next_prob is None:
-                    yield cur_token.clone(), None
+                    yield out_token, None
                 else:
                     new_probs.append(next_prob.clone())
-                    yield cur_token.clone(), next_prob.clone()
+                    yield out_token, next_prob.clone()
                 cur_token = next_token
 
                 # encountered eos
