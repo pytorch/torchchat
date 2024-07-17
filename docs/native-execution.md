@@ -153,21 +153,6 @@ Torchchat includes both Python and C/C++ implementations of both the
 SentencePiece and Tiktoken tokenizers that may be used with the Python
 and native execution environments, respectively.
 
-The SentencePiece tokenizer implementations for Python (developed by
-Google) and and one of the two the C/C++ implementation (developed by
-Andrej Karpathy) use different input formats.  The Python
-implementation reads a tokenizer specification in `tokenizer.model`
-format.  The C/C++ tokenizer that reads the tokenizer instructions
-from a file in `tokenizer.bin` format.
-
-We include Andrej's SentencePiece converter which translates a
-SentencePiece tokenizer in `tokenizer.model` format to `tokenizer.bin`
-in the unsupported/llama2.c subdirectory:
-
-```
-python3 unsupported/llama2.c//tokenizer.py --tokenizer-model=${MODEL_DIR}/tokenizer.model
-```
-
 ## Appendix: Native model verification using the Python environment
 
 After exporting a model, you will want to verify that the model

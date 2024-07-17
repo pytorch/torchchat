@@ -56,7 +56,7 @@ source .venv/bin/activate
 
 [shell default]: ./install_requirements.sh
 
-Installations can be tested by
+Installations can be tested by running
 
 ```bash
 # ensure everything installed correctly
@@ -64,24 +64,24 @@ python3 torchchat.py --help
 ```
 
 ### Download Weights
-Most models use HuggingFace as the distribution channel, so you will need to create a HuggingFace account.
+Most models use Hugging Face as the distribution channel, so you will need to create a Hugging Face account.
 
 [prefix default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}"
-Create a HuggingFace user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens) with the `write` role.
-Log into huggingface:
+Create a Hugging Face user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens) with the `write` role.
+Log into Hugging Face:
 ```
 huggingface-cli login
 ```
 
 Once this is done, torchchat will be able to download model artifacts from
-HuggingFace.
+Hugging Face.
 
 ```
 python3 torchchat.py download llama3
 ```
 
-*NOTE: This command may prompt you to request access to llama3 via
- HuggingFace, if you do not already have access. Simply follow the
+*NOTE: This command may prompt you to request access to Llama 3 via
+ Hugging Face, if you do not already have access. Simply follow the
  prompts and re-run the command when access is granted.*
 
 View available models with:
@@ -99,9 +99,10 @@ Finally, you can also remove downloaded models with the remove command:
 
 
 ## Running via PyTorch / Python
-[Follow the installation steps if you haven't](#installation)
+[Follow the installation steps if you haven't.](#installation)
 
 ### Chat
+This mode allows you to chat with an LLM in an interactive fashion. 
 [skip default]: begin
 ```bash
 # Llama 3 8B Instruct
@@ -112,6 +113,7 @@ python3 torchchat.py chat llama3
 For more information run `python3 torchchat.py chat --help`
 
 ### Generate
+This mode generates text based on an input prompt.
 ```bash
 python3 torchchat.py generate llama3 --prompt "write me a story about a boy and his bear"
 ```
@@ -120,7 +122,7 @@ For more information run `python3 torchchat.py generate --help`
 
 
 ### Browser
-
+This mode provides access to the model via the browser's localhost.
 [skip default]: begin
 ```
 python3 torchchat.py browser llama3
@@ -143,7 +145,7 @@ conversation.
 ## Desktop/Server Execution
 
 ### AOTI (AOT Inductor)
-AOT compiles models before execution for faster inference
+AOT compiles models before execution for faster inference (read more about AOTI [here](https://pytorch.org/blog/pytorch2-2/)).
 
 The following example exports and executes the Llama3 8B Instruct
 model.  The first command performs the actual export, the second
@@ -179,7 +181,7 @@ cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama
 
 ## Mobile Execution
 
-ExecuTorch enables you to optimize your model for execution on a
+[ExecuTorch] (https://github.com/pytorch/executorch) enables you to optimize your model for execution on a
 mobile or embedded device, but can also be used on desktop for
 testing.
 
