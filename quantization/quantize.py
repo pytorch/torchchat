@@ -77,7 +77,7 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
                     raise e
             model = quant_handler.quantize(model)
         elif quantizer in ao_quant_api_dict:
-            quantize_(model, ao_quant_api_dict[quantizer](groupsize=q_kwargs["groupsize"]))
+            quantize_(model, ao_quant_api_dict[quantizer](group_size=q_kwargs["groupsize"]))
         else:
             model = quantizer_class_dict[quantizer](
                 model, device=device, tokenizer=tokenizer, **q_kwargs
