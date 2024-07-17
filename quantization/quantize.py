@@ -23,7 +23,6 @@ from torch.ao.quantization.fx._decomposed import quantized_decomposed_lib  # noq
 from torchao.quantization.quant_api import (
     quantize_,
     int4_weight_only,
-    int8_weight_only,
     Int8DynActInt4WeightQuantizer,
 )
 
@@ -544,6 +543,7 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
 # class references
 quantizer_class_dict = {
     "embedding": EmbeddingOnlyQuantHandler,
+    "linear:int8": WeightOnlyInt8QuantHandler,
     "precision": PrecisionHandler,
     "executor": ExecutorHandler,
 }
@@ -554,5 +554,4 @@ ao_quantizer_class_dict = {
 
 ao_quant_api_dict = {
     "linear:int4": int4_weight_only,
-    "linear:int8": int8_weight_only,
 }
