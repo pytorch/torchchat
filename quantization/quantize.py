@@ -550,7 +550,6 @@ quantizer_class_dict = {
 }
 
 ao_quantizer_class_dict = {
-    "linear:int4": Int4WeightOnlyQuantizer,
     "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
 }
 
