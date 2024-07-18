@@ -92,8 +92,8 @@ class GeneratorArgs:
             reason = "model compilation for prefill"
         if self.compile:
             reason = "model compilation"
-        if builder_args.dso_path:
-            model_type = "DSO"
+        if builder_args.aoti_package_path:
+            model_type = "PT2"
         if builder_args.pte_path:
             model_type = "PTE"
         if model_type and reason:
@@ -104,7 +104,7 @@ class GeneratorArgs:
     @classmethod
     def from_args(cls, args):
         sequential_prefill = (
-            args.sequential_prefill or bool(args.dso_path) or bool(args.pte_path)
+            args.sequential_prefill or bool(args.aoti_package_path) or bool(args.pte_path)
         )
 
         return cls(

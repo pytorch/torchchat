@@ -8,11 +8,12 @@
 import torch
 import torch.nn as nn
 from torch.export import Dim
+import torch._inductor.config 
 
 default_device = "cpu"
 
 
-def export_model(model: nn.Module, device, output_path, args=None):
+def export_model(model: nn.Module, device, output_path, args=None, package=True):
     max_seq_length = 350
 
     input = (
@@ -25,11 +26,17 @@ def export_model(model: nn.Module, device, output_path, args=None):
     dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
 
     model.to(device)
-    so = torch._export.aot_compile(
+
+    options = {"aot_inductor.output_path": output_path}
+    # TODO: workaround until we update torch version
+    if "aot_inductor.package" in torch._inductor.config._config:
+        options["aot_inductor.package"] = package
+    
+    path = torch._export.aot_compile(
         model,
         args=input,
-        options={"aot_inductor.output_path": output_path},
+        options=options,
         dynamic_shapes=dynamic_shapes,
     )
-    print(f"The generated DSO model can be found at: {so}")
-    return so
+    print(f"The AOTInductor compiled files can be found at: {path}")
+    return path

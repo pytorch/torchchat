@@ -152,13 +152,13 @@ model.  The first command performs the actual export, the second
 command loads the exported model into the Python interface to enable
 users to test the exported model.
 
-```
+```bash
 # Compile
-python3 torchchat.py export llama3 --output-dso-path exportedModels/llama3.so
+python3 torchchat.py export llama3 --output-aoti-package-path exportedModels/llama3_artifacts --device cpu
 
 # Execute the exported model using Python
 
-python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --prompt "Hello my name is"
+python3 torchchat.py generate llama3 --aoti-package-path exportedModels/llama3_artifacts --prompt "Hello my name is" --device cpu
 ```
 
 NOTE: If your machine has cuda add this flag for performance
@@ -174,9 +174,14 @@ To build the runner binary on your Mac or Linux:
 scripts/build_native.sh aoti
 ```
 
+To compile the AOTI generated artifacts into a `.so`:
+```bash
+make -C exportedModels/llama3_artifacts
+```
+
 Execute
 ```bash
-cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/aoti_run exportedModels/llama3_artifacts/llama3_artifacts.so -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time" -d cpu
 ```
 
 ## Mobile Execution

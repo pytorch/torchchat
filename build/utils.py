@@ -69,42 +69,46 @@ def unpack_packed_weights(
 
 active_builder_args_dso = None
 active_builder_args_pte = None
+active_builder_args_aoti_package = None
 
 
-def set_backend(dso, pte):
+def set_backend(dso, pte, aoti_package):
     global active_builder_args_dso
     global active_builder_args_pte
     active_builder_args_dso = dso
+    active_builder_args_aoti_package = aoti_package
     active_builder_args_pte = pte
 
 
 def use_aoti_backend() -> bool:
     global active_builder_args_dso
+    global active_builder_args_aoti_package
     global active_builder_args_pte
 
     # eager == aoti, which is when backend has not been explicitly set
-    if (not active_builder_args_dso) and not (active_builder_args_pte):
+    if (not active_builder_args_pte) and (not active_builder_args_aoti_package):
         return True
 
-    if active_builder_args_pte and active_builder_args_dso:
+    if active_builder_args_pte and active_builder_args_aoti_package:
         raise RuntimeError(
-            "code generation needs to choose different implementations for DSO and PTE path.  Please only use one export option, and call export twice if necessary!"
+            "code generation needs to choose different implementations for AOTI and PTE path.  Please only use one export option, and call export twice if necessary!"
         )
 
-    return bool(active_builder_args_dso)
+    return bool(active_builder_args_dso) or bool(active_builder_args_aoti_package)
 
 
 def use_et_backend() -> bool:
     global active_builder_args_dso
+    global active_builder_args_aoti_package
     global active_builder_args_pte
 
     # eager == aoti, which is when backend has not been explicitly set
-    if not (active_builder_args_pte or active_builder_args_dso):
-        return False
+    if (not active_builder_args_pte) and (not active_builder_args_aoti_package):
+        return True
 
-    if active_builder_args_pte and active_builder_args_dso:
+    if active_builder_args_pte and active_builder_args_aoti_package:
         raise RuntimeError(
-            "code generation needs to choose different implementations for DSO and PTE path.  Please only use one export option, and call export twice if necessary!"
+            "code generation needs to choose different implementations for AOTI and PTE path.  Please only use one export option, and call export twice if necessary!"
         )
 
     return bool(active_builder_args_pte)

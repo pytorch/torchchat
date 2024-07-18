@@ -39,14 +39,16 @@ def main(args):
 
     print(f"Using device={builder_args.device}")
     set_precision(builder_args.precision)
-    set_backend(dso=args.output_dso_path, pte=args.output_pte_path)
+    set_backend(dso=args.output_dso_path, pte=args.output_pte_path, aoti_package=args.output_aoti_package_path)
 
     builder_args.dso_path = None
     builder_args.pte_path = None
+    builder_args.aoti_package_path = None
     builder_args.setup_caches = True
 
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
+    output_aoti_package_path = args.output_aoti_package_path
 
     if output_pte_path and builder_args.device != "cpu":
         print(
@@ -74,6 +76,7 @@ def main(args):
         )
         model_to_pte = model
         model_to_dso = model
+        model_to_aoti_package = model
     else:
         if output_pte_path:
             _set_gguf_kwargs(builder_args, is_et=True, context="export")
@@ -83,12 +86,13 @@ def main(args):
             )
             _unset_gguf_kwargs(builder_args)
 
-        if output_dso_path:
+        if output_dso_path or output_aoti_package_path:
             _set_gguf_kwargs(builder_args, is_et=False, context="export")
-            model_to_dso = _initialize_model(
+            model_to_aoti_package = _initialize_model(
                 builder_args,
                 quantize,
             )
+            model_to_dso = model_to_aoti_package
             _unset_gguf_kwargs(builder_args)
 
     with torch.no_grad():
@@ -104,10 +108,16 @@ def main(args):
                     "Export with executorch requested but ExecuTorch could not be loaded"
                 )
                 print(executorch_exception)
+                
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
             print(f"Exporting model using AOT Inductor to {output_dso_path}")
-            export_model_aoti(model_to_dso, builder_args.device, output_dso_path, args)
+            export_model_aoti(model_to_dso, builder_args.device, output_dso_path, args, False)
+
+        if output_aoti_package_path:
+            output_aoti_package_path = str(os.path.abspath(output_aoti_package_path))
+            print(f"Exporting model using AOT Inductor to {output_aoti_package_path}")
+            export_model_aoti(model_to_aoti_package, builder_args.device, output_aoti_package_path, args, True)
 
 
 if __name__ == "__main__":
