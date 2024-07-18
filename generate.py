@@ -132,7 +132,7 @@ class Generator:
         tokenizer_args: Defines the tokenizer configuration for both the model and speculative model
         generator_args: Controls the generation parameters
         profile: A Path to a directory where the profiling results will be stored, if enabled.
-        quantize: If True, quantize the model.
+        quantize: If True, quantize the model. Please refer to docs/quantization.md for details.
         draft_quantize: If True, quantize the draft model.
     """
 
@@ -715,6 +715,7 @@ class Generator:
                 print("Model: ", end="")
 
                 buffer = []
+
                 def callback(x, *, done_generating=False):
                     return self._callback(
                         x,
@@ -726,6 +727,7 @@ class Generator:
                 assert not generator_args.chat_mode
 
                 buffer = [generator_args.prompt]
+
                 def callback(x, *, done_generating=False):
                     return self._callback(
                         x,
@@ -794,7 +796,7 @@ class Generator:
                 )
                 # Don't continue here.... because we need to report and reset
                 # continue
-            
+
             logging.info(
                 f"\nTime for inference {i + 1}: {t:.02f} sec total, time to first token {metrics.get('time_to_first_token', 0.0):.02f} sec with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill, {num_tokens_generated} tokens, {tokens_sec:.02f} tokens/sec, {1000 / tokens_sec:.02f} ms/token"
             )
