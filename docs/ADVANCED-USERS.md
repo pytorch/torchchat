@@ -1,3 +1,6 @@
+> [!WARNING]
+> Files in this directory may be outdated, incomplete, scratch notes, or a WIP. torchchat provides no guarantees on these files as references. Please refer to the root README for stable features and documentation.
+
 # Torchchat is still in pre-release!
 
 
@@ -215,7 +218,7 @@ adapted to support other models, either by extending the model
 description in `model.py` or by initializing a completely different
 model.  *We invite and welcome community contributions of open-source
 model enablement to torchchat, as well as to our related open source
-projects PyTorch, ExecuTorch (for mobile/edge models), torchao 
+projects PyTorch, ExecuTorch (for mobile/edge models), torchao
 (for architecture optimization) and other
 PyTorch projects.* (Please refer to individual projects for specific
 submission guidelines.)
