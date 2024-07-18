@@ -130,6 +130,11 @@ python3 torchchat.py server llama3
 [skip default]: end
 
 <details>
+
+> [!NOTE]
+> Depending on the model configuration, this query might take a few minutes
+to respond
+
 <summary>Sample Input + Output</summary>
 
 ```
@@ -155,7 +160,7 @@ curl http://127.0.0.1:5000/chat \
 </details>
 
 ### Browser
-This mode provides access to a localhost browset hosting [Streamlit](https://streamlit.io/).
+This mode provides access to a localhost browser hosting [Streamlit](https://streamlit.io/).
 Running the command automatically open a tab in your browser.
 ```
 streamlit run torchchat.py -- browser <model_name> <model_args>
@@ -194,7 +199,7 @@ python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --promp
 
 > [!NOTE]
 > If your machine has cuda add this flag for performance
-`--quantize config/data/cuda.json`
+`--quantize config/data/cuda.json` when exporting. You'll also need to tell generate to use `--device cuda`
 
 ### Running native using our C++ Runner
 
@@ -330,9 +335,11 @@ If your model uses tiktoken tokenizer (llama3 model for example), download `exec
 
 Currently the tokenizer is built at compile time, so you need to re-build the app when you need to use a different tokenizer for different model.
 
-NOTE: The script to build the AAR can be found [here](https://github.com/pytorch/executorch/blob/main/build/build_android_library.sh). If you need to tweak with the tokenizer or runtime (for example use your own tokenizer or runtime library), you can modify the ExecuTorch code and use that script to build the AAR library.
+> [!NOTE]
+> The script to build the AAR can be found [here](https://github.com/pytorch/executorch/blob/main/build/build_android_library.sh). If you need to tweak with the tokenizer or runtime (for example use your own tokenizer or runtime library), you can modify the ExecuTorch code and use that script to build the AAR library.
 
 [executorch-llama-torchchat-bpe.aar](https://ossci-android.s3.amazonaws.com/executorch/release/0.3/executorch-llama-bpe-rc1.aar) (SHASUM: 673af4a1338a93d47369b68ec0d52b8ea7f983a2)
+
 [executorch-llama-torchchat-tiktoken.aar](https://ossci-android.s3.amazonaws.com/executorch/release/0.3/executorch-llama-tiktoken-rc1.aar) (SHASUM: 575190205dbb1ee932a277b50520dc4260a9a9cf)
 
 For BPE tokenizer:
