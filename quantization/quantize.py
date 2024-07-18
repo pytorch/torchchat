@@ -50,6 +50,7 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
         if (
             quantizer not in quantizer_class_dict
             and quantizer not in ao_quantizer_class_dict
+            and quantizer not in ao_quantize_subclass_dict
         ):
             raise RuntimeError(f"unknown quantizer {quantizer} specified")
         if quantizer in ao_quantizer_class_dict:
