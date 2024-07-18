@@ -24,14 +24,13 @@ from build.utils import (
 )
 
 from quantization.qops import (
-    LinearInt4 as WeightOnlyInt4Linear,
     LinearInt8 as WeightOnlyInt8Linear,
     QuantizedEmbedding,
 )
 
 # AttributeError: '_OpNamespace' 'quantized_decomposed' object has no attribute 'quantize_per_channel_group'
 from torch.ao.quantization.fx._decomposed import quantized_decomposed_lib  # noqa
-from torchao.quantization.quant_api import Int8DynActInt4WeightQuantizer
+from torchao.quantization.quant_api import (Int4WeightOnlyQuantizer, Int8DynActInt4WeightQuantizer)
 
 
 #########################################################################
@@ -540,91 +539,6 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
         return self.quantize(self.model_)
 
 
-#########################################################################
-#####     weight only int4 per channel groupwise quantized code    ######
-
-
-class WeightOnlyInt4QuantHandler(QuantHandler):
-    def __init__(
-        self,
-        model: nn.Module,
-        device=None,
-        *,
-        tokenizer=None,
-        groupsize=128,
-        inner_k_tiles=8,
-        padding_allowed=True,
-    ):
-        self.model_ = model
-        self.device = device
-        self.groupsize = groupsize
-        self.inner_k_tiles = inner_k_tiles
-        self.padding_allowed = padding_allowed
-        assert groupsize in [32, 64, 128, 256]
-        assert inner_k_tiles in [2, 4, 8]
-
-    @torch.no_grad()
-    def quantize(self, module):
-        for name, child in module.named_children():
-            # print(f"name: {name}")
-            if isinstance(child, torch.nn.Linear):
-                assert not child.bias
-                out_features = child.out_features
-                in_features = child.in_features
-                assert out_features % 8 == 0, "require out_features % 8 == 0"
-                # print(f"linear: {fqn}, in={in_features}, out={out_features}")
-
-                weight = child.weight.data
-                if not WeightOnlyInt4Linear._check_k(
-                    k=in_features,
-                    groupsize=self.groupsize,
-                    inner_k_tiles=self.inner_k_tiles,
-                ):
-                    if self.padding_allowed:
-                        # print(
-                        #     f"warning: {name} is padded to satisfy in_features % 1024 == 0"
-                        # )
-                        padded_in_features = find_multiple(in_features, 1024)
-                        weight = F.pad(
-                            weight, pad=(0, padded_in_features - in_features)
-                        )
-                    else:
-                        print(
-                            f"warning: {name} is skipped, int4 requires that in_features is 32, 64, or is divisible by 1024, "
-                            + "and that groupsize and inner_k_tiles*16 evenly divide into it"
-                        )
-                        continue
-                weight_int4pack, scales_and_zeros = (
-                    WeightOnlyInt4Linear._prepare_weight_and_scales_and_zeros(
-                        weight.to(torch.float), self.groupsize, self.inner_k_tiles
-                    )
-                )
-                weight_int4pack = weight_int4pack.to(device=self.device)
-                scales_and_zeros = scales_and_zeros.to(device=self.device)
-
-                setattr(
-                    module,
-                    name,
-                    WeightOnlyInt4Linear(
-                        child.in_features,
-                        child.out_features,
-                        bias=False,
-                        device=self.device,
-                        groupsize=self.groupsize,
-                        inner_k_tiles=self.inner_k_tiles,
-                        weight=weight_int4pack,
-                        scales_and_zeros=scales_and_zeros,
-                    ),
-                )
-            else:
-                self.quantize(child)
-
-        return module
-
-    def quantized_model(self) -> nn.Module:
-        return self.quantize(self.model_)
-
-
 ##########################################################################
 ###                       quantization dictionary                      ###
 
@@ -634,11 +548,11 @@ class WeightOnlyInt4QuantHandler(QuantHandler):
 quantizer_class_dict = {
     "embedding": EmbeddingOnlyQuantHandler,
     "linear:int8": WeightOnlyInt8QuantHandler,
-    "linear:int4": WeightOnlyInt4QuantHandler,
     "precision": PrecisionHandler,
     "executor": ExecutorHandler,
 }
 
 ao_quantizer_class_dict = {
+    "linear:int4": Int4WeightOnlyQuantizer,
     "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
 }
