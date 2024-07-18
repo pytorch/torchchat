@@ -36,6 +36,7 @@ if __name__ == "__main__":
     VERB_HELP = {
         "chat": "Chat interactively with a model",
         "browser": "Chat interactively in a browser",
+        "server": "Server to interact with the model",
         "download": "Download a model from Hugging Face or others",
         "generate": "Generate responses from a model given a prompt",
         "eval": "Evaluate a model given a prompt",
@@ -75,6 +76,11 @@ if __name__ == "__main__":
         from browser.browser import main as browser_main
 
         browser_main(args)
+    elif args.command == "server":
+        check_args(args, "server")
+        from server import main as server_main
+
+        server_main(args)
     elif args.command == "generate":
         check_args(args, "generate")
         from generate import main as generate_main

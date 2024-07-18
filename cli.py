@@ -29,7 +29,7 @@ default_model_dir = Path(
 INVENTORY_VERBS = ["download", "list", "remove", "where"]
 
 # List of all supported subcommands in torchchat
-KNOWN_VERBS = ["chat", "browser", "generate", "eval", "export"] + INVENTORY_VERBS
+KNOWN_VERBS = ["chat", "browser", "generate", "server", "eval", "export"] + INVENTORY_VERBS
 
 
 # Handle CLI arguments that are common to a majority of subcommands.
@@ -70,8 +70,8 @@ def add_arguments_for_verb(parser, verb: str) -> None:
     )
 
     # Add thematic argument groups based on the subcommand
-    if verb in ["browser", "chat", "generate"]:
-        _add_generation_args(parser) 
+    if verb in ["browser", "chat", "generate", "server"]:
+        _add_generation_args(parser)
     if verb == "eval":
         _add_evaluation_args(parser)
 

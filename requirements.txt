@@ -26,3 +26,6 @@ zstd
 
 # Browser mode
 streamlit
+
+# Server mode
+flask
