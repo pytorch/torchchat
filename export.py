@@ -20,11 +20,11 @@ from build.builder import (
 
 from build.utils import set_backend, set_precision
 from cli import add_arguments_for_verb, arg_init, check_args
-from export_aoti import export_model as export_model_aoti
+from export_util.export_aoti import export_model as export_model_aoti
 
 try:
     executorch_export_available = True
-    from export_et import export_model as export_model_et
+    from export_util.export_et import export_model as export_model_et
 except Exception as e:
     executorch_exception = f"ET EXPORT EXCEPTION: {e}"
     executorch_export_available = False
