@@ -103,6 +103,7 @@ Finally, you can also remove downloaded models with the remove command:
 
 ### Chat
 This mode allows you to chat with an LLM in an interactive fashion.
+
 [skip default]: begin
 ```bash
 # Llama 3 8B Instruct
@@ -121,14 +122,18 @@ python3 torchchat.py generate llama3 --prompt "write me a story about a boy and 
 For more information run `python3 torchchat.py generate --help`
 
 ### Server
-Start the server to send requests and receive the responses.
+**note this feature is still in progress and not all endpoints are working ATM**
+Server gives you a REST API that matches the OpenAI API spec for interacting with a model
+
+Start the server
+
 [skip default]: begin
 ```bash
 python3 torchchat.py server llama3
 ```
 [skip default]: end
 
-Sample curl request sent to the server looks like:
+Open another terminal window to interact with the API using curl
 ```
 curl http://127.0.0.1:5000/chat \
   -H "Content-Type: application/json" \
@@ -148,19 +153,11 @@ curl http://127.0.0.1:5000/chat \
 ```
 
 ### Browser
-This mode provides access to the model via the browser's localhost.
+This mode allows you to chat with the model using a UI in your browser
 
-Launch an interactive chat with your model. Running the command will automatically open a tab in your browser. [Streamlit](https://streamlit.io/) should already be installed by the `install_requirements.sh` script.
 ```
-streamlit run torchchat.py -- browser <model_name> <model_args>
+streamlit run torchchat.py -- browser llama3
 ```
-
-For example, to quantize and chat with LLaMA3:
-[skip default]: begin
-```
-streamlit run torchchat.py -- browser llama3 --quantize '{"precision": {"dtype":"float16"}, "executor":{"accelerator":"cpu"}}' --max-new-tokens 256 --compile
-```
-[skip default]: end
 
 
 
