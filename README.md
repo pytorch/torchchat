@@ -238,36 +238,14 @@ export TORCHCHAT_ROOT=${PWD}
 ./scripts/install_et.sh
 ```
 
-### Test it out using our ExecuTorch runner
-
-While ExecuTorch does not focus on desktop inference, it is capable
-of building a runner to do so. This is handy for testing out PTE
-models without sending them to a physical device.
-
-Build the runner
-```bash
-scripts/build_native.sh et
-```
-
-Get a PTE file if you don't have one already
-```
-python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
-```
-
-Execute using the runner
-```bash
-cmake-out/et_run llama3.pte -z `python3 torchchat.py where llama3`/tokenizer.model -i "Once upon a time"
-```
 
 ### Export for mobile
-The following example uses the Llama3 8B Instruct model.
+Similar to AOTI, to deploy onto device, we first export the PTE artifact, then we load the artifact for inference.
 
+The following example uses the Llama3 8B Instruct model.
 ```
 # Export
 python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
-
-# Execute
-python3 torchchat.py generate llama3 --device cpu --pte-path llama3.pte --prompt "Hello my name is"
 ```
 
 > [!NOTE]
@@ -276,8 +254,42 @@ llama3 model to reduce model size and improve performance for
 on-device use cases.
 
 For more details on quantization and what settings to use for your use
-case visit our [Quantization documentation](docs/quantization.md) or
-run `python3 torchchat.py export`
+case visit our [Quantization documentation](docs/quantization.md).
+
+### Deploy and run on Desktop
+
+While ExecuTorch does not focus on desktop inference, it is capable
+of doing so. This is handy for testing out PTE
+models without sending them to a physical device.
+
+Specifically there are 2 ways of doing so: Pure Python and via a Runner
+
+<details>
+<summary>Deploying via Python</summary>
+
+```
+# Execute
+python3 torchchat.py generate llama3 --device cpu --pte-path llama3.pte --prompt "Hello my name is"
+```
+
+</details>
+
+
+<details>
+<summary>Deploying via a Runner</summary>
+
+Build the runner
+```bash
+scripts/build_native.sh et
+```
+
+Execute using the runner
+```bash
+cmake-out/et_run llama3.pte -z `python3 torchchat.py where llama3`/tokenizer.model -i "Once upon a time"
+```
+
+</details>
+
 
 [end default]: end
 
