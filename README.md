@@ -4,35 +4,28 @@ torchchat is a small codebase showcasing the ability to run large language model
 
 
 ## What can you do with torchchat?
-- [Setup the Repo](#installation)
-- [Download Models](#download-weights)
 - [Run models via PyTorch / Python](#running-via-pytorch--python)
   - [Chat](#chat)
   - [Generate](#generate)
   - [Run chat in the Browser](#browser)
-- [Export models for running on desktop/server without python](#desktopserver-execution)
+- [Run models on desktop/server without python](#desktopserver-execution)
   - [Use AOT Inductor for faster execution](#aoti-aot-inductor)
   - [Running in c++ using the runner](#running-native-using-our-c-runner)
-- [Run on mobile](#mobile-execution)
-  - [Setup](#set-up-executorch)
-  - [Export a model for use on mobile](#export-for-mobile)
+- [Run models on mobile](#mobile-execution)
   - [Deploy and run on iOS](#deploy-and-run-on-ios)
   - [Deploy and run on Android](#deploy-and-run-on-android)
-- [Evaluate a mode](#eval)
-- [Supported Models](#models)
-- [Troubleshooting](#troubleshooting)
+- [Evaluate a model](#eval)
 
 
 ## Highlights
 - Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
-  - Supports [common GGUF formats](docs/GGUF.md) and the Hugging Face checkpoint format
 - PyTorch-native execution with performance
 - Supports popular hardware and OS
   - Linux (x86)
   - Mac OS (M1/M2/M3)
   - Android (Devices that support XNNPACK)
   - iOS 17+ (iPhone 13 Pro+)
-- Multiple data types including: float32, float16, bfloat16, select GGUF data types
+- Multiple data types including: float32, float16, bfloat16
 - Multiple quantization schemes
 - Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
@@ -65,10 +58,12 @@ python3 torchchat.py --help
 
 ### Download Weights
 Most models use Hugging Face as the distribution channel, so you will need to create a Hugging Face account.
+Create a Hugging Face user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens) with the `write` role.
+
+Log into Hugging Face:
 
 [prefix default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}"
-Create a Hugging Face user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens) with the `write` role.
-Log into Hugging Face:
+
 ```
 huggingface-cli login
 ```
@@ -84,6 +79,10 @@ python3 torchchat.py download llama3
  Hugging Face, if you do not already have access. Simply follow the
  prompts and re-run the command when access is granted.*
 
+
+<details>
+<summary>Additional Model Inventory Management Commands</summary>
+  
 View available models with:
 ```
 python3 torchchat.py list
@@ -97,12 +96,15 @@ python3 torchchat.py where llama3
 Finally, you can also remove downloaded models with the remove command:
 `python3 torchchat.py remove llama3`
 
+</details>
+
 
 ## Running via PyTorch / Python
 [Follow the installation steps if you haven't.](#installation)
 
 ### Chat
 This mode allows you to chat with an LLM in an interactive fashion.
+
 [skip default]: begin
 ```bash
 # Llama 3 8B Instruct
@@ -122,6 +124,7 @@ For more information run `python3 torchchat.py generate --help`
 
 ### Server
 Start the server to send requests and receive the responses.
+
 [skip default]: begin
 ```bash
 python3 torchchat.py server llama3
@@ -156,13 +159,12 @@ streamlit run torchchat.py -- browser <model_name> <model_args>
 ```
 
 For example, to quantize and chat with LLaMA3:
+
 [skip default]: begin
 ```
 streamlit run torchchat.py -- browser llama3 --quantize '{"precision": {"dtype":"float16"}, "executor":{"accelerator":"cpu"}}' --max-new-tokens 256 --compile
 ```
 [skip default]: end
-
-
 
 
 
@@ -207,7 +209,7 @@ cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama
 
 ## Mobile Execution
 
-[ExecuTorch] (https://github.com/pytorch/executorch) enables you to optimize your model for execution on a
+[ExecuTorch](https://github.com/pytorch/executorch) enables you to optimize your model for execution on a
 mobile or embedded device, but can also be used on desktop for
 testing.
 
@@ -267,10 +269,14 @@ run `python3 torchchat.py export`
 
 The following assumes you've completed the steps for [Setting up ExecuTorch](#set-up-executorch).
 
+<details>
+<summary>Deploying with Xcode</summary>
+
 #### Requirements
 - Xcode 15.0 or later
 - A development provisioning profile with the [`increased-memory-limit`](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_developer_kernel_increased-memory-limit) entitlement.
 
+  
 #### Steps
 
 1. Open the Xcode project:
@@ -293,11 +299,15 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 <a href="https://pytorch.org/executorch/main/_static/img/llama_ios_app.mp4">
   <img src="https://pytorch.org/executorch/main/_static/img/llama_ios_app.png" width="600" alt="iOS app running a LlaMA model">
 </a>
+</details>
 
 
 ### Deploy and run on Android
 
-#### Approach 1 (Recommended): Android Studio
+The following assumes you've completed the steps for [Setting up ExecuTorch](#set-up-executorch). In torchchat, we show 2 approaches for Android deployment:
+
+<details>
+<summary>Approach 1 (Recommended): Android Studio</summary>
 
 If you have Android Studio set up, and you have Java 17 and Android SDK 34 configured, you can follow this step.
 
@@ -342,7 +352,9 @@ Now, follow the app's UI guidelines to pick the model and tokenizer files from t
 
 <img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
 
-#### Approach 2: E2E Script
+</details>
+<details>
+<summary>Approach 2: E2E Script</summary>
 
 Alternatively, you can run `scripts/android_example.sh` which sets up Java, Android SDK Manager, Android SDK, Android emulator (if no physical device is found), builds the app, and launches it for you. It can be used if you don't have a GUI.
 
@@ -352,8 +364,9 @@ export USE_TIKTOKEN=ON # Set this only for tiktoken tokenizer
 sh scripts/android_example.sh
 ```
 
+</details>
 
-### Eval
+## Eval
 
 Uses the lm_eval library to evaluate model accuracy on a variety of
 tasks. Defaults to wikitext and can be manually controlled using the
