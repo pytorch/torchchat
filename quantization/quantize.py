@@ -50,10 +50,13 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
         if (
             quantizer not in quantizer_class_dict
             and quantizer not in ao_quantizer_class_dict
-            and quantizer not in ao_quantize_subclass_dict
         ):
             raise RuntimeError(f"unknown quantizer {quantizer} specified")
         if quantizer in ao_quantizer_class_dict:
+            # Use tensor subclass API for int4 weight only.
+            if device == "cuda" and quantizer == "linear:int4":
+                quantize_(model, int4_weight_only(q_kwargs["groupsize"]))
+                continue
             # Use dtype precision specified in user config, else fallback on global precision.
             if "precision" in quantize_options:
                 dtype = quantize_options["precision"].get("dtype", str(get_precision()))
@@ -78,8 +81,6 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
                 else:
                     raise e
             model = quant_handler.quantize(model)
-        elif quantizer in ao_quantize_subclass_dict:
-            quantize_(model, ao_quantize_subclass_dict[quantizer](group_size=q_kwargs["groupsize"]))
         else:
             model = quantizer_class_dict[quantizer](
                 model, device=device, tokenizer=tokenizer, **q_kwargs
@@ -551,9 +552,6 @@ quantizer_class_dict = {
 }
 
 ao_quantizer_class_dict = {
+    "linear:int4": Int4WeightOnlyQuantizer,
     "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
-}
-
-ao_quantize_subclass_dict = {
-    "linear:int4": int4_weight_only,
 }
