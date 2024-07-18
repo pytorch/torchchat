@@ -4,6 +4,22 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
+# Quantization API library for torchchat.
+#
+# NOTICE: most of the quant primitives code here will be deprecated in favor of torchao quantization APIs.
+#
+# Here are the quantization APIs available:
+#   * quantize_model(): the entry point for all quantization with different options.
+#   * QuantHandler: a base class for quantization handlers. This will be deprecated in favorr of torchao API.
+#
+# Different implementation of Handlers:
+#   * EmbeddingOnlyQuantHandler: quantize embeddings.
+#   * WeightOnlyInt8QuantHandler: int8 weight only quantization. Will be migrated to torchao API.
+#   * WeightOnlyInt4QuantHandler: int4 weight only quantization. Will be migrated to torchao API.
+#
+# torchao Quantizer:
+#   * Int8DynActInt4WeightQuantizer: dynamic quantization for int8 acitvation and int4 weight. Using torchao API.
+#
 from __future__ import annotations
 
 import json
