@@ -1,3 +1,6 @@
+> [!WARNING]
+> Files in this directory may be outdated, incomplete, scratch notes, or a WIP. torchchat provides no guarantees on these files as references. Please refer to the root README for stable features and documentation.
+
 # Using GGUF Models
 
 <!--
@@ -99,7 +102,7 @@ ${GGUF}/quantize --allow-requantize path_of_model_you_are_converting_from.gguf p
 
 For example, to convert the quantized model you downloaded above to an FP16 model, you would execute:
 ```
-${GGUF}/quantize --allow-requantize ${GGUF_MODEL_PATH} ./open_orca_fp16.gguf fp16   
+${GGUF}/quantize --allow-requantize ${GGUF_MODEL_PATH} ./open_orca_fp16.gguf fp16
 ```
 
 After the model is converted to a supported format like FP16, you can proceed using the instructions above.

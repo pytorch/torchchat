@@ -1,3 +1,6 @@
+> [!WARNING]
+> Files in this directory may be outdated, incomplete, scratch notes, or a WIP. torchchat provides no guarantees on these files as references. Please refer to the root README for stable features and documentation.
+
 
 # Quantization
 
@@ -133,7 +136,7 @@ python3 export.py --dtype [ fast16 | fast | bf16 | fp16 | fp32] ...
 ```
 [skip default]: end
 
-Unlike gpt-fast which uses bfloat16 as default, torchchat uses the dtype "fast16" as the default. Torchchat will pick the appropriate 16-bit floating point type available and offering the best performance (for execution with Executorch, macOS/ARM and Linux/x86 platforms).  For macOS, support depends on the OS version, with versions starting with 14.0 supporting bfloat16 as support, and float16 for earlier OS version based on system support for these data types.  
+Unlike gpt-fast which uses bfloat16 as default, torchchat uses the dtype "fast16" as the default. Torchchat will pick the appropriate 16-bit floating point type available and offering the best performance (for execution with Executorch, macOS/ARM and Linux/x86 platforms).  For macOS, support depends on the OS version, with versions starting with 14.0 supporting bfloat16 as support, and float16 for earlier OS version based on system support for these data types.
 
 Support for FP16 and BF16 is limited in many embedded processors and -dtype fp32 may be required in some environments. Additional ExecuTorch support for 16-bit floating point types may be added in the future based on hardware support.
 
