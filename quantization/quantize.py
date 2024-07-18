@@ -24,6 +24,7 @@ from torch.ao.quantization.fx._decomposed import quantized_decomposed_lib  # noq
 from torchao.quantization.quant_api import (
     quantize_,
     int4_weight_only,
+    Int4WeightOnlyQuantizer,
     Int8DynActInt4WeightQuantizer,
 )
 
