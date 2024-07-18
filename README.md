@@ -84,10 +84,6 @@ python3 torchchat.py download llama3
 <details>
 <summary>Additional Model Inventory Management Commands</summary>
 
-
-View available models with:
-
-View available models with:
 ```
 # View available models
 python3 torchchat.py list
@@ -133,30 +129,8 @@ python3 torchchat.py server llama3
 ```
 [skip default]: end
 
-Sample curl request sent to the server looks like:
-```
-curl http://127.0.0.1:5000/chat \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "llama3",
-    "messages": [
-      {
-        "role": "system",
-        "content": "You are a helpful assistant."
-      },
-      {
-        "role": "user",
-        "content": "Hello!"
-      }
-    ]
-  }'
-```
-
-> [!NOTE]
-> The response may take a few minutes to return depending on the model configuration
-
 <details>
-<summary>Sample Output</summary>
+<summary>Sample Input + Output</summary>
 
 ```
 curl http://127.0.0.1:5000/chat \
@@ -247,9 +221,8 @@ mobile or embedded device.
 Before running any commands in torchchat that require ExecuTorch, you
 must first install ExecuTorch.
 
-To install ExecuTorch, run the following commands *from the torchchat
-root directory*.  This will download the ExecuTorch repo to
-./et-build/src and install various ExecuTorch libraries to
+To install ExecuTorch, run the following commands.  This will download the
+ExecuTorch repo to ./et-build/src and install various ExecuTorch libraries to
 ./et-build/install.
 
 > [!IMPORTANT]
@@ -263,7 +236,7 @@ export TORCHCHAT_ROOT=${PWD}
 ### Test it out using our ExecuTorch runner
 
 While ExecuTorch does not focus on desktop inference, it is capable
-of building an ET runner to do so. This is handy for testing out PTE
+of building a runner to do so. This is handy for testing out PTE
 models without sending them to a physical device.
 
 Build the runner
@@ -271,7 +244,7 @@ Build the runner
 scripts/build_native.sh et
 ```
 
-**Get a PTE file if you don't have one already**
+Get a PTE file if you don't have one already
 ```
 python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
 ```
