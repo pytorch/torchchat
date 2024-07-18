@@ -1,3 +1,6 @@
+> [!WARNING]
+> Files in this directory may be outdated, incomplete, scratch notes, or a WIP. torchchat provides no guarantees on these files as references. Please refer to the root README for stable features and documentation.
+
 # Running LLaMA models on iOS
 
 On a Mac set-up [ExecuTorch](executorch_setup.md) and open the LLaMA app project with Xcode:

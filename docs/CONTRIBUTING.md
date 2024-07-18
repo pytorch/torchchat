@@ -1,3 +1,7 @@
+> [!WARNING]
+> Files in this directory may be outdated, incomplete, scratch notes, or a WIP. torchchat provides no guarantees on these files as references. Please refer to the root README for stable features and documentation.
+
+
 # Contributing to torchchat
 We want to make contributing to this project as easy and transparent as possible.
 

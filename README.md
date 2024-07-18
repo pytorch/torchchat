@@ -437,7 +437,7 @@ We provide
 
 ## Community Contributions
 
-We really value our community and the contributions made by our wonderful users. We'll use this section to call out some of these contributions! If you'd like to help out as well, please see the [CONTRIBUTING](docs/CONTRIBUTING.md) guide.
+We really value our community and the contributions made by our wonderful users. We'll use this section to call out some of these contributions! If you'd like to help out as well, please see the [CONTRIBUTING](CONTRIBUTING.md) guide.
 
 ## Troubleshooting
 
@@ -472,7 +472,7 @@ solely responsible for complying with all such obligations.
 
 
 ## Acknowledgements
-Thank you to the [community](docs/ACKNOWLEDGEMENTS.md) for all the
+Thank you to the community for all the
 awesome libraries and tools you've built around local LLM inference.
 
 * Georgi Gerganov and his [GGML](https://github.com/ggerganov/ggml)
