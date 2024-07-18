@@ -75,32 +75,37 @@ Hugging Face.
 python3 torchchat.py download llama3
 ```
 
-*NOTE: This command may prompt you to request access to Llama 3 via
- Hugging Face, if you do not already have access. Simply follow the
- prompts and re-run the command when access is granted.*
+> [!NOTE]
+> This command may prompt you to request access to Llama 3 via
+> Hugging Face, if you do not already have access. Simply follow the
+> prompts and re-run the command when access is granted.*
 
 
 <details>
 <summary>Additional Model Inventory Management Commands</summary>
-  
+
+
+View available models with:
+
 View available models with:
 ```
+# View available models
 python3 torchchat.py list
-```
 
-Query the location of a particular model -- this is particularly useful in scripts when you do not want to hard-code paths:
-```
+# Query the location of a particular model
+# This is useful in scripts when you do not want to hard-code paths
 python3 torchchat.py where llama3
-```
 
-Finally, you can also remove downloaded models with the remove command:
-`python3 torchchat.py remove llama3`
+# Remove downloaded models
+python3 torchchat.py remove llama3
+```
+More information about these commands can be found by adding the `--help` option.
 
 </details>
 
 
 ## Running via PyTorch / Python
-[Follow the installation steps if you haven't.](#installation)
+[Follow the installation steps if you haven't already.](#installation)
 
 ### Chat
 This mode allows you to chat with an LLM in an interactive fashion.
@@ -112,18 +117,15 @@ python3 torchchat.py chat llama3
 ```
 [skip default]: end
 
-For more information run `python3 torchchat.py chat --help`
-
 ### Generate
 This mode generates text based on an input prompt.
 ```bash
 python3 torchchat.py generate llama3 --prompt "write me a story about a boy and his bear"
 ```
 
-For more information run `python3 torchchat.py generate --help`
 
 ### Server
-Start the server to send requests and receive the responses.
+Thie mode kicks off a server to send curl requests against.
 
 [skip default]: begin
 ```bash
@@ -150,10 +152,37 @@ curl http://127.0.0.1:5000/chat \
   }'
 ```
 
-### Browser
-This mode provides access to the model via the browser's localhost.
+> [!NOTE]
+> The response may take a few minutes to return depending on the model configuration
 
-Launch an interactive chat with your model. Running the command will automatically open a tab in your browser. [Streamlit](https://streamlit.io/) should already be installed by the `install_requirements.sh` script.
+<details>
+<summary>Sample Output</summary>
+
+```
+curl http://127.0.0.1:5000/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "llama3",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful assistant."
+      },
+      {
+        "role": "user",
+        "content": "Hello!"
+      }
+    ]
+  }'
+
+{"response":" I'm a software developer with a passion for building innovative and user-friendly applications. I have experience in developing web and mobile applications using various technologies such as Java, Python, and JavaScript. I'm always looking for new challenges and opportunities to learn and grow as a developer.\n\nIn my free time, I enjoy reading books on computer science and programming, as well as experimenting with new technologies and techniques. I'm also interested in machine learning and artificial intelligence, and I'm always looking for ways to apply these concepts to real-world problems.\n\nI'm excited to be a part of the developer community and to have the opportunity to share my knowledge and experience with others. I'm always happy to help with any questions or problems you may have, and I'm looking forward to learning from you as well.\n\nThank you for visiting my profile! I hope you find my information helpful and interesting. If you have any questions or would like to discuss any topics, please feel free to reach out to me. I"}
+```
+
+</details>
+
+### Browser
+This mode provides access to a localhost browset hosting [Streamlit](https://streamlit.io/).
+Running the command automatically open a tab in your browser.
 ```
 streamlit run torchchat.py -- browser <model_name> <model_args>
 ```
@@ -167,13 +196,14 @@ streamlit run torchchat.py -- browser llama3 --quantize '{"precision": {"dtype":
 [skip default]: end
 
 
-
+> [!TIP]
+> For more information about these commands, please refer to the `--help` menu.
 
 
 ## Desktop/Server Execution
 
 ### AOTI (AOT Inductor)
-AOT compiles models before execution for faster inference (read more about AOTI [here](https://pytorch.org/blog/pytorch2-2/)).
+[AOTI](https://pytorch.org/blog/pytorch2-2/) compiles models before execution for faster inference.
 
 The following example exports and executes the Llama3 8B Instruct
 model.  The first command performs the actual export, the second
@@ -185,11 +215,11 @@ users to test the exported model.
 python3 torchchat.py export llama3 --output-dso-path exportedModels/llama3.so
 
 # Execute the exported model using Python
-
 python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --prompt "Hello my name is"
 ```
 
-NOTE: If your machine has cuda add this flag for performance
+> [!NOTE]
+> If your machine has cuda add this flag for performance
 `--quantize config/data/cuda.json`
 
 ### Running native using our C++ Runner
@@ -210,8 +240,7 @@ cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama
 ## Mobile Execution
 
 [ExecuTorch](https://github.com/pytorch/executorch) enables you to optimize your model for execution on a
-mobile or embedded device, but can also be used on desktop for
-testing.
+mobile or embedded device.
 
 ### Set Up ExecuTorch
 
@@ -223,12 +252,20 @@ root directory*.  This will download the ExecuTorch repo to
 ./et-build/src and install various ExecuTorch libraries to
 ./et-build/install.
 
+> [!IMPORTANT]
+> The following commands should be run from the torchchat root directory.
+
 ```
 export TORCHCHAT_ROOT=${PWD}
 ./scripts/install_et.sh
 ```
 
 ### Test it out using our ExecuTorch runner
+
+While ExecuTorch does not focus on desktop inference, it is capable
+of building an ET runner to do so. This is handy for testing out PTE
+models without sending them to a physical device.
+
 Build the runner
 ```bash
 scripts/build_native.sh et
@@ -255,12 +292,13 @@ python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-p
 python3 torchchat.py generate llama3 --device cpu --pte-path llama3.pte --prompt "Hello my name is"
 ```
 
-NOTE: We use `--quantize config/data/mobile.json` to quantize the
+> [!NOTE]
+> We use `--quantize config/data/mobile.json` to quantize the
 llama3 model to reduce model size and improve performance for
 on-device use cases.
 
 For more details on quantization and what settings to use for your use
-case visit our [Quanitization documentation](docs/quantization.md) or
+case visit our [Quantization documentation](docs/quantization.md) or
 run `python3 torchchat.py export`
 
 [end default]: end
@@ -276,7 +314,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 - Xcode 15.0 or later
 - A development provisioning profile with the [`increased-memory-limit`](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_developer_kernel_increased-memory-limit) entitlement.
 
-  
+
 #### Steps
 
 1. Open the Xcode project:
@@ -374,8 +412,6 @@ tasks and limit args.
 
 See [Evaluation](docs/evaluation.md)
 
-For more information run `python3 torchchat.py eval --help`
-
 **Examples**
 
 Eager mode:
@@ -395,8 +431,7 @@ python3 torchchat.py eval llama3 --pte-path llama3.pte --limit 5
 ## Models
 
 The following models are supported by torchchat and have associated
-aliases. Other models, including GGUF format, can be run by specifying
-a URL directly.
+aliases.
 
 | Model | Mobile Friendly | Notes |
 |------------------|---|---------------------|
@@ -415,10 +450,6 @@ a URL directly.
 |[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories42M`.|
 |[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories110M`.|
 |[openlm-research/open_llama_7b](https://huggingface.co/openlm-research/open_llama_7b)|✅|Best for `generate`. Alias to `open-llama`.|
-
-torchchat also supports loading of many models in the GGUF format. See
-the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF
-files.
 
 While we describe how to use torchchat using the popular llama3 model,
 you can perform the example commands with any of these models.
