@@ -270,13 +270,11 @@ function eval_model_sanity_check() {
             export QUANT_OPTIONS='{"linear:int4" : {"groupsize": 32}}'
             python -W ignore eval.py --compile --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval" || exit 1
             cat "$MODEL_DIR/eval"
-        fi
 
-        echo "**************************************************"
-        echo "******** INT4 group-wise quantized (eager) *******"
-        echo "**************************************************"
+            echo "**************************************************"
+            echo "******** INT4 group-wise quantized (eager) *******"
+            echo "**************************************************"
 
-        if [ "$TARGET_DEVICE" == "cuda" ] && [ "$DTYPE" != "float16" ]; then
             python -W ignore eval.py --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval_eager" || exit 1
             cat "$MODEL_DIR/eval_eager"
         fi;
