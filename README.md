@@ -121,8 +121,9 @@ python3 torchchat.py generate llama3 --prompt "write me a story about a boy and 
 
 
 ### Server
-**note this feature is still in progress and not all endpoints are working ATM**
-Server gives you a REST API that matches the OpenAI API spec for interacting with a model
+**Note: This feature is still in progress and not all endpoints are working ATM**
+ 
+This mode gives a REST API that matches the OpenAI API spec for interacting with a model
 
 [skip default]: begin
 
@@ -134,11 +135,12 @@ python3 torchchat.py server llama3
 
 Open another terminal window to interact with the API using curl
 
+> [!NOTE]
+> Depending on the model configuration, this query might take a few minutes
+> to respond
 
-**Note: Depending on the model configuration, this query might take a few minutes
-to respond**
-
-<summary>Sample Input + Output</summary>
+  
+**Sample Input + Output**
 
 ```
 curl http://127.0.0.1:5000/chat \
@@ -160,18 +162,17 @@ curl http://127.0.0.1:5000/chat \
 {"response":" I'm a software developer with a passion for building innovative and user-friendly applications. I have experience in developing web and mobile applications using various technologies such as Java, Python, and JavaScript. I'm always looking for new challenges and opportunities to learn and grow as a developer.\n\nIn my free time, I enjoy reading books on computer science and programming, as well as experimenting with new technologies and techniques. I'm also interested in machine learning and artificial intelligence, and I'm always looking for ways to apply these concepts to real-world problems.\n\nI'm excited to be a part of the developer community and to have the opportunity to share my knowledge and experience with others. I'm always happy to help with any questions or problems you may have, and I'm looking forward to learning from you as well.\n\nThank you for visiting my profile! I hope you find my information helpful and interesting. If you have any questions or would like to discuss any topics, please feel free to reach out to me. I"}
 ```
 
-
 ### Browser
 This mode allows you to chat with the model using a UI in your browser
-
-
 Running the command automatically open a tab in your browser.
+
 [skip default]: begin
 
 ```
 streamlit run torchchat.py -- browser llama3
 ```
 
+[skip default]: end
 
 > [!TIP]
 > For more information about these commands, please refer to the `--help` menu.
