@@ -31,11 +31,11 @@ else
 fi
 
 if [ "${USE_TIKTOKEN:-OFF}" == "ON" ]; then
-LLAMA_AAR_URL="https://ossci-android.s3.amazonaws.com/executorch/release/0.3/executorch-llama-tiktoken-rc1.aar"
-LLAMA_AAR_SHASUM="575190205dbb1ee932a277b50520dc4260a9a9cf"
+  LLAMA_AAR_URL="https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc2-0719.aar"
+  LLAMA_AAR_SHASUM="24bae36a65dc07567b788813980e679c81fa01eb"
 else
-LLAMA_AAR_URL="https://ossci-android.s3.amazonaws.com/executorch/release/0.3/executorch-llama-bpe-rc1.aar"
-LLAMA_AAR_SHASUM="673af4a1338a93d47369b68ec0d52b8ea7f983a2"
+  LLAMA_AAR_URL="https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc2-0719.aar"
+  LLAMA_AAR_SHASUM="1e9353e8dc6124f8dd6dd32c9212bae2770c01ea"
 fi
 
 mkdir -p ${TORCHCHAT_ROOT}/build/android
@@ -162,4 +162,4 @@ adb install -t android/Torchchat/app/build/outputs/apk/debug/app-debug.apk
 
 if [ -z "${CI_ENV:-}" ]; then
   read -p "Press enter to exit emulator and finish"
-else
+fi
