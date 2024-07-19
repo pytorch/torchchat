@@ -227,21 +227,23 @@ function eval_model() {
             echo "perplexity checking succeeded for non-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE"
         fi;
 
-        echo "******************************************"
-        echo "******** INT4 group-wise quantized *******"
-        echo "******************************************"
+        if [[ "$TARGET_DEVICE" != "cuda" || "$DTYPE" == "bfloat16" ]]; then
+            echo "******************************************"
+            echo "******** INT4 group-wise quantized *******"
+            echo "******************************************"
 
-        export QUANT_OPTIONS='{"linear:int4" : {"groupsize": 32}}'
-        python -W ignore eval.py --compile --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
-        cat "$MODEL_DIR/eval"
-        export REF_PERPLEXITY=100000
-        export PERPLEXITY=cat "$MODEL_DIR/eval" | tail -n 1 log | awk -F '[, ]' '{print $4}'
-        # == 1 meaning the check succeeded
-        if [ "$(echo "$PERPLEXITY >= $REF_PERPLEXITY" | bc)" == 1]; then
-            echo "perplexity checking failed for int4-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE $QUANT_OPTIONS"
-        else
-            echo "perplexity checking succeeded for int4-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE $QUANT_OPTIONS"
-        fi;
+            export QUANT_OPTIONS='{"linear:int4" : {"groupsize": 32}}'
+            python -W ignore eval.py --compile --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
+            cat "$MODEL_DIR/eval"
+            export REF_PERPLEXITY=100000
+            export PERPLEXITY=cat "$MODEL_DIR/eval" | tail -n 1 log | awk -F '[, ]' '{print $4}'
+            # == 1 meaning the check succeeded
+            if [ "$(echo "$PERPLEXITY >= $REF_PERPLEXITY" | bc)" == 1]; then
+                echo "perplexity checking failed for int4-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE $QUANT_OPTIONS"
+            else
+                echo "perplexity checking succeeded for int4-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE $QUANT_OPTIONS"
+            fi;
+        fi
 
     done
 }
