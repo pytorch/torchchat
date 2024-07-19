@@ -449,12 +449,11 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          # Have to install ET first because deps of Torchchat might not be the same.
-          export TORCHCHAT_ROOT=$PWD
-          ./scripts/install_et.sh
-
           echo "Intalling pip3 packages"
           ./install_requirements.sh
+
+          export TORCHCHAT_ROOT=$PWD
+          ./scripts/install_et.sh
 
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'

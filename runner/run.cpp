@@ -156,7 +156,7 @@ void build_transformer(
 #else //__ET_MODEL__
   t->runner = new Module(
       /* path to PTE model */ model_path,
-      /* PTE mmap settings */ Module::MlockConfig::UseMlockIgnoreErrors);
+      /* PTE mmap settings */ Module::LoadMode::MmapUseMlockIgnoreErrors);
 #endif
 }
 
