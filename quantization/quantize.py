@@ -22,11 +22,12 @@ from quantization.qops import LinearInt8 as WeightOnlyInt8Linear, QuantizedEmbed
 # AttributeError: '_OpNamespace' 'quantized_decomposed' object has no attribute 'quantize_per_channel_group'
 from torch.ao.quantization.fx._decomposed import quantized_decomposed_lib  # noqa
 from torchao.quantization.quant_api import (
-    quantize_,
     int4_weight_only,
     Int4WeightOnlyQuantizer,
     Int8DynActInt4WeightQuantizer,
+    quantize_,
 )
+from torchao.utils import unwrap_tensor_subclass
 
 
 #########################################################################
