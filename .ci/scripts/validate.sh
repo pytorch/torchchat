@@ -92,13 +92,16 @@ function generate_compiled_model_output() {
             python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
             .ci/scripts/check_gibberish "$MODEL_DIR/output_compiled"
 
-            echo "******************************************"
-            echo "******** INT4 group-wise quantized *******"
-            echo "******************************************"
-            python3 -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
-            .ci/scripts/check_gibberish "$MODEL_DIR/output_eager"
-            python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
-            .ci/scripts/check_gibberish "$MODEL_DIR/output_compiled"
+            if [[ $TARGET_DEVICE != "cuda" || "$DTYPE" == "bfloat16" ]]; then
+                # For CUDA, only bfloat16 makes sense for int4 mm kernel
+                echo "******************************************"
+                echo "******** INT4 group-wise quantized *******"
+                echo "******************************************"
+                python3 -W ignore generate.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_eager" || exit 1
+                .ci/scripts/check_gibberish "$MODEL_DIR/output_eager"
+                python3 -W ignore generate.py --dtype ${DTYPE} --compile --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --device "$TARGET_DEVICE" > "$MODEL_DIR/output_compiled" || exit 1
+                .ci/scripts/check_gibberish "$MODEL_DIR/output_compiled"
+            fi
         fi
     done
 }
@@ -180,12 +183,11 @@ function generate_aoti_model_output() {
         echo "******************************************"
         echo "******** INT4 group-wise quantized *******"
         echo "******************************************"
-        if [ "$TARGET_DEVICE" == "cuda" ]; then
-            if [ "$DTYPE" != "float16" ]; then
-                python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-                python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
-                .ci/scripts/check_gibberish "$MODEL_DIR/output_aoti"
-            fi
+        if [[ "$TARGET_DEVICE" != "cuda" || "$DTYPE" == "bfloat16" ]]; then
+            # For CUDA, only bfloat16 makes sense for int4 mm kernel
+            python3 -W ignore export.py --dtype ${DTYPE} --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+            python3 -W ignore generate.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --temperature 0 --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" > "$MODEL_DIR/output_aoti" || exit 1
+            .ci/scripts/check_gibberish "$MODEL_DIR/output_aoti"
         fi
     done
 }
@@ -225,21 +227,23 @@ function eval_model() {
             echo "perplexity checking succeeded for non-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE"
         fi;
 
-        echo "******************************************"
-        echo "******** INT4 group-wise quantized *******"
-        echo "******************************************"
+        if [[ "$TARGET_DEVICE" != "cuda" || "$DTYPE" == "bfloat16" ]]; then
+            echo "******************************************"
+            echo "******** INT4 group-wise quantized *******"
+            echo "******************************************"
 
-        export QUANT_OPTIONS='{"linear:int4" : {"groupsize": 32}}'
-        python -W ignore eval.py --compile --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
-        cat "$MODEL_DIR/eval"
-        export REF_PERPLEXITY=100000
-        export PERPLEXITY=cat "$MODEL_DIR/eval" | tail -n 1 log | awk -F '[, ]' '{print $4}'
-        # == 1 meaning the check succeeded
-        if [ "$(echo "$PERPLEXITY >= $REF_PERPLEXITY" | bc)" == 1]; then
-            echo "perplexity checking failed for int4-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE $QUANT_OPTIONS"
-        else
-            echo "perplexity checking succeeded for int4-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE $QUANT_OPTIONS"
-        fi;
+            export QUANT_OPTIONS='{"linear:int4" : {"groupsize": 32}}'
+            python -W ignore eval.py --compile --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
+            cat "$MODEL_DIR/eval"
+            export REF_PERPLEXITY=100000
+            export PERPLEXITY=cat "$MODEL_DIR/eval" | tail -n 1 log | awk -F '[, ]' '{print $4}'
+            # == 1 meaning the check succeeded
+            if [ "$(echo "$PERPLEXITY >= $REF_PERPLEXITY" | bc)" == 1]; then
+                echo "perplexity checking failed for int4-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE $QUANT_OPTIONS"
+            else
+                echo "perplexity checking succeeded for int4-quantized model $MODEL_NAME with $DTYPE $TARGET_DEVICE $QUANT_OPTIONS"
+            fi;
+        fi
 
     done
 }
@@ -260,32 +264,31 @@ function eval_model_sanity_check() {
         python -W ignore eval.py --compile --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval" || exit 1
         cat "$MODEL_DIR/eval"
 
-        echo "******************************************"
-        echo "******** INT4 group-wise quantized *******"
-        echo "******************************************"
+        if [[ "$TARGET_DEVICE" != "cuda" || "$DTYPE" == "bfloat16" ]]; then
+            echo "******************************************"
+            echo "******** INT4 group-wise quantized *******"
+            echo "******************************************"
 
-        export QUANT_OPTIONS='{"linear:int4" : {"groupsize": 32}}'
-        python -W ignore eval.py --compile --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval" || exit 1
-        cat "$MODEL_DIR/eval"
+            export QUANT_OPTIONS='{"linear:int4" : {"groupsize": 32}}'
+            python -W ignore eval.py --compile --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval" || exit 1
+            cat "$MODEL_DIR/eval"
 
-        echo "**************************************************"
-        echo "******** INT4 group-wise quantized (eager) *******"
-        echo "**************************************************"
+            echo "**************************************************"
+            echo "******** INT4 group-wise quantized (eager) *******"
+            echo "**************************************************"
 
-        if [ "$TARGET_DEVICE" == "cuda" ] && [ "$DTYPE" != "float16" ]; then
             python -W ignore eval.py --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval_eager" || exit 1
             cat "$MODEL_DIR/eval_eager"
-        fi;
 
-
-        # there is some issues with AOTI cpu and cuda, need to fix and enable the test for cuda as well
-        echo "*************************************************"
-        echo "******** INT4 group-wise quantized (AOTI) *******"
-        echo "*************************************************"
-        if [ "$DTYPE" != "float16" ]; then
-            python3 -W ignore export.py --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
-            python3 -W ignore eval.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/output_eval_aoti" || exit 1
-            cat "$MODEL_DIR/output_eval_aoti"
+            # there is some issues with AOTI cpu and cuda, need to fix and enable the test for cuda as well
+            echo "*************************************************"
+            echo "******** INT4 group-wise quantized (AOTI) *******"
+            echo "*************************************************"
+            if [ "$DTYPE" != "float16" ]; then
+                python3 -W ignore export.py --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" || exit 1
+                python3 -W ignore eval.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/output_eval_aoti" || exit 1
+                cat "$MODEL_DIR/output_eval_aoti"
+            fi;
         fi;
 
     done
