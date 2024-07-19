@@ -348,20 +348,20 @@ Currently the tokenizer is built at compile time, so you need to re-build the ap
 > [!NOTE]
 > The script to build the AAR can be found [here](https://github.com/pytorch/executorch/blob/main/build/build_android_library.sh). If you need to tweak with the tokenizer or runtime (for example use your own tokenizer or runtime library), you can modify the ExecuTorch code and use that script to build the AAR library.
 
-[executorch-llama-bpe-rc2-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc2-0719.aar) (SHASUM: 1e9353e8dc6124f8dd6dd32c9212bae2770c01ea)
+[executorch-llama-bpe-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar) (SHASUM: d5fe81d9a4700c36b50ae322e6bf34882134edb0)
 
-[executorch-llama-tiktoken-rc2-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc2-0719.aar) (SHASUM: 24bae36a65dc07567b788813980e679c81fa01eb)
+[executorch-llama-tiktoken-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc3-0719.aar) (SHASUM: c3e5d2a97708f033c2b1839a89f12f737e3bbbef)
 
 For BPE tokenizer:
 ```
-curl https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc2-0719.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
-echo "1e9353e8dc6124f8dd6dd32c9212bae2770c01ea  android/Torchchat/app/libs/executorch.aar" | shasum --check
+curl https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
+echo "d5fe81d9a4700c36b50ae322e6bf34882134edb0  android/Torchchat/app/libs/executorch.aar" | shasum --check
 ```
 
 For tiktoken tokenizer:
 ```
-curl https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc2-0719.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
-echo "24bae36a65dc07567b788813980e679c81fa01eb  android/Torchchat/app/libs/executorch.aar" | shasum --check
+curl https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc3-0719.aar -o android/Torchchat/app/libs/executorch.aar --create-dirs
+echo "c3e5d2a97708f033c2b1839a89f12f737e3bbbef  android/Torchchat/app/libs/executorch.aar" | shasum --check
 ```
 
 You also need to push the model and tokenizer file to your device. Please refer to the docs above on generating the pte and bin file, or use E2E script (see section below) to generate and push the file.
