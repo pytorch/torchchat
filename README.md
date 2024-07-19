@@ -335,6 +335,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 <details>
 <summary>Approach 1 (Recommended): Android Studio</summary>
 
+
 If you have Android Studio set up, and you have Java 17 and Android SDK 34 configured, you can follow this step.
 
 First, you need to download the ones of the following AAR files which contains the required Java library and its corresponding JNI library, for the app to build and run. You need to put the file to `android/Torchchat/app/libs/executorch.aar`
@@ -345,8 +346,8 @@ If your model uses tiktoken tokenizer (llama3 model for example), download `exec
 
 Currently the tokenizer is built at compile time, so you need to re-build the app when you need to use a different tokenizer for different model.
 
-> [!NOTE]
-> The script to build the AAR can be found [here](https://github.com/pytorch/executorch/blob/main/build/build_android_library.sh). If you need to tweak with the tokenizer or runtime (for example use your own tokenizer or runtime library), you can modify the ExecuTorch code and use that script to build the AAR library.
+
+> The script to build the AAR can be found [here](https://github.com/pytorch/executorch/blob/main/build/build_android_library.sh). If you need to tweak with the tokenizer or runtime (for example use your own tokenizer or runtime library), you can modify the ExecuTorch code and use that script to build the AAR library. 
 
 [executorch-llama-bpe-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar) (SHASUM: d5fe81d9a4700c36b50ae322e6bf34882134edb0)
 
