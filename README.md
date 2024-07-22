@@ -192,36 +192,37 @@ curl http://127.0.0.1:5000/chat \
 ## Desktop/Server Execution
 
 ### AOTI (AOT Inductor)
-[AOTI](https://pytorch.org/blog/pytorch2-2/) compiles models before execution for faster inference.
+[AOTI](https://pytorch.org/blog/pytorch2-2/) compiles models before execution for faster inference. The process creates a [DSO](https://en.wikipedia.org/wiki/Shared_library) model (represented by a file with extension `.so`)
+that is then loaded for inference. This can be done with both Python and C++ enviroments.
 
 The following example exports and executes the Llama3 8B Instruct
-model.  The first command performs the actual export, the second
-command loads the exported model into the Python interface to enable
-users to test the exported model.
-
+model.  The first command compiles and performs the actual export.
 ```
-# Compile
 python3 torchchat.py export llama3 --output-dso-path exportedModels/llama3.so
-
-# Execute the exported model using Python
-python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --prompt "Hello my name is"
 ```
 
 > [!NOTE]
 > If your machine has cuda add this flag for performance
-`--quantize config/data/cuda.json` when exporting. You'll also need to tell generate to use `--device cuda`
+`--quantize config/data/cuda.json` when exporting. You'll also need to tell generate to use `--device cuda` and the runner to use `-d CUDA`
 
-### Running native using our C++ Runner
 
-The end-to-end C++ [runner](runner/run.cpp) runs a [DSO](https://en.wikipedia.org/wiki/Shared_library)  model (represented by a file with extension `.so`)
-exported in the previous step.
+### Run in a Python Enviroment
 
-To build the runner binary on your Mac or Linux:
+To run in a python enviroment, use the generate subcommand like before, but include the dso file.
+
+```
+python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --prompt "Hello my name is"
+```
+
+
+### Run using our C++ Runner
+
+To run in a C++ enviroment, we need to build the runner binary.
 ```bash
 scripts/build_native.sh aoti
 ```
 
-Execute
+Then run the compiled executable, with the exported DSO from earlier: 
 ```bash
 cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time"
 ```
