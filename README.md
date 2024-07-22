@@ -84,24 +84,35 @@ python3 torchchat.py download llama3
 <details>
 <summary>Additional Model Inventory Management Commands</summary>
 
-```
-# View available models
+### List
+This subcommands shows the available models
+```bash
 python3 torchchat.py list
+```
 
-# Query the location of a particular model
-# This is useful in scripts when you do not want to hard-code paths
-python3 torchchat.py where llama3
+### Where
+This subcommands shows location of a particular model. 
+```bash
+python3 torchchat.py list
+```
+This is useful in scripts when you do not want to hard-code paths
 
-# Remove downloaded models
+
+### Remove
+This subcommands removes the specified model
+```bash
 python3 torchchat.py remove llama3
 ```
+
 More information about these commands can be found by adding the `--help` option.
 
 </details>
 
 
 ## Running via PyTorch / Python
-[Follow the installation steps if you haven't already.](#installation)
+
+> [!TIP]
+> For more information about these commands, please refer to the `--help` menu.
 
 ### Chat
 This mode allows you to chat with an LLM in an interactive fashion.
@@ -119,11 +130,29 @@ This mode generates text based on an input prompt.
 python3 torchchat.py generate llama3 --prompt "write me a story about a boy and his bear"
 ```
 
+### Browser
+This mode allows you to chat with the model using a UI in your browser
+Running the command automatically open a tab in your browser.
+
+[skip default]: begin
+
+```
+streamlit run torchchat.py -- browser llama3
+```
+
+[skip default]: end
 
 ### Server
 **Note: This feature is still in progress and not all endpoints are working ATM**
- 
-This mode gives a REST API that matches the OpenAI API spec for interacting with a model
+
+
+<details>
+<summary>This mode gives a REST API that matches the OpenAI API spec for interacting with a model</summary>
+
+To test out the REST API, **you'll need 2 terminals**: one to host the server, and one to send the request.
+
+
+In one terminal, kick off the server
 
 [skip default]: begin
 
@@ -132,15 +161,9 @@ python3 torchchat.py server llama3
 ```
 [skip default]: end
 
-
-Open another terminal window to interact with the API using curl
-
-> [!NOTE]
-> Depending on the model configuration, this query might take a few minutes
-> to respond
-
+In the other terminal window, interact with the API using curl. Depending on the model configuration, this query might take a few minutes to respond
   
-**Sample Input + Output**
+**Example Input + Output**
 
 ```
 curl http://127.0.0.1:5000/chat \
@@ -158,24 +181,12 @@ curl http://127.0.0.1:5000/chat \
       }
     ]
   }'
-
+```
+```
 {"response":" I'm a software developer with a passion for building innovative and user-friendly applications. I have experience in developing web and mobile applications using various technologies such as Java, Python, and JavaScript. I'm always looking for new challenges and opportunities to learn and grow as a developer.\n\nIn my free time, I enjoy reading books on computer science and programming, as well as experimenting with new technologies and techniques. I'm also interested in machine learning and artificial intelligence, and I'm always looking for ways to apply these concepts to real-world problems.\n\nI'm excited to be a part of the developer community and to have the opportunity to share my knowledge and experience with others. I'm always happy to help with any questions or problems you may have, and I'm looking forward to learning from you as well.\n\nThank you for visiting my profile! I hope you find my information helpful and interesting. If you have any questions or would like to discuss any topics, please feel free to reach out to me. I"}
 ```
 
-### Browser
-This mode allows you to chat with the model using a UI in your browser
-Running the command automatically open a tab in your browser.
-
-[skip default]: begin
-
-```
-streamlit run torchchat.py -- browser llama3
-```
-
-[skip default]: end
-
-> [!TIP]
-> For more information about these commands, please refer to the `--help` menu.
+</details>
 
 
 ## Desktop/Server Execution
@@ -449,7 +460,7 @@ you can perform the example commands with any of these models.
 
 ## Design Principles
 
-torchchat embodies PyTorch’s design philosophy [[details](https://pytorch.org/docs/stable/community/design.html)], especially "usability over everything else".
+torchchat embodies PyTorch’s design philosophy [details](https://pytorch.org/docs/stable/community/design.html), especially "usability over everything else".
 
 ### Native PyTorch
 
@@ -490,7 +501,7 @@ link provided in the error to get access.
 If `./scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
 
 
-### Disclaimer
+## Disclaimer
 The torchchat Repository Content is provided without any guarantees
 about performance or compatibility. In particular, torchchat makes
 available model architectures written in Python for PyTorch that may
