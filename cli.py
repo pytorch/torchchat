@@ -49,6 +49,9 @@ def check_args(args, verb: str) -> None:
 
 # Given a arg parser and a subcommand (verb), add the appropriate arguments
 # for that subcommand.
+#
+# Note the use of argparse.SUPPRESS to hide arguments from --help due to 
+# legacy CLI arg parsing. See https://github.com/pytorch/torchchat/issues/932
 def add_arguments_for_verb(parser, verb: str) -> None:
     # Argument closure for inventory related subcommands
     if verb in INVENTORY_VERBS:
@@ -56,9 +59,38 @@ def add_arguments_for_verb(parser, verb: str) -> None:
         _add_cli_metadata_args(parser)
         return
 
-    # Model specification
-    # A model can be specified using a positional model name or checkpoint path
-    exclusive_parser = parser.add_mutually_exclusive_group(required=True)
+    # Add argument groups for model specification (what base model to use)
+    _add_model_specification_args(parser)
+
+    # Add argument groups for exported model path IO
+    _add_exported_input_path_args(parser, verb)
+    _add_export_output_path_args(parser, verb)
+    
+    # Add argument groups for model configuration (compilation, quant, etc)
+    _add_model_config_args(parser, verb)
+
+    # Add thematic argument groups based on the subcommand
+    if verb in ["browser", "chat", "generate", "server"]:
+        _add_generation_args(parser, verb)
+    if verb == "eval":
+        _add_evaluation_args(parser)
+
+    # Add CLI Args related to downloading of model artifacts (if not already downloaded)
+    _add_jit_downloading_args(parser)
+
+    # Add CLI Args that are general to subcommand cli execution
+    _add_cli_metadata_args(parser)
+
+    # WIP Features (suppressed from --help)
+    _add_distributed_args(parser)
+    _add_custom_model_args(parser)
+    _add_speculative_execution_args(parser)
+
+
+# Add CLI Args related to model specification (what base model to use)
+def _add_model_specification_args(parser) -> None:
+    model_specification_parser = parser.add_argument_group("Model Specification", "(REQUIRED) Specify the base model. Args are mutually exclusive.")
+    exclusive_parser = model_specification_parser.add_mutually_exclusive_group(required=True)
     exclusive_parser.add_argument(
         "model",
         type=str,
@@ -81,50 +113,12 @@ def add_arguments_for_verb(parser, verb: str) -> None:
         # "Use the specified GGUF model file",
     )
 
-    # Add argument groups for exported model path IO
-    _add_exported_input_path_args(parser, verb)
-    _add_export_output_path_args(parser, verb)
-    _add_model_config_args(parser, verb)
-
-    # Add thematic argument groups based on the subcommand
-    if verb in ["browser", "chat", "generate", "server"]:
-        _add_generation_args(parser, verb)
-    if verb == "eval":
-        _add_evaluation_args(parser)
-
-    parser.add_argument(
+    model_specification_parser.add_argument(
         "--is-chat-model",
         action="store_true",
         # help="Indicate that the model was trained to support chat functionality",
         help=argparse.SUPPRESS,
     )
-
-    parser.add_argument(
-        "--hf-token",
-        type=str,
-        default=None,
-        help="A HuggingFace API token to use when downloading model artifacts",
-    )
-    parser.add_argument(
-        "--model-directory",
-        type=Path,
-        default=default_model_dir,
-        help=f"The directory to store downloaded model artifacts. Default: {default_model_dir}",
-    )
-    parser.add_argument(
-        "--profile",
-        type=Path,
-        default=None,
-        # help="Profile path.",
-        help=argparse.SUPPRESS,
-    )
-    _add_cli_metadata_args(parser)
-
-    # WIP Features (suppressed from --help)
-    _add_distributed_args(parser)
-    _add_custom_model_args(parser)
-    _add_speculative_execution_args(parser)
-
 
 # Add CLI Args representing user provided exported model files
 def _add_model_config_args(parser, verb: str) -> None:
@@ -167,7 +161,7 @@ def _add_export_output_path_args(parser, verb: str) -> None:
     is_export = verb == "export"
 
     output_path_parser = parser.add_argument_group(
-        "Export Output Path Args" if is_export else None,
+        "Export Output Path" if is_export else None,
         "Specify the output path for the exported model files" if is_export else None,
     )
     exclusive_parser = output_path_parser.add_mutually_exclusive_group()
@@ -190,7 +184,7 @@ def _add_exported_input_path_args(parser, verb: str) -> None:
     is_generation_verb = verb in GENERATION_VERBS
 
     exported_model_path_parser = parser.add_argument_group(
-        "Exported Model Path Args" if is_generation_verb else None,
+        "Exported Model Path" if is_generation_verb else None,
         "Specify the path of the exported model files to ingest" if is_generation_verb else None,
     )
     exclusive_parser = exported_model_path_parser.add_mutually_exclusive_group()
@@ -207,9 +201,31 @@ def _add_exported_input_path_args(parser, verb: str) -> None:
         help="Use the specified ExecuTorch .pte model file" if is_generation_verb else argparse.SUPPRESS,
     )
 
+# Add CLI Args related to JIT downloading of model artifacts
+def _add_jit_downloading_args(parser) -> None:
+    jit_downloading_parser = parser.add_argument_group("Model Downloading", "Specify args for model downloading (if model is not downloaded)",)
+    jit_downloading_parser.add_argument(
+        "--hf-token",
+        type=str,
+        default=None,
+        help="A HuggingFace API token to use when downloading model artifacts",
+    )
+    jit_downloading_parser.add_argument(
+        "--model-directory",
+        type=Path,
+        default=default_model_dir,
+        help=f"The directory to store downloaded model artifacts. Default: {default_model_dir}",
+    )
     
 # Add CLI Args that are general to subcommand cli execution
 def _add_cli_metadata_args(parser) -> None:
+    parser.add_argument(
+        "--profile",
+        type=Path,
+        default=None,
+        # help="Profile path.",
+        help=argparse.SUPPRESS,
+    )
     parser.add_argument(
         "-v",
         "--verbose",
@@ -255,7 +271,7 @@ def _configure_artifact_inventory_args(parser, verb: str) -> None:
 # Add CLI Args specific to user prompted generation
 def _add_generation_args(parser, verb: str) -> None:
     generator_parser = parser.add_argument_group(
-        "Generation Args", "Configs for generating output based on provided prompt"
+        "Generation", "Configs for generating output based on provided prompt"
     )
     generator_parser.add_argument(
         "--prompt",
@@ -307,7 +323,7 @@ def _add_generation_args(parser, verb: str) -> None:
 # Add CLI Args specific to Model Evaluation
 def _add_evaluation_args(parser) -> None:
     eval_parser = parser.add_argument_group(
-        "Evaluation Args", "Configs for evaluating model performance"
+        "Evaluation", "Configs for evaluating model performance"
     )
     eval_parser.add_argument(
         "--tasks",
