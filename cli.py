@@ -120,7 +120,7 @@ def _add_model_specification_args(parser) -> None:
         help=argparse.SUPPRESS,
     )
 
-# Add CLI Args representing user provided exported model files
+# Add CLI Args related to model configuration (compilation, quant, etc)
 def _add_model_config_args(parser, verb: str) -> None:
     model_config_parser = parser.add_argument_group("Model Configuration", "Specify model configurations")
     model_config_parser.add_argument(
@@ -156,7 +156,7 @@ def _add_model_config_args(parser, verb: str) -> None:
         help="Hardware device to use. Options: cpu, cuda, mps",
     )
 
-# Add CLI Args representing user provided exported model files
+# Add CLI Args representing output paths of exported model files
 def _add_export_output_path_args(parser, verb: str) -> None:
     is_export = verb == "export"
 
