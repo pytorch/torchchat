@@ -348,7 +348,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 <summary>Approach 1 (Recommended): Android Studio</summary>
 
 
-If you have Android Studio set up, and you have Java 17 and Android SDK 34 configured, you can follow this step.
+If you have Android Studio set up, and you have Java 17 and [Android SDK 34](https://developer.android.com/about/versions/14/setup-sdk) configured, you can follow this step.
 
 First, you need to download ones of the following AAR files which contains the required Java library and its corresponding JNI library, for the app to build and run. You need to create directory `android/Torchchat/app/libs/` if it does not exist. You need to rename the downloaded AAR file to `executorch.aar` and move the file to `android/Torchchat/app/libs/`.
 
