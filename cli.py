@@ -72,6 +72,14 @@ def add_arguments_for_verb(parser, verb: str) -> None:
         default="not_specified",
         help="Use the specified model checkpoint path",
     )
+    # See _add_custom_model_args() for more details
+    exclusive_parser.add_argument(
+        "--gguf-path",
+        type=Path,
+        default=None,
+        help=argparse.SUPPRESS,
+        # "Use the specified GGUF model file",
+    )
 
     # Add argument groups for exported model path IO
     _add_exported_input_path_args(parser, verb)
@@ -357,13 +365,6 @@ def _add_custom_model_args(parser) -> None:
         default=None,
         help=argparse.SUPPRESS,
         # "Use the specified parameter file",
-    )
-    parser.add_argument(
-        "--gguf-path",
-        type=Path,
-        default=None,
-        help=argparse.SUPPRESS,
-        # "Use the specified GGUF model file",
     )
     parser.add_argument(
         "--tokenizer-path",
