@@ -69,7 +69,7 @@ setup_android_sdk_manager() {
   fi
   pushd ${TORCHCHAT_ROOT}/build/android
   mkdir -p sdk/cmdline-tools/latest
-  rm -r sdk/cmdline-tools/latest/*
+  rm -r sdk/cmdline-tools/latest/* || true
 
   echo "Download Android SDK Manager"
   curl "${SDK_MANAGER_URL}" -o commandlinetools.zip
