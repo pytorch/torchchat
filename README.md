@@ -357,7 +357,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 #### Steps
 
-1. Download the AAR file containing the Java library and its corresponding JNI library, used build and run the app. 
+1. Download the AAR file, which contains the Java library and corresponding JNI library, to build and run the app. 
 
    - [executorch-llama-tiktoken-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc3-0719.aar) (SHASUM: c3e5d2a97708f033c2b1839a89f12f737e3bbbef)
 
