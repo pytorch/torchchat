@@ -343,41 +343,52 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 ### Deploy and run on Android
 
-The following assumes you've completed the steps for [Setting up ExecuTorch](#set-up-executorch). In torchchat, we show 2 approaches for Android deployment:
+The following assumes you've completed the steps for [Setting up ExecuTorch](#set-up-executorch). 
 
 <details>
 <summary>Approach 1 (Recommended): Android Studio</summary>
 
+#### Requirements
+- Android Studio
+- [Java 17](https://developer.android.com/build/jdks)
+- [Android SDK 34](https://developer.android.com/about/versions/14/setup-sdk)
+- [adb](https://developer.android.com/tools/adb)
 
-If you have Android Studio set up, and you have [Java 17](https://developer.android.com/build/jdks) and [Android SDK 34](https://developer.android.com/about/versions/14/setup-sdk) configured, and [adb](https://developer.android.com/tools/adb) set up, you can follow this step.
 
-First, you need to download the AAR file which contains the required Java library and its corresponding JNI library, for the app to build and run. You need to create directory `android/Torchchat/app/libs/` if it does not exist. You need to rename the downloaded AAR file to `executorch.aar` and move the file to `android/Torchchat/app/libs/`.
+#### Steps
 
-[executorch-llama-tiktoken-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc3-0719.aar) (SHASUM: c3e5d2a97708f033c2b1839a89f12f737e3bbbef)
+1. Download the AAR file containing the Java library and its corresponding JNI library, used build and run the app. 
 
-> Note: The AAR file listed above comes with tiktoken tokenizer, which is used for llama3 model. If you want to use a model with BPE tokenizer (llama2 model for example), you can download this AAR: [executorch-llama-bpe-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar) (SHASUM: d5fe81d9a4700c36b50ae322e6bf34882134edb0)
->
-> Currently the tokenizer is built at compile time, so you need to re-build the app when you need to use a different tokenizer for different model.
-> 
-> The script to build the AAR can be found [here](https://github.com/pytorch/executorch/blob/main/build/build_android_library.sh). If you need to tweak with the tokenizer or runtime (for example use your own tokenizer or runtime library), you can modify the ExecuTorch code and use that script to build the AAR library. 
+   - [executorch-llama-tiktoken-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc3-0719.aar) (SHASUM: c3e5d2a97708f033c2b1839a89f12f737e3bbbef)
 
-You also need to push the model and tokenizer file to your device. Please refer to the docs above on generating the .pte and .model/.bin file, or use E2E script (see section below) to generate and push the file.
+2. Rename the downloaded AAR file to `executorch.aar` and move the file to `android/Torchchat/app/libs/`. You may need to create directory `android/Torchchat/app/libs/` if it does not exist.
 
-```
-adb shell mkdir -p /data/local/tmp/llama
-adb push <model.pte> /data/local/tmp/llama
-adb push <tokenizer.model or tokenizer.bin> /data/local/tmp/llama
-```
+3. Push the model and tokenizer file to your device. You can find the model file called `llama3.pte` in the current `torchchat` directory and the tokenizer file at `$(python3 torchchat.py where llama3)/tokenizer.model` path.
+    ```
+    adb shell mkdir -p /data/local/tmp/llama
+    adb push <model.pte> /data/local/tmp/llama
+    adb push <tokenizer.model or tokenizer.bin> /data/local/tmp/llama
+    ```
 
-Now, you can open the torchchat app skeleton, which is located at `android/Torchchat`. Use Android Studio to open this directory.
+4. Use Android Studio to open the torchchat app skeleton, located at `android/Torchchat`. 
 
-Then, click the Play button (^R) to launch it to emulator/device.
+5. Click the Play button (^R) to launch it to emulator/device.
 
-> Note: We recommend you to use a device with at least 12GB RAM and 20GB storage. If you use an emulated device, you can see [this post](https://stackoverflow.com/questions/45517553/cant-change-the-ram-size-in-avd-manager-android-studio) on setting the RAM.
+    - We recommend using a device with at least 12GB RAM and 20GB storage.
+    - If using an emulated device, refer to [this post](https://stackoverflow.com/questions/45517553/cant-change-the-ram-size-in-avd-manager-android-studio) on how to set the RAM.
 
-Now, follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem and issue a prompt.
+6. Follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem. Then issue a prompt.
 
-<img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
+    <img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
+
+**Note:** The AAR file listed above comes with tiktoken tokenizer, which is used for llama3 model. If you want to use a model with BPE tokenizer (llama2 model for example), 
+use this AAR 
+
+  * [executorch-llama-bpe-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar) (SHASUM: d5fe81d9a4700c36b50ae322e6bf34882134edb0)
+  * Since the tokenizer is built at compile time, to use a different tokenizer you need to re-build the app.
+
+If you need to tweak or use your own tokenizer and runtime, modify the ExecuTorch code and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library. 
+
 
 </details>
 <details>
