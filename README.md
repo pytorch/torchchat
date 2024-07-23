@@ -143,7 +143,7 @@ streamlit run torchchat.py -- browser llama3
 [skip default]: end
 
 ### Server
-**Note: This feature is still in progress and not all endpoints are working ATM**
+**Note: This feature is still a work in progress and not all endpoints are working**
 
 
 <details>
@@ -395,11 +395,11 @@ sh scripts/android_example.sh
 
 ## Eval
 
+**Note: This feature is still a work in progress and not all features are working**
+
 Uses the lm_eval library to evaluate model accuracy on a variety of
 tasks. Defaults to wikitext and can be manually controlled using the
-tasks and limit args.
-
-See [Evaluation](docs/evaluation.md)
+tasks and limit args. See [Evaluation](docs/evaluation.md)
 
 **Examples**
 
