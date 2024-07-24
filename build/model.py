@@ -5,7 +5,6 @@
 # LICENSE file in the root directory of this source tree.
 import json
 import os
-import math
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -376,7 +375,7 @@ def apply_scaling(freqs: torch.Tensor):
     high_freq_wavelen = old_context_len / high_freq_factor
     new_freqs = []
     for freq in freqs:
-        wavelen = 2 * math.pi / freq
+        wavelen = 2 * torch.pi / freq
         if wavelen < high_freq_wavelen:
             new_freqs.append(freq)
         elif wavelen > low_freq_wavelen:
