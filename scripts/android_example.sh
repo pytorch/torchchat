@@ -92,13 +92,13 @@ setup_android_sdk() {
 }
 
 download_aar_library() {
-  mkdir -p ${TORCHCHAT_ROOT}/android/Torchchat/app/libs
-  curl "${LLAMA_AAR_URL}" -o ${TORCHCHAT_ROOT}/android/Torchchat/app/libs/executorch.aar
-  echo "${LLAMA_AAR_SHASUM}  ${TORCHCHAT_ROOT}/android/Torchchat/app/libs/executorch.aar" | shasum --check --status
+  mkdir -p ${TORCHCHAT_ROOT}/android/torchchat/app/libs
+  curl "${LLAMA_AAR_URL}" -o ${TORCHCHAT_ROOT}/android/torchchat/app/libs/executorch.aar
+  echo "${LLAMA_AAR_SHASUM}  ${TORCHCHAT_ROOT}/android/torchchat/app/libs/executorch.aar" | shasum --check --status
 }
 
 build_app() {
-  pushd android/Torchchat
+  pushd android/torchchat
   ./gradlew :app:build
   popd
 }
@@ -141,7 +141,7 @@ push_files_to_android() {
 }
 
 run_android_instrumented_test() {
-  pushd android/Torchchat
+  pushd android/torchchat
   ./gradlew connectedAndroidTest
   popd
 }
@@ -158,7 +158,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   run_android_instrumented_test
 fi
 
-adb install -t android/Torchchat/app/build/outputs/apk/debug/app-debug.apk
+adb install -t android/torchchat/app/build/outputs/apk/debug/app-debug.apk
 
 if [ -z "${CI_ENV:-}" ]; then
   read -p "Press enter to exit emulator and finish"
