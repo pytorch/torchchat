@@ -83,19 +83,19 @@ options:
 
 [skip default]: end
 
-__Python Inference__: chat, generate, browser, server
+__Python Inference__ (chat, generate, browser, server)
 * These commands represent different flavors of performing model inference in a Python enviroment.
 * Models are constructed either from CLI args or from loading exported artifacts.
 
-__Exporting__: export
+__Exporting__ (export)
 * This command generates model artifacts that are consumed by Python Inference or Native Runners.
 * More information is provided in the [AOT Inductor](https://github.com/pytorch/torchchat?tab=readme-ov-file#aoti-aot-inductor) and [ExecuTorch](https://github.com/pytorch/torchchat?tab=readme-ov-file#export-for-mobile) sections.
 
-__Inventory Management__: download, list, remove, where
+__Inventory Management__ (download, list, remove, where)
 * These commands are used to manage and download models.
 * More information is provided in the [Download Weights](https://github.com/pytorch/torchchat?tab=readme-ov-file#download-weights) section.
 
-__Evaluation__: eval
+__Evaluation__ (eval)
 * This command test model fidelity via EleutherAI's [lm_evaluation_harness](https://github.com/EleutherAI/lm-evaluation-harness).
 * More information is provided in the [Evaluation](https://github.com/pytorch/torchchat?tab=readme-ov-file#eval) section.
 
