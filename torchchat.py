@@ -34,16 +34,16 @@ if __name__ == "__main__":
     subparsers.required = True
 
     VERB_HELP = {
-        "chat": "Chat interactively with a model",
-        "browser": "Chat interactively in a browser",
-        "server": "Server to interact with the model",
-        "download": "Download a model from Hugging Face or others",
+        "chat": "Chat interactively with a model via the CLI",
+        "browser": "Chat interactively with a model in a locally hosted browser",
         "generate": "Generate responses from a model given a prompt",
-        "eval": "Evaluate a model given a prompt",
-        "export": "Export a model for AOT Inductor or ExecuTorch",
-        "list": "List supported models",
+        "export": "Export a model artifact for AOT Inductor or ExecuTorch",
+        "eval": "Evaluate a model via lm-eval",
+        "download": "Download model artifacts",
+        "list": "List all supported models",
         "remove": "Remove downloaded model artifacts",
         "where": "Return directory containing downloaded model artifacts",
+        "server": "[WIP] Starts a locally hosted REST server for model interaction",
     }
     for verb in KNOWN_VERBS:
         subparser = subparsers.add_parser(verb, help=VERB_HELP[verb])
