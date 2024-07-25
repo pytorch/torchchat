@@ -498,7 +498,7 @@ link provided in the error to get access.
 If `./scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
 
 ## Filing Issues
-Please ensure you include the exact command you ran and the output of that command.
+Please include the exact command you ran and the output of that command.
 Also, run this script and include the output saved to `system_info.txt` so that we can better debug your issue.
 
 ```
