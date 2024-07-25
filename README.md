@@ -49,14 +49,58 @@ source .venv/bin/activate
 
 [shell default]: ./install_requirements.sh
 
-Installations can be tested by running
+## Commands
+
+The interfaces of torchchat are leveraged through **Python Commands** and **Native Runners**. While the Python Commands are enumerable in the --help menu, the latter are explored in their respective sections.
 
 ```bash
-# ensure everything installed correctly
 python3 torchchat.py --help
 ```
 
-### Download Weights
+[skip default]: begin
+
+```bash
+# Output
+usage: torchchat [-h] {chat,browser,generate,export,eval,download,list,remove,where,server} ...
+
+positional arguments:
+  {chat,browser,generate,export,eval,download,list,remove,where,server}
+                        The specific command to run
+    chat                Chat interactively with a model via the CLI
+    generate            Generate responses from a model given a prompt
+    browser             Chat interactively with a model in a locally hosted browser
+    export              Export a model artifact to AOT Inductor or ExecuTorch
+    download            Download model artifacts
+    list                List all supported models
+    remove              Remove downloaded model artifacts
+    where               Return directory containing downloaded model artifacts
+    server              [WIP] Starts a locally hosted REST server for model interaction
+    eval                Evaluate a model via lm-eval
+
+options:
+  -h, --help            show this help message and exit
+```
+
+[skip default]: end
+
+__Python Inference__ (chat, generate, browser, server)
+* These commands represent different flavors of performing model inference in a Python enviroment.
+* Models are constructed either from CLI args or from loading exported artifacts.
+
+__Exporting__ (export)
+* This command generates model artifacts that are consumed by Python Inference or Native Runners.
+* More information is provided in the [AOT Inductor](https://github.com/pytorch/torchchat?tab=readme-ov-file#aoti-aot-inductor) and [ExecuTorch](https://github.com/pytorch/torchchat?tab=readme-ov-file#export-for-mobile) sections.
+
+__Inventory Management__ (download, list, remove, where)
+* These commands are used to manage and download models.
+* More information is provided in the [Download Weights](https://github.com/pytorch/torchchat?tab=readme-ov-file#download-weights) section.
+
+__Evaluation__ (eval)
+* This command test model fidelity via EleutherAI's [lm_evaluation_harness](https://github.com/EleutherAI/lm-evaluation-harness).
+* More information is provided in the [Evaluation](https://github.com/pytorch/torchchat?tab=readme-ov-file#eval) section.
+
+
+## Download Weights
 Most models use Hugging Face as the distribution channel, so you will need to create a Hugging Face account.
 Create a Hugging Face user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens) with the `write` role.
 
@@ -165,6 +209,8 @@ In the other terminal window, interact with the API using curl. Depending on the
 
 **Example Input + Output**
 
+[skip default]: begin
+
 ```
 curl http://127.0.0.1:5000/chat \
   -H "Content-Type: application/json" \
@@ -185,6 +231,8 @@ curl http://127.0.0.1:5000/chat \
 ```
 {"response":" I'm a software developer with a passion for building innovative and user-friendly applications. I have experience in developing web and mobile applications using various technologies such as Java, Python, and JavaScript. I'm always looking for new challenges and opportunities to learn and grow as a developer.\n\nIn my free time, I enjoy reading books on computer science and programming, as well as experimenting with new technologies and techniques. I'm also interested in machine learning and artificial intelligence, and I'm always looking for ways to apply these concepts to real-world problems.\n\nI'm excited to be a part of the developer community and to have the opportunity to share my knowledge and experience with others. I'm always happy to help with any questions or problems you may have, and I'm looking forward to learning from you as well.\n\nThank you for visiting my profile! I hope you find my information helpful and interesting. If you have any questions or would like to discuss any topics, please feel free to reach out to me. I"}
 ```
+
+[skip default]: end
 
 </details>
 
