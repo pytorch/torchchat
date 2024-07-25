@@ -256,6 +256,9 @@ class OpenAiApiGenerator(Generator):
             start_pos=self.start_pos,
             max_seq_length=self.max_seq_length,
         ):
+            if y is None:
+                continue
+
             # Decode the torch.Tensor token to a string and append to the buffer. Separate the sequences with a period token.
             content = "".join(
                 self.tokenizer.decode([self.tokenizer.encode(".")[0]] + y.tolist())[1:]

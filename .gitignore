@@ -18,3 +18,6 @@ runner-aoti/cmake-out/*
 
 # pte files
 *.pte
+
+# debug / logging files
+system_info.txt

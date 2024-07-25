@@ -295,7 +295,7 @@ def _add_generation_args(parser, verb: str) -> None:
         "--num-samples",
         type=int,
         default=1,
-        help="Number of samples",
+        help="Number of samples" if verb == "generate" else argparse.SUPPRESS,
     )
     generator_parser.add_argument(
         "--max-new-tokens",

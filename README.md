@@ -91,7 +91,7 @@ python3 torchchat.py list
 ```
 
 ### Where
-This subcommands shows location of a particular model. 
+This subcommands shows location of a particular model.
 ```bash
 python3 torchchat.py list
 ```
@@ -162,7 +162,7 @@ python3 torchchat.py server llama3
 [skip default]: end
 
 In the other terminal window, interact with the API using curl. Depending on the model configuration, this query might take a few minutes to respond
-  
+
 **Example Input + Output**
 
 ```
@@ -222,7 +222,7 @@ To run in a C++ enviroment, we need to build the runner binary.
 scripts/build_native.sh aoti
 ```
 
-Then run the compiled executable, with the exported DSO from earlier: 
+Then run the compiled executable, with the exported DSO from earlier:
 ```bash
 cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time"
 ```
@@ -344,7 +344,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 ### Deploy and run on Android
 
-The following assumes you've completed the steps for [Setting up ExecuTorch](#set-up-executorch). 
+The following assumes you've completed the steps for [Setting up ExecuTorch](#set-up-executorch).
 
 <details>
 <summary>Approach 1 (Recommended): Android Studio</summary>
@@ -358,7 +358,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 #### Steps
 
-1. Download the AAR file, which contains the Java library and corresponding JNI library, to build and run the app. 
+1. Download the AAR file, which contains the Java library and corresponding JNI library, to build and run the app.
 
    - [executorch-llama-tiktoken-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc3-0719.aar) (SHASUM: c3e5d2a97708f033c2b1839a89f12f737e3bbbef)
 
@@ -382,13 +382,13 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
     <img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
 
-**Note:** The AAR file listed above comes with tiktoken tokenizer, which is used for llama3 model. If you want to use a model with BPE tokenizer (llama2 model for example), 
-use this AAR 
+**Note:** The AAR file listed above comes with tiktoken tokenizer, which is used for llama3 model. If you want to use a model with BPE tokenizer (llama2 model for example),
+use this AAR
 
   * [executorch-llama-bpe-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar) (SHASUM: d5fe81d9a4700c36b50ae322e6bf34882134edb0)
   * Since the tokenizer is built at compile time, to use a different tokenizer you need to re-build the app.
 
-If you need to tweak or use your own tokenizer and runtime, modify the ExecuTorch code and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library. 
+If you need to tweak or use your own tokenizer and runtime, modify the ExecuTorch code and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library.
 
 
 </details>
@@ -436,6 +436,8 @@ aliases.
 
 | Model | Mobile Friendly | Notes |
 |------------------|---|---------------------|
+|[meta-llama/Meta-Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3.1`.|
+|[meta-llama/Meta-Llama-3.1-8B](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B)|✅|Best for `generate`. Alias to `llama3.1-base`.|
 |[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3`.|
 |[meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅|Best for `generate`. Alias to `llama3-base`.|
 |[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|✅|Tuned for `chat`. Alias to `llama2`.|
@@ -486,7 +488,6 @@ We really value our community and the contributions made by our wonderful users.
 
 ## Troubleshooting
 
-
 **CERTIFICATE_VERIFY_FAILED**
 Run `pip install --upgrade certifi`.
 
@@ -498,6 +499,13 @@ link provided in the error to get access.
 **Installing ET Fails**
 If `./scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
 
+## Filing Issues
+Please include the exact command you ran and the output of that command.
+Also, run this script and include the output saved to `system_info.txt` so that we can better debug your issue.
+
+```
+(echo "Operating System Information"; uname -a; echo ""; cat /etc/os-release; echo ""; echo "Python Version"; python --version || python3 --version; echo ""; echo "PIP Version"; pip --version || pip3 --version; echo ""; echo "Installed Packages"; pip freeze || pip3 freeze; echo ""; echo "PyTorch Version"; python -c "import torch; print(torch.__version__)" || python3 -c "import torch; print(torch.__version__)"; echo ""; echo "Collection Complete") > system_info.txt
+```
 
 ## Disclaimer
 The torchchat Repository Content is provided without any guarantees
