@@ -4,11 +4,11 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-from flask import Flask, jsonify, request
+from api.api import AssistantMessage, CompletionRequest, OpenAiApiGenerator
 
 from build.builder import BuilderArgs, TokenizerArgs
+from flask import Flask, jsonify, request, Response
 from generate import GeneratorArgs
-from api.api import CompletionRequest, OpenAiApiGenerator, AssistantMessage
 
 app = Flask(__name__)
 # Messages and gen are kept global so they can be accessed by the flask app endpoints.
@@ -23,10 +23,11 @@ def chat_endpoint():
     This endpoint emulates the behavior of the OpenAI Chat API. (https://platform.openai.com/docs/api-reference/chat)
     """
     data = request.get_json()
+
     # Add user message to chat history
     messages.append(data["messages"][-1])
     prompt = messages[-1]["content"]
-    
+
     # Generate the assistant response
     req = CompletionRequest(
         model=gen.builder_args.checkpoint_path,
@@ -36,18 +37,24 @@ def chat_endpoint():
     )
 
     response = ""
+
     def unwrap(completion_generator):
         token_count = 0
         for chunk_response in completion_generator:
             content = chunk_response.choices[0].delta.content
-            if not gen.is_llama3_model or content not in set(gen.tokenizer.special_tokens.keys()):
+            if not gen.is_llama3_model or content not in set(
+                gen.tokenizer.special_tokens.keys()
+            ):
                 yield content if content is not None else ""
             if content == gen.tokenizer.eos_id():
                 yield "."
             token_count += 1
 
-    for content in unwrap(gen.completion(req)):
-        response += content
+    if data.get("stream") == "true":
+        return Response(unwrap(gen.completion(req)), mimetype="text/event-stream")
+    else:
+        for content in unwrap(gen.completion(req)):
+            response += content
 
     # Add assistant response to chat history
     messages.append(AssistantMessage(content=response))
