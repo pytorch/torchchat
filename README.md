@@ -424,7 +424,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
     adb push <tokenizer.model or tokenizer.bin> /data/local/tmp/llama
     ```
 
-4. Use Android Studio to open the torchchat app skeleton, located at `android/Torchchat`.
+4. Use Android Studio to open the torchchat app skeleton, located at `android/torchchat`.
 
 5. Click the Play button (^R) to launch it to emulator/device.
 
