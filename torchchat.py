@@ -35,18 +35,18 @@ if __name__ == "__main__":
 
     VERB_HELP = {
         "chat": "Chat interactively with a model via the CLI",
-        "browser": "Chat interactively with a model in a locally hosted browser",
         "generate": "Generate responses from a model given a prompt",
-        "export": "Export a model artifact for AOT Inductor or ExecuTorch",
-        "eval": "Evaluate a model via lm-eval",
+        "browser": "Chat interactively with a model in a locally hosted browser",
+        "export": "Export a model artifact to AOT Inductor or ExecuTorch",
         "download": "Download model artifacts",
         "list": "List all supported models",
         "remove": "Remove downloaded model artifacts",
         "where": "Return directory containing downloaded model artifacts",
         "server": "[WIP] Starts a locally hosted REST server for model interaction",
+        "eval": "Evaluate a model via lm-eval",
     }
-    for verb in KNOWN_VERBS:
-        subparser = subparsers.add_parser(verb, help=VERB_HELP[verb])
+    for verb, description in VERB_HELP.items():
+        subparser = subparsers.add_parser(verb, help=description)
         add_arguments_for_verb(subparser, verb)
 
     # Now parse the arguments
