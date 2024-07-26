@@ -256,7 +256,7 @@ python3 torchchat.py export llama3 --output-dso-path exportedModels/llama3.so
 
 > [!NOTE]
 > If your machine has cuda add this flag for performance
-`--quantize config/data/cuda.json` when exporting. You'll also need to tell generate to use `--device cuda` and the runner to use `-d CUDA`
+`--quantize config/data/cuda.json` when exporting.
 
 
 ### Run in a Python Enviroment
@@ -266,6 +266,7 @@ To run in a python enviroment, use the generate subcommand like before, but incl
 ```
 python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --prompt "Hello my name is"
 ```
+**Note:** Depending on which accelerator is used to generate the .dso file, the command may need the device specified: `--device (cuda | cpu)`.
 
 
 ### Run using our C++ Runner
@@ -275,10 +276,11 @@ To run in a C++ enviroment, we need to build the runner binary.
 scripts/build_native.sh aoti
 ```
 
-Then run the compiled executable, with the exported DSO from earlier:
+Then run the compiled executable, with the exported DSO from earlier.
 ```bash
 cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time"
 ```
+**Note:** Depending on which accelerator is used to generate the .dso file, the runner may need the device specified: `-d (CUDA | CPU)`.
 
 ## Mobile Execution
 
