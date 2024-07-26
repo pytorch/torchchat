@@ -389,9 +389,11 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 *Click the image below to see it in action!*
 
+<p align="center">
 <a href="https://pytorch.org/executorch/main/_static/img/llama_ios_app.mp4">
   <img src="https://pytorch.org/executorch/main/_static/img/llama_ios_app.png" width="600" alt="iOS app running a LlaMA model">
 </a>
+</p>
 </details>
 
 
@@ -433,15 +435,13 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 6. Follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem. Then issue a prompt.
 
+**Note:** The AAR file listed in Step 1 has the tiktoken tokenizer, which is used for Llama 3. To tweak or use a custom tokenizer and runtime, modify the ExecuTorch code 
+and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library.
+
+<p align="center">
     <img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
+</p>
 
-**Note:** The AAR file listed above comes with tiktoken tokenizer, which is used for llama3 model. If you want to use a model with BPE tokenizer (llama2 model for example),
-use this AAR
-
-  * [executorch-llama-bpe-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar) (SHASUM: d5fe81d9a4700c36b50ae322e6bf34882134edb0)
-  * Since the tokenizer is built at compile time, to use a different tokenizer you need to re-build the app.
-
-If you need to tweak or use your own tokenizer and runtime, modify the ExecuTorch code and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library.
 
 
 </details>
