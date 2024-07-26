@@ -195,8 +195,7 @@ streamlit run torchchat.py -- browser llama3
 
 To test out the REST API, **you'll need 2 terminals**: one to host the server, and one to send the request.
 
-
-In one terminal, kick off the server
+In one terminal, start the server
 
 [skip default]: begin
 
@@ -205,7 +204,11 @@ python3 torchchat.py server llama3
 ```
 [skip default]: end
 
-In the other terminal window, interact with the API using curl. Depending on the model configuration, this query might take a few minutes to respond
+In another terminal, query the server using `curl`. Depending on the model configuration, this query might take a few minutes to respond.
+
+Setting `stream` to "true" in the request emits a response in chunks. Currently, this response
+is plaintext and will not be formatted to the OpenAI API specification. If `stream` is unset or not "true", then the client will await the full response from the server.
+
 
 **Example Input + Output**
 
@@ -216,6 +219,7 @@ curl http://127.0.0.1:5000/chat \
   -H "Content-Type: application/json" \
   -d '{
     "model": "llama3",
+    "stream": "true",
     "messages": [
       {
         "role": "system",
@@ -233,6 +237,7 @@ curl http://127.0.0.1:5000/chat \
 ```
 
 [skip default]: end
+
 
 </details>
 

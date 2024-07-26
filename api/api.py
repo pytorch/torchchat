@@ -78,6 +78,16 @@ class AssistantMessage(_AbstractMessage):
 
 
 @dataclass
+class StreamOptions:
+    """Parameters for streamed responses.
+
+    Only set when `stream` is set to `true` in the request.
+    """
+
+    include_usage: bool = False
+
+
+@dataclass
 class CompletionRequest:
     """A full chat completion request.
 
@@ -90,6 +100,8 @@ class CompletionRequest:
     frequency_penalty: float = 0.0
     temperature: float = 0.0
     stop: Optional[List[str]] = None
+    stream: bool = False
+    stream_options: Optional[StreamOptions] = None
     echo: bool = False
     frequency_penalty: float = 0.0
     guided_decode_json_schema: str = None
