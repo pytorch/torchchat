@@ -367,7 +367,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 #### Requirements
 - [Xcode](https://apps.apple.com/us/app/xcode/id497799835?mt=12/) 15.0 or later
 - [Cmake](https://cmake.org/download/) 3.19 or later
-  - Download and open macOS 10.13 or later `.dmg` installer and move the Cmake app to `/Applications` folder.
+  - Download and open the macOS `.dmg` installer and move the Cmake app to `/Applications` folder.
   - Install Cmake command line tools: `sudo /Applications/CMake.app/Contents/bin/cmake-gui --install`
 - A development provisioning profile with the [`increased-memory-limit`](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_developer_kernel_increased-memory-limit) entitlement.
 
