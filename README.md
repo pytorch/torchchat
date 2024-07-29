@@ -155,6 +155,13 @@ More information about these commands can be found by adding the `--help` option
 
 ## Running via PyTorch / Python
 
+The simplest way to run a model in PyTorch is via [eager execution](https://pytorch.org/blog/optimizing-production-pytorch-performance-with-graph-transformations/).
+This is the default execution mode for both PyTorch and torchchat. It performs inference
+without creating exporting artifacts or using a separate runner.
+
+The model used for inference can also be configured and tailored to specific needs
+(compilation, quantization, etc.). See the [customization guide](docs/model_customization.md) for the options supported by torchchat.
+
 > [!TIP]
 > For more information about these commands, please refer to the `--help` menu.
 
@@ -258,6 +265,8 @@ python3 torchchat.py export llama3 --output-dso-path exportedModels/llama3.so
 > If your machine has cuda add this flag for performance
 `--quantize config/data/cuda.json` when exporting.
 
+For more details on quantization and what settings to use for your use
+case visit our [customization guide](docs/model_customization.md).
 
 ### Run in a Python Enviroment
 
@@ -320,7 +329,7 @@ llama3 model to reduce model size and improve performance for
 on-device use cases.
 
 For more details on quantization and what settings to use for your use
-case visit our [Quantization documentation](docs/quantization.md).
+case visit our [customization guide](docs/model_customization.md).
 
 ### Deploy and run on Desktop
 
