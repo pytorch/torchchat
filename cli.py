@@ -122,16 +122,17 @@ def _add_model_specification_args(parser) -> None:
 
 # Add CLI Args related to model configuration (compilation, quant, etc)
 def _add_model_config_args(parser, verb: str) -> None:
+    is_not_export = verb != "export"
     model_config_parser = parser.add_argument_group("Model Configuration", "Specify model configurations")
     model_config_parser.add_argument(
         "--compile",
         action="store_true",
-        help="Whether to compile the model with torch.compile",
+        help="Whether to compile the model with torch.compile" if is_not_export else argparse.SUPPRESS,
     )
     model_config_parser.add_argument(
         "--compile-prefill",
         action="store_true",
-        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times.",
+        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times." if is_not_export else argparse.SUPPRESS,
     )
     model_config_parser.add_argument(
         "--dtype",
