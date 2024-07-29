@@ -17,7 +17,7 @@ from gguf import GGUFValueType
 from quantization.qops import LinearInt4 as WeightOnlyInt4Linear
 from quantization.quantize import pack_scales_and_zeros
 from build.gguf_util import Q4_0, to_float
-from build.model import ModelArgs, Transformer
+from build.model import TransformerArgs, Transformer
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -107,7 +107,7 @@ def load_model(gguf_file: str) -> torch.nn.Module:
     arch = metadata["general.architecture"]
     assert arch == "llama", "Only LLaMa models are supported by this converter."
 
-    model_args = ModelArgs(
+    model_args = TransformerArgs(
         dim=metadata[f"{arch}.embedding_length"],
         n_layers=metadata[f"{arch}.block_count"],
         n_heads=metadata[f"{arch}.attention.head_count"],
