@@ -49,14 +49,58 @@ source .venv/bin/activate
 
 [shell default]: ./install_requirements.sh
 
-Installations can be tested by running
+## Commands
+
+The interfaces of torchchat are leveraged through **Python Commands** and **Native Runners**. While the Python Commands are enumerable in the --help menu, the latter are explored in their respective sections.
 
 ```bash
-# ensure everything installed correctly
 python3 torchchat.py --help
 ```
 
-### Download Weights
+[skip default]: begin
+
+```bash
+# Output
+usage: torchchat [-h] {chat,browser,generate,export,eval,download,list,remove,where,server} ...
+
+positional arguments:
+  {chat,browser,generate,export,eval,download,list,remove,where,server}
+                        The specific command to run
+    chat                Chat interactively with a model via the CLI
+    generate            Generate responses from a model given a prompt
+    browser             Chat interactively with a model in a locally hosted browser
+    export              Export a model artifact to AOT Inductor or ExecuTorch
+    download            Download model artifacts
+    list                List all supported models
+    remove              Remove downloaded model artifacts
+    where               Return directory containing downloaded model artifacts
+    server              [WIP] Starts a locally hosted REST server for model interaction
+    eval                Evaluate a model via lm-eval
+
+options:
+  -h, --help            show this help message and exit
+```
+
+[skip default]: end
+
+__Python Inference__ (chat, generate, browser, server)
+* These commands represent different flavors of performing model inference in a Python enviroment.
+* Models are constructed either from CLI args or from loading exported artifacts.
+
+__Exporting__ (export)
+* This command generates model artifacts that are consumed by Python Inference or Native Runners.
+* More information is provided in the [AOT Inductor](https://github.com/pytorch/torchchat?tab=readme-ov-file#aoti-aot-inductor) and [ExecuTorch](https://github.com/pytorch/torchchat?tab=readme-ov-file#export-for-mobile) sections.
+
+__Inventory Management__ (download, list, remove, where)
+* These commands are used to manage and download models.
+* More information is provided in the [Download Weights](https://github.com/pytorch/torchchat?tab=readme-ov-file#download-weights) section.
+
+__Evaluation__ (eval)
+* This command test model fidelity via EleutherAI's [lm_evaluation_harness](https://github.com/EleutherAI/lm-evaluation-harness).
+* More information is provided in the [Evaluation](https://github.com/pytorch/torchchat?tab=readme-ov-file#eval) section.
+
+
+## Download Weights
 Most models use Hugging Face as the distribution channel, so you will need to create a Hugging Face account.
 Create a Hugging Face user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens) with the `write` role.
 
@@ -91,7 +135,7 @@ python3 torchchat.py list
 ```
 
 ### Where
-This subcommands shows location of a particular model. 
+This subcommands shows location of a particular model.
 ```bash
 python3 torchchat.py list
 ```
@@ -151,8 +195,7 @@ streamlit run torchchat.py -- browser llama3
 
 To test out the REST API, **you'll need 2 terminals**: one to host the server, and one to send the request.
 
-
-In one terminal, kick off the server
+In one terminal, start the server
 
 [skip default]: begin
 
@@ -161,15 +204,22 @@ python3 torchchat.py server llama3
 ```
 [skip default]: end
 
-In the other terminal window, interact with the API using curl. Depending on the model configuration, this query might take a few minutes to respond
-  
+In another terminal, query the server using `curl`. Depending on the model configuration, this query might take a few minutes to respond.
+
+Setting `stream` to "true" in the request emits a response in chunks. Currently, this response
+is plaintext and will not be formatted to the OpenAI API specification. If `stream` is unset or not "true", then the client will await the full response from the server.
+
+
 **Example Input + Output**
+
+[skip default]: begin
 
 ```
 curl http://127.0.0.1:5000/chat \
   -H "Content-Type: application/json" \
   -d '{
     "model": "llama3",
+    "stream": "true",
     "messages": [
       {
         "role": "system",
@@ -185,6 +235,9 @@ curl http://127.0.0.1:5000/chat \
 ```
 {"response":" I'm a software developer with a passion for building innovative and user-friendly applications. I have experience in developing web and mobile applications using various technologies such as Java, Python, and JavaScript. I'm always looking for new challenges and opportunities to learn and grow as a developer.\n\nIn my free time, I enjoy reading books on computer science and programming, as well as experimenting with new technologies and techniques. I'm also interested in machine learning and artificial intelligence, and I'm always looking for ways to apply these concepts to real-world problems.\n\nI'm excited to be a part of the developer community and to have the opportunity to share my knowledge and experience with others. I'm always happy to help with any questions or problems you may have, and I'm looking forward to learning from you as well.\n\nThank you for visiting my profile! I hope you find my information helpful and interesting. If you have any questions or would like to discuss any topics, please feel free to reach out to me. I"}
 ```
+
+[skip default]: end
+
 
 </details>
 
@@ -222,7 +275,7 @@ To run in a C++ enviroment, we need to build the runner binary.
 scripts/build_native.sh aoti
 ```
 
-Then run the compiled executable, with the exported DSO from earlier: 
+Then run the compiled executable, with the exported DSO from earlier:
 ```bash
 cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time"
 ```
@@ -314,6 +367,8 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 #### Requirements
 - [Xcode](https://apps.apple.com/us/app/xcode/id497799835?mt=12/) 15.0 or later
 - [Cmake](https://cmake.org/download/) 3.19 or later
+  - Download and open the macOS `.dmg` installer and move the Cmake app to `/Applications` folder.
+  - Install Cmake command line tools: `sudo /Applications/CMake.app/Contents/bin/cmake-gui --install`
 - A development provisioning profile with the [`increased-memory-limit`](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_developer_kernel_increased-memory-limit) entitlement.
 
 
@@ -323,6 +378,15 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
     ```bash
     open et-build/src/executorch/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj
     ```
+
+    > Note: If you're running into any issues related to package dependencies, close Xcode, clean some of the caches and/or the build products, and open the Xcode project again:
+    > ```bash
+    > rm -rf \
+    >   ~/Library/org.swift.swiftpm \
+    >   ~/Library/Caches/org.swift.swiftpm \
+    >   ~/Library/Caches/com.apple.dt.Xcode \
+    >   ~/Library/Developer/Xcode/DerivedData
+    > ```
 2. Click the Play button to launch the app in the Simulator.
 
 3. To run on a device, ensure you have it set up for development and a provisioning profile with the `increased-memory-limit` entitlement. Update the app's bundle identifier to match your provisioning profile with the required capability.
@@ -344,7 +408,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 ### Deploy and run on Android
 
-The following assumes you've completed the steps for [Setting up ExecuTorch](#set-up-executorch). 
+The following assumes you've completed the steps for [Setting up ExecuTorch](#set-up-executorch).
 
 <details>
 <summary>Approach 1 (Recommended): Android Studio</summary>
@@ -358,11 +422,11 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 #### Steps
 
-1. Download the AAR file, which contains the Java library and corresponding JNI library, to build and run the app. 
+1. Download the AAR file, which contains the Java library and corresponding JNI library, to build and run the app.
 
    - [executorch-llama-tiktoken-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc3-0719.aar) (SHASUM: c3e5d2a97708f033c2b1839a89f12f737e3bbbef)
 
-2. Rename the downloaded AAR file to `executorch.aar` and move the file to `android/Torchchat/app/libs/`. You may need to create directory `android/Torchchat/app/libs/` if it does not exist.
+2. Rename the downloaded AAR file to `executorch.aar` and move the file to `android/torchchat/app/libs/`. You may need to create directory `android/torchchat/app/libs/` if it does not exist.
 
 3. Push the model and tokenizer file to your device. You can find the model file called `llama3.pte` in the current `torchchat` directory and the tokenizer file at `$(python3 torchchat.py where llama3)/tokenizer.model` path.
     ```
@@ -371,7 +435,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
     adb push <tokenizer.model or tokenizer.bin> /data/local/tmp/llama
     ```
 
-4. Use Android Studio to open the torchchat app skeleton, located at `android/Torchchat`. 
+4. Use Android Studio to open the torchchat app skeleton, located at `android/torchchat`.
 
 5. Click the Play button (^R) to launch it to emulator/device.
 
@@ -382,13 +446,13 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
     <img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
 
-**Note:** The AAR file listed above comes with tiktoken tokenizer, which is used for llama3 model. If you want to use a model with BPE tokenizer (llama2 model for example), 
-use this AAR 
+**Note:** The AAR file listed above comes with tiktoken tokenizer, which is used for llama3 model. If you want to use a model with BPE tokenizer (llama2 model for example),
+use this AAR
 
   * [executorch-llama-bpe-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar) (SHASUM: d5fe81d9a4700c36b50ae322e6bf34882134edb0)
   * Since the tokenizer is built at compile time, to use a different tokenizer you need to re-build the app.
 
-If you need to tweak or use your own tokenizer and runtime, modify the ExecuTorch code and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library. 
+If you need to tweak or use your own tokenizer and runtime, modify the ExecuTorch code and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library.
 
 
 </details>
@@ -436,6 +500,8 @@ aliases.
 
 | Model | Mobile Friendly | Notes |
 |------------------|---|---------------------|
+|[meta-llama/Meta-Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3.1`.|
+|[meta-llama/Meta-Llama-3.1-8B](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B)|✅|Best for `generate`. Alias to `llama3.1-base`.|
 |[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3`.|
 |[meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅|Best for `generate`. Alias to `llama3-base`.|
 |[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|✅|Tuned for `chat`. Alias to `llama2`.|
@@ -486,7 +552,6 @@ We really value our community and the contributions made by our wonderful users.
 
 ## Troubleshooting
 
-
 **CERTIFICATE_VERIFY_FAILED**
 Run `pip install --upgrade certifi`.
 
@@ -498,6 +563,13 @@ link provided in the error to get access.
 **Installing ET Fails**
 If `./scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
 
+## Filing Issues
+Please include the exact command you ran and the output of that command.
+Also, run this script and include the output saved to `system_info.txt` so that we can better debug your issue.
+
+```
+(echo "Operating System Information"; uname -a; echo ""; cat /etc/os-release; echo ""; echo "Python Version"; python --version || python3 --version; echo ""; echo "PIP Version"; pip --version || pip3 --version; echo ""; echo "Installed Packages"; pip freeze || pip3 freeze; echo ""; echo "PyTorch Version"; python -c "import torch; print(torch.__version__)" || python3 -c "import torch; print(torch.__version__)"; echo ""; echo "Collection Complete") > system_info.txt
+```
 
 ## Disclaimer
 The torchchat Repository Content is provided without any guarantees

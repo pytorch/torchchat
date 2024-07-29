@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Torchchat"
+rootProject.name = "torchchat"
 include(":app")

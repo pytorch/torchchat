@@ -37,6 +37,9 @@ public class MainActivity extends Activity implements Runnable, LlamaCallback {
 
     @Override
     public void onResult(String result) {
+        if (result.startsWith("<") && result.endsWith(">")) {
+            return;
+        }
         mResultMessage.appendText(result);
         run();
     }

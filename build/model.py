@@ -5,7 +5,6 @@
 # LICENSE file in the root directory of this source tree.
 import json
 import os
-import math
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -23,7 +22,7 @@ config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
 
 @dataclass
-class ModelArgs:
+class TransformerArgs:
     block_size: int = 2048
     vocab_size: int = 32000
     n_layers: int = 32
@@ -46,7 +45,7 @@ class ModelArgs:
         if self.n_local_heads == -1:
             self.n_local_heads = self.n_heads
         if self.hidden_dim is None:
-            # If hidden_dim is not explicitly set in the ModelArgs,
+            # If hidden_dim is not explicitly set in the TransformerArgs,
             # then calculate implicitly based on dim and
             # also multiple of `args.multiple_of`
             multiple_of = self.multiple_of
@@ -74,7 +73,7 @@ class ModelArgs:
     def from_table(cls, name: str):
         json_path = config_path / f"{name}.json"
         if json_path.is_file():
-            return ModelArgs.from_params(json_path)
+            return TransformerArgs.from_params(json_path)
         else:
             known_model_params = [
                 config.replace(".json", "") for config in os.listdir(config_path)
@@ -87,7 +86,7 @@ class ModelArgs:
     def from_name(cls, name: str):
         json_path = config_path / f"{name}.json"
         if Path(json_path).is_file():
-            return ModelArgs.from_params(json_path)
+            return TransformerArgs.from_params(json_path)
 
         known_model_params = [
             config.replace(".json", "") for config in os.listdir(config_path)
@@ -114,7 +113,7 @@ class ModelArgs:
                 f"Unknown model directory name {name}. Must be one of {known_model_params}."
             )
 
-        return ModelArgs.from_params(config_path / f"{config[0]}.json")
+        return TransformerArgs.from_params(config_path / f"{config[0]}.json")
 
 
 class KVCache(nn.Module):
@@ -146,7 +145,7 @@ class KVCache(nn.Module):
 
 
 class Transformer(nn.Module):
-    def __init__(self, config: ModelArgs) -> None:
+    def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
         self.config = config
 
@@ -204,15 +203,15 @@ class Transformer(nn.Module):
 
     @classmethod
     def from_name(cls, name: str):
-        return cls(ModelArgs.from_name(name))
+        return cls(TransformerArgs.from_name(name))
 
     @classmethod
     def from_table(cls, name: str):
-        return cls(ModelArgs.from_table(name))
+        return cls(TransformerArgs.from_table(name))
 
     @classmethod
     def from_params(cls, params_path: str):
-        return cls(ModelArgs.from_params(params_path))
+        return cls(TransformerArgs.from_params(params_path))
 
     @classmethod
     def from_gguf(cls, gguf_path: str, **kwargs):
@@ -225,7 +224,7 @@ class Transformer(nn.Module):
 
 
 class TransformerBlock(nn.Module):
-    def __init__(self, config: ModelArgs) -> None:
+    def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
         self.attention = Attention(config)
         self.feed_forward = FeedForward(config)
@@ -241,7 +240,7 @@ class TransformerBlock(nn.Module):
 
 
 class Attention(nn.Module):
-    def __init__(self, config: ModelArgs):
+    def __init__(self, config: TransformerArgs):
         super().__init__()
         assert config.dim % config.n_heads == 0
 
@@ -341,7 +340,7 @@ class Attention(nn.Module):
 
 
 class FeedForward(nn.Module):
-    def __init__(self, config: ModelArgs) -> None:
+    def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
         self.w1 = nn.Linear(config.dim, config.hidden_dim, bias=False)
         self.w2 = nn.Linear(config.hidden_dim, config.dim, bias=False)
@@ -376,7 +375,7 @@ def apply_scaling(freqs: torch.Tensor):
     high_freq_wavelen = old_context_len / high_freq_factor
     new_freqs = []
     for freq in freqs:
-        wavelen = 2 * math.pi / freq
+        wavelen = 2 * torch.pi / freq
         if wavelen < high_freq_wavelen:
             new_freqs.append(freq)
         elif wavelen > low_freq_wavelen:
