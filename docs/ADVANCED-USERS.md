@@ -112,24 +112,24 @@ architecture, provided you have the model weights in llama format, the
 model parameters and the tokenizer model used by your language model.
 
 Some common models are recognized by torchchat based on their filename
-through `Transformer.from_name()` to perform a fuzzy match against a
+through `Model.from_name()` to perform a fuzzy match against a
 table of known model architectures. Alternatively, you can specify the
 index into that table with the option `--params-table ${INDEX}` where
 the index is the lookup key key in the [the list of known
 pconfigurations](https://github.com/pytorch/torchchat/tree/main/build/known_model_params)
 For example, for the stories15M model, this would be expressed as
 `--params-table stories15M`. (We use the model constructor
-`Transformer.from_table()`)
+`Model.from_table()`)
 
 For models using a configuration not in the list of known
 configurations, you can construct the model by initializing the
-`TransformerArgs` dataclass that controls model construction from a
+`ModelArgs` dataclass that controls model construction from a
 parameter json using the `params-path ${PARAMS_PATH}` containing the
-appropriate model parameters to initialize the `TransformerArgs` for the
-model. (We use the model constructor `Transformer.from_params()`).
+appropriate model parameters to initialize the `ModelArgs` for the
+model. (We use the model constructor `Model.from_params()`).
 
 The parameter file should be in JSON format specifying these
-parameters. You can find the `TransformerArgs` data class in
+parameters. You can find the `ModelArgs` data class in
 [`model.py`](https://github.com/pytorch/torchchat/blob/main/model.py#L22).
 
 The final way to initialize a torchchat model is from GGUF. You load a

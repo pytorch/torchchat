@@ -12,19 +12,23 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Union
 
 import torch
-import torch.nn as nn
-from torch.distributed.device_mesh import DeviceMesh
 import torch._dynamo.config
 import torch._inductor.config
+import torch.nn as nn
 
 from config.model_config import resolve_model_config
-from distributed import init_distributed, ParallelDims, parallelize_llama
+from distributed import (
+    init_distributed,
+    launch_distributed,
+    ParallelDims,
+    parallelize_llama,
+)
 from quantization.quantize import quantize_model
+from torch.distributed.device_mesh import DeviceMesh
 from utils.measure_time import measure_time
 
-from build.model import Transformer
+from build.model import Model
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
-from distributed import launch_distributed
 
 
 @dataclass
@@ -200,7 +204,7 @@ class TokenizerArgs:
 
     def validate_model(
         self,
-        model: Transformer,
+        model: Model,
         model_description: str = "model",
     ) -> None:
         if model is None:
@@ -288,11 +292,11 @@ def _unset_gguf_kwargs(builder_args):
 def _init_model_on_meta_device(builder_args):
     with torch.device("meta"):
         if builder_args.params_path:
-            return Transformer.from_params(builder_args.params_path)
+            return Model.from_params(builder_args.params_path)
         elif builder_args.params_table:
-            return Transformer.from_table(builder_args.params_table)
+            return Model.from_table(builder_args.params_table)
         else:
-            return Transformer.from_name(builder_args.checkpoint_path.parent.name)
+            return Model.from_name(builder_args.checkpoint_path.parent.name)
 
 
 def _load_model_gguf(builder_args, only_config=False):
@@ -301,7 +305,7 @@ def _load_model_gguf(builder_args, only_config=False):
         kwargs = {}
     else:
         kwargs = builder_args.gguf_kwargs
-    model = Transformer.from_gguf(builder_args.gguf_path, **kwargs)
+    model = Model.from_gguf(builder_args.gguf_path, **kwargs)
     return model
 
 
@@ -355,27 +359,29 @@ def _maybe_init_distributed(
     builder_args: BuilderArgs,
 ) -> Tuple[Optional[DeviceMesh], Optional[ParallelDims]]:
     """
-    Initialize distributed related setups if the user specified 
+    Initialize distributed related setups if the user specified
     using distributed inference. If not, this is a no-op.
 
     Args:
         builder_args (:class:`BuilderArgs`):
             Command args for model building.
     Returns:
-        Tuple[Optional[DeviceMesh], Optional[ParallelDims]]: 
-            - The first element is an optional DeviceMesh object, 
+        Tuple[Optional[DeviceMesh], Optional[ParallelDims]]:
+            - The first element is an optional DeviceMesh object,
             which which describes the mesh topology of devices for the DTensor.
-            - The second element is an optional ParallelDims object, 
+            - The second element is an optional ParallelDims object,
             which represents the parallel dimensions configuration.
     """
     if not builder_args.use_distributed:
         return None, None
-    dist_config = 'llama3_8B.toml'  # TODO - integrate with chat cmd line
-    
-    world_mesh, parallel_dims = launch_distributed(dist_config) 
-    
-    assert world_mesh is not None and parallel_dims is not None, f"failed to launch distributed using {dist_config}"
-    
+    dist_config = "llama3_8B.toml"  # TODO - integrate with chat cmd line
+
+    world_mesh, parallel_dims = launch_distributed(dist_config)
+
+    assert (
+        world_mesh is not None and parallel_dims is not None
+    ), f"failed to launch distributed using {dist_config}"
+
     return world_mesh, parallel_dims
 
 

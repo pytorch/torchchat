@@ -6,7 +6,7 @@
 
 
 import torch
-from build.model import Transformer
+from build.model import Model, Transformer
 from build.utils import get_precision
 
 from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
@@ -26,7 +26,7 @@ from torch._export import capture_pre_autograd_graph
 default_device = "cpu"
 
 
-def materialze_broadcast_of_rope_freq_cis(
+def materialze_broadcast_of_rope_freq_cis_transformer(
     module: torch.nn.Module,
 ):
     assert isinstance(module, Transformer)
@@ -49,6 +49,18 @@ def materialze_broadcast_of_rope_freq_cis(
     ), f"sin and cos freq table sizes must match. Mismatch found at dim 1: {dim1} vs {module.freqs_sin.size(1)}"
     module.freqs_sin = module.freqs_sin.view(dim0, 1, dim1)
     module.freqs_sin = module.freqs_sin.expand(dim0, num_heads, dim1).contiguous()
+    return module
+
+
+def materialze_broadcast_of_rope_freq_cis(
+    module: torch.nn.Module,
+):
+    assert instance(module, Model)
+
+    for k in module.transformer_map.keys():
+        module.transformer_map[k] = materialze_broadcast_of_rope_freq_cis_transformer(
+            module.transformer_map[k]
+        )
     return module
 
 

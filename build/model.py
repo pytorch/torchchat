@@ -22,6 +22,76 @@ config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
 
 @dataclass
+class ModelArgs:
+    transformer_args_maps: Dict[str, TransformerArgs]
+
+    @classmethod
+    def from_params(cls, params_path):
+        with open(params_path, "r") as f:
+            loaded_params = json.loads(f.read())
+
+        transformer_args_maps: Dict[str, TransformerArgs] = {}
+
+        try:
+            # try to interpret as a single transformer config
+            transformer_args_maps["default"] = TransformerArgs.from_params(
+                loaded_params
+            )
+        except TypeError:
+            # try to interpret as a dict of transformer configs
+            for name, params in loaded_params.items():
+                transformer_args_maps[name] = TransformerArgs.from_params(params)
+
+        return cls(transformer_args_maps)
+
+    @classmethod
+    def from_table(cls, name: str):
+        json_path = config_path / f"{name}.json"
+        if json_path.is_file():
+            return ModelArgs.from_params(json_path)
+        else:
+            known_model_params = [
+                config.replace(".json", "") for config in os.listdir(config_path)
+            ]
+            raise RuntimeError(
+                f"unknown table index {name} for transformer config, must be from {known_model_params}"
+            )
+
+    @classmethod
+    def from_name(cls, name: str):
+        json_path = config_path / f"{name}.json"
+        if Path(json_path).is_file():
+            return ModelArgs.from_params(json_path)
+
+        known_model_params = [
+            config.replace(".json", "") for config in os.listdir(config_path)
+        ]
+
+        print(f"known configs: {known_model_params}")
+        # Fuzzy search by name (e.g. "7B" and "Mistral-7B")
+        config = [
+            config
+            for config in known_model_params
+            if config in str(name).upper() or config in str(name)
+        ]
+
+        # We may have two or more configs matched (e.g., "7B" and
+        # "Mistral-7B"). Find the best config match:  take longer
+        # name (as it have more symbols matched)
+        if len(config) > 1:
+            config.sort(key=len, reverse=True)
+            assert len(config[0]) != len(
+                config[1]
+            ), name  # make sure only one 'best' match
+        elif len(config) == 0:
+            raise ValueError(
+                f"Unknown model directory name {name}. Must be one of {known_model_params}."
+            )
+
+        return ModelArgs.from_params(config_path / f"{config[0]}.json")
+
+
+@dataclass
 class TransformerArgs:
     block_size: int = 2048
     vocab_size: int = 32000
@@ -144,6 +214,46 @@ class KVCache(nn.Module):
         return k_out, v_out
 
 
+class Model(nn.Module):
+    def __init__(self, config: ModelArgs) -> None:
+        super().__init__()
+        self.config = config
+        self.transformer_map: Dict[str, Transformer] = {}
+        for name, config in self.config.transformer_args_maps.items():
+            self.transformer_map[name] = Transformer(config)
+
+        assert (
+            len(self.transformer_map) == 1
+        ), "Only support one transformer model for now"
+        assert (
+            "default" in self.transformer_map
+        ), '"default" not in self.transformer_map'
+
+    def forward(self, *args, **kwargs) -> Tensor:
+        return self.transformer_map["default"](*args, **kwargs)
+
+    @classmethod
+    def from_name(cls, name: str):
+        return cls(ModelArgs.from_name(name))
+
+    @classmethod
+    def from_table(cls, name: str):
+        return cls(ModelArgs.from_table(name))
+
+    @classmethod
+    def from_params(cls, params_path: str):
+        return cls(ModelArgs.from_params(params_path))
+
+    @classmethod
+    def from_gguf(cls, gguf_path: str, **kwargs):
+        from build.gguf_loader import load_model_and_state_dict
+
+        model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
+        if state_dict != {}:
+            model.load_state_dict(state_dict, assign=True)
+        return model
+
+
 class Transformer(nn.Module):
     def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
@@ -180,7 +290,7 @@ class Transformer(nn.Module):
             self.config.dim // self.config.n_heads,
             self.config.block_size * 2,
             self.config.rope_base,
-            use_scaled = self.config.use_scaled_rope,
+            use_scaled=self.config.use_scaled_rope,
         )
         self.register_buffer("freqs_cis", freqs_cis, persistent=True)
         causal_mask = torch.tril(
@@ -200,27 +310,6 @@ class Transformer(nn.Module):
         logits = self.output(x)
         # print(f"logits shape: {logits.shape}")
         return logits
-
-    @classmethod
-    def from_name(cls, name: str):
-        return cls(TransformerArgs.from_name(name))
-
-    @classmethod
-    def from_table(cls, name: str):
-        return cls(TransformerArgs.from_table(name))
-
-    @classmethod
-    def from_params(cls, params_path: str):
-        return cls(TransformerArgs.from_params(params_path))
-
-    @classmethod
-    def from_gguf(cls, gguf_path: str, **kwargs):
-        from build.gguf_loader import load_model_and_state_dict
-
-        model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
-        if state_dict != {}:
-            model.load_state_dict(state_dict, assign=True)
-        return model
 
 
 class TransformerBlock(nn.Module):
@@ -387,6 +476,7 @@ def apply_scaling(freqs: torch.Tensor):
             )
             new_freqs.append((1 - smooth) * freq / scale_factor + smooth * freq)
     return torch.tensor(new_freqs, dtype=freqs.dtype, device=freqs.device)
+
 
 def precompute_freqs_cis(
     n_elem: int, seq_len: int, base: int = 10000, dtype=None, use_scaled: bool = False

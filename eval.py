@@ -16,7 +16,7 @@ from build.builder import (
     TokenizerArgs,
 )
 
-from build.model import Transformer
+from build.model import Model
 from build.utils import set_precision
 from cli import add_arguments_for_verb, arg_init
 from utils.measure_time import measure_time
@@ -35,7 +35,7 @@ from lm_eval.tasks import get_task_dict
 
 
 def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
-    model: Transformer,
+    model: Model,
     prompt: torch.Tensor,
     max_new_tokens: int,
     max_seq_length: Optional[int] = None,
@@ -81,7 +81,7 @@ class GPTFastEvalWrapper(eval_wrapper):
 
     def __init__(
         self,
-        model: Transformer,
+        model: Model,
         tokenizer,
         model_forward: Optional[Callable] = None,
         max_seq_length: Optional[int] = None,
@@ -153,7 +153,7 @@ class GPTFastEvalWrapper(eval_wrapper):
 
 @torch.no_grad()
 def eval(
-    model: Transformer,
+    model: Model,
     model_forward: Callable,
     tokenizer,
     tasks: Optional[list] = None,
@@ -165,7 +165,7 @@ def eval(
     Evaluates a language model on a specified task using the lm-evaluation-harness library.
 
     Args:
-        model (Transformer): The pre-trained language model to evaluate.
+        model (Model): The pre-trained language model to evaluate.
         tokenizer: The tokenizer to use for encoding/decoding text.
         task (str): The name of the evaluation task to perform.
         limit (Optional[int]): The maximum number of samples to evaluate (None for all available).
