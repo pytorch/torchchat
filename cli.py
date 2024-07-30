@@ -165,7 +165,7 @@ def _add_export_output_path_args(parser, verb: str) -> None:
         "Export Output Path" if is_export else None,
         "Specify the output path for the exported model files" if is_export else None,
     )
-    exclusive_parser = output_path_parser.add_mutually_exclusive_group()
+    exclusive_parser = output_path_parser.add_mutually_exclusive_group(required=is_export)
     exclusive_parser.add_argument(
         "--output-pte-path",
         type=str,
