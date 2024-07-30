@@ -481,7 +481,7 @@ jobs:
           export MODEL_PATH=${PWD}/checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
 
-          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0
+          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0  --device cpu
 
           python export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${PWD}/${MODEL_NAME}.pte
@@ -618,7 +618,7 @@ jobs:
 
           python torchchat.py list
           python torchchat.py download stories15m
-          python torchchat.py generate stories15M
+          python torchchat.py generate stories15M --device cpu
           python torchchat.py remove stories15m
 
   test-mps:
@@ -832,30 +832,30 @@ jobs:
           echo "******************************************"
 
           echo "Running eager"
-          python3 torchchat.py generate --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0
+          python3 torchchat.py generate --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --device cpu
 
           echo "Running compiled"
-          python3 torchchat.py generate --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --compile
+          python3 torchchat.py generate --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --compile --device cpu
 
           echo "******************************************"
           echo "******* Emb: channel-wise quantized ******"
           echo "******************************************"
 
           echo "Running eager"
-          python3 torchchat.py generate --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0
+          python3 torchchat.py generate --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --device cpu
 
           echo "Running compiled"
-          python3 torchchat.py generate --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --compile
+          python3 torchchat.py generate --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --compile --device cpu
 
           echo "******************************************"
           echo "******** Emb: group-wise quantized *******"
           echo "******************************************"
 
           echo "Running eager"
-          python3 torchchat.py generate --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0
+          python3 torchchat.py generate --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --device cpu
 
           echo "Running compiled"
-          python3 torchchat.py generate --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --compile
+          python3 torchchat.py generate --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --gguf-path ${GGUF_PATH} --tokenizer-path ${TOKENIZER_PATH} --max-new-tokens 20 --temperature 0 --compile --device cpu
 
           echo "tests complete"
           echo "******************************************"
@@ -942,7 +942,7 @@ jobs:
 
           export PRMT="Once upon a time in a land far away"
 
-          python torchchat.py generate stories15M --temperature 0 --prompt "${PRMT}"
+          python torchchat.py generate stories15M --temperature 0 --prompt "${PRMT}"  --device cpu
 
           python torchchat.py export stories15M --output-pte-path ./model.pte
           ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
@@ -995,7 +995,7 @@ jobs:
           export MODEL_DIR=${PWD}/checkpoints/stories15M
           export PROMPT="Once upon a time in a land far away"
 
-          python torchchat.py generate --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}"
+          python torchchat.py generate --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}" --device cpu
 
           for dtype in fp32 fp16 bf16 fast fast16; do
             echo "Running export + runner with dtype=$dtype"
