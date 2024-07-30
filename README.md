@@ -1,7 +1,11 @@
 # Chat with LLMs Everywhere
 
-torchchat is a small codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
+torchchat is a small codebase showcasing the ability to run large language models (LLMs) seamlessly via PyTorch. 
+With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
 
+torchchat is a very new repo and under active development. We are iterating quickly and encourage you to clone the repo, 
+give it a spin, explore its capabilities, and share your [feedback](https://github.com/pytorch/torchchat/issues) as 
+we continue to empower the PyTorch community to run LLMs locally and on constrained devices.
 
 ## What can you do with torchchat?
 - [Run models via PyTorch / Python](#running-via-pytorch--python)
