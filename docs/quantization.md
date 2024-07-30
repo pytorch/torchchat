@@ -11,9 +11,14 @@
 -->
 
 ## Introduction
-Quantization focuses on reducing the precision of model parameters and computations from floating-point to lower-bit integers, such as 8-bit integers. This approach aims to minimize memory requirements, accelerate inference speeds, and decrease power consumption, making models more feasible for deployment on edge devices with limited computational resources. For high-performance devices such as GPUs, quantization provides a way to reduce the required memory bandwidth and take advantage of the massive compute capabilities provided by today's server-based accelerators such as GPUs.
+Quantization focuses on reducing the precision of model parameters and computations from floating-point to lower-bit integers, such as 8-bit integers. 
+This approach aims to minimize memory requirements, accelerate inference speeds, and decrease power consumption, making models more feasible for 
+deployment on edge devices with limited computational resources. For high-performance devices such as GPUs, quantization provides a way to 
+reduce the required memory bandwidth and take advantage of the massive compute capabilities provided by today's server-based accelerators such as GPUs.
 
-While quantization can potentially degrade the model's performance, the methods supported by torchchat are designed to mitigate this effect, maintaining a balance between efficiency and accuracy. In this document we provide details on the supported quantization schemes, how to quantize models with these schemes and a few example of running such quantized models on supported backends.
+While quantization can potentially degrade the model's performance, the methods supported by torchchat are designed to mitigate this effect, 
+maintaining a balance between efficiency and accuracy. In this document we provide details on the supported quantization schemes, how to quantize 
+models with these schemes and a few example of running such quantized models on supported backends.
 
 ## Supported Quantization Schemes
 ### Weight Quantization
@@ -33,32 +38,26 @@ on-device usecases.
 | embedding (symmetric) | [8, 4]* | [32, 64, 128, 256]+ | | ✅ | ✅ | ✅ |
 
 
+>\* These are the only valid bitwidth options.
 
-* These are the only valid bitwidth options.
-
-** There are many valid group size options, including 512, 1024,
+>** There are many valid group size options, including 512, 1024,
    etc. Note that smaller groupsize tends to be better for preserving
    model quality and accuracy, and larger groupsize for further
    improving performance. Set 0 for channelwise quantization.
 
-+ Should support non-power-of-2-groups as well.
+>\+ Should support non-power-of-2-groups as well.
 
 ## Quantization Profiles
 
 Torchchat quantization supports profiles with multiple settings such
 as accelerator, dtype, and quantization specified in a JSON file.
-Four sample profiles are included wwith the torchchat distributin in
+Four sample profiles are included with the torchchat distribution in
 config/data: `cuda.json`, `desktop.json`, `mobile.json`, `pi5.json`
 with profiles optimizing for execution on cuda, desktop, mobile and
 raspberry Pi devices.
 
-In addition to quantization recipes described below, the profiles also
-enable developers to specify the accelerator and dtype to be used.
-
-At present torchchat supports the fast, cuda, mps, and cpu devices.
-The default device in torchchat is "fast". The "fast" device is a
-virtual device that defaults to the fastest executor available in the
-system, selecting cuda, mps, and cpu in this order.
+In addition to quantization recipes described below, the profiles can
+also specify the accelerator and dtype to be used.
 
 At present torchchat supports the fast16, fast, bf16, fp16 and fp32
 data types. The default data type for models is "fast16".  The
@@ -111,18 +110,16 @@ with `export`.
 
 ### Eager mode
 ```
-python3 generate.py [--compile] llama3 --prompt "Hello, my name is" --quantize '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --device cpu
+python3 generate.py llama3 --prompt "Hello, my name is" --quantize '{"embedding" : {"bitwidth": 8, "groupsize": 0}}'
 ```
 ### AOTI
 ```
 python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:int4": {"groupsize" : 256}}' --output-dso-path llama3.so
-
 python3 generate.py llama3 --dso-path llama3.so  --prompt "Hello my name is"
 ```
 ### ExecuTorch
 ```
 python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}' --output-pte-path llama3.pte
-
 python3 generate.py llama3 --pte-path llama3.pte  --prompt "Hello my name is"
 ```
 
