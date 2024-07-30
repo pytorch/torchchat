@@ -155,6 +155,13 @@ More information about these commands can be found by adding the `--help` option
 
 ## Running via PyTorch / Python
 
+The simplest way to run a model in PyTorch is via [eager execution](https://pytorch.org/blog/optimizing-production-pytorch-performance-with-graph-transformations/).
+This is the default execution mode for both PyTorch and torchchat. It performs inference
+without creating exporting artifacts or using a separate runner.
+
+The model used for inference can also be configured and tailored to specific needs
+(compilation, quantization, etc.). See the [customization guide](docs/model_customization.md) for the options supported by torchchat.
+
 > [!TIP]
 > For more information about these commands, please refer to the `--help` menu.
 
@@ -256,8 +263,10 @@ python3 torchchat.py export llama3 --output-dso-path exportedModels/llama3.so
 
 > [!NOTE]
 > If your machine has cuda add this flag for performance
-`--quantize config/data/cuda.json` when exporting. You'll also need to tell generate to use `--device cuda` and the runner to use `-d CUDA`
+`--quantize config/data/cuda.json` when exporting.
 
+For more details on quantization and what settings to use for your use
+case visit our [customization guide](docs/model_customization.md).
 
 ### Run in a Python Enviroment
 
@@ -266,6 +275,7 @@ To run in a python enviroment, use the generate subcommand like before, but incl
 ```
 python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --prompt "Hello my name is"
 ```
+**Note:** Depending on which accelerator is used to generate the .dso file, the command may need the device specified: `--device (cuda | cpu)`.
 
 
 ### Run using our C++ Runner
@@ -275,10 +285,11 @@ To run in a C++ enviroment, we need to build the runner binary.
 scripts/build_native.sh aoti
 ```
 
-Then run the compiled executable, with the exported DSO from earlier:
+Then run the compiled executable, with the exported DSO from earlier.
 ```bash
 cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time"
 ```
+**Note:** Depending on which accelerator is used to generate the .dso file, the runner may need the device specified: `-d (CUDA | CPU)`.
 
 ## Mobile Execution
 
@@ -318,7 +329,7 @@ llama3 model to reduce model size and improve performance for
 on-device use cases.
 
 For more details on quantization and what settings to use for your use
-case visit our [Quantization documentation](docs/quantization.md).
+case visit our [customization guide](docs/model_customization.md).
 
 ### Deploy and run on Desktop
 
@@ -400,9 +411,11 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 *Click the image below to see it in action!*
 
+<p align="center">
 <a href="https://pytorch.org/executorch/main/_static/img/llama_ios_app.mp4">
   <img src="https://pytorch.org/executorch/main/_static/img/llama_ios_app.png" width="600" alt="iOS app running a LlaMA model">
 </a>
+</p>
 </details>
 
 
@@ -444,15 +457,13 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 6. Follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem. Then issue a prompt.
 
+**Note:** The AAR file listed in Step 1 has the tiktoken tokenizer, which is used for Llama 3. To tweak or use a custom tokenizer and runtime, modify the ExecuTorch code 
+and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library.
+
+<p align="center">
     <img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
+</p>
 
-**Note:** The AAR file listed above comes with tiktoken tokenizer, which is used for llama3 model. If you want to use a model with BPE tokenizer (llama2 model for example),
-use this AAR
-
-  * [executorch-llama-bpe-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar) (SHASUM: d5fe81d9a4700c36b50ae322e6bf34882134edb0)
-  * Since the tokenizer is built at compile time, to use a different tokenizer you need to re-build the app.
-
-If you need to tweak or use your own tokenizer and runtime, modify the ExecuTorch code and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library.
 
 
 </details>
