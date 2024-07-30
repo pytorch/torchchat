@@ -1,7 +1,3 @@
-> [!WARNING]
-> Files in this directory may be outdated, incomplete, scratch notes, or a WIP. torchchat provides no guarantees on these files as references. Please refer to the root README for stable features and documentation.
-
-
 # Quantization
 
 <!--
@@ -11,31 +7,31 @@
 -->
 
 ## Introduction
-Quantization focuses on reducing the precision of model parameters and computations from floating-point to lower-bit integers, such as 8-bit integers. 
-This approach aims to minimize memory requirements, accelerate inference speeds, and decrease power consumption, making models more feasible for 
-deployment on edge devices with limited computational resources. For high-performance devices such as GPUs, quantization provides a way to 
+Quantization focuses on reducing the precision of model parameters and computations from floating-point to lower-bit integers, such as 8-bit integers.
+This approach aims to minimize memory requirements, accelerate inference speeds, and decrease power consumption, making models more feasible for
+deployment on edge devices with limited computational resources. For high-performance devices such as GPUs, quantization provides a way to
 reduce the required memory bandwidth and take advantage of the massive compute capabilities provided by today's server-based accelerators such as GPUs.
 
-While quantization can potentially degrade the model's performance, the methods supported by torchchat are designed to mitigate this effect, 
-maintaining a balance between efficiency and accuracy. In this document we provide details on the supported quantization schemes, how to quantize 
+While quantization can potentially degrade the model's performance, the methods supported by torchchat are designed to mitigate this effect,
+maintaining a balance between efficiency and accuracy. In this document we provide details on the supported quantization schemes, how to quantize
 models with these schemes and a few example of running such quantized models on supported backends.
 
 ## Supported Quantization Schemes
 ### Weight Quantization
 | compression | bitwidth| group size | dynamic activation quantization | Eager | AOTI | ExecuTorch |
 |--|--|--|--|--|--|--|
-| linear (asymmetric) | [8, 4]* | [32, 64, 128, 256]** | | ✅ | ✅ | 🚧 |
+| linear (asymmetric) | [4, 8]* | [32, 64, 128, 256]^ | | ✅ | ✅ | 🚧 |
 | linear with dynamic activations (symmetric) | | [32, 64, 128, 256]* | a8w4dq | 🚧 |🚧 | ✅ |
 
 ### Embedding Quantization
 
-Due to the larger vocabulary size of llama3, we also recommend
+To support the larger vocabularies (e.g. Llama 3), we also recommend
 quantizing the embeddings to further reduce the model size for
 on-device usecases.
 
 | compression | weight quantization (bitwidth)| weight quantization (group size) | dynamic activation quantization | Eager | AOTI | ExecuTorch |
 |--|--|--|--|--|--|--|
-| embedding (symmetric) | [8, 4]* | [32, 64, 128, 256]+ | | ✅ | ✅ | ✅ |
+| embedding (symmetric) | [4, 8]* | [32, 64, 128, 256]+ | | ✅ | ✅ | ✅ |
 
 
 >\* These are the only valid bitwidth options.
@@ -46,26 +42,6 @@ on-device usecases.
    improving performance. Set 0 for channelwise quantization.
 
 >\+ Should support non-power-of-2-groups as well.
-
-## Quantization Profiles
-
-Torchchat quantization supports profiles with multiple settings such
-as accelerator, dtype, and quantization specified in a JSON file.
-Four sample profiles are included with the torchchat distribution in
-config/data: `cuda.json`, `desktop.json`, `mobile.json`, `pi5.json`
-with profiles optimizing for execution on cuda, desktop, mobile and
-raspberry Pi devices.
-
-In addition to quantization recipes described below, the profiles can
-also specify the accelerator and dtype to be used.
-
-At present torchchat supports the fast16, fast, bf16, fp16 and fp32
-data types. The default data type for models is "fast16".  The
-"fast16" data type is a virtual data type that defaults to the best
-16-bit floating point data type available on the selected device. The
-"fast" data type is a virtual data type that defaults to the best
-floating point data type available on the selected device.  ("Best"
-tangibly representing a combination of speed and accuracy.)
 
 
 ## Quantization API
@@ -85,8 +61,19 @@ for valid `bitwidth` and `groupsize` values.
 
 See the available quantization schemes [here](https://github.com/pytorch/torchchat/blob/main/quantization/quantize.py#L1260-L1266).
 
+In addition to quantization, the [accelerator](model_customization.md#device)
+and [precision](model_customization.md#model-precision) can also be specified.
+Preference is given to the args provided in the quantization API over those
+provided explicitly (e.g. `--device`).
+
+The expected JSON format is described below. Refer to the links above for valid `device` and `dtype` values.
+| config | JSON string |
+|--|--|
+| accelerator | `'{"executor": {"accelerator": <device>}}'` |
+| precision | `'{"precision": {"dtype": <dtype>}}'`|
+
 ## Examples
-We can mix and match weight quantization with embedding quantization.
+Here are some examples of quantization configurations
 
 [skip default]: begin
 * Config file
@@ -101,10 +88,18 @@ We can mix and match weight quantization with embedding quantization.
   ```
   --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}'
   ```
+* Quantize linear layers with specified dtype and device
+  ```
+  --quantize '{"executor": {"accelerator": "cuda"},
+    "precision": {"dtype": "bf16"},
+    "linear:int4": {"groupsize" : 256}}'
+  ```
 [skip default]: end
 
 Quantization recipes can be applied in conjunction with any of the
-`chat`, `generate`, `browser` and `export` commands. Below are
+`chat`, `generate`, `browser`, `server`, and `export` commands.
+
+Below are
 examples showcasing eager mode with `generate` and AOTI and ExecuTorch
 with `export`.
 
@@ -123,19 +118,11 @@ python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "gr
 python3 generate.py llama3 --pte-path llama3.pte  --prompt "Hello my name is"
 ```
 
-## Model precision (dtype precision setting)
-On top of quantizing models with integer quantization schemes mentioned above, models can be converted to lower bit floating point precision to reduce the memory bandwidth requirement and take advantage of higher density compute available. For example, many GPUs and some of the CPUs have good support for BFloat16 and Float16. This can be taken advantage of via `--dtype` arg as shown below.
+## Quantization Profiles
 
-[skip default]: begin
-```
-python3 generate.py --dtype [ fast16 | fast | bf16 | fp16 | fp32] ...
-python3 export.py --dtype [ fast16 | fast | bf16 | fp16 | fp32] ...
-```
-[skip default]: end
-
-Unlike gpt-fast which uses bfloat16 as default, torchchat uses the dtype "fast16" as the default. Torchchat will pick the appropriate 16-bit floating point type available and offering the best performance (for execution with Executorch, macOS/ARM and Linux/x86 platforms).  For macOS, support depends on the OS version, with versions starting with 14.0 supporting bfloat16 as support, and float16 for earlier OS version based on system support for these data types.
-
-Support for FP16 and BF16 is limited in many embedded processors and -dtype fp32 may be required in some environments. Additional ExecuTorch support for 16-bit floating point types may be added in the future based on hardware support.
+Four [sample profiles](https://github.com/pytorch/torchchat/tree/main/config/data) are included with the torchchat distribution: `cuda.json`, `desktop.json`, `mobile.json`, `pi5.json`
+with profiles optimizing for execution on cuda, desktop, mobile and
+raspberry Pi devices.
 
 ## Adding additional quantization schemes
 We invite contributors to submit established quantization schemes, with accuracy and performance results demonstrating soundness.
