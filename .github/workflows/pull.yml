@@ -449,6 +449,7 @@ jobs:
           fi
       - name: Install requirements
         run: |
+          PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0
           echo "Intalling pip3 packages"
           ./install_requirements.sh
 
@@ -588,6 +589,7 @@ jobs:
           fi
       - name: Install requirements
         run: |
+          PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0
           echo "Installing pip3 packages"
           ./install_requirements.sh
           pip3 list
@@ -809,6 +811,7 @@ jobs:
           fi
       - name: Install requirements
         run: |
+          PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0
           ./install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
@@ -887,6 +890,7 @@ jobs:
           fi
       - name: Install torchchat
         run: |
+          PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0
           echo "Intalling pip3 packages"
           ./install_requirements.sh
           pip3 list
@@ -975,6 +979,7 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
+          PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0
           ./install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
