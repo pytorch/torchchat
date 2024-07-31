@@ -29,7 +29,11 @@ from torch.distributed.pipelining import pipeline, SplitPoint
 from torch._subclasses.fake_tensor import FakeTensorMode
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from utils import Color
-#from load_weights import load_weights
+#from load_weights import load_weight
+import safetensors.torch as st
+import json
+
+from typing import Optional, Dict
 
 # Model configuration
 MODEL_CONFIGS = {
@@ -66,14 +70,119 @@ def create_pipeline(model, inputs, world_size):
         split_spec=split_spec,
     )
 
+
+def load_safetensor_weights(
+    stage_module: torch.nn.Module,
+    weight_map: Dict[str, str],
+):
+    """
+    Load weights stored as safetensors, from Hugging Face checkpoints into a stage module.
+
+    """
+    stage_state_dict = stage_module.state_dict()
+    updated_states = dict()
+
+    needed_files = set()
+    for param in stage_state_dict.keys():
+        file = weight_map.get(param, None)
+        if not file:
+            print(f"Warning: {param} not found in weight map")
+            continue
+        needed_files.add(file)
+    
+    for file in needed_files:
+        print(f"stage file {needed_files=}")
+
+
+    # Now load the weights into the stage module
+    # We use `assign=True` because otherwise the properties of the tensors in
+    # the current module are preserved.
+    # stage_module.load_state_dict(state_dict, assign=True)
+
+
+def load_weights(
+    stage_module: torch.nn.Module,
+    weight_index_file: Optional[str] = "pytorch_model.bin.index.json",
+):
+    """
+    Load weights from Hugging Face checkpoints into a stage module.
+
+    This is a utility for Hugging Face ModelHub checkpoints that comes with an
+    index file and multiple binary files.  The index file indicates which
+    parameter is saved in which binary. An example can be found at:
+    https://huggingface.co/meta-llama/Llama-2-7b-chat-hf/tree/main
+
+    Please download the following files in the same directory as this script:
+    - pytorch_model.bin.index.json
+    - pytorch_model-00001-of-00002.bin
+    - pytorch_model-00002-of-00002.bin
+    """
+
+    state_dict = stage_module.state_dict()
+    updated_states = dict()
+
+    # Get the weight map -- a map from parameter name to file it is saved in
+    f = open(weight_index_file)
+    js = json.load(f)
+    weight_map = js["weight_map"]
+
+    # Figure the set of binary files we'd need to open in order to fill the
+    # state dict of the stage module. It will be a subset of all the binary
+    # files because the stage module is a partition of the full model.
+    needed_files = set()
+    for param in state_dict.keys():
+        file = weight_map[param]
+        needed_files.add(file)
+
+    # Now we load the needed binary files
+    for file in needed_files:
+        checkpoint = torch.load(file, weights_only=True)
+        for param in state_dict.keys():
+            if weight_map[param] == file:
+                state_dict[param] = checkpoint[param]
+                updated_states.setdefault(param, None)
+
+    # Check if the module's state dict will be fully updated from checkpoint
+    if state_dict.keys() == updated_states.keys():
+        print("Fully updated state dict")
+    else:
+        print("Partially updated state dict")
+
+    # Now load the weights into the stage module
+    # We use `assign=True` because otherwise the properties of the tensors in
+    # the current module are preserved.
+    stage_module.load_state_dict(state_dict, assign=True)
+
+def read_weights_from_json(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+            
+        if 'weight_map' in data and isinstance(data['weight_map'], dict):
+            return data['weight_map']
+        else:
+            print("No 'weight_map' dictionary found in the JSON file.")
+            return None
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+        return None
+    except json.JSONDecodeError:
+        print(f"Invalid JSON in file: {file_path}")
+        return None
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return None
+
+
 def main():
     # Configuration
-    model_size = "70b"
+    model_size = "8b"
     world_size = 8
     device = "cuda"  # Change to "cuda" if using GPUs
 
     # Initialize model and tokenizer
     model_id = MODEL_CONFIGS[model_size]
+    print(f"{model_id=}")
     model, fake_mode = create_model(model_id, device)
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     tokenizer.pad_token = tokenizer.eos_token
@@ -83,16 +192,32 @@ def main():
     inputs = tokenizer(prompts, return_tensors="pt", padding=True)
     fake_ids = fake_mode.from_tensor(inputs["input_ids"])
 
+    
+    from transformers.utils import cached_file
+    from safetensors import safe_open
+    cfile = cached_file(model_id, "model.safetensors.index.json")
+    print(f"{cfile=}")
+
+    weight_map = read_weights_from_json(cfile)  
+    
+    
     # Create pipeline
+    print(f"creating pipeline...")
     pipe = create_pipeline(model, fake_ids, world_size)
+
+
+    print(f"Materialize each stage...")
 
     # Materialize each stage
     for rank in range(world_size):
         stage_module = pipe.get_stage_module(rank)
         print(f"Loading weights into stage {rank}")
+        #gpu_stage, missing = st.load_model(model=stage_module, filename = file_location, device=device, strict=False)
+        #print(f"{gpu_stage=}")
         # Uncomment the following line when ready to load weights
-        # load_weights(stage_module)
-        stage_module.print_readable()
+        load_safetensor_weights(stage_module, weight_map)
+        print(f"completed dummy load of stage {rank}")
+        #stage_module.print_readable()
     
     print(f"{Color.blue}\n--->  Successfully traced and segmented model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}")
 
