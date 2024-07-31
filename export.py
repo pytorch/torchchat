@@ -145,7 +145,7 @@ def main(args):
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
             print(f"Exporting model using AOT Inductor to {output_dso_path}")
-            export_for_server(model_to_dso, builder_args.device, output_dso_path, args)
+            export_for_server(model_to_dso, builder_args.device, output_dso_path)
 
 
 if __name__ == "__main__":
