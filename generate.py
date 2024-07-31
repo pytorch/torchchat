@@ -103,8 +103,10 @@ class GeneratorArgs:
 
     @classmethod
     def from_args(cls, args):
-        sequential_prefill = (
-            args.sequential_prefill or bool(args.dso_path) or bool(args.pte_path)
+        dso_path = getattr(args, "dso_path", None)
+        pte_path = getattr(args, "pte_path", None)
+        sequential_prefill = args(
+            args.sequential_prefill or bool(dso_path) or bool(pte_path)
         )
 
         return cls(

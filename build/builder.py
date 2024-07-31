@@ -103,6 +103,9 @@ class BuilderArgs:
                 model_config.transformer_params_key or model_config.name.split("/")[-1]
             )
 
+        dso_path = getattr(args, "dso_path", None)
+        pte_path = getattr(args, "pte_path", None)
+
         is_chat_model = False
         if args.is_chat_model:
             is_chat_model = True
@@ -110,8 +113,8 @@ class BuilderArgs:
             for path in [
                 checkpoint_path,
                 checkpoint_dir,
-                args.dso_path,
-                args.pte_path,
+                dso_path,
+                pte_path,
                 args.gguf_path,
             ]:
                 if path is not None:
@@ -125,7 +128,10 @@ class BuilderArgs:
                     if "chat" in path_basename or "instruct" in path_basename:
                         is_chat_model = True
 
-        if args.output_pte_path and args.dtype.startswith("fast"):
+
+        output_pte_path = getattr(args, "output_pte_path", None)
+        output_dso_path = getattr(args, "output_dso_path", None)
+        if output_pte_path and args.dtype.startswith("fast"):
             if args.dtype == "fast":
                 # As per Kimish, float32 should be faster on ET XNNPACK
                 # (because fp16 is implemented as upcast to fp32 for several
@@ -144,11 +150,11 @@ class BuilderArgs:
             params_table=params_table,
             gguf_path=args.gguf_path,
             gguf_kwargs=None,
-            dso_path=args.dso_path,
-            pte_path=args.pte_path,
+            dso_path=dso_path,
+            pte_path=pte_path,
             device=args.device,
             precision=dtype,
-            setup_caches=(args.output_dso_path or args.output_pte_path),
+            setup_caches=(output_dso_path or output_pte_path),
             use_distributed=args.distributed,
             is_chat_model=is_chat_model,
         )
@@ -355,27 +361,27 @@ def _maybe_init_distributed(
     builder_args: BuilderArgs,
 ) -> Tuple[Optional[DeviceMesh], Optional[ParallelDims]]:
     """
-    Initialize distributed related setups if the user specified 
+    Initialize distributed related setups if the user specified
     using distributed inference. If not, this is a no-op.
 
     Args:
         builder_args (:class:`BuilderArgs`):
             Command args for model building.
     Returns:
-        Tuple[Optional[DeviceMesh], Optional[ParallelDims]]: 
-            - The first element is an optional DeviceMesh object, 
+        Tuple[Optional[DeviceMesh], Optional[ParallelDims]]:
+            - The first element is an optional DeviceMesh object,
             which which describes the mesh topology of devices for the DTensor.
-            - The second element is an optional ParallelDims object, 
+            - The second element is an optional ParallelDims object,
             which represents the parallel dimensions configuration.
     """
     if not builder_args.use_distributed:
         return None, None
     dist_config = 'llama3_8B.toml'  # TODO - integrate with chat cmd line
-    
-    world_mesh, parallel_dims = launch_distributed(dist_config) 
-    
+
+    world_mesh, parallel_dims = launch_distributed(dist_config)
+
     assert world_mesh is not None and parallel_dims is not None, f"failed to launch distributed using {dist_config}"
-    
+
     return world_mesh, parallel_dims
 
 
