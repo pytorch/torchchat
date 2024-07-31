@@ -10,7 +10,8 @@ from datetime import timedelta
 
 import torch
 
-from distributed.logging_utils import logger
+from logging_utils import logger
+
 
 def _warn_overwrite_env(env, val):
     if env in os.environ:
@@ -18,6 +19,7 @@ def _warn_overwrite_env(env, val):
             f"ENV[{env}] = {os.environ[env]} will be overridden to {val} based on job config"
         )
     os.environ[env] = val
+
 
 TRACE_BUFFER_SIZE = "TORCH_NCCL_TRACE_BUFFER_SIZE"
 TRACE_FILE = "TORCH_NCCL_DEBUG_INFO_TEMP_FILE"
