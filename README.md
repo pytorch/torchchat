@@ -29,6 +29,10 @@ torchchat is a small codebase showcasing the ability to run large language model
 - Multiple quantization schemes
 - Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
+## Overview
+![System Overview](assets/torchchat.png)
+
+
 ## Installation
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
@@ -457,7 +461,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 6. Follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem. Then issue a prompt.
 
-**Note:** The AAR file listed in Step 1 has the tiktoken tokenizer, which is used for Llama 3. To tweak or use a custom tokenizer and runtime, modify the ExecuTorch code 
+**Note:** The AAR file listed in Step 1 has the tiktoken tokenizer, which is used for Llama 3. To tweak or use a custom tokenizer and runtime, modify the ExecuTorch code
 and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library.
 
 <p align="center">
