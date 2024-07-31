@@ -70,10 +70,37 @@ def create_pipeline(model, inputs, world_size):
         split_spec=split_spec,
     )
 
+from safetensors import safe_open
 
+def open_hf_safetensor(file_path):
+    try:
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"File not found: {file_path}")
+        
+        if not file_path.endswith('.safetensors'):
+            raise ValueError("File does not have .safetensors extension")
+        
+        # Open the safetensor file
+        with safe_open(file_path, framework="pt", device="cpu") as f:
+            # Load all tensors into a dictionary
+            tensors = {k: f.get_tensor(k) for k in f.keys()}
+        
+        return tensors
+    
+    except Exception as e:
+        print(f"An error occurred while opening the safetensor file: {str(e)}")
+        return None
+
+# Example usage
+# file_path = 'path/to/your/model.safetensors'
+# tensors = open_hf_safetensor(file_path)
+# if tensors:
+#     for key, tensor in tensors.items():
+#         print(f"{key}: {tensor.shape}")
 def load_safetensor_weights(
     stage_module: torch.nn.Module,
     weight_map: Dict[str, str],
+    file_location: str,
 ):
     """
     Load weights stored as safetensors, from Hugging Face checkpoints into a stage module.
@@ -92,12 +119,30 @@ def load_safetensor_weights(
     
     for file in needed_files:
         print(f"stage file {needed_files=}")
+        full_path = os.path.join(file_location, file)
+        checkpoint = open_hf_safetensor(full_path)
+        print(f"Loaded {full_path}")
+        #from safetensors.torch import load_model d
+        for param in stage_state_dict.keys():
+            valid_weight = weight_map.get(param, None)
+            if valid_weight == file:
+                stage_state_dict[param] = checkpoint[param]
+                updated_states.setdefault(param, None)
+            else:
+                print(f"Warning: {param} not found in {file}")
+        
+    # Check if the module's state dict will be fully updated from checkpoint
+    if stage_state_dict.keys() == updated_states.keys():
+        print("Fully updated state dict")
+    else:
+        print("Partially updated state dict")
 
 
     # Now load the weights into the stage module
     # We use `assign=True` because otherwise the properties of the tensors in
     # the current module are preserved.
-    # stage_module.load_state_dict(state_dict, assign=True)
+    stage_module.load_state_dict(stage_state_dict, assign=True)
+    print(f"Loaded {len(updated_states)} weights into stage module {stage_module}")
 
 
 def load_weights(
@@ -135,6 +180,7 @@ def load_weights(
         needed_files.add(file)
 
     # Now we load the needed binary files
+    
     for file in needed_files:
         checkpoint = torch.load(file, weights_only=True)
         for param in state_dict.keys():
@@ -197,6 +243,7 @@ def main():
     from safetensors import safe_open
     cfile = cached_file(model_id, "model.safetensors.index.json")
     print(f"{cfile=}")
+    file_location = os.path.dirname(cfile)
 
     weight_map = read_weights_from_json(cfile)  
     
@@ -215,7 +262,7 @@ def main():
         #gpu_stage, missing = st.load_model(model=stage_module, filename = file_location, device=device, strict=False)
         #print(f"{gpu_stage=}")
         # Uncomment the following line when ready to load weights
-        load_safetensor_weights(stage_module, weight_map)
+        load_safetensor_weights(stage_module, weight_map, file_location)
         print(f"completed dummy load of stage {rank}")
         #stage_module.print_readable()
     
