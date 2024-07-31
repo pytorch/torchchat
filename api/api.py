@@ -224,6 +224,17 @@ class OpenAiApiGenerator(Generator):
     def completion(self, completion_request: CompletionRequest):
         """Handle a chat completion request and yield a chunked response.
 
+        ** Warning ** : Not all arguments of the CompletionRequest are consumed as the server isn't completely implemented.
+        Current treatment of parameters is described below.
+
+        - messages: The server consumes the final element of the array as the prompt.
+        - model: This has no impact on the server state, i.e. changing the model in the request
+        will not change which model is responding. Instead, use the --model flag to seelect the model when starting the server.
+        - temperature: This is used to control the randomness of the response. The server will use the temperature
+
+        See https://github.com/pytorch/torchchat/issues/973 for more details.
+
+
         Args:
             completion_request: Request object with prompt and other parameters.
 

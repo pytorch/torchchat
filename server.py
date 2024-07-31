@@ -21,6 +21,11 @@ def chat_endpoint():
     """
     Endpoint for the Chat API. This endpoint is used to generate a response to a user prompt.
     This endpoint emulates the behavior of the OpenAI Chat API. (https://platform.openai.com/docs/api-reference/chat)
+
+    ** Warning ** : Not all arguments of the CompletionRequest are consumed.
+
+    See https://github.com/pytorch/torchchat/issues/973 and the OpenAiApiGenerator class for more details.
+
     """
     data = request.get_json()
 
