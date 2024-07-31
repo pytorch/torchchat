@@ -181,6 +181,15 @@ def main(model_size: str, world_size: int, device: str):
         f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}"
     )
 
+    print(f"{rank=} Moving stage to device {device=}...")
+    stage_module.to(device)
+
+    # Create schedule runtime
+    stage = pipe.build_stage(
+        rank,
+        device=device,
+    )
+
     # Run
     # Run time inputs
     full_batch_prompts = (
@@ -191,22 +200,22 @@ def main(model_size: str, world_size: int, device: str):
 
     # Attach to a schedule
     # number of microbatches = 8 // 2 = 4
-    # num_mbs = 4
-    # schedule = ScheduleGPipe(stage, num_mbs)
+    num_mbs = 4
+    schedule = ScheduleGPipe(stage, num_mbs)
 
-    # if rank == 0:
-    #    args = inputs["input_ids"]
-    #else:
-    #    args = None
+    if rank == 0:
+        args = inputs["input_ids"]
+    else:
+        args = None
 
-    #output = schedule.step(args)
+    output = schedule.step(args)
 
     # Decode
-    '''if output is not None:
+    if output is not None:
         next_token_logits = output[0][:, -1, :]
         next_token = torch.argmax(next_token_logits, dim=-1)
         print(tokenizer.batch_decode(next_token))
-    '''
+    
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Model tracing and segmentation")
