@@ -1,8 +1,10 @@
+# $ torchrun --nproc-per-node 4 pp_meta.py
+
 import os
 import json
 from typing import Optional, Dict
 import torch
-from torch.distributed.pipelining import pipeline, SplitPoint
+from torch.distributed.pipelining import pipeline, SplitPoint, ScheduleGPipe
 from torch._subclasses.fake_tensor import FakeTensorMode
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from transformers.utils import cached_file
@@ -101,6 +103,7 @@ def load_safetensor_weights(
                     updated_states[param] = None
                 else:
                     # print(f"Warning: {param} not found in {file}")
+                    # TODO - need to handle this better
                     pass
 
     print(
@@ -128,6 +131,20 @@ def read_weights_from_json(file_path: str) -> Optional[Dict[str, str]]:
 
 
 def main(model_size: str, world_size: int, device: str):
+
+    rank = int(os.environ["RANK"])
+    world_size_dist = int(os.environ["WORLD_SIZE"])
+    if world_size_dist != world_size:
+        print(
+            f"Warning: world size mismatch: {world_size_dist} != {world_size}. "
+            "This may cause issues with the pipeline.  Overriding with dist world size"
+        )
+        world_size = world_size_dist
+    print(f"Rank: {rank} / {world_size}")
+
+    device = torch.device(f"cuda:{rank % torch.cuda.device_count()}")
+    torch.distributed.init_process_group(rank=rank, world_size=world_size)
+
     model_id = MODEL_CONFIGS[model_size]
     print(f"Model ID: {model_id}")
 
@@ -152,16 +169,44 @@ def main(model_size: str, world_size: int, device: str):
     pipe = create_pipeline(model, fake_ids, world_size)
 
     print("Materializing each stage...")
-    for rank in range(world_size):
-        stage_module = pipe.get_stage_module(rank)
+    for stage_rank in range(world_size):
+        if stage_rank != rank:
+            continue
+        stage_module = pipe.get_stage_module(stage_rank)
         print(f"Loading weights into stage {rank}")
         load_safetensor_weights(stage_module, weight_map, file_location)
         print(f"Completed load of stage {rank}")
 
     print(
-        f"{Color.blue}\n--->  Successfully traced and segmented model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}"
+        f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}"
     )
 
+    # Run
+    # Run time inputs
+    full_batch_prompts = (
+        "How do you", "I like to", "Can I help", "You need to",
+        "The weather is", "I found a", "What is your", "You are so",
+    )  # full batch size = 8
+    inputs = tokenizer(full_batch_prompts, return_tensors="pt", padding=True).to(device)
+
+    # Attach to a schedule
+    # number of microbatches = 8 // 2 = 4
+    # num_mbs = 4
+    # schedule = ScheduleGPipe(stage, num_mbs)
+
+    # if rank == 0:
+    #    args = inputs["input_ids"]
+    #else:
+    #    args = None
+
+    #output = schedule.step(args)
+
+    # Decode
+    '''if output is not None:
+        next_token_logits = output[0][:, -1, :]
+        next_token = torch.argmax(next_token_logits, dim=-1)
+        print(tokenizer.batch_decode(next_token))
+    '''
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Model tracing and segmentation")
