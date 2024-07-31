@@ -6,10 +6,10 @@
 
 import argparse
 import os
+from typing import Optional
 
 import torch
 import torch.nn as nn
-from torch.export import Dim
 
 from build.builder import (
     _initialize_model,
@@ -23,6 +23,8 @@ from build.builder import (
 from build.utils import set_backend, set_precision
 from cli import add_arguments_for_verb, arg_init, check_args
 
+from torch.export import Dim
+
 try:
     executorch_export_available = True
     from export_util.export_et import export_model as export_model_et
@@ -33,9 +35,12 @@ except Exception as e:
 
 default_device = "cpu"
 
-def export_for_server(model: nn.Module, device: Optional[str] = "cpu", output_path: str) -> str:
+
+def export_for_server(
+    model: nn.Module, device: Optional[str] = "cpu", output_path: str = "model.dso"
+) -> str:
     """
-    Export the model using AOT Compile to get a .dso for server use cases. 
+    Export the model using AOT Compile to get a .dso for server use cases.
 
     Args:
         model: The model to be exported.
