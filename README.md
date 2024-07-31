@@ -29,9 +29,6 @@ torchchat is a small codebase showcasing the ability to run large language model
 - Multiple quantization schemes
 - Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
-## Overview
-![System Overview](assets/torchchat.png)
-
 
 ## Installation
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
