@@ -177,14 +177,29 @@ def main(model_size: str, world_size: int, device: str):
         return
 
     print("Creating pipeline...")
-    
     pipe = create_pipeline(model, fake_ids, world_size)
 
+    # ---- stage materialization -------
     print("Materializing each stage...")
     stage_module = pipe.get_stage_module(rank)
     print(f"Loading weights into stage {rank}")
     load_safetensor_weights(stage_module, weight_map, file_location)
     print(f"Completed load of stage {rank}")
+    # optional debugging - stage_module.print_readable()
+    # In progress - need to generate rope embeddings via an init call
+    if rank==0:
+        print(f"{stage_module.model.rotary_emb=}")
+        print(f"{stage_module.model.rotary_emb._buffers=}")
+        # Completed load of stage 0
+        #stage_module.model.rotary_emb=InterpreterModule()
+        # stage_module.model.rotary_emb._buffers={'inv_freq': FakeTensor(..., device='cuda:0', size=(64,))}
+        print(f"{stage_module.model=}") # .init(config = config_file)
+        # stage_module.model.submod.init()
+        print(f"============>>>>>> {stage_module.model.rotary_emb=}")
+        print(f"{stage_module.model.rotary_emb._buffers=}")
+
+
+
 
     print(
         f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}"
@@ -197,24 +212,24 @@ def main(model_size: str, world_size: int, device: str):
         device=device,
     )
 
-    print(f"{rank=} Completed stage building:  {stage=}...")
+    
 
+    if rank == 0:
+        print(f"{stage_module.print_readable()=}")
+        print(f"{Color.green}{rank=} {stage_module.model.rotary_emb=} {Color.reset}")
+        print(f"{stage.device=}")
+        print(f"{rank=} Completed stage building:  {stage=}...")
+        print(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
+
+        #print(f"{dir(stage_module)=} {dir(stage_module.model)=} {dir(stage_module)}")
+    
     # run init with config
     print(f"{rank=} Running init with config {config_file}...")
     with open(config_file, "r") as f:
         config = json.load(f)
 
-    #stage.init_from_config(config)
-    # need to init rope embeddings... 
-    if rank == 0:
-        print(f"{rank=} Initializing rope embeddings...")
-        
-        print(f"{rank=} Completed rope embeddings init...")
-
-    # TODO - need to figure out how to init from config
-    print(f"{rank=} Completed init with config {config_file}...")
-
-    print(f"TODO = continue here....returning now for debugging")
+    
+    print(f"TODO = continue here....returning now via early stop for debugging")
     return
 
     # Run
