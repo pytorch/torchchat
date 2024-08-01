@@ -1,5 +1,9 @@
 # $ torchrun --nproc-per-node 4 pp_meta.py
 
+# derived from Ke's PR:
+# https://github.com/pytorch/PiPPy/pull/1135
+
+
 import os
 import json
 from typing import Optional, Dict
@@ -25,6 +29,7 @@ MODEL_CONFIGS = {
 }
 
 _default_safetensor_file_name = "model.safetensors.index.json"
+_config_name = "config.json"
 
 
 def create_model(model_id: str, device: str = "cuda"):
@@ -156,8 +161,14 @@ def main(model_size: str, world_size: int, device: str):
     inputs = tokenizer(prompts, return_tensors="pt", padding=True)
     fake_ids = fake_mode.from_tensor(inputs["input_ids"])
 
-    cfile = cached_file(model_id, _default_safetensor_file_name)
-    print(f"Cache file: {cfile}")
+    cfile = cached_file(model_id, _default_safetensor_file_name) # model.safetensors.index.json
+    config_file = cached_file(model_id, _config_name)  # config.json
+    
+    assert os.path.exists(cfile), f"safetensor index file {cfile} does not exist."
+    assert os.path.exists(config_file), f"config file {config_file} does not exist."
+
+    print(f"Cache file: {cfile} and config file: {config_file}")
+
     file_location = os.path.dirname(cfile)
 
     weight_map = read_weights_from_json(cfile)
@@ -181,14 +192,28 @@ def main(model_size: str, world_size: int, device: str):
         f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}"
     )
 
-    print(f"{rank=} Moving stage to device {device=}...")
-    stage_module.to(device)
-
     # Create schedule runtime
     stage = pipe.build_stage(
         rank,
         device=device,
     )
+
+    # print(f"{rank=} Moving stage to device {stage=}...")
+    #stage.to(device)
+    print(f"{rank=} Completed stage building:  {stage=}...")
+
+    # run init with config
+    print(f"{rank=} Running init with config {config_file}...")
+    with open(config_file, "r") as f:
+        config = json.load(f)
+
+    #stage.init_from_config(config)
+    # TODO - need to figure out how to init from config
+    print(f"{rank=} Completed init with config {config_file}...")
+
+    print(f"TODO = continue here....returning now for debugging")
+
+    return
 
     # Run
     # Run time inputs
