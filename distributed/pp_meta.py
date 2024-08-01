@@ -177,20 +177,19 @@ def main(model_size: str, world_size: int, device: str):
         return
 
     print("Creating pipeline...")
+    
     pipe = create_pipeline(model, fake_ids, world_size)
 
     print("Materializing each stage...")
-    for stage_rank in range(world_size):
-        if stage_rank != rank:
-            continue
-        stage_module = pipe.get_stage_module(stage_rank)
-        print(f"Loading weights into stage {rank}")
-        load_safetensor_weights(stage_module, weight_map, file_location)
-        print(f"Completed load of stage {rank}")
+    stage_module = pipe.get_stage_module(rank)
+    print(f"Loading weights into stage {rank}")
+    load_safetensor_weights(stage_module, weight_map, file_location)
+    print(f"Completed load of stage {rank}")
 
     print(
         f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}"
     )
+
 
     # Create schedule runtime
     stage = pipe.build_stage(
@@ -198,8 +197,6 @@ def main(model_size: str, world_size: int, device: str):
         device=device,
     )
 
-    # print(f"{rank=} Moving stage to device {stage=}...")
-    #stage.to(device)
     print(f"{rank=} Completed stage building:  {stage=}...")
 
     # run init with config
@@ -208,11 +205,16 @@ def main(model_size: str, world_size: int, device: str):
         config = json.load(f)
 
     #stage.init_from_config(config)
+    # need to init rope embeddings... 
+    if rank == 0:
+        print(f"{rank=} Initializing rope embeddings...")
+        
+        print(f"{rank=} Completed rope embeddings init...")
+
     # TODO - need to figure out how to init from config
     print(f"{rank=} Completed init with config {config_file}...")
 
     print(f"TODO = continue here....returning now for debugging")
-
     return
 
     # Run
