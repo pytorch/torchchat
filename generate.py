@@ -467,7 +467,7 @@ class Generator:
         if start_pos == 0:
             model = model.to(device=device)
             with torch.device(device):
-                model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+                model.text_transformer.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
                 if is_speculative and draft_model is not model:
                     draft_model.setup_caches(
                         max_batch_size=1, max_seq_length=max_seq_length
@@ -628,7 +628,7 @@ class Generator:
         self.system_prompt = None
         # Set up our max_seq_length
         if generator_args.chat_mode:
-            max_seq_length = self.model.config.max_seq_length
+            max_seq_length = self.model.text_transformer.config.max_seq_length
             print(
                 f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye"
             )
@@ -642,7 +642,7 @@ class Generator:
         else:
             max_seq_length = min(
                 encoded.size(0) + generator_args.max_new_tokens,
-                self.model.config.block_size,
+                self.model.text_transformer.config.block_size,
             )
 
         max_seq_length = (

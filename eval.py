@@ -58,7 +58,7 @@ def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
     T = prompt.size(0)
     T_new = T + max_new_tokens
     if max_seq_length is None:
-        max_seq_length = min(T_new, model.config.block_size)
+        max_seq_length = min(T_new, model.text_transformer.config.block_size)
 
     device, dtype = prompt.device, prompt.dtype
     # create an empty tensor of the expected final shape and
@@ -69,7 +69,7 @@ def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
     input_pos = torch.arange(0, T, device=device)
 
     with torch.device(device):
-        model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+        model.text_transformer.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
 
     return seq, input_pos, max_seq_length
 

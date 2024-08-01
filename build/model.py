@@ -22,27 +22,73 @@ config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
 
 @dataclass
+class TransformerArgs:
+    block_size: int = 2048
+    vocab_size: int = 32000
+    n_layers: int = 32
+    # n_head in gpt-fast
+    n_heads: int = 32
+    dim: int = 4096
+    # hidden dim is intermediate_size in gpt-fast
+    hidden_dim: int = None
+    n_local_heads: int = -1
+    head_dim: int = 64
+    rope_base: float = 10000
+    norm_eps: float = 1e-5
+    multiple_of: int = 256
+    ffn_dim_multiplier: Optional[int] = None
+    use_tiktoken: bool = False
+    max_seq_length: int = 8192
+    use_scaled_rope: bool = False
+
+    def __post_init__(self):
+        if self.n_local_heads == -1:
+            self.n_local_heads = self.n_heads
+        if self.hidden_dim is None:
+            # If hidden_dim is not explicitly set in the TransformerArgs,
+            # then calculate implicitly based on dim and
+            # also multiple of `args.multiple_of`
+            multiple_of = self.multiple_of
+            hidden_dim = 4 * self.dim
+            hidden_dim = int(2 * hidden_dim / 3)
+            if self.ffn_dim_multiplier is not None:
+                hidden_dim = int(self.ffn_dim_multiplier * hidden_dim)
+            self.hidden_dim = find_multiple(hidden_dim, multiple_of)
+        self.head_dim = self.dim // self.n_heads
+        if isinstance(self.use_tiktoken, str):
+            self.use_tiktoken = self.use_tiktoken == "True"
+
+    @classmethod
+    def from_params(cls, params):
+        replace = [("rope_theta", "rope_base"), ("n_kv_heads", "n_local_heads")]
+        for _from, _to in replace:
+            if _from in params:
+                params[_to] = params.pop(_from)
+        return cls(**params)
+
+@dataclass
 class ModelArgs:
-    transformer_args_maps: Dict[str, TransformerArgs]
+    text_transformer_args: TransformerArgs
 
     @classmethod
     def from_params(cls, params_path):
         with open(params_path, "r") as f:
             loaded_params = json.loads(f.read())
 
-        transformer_args_maps: Dict[str, TransformerArgs] = {}
-
         try:
             # try to interpret as a single transformer config
-            transformer_args_maps["default"] = TransformerArgs.from_params(
+            text_transformer_args = TransformerArgs.from_params(
                 loaded_params
             )
         except TypeError:
             # try to interpret as a dict of transformer configs
             for name, params in loaded_params.items():
-                transformer_args_maps[name] = TransformerArgs.from_params(params)
+                if name == "text":
+                    text_transformer_args = TransformerArgs.from_params(params)
+                else:
+                    raise ValueError(f"Unknown transformer name {name}")
 
-        return cls(transformer_args_maps)
+        return cls(text_transformer_args)
 
     @classmethod
     def from_table(cls, name: str):
@@ -91,101 +137,6 @@ class ModelArgs:
         return ModelArgs.from_params(config_path / f"{config[0]}.json")
 
 
-@dataclass
-class TransformerArgs:
-    block_size: int = 2048
-    vocab_size: int = 32000
-    n_layers: int = 32
-    # n_head in gpt-fast
-    n_heads: int = 32
-    dim: int = 4096
-    # hidden dim is intermediate_size in gpt-fast
-    hidden_dim: int = None
-    n_local_heads: int = -1
-    head_dim: int = 64
-    rope_base: float = 10000
-    norm_eps: float = 1e-5
-    multiple_of: int = 256
-    ffn_dim_multiplier: Optional[int] = None
-    use_tiktoken: bool = False
-    max_seq_length: int = 8192
-    use_scaled_rope: bool = False
-
-    def __post_init__(self):
-        if self.n_local_heads == -1:
-            self.n_local_heads = self.n_heads
-        if self.hidden_dim is None:
-            # If hidden_dim is not explicitly set in the TransformerArgs,
-            # then calculate implicitly based on dim and
-            # also multiple of `args.multiple_of`
-            multiple_of = self.multiple_of
-            hidden_dim = 4 * self.dim
-            hidden_dim = int(2 * hidden_dim / 3)
-            if self.ffn_dim_multiplier is not None:
-                hidden_dim = int(self.ffn_dim_multiplier * hidden_dim)
-            self.hidden_dim = find_multiple(hidden_dim, multiple_of)
-        self.head_dim = self.dim // self.n_heads
-        if isinstance(self.use_tiktoken, str):
-            self.use_tiktoken = self.use_tiktoken == "True"
-
-    @classmethod
-    def from_params(cls, params_path):
-        replace = [("rope_theta", "rope_base"), ("n_kv_heads", "n_local_heads")]
-        with open(params_path, "r") as f:
-            params = json.loads(f.read())
-            # Patch for llama3
-            for _from, _to in replace:
-                if _from in params:
-                    params[_to] = params.pop(_from)
-        return cls(**params)
-
-    @classmethod
-    def from_table(cls, name: str):
-        json_path = config_path / f"{name}.json"
-        if json_path.is_file():
-            return TransformerArgs.from_params(json_path)
-        else:
-            known_model_params = [
-                config.replace(".json", "") for config in os.listdir(config_path)
-            ]
-            raise RuntimeError(
-                f"unknown table index {name} for transformer config, must be from {known_model_params}"
-            )
-
-    @classmethod
-    def from_name(cls, name: str):
-        json_path = config_path / f"{name}.json"
-        if Path(json_path).is_file():
-            return TransformerArgs.from_params(json_path)
-
-        known_model_params = [
-            config.replace(".json", "") for config in os.listdir(config_path)
-        ]
-
-        print(f"known configs: {known_model_params}")
-        # Fuzzy search by name (e.g. "7B" and "Mistral-7B")
-        config = [
-            config
-            for config in known_model_params
-            if config in str(name).upper() or config in str(name)
-        ]
-
-        # We may have two or more configs matched (e.g., "7B" and
-        # "Mistral-7B"). Find the best config match:  take longer
-        # name (as it have more symbols matched)
-        if len(config) > 1:
-            config.sort(key=len, reverse=True)
-            assert len(config[0]) != len(
-                config[1]
-            ), name  # make sure only one 'best' match
-        elif len(config) == 0:
-            raise ValueError(
-                f"Unknown model directory name {name}. Must be one of {known_model_params}."
-            )
-
-        return TransformerArgs.from_params(config_path / f"{config[0]}.json")
-
-
 class KVCache(nn.Module):
     def __init__(
         self,
@@ -218,19 +169,10 @@ class Model(nn.Module):
     def __init__(self, config: ModelArgs) -> None:
         super().__init__()
         self.config = config
-        self.transformer_map: Dict[str, Transformer] = {}
-        for name, config in self.config.transformer_args_maps.items():
-            self.transformer_map[name] = Transformer(config)
-
-        assert (
-            len(self.transformer_map) == 1
-        ), "Only support one transformer model for now"
-        assert (
-            "default" in self.transformer_map
-        ), '"default" not in self.transformer_map'
+        self.text_transformer = Transformer(config.text_transformer_args)
 
     def forward(self, *args, **kwargs) -> Tensor:
-        return self.transformer_map["default"](*args, **kwargs)
+        return self.text_transformer(*args, **kwargs)
 
     @classmethod
     def from_name(cls, name: str):

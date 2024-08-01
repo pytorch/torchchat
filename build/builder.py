@@ -215,7 +215,7 @@ class TokenizerArgs:
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
-        use_tiktoken = model.config.use_tiktoken
+        use_tiktoken = model.text_transformer.config.use_tiktoken
 
         if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
             raise RuntimeError(
@@ -328,7 +328,6 @@ def _load_model_default(builder_args, only_config=False):
                     mmap=True,
                 )
             )
-
         checkpoint = {}
         for key in cps[0].keys():
             if not torch.allclose(cps[0][key], cps[1][key]):
@@ -349,9 +348,10 @@ def _load_model_default(builder_args, only_config=False):
 
     if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
         checkpoint = checkpoint["model"]
+    
+    checkpoint = {'text_transformer.' + k: v for k, v in checkpoint.items()}
 
-    model.load_state_dict(checkpoint, assign=True, strict=False)
-
+    model.load_state_dict(checkpoint, assign=True, strict=True)
     return model
 
 
@@ -494,7 +494,7 @@ def _initialize_model(
         try:
             from build.model_et import PTEModel
 
-            model = PTEModel(model.config, builder_args.pte_path)
+            model = PTEModel(model.text_transformer.config, builder_args.pte_path)
         except Exception:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
     else:
@@ -510,8 +510,8 @@ def _initialize_model(
 
         if builder_args.setup_caches:
             with torch.device(builder_args.device):
-                model.setup_caches(
-                    max_batch_size=1, max_seq_length=model.config.max_seq_length
+                model.text_transformer.setup_caches(
+                    max_batch_size=1, max_seq_length=model.text_transformer.config.max_seq_length
                 )
 
         model.to(dtype=builder_args.precision)
