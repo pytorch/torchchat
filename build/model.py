@@ -175,8 +175,8 @@ class Model(nn.Module):
         self.config = config
         self.text_transformer = Transformer(config.text_transformer_args)
 
-    def forward(self, *args, **kwargs) -> Tensor:
-        return self.text_transformer(*args, **kwargs)
+    def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
+        return self.text_transformer(idx, input_pos)
 
     @classmethod
     def from_name(cls, name: str):
