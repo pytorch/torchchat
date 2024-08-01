@@ -9,14 +9,10 @@ set -eou pipefail
 
 # Install required python dependencies for developing
 # Dependencies are defined in .pyproject.toml
-if [[ -z $PYTHON_EXECUTABLE ]];
+PYTHON_EXECUTABLE=${PYTHON_EXECUTABLE:-python}
+if [[ -z $CONDA_DEFAULT_ENV ]] || [[ $CONDA_DEFAULT_ENV == "base" ]] || [[ ! -x "$(command -v python)" ]];
 then
-  if [[ -z $CONDA_DEFAULT_ENV ]] || [[ $CONDA_DEFAULT_ENV == "base" ]] || [[ ! -x "$(command -v python)" ]];
-  then
-    PYTHON_EXECUTABLE=python3
-  else
-    PYTHON_EXECUTABLE=python
-  fi
+  PYTHON_EXECUTABLE=python3
 fi
 
 # Check python version. Expect 3.10.x or 3.11.x
