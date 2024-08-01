@@ -4,16 +4,34 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-from api.api import AssistantMessage, CompletionRequest, OpenAiApiGenerator
+import json
+
+from dataclasses import asdict
+from typing import Dict, List, Union
+
+from api.api import AssistantMessage, CompletionRequest, OpenAiApiGenerator, UserMessage
 
 from build.builder import BuilderArgs, TokenizerArgs
-from flask import Flask, jsonify, request, Response
+from flask import Flask, request, Response
 from generate import GeneratorArgs
 
+
+"""
+Creates a flask app that can be used to serve the model as a chat API.
+"""
 app = Flask(__name__)
 # Messages and gen are kept global so they can be accessed by the flask app endpoints.
 messages: list = []
 gen: OpenAiApiGenerator = None
+
+
+def _del_none(d: Union[Dict, List]) -> Union[Dict, List]:
+    """Recursively delete None values from a dictionary."""
+    if type(d) is dict:
+        return {k: _del_none(v) for k, v in d.items() if v}
+    elif type(d) is list:
+        return [_del_none(v) for v in d if v]
+    return d
 
 
 @app.route("/chat", methods=["POST"])
@@ -26,45 +44,44 @@ def chat_endpoint():
 
     See https://github.com/pytorch/torchchat/issues/973 and the OpenAiApiGenerator class for more details.
 
+    If stream is set to true, the response will be streamed back as a series of CompletionResponseChunk objects. Otherwise,
+    a single CompletionResponse object will be returned.
     """
+
+    print(" === Completion Request ===")
+
+    # Parse the request in to a CompletionRequest object
     data = request.get_json()
+    req = CompletionRequest(**data)
 
-    # Add user message to chat history
-    messages.append(data["messages"][-1])
-    prompt = messages[-1]["content"]
-
-    # Generate the assistant response
-    req = CompletionRequest(
-        model=gen.builder_args.checkpoint_path,
-        prompt=prompt,
-        temperature=0,
-        messages=[],
-    )
-
-    response = ""
-
-    def unwrap(completion_generator):
-        token_count = 0
-        for chunk_response in completion_generator:
-            content = chunk_response.choices[0].delta.content
-            if not gen.is_llama3_model or content not in set(
-                gen.tokenizer.special_tokens.keys()
-            ):
-                yield content if content is not None else ""
-            if content == gen.tokenizer.eos_id():
-                yield "."
-            token_count += 1
+    # Add the user message to our internal message history.
+    messages.append(UserMessage(**req.messages[-1]))
 
     if data.get("stream") == "true":
-        return Response(unwrap(gen.completion(req)), mimetype="text/event-stream")
+
+        def chunk_processor(chunked_completion_generator):
+            """Inline function for postprocessing CompletionResponseChunk objects.
+
+            Here, we just jsonify the chunk and yield it as a string.
+            """
+            messages.append(AssistantMessage(content=""))
+            for chunk in chunked_completion_generator:
+                if (next_tok := chunk.choices[0].delta.content) is None:
+                    next_tok = ""
+                messages[-1].content += next_tok
+                print(next_tok, end="")
+                yield json.dumps(_del_none(asdict(chunk)))
+
+        return Response(
+            chunk_processor(gen.chunked_completion(req)), mimetype="text/event-stream"
+        )
     else:
-        for content in unwrap(gen.completion(req)):
-            response += content
+        response = gen.sync_completion(req)
 
-    # Add assistant response to chat history
-    messages.append(AssistantMessage(content=response))
+        messages.append(response.choices[0].message)
+        print(messages[-1].content)
 
-    return jsonify({"response": response})
+        return json.dumps(_del_none(asdict(response)))
 
 
 def initialize_generator(args) -> OpenAiApiGenerator:
