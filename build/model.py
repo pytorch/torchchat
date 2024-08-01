@@ -70,6 +70,10 @@ class TransformerArgs:
 class ModelArgs:
     text_transformer_args: TransformerArgs
 
+    def __post_init__(self):
+        assert self.text_transformer_args is not None
+        assert type(self.text_transformer_args) == TransformerArgs
+
     @classmethod
     def from_params(cls, params_path):
         with open(params_path, "r") as f:

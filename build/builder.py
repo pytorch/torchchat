@@ -215,7 +215,7 @@ class TokenizerArgs:
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
-        use_tiktoken = model.text_transformer.config.use_tiktoken
+        use_tiktoken = model.config.text_transformer_args.use_tiktoken
 
         if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
             raise RuntimeError(
