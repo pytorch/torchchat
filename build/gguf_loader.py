@@ -13,12 +13,12 @@ import gguf
 
 import torch
 
+from build.gguf_util import Q4_0, to_float
+from build.model import Model, ModelArgs, TransformerArgs
+
 from gguf import GGUFValueType
 from quantization.qops import LinearInt4 as WeightOnlyInt4Linear
 from quantization.quantize import pack_scales_and_zeros
-
-from build.gguf_util import Q4_0, to_float
-from build.model import Model, ModelArgs, TransformerArgs
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -109,17 +109,15 @@ def load_model(gguf_file: str) -> torch.nn.Module:
     assert arch == "llama", "Only LLaMa models are supported by this converter."
 
     model_args = ModelArgs(
-        {
-            "default": TransformerArgs(
-                dim=metadata[f"{arch}.embedding_length"],
-                n_layers=metadata[f"{arch}.block_count"],
-                n_heads=metadata[f"{arch}.attention.head_count"],
-                n_local_heads=metadata[f"{arch}.attention.head_count_kv"],
-                vocab_size=len(metadata["tokenizer.ggml.tokens"]),
-                norm_eps=metadata[f"{arch}.attention.layer_norm_rms_epsilon"],
-                hidden_dim=metadata[f"{arch}.feed_forward_length"],
-            )
-        }
+        TransformerArgs(
+            dim=metadata[f"{arch}.embedding_length"],
+            n_layers=metadata[f"{arch}.block_count"],
+            n_heads=metadata[f"{arch}.attention.head_count"],
+            n_local_heads=metadata[f"{arch}.attention.head_count_kv"],
+            vocab_size=len(metadata["tokenizer.ggml.tokens"]),
+            norm_eps=metadata[f"{arch}.attention.layer_norm_rms_epsilon"],
+            hidden_dim=metadata[f"{arch}.feed_forward_length"],
+        )
     )
 
     # TODO: what to do with rope args like
