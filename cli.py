@@ -69,6 +69,7 @@ def add_arguments_for_verb(parser, verb: str) -> None:
     if verb == "export":
         _add_export_output_path_args(parser)
     if verb == "eval":
+        _add_exported_input_path_args(parser)
         _add_evaluation_args(parser)
 
     # Add CLI Args related to downloading of model artifacts (if not already downloaded)
@@ -123,6 +124,7 @@ def _add_model_specification_args(parser) -> None:
 
 
 # Add CLI Args related to model configuration (compilation, quant, etc)
+# Excludes compile args if subcommand is export
 def _add_model_config_args(parser, verb: str) -> None:
     model_config_parser = parser.add_argument_group(
         "Model Configuration", "Specify model configurations"
@@ -278,6 +280,7 @@ def _configure_artifact_inventory_args(parser, verb: str) -> None:
 
 
 # Add CLI Args specific to user prompted generation
+# Include prompt and num_sample args when the subcommand is generate
 def _add_generation_args(parser, verb: str) -> None:
     generator_parser = parser.add_argument_group(
         "Generation", "Configs for generating output based on provided prompt"
