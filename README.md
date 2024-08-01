@@ -458,7 +458,8 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 6. Follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem. Then issue a prompt.
 
 **Note:** The AAR file listed in Step 1 has the tiktoken tokenizer, which is used for Llama 3. To tweak or use a custom tokenizer and runtime, modify the ExecuTorch code
-and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library.
+and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library. For convenience, we also provide an AAR
+for sentencepiece tokenizer (e.g. Llama 2): [executorch-llama-bpe-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar) (SHASUM: d5fe81d9a4700c36b50ae322e6bf34882134edb0)
 
 <p align="center">
     <img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
