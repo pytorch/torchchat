@@ -349,7 +349,7 @@ def _load_model_default(builder_args, only_config=False):
     if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
         checkpoint = checkpoint["model"]
     
-    checkpoint = {'text_transformer.' + k: v for k, v in checkpoint.items()}
+    checkpoint = {"text_transformer." + k: v for k, v in checkpoint.items()}
 
     model.load_state_dict(checkpoint, assign=True, strict=True)
     return model
@@ -494,7 +494,7 @@ def _initialize_model(
         try:
             from build.model_et import PTEModel
 
-            model = PTEModel(model.text_transformer.config, builder_args.pte_path)
+            model = PTEModel(model.config, builder_args.pte_path)
         except Exception:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
     else:
