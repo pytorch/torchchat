@@ -47,7 +47,7 @@ fi
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-NIGHTLY_VERSION=dev20240727
+NIGHTLY_VERSION=dev20240728
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 (
