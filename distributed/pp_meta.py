@@ -8,17 +8,18 @@ import os
 import json
 from typing import Optional, Dict
 import torch
+import torch.distributed as dist
 from torch.distributed.pipelining import pipeline, SplitPoint, ScheduleGPipe
 from torch._subclasses.fake_tensor import FakeTensorMode
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
 # TODO- this is only temp import for now
 from transformers.models.llama.modeling_llama import LlamaRotaryEmbedding
 from transformers.utils import cached_file
 from safetensors import safe_open
 from argparse import ArgumentParser
-from contextlib import redirect_stdout
 
 from utils import Color
+from modeling_utils import reinit_layers, enumerate_transformer_llm
 
 # Model configuration
 MODEL_CONFIGS = {
@@ -35,70 +36,22 @@ _default_safetensor_file_name = "model.safetensors.index.json"
 _config_name = "config.json"
 
 
-def reinit_layers(model, target_type=LlamaRotaryEmbedding, config_file: Optional[str] = None):
-    reinitialized_count = 0
-
-    def recursive_reinit(module):
-        nonlocal reinitialized_count
-        for name, child in module.named_children():
-            if isinstance(child, target_type):
-                #if hasattr(child, 'reset_parameters'):
-                print(f"Reinitializing {name} of type {type(child).__name__}")
-                child.__init__(config_file)
-                reinitialized_count += 1
-                #else:
-                #print(f"Warning: {name} of type {type(child).__name__} does not have a reset_parameters method")
-                # If there's no reset_parameters method, we can implement a custom initialization here
-                    
-            else:
-                recursive_reinit(child)
-
-    recursive_reinit(model)
-    print(f"Total reinitialized modules: {reinitialized_count}")
-
-def enumerate_transformer_llm(model, prefix='', output_file=None):
-    def print_info(*args):
-        print(*args)
-        if output_file:
-            print(*args, file=output_file)
-
-    for name, module in model.named_children():
-        full_name = f"{prefix}.{name}" if prefix else name
-        
-        print_info(f"Module: {full_name}, Type: {type(module).__name__}")
-        
-        if list(module.parameters()):
-            for param_name, param in module.named_parameters():
-                print_info(f"  Parameter: {full_name}.{param_name}, Shape: {param.shape}")
-        
-        if list(module.buffers()):
-            for buffer_name, buffer in module.named_buffers():
-                print_info(f"  Buffer: {full_name}.{buffer_name}, Shape: {buffer.shape}")
-        
-        if list(module.children()):
-            enumerate_transformer_llm(module, full_name, output_file)
-
-
-
 def create_model(model_id: str, device: str = "cuda", rank: int=0, config_file: Optional[str] = None):
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
-    #with torch.device("meta"):
-    model = AutoModelForCausalLM.from_pretrained(model_id)
+    with torch.device("meta"):
+        model = AutoModelForCausalLM.from_pretrained(model_id)
+        config = model.config
+        if rank == 0:
+            print(f"Model config: {config}")
+            print(f"Model type: {type(model)}")
+            print(f"Model device: {model.device}")
+            print(f"Model dtype: {model.dtype}")
+            print(f"Model num params: {get_num_params(model)}")
+            print(f"Model num params (exclude embedding): {get_num_params(model, exclude_embedding=True)}")
+            print(f"Model num layers: {config.num_hidden_layers}")
     model.eval()
-    model = model.to(device)
     
-    #print(f"{model=}")
-    '''if rank==0:
-        with open('model_structure.txt', 'w') as f:
-            with redirect_stdout(f):
-                enumerate_transformer_llm(model)
-        
-        assert False, "good"
-    '''
-    reinit_layers(model= model, target_type=LlamaRotaryEmbedding, config_file=config_file)
-
-    assert False, "good"
-
+    
     with fake_mode:
         model.to_empty(device=device)
     return model, fake_mode
@@ -217,8 +170,12 @@ def main(model_size: str, world_size: int, device: str):
     cfile = cached_file(model_id, _default_safetensor_file_name) # model.safetensors.index.json
     config_file = cached_file(model_id, _config_name)  # config.json
     
+    
     assert os.path.exists(cfile), f"safetensor index file {cfile} does not exist."
     assert os.path.exists(config_file), f"config file {config_file} does not exist."
+
+    with open(config_file, "r") as file:
+        config_file = json.load(file)
 
     print(f"Cache file: {cfile} and config file: {config_file}")
 
@@ -251,34 +208,15 @@ def main(model_size: str, world_size: int, device: str):
     load_safetensor_weights(stage_module, weight_map, file_location)
     if rank==0:
         print(f"after load safe tensor Stage module type: {type(stage_module)}")
-
+    
     print(f"Completed load of stage {rank}")
-    # optional debugging - stage_module.print_readable()
-    # In progress - need to generate rope embeddings via an init call
-    if rank==0:
-        print(f"{stage_module.model.rotary_emb=}")
-        print(f"{stage_module.model.rotary_emb._buffers=}")
-        print(f"{dir(stage_module.model)=}")
-        print(f"type = {type(stage_module.model.rotary_emb)=}")
-        # Completed load of stage 0
-        #stage_module.model.rotary_emb=InterpreterModule()
-        # stage_module.model.rotary_emb._buffers={'inv_freq': FakeTensor(..., device='cuda:0', size=(64,))}
-        print(f"{type(stage_module.model)=}") # .init(config = config_file)
-        # stage_module.model.submod.init()
-        print(f"============>>>>>> {stage_module.model.rotary_emb=}")
-        print(f"{stage_module.model.rotary_emb._buffers=}")
-        stage_module.model.init() 
-        print(f"after init {stage_module.model.rotary_emb=}")
-        print(f"{stage_module.model.rotary_emb._buffers=}")
-
-
-
-
+    
     print(
         f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}"
     )
 
-
+    reinit_layers(model= stage_module.model, target_type=LlamaRotaryEmbedding, config_file=config_file)
+    dist.barrier()
     # Create schedule runtime
     stage = pipe.build_stage(
         rank,
