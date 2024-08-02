@@ -1,5 +1,6 @@
-
+from typing import Any, Dict, List, Optional, Tuple, Union
 from contextlib import redirect_stdout
+from transformers.models.llama.modeling_llama import LlamaRotaryEmbedding
 
 def reinit_layers(model, target_type=LlamaRotaryEmbedding, config_file: Optional[str] = None):
     """Reinitializes all layers of a given type in the model."""

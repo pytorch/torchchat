@@ -45,13 +45,10 @@ def create_model(model_id: str, device: str = "cuda", rank: int=0, config_file: 
             print(f"Model config: {config}")
             print(f"Model type: {type(model)}")
             print(f"Model device: {model.device}")
-            print(f"Model dtype: {model.dtype}")
-            print(f"Model num params: {get_num_params(model)}")
-            print(f"Model num params (exclude embedding): {get_num_params(model, exclude_embedding=True)}")
+            print(f"Model dtype: {model.torch_dtype}")
             print(f"Model num layers: {config.num_hidden_layers}")
     model.eval()
-    
-    
+    assert False, "good"
     with fake_mode:
         model.to_empty(device=device)
     return model, fake_mode
