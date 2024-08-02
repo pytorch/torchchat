@@ -6,7 +6,7 @@
 
 import os
 import json
-from typing import Optional, Dict
+from typing import Optional, Dict, Tuple
 import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import pipeline, SplitPoint, ScheduleGPipe
@@ -19,7 +19,7 @@ from safetensors import safe_open
 from argparse import ArgumentParser
 
 from utils import Color
-from modeling_utils import reinit_layers, enumerate_transformer_llm
+from modeling_utils import reinit_layers, enumerate_transformer_llm, find_main_llama_rope_embeddings
 
 # Model configuration
 MODEL_CONFIGS = {
@@ -36,22 +36,22 @@ _default_safetensor_file_name = "model.safetensors.index.json"
 _config_name = "config.json"
 
 
-def create_model(model_id: str, device: str = "cuda", rank: int=0, config_file: Optional[str] = None):
+def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[AutoModelForCausalLM, FakeTensorMode, Optional[Dict[str, str]]]:
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
+    config = None
     with torch.device("meta"):
         model = AutoModelForCausalLM.from_pretrained(model_id)
         config = model.config
         if rank == 0:
             print(f"Model config: {config}")
             print(f"Model type: {type(model)}")
-            print(f"Model device: {model.device}")
-            print(f"Model dtype: {model.torch_dtype}")
+            print(f"Model dtype: {config.torch_dtype}")
             print(f"Model num layers: {config.num_hidden_layers}")
     model.eval()
-    assert False, "good"
+
     with fake_mode:
         model.to_empty(device=device)
-    return model, fake_mode
+    return model, fake_mode, config
 
 
 def create_pipeline(model, inputs, world_size: int):
@@ -153,7 +153,7 @@ def main(model_size: str, world_size: int, device: str):
     if world_size_dist != world_size:
         print(
             f"Warning: world size mismatch: {world_size_dist} != {world_size}. "
-            "This may cause issues with the pipeline.  Overriding with dist world size"
+            "Overriding with dist world size"
         )
         world_size = world_size_dist
     print(f"Rank: {rank} / {world_size}")
@@ -178,7 +178,8 @@ def main(model_size: str, world_size: int, device: str):
 
     file_location = os.path.dirname(cfile)
 
-    model, fake_mode = create_model(model_id, device, rank, config_file)
+    # Create model on meta device
+    model, fake_mode, model_config = create_model(model_id, device, rank,)
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     tokenizer.pad_token = tokenizer.eos_token
@@ -211,8 +212,22 @@ def main(model_size: str, world_size: int, device: str):
     print(
         f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}"
     )
+    
+    # find the rotary embedding
+    if rank==0:
+        print(f"Finding the main llama rope embeddings...")
+        print(f"{stage_module.model=}")
+        original_rotary_emb = model.rotary_emb._c
+        print(f"{original_rotary_emb=}")
+        
+        assert False, "good"
 
-    reinit_layers(model= stage_module.model, target_type=LlamaRotaryEmbedding, config_file=config_file)
+        print(f"{stage_module.model= }")
+        rope_list = find_main_llama_rope_embeddings(stage_module.model)
+        print(f"Found {len(rope_list)} LlamaRotaryEmbedding at the main level: {[name for name, _ in rope_list]}")
+
+    assert False, "good"
+    #reinit_layers(model= stage_module.model, target_type=LlamaRotaryEmbedding, config_file=config_file)
     dist.barrier()
     # Create schedule runtime
     stage = pipe.build_stage(
@@ -220,7 +235,6 @@ def main(model_size: str, world_size: int, device: str):
         device=device,
     )
 
-    
 
     if rank == 0:
         print(f"{stage_module.print_readable()=}")
@@ -231,10 +245,6 @@ def main(model_size: str, world_size: int, device: str):
 
         #print(f"{dir(stage_module)=} {dir(stage_module.model)=} {dir(stage_module)}")
     
-    # run init with config
-    print(f"{rank=} Running init with config {config_file}...")
-    with open(config_file, "r") as f:
-        config = json.load(f)
 
     
     print(f"TODO = continue here....returning now via early stop for debugging")

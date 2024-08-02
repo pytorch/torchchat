@@ -2,6 +2,24 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from contextlib import redirect_stdout
 from transformers.models.llama.modeling_llama import LlamaRotaryEmbedding
 
+
+def find_main_llama_rope_embeddings(model):
+    rope_embeddings = []
+    
+    for name, module in model.named_children():
+        if isinstance(module, LlamaRotaryEmbedding):
+            rope_embeddings.append((name, module))
+    
+    if not rope_embeddings:
+        print("No LlamaRotaryEmbedding found at the main level of the model.")
+    elif len(rope_embeddings) == 1:
+        print(f"Found one LlamaRotaryEmbedding at the main level: {rope_embeddings[0][0]}")
+        return rope_embeddings[0][1]
+    else:
+        print(f"Found multiple LlamaRotaryEmbeddings at the main level: {[name for name, _ in rope_embeddings]}")
+        return rope_embeddings
+
+
 def reinit_layers(model, target_type=LlamaRotaryEmbedding, config_file: Optional[str] = None):
     """Reinitializes all layers of a given type in the model."""
     reinitialized_count = 0
