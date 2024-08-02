@@ -564,18 +564,29 @@ We really value our community and the contributions made by our wonderful users.
 
 ## Troubleshooting
 
-**CERTIFICATE_VERIFY_FAILED**
-Run `pip install --upgrade certifi`.
+A section of commonly encountered setup errors/exceptions. If this section doesn't contain your situation, check the GitHub [issues](https://github.com/pytorch/torchchat/issues)
 
+### Model Access
 
 **Access to model is restricted and you are not in the authorized list**
+
 Some models require an additional step to access. Follow the
 link provided in the error to get access.
 
-**Installing ET Fails**
+### Installing ExecuTorch
+
+**Failed Building Wheel**
+
 If `./scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
 
+**CERTIFICATE_VERIFY_FAILED**
+
+Run `pip install --upgrade certifi`.
+
 ## Filing Issues
+
+If you encounter bugs or difficulty using torchchat, please file an GitHub [issue](https://github.com/pytorch/torchchat/issues).
+
 Please include the exact command you ran and the output of that command.
 Also, run this script and include the output saved to `system_info.txt` so that we can better debug your issue.
 
