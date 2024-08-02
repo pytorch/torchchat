@@ -11,6 +11,8 @@ import torch
 from torch.distributed.pipelining import pipeline, SplitPoint, ScheduleGPipe
 from torch._subclasses.fake_tensor import FakeTensorMode
 from transformers import AutoModelForCausalLM, AutoTokenizer
+# TODO- this is only temp import for now
+from transformers.models.llama.modeling_llama import LlamaRotaryEmbedding
 from transformers.utils import cached_file
 from safetensors import safe_open
 from argparse import ArgumentParser
@@ -31,6 +33,28 @@ MODEL_CONFIGS = {
 
 _default_safetensor_file_name = "model.safetensors.index.json"
 _config_name = "config.json"
+
+
+def reinit_layers(model, target_type=LlamaRotaryEmbedding, config_file: Optional[str] = None):
+    reinitialized_count = 0
+
+    def recursive_reinit(module):
+        nonlocal reinitialized_count
+        for name, child in module.named_children():
+            if isinstance(child, target_type):
+                #if hasattr(child, 'reset_parameters'):
+                print(f"Reinitializing {name} of type {type(child).__name__}")
+                child.__init__(config_file)
+                reinitialized_count += 1
+                #else:
+                #print(f"Warning: {name} of type {type(child).__name__} does not have a reset_parameters method")
+                # If there's no reset_parameters method, we can implement a custom initialization here
+                    
+            else:
+                recursive_reinit(child)
+
+    recursive_reinit(model)
+    print(f"Total reinitialized modules: {reinitialized_count}")
 
 def enumerate_transformer_llm(model, prefix='', output_file=None):
     def print_info(*args):
@@ -56,7 +80,7 @@ def enumerate_transformer_llm(model, prefix='', output_file=None):
 
 
 
-def create_model(model_id: str, device: str = "cuda", rank=rank):
+def create_model(model_id: str, device: str = "cuda", rank: int=0, config_file: Optional[str] = None):
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
     #with torch.device("meta"):
     model = AutoModelForCausalLM.from_pretrained(model_id)
@@ -64,12 +88,17 @@ def create_model(model_id: str, device: str = "cuda", rank=rank):
     model = model.to(device)
     
     #print(f"{model=}")
-    with open('model_structure.txt', 'w') as f:
-        with redirect_stdout(f):
-            enumerate_transformer_llm(model)
-    
+    '''if rank==0:
+        with open('model_structure.txt', 'w') as f:
+            with redirect_stdout(f):
+                enumerate_transformer_llm(model)
+        
+        assert False, "good"
+    '''
+    reinit_layers(model= model, target_type=LlamaRotaryEmbedding, config_file=config_file)
+
     assert False, "good"
-    
+
     with fake_mode:
         model.to_empty(device=device)
     return model, fake_mode
@@ -185,15 +214,6 @@ def main(model_size: str, world_size: int, device: str):
     model_id = MODEL_CONFIGS[model_size]
     print(f"Model ID: {model_id}")
 
-    model, fake_mode = create_model(model_id, device, rank)
-
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
-    tokenizer.pad_token = tokenizer.eos_token
-
-    prompts = ("How do you", "I like to")
-    inputs = tokenizer(prompts, return_tensors="pt", padding=True)
-    fake_ids = fake_mode.from_tensor(inputs["input_ids"])
-
     cfile = cached_file(model_id, _default_safetensor_file_name) # model.safetensors.index.json
     config_file = cached_file(model_id, _config_name)  # config.json
     
@@ -203,6 +223,16 @@ def main(model_size: str, world_size: int, device: str):
     print(f"Cache file: {cfile} and config file: {config_file}")
 
     file_location = os.path.dirname(cfile)
+
+    model, fake_mode = create_model(model_id, device, rank, config_file)
+
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    tokenizer.pad_token = tokenizer.eos_token
+
+    prompts = ("How do you", "I like to")
+    inputs = tokenizer(prompts, return_tensors="pt", padding=True)
+    fake_ids = fake_mode.from_tensor(inputs["input_ids"])
+
 
     weight_map = read_weights_from_json(cfile)
     if weight_map is None:
