@@ -49,14 +49,12 @@ def export_for_server(
     Returns:
         The path to the exported model.
     """
-    max_seq_length = 350
-
     input = (
         torch.tensor([[1, 9038, 2501, 263, 931]], dtype=torch.int, device=device),
         torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
     )
 
-    seq = Dim("seq", min=1, max=max_seq_length)
+    seq = Dim("seq", min=1, max=model.config.max_seq_length)
     # Specify that the first dimension of each input is that batch size
     dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
 
