@@ -14,6 +14,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from transformers.utils import cached_file
 from safetensors import safe_open
 from argparse import ArgumentParser
+from contextlib import redirect_stdout
 
 from utils import Color
 
@@ -31,13 +32,44 @@ MODEL_CONFIGS = {
 _default_safetensor_file_name = "model.safetensors.index.json"
 _config_name = "config.json"
 
+def enumerate_transformer_llm(model, prefix='', output_file=None):
+    def print_info(*args):
+        print(*args)
+        if output_file:
+            print(*args, file=output_file)
 
-def create_model(model_id: str, device: str = "cuda"):
+    for name, module in model.named_children():
+        full_name = f"{prefix}.{name}" if prefix else name
+        
+        print_info(f"Module: {full_name}, Type: {type(module).__name__}")
+        
+        if list(module.parameters()):
+            for param_name, param in module.named_parameters():
+                print_info(f"  Parameter: {full_name}.{param_name}, Shape: {param.shape}")
+        
+        if list(module.buffers()):
+            for buffer_name, buffer in module.named_buffers():
+                print_info(f"  Buffer: {full_name}.{buffer_name}, Shape: {buffer.shape}")
+        
+        if list(module.children()):
+            enumerate_transformer_llm(module, full_name, output_file)
+
+
+
+def create_model(model_id: str, device: str = "cuda", rank=rank):
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
-    with torch.device("meta"):
-        model = AutoModelForCausalLM.from_pretrained(model_id)
+    #with torch.device("meta"):
+    model = AutoModelForCausalLM.from_pretrained(model_id)
     model.eval()
-
+    model = model.to(device)
+    
+    #print(f"{model=}")
+    with open('model_structure.txt', 'w') as f:
+        with redirect_stdout(f):
+            enumerate_transformer_llm(model)
+    
+    assert False, "good"
+    
     with fake_mode:
         model.to_empty(device=device)
     return model, fake_mode
@@ -153,7 +185,8 @@ def main(model_size: str, world_size: int, device: str):
     model_id = MODEL_CONFIGS[model_size]
     print(f"Model ID: {model_id}")
 
-    model, fake_mode = create_model(model_id, device)
+    model, fake_mode = create_model(model_id, device, rank)
+
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     tokenizer.pad_token = tokenizer.eos_token
 
@@ -182,20 +215,30 @@ def main(model_size: str, world_size: int, device: str):
     # ---- stage materialization -------
     print("Materializing each stage...")
     stage_module = pipe.get_stage_module(rank)
+    if rank==0:
+        print(f"Stage module type: {type(stage_module)}")
     print(f"Loading weights into stage {rank}")
     load_safetensor_weights(stage_module, weight_map, file_location)
+    if rank==0:
+        print(f"after load safe tensor Stage module type: {type(stage_module)}")
+
     print(f"Completed load of stage {rank}")
     # optional debugging - stage_module.print_readable()
     # In progress - need to generate rope embeddings via an init call
     if rank==0:
         print(f"{stage_module.model.rotary_emb=}")
         print(f"{stage_module.model.rotary_emb._buffers=}")
+        print(f"{dir(stage_module.model)=}")
+        print(f"type = {type(stage_module.model.rotary_emb)=}")
         # Completed load of stage 0
         #stage_module.model.rotary_emb=InterpreterModule()
         # stage_module.model.rotary_emb._buffers={'inv_freq': FakeTensor(..., device='cuda:0', size=(64,))}
-        print(f"{stage_module.model=}") # .init(config = config_file)
+        print(f"{type(stage_module.model)=}") # .init(config = config_file)
         # stage_module.model.submod.init()
         print(f"============>>>>>> {stage_module.model.rotary_emb=}")
+        print(f"{stage_module.model.rotary_emb._buffers=}")
+        stage_module.model.init() 
+        print(f"after init {stage_module.model.rotary_emb=}")
         print(f"{stage_module.model.rotary_emb._buffers=}")
 
 
