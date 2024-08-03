@@ -42,13 +42,55 @@ def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[Auto
     #with torch.device("meta"):
     with init_on_meta_device(device="meta"):
         model = AutoModelForCausalLM.from_pretrained(model_id)
+        if rank==0:
+            print(f"---- precision meta init ----")
+            print(f"{model.model.rotary_emb=}")
+            print(f"rope type {type(model.model.rotary_emb)}")
+            print(f"{model.model.rotary_emb.inv_freq[0:5]=}")
+            print(f"{model.model.rotary_emb.inv_freq.device=}")
+
+        # what we expect:
+        #model.model.rotary_emb=LlamaRotaryEmbedding()
+        #model.model.rotary_emb.inv_freq=tensor([1.0000e+00, 8.1462e-01, 6.6360e-01, 5.4058e-01, 4.4037e-01, 3.5873e-01,
+        #    2.9223e-01, 2.3805e-01, 1.9392e-01, 1.5797e-01, 1.2869e-01, 1.0483e-01,
+        
     print(f"Model type: {type(model)}")
 
     config = model.config
+    config.device = device
     model.eval()
     
     with fake_mode:
-        model.to_empty(device=device)
+        model.to_empty(device='cuda')
+    if rank==0:
+            print(f"---- after fake mode to cuda move ----")
+            print(f"{model.model.rotary_emb=}")
+            print(f"rope type {type(model.model.rotary_emb)}")
+            print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
+            print(f"{model.model.rotary_emb.inv_freq.device=}")
+    
+    model.model.rotary_emb.__init__(config=config)
+    model.model.rotary_emb.to('cuda')
+
+    if rank==0:
+            print(f"---- after rope re-init and move to device manually ----")
+            print(f"{model.model.rotary_emb=}")
+            print(f"rope type {type(model.model.rotary_emb)}")
+            print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
+            print(f"-- final result: {model.model.rotary_emb.inv_freq.device=}")
+
+
+
+    if rank==0:
+            print(f"---- afterto cuda move, then rotary re-init ----")
+            print(f"{model.model.rotary_emb=}")
+            print(f"rope type {type(model.model.rotary_emb)}")
+            print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
+
+    print(f"check both devices: {model.model.rotary_emb.inv_freq.device=}")
+
+    dist.barrier()
+
     return model, fake_mode, config
 
 
@@ -176,7 +218,7 @@ def main(model_size: str, world_size: int, device: str):
 
     file_location = os.path.dirname(cfile)
 
-    # Create model on meta device
+    # ========== Create model on meta device =================
     model, fake_mode, model_config = create_model(model_id, device, rank,)
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
@@ -192,6 +234,7 @@ def main(model_size: str, world_size: int, device: str):
         print(f"No weight map found in the JSON file {cfile}.")
         return
 
+    # =========== Create pipeline =================
     print("Creating pipeline...")
     pipe = create_pipeline(model, fake_ids, world_size)
 
@@ -213,8 +256,8 @@ def main(model_size: str, world_size: int, device: str):
     if rank==0:
         # model.model.rotary_emb.__init__(config=config)
         stage_module.model.graph.print_tabular()
-        assert False, "good"
-        for node in stage_module.graph.nodes:
+        
+        '''for node in stage_module.graph.nodes:
             if node.name == "model":
                 for subnode in node.children():
                     print(f"{subnode=}")
@@ -226,31 +269,22 @@ def main(model_size: str, world_size: int, device: str):
                     print(f"{subnode.op=}")
                     print(f"{subnode.type=}")
                     print(f"{subnode.users=}")
-                    
+        '''      
            
                 
         # print(f"rank 0 {stage_module=}")
-        stage_module.rotary_emb.__init__() # config=model_config)
-        print(f"!!! **********     ran init pre weights")
+        print(f"===== check rope freq ===>>>> {stage_module.model.rotary_emb.inv_freq[0:2]=}")
     dist.barrier()
+    assert False, "stop here"
     # find the rotary embedding
     if rank==0:
         print(f"Finding the main llama rope embeddings...")
         # model.rotary_emb
         print(f"**********     ran init")
         print(f"{stage_module.model.rotary_emb=}")
-        original_rotary_emb = stage_module.model.rotary_emb._modules
-        print(f"{original_rotary_emb=}")
-        
-        assert False, "good"
 
         print(f"{stage_module.model= }")
-        rope_list = find_main_llama_rope_embeddings(stage_module.model)
-        print(f"Found {len(rope_list)} LlamaRotaryEmbedding at the main level: {[name for name, _ in rope_list]}")
-
-    assert False, "good"
-    #reinit_layers(model= stage_module.model, target_type=LlamaRotaryEmbedding, config_file=config_file)
-    dist.barrier()
+        
     # Create schedule runtime
     stage = pipe.build_stage(
         rank,
