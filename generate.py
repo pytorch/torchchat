@@ -110,11 +110,11 @@ class GeneratorArgs:
         )
 
         return cls(
-            prompt=args.prompt,
+            prompt=getattr(args, "prompt", ""),
             encoded_prompt=None,
             chat_mode=args.chat,
             gui_mode=args.gui,
-            num_samples=args.num_samples,
+            num_samples=getattr(args, "num_samples", 1),
             max_new_tokens=args.max_new_tokens,
             top_k=args.top_k,
             temperature=args.temperature,
