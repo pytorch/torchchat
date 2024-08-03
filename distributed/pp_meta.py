@@ -39,16 +39,13 @@ _config_name = "config.json"
 def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[AutoModelForCausalLM, FakeTensorMode, Optional[Dict[str, str]]]:
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
     config = None
-    with torch.device("meta"):
-        model = AutoModelForCausalLM.from_pretrained(model_id)
-        config = model.config
-        if rank == 0:
-            print(f"Model config: {config}")
-            print(f"Model type: {type(model)}")
-            print(f"Model dtype: {config.torch_dtype}")
-            print(f"Model num layers: {config.num_hidden_layers}")
-    model.eval()
+    #with torch.device("meta"):
+    model = AutoModelForCausalLM.from_pretrained(model_id)
+    print(f"Model type: {type(model)}")
 
+    config = model.config
+    model.eval()
+    
     with fake_mode:
         model.to_empty(device=device)
     return model, fake_mode, config
@@ -201,7 +198,10 @@ def main(model_size: str, world_size: int, device: str):
     print("Materializing each stage...")
     stage_module = pipe.get_stage_module(rank)
     if rank==0:
-        print(f"Stage module type: {type(stage_module)}")
+
+        # model.model.rotary_emb.__init__(config=config
+        stage_module.model.model.rotary_emb._init_weights(config=model_config)
+        print(f"!!! **********     ran init pre weights")
     print(f"Loading weights into stage {rank}")
     load_safetensor_weights(stage_module, weight_map, file_location)
     if rank==0:
@@ -216,8 +216,11 @@ def main(model_size: str, world_size: int, device: str):
     # find the rotary embedding
     if rank==0:
         print(f"Finding the main llama rope embeddings...")
-        print(f"{stage_module.model=}")
-        original_rotary_emb = model.rotary_emb._c
+        # model.rotary_emb
+        stage_module.model._init_weights()
+        print(f"**********     ran init")
+        print(f"{stage_module.model.rotary_emb=}")
+        original_rotary_emb = stage_module.model.rotary_emb._modules
         print(f"{original_rotary_emb=}")
         
         assert False, "good"
@@ -234,7 +237,6 @@ def main(model_size: str, world_size: int, device: str):
         rank,
         device=device,
     )
-
 
     if rank == 0:
         print(f"{stage_module.print_readable()=}")

@@ -19,25 +19,34 @@ def find_main_llama_rope_embeddings(model):
         print(f"Found multiple LlamaRotaryEmbeddings at the main level: {[name for name, _ in rope_embeddings]}")
         return rope_embeddings
 
+def print_model_structure(model):
+    """prints tab indented model structure"""
+    def search(module, depth=0):
+            for name, child in module.named_children():
+                print(f"{'  '*(depth+1)}{name}")
+                search(child, depth+1)
+        search(model)
 
 def reinit_layers(model, target_type=LlamaRotaryEmbedding, config_file: Optional[str] = None):
     """Reinitializes all layers of a given type in the model."""
     reinitialized_count = 0
 
-    def recursive_reinit(module):
+    def recursive_reinit(module, depth=0):
         nonlocal reinitialized_count
         for name, child in module.named_children():
             if isinstance(child, target_type):
                 #if hasattr(child, 'reset_parameters'):
-                print(f"Reinitializing {name} of type {type(child).__name__}")
-                child.__init__(config=config_file)
+                print(f"{depth=}, Reinitializing {name} of type {type(child).__name__}")
+                if depth==1:
+                    return child
+                # child.__init__(config=config_file)
                 reinitialized_count += 1
                 #else:
                 #print(f"Warning: {name} of type {type(child).__name__} does not have a reset_parameters method")
                 # If there's no reset_parameters method, we can implement a custom initialization here
                     
             else:
-                recursive_reinit(child)
+                recursive_reinit(child, depth+1)
 
     recursive_reinit(model)
     print(f"Total reinitialized modules: {reinitialized_count}")
