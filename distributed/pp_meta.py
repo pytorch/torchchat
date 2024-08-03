@@ -19,7 +19,7 @@ from safetensors import safe_open
 from argparse import ArgumentParser
 
 from utils import Color
-from modeling_utils import reinit_layers, enumerate_transformer_llm, find_main_llama_rope_embeddings
+from modeling_utils import reinit_layers, enumerate_transformer_llm, find_main_llama_rope_embeddings, init_on_meta_device
 
 # Model configuration
 MODEL_CONFIGS = {
@@ -40,7 +40,8 @@ def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[Auto
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
     config = None
     #with torch.device("meta"):
-    model = AutoModelForCausalLM.from_pretrained(model_id)
+    with init_on_meta_device(device="meta"):
+        model = AutoModelForCausalLM.from_pretrained(model_id)
     print(f"Model type: {type(model)}")
 
     config = model.config
@@ -171,7 +172,7 @@ def main(model_size: str, world_size: int, device: str):
     with open(config_file, "r") as file:
         config_file = json.load(file)
 
-    print(f"Cache file: {cfile} and config file: {config_file}")
+    #print(f"Cache file: {cfile} and config file: {config_file}")
 
     file_location = os.path.dirname(cfile)
 
@@ -197,11 +198,7 @@ def main(model_size: str, world_size: int, device: str):
     # ---- stage materialization -------
     print("Materializing each stage...")
     stage_module = pipe.get_stage_module(rank)
-    if rank==0:
-
-        # model.model.rotary_emb.__init__(config=config
-        stage_module.model.model.rotary_emb._init_weights(config=model_config)
-        print(f"!!! **********     ran init pre weights")
+    
     print(f"Loading weights into stage {rank}")
     load_safetensor_weights(stage_module, weight_map, file_location)
     if rank==0:
@@ -212,12 +209,34 @@ def main(model_size: str, world_size: int, device: str):
     print(
         f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}"
     )
-    
+
+    if rank==0:
+        # model.model.rotary_emb.__init__(config=config)
+        stage_module.model.graph.print_tabular()
+        assert False, "good"
+        for node in stage_module.graph.nodes:
+            if node.name == "model":
+                for subnode in node.children():
+                    print(f"{subnode=}")
+                    print(f"{subnode.target=}")
+                    print(f"{subnode.args=}")
+                    print(f"{subnode.kwargs=}")
+                    print(f"{subnode.meta=}")
+                    print(f"{subnode.name=}")
+                    print(f"{subnode.op=}")
+                    print(f"{subnode.type=}")
+                    print(f"{subnode.users=}")
+                    
+           
+                
+        # print(f"rank 0 {stage_module=}")
+        stage_module.rotary_emb.__init__() # config=model_config)
+        print(f"!!! **********     ran init pre weights")
+    dist.barrier()
     # find the rotary embedding
     if rank==0:
         print(f"Finding the main llama rope embeddings...")
         # model.rotary_emb
-        stage_module.model._init_weights()
         print(f"**********     ran init")
         print(f"{stage_module.model.rotary_emb=}")
         original_rotary_emb = stage_module.model.rotary_emb._modules

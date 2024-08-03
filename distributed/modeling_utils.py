@@ -1,6 +1,40 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
-from contextlib import redirect_stdout
+from contextlib import redirect_stdout, contextmanager
 from transformers.models.llama.modeling_llama import LlamaRotaryEmbedding
+import torch
+import torch.nn as nn
+
+@contextmanager
+def init_on_meta_device(device: torch.device):
+    """Device initialization context manager for meta init. Keeps buffers on current device"""
+
+    old_register_parameter = nn.Module.register_parameter
+
+    def register_empty_parameter(module, name, param):
+        old_register_parameter(module, name, param)
+        if param is not None:
+            param_cls = type(module._parameters[name])
+            kwargs = module._parameters[name].__dict__
+            module._parameters[name] = param_cls(module._parameters[name].to(device), **kwargs)
+
+    tensor_constructors_to_patch = {torch_function_name: getattr(torch, torch_function_name) 
+                                    for torch_function_name in ['empty', 'zeros', 'ones', 'full']}
+
+    def patch_tensor_constructor(fn):
+        def wrapper(*args, **kwargs):
+            kwargs['device'] = device
+            return fn(*args, **kwargs)
+        return wrapper
+    try:
+        nn.Module.register_parameter = register_empty_parameter
+        for torch_function_name, old_torch_function in tensor_constructors_to_patch.items():
+            setattr(torch, torch_function_name, patch_tensor_constructor(old_torch_function))
+        yield
+    finally:
+        nn.Module.register_parameter = old_register_parameter
+        for torch_function_name, old_torch_function in tensor_constructors_to_patch.items():
+            setattr(torch, torch_function_name, old_torch_function)
+
 
 
 def find_main_llama_rope_embeddings(model):
@@ -21,11 +55,11 @@ def find_main_llama_rope_embeddings(model):
 
 def print_model_structure(model):
     """prints tab indented model structure"""
-    def search(module, depth=0):
+    def _search(module, depth=0):
             for name, child in module.named_children():
                 print(f"{'  '*(depth+1)}{name}")
                 search(child, depth+1)
-        search(model)
+    _search(model)
 
 def reinit_layers(model, target_type=LlamaRotaryEmbedding, config_file: Optional[str] = None):
     """Reinitializes all layers of a given type in the model."""
