@@ -117,7 +117,7 @@ Once this is done, torchchat will be able to download model artifacts from
 Hugging Face.
 
 ```
-python3 torchchat.py download llama3
+python3 torchchat.py download llama3.1
 ```
 
 > [!NOTE]
@@ -146,7 +146,7 @@ This is useful in scripts when you do not want to hard-code paths
 ### Remove
 This subcommands removes the specified model
 ```bash
-python3 torchchat.py remove llama3
+python3 torchchat.py remove llama3.1
 ```
 
 More information about these commands can be found by adding the `--help` option.
@@ -171,15 +171,14 @@ This mode allows you to chat with an LLM in an interactive fashion.
 
 [skip default]: begin
 ```bash
-# Llama 3 8B Instruct
-python3 torchchat.py chat llama3
+python3 torchchat.py chat llama3.1
 ```
 [skip default]: end
 
 ### Generate
 This mode generates text based on an input prompt.
 ```bash
-python3 torchchat.py generate llama3 --prompt "write me a story about a boy and his bear"
+python3 torchchat.py generate llama3.1 --prompt "write me a story about a boy and his bear"
 ```
 
 ### Browser
@@ -189,7 +188,7 @@ Running the command automatically open a tab in your browser.
 [skip default]: begin
 
 ```
-streamlit run torchchat.py -- browser llama3
+streamlit run torchchat.py -- browser llama3.1
 ```
 
 [skip default]: end
@@ -208,7 +207,7 @@ In one terminal, start the server
 [skip default]: begin
 
 ```bash
-python3 torchchat.py server llama3
+python3 torchchat.py server llama3.1
 ```
 [skip default]: end
 
@@ -226,7 +225,7 @@ is plaintext and will not be formatted to the OpenAI API specification. If `stre
 curl http://127.0.0.1:5000/chat \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "llama3",
+    "model": "llama3.1",
     "stream": "true",
     "messages": [
       {
@@ -256,10 +255,10 @@ curl http://127.0.0.1:5000/chat \
 [AOTI](https://pytorch.org/blog/pytorch2-2/) compiles models before execution for faster inference. The process creates a [DSO](https://en.wikipedia.org/wiki/Shared_library) model (represented by a file with extension `.so`)
 that is then loaded for inference. This can be done with both Python and C++ enviroments.
 
-The following example exports and executes the Llama3 8B Instruct
+The following example exports and executes the Llama3.1 8B Instruct
 model.  The first command compiles and performs the actual export.
 ```
-python3 torchchat.py export llama3 --output-dso-path exportedModels/llama3.so
+python3 torchchat.py export llama3.1 --output-dso-path exportedModels/llama3.1.so
 ```
 
 > [!NOTE]
@@ -274,7 +273,7 @@ case visit our [customization guide](docs/model_customization.md).
 To run in a python enviroment, use the generate subcommand like before, but include the dso file.
 
 ```
-python3 torchchat.py generate llama3 --dso-path exportedModels/llama3.so --prompt "Hello my name is"
+python3 torchchat.py generate llama3.1 --dso-path exportedModels/llama3.1.so --prompt "Hello my name is"
 ```
 **Note:** Depending on which accelerator is used to generate the .dso file, the command may need the device specified: `--device (cuda | cpu)`.
 
@@ -288,7 +287,7 @@ scripts/build_native.sh aoti
 
 Then run the compiled executable, with the exported DSO from earlier.
 ```bash
-cmake-out/aoti_run exportedModels/llama3.so -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/aoti_run exportedModels/llama3.1.so -z `python3 torchchat.py where llama3.1`/tokenizer.model -l 3 -i "Once upon a time"
 ```
 **Note:** Depending on which accelerator is used to generate the .dso file, the runner may need the device specified: `-d (CUDA | CPU)`.
 
@@ -318,15 +317,15 @@ export TORCHCHAT_ROOT=${PWD}
 ### Export for mobile
 Similar to AOTI, to deploy onto device, we first export the PTE artifact, then we load the artifact for inference.
 
-The following example uses the Llama3 8B Instruct model.
+The following example uses the Llama3.1 8B Instruct model.
 ```
 # Export
-python3 torchchat.py export llama3 --quantize config/data/mobile.json --output-pte-path llama3.pte
+python3 torchchat.py export llama3.1 --quantize config/data/mobile.json --output-pte-path llama3.1.pte
 ```
 
 > [!NOTE]
 > We use `--quantize config/data/mobile.json` to quantize the
-llama3 model to reduce model size and improve performance for
+llama3.1 model to reduce model size and improve performance for
 on-device use cases.
 
 For more details on quantization and what settings to use for your use
@@ -345,7 +344,7 @@ Specifically there are 2 ways of doing so: Pure Python and via a Runner
 
 ```
 # Execute
-python3 torchchat.py generate llama3 --device cpu --pte-path llama3.pte --prompt "Hello my name is"
+python3 torchchat.py generate llama3.1 --device cpu --pte-path llama3.1.pte --prompt "Hello my name is"
 ```
 
 </details>
@@ -361,7 +360,7 @@ scripts/build_native.sh et
 
 Execute using the runner
 ```bash
-cmake-out/et_run llama3.pte -z `python3 torchchat.py where llama3`/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/et_run llama3.1.pte -z `python3 torchchat.py where llama3.1`/tokenizer.model -l 3 -i "Once upon a time"
 ```
 
 </details>
@@ -403,7 +402,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 3. To run on a device, ensure you have it set up for development and a provisioning profile with the `increased-memory-limit` entitlement. Update the app's bundle identifier to match your provisioning profile with the required capability.
 
-4. After successfully launching the app, copy the exported ExecuTorch model (`.pte`) and tokenizer (`.model`) files to the iLLaMA folder. You can find the model file called `llama3.pte` in the current `torchchat` directory and the tokenizer file at `$(python3 torchchat.py where llama3)/tokenizer.model` path.
+4. After successfully launching the app, copy the exported ExecuTorch model (`.pte`) and tokenizer (`.model`) files to the iLLaMA folder. You can find the model file called `llama3.1.pte` in the current `torchchat` directory and the tokenizer file at `$(python3 torchchat.py where llama3.1)/tokenizer.model` path.
 
     - **For the Simulator:** Drag and drop both files onto the Simulator window and save them in the `On My iPhone > iLLaMA` folder.
     - **For a device:** Open a separate Finder window, navigate to the Files tab, drag and drop both files into the iLLaMA folder, and wait for the copying to finish.
@@ -442,7 +441,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 2. Rename the downloaded AAR file to `executorch.aar` and move the file to `android/torchchat/app/libs/`. You may need to create directory `android/torchchat/app/libs/` if it does not exist.
 
-3. Push the model and tokenizer file to your device. You can find the model file called `llama3.pte` in the current `torchchat` directory and the tokenizer file at `$(python3 torchchat.py where llama3)/tokenizer.model` path.
+3. Push the model and tokenizer file to your device. You can find the model file called `llama3.1.pte` in the current `torchchat` directory and the tokenizer file at `$(python3 torchchat.py where llama3.1)/tokenizer.model` path.
     ```
     adb shell mkdir -p /data/local/tmp/llama
     adb push <model.pte> /data/local/tmp/llama
@@ -459,7 +458,8 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 6. Follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem. Then issue a prompt.
 
 **Note:** The AAR file listed in Step 1 has the tiktoken tokenizer, which is used for Llama 3. To tweak or use a custom tokenizer and runtime, modify the ExecuTorch code
-and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library.
+and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library. For convenience, we also provide an AAR
+for sentencepiece tokenizer (e.g. Llama 2): [executorch-llama-bpe-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar) (SHASUM: d5fe81d9a4700c36b50ae322e6bf34882134edb0)
 
 <p align="center">
     <img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
@@ -493,14 +493,14 @@ tasks and limit args. See [Evaluation](docs/evaluation.md)
 
 Eager mode:
 ```
-python3 torchchat.py eval llama3 --dtype fp32 --limit 5
+python3 torchchat.py eval llama3.1 --dtype fp32 --limit 5
 ```
 
 To test the perplexity for a lowered or quantized model, pass it in
 the same way you would to generate:
 
 ```
-python3 torchchat.py eval llama3 --pte-path llama3.pte --limit 5
+python3 torchchat.py eval llama3.1 --pte-path llama3.1.pte --limit 5
 ```
 
 
@@ -564,18 +564,29 @@ We really value our community and the contributions made by our wonderful users.
 
 ## Troubleshooting
 
-**CERTIFICATE_VERIFY_FAILED**
-Run `pip install --upgrade certifi`.
+A section of commonly encountered setup errors/exceptions. If this section doesn't contain your situation, check the GitHub [issues](https://github.com/pytorch/torchchat/issues)
 
+### Model Access
 
 **Access to model is restricted and you are not in the authorized list**
+
 Some models require an additional step to access. Follow the
 link provided in the error to get access.
 
-**Installing ET Fails**
+### Installing ExecuTorch
+
+**Failed Building Wheel**
+
 If `./scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
 
+**CERTIFICATE_VERIFY_FAILED**
+
+Run `pip install --upgrade certifi`.
+
 ## Filing Issues
+
+If you encounter bugs or difficulty using torchchat, please file an GitHub [issue](https://github.com/pytorch/torchchat/issues).
+
 Please include the exact command you ran and the output of that command.
 Also, run this script and include the output saved to `system_info.txt` so that we can better debug your issue.
 

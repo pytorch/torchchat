@@ -6,8 +6,10 @@
 
 import argparse
 import os
+from typing import Optional
 
 import torch
+import torch.nn as nn
 
 from build.builder import (
     _initialize_model,
@@ -20,7 +22,8 @@ from build.builder import (
 
 from build.utils import set_backend, set_precision
 from cli import add_arguments_for_verb, arg_init, check_args
-from export_util.export_aoti import export_model as export_model_aoti
+
+from torch.export import Dim
 
 try:
     executorch_export_available = True
@@ -31,6 +34,39 @@ except Exception as e:
 
 
 default_device = "cpu"
+
+
+def export_for_server(
+    model: nn.Module, device: Optional[str] = "cpu", output_path: str = "model.dso"
+) -> str:
+    """
+    Export the model using AOT Compile to get a .dso for server use cases.
+
+    Args:
+        model: The model to be exported.
+        device: The device to run the model on.
+        output_path: The path to save the exported model.
+    Returns:
+        The path to the exported model.
+    """
+    input = (
+        torch.tensor([[1, 9038, 2501, 263, 931]], dtype=torch.int, device=device),
+        torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
+    )
+
+    seq = Dim("seq", min=1, max=model.config.max_seq_length)
+    # Specify that the first dimension of each input is that batch size
+    dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
+
+    model.to(device)
+    so = torch._export.aot_compile(
+        model,
+        args=input,
+        options={"aot_inductor.output_path": output_path},
+        dynamic_shapes=dynamic_shapes,
+    )
+    print(f"The generated DSO model can be found at: {so}")
+    return so
 
 
 def main(args):
@@ -107,7 +143,7 @@ def main(args):
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
             print(f"Exporting model using AOT Inductor to {output_dso_path}")
-            export_model_aoti(model_to_dso, builder_args.device, output_dso_path, args)
+            export_for_server(model_to_dso, builder_args.device, output_dso_path)
 
 
 if __name__ == "__main__":
