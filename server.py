@@ -64,6 +64,12 @@ def chat_endpoint():
 
 def initialize_generator(args) -> OpenAiApiGenerator:
     builder_args = BuilderArgs.from_args(args)
+    # check if args has attribute "prompt"
+    if not hasattr(args, "prompt"):
+        args.prompt = ""
+    if not hasattr(args, "num_samples"):
+        args.num_samples = 1
+
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
     generator_args = GeneratorArgs.from_args(args)
