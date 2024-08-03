@@ -572,23 +572,22 @@ class Generator:
         return torch.tensor(tokens, dtype=torch.int, device=device)
 
     def _callback(self, x, *, buffer, done_generating):
-        # TODO: Refactor this callback to only include basic functionality & remove print statements
         period_id = self.tokenizer.encode(".")[0]
         buffer.append(
             self.tokenizer.decode([period_id] + x.tolist())[1:]
-        )  # I think this results in the first output token being dropped from the display which is wrong.
-        if x.item() == self.tokenizer.eos_id():
-            done_generating = True
-        if (
-            self.is_llama3_model
-            and x.item() == self.tokenizer.special_tokens["<|eot_id|>"]
-        ):
-            done_generating = True
-            buffer = buffer[:-1]  # drop the eot_id from the output buffer
+        )
+        done_generating = self._check_done_generating(x, buffer)
         if len(buffer) == 4 or done_generating:
-            print("".join(buffer), end="", flush=True)
+            self._output(buffer)
             buffer.clear()
-        # print(, end='', flush=True)
+
+    def _check_done_generating(self, x, buffer):
+        if x.item() == self.tokenizer.eos_id():
+            return True
+        if self.is_llama3_model and x.item() == self.tokenizer.special_tokens["<|eot_id|>"]:
+            buffer = buffer[:-1]  # drop the eot_id from the output buffer
+            return True
+        return False
 
     def chat(
         self,
