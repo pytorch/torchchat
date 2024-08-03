@@ -29,7 +29,7 @@ default_model_dir = Path(
 INVENTORY_VERBS = ["download", "list", "remove", "where"]
 
 # Subcommands related to generating inference output based on user prompts
-GENERATION_VERBS = ["browser", "chat", "generate", "server"] 
+GENERATION_VERBS = ["browser", "chat", "generate", "server"]
 
 # List of all supported subcommands in torchchat
 KNOWN_VERBS = GENERATION_VERBS + ["eval", "export"] + INVENTORY_VERBS
@@ -49,9 +49,6 @@ def check_args(args, verb: str) -> None:
 
 # Given a arg parser and a subcommand (verb), add the appropriate arguments
 # for that subcommand.
-#
-# Note the use of argparse.SUPPRESS to hide arguments from --help due to 
-# legacy CLI arg parsing. See https://github.com/pytorch/torchchat/issues/932
 def add_arguments_for_verb(parser, verb: str) -> None:
     # Argument closure for inventory related subcommands
     if verb in INVENTORY_VERBS:
@@ -62,17 +59,17 @@ def add_arguments_for_verb(parser, verb: str) -> None:
     # Add argument groups for model specification (what base model to use)
     _add_model_specification_args(parser)
 
-    # Add argument groups for exported model path IO
-    _add_exported_input_path_args(parser, verb)
-    _add_export_output_path_args(parser, verb)
-    
     # Add argument groups for model configuration (compilation, quant, etc)
     _add_model_config_args(parser, verb)
 
     # Add thematic argument groups based on the subcommand
-    if verb in ["browser", "chat", "generate", "server"]:
+    if verb in GENERATION_VERBS:
+        _add_exported_input_path_args(parser)
         _add_generation_args(parser, verb)
+    if verb == "export":
+        _add_export_output_path_args(parser)
     if verb == "eval":
+        _add_exported_input_path_args(parser)
         _add_evaluation_args(parser)
 
     # Add CLI Args related to downloading of model artifacts (if not already downloaded)
@@ -89,8 +86,13 @@ def add_arguments_for_verb(parser, verb: str) -> None:
 
 # Add CLI Args related to model specification (what base model to use)
 def _add_model_specification_args(parser) -> None:
-    model_specification_parser = parser.add_argument_group("Model Specification", "(REQUIRED) Specify the base model. Args are mutually exclusive.")
-    exclusive_parser = model_specification_parser.add_mutually_exclusive_group(required=True)
+    model_specification_parser = parser.add_argument_group(
+        "Model Specification",
+        "(REQUIRED) Specify the base model. Args are mutually exclusive.",
+    )
+    exclusive_parser = model_specification_parser.add_mutually_exclusive_group(
+        required=True
+    )
     exclusive_parser.add_argument(
         "model",
         type=str,
@@ -120,20 +122,26 @@ def _add_model_specification_args(parser) -> None:
         help=argparse.SUPPRESS,
     )
 
+
 # Add CLI Args related to model configuration (compilation, quant, etc)
+# Excludes compile args if subcommand is export
 def _add_model_config_args(parser, verb: str) -> None:
-    is_not_export = verb != "export"
-    model_config_parser = parser.add_argument_group("Model Configuration", "Specify model configurations")
-    model_config_parser.add_argument(
-        "--compile",
-        action="store_true",
-        help="Whether to compile the model with torch.compile" if is_not_export else argparse.SUPPRESS,
+    model_config_parser = parser.add_argument_group(
+        "Model Configuration", "Specify model configurations"
     )
-    model_config_parser.add_argument(
-        "--compile-prefill",
-        action="store_true",
-        help="Whether to compile the prefill. Improves prefill perf, but has higher compile times." if is_not_export else argparse.SUPPRESS,
-    )
+
+    if verb != "export":
+        model_config_parser.add_argument(
+            "--compile",
+            action="store_true",
+            help="Whether to compile the model with torch.compile",
+        )
+        model_config_parser.add_argument(
+            "--compile-prefill",
+            action="store_true",
+            help="Whether to compile the prefill. Improves prefill perf, but has higher compile times.",
+        )
+
     model_config_parser.add_argument(
         "--dtype",
         default="fast",
@@ -157,54 +165,55 @@ def _add_model_config_args(parser, verb: str) -> None:
         help="Hardware device to use. Options: cpu, cuda, mps",
     )
 
-# Add CLI Args representing output paths of exported model files
-def _add_export_output_path_args(parser, verb: str) -> None:
-    is_export = verb == "export"
 
+# Add CLI Args representing output paths of exported model files
+def _add_export_output_path_args(parser) -> None:
     output_path_parser = parser.add_argument_group(
-        "Export Output Path" if is_export else None,
-        "Specify the output path for the exported model files" if is_export else None,
+        "Export Output Path",
+        "Specify the output path for the exported model files",
     )
     exclusive_parser = output_path_parser.add_mutually_exclusive_group()
     exclusive_parser.add_argument(
         "--output-pte-path",
         type=str,
         default=None,
-        help="Output to the specified ExecuTorch .pte model file" if is_export else argparse.SUPPRESS,
+        help="Output to the specified ExecuTorch .pte model file",
     )
     exclusive_parser.add_argument(
         "--output-dso-path",
         type=str,
         default=None,
-        help="Output to the specified AOT Inductor .dso model file" if is_export else argparse.SUPPRESS,
+        help="Output to the specified AOT Inductor .dso model file",
     )
 
 
 # Add CLI Args representing user provided exported model files
-def _add_exported_input_path_args(parser, verb: str) -> None:
-    is_generation_verb = verb in GENERATION_VERBS
-
+def _add_exported_input_path_args(parser) -> None:
     exported_model_path_parser = parser.add_argument_group(
-        "Exported Model Path" if is_generation_verb else None,
-        "Specify the path of the exported model files to ingest" if is_generation_verb else None,
+        "Exported Model Path",
+        "Specify the path of the exported model files to ingest",
     )
     exclusive_parser = exported_model_path_parser.add_mutually_exclusive_group()
     exclusive_parser.add_argument(
         "--dso-path",
         type=Path,
         default=None,
-        help="Use the specified AOT Inductor .dso model file" if is_generation_verb else argparse.SUPPRESS,
+        help="Use the specified AOT Inductor .dso model file",
     )
     exclusive_parser.add_argument(
         "--pte-path",
         type=Path,
         default=None,
-        help="Use the specified ExecuTorch .pte model file" if is_generation_verb else argparse.SUPPRESS,
+        help="Use the specified ExecuTorch .pte model file",
     )
+
 
 # Add CLI Args related to JIT downloading of model artifacts
 def _add_jit_downloading_args(parser) -> None:
-    jit_downloading_parser = parser.add_argument_group("Model Downloading", "Specify args for model downloading (if model is not downloaded)",)
+    jit_downloading_parser = parser.add_argument_group(
+        "Model Downloading",
+        "Specify args for model downloading (if model is not downloaded)",
+    )
     jit_downloading_parser.add_argument(
         "--hf-token",
         type=str,
@@ -217,7 +226,8 @@ def _add_jit_downloading_args(parser) -> None:
         default=default_model_dir,
         help=f"The directory to store downloaded model artifacts. Default: {default_model_dir}",
     )
-    
+
+
 # Add CLI Args that are general to subcommand cli execution
 def _add_cli_metadata_args(parser) -> None:
     parser.add_argument(
@@ -270,16 +280,26 @@ def _configure_artifact_inventory_args(parser, verb: str) -> None:
 
 
 # Add CLI Args specific to user prompted generation
+# Include prompt and num_sample args when the subcommand is generate
 def _add_generation_args(parser, verb: str) -> None:
     generator_parser = parser.add_argument_group(
         "Generation", "Configs for generating output based on provided prompt"
     )
-    generator_parser.add_argument(
-        "--prompt",
-        type=str,
-        default="Hello, my name is",
-        help="Input prompt for manual output generation" if verb == "generate" else argparse.SUPPRESS,
-    )
+
+    if verb == "generate":
+        generator_parser.add_argument(
+            "--prompt",
+            type=str,
+            default="Hello, my name is",
+            help="Input prompt for manual output generation",
+        )
+        generator_parser.add_argument(
+            "--num-samples",
+            type=int,
+            default=1,
+            help="Number of samples",
+        )
+
     generator_parser.add_argument(
         "--chat",
         action="store_true",
@@ -291,12 +311,6 @@ def _add_generation_args(parser, verb: str) -> None:
         action="store_true",
         # help="Whether to use a web UI for an interactive chat session",
         help=argparse.SUPPRESS,
-    )
-    generator_parser.add_argument(
-        "--num-samples",
-        type=int,
-        default=1,
-        help="Number of samples" if verb == "generate" else argparse.SUPPRESS,
     )
     generator_parser.add_argument(
         "--max-new-tokens",
@@ -441,7 +455,7 @@ def arg_init(args):
     # if we specify dtype in quantization recipe, replicate it as args.dtype
     args.dtype = args.quantize.get("precision", {}).get("dtype", args.dtype)
 
-    if args.output_pte_path:
+    if getattr(args, "output_pte_path", None):
         if args.device not in ["cpu", "fast"]:
             raise RuntimeError("Device not supported by ExecuTorch")
         args.device = "cpu"
@@ -451,12 +465,12 @@ def arg_init(args):
         )
 
     if "mps" in args.device:
-        if args.compile or args.compile_prefill:
+        if hasattr(args, "compile") and hasattr(args, "compile_prefill"):
             print(
                 "Warning: compilation is not available with device MPS, ignoring option to engage compilation"
             )
-            args.compile = False
-            args.compile_prefill = False
+            vars(args)["compile"] = False
+            vars(args)["compile_prefill"] = False
 
     if hasattr(args, "seed") and args.seed:
         torch.manual_seed(args.seed)
