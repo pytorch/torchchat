@@ -6,7 +6,7 @@
 
 import os
 import json
-from typing import Optional, Dict, Tuple
+from typing import Optional, Dict, Tuple, Callable, Any, List
 import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import pipeline, SplitPoint, ScheduleGPipe
@@ -32,15 +32,30 @@ MODEL_CONFIGS = {
     "22b": "mistralai/Codestral-22B-v0.1",
 }
 
+# from HF
+#from transformers.modeling_rope_utils import ROPE_INIT_FUNCTIONS as hf_rope_init_functions
+#from transformers.modeling_rope_utils import _compute_default_rope_parameters, _compute_linear_scaling_rope_parameters
+
+
+#def rope_emb_init(_device, config):
+#    rope_init_fn = _compute_default_rope_parameters # hf_rope_init_functions[self, 'default']
+#    inv_freq, _ = rope_init_fn(config, device=_device,) #  **self.rope_kwargs)
+#    return inv_freq
+
+
+#buf_init_callbacks = { "model.rotary_emb.inv_freq": rope_emb_init}
+
 _default_safetensor_file_name = "model.safetensors.index.json"
 _config_name = "config.json"
-
+_model_config = None
 
 def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[AutoModelForCausalLM, FakeTensorMode, Optional[Dict[str, str]]]:
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
     config = None
-    #with torch.device("meta"):
-    with init_on_meta_device(device="meta"):
+    #nonlocal _model_config
+
+    with torch.device("meta"):
+    #@with init_on_meta_device(device="meta"):
         model = AutoModelForCausalLM.from_pretrained(model_id)
         if rank==0:
             print(f"---- precision meta init ----")
@@ -49,6 +64,9 @@ def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[Auto
             print(f"{model.model.rotary_emb.inv_freq[0:5]=}")
             print(f"{model.model.rotary_emb.inv_freq.device=}")
 
+    config = model.config
+    #_model_config = config
+    assert config is not None, "config is None"
         # what we expect:
         #model.model.rotary_emb=LlamaRotaryEmbedding()
         #model.model.rotary_emb.inv_freq=tensor([1.0000e+00, 8.1462e-01, 6.6360e-01, 5.4058e-01, 4.4037e-01, 3.5873e-01,
@@ -56,8 +74,10 @@ def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[Auto
         
     print(f"Model type: {type(model)}")
 
-    config = model.config
-    config.device = device
+    print(f"buf callback = {model.buf_init_callbacks}")
+    #assert False, "check"
+    
+    #config.device = device
     model.eval()
     
     with fake_mode:
@@ -69,27 +89,27 @@ def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[Auto
             print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
             print(f"{model.model.rotary_emb.inv_freq.device=}")
     
-    model.model.rotary_emb.__init__(config=config)
-    model.model.rotary_emb.to('cuda')
+    #model.model.rotary_emb.__init__(config=config)
+    #model.model.rotary_emb.to('cuda')
 
-    if rank==0:
-            print(f"---- after rope re-init and move to device manually ----")
-            print(f"{model.model.rotary_emb=}")
-            print(f"rope type {type(model.model.rotary_emb)}")
-            print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
-            print(f"-- final result: {model.model.rotary_emb.inv_freq.device=}")
+    #if rank==0:
+    #        print(f"---- after rope re-init and move to device manually ----")
+    #        print(f"{model.model.rotary_emb=}")
+    #        print(f"rope type {type(model.model.rotary_emb)}")
+    #        print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
+    #        print(f"-- final result: {model.model.rotary_emb.inv_freq.device=}")
 
 
 
-    if rank==0:
-            print(f"---- afterto cuda move, then rotary re-init ----")
-            print(f"{model.model.rotary_emb=}")
-            print(f"rope type {type(model.model.rotary_emb)}")
-            print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
+    #if rank==0:
+    #        print(f"---- afterto cuda move, then rotary re-init ----")
+    #        print(f"{model.model.rotary_emb=}")
+    #        print(f"rope type {type(model.model.rotary_emb)}")
+    #        print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
 
     print(f"check both devices: {model.model.rotary_emb.inv_freq.device=}")
 
-    dist.barrier()
+    #dist.barrier()
 
     return model, fake_mode, config
 
@@ -130,6 +150,32 @@ def open_hf_safetensor(file_path: str):
         print(f"An error occurred while opening the safetensor file: {str(e)}")
         return None
 
+def init_buffers(
+    stage_module: torch.nn.Module,
+    device: torch.device,
+    init_callbacks: Dict[str, Callable],
+    model_config: Optional[Dict[str, str]] = None,
+):
+    """
+    Initialize buffers of `stage_module` per the callback in `init_callbacks`.
+    `init_callbacks` is a dictionary from a buffer's FQN to its init function.
+    """
+    for name, buf in stage_module.named_buffers():
+        if name in init_callbacks:
+            print(f"about to call {name} on {device}")
+            cb = init_callbacks[name]
+            print(f"cb: {cb=}")
+            print(f"{model_config=}")
+            buf_val = cb(device,)
+            # Find the parent module
+            splits = name.split(".")
+            mod = stage_module
+            for atom in splits[: -1]:
+                mod = getattr(mod, atom)
+            mod.register_buffer(
+                splits[-1], buf_val, persistent=False,
+            )
+            print(f"====>>>> Initialized buffer {name}")
 
 def load_safetensor_weights(
     stage_module: torch.nn.Module,
@@ -139,13 +185,20 @@ def load_safetensor_weights(
     stage_state_dict = stage_module.state_dict()
     updated_states = {}
 
-    needed_files = set(
-        weight_map.get(param, None)
-        for param in stage_state_dict.keys()
-        if weight_map.get(param, None)
-    )
+    needed_files = set() 
+    #    weight_map.get(param, None)
+    #    for param in stage_state_dict.keys()
+    #    if weight_map.get(param, None)
+    #)
+
+    # The file a param is saved in
+    for param in stage_state_dict.keys():
+        file = weight_map.setdefault(param, None)
+        if file:
+            needed_files.add(file)
 
     for file in needed_files:
+        #checkpoint = open_hf_safetensor(os.path.join(file_location, file))
         print(f"Loading file: {file}")
         full_path = os.path.join(file_location, file)
         checkpoint = open_hf_safetensor(full_path)
@@ -153,14 +206,14 @@ def load_safetensor_weights(
             continue
 
         for param in stage_state_dict.keys():
-            if weight_map.get(param) == file:
+            file_with_param = weight_map.get(param, None)
+            if not file_with_param:
+                print(f"Warning: {param} not found in weight map, skipping")
+            elif weight_map.get(param) == file:
                 if param in checkpoint:
                     stage_state_dict[param] = checkpoint[param]
                     updated_states[param] = None
-                else:
-                    # print(f"Warning: {param} not found in {file}")
-                    # TODO - need to handle this better
-                    pass
+                
 
     print(
         "Fully updated state dict"
@@ -220,6 +273,7 @@ def main(model_size: str, world_size: int, device: str):
 
     # ========== Create model on meta device =================
     model, fake_mode, model_config = create_model(model_id, device, rank,)
+    assert model.buf_init_callbacks is not None, "buffer_init_callbacks is None"
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     tokenizer.pad_token = tokenizer.eos_token
@@ -247,6 +301,13 @@ def main(model_size: str, world_size: int, device: str):
     if rank==0:
         print(f"after load safe tensor Stage module type: {type(stage_module)}")
     
+    # TODO
+    #if hasattr(model, "buf_init_callbacks"):
+    print(f"about to try to init buffers")
+    if hasattr(model, "buf_init_callbacks"):
+        init_buffers(stage_module, device, model.buf_init_callbacks, model_config)
+    stage_module.print_readable()
+    #init_buffers(stage_module, "cuda", buf_init_callbacks, model_config)
     print(f"Completed load of stage {rank}")
     
     print(
@@ -273,9 +334,13 @@ def main(model_size: str, world_size: int, device: str):
            
                 
         # print(f"rank 0 {stage_module=}")
-        print(f"===== check rope freq ===>>>> {stage_module.model.rotary_emb.inv_freq[0:2]=}")
+        print(f"===== check rope freq ===>>>> {stage_module.model.rotary_emb.inv_freq[0:4]=}")
+    if rank==1:
+        print(f"Stage 2: ")
+        # model.model.rotary_emb.__init__(config=config)
+        stage_module.model.graph.print_tabular()
     dist.barrier()
-    assert False, "stop here"
+    
     # find the rotary embedding
     if rank==0:
         print(f"Finding the main llama rope embeddings...")
@@ -283,7 +348,7 @@ def main(model_size: str, world_size: int, device: str):
         print(f"**********     ran init")
         print(f"{stage_module.model.rotary_emb=}")
 
-        print(f"{stage_module.model= }")
+        #print(f"{stage_module.model= }")
         
     # Create schedule runtime
     stage = pipe.build_stage(
@@ -303,6 +368,7 @@ def main(model_size: str, world_size: int, device: str):
 
     
     print(f"TODO = continue here....returning now via early stop for debugging")
+    assert False, "stop here"
     return
 
     # Run
