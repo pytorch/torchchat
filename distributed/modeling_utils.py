@@ -25,26 +25,26 @@ def init_on_meta_device(device: torch.device):
             kwargs = module._parameters[name].__dict__
             module._parameters[name] = param_class(module._parameters[name].to(device), **kwargs)
 
-    def patch_tensor_constructor(fn: Callable) -> Callable:
+    def reroute_device_tensor_constructor(fn: Callable) -> Callable:
         def wrapper(*args, **kwargs):
             kwargs['device'] = device
             return fn(*args, **kwargs)
         return wrapper
 
     old_register_parameter = nn.Module.register_parameter
-    tensor_constructors_to_patch: Dict[str, Callable] = {
+    tensor_constructors_to_proxy: Dict[str, Callable] = {
         torch_function_name: getattr(torch, torch_function_name)
         for torch_function_name in ['empty', 'zeros', 'ones', 'full']
     }
 
     try:
         nn.Module.register_parameter = register_empty_parameter
-        for torch_function_name, old_torch_function in tensor_constructors_to_patch.items():
-            setattr(torch, torch_function_name, patch_tensor_constructor(old_torch_function))
+        for torch_function_name, old_torch_function in tensor_constructors_to_proxy.items():
+            setattr(torch, torch_function_name, reroute_device_tensor_constructor(old_torch_function))
         yield
     finally:
         nn.Module.register_parameter = old_register_parameter
-        for torch_function_name, old_torch_function in tensor_constructors_to_patch.items():
+        for torch_function_name, old_torch_function in tensor_constructors_to_proxy.items():
             setattr(torch, torch_function_name, old_torch_function)
 
 
