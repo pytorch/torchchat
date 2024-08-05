@@ -103,16 +103,18 @@ class GeneratorArgs:
 
     @classmethod
     def from_args(cls, args):
+        dso_path = getattr(args, "dso_path", None)
+        pte_path = getattr(args, "pte_path", None)
         sequential_prefill = (
-            args.sequential_prefill or bool(args.dso_path) or bool(args.pte_path)
+            args.sequential_prefill or bool(dso_path) or bool(pte_path)
         )
 
         return cls(
-            prompt=args.prompt,
+            prompt=getattr(args, "prompt", ""),
             encoded_prompt=None,
             chat_mode=args.chat,
             gui_mode=args.gui,
-            num_samples=args.num_samples,
+            num_samples=getattr(args, "num_samples", 1),
             max_new_tokens=args.max_new_tokens,
             top_k=args.top_k,
             temperature=args.temperature,

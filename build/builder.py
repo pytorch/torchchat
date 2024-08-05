@@ -107,6 +107,9 @@ class BuilderArgs:
                 model_config.transformer_params_key or model_config.name.split("/")[-1]
             )
 
+        dso_path = getattr(args, "dso_path", None)
+        pte_path = getattr(args, "pte_path", None)
+
         is_chat_model = False
         if args.is_chat_model:
             is_chat_model = True
@@ -114,8 +117,8 @@ class BuilderArgs:
             for path in [
                 checkpoint_path,
                 checkpoint_dir,
-                args.dso_path,
-                args.pte_path,
+                dso_path,
+                pte_path,
                 args.gguf_path,
             ]:
                 if path is not None:
@@ -129,7 +132,10 @@ class BuilderArgs:
                     if "chat" in path_basename or "instruct" in path_basename:
                         is_chat_model = True
 
-        if args.output_pte_path and args.dtype.startswith("fast"):
+
+        output_pte_path = getattr(args, "output_pte_path", None)
+        output_dso_path = getattr(args, "output_dso_path", None)
+        if output_pte_path and args.dtype.startswith("fast"):
             if args.dtype == "fast":
                 # As per Kimish, float32 should be faster on ET XNNPACK
                 # (because fp16 is implemented as upcast to fp32 for several
@@ -148,11 +154,11 @@ class BuilderArgs:
             params_table=params_table,
             gguf_path=args.gguf_path,
             gguf_kwargs=None,
-            dso_path=args.dso_path,
-            pte_path=args.pte_path,
+            dso_path=dso_path,
+            pte_path=pte_path,
             device=args.device,
             precision=dtype,
-            setup_caches=(args.output_dso_path or args.output_pte_path),
+            setup_caches=(output_dso_path or output_pte_path),
             use_distributed=args.distributed,
             is_chat_model=is_chat_model,
         )

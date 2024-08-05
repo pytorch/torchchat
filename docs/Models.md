@@ -20,4 +20,4 @@ These are the supported models
 |[mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)|✅||
 |[meta-llama/Llama3](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅||
 
-See the [documentation on GGUF](docs/GGUF.md) to learn how to use GGUF files.
+See the [documentation on GGUF](GGUF.md) to learn how to use GGUF files.
