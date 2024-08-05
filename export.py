@@ -23,8 +23,6 @@ from build.builder import (
 from build.utils import set_backend, set_precision
 from cli import add_arguments_for_verb, arg_init, check_args
 
-from torch.export import Dim
-
 try:
     executorch_export_available = True
     from export_util.export_et import export_model as export_model_et
@@ -50,20 +48,15 @@ def export_for_server(
         The path to the exported model.
     """
     input = (
-        torch.tensor([[1, 9038, 2501, 263, 931]], dtype=torch.int, device=device),
-        torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
+        torch.tensor([[1]], dtype=torch.int, device=device),
+        torch.tensor([0], dtype=torch.int, device=device),
     )
-
-    seq = Dim("seq", min=1, max=model.config.max_seq_length)
-    # Specify that the first dimension of each input is that batch size
-    dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
 
     model.to(device)
     so = torch._export.aot_compile(
         model,
         args=input,
         options={"aot_inductor.output_path": output_path},
-        dynamic_shapes=dynamic_shapes,
     )
     print(f"The generated DSO model can be found at: {so}")
     return so
