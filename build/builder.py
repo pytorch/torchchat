@@ -44,6 +44,7 @@ class BuilderArgs:
     use_distributed: bool = False
     is_chat_model: bool = False
     prefill_possible: bool = False
+    dynamic_shapes: bool = False
 
     def __post_init__(self):
         if self.device is None:
