@@ -54,8 +54,8 @@ def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[Auto
     config = None
     #nonlocal _model_config
 
-    with torch.device("meta"):
-    #@with init_on_meta_device(device="meta"):
+    #with torch.device("meta"):
+    with init_on_meta_device(device="meta"):
         model = AutoModelForCausalLM.from_pretrained(model_id)
         if rank==0:
             print(f"---- precision meta init ----")
@@ -403,7 +403,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_size",
         type=str,
-        default="8b",
+        default="405b",
         choices=MODEL_CONFIGS.keys(),
         help="Model size",
     )

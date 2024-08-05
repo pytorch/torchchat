@@ -15,7 +15,7 @@ export USE_LIBUV=1
 # e.g.
 # LOG_RANK=0,1 NGPU=4 ./run_dist_inference.sh
 
-NGPU=${NGPU:-"2"}
+NGPU=${NGPU:-"4"}
 
 # TODO: We need to decide how to log for inference.
 # by default log just rank 0 output,
