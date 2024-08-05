@@ -13,7 +13,7 @@ def init_on_meta_device(device: torch.device):
     """
     Device initialization context manager.
     A context manager under which parameters are initialized on meta device, 
-    butbuffers remain on actual device, 
+    butbuffers init on actual device, 
     The goal here is to ensure that buffer initialization is done on the actual device, 
     preserving generated buffers esp RopE embeddings. 
 
