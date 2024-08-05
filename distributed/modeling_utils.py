@@ -3,28 +3,40 @@ from contextlib import redirect_stdout, contextmanager
 from transformers.models.llama.modeling_llama import LlamaRotaryEmbedding
 import torch
 import torch.nn as nn
+from contextlib import contextmanager
+import torch
+import torch.nn as nn
+from typing import Dict, Callable
 
 @contextmanager
 def init_on_meta_device(device: torch.device):
-    """Device initialization context manager for meta init. Keeps buffers on current device"""
+    """
+    Device initialization context manager.
+    A context manager under which parameters are initialized on meta device, 
+    butbuffers remain on actual device, 
+    The goal here is to ensure that buffer initialization is done on the actual device, 
+    preserving generated buffers esp RopE embeddings. 
 
-    old_register_parameter = nn.Module.register_parameter
-
-    def register_empty_parameter(module, name, param):
+    """
+    def register_empty_parameter(module: nn.Module, name: str, param: nn.Parameter) -> None:
         old_register_parameter(module, name, param)
         if param is not None:
-            param_cls = type(module._parameters[name])
+            param_class = type(module._parameters[name])
             kwargs = module._parameters[name].__dict__
-            module._parameters[name] = param_cls(module._parameters[name].to(device), **kwargs)
+            module._parameters[name] = param_class(module._parameters[name].to(device), **kwargs)
 
-    tensor_constructors_to_patch = {torch_function_name: getattr(torch, torch_function_name) 
-                                    for torch_function_name in ['empty', 'zeros', 'ones', 'full']}
-
-    def patch_tensor_constructor(fn):
+    def patch_tensor_constructor(fn: Callable) -> Callable:
         def wrapper(*args, **kwargs):
             kwargs['device'] = device
             return fn(*args, **kwargs)
         return wrapper
+
+    old_register_parameter = nn.Module.register_parameter
+    tensor_constructors_to_patch: Dict[str, Callable] = {
+        torch_function_name: getattr(torch, torch_function_name)
+        for torch_function_name in ['empty', 'zeros', 'ones', 'full']
+    }
+
     try:
         nn.Module.register_parameter = register_empty_parameter
         for torch_function_name, old_torch_function in tensor_constructors_to_patch.items():
@@ -34,7 +46,6 @@ def init_on_meta_device(device: torch.device):
         nn.Module.register_parameter = old_register_parameter
         for torch_function_name, old_torch_function in tensor_constructors_to_patch.items():
             setattr(torch, torch_function_name, old_torch_function)
-
 
 
 def find_main_llama_rope_embeddings(model):
