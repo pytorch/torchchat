@@ -4,62 +4,89 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-from api.api import AssistantMessage, CompletionRequest, OpenAiApiGenerator
+import json
+
+from dataclasses import asdict
+from typing import Dict, List, Union
+
+from api.api import CompletionRequest, OpenAiApiGenerator
+from api.models import get_model_info_list, retrieve_model_info
 
 from build.builder import BuilderArgs, TokenizerArgs
-from flask import Flask, jsonify, request, Response
+from flask import Flask, request, Response
 from generate import GeneratorArgs
 
-app = Flask(__name__)
-# Messages and gen are kept global so they can be accessed by the flask app endpoints.
-messages: list = []
-gen: OpenAiApiGenerator = None
 
-
-@app.route("/chat", methods=["POST"])
-def chat_endpoint():
+def create_app(args):
     """
-    Endpoint for the Chat API. This endpoint is used to generate a response to a user prompt.
-    This endpoint emulates the behavior of the OpenAI Chat API. (https://platform.openai.com/docs/api-reference/chat)
+    Creates a flask app that can be used to serve the model as a chat API.
     """
-    data = request.get_json()
+    app = Flask(__name__)
 
-    # Add user message to chat history
-    messages.append(data["messages"][-1])
-    prompt = messages[-1]["content"]
+    gen: OpenAiApiGenerator = initialize_generator(args)
 
-    # Generate the assistant response
-    req = CompletionRequest(
-        model=gen.builder_args.checkpoint_path,
-        prompt=prompt,
-        temperature=0,
-        messages=[],
-    )
+    def _del_none(d: Union[Dict, List]) -> Union[Dict, List]:
+        """Recursively delete None values from a dictionary."""
+        if type(d) is dict:
+            return {k: _del_none(v) for k, v in d.items() if v}
+        elif type(d) is list:
+            return [_del_none(v) for v in d if v]
+        return d
 
-    response = ""
+    @app.route("/chat", methods=["POST"])
+    def chat_endpoint():
+        """
+        Endpoint for the Chat API. This endpoint is used to generate a response to a user prompt.
+        This endpoint emulates the behavior of the OpenAI Chat API. (https://platform.openai.com/docs/api-reference/chat)
 
-    def unwrap(completion_generator):
-        token_count = 0
-        for chunk_response in completion_generator:
-            content = chunk_response.choices[0].delta.content
-            if not gen.is_llama3_model or content not in set(
-                gen.tokenizer.special_tokens.keys()
-            ):
-                yield content if content is not None else ""
-            if content == gen.tokenizer.eos_id():
-                yield "."
-            token_count += 1
+        ** Warning ** : Not all arguments of the CompletionRequest are consumed.
 
-    if data.get("stream") == "true":
-        return Response(unwrap(gen.completion(req)), mimetype="text/event-stream")
-    else:
-        for content in unwrap(gen.completion(req)):
-            response += content
+        See https://github.com/pytorch/torchchat/issues/973 and the OpenAiApiGenerator class for more details.
 
-    # Add assistant response to chat history
-    messages.append(AssistantMessage(content=response))
+        If stream is set to true, the response will be streamed back as a series of CompletionResponseChunk objects. Otherwise,
+        a single CompletionResponse object will be returned.
+        """
 
-    return jsonify({"response": response})
+        print(" === Completion Request ===")
+
+        # Parse the request in to a CompletionRequest object
+        data = request.get_json()
+        req = CompletionRequest(**data)
+
+        if data.get("stream") == "true":
+
+            def chunk_processor(chunked_completion_generator):
+                """Inline function for postprocessing CompletionResponseChunk objects.
+
+                Here, we just jsonify the chunk and yield it as a string.
+                """
+                for chunk in chunked_completion_generator:
+                    if (next_tok := chunk.choices[0].delta.content) is None:
+                        next_tok = ""
+                    print(next_tok, end="")
+                    yield json.dumps(_del_none(asdict(chunk)))
+
+            return Response(
+                chunk_processor(gen.chunked_completion(req)),
+                mimetype="text/event-stream",
+            )
+        else:
+            response = gen.sync_completion(req)
+
+            return json.dumps(_del_none(asdict(response)))
+
+    @app.route("/models", methods=["GET"])
+    def models_endpoint():
+        return json.dumps(asdict(get_model_info_list(args)))
+
+    @app.route("/models/<model_id>", methods=["GET"])
+    def models_retrieve_endpoint(model_id):
+        if response := retrieve_model_info(args, model_id):
+            return json.dumps(asdict(response))
+        else:
+            return "Model not found", 404
+
+    return app
 
 
 def initialize_generator(args) -> OpenAiApiGenerator:
@@ -81,6 +108,5 @@ def initialize_generator(args) -> OpenAiApiGenerator:
 
 
 def main(args):
-    global gen
-    gen = initialize_generator(args)
+    app = create_app(args)
     app.run()

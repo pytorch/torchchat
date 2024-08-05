@@ -8,7 +8,7 @@ import time
 import uuid
 from abc import ABC
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from build.utils import device_sync
 
@@ -88,30 +88,38 @@ class StreamOptions:
 
 
 @dataclass
+class ResponseFormat:
+    type: Optional[str] = None
+
+
+@dataclass
 class CompletionRequest:
     """A full chat completion request.
 
     See the "Create Chat Completion >>> Request body" section of the OpenAI API docs for more details.
     """
 
+    messages: List[_AbstractMessage]
     model: str
-    prompt: str
-    messages: Optional[List[_AbstractMessage]]
-    frequency_penalty: float = 0.0
-    temperature: float = 0.0
-    stop: Optional[List[str]] = None
-    stream: bool = False
-    stream_options: Optional[StreamOptions] = None
-    echo: bool = False
-    frequency_penalty: float = 0.0
-    guided_decode_json_schema: str = None
-    guided_decode_json_schema_path: str = None
+    frequency_penalty: float = 0.0  # unimplemented
+    logit_bias: Optional[Dict[str, float]] = None  # unimplemented
+    logprobs: Optional[bool] = None  # unimplemented
+    top_logprobs: Optional[int] = None  # unimplemented
+    max_tokens: Optional[int] = None  # unimplemented
     n: int = 1
-    presence_penalty: float = 0
-    logit_bias: Optional[Dict[str, float]] = None
-    logprobs: Optional[bool] = None
-    top_logprobs: Optional[int] = None
-    max_tokens: Optional[int] = None
+    presence_penalty: float = 0  # unimplemented
+    response_format: Optional[ResponseFormat] = None  # unimplemented
+    seed: Optional[int] = None  # unimplemented
+    service_tier: Optional[str] = None  # unimplemented
+    stop: Optional[List[str]] = None  # unimplemented
+    stream: bool = False
+    stream_options: Optional[StreamOptions] = None  # unimplemented
+    temperature: Optional[float] = 1.0  # unimplemented
+    top_p: Optional[float] = 1.0  # unimplemented
+    tools: Optional[List[Any]] = None  # unimplemented
+    tool_choice: Optional[Union[str, Any]] = None  # unimplemented
+    parallel_tool_calls: Optional[bool] = None  # unimplemented
+    user: Optional[str] = None  # unimplemented
 
 
 @dataclass
@@ -121,10 +129,10 @@ class CompletionChoice:
     See the "The chat completion object >>> choices" section of the OpenAI API docs for more details.
     """
 
-    finish_reason: str
     index: int
     message: AssistantMessage
-    logprobs: Optional[List[Any]]
+    finish_reason: str = None
+    logprobs: Optional[List[Any]] = None
 
 
 @dataclass
@@ -151,9 +159,9 @@ class CompletionResponse:
     created: int
     model: str
     system_fingerprint: str
-    usage: UsageStats
-    object: str = "chat.completion"
     service_tier: Optional[str] = None
+    usage: Optional[UsageStats] = None
+    object: str = "chat.completion"
 
 
 @dataclass
@@ -193,8 +201,8 @@ class CompletionResponseChunk:
     created: int
     model: str
     system_fingerprint: str
-    object: str = "chat.completion.chunk"
     service_tier: Optional[str] = None
+    object: str = "chat.completion.chunk"
     usage: Optional[UsageStats] = None
 
 
@@ -220,9 +228,26 @@ class OpenAiApiGenerator(Generator):
             if self.draft_model is not None
             else self.model.config.max_seq_length
         )
+        # The System fingerprint is a unique identifier for the model and its configuration.
+        # Currently, this is not implemented in a
+        self.system_fingerprint = (
+            self.builder_args.device + type(self.builder_args.precision).__name__
+        )
 
-    def completion(self, completion_request: CompletionRequest):
+    def chunked_completion(self, completion_request: CompletionRequest):
         """Handle a chat completion request and yield a chunked response.
+
+        ** Warning ** : Not all arguments of the CompletionRequest are consumed as the server isn't completely implemented.
+        Current treatment of parameters is described below.
+
+        - messages: The server consumes the final element of the array as the prompt.
+        - model: This has no impact on the server state, i.e. changing the model in the request
+        will not change which model is responding. Instead, use the --model flag to seelect the model when starting the server.
+        - temperature: This is used to control the randomness of the response.
+        - system_fingerprint: A unique identifier for the model and its configuration. Currently unimplemented - subject to change.
+
+        See https://github.com/pytorch/torchchat/issues/973 for more details.
+
 
         Args:
             completion_request: Request object with prompt and other parameters.
@@ -235,13 +260,16 @@ class OpenAiApiGenerator(Generator):
 
         # Initialize counters for chunk responses and encode the prompt.
         id = str(uuid.uuid4())
+
         idx = 0
         buffer = []
         encoded = self.encode_tokens(
-            completion_request.prompt, bos=True, device=self.builder_args.device
+            completion_request.messages[-1].get("content"),
+            bos=True,
+            device=self.builder_args.device,
         )
         generator_args = GeneratorArgs(
-            completion_request.prompt,
+            completion_request.messages[-1].get("content"),
             encoded_prompt=encoded,
             chat_mode=False,
         )
@@ -291,21 +319,45 @@ class OpenAiApiGenerator(Generator):
                 choices=[choice_chunk],
                 created=int(time.time()),
                 model=completion_request.model,
-                system_fingerprint=uuid.UUID(int=uuid.getnode()),
+                system_fingerprint=self.system_fingerprint,
             )
             yield chunk_response
             self.start_pos += y.size(0)
             idx += 1
 
         # Yield an ending chunk indicating the generation has completed.
-        end_chunk = CompletionChoiceChunk(ChunkDelta(None, None, None), idx, "eos")
+        end_chunk = CompletionChoiceChunk(
+            ChunkDelta(None, None, None), idx, finish_reason="stop"
+        )
 
         yield CompletionResponseChunk(
             id=str(id),
             choices=[end_chunk],
             created=int(time.time()),
             model=completion_request.model,
-            system_fingerprint=uuid.UUID(int=uuid.getnode()),
+            system_fingerprint=self.system_fingerprint,
+        )
+
+    def sync_completion(self, request: CompletionRequest):
+        """Handle a chat completion request and yield a single, non-chunked response"""
+        output = ""
+        for chunk in self.chunked_completion(request):
+            if not chunk.choices[0].finish_reason:
+                output += chunk.choices[0].delta.content
+
+        message = AssistantMessage(content=output)
+        return CompletionResponse(
+            id=str(uuid.uuid4()),
+            choices=[
+                CompletionChoice(
+                    finish_reason="stop",
+                    index=0,
+                    message=message,
+                )
+            ],
+            created=int(time.time()),
+            model=request.model,
+            system_fingerprint=self.system_fingerprint,
         )
 
     def _callback(self, x, *, buffer, done_generating):
