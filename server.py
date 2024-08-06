@@ -16,6 +16,8 @@ from build.builder import BuilderArgs, TokenizerArgs
 from flask import Flask, request, Response
 from generate import GeneratorArgs
 
+OPENAI_API_VERSION = "v1"
+
 
 def create_app(args):
     """
@@ -33,7 +35,7 @@ def create_app(args):
             return [_del_none(v) for v in d if v]
         return d
 
-    @app.route("/chat", methods=["POST"])
+    @app.route(f"/{OPENAI_API_VERSION}/chat", methods=["POST"])
     def chat_endpoint():
         """
         Endpoint for the Chat API. This endpoint is used to generate a response to a user prompt.
@@ -75,11 +77,11 @@ def create_app(args):
 
             return json.dumps(_del_none(asdict(response)))
 
-    @app.route("/models", methods=["GET"])
+    @app.route(f"/{OPENAI_API_VERSION}/models", methods=["GET"])
     def models_endpoint():
         return json.dumps(asdict(get_model_info_list(args)))
 
-    @app.route("/models/<model_id>", methods=["GET"])
+    @app.route(f"/{OPENAI_API_VERSION}/models/<model_id>", methods=["GET"])
     def models_retrieve_endpoint(model_id):
         if response := retrieve_model_info(args, model_id):
             return json.dumps(asdict(response))
