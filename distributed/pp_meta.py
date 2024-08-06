@@ -460,7 +460,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_size",
         type=str,
-        default="22b",
+        default="123b",
         choices=MODEL_CONFIGS.keys(),
         help="Model size",
     )
