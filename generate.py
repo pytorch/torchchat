@@ -578,7 +578,6 @@ class Generator:
         )
         done_generating = self._check_done_generating(x, buffer)
         if len(buffer) == 4 or done_generating:
-            self._output(buffer)
             buffer.clear()
 
     def _check_done_generating(self, x, buffer):
