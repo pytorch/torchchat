@@ -214,11 +214,11 @@ class OpenAiApiGenerator(Generator):
         super().__init__(*args, **kwargs)
         self.start_pos = 0
         self.max_seq_length = (
-            self.model.text_transformer.config.max_seq_length
+            self.model.config.text_transformer_args.max_seq_length
             + self.speculative_builder_args.speculate_k
             + 1
             if self.draft_model is not None
-            else self.model.text_transformer.config.max_seq_length
+            else self.model.config.text_transformer_args.max_seq_length
         )
 
     def completion(self, completion_request: CompletionRequest):
