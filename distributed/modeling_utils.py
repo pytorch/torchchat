@@ -119,3 +119,16 @@ def enumerate_transformer_llm(model, prefix='', output_file=None):
         
         if list(module.children()):
             enumerate_transformer_llm(module, full_name, output_file)
+
+    def check_rope_embedding(stage_module: GraphModule, layer_to_check: str=None):
+    """ generic check on rope embedding"""
+    
+    # stage_module.model.graph.print_tabular()
+    if not layer_to_check:
+        layer_to_check = "model.layers.0.self_attn.rotary_emb"
+    
+    rotary = stage_module.get_submodule(layer_to_check)
+    print(f"checkmate {rotary=}")
+    buffer = rotary._buffers['inv_freq']
+    print(f"inv freq checkmate {buffer=}")
+     

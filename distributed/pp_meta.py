@@ -19,7 +19,7 @@ from safetensors import safe_open
 from argparse import ArgumentParser
 
 from utils import Color
-from modeling_utils import reinit_layers, enumerate_transformer_llm, find_main_llama_rope_embeddings, init_on_meta_device
+from modeling_utils import reinit_layers, enumerate_transformer_llm, find_main_llama_rope_embeddings, init_on_meta_device, check_rope_embedding
 
 # Model configuration
 MODEL_CONFIGS = {
@@ -311,62 +311,15 @@ def main(model_size: str, world_size: int, device: str):
     print(
         f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}"
     )
-    dist.barrier()
-    if rank==0:
-        # model.model.rotary_emb.__init__(config=config)
-        # stage_module.model.graph.print_tabular()
-        print(f"**********     ran init")
-        rotary = stage_module.get_submodule('model.layers.0.self_attn.rotary_emb')
-        print(f"checkmate {rotary=}")
-        #$submodule = stage_module.get_submodule('model.layers.0.self_attn')
-        buffer = rotary._buffers['inv_freq']
-        print(f"inv freq checkmate {buffer=}")
-        rotary1 = stage_module.get_submodule('model.layers.1.self_attn.rotary_emb')
-        print(f"checkmate {rotary1=}")
-        #$submodule = stage_module.get_submodule('model.layers.0.self_attn')
-        buffer1 = rotary1._buffers['inv_freq']
-        print(f"inv freq checkmate {buffer1=}")
 
-        
-        '''for node in stage_module.graph.nodes:
-            if node.name == "model":
-                for subnode in node.children():
-                    print(f"{subnode=}")
-                    print(f"{subnode.target=}")
-                    print(f"{subnode.args=}")
-                    print(f"{subnode.kwargs=}")
-                    print(f"{subnode.meta=}")
-                    print(f"{subnode.name=}")
-                    print(f"{subnode.op=}")
-                    print(f"{subnode.type=}")
-                    print(f"{subnode.users=}")
-        '''      
-           
-                
-        
-    if rank==1:
-        print(f"Stage 2: ")
-        # model.model.rotary_emb.__init__(config=config)
-        #stage_module.model.graph.print_tabular()
-    dist.barrier()
-    
-    # find the rotary embedding
-    if rank==0:
-        print(f"Finding the main llama rope embeddings...")
-        # model.rotary_emb
-        print(f"**********     ran init")
-        self_attn = stage_module.get_submodule('model.layers.0.self_attn')
-        print(f"checkmate {self_attn=}")
-        #print(f"checkmate - {stage_module.model.layers.self_attn.rotary_emb.inv_freq[0:4]=}")
-
-        #print(f"{stage_module.model= }")
-        
+    # optional - check rope embedding (default rank 0)
+    # check_rope_embedding(stage_module)
+       
     # Create schedule runtime
     stage = pipe.build_stage(
         rank,
         device=device,
     )
-
     if rank == 0:
         #print(f"{stage_module.print_readable()=}")
         #print(f"{Color.green}{rank=} {stage_module.model.rotary_emb=} {Color.reset}")
