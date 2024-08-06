@@ -23,7 +23,7 @@ from build.builder import (
     BuilderArgs,
     TokenizerArgs,
 )
-from build.model import Transformer
+from build.model import Model
 from build.utils import device_sync, set_precision
 from cli import add_arguments_for_verb, arg_init, check_args
 from utils.device_info import get_device_info
@@ -261,7 +261,7 @@ class Generator:
 
     def prefill(
         self,
-        model: Transformer,
+        model: Model,
         x: torch.Tensor,
         input_pos: torch.Tensor,
         *,
@@ -287,7 +287,7 @@ class Generator:
 
     def decode_one_token(
         self,
-        model: Transformer,
+        model: Model,
         x: torch.Tensor,
         input_pos: torch.Tensor,
         need_probs: bool,
@@ -307,7 +307,7 @@ class Generator:
 
     def decode_n_tokens(
         self,
-        model: Transformer,
+        model: Model,
         cur_token: torch.Tensor,
         input_pos: torch.Tensor,
         num_new_tokens: int,
@@ -376,8 +376,8 @@ class Generator:
 
     def speculative_decode(
         self,
-        model: Transformer,
-        draft_model: Transformer,
+        model: Model,
+        draft_model: Model,
         cur_token: torch.Tensor,
         input_pos: int,
         speculate_k: int,
@@ -441,13 +441,13 @@ class Generator:
     @torch.no_grad()
     def generate(
         self,
-        model: Transformer,
+        model: Model,
         prompt: torch.Tensor,
         max_new_tokens: int,
         *,
         chat_mode: bool,
         start_pos: int = 0,
-        draft_model: Transformer,
+        draft_model: Model,
         speculate_k: Optional[int] = 8,
         sequential_prefill=True,
         callback=lambda x: x,
@@ -634,7 +634,7 @@ class Generator:
         self.system_prompt = None
         # Set up our max_seq_length
         if generator_args.chat_mode:
-            max_seq_length = self.model.config.max_seq_length
+            max_seq_length = self.model.config.text_transformer_args.max_seq_length
             print(
                 f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye"
             )
@@ -648,7 +648,7 @@ class Generator:
         else:
             max_seq_length = min(
                 encoded.size(0) + generator_args.max_new_tokens,
-                self.model.config.block_size,
+                self.model.config.text_transformer_args.block_size,
             )
 
         max_seq_length = (
