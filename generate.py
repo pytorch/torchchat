@@ -469,7 +469,7 @@ class Generator:
         if start_pos == 0:
             model = model.to(device=device)
             with torch.device(device):
-                model.text_transformer.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+                model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
                 if is_speculative and draft_model is not model:
                     draft_model.setup_caches(
                         max_batch_size=1, max_seq_length=max_seq_length

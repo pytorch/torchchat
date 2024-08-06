@@ -177,6 +177,9 @@ class Model(nn.Module):
 
     def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         return self.text_transformer(idx, input_pos)
+    
+    def setup_caches(self, max_batch_size, max_seq_length):
+        self.text_transformer.setup_caches(max_batch_size, max_seq_length)
 
     @classmethod
     def from_name(cls, name: str):

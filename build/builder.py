@@ -516,7 +516,7 @@ def _initialize_model(
 
         if builder_args.setup_caches:
             with torch.device(builder_args.device):
-                model.text_transformer.setup_caches(
+                model.setup_caches(
                     max_batch_size=1, max_seq_length=model.config.text_transformer_args.max_seq_length
                 )
 
