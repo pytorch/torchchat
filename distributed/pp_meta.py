@@ -59,10 +59,11 @@ def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[Auto
         model = AutoModelForCausalLM.from_pretrained(model_id)
         if rank==0:
             print(f"---- precision meta init ----")
-            print(f"{model.model.rotary_emb=}")
-            print(f"rope type {type(model.model.rotary_emb)}")
-            print(f"{model.model.rotary_emb.inv_freq[0:5]=}")
-            print(f"{model.model.rotary_emb.inv_freq.device=}")
+            print(f"{model.model=}")
+            enumerate_transformer_llm(model.model)
+            #print(f"rope type {type(model.model.rotary_emb)}")
+            #print(f"{model.model.layers.0.rotary_emb.inv_freq[0:5]=}")
+            #print(f"{model.model.layers.0.rotary_emb.inv_freq.device=}")
 
     config = model.config
     #_model_config = config
@@ -84,10 +85,11 @@ def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[Auto
         model.to_empty(device='cuda')
     if rank==0:
             print(f"---- after fake mode to cuda move ----")
-            print(f"{model.model.rotary_emb=}")
-            print(f"rope type {type(model.model.rotary_emb)}")
-            print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
-            print(f"{model.model.rotary_emb.inv_freq.device=}")
+            print(f"{model.model.layers[0].self_attn.rotary_emb=}") #model.model.rotary_emb=}")
+            print(f"rope type {type(model.model.layers[0].self_attn.rotary_emb)}")
+            #print(f"rope type {type(model.model.rotary_emb)}")
+            #print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
+            #print(f"{model.model.rotary_emb.inv_freq.device=}")
     
     #model.model.rotary_emb.__init__(config=config)
     #model.model.rotary_emb.to('cuda')
@@ -107,9 +109,10 @@ def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[Auto
     #        print(f"rope type {type(model.model.rotary_emb)}")
     #        print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
 
-    print(f"check both devices: {model.model.rotary_emb.inv_freq.device=}")
+            #print(f"check both devices: {model.model.rotary_emb.inv_freq.device=}")
 
     #dist.barrier()
+    #assert False, "check"
 
     return model, fake_mode, config
 
@@ -150,6 +153,16 @@ def open_hf_safetensor(file_path: str):
         print(f"An error occurred while opening the safetensor file: {str(e)}")
         return None
 
+def remove_pattern_prefix(s):
+    """ Remove the prefix 'pattern.' from a string and return bool re: if it was present 
+    example: has_pattern, result = remove_pattern_prefix(input_string)
+    """
+    prefix = "pattern."
+    if s.startswith(prefix):
+        return True, s[len(prefix):]
+    else:
+        return False, s
+
 def init_buffers(
     stage_module: torch.nn.Module,
     device: torch.device,
@@ -160,22 +173,52 @@ def init_buffers(
     Initialize buffers of `stage_module` per the callback in `init_callbacks`.
     `init_callbacks` is a dictionary from a buffer's FQN to its init function.
     """
+    print(f"checking {init_callbacks=}")
     for name, buf in stage_module.named_buffers():
-        if name in init_callbacks:
+        print(f"****** checking {name=} and {buf=}")
+        fire_init: bool = False
+        for buffer_name_to_init, func_to_init in init_callbacks.items():
+            fire_init = False
+            print(f"checking {buffer_name_to_init=} and {func_to_init=}")
+            has_pattern, exact_buf_name = remove_pattern_prefix(buffer_name_to_init)
+            print(f"checking {has_pattern=} and {exact_buf_name=}")
+            if has_pattern:
+                if exact_buf_name in name:
+                    print(f"checkmate - Found *pattern* match buffer {name} via {exact_buf_name}")
+                    print(f"checkmate - looking for {init_callbacks=}")
+                    
+                    if "inv_freq" in name:
+                        fire_init = True
+                elif exact_buf_name == name:
+                    print(f"checkmate - Found *exact* match buffer {name} via {exact_buf_name}")
+                    print(f"checkmate - looking for {init_callbacks=}")
+                    fire_init = True
+
+            if not fire_init:
+                continue
+
+            print(f"checkmate - Found buffer {name}")
+            print(f"checkmate - looking for {init_callbacks=}")
+            
+            
             print(f"about to call {name} on {device}")
-            cb = init_callbacks[name]
-            print(f"cb: {cb=}")
-            print(f"{model_config=}")
+                
+            cb = func_to_init
+            print(f"checking cb: {cb=}")
+            
             buf_val = cb(device,)
             # Find the parent module
             splits = name.split(".")
             mod = stage_module
             for atom in splits[: -1]:
                 mod = getattr(mod, atom)
+            print(f"checking mod: {mod=}")
+            print(f"checking buf_val: {buf_val=}")
+            print(f"{splits=}")
             mod.register_buffer(
                 splits[-1], buf_val, persistent=False,
             )
-            print(f"====>>>> Initialized buffer {name}")
+            print(f"checking ====>>>> Initialized buffer {name}")
 
 def load_safetensor_weights(
     stage_module: torch.nn.Module,
@@ -305,18 +348,31 @@ def main(model_size: str, world_size: int, device: str):
     #if hasattr(model, "buf_init_callbacks"):
     print(f"about to try to init buffers")
     if hasattr(model, "buf_init_callbacks"):
+        print(f"..... checkmate  - init buffers with {device=}, ")
         init_buffers(stage_module, device, model.buf_init_callbacks, model_config)
-    stage_module.print_readable()
+    #stage_module.print_readable()
     #init_buffers(stage_module, "cuda", buf_init_callbacks, model_config)
     print(f"Completed load of stage {rank}")
     
     print(
         f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}"
     )
-
+    dist.barrier()
     if rank==0:
         # model.model.rotary_emb.__init__(config=config)
-        stage_module.model.graph.print_tabular()
+        # stage_module.model.graph.print_tabular()
+        print(f"**********     ran init")
+        rotary = stage_module.get_submodule('model.layers.0.self_attn.rotary_emb')
+        print(f"checkmate {rotary=}")
+        #$submodule = stage_module.get_submodule('model.layers.0.self_attn')
+        buffer = rotary._buffers['inv_freq']
+        print(f"inv freq checkmate {buffer=}")
+        rotary1 = stage_module.get_submodule('model.layers.1.self_attn.rotary_emb')
+        print(f"checkmate {rotary1=}")
+        #$submodule = stage_module.get_submodule('model.layers.0.self_attn')
+        buffer1 = rotary1._buffers['inv_freq']
+        print(f"inv freq checkmate {buffer1=}")
+
         
         '''for node in stage_module.graph.nodes:
             if node.name == "model":
@@ -333,12 +389,11 @@ def main(model_size: str, world_size: int, device: str):
         '''      
            
                 
-        # print(f"rank 0 {stage_module=}")
-        print(f"===== check rope freq ===>>>> {stage_module.model.rotary_emb.inv_freq[0:4]=}")
+        
     if rank==1:
         print(f"Stage 2: ")
         # model.model.rotary_emb.__init__(config=config)
-        stage_module.model.graph.print_tabular()
+        #stage_module.model.graph.print_tabular()
     dist.barrier()
     
     # find the rotary embedding
@@ -346,7 +401,9 @@ def main(model_size: str, world_size: int, device: str):
         print(f"Finding the main llama rope embeddings...")
         # model.rotary_emb
         print(f"**********     ran init")
-        print(f"{stage_module.model.rotary_emb=}")
+        self_attn = stage_module.get_submodule('model.layers.0.self_attn')
+        print(f"checkmate {self_attn=}")
+        #print(f"checkmate - {stage_module.model.layers.self_attn.rotary_emb.inv_freq[0:4]=}")
 
         #print(f"{stage_module.model= }")
         
@@ -357,9 +414,9 @@ def main(model_size: str, world_size: int, device: str):
     )
 
     if rank == 0:
-        print(f"{stage_module.print_readable()=}")
-        print(f"{Color.green}{rank=} {stage_module.model.rotary_emb=} {Color.reset}")
-        print(f"{stage.device=}")
+        #print(f"{stage_module.print_readable()=}")
+        #print(f"{Color.green}{rank=} {stage_module.model.rotary_emb=} {Color.reset}")
+        #print(f"{stage.device=}")
         print(f"{rank=} Completed stage building:  {stage=}...")
         print(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
 
@@ -403,7 +460,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_size",
         type=str,
-        default="405b",
+        default="22b",
         choices=MODEL_CONFIGS.keys(),
         help="Model size",
     )
