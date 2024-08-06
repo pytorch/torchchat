@@ -32,18 +32,7 @@ MODEL_CONFIGS = {
     "22b": "mistralai/Codestral-22B-v0.1",
 }
 
-# from HF
-#from transformers.modeling_rope_utils import ROPE_INIT_FUNCTIONS as hf_rope_init_functions
-#from transformers.modeling_rope_utils import _compute_default_rope_parameters, _compute_linear_scaling_rope_parameters
 
-
-#def rope_emb_init(_device, config):
-#    rope_init_fn = _compute_default_rope_parameters # hf_rope_init_functions[self, 'default']
-#    inv_freq, _ = rope_init_fn(config, device=_device,) #  **self.rope_kwargs)
-#    return inv_freq
-
-
-#buf_init_callbacks = { "model.rotary_emb.inv_freq": rope_emb_init}
 
 _default_safetensor_file_name = "model.safetensors.index.json"
 _config_name = "config.json"
@@ -57,63 +46,22 @@ def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[Auto
     #with torch.device("meta"):
     with init_on_meta_device(device="meta"):
         model = AutoModelForCausalLM.from_pretrained(model_id)
-        if rank==0:
-            print(f"---- precision meta init ----")
-            print(f"{model.model=}")
-            enumerate_transformer_llm(model.model)
-            #print(f"rope type {type(model.model.rotary_emb)}")
-            #print(f"{model.model.layers.0.rotary_emb.inv_freq[0:5]=}")
-            #print(f"{model.model.layers.0.rotary_emb.inv_freq.device=}")
+    model.eval()
 
     config = model.config
-    #_model_config = config
     assert config is not None, "config is None"
-        # what we expect:
-        #model.model.rotary_emb=LlamaRotaryEmbedding()
-        #model.model.rotary_emb.inv_freq=tensor([1.0000e+00, 8.1462e-01, 6.6360e-01, 5.4058e-01, 4.4037e-01, 3.5873e-01,
-        #    2.9223e-01, 2.3805e-01, 1.9392e-01, 1.5797e-01, 1.2869e-01, 1.0483e-01,
-        
+    # what we expect:
+    #model.model.rotary_emb=LlamaRotaryEmbedding()
+    #model.model.rotary_emb.inv_freq=tensor([1.0000e+00, 8.1462e-01, 6.6360e-01, 5.4058e-01, 4.4037e-01, 3.5873e-01,
+    #    2.9223e-01, 2.3805e-01, 1.9392e-01, 1.5797e-01, 1.2869e-01, 1.0483e-01,
+     
     print(f"Model type: {type(model)}")
-
     print(f"buf callback = {model.buf_init_callbacks}")
-    #assert False, "check"
-    
-    #config.device = device
-    model.eval()
+    assert model.buf_init_callbacks is not None, "rope generation will not succeed - buf_init_callbacks is None"
     
     with fake_mode:
         model.to_empty(device='cuda')
-    if rank==0:
-            print(f"---- after fake mode to cuda move ----")
-            print(f"{model.model.layers[0].self_attn.rotary_emb=}") #model.model.rotary_emb=}")
-            print(f"rope type {type(model.model.layers[0].self_attn.rotary_emb)}")
-            #print(f"rope type {type(model.model.rotary_emb)}")
-            #print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
-            #print(f"{model.model.rotary_emb.inv_freq.device=}")
     
-    #model.model.rotary_emb.__init__(config=config)
-    #model.model.rotary_emb.to('cuda')
-
-    #if rank==0:
-    #        print(f"---- after rope re-init and move to device manually ----")
-    #        print(f"{model.model.rotary_emb=}")
-    #        print(f"rope type {type(model.model.rotary_emb)}")
-    #        print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
-    #        print(f"-- final result: {model.model.rotary_emb.inv_freq.device=}")
-
-
-
-    #if rank==0:
-    #        print(f"---- afterto cuda move, then rotary re-init ----")
-    #        print(f"{model.model.rotary_emb=}")
-    #        print(f"rope type {type(model.model.rotary_emb)}")
-    #        print(f"{model.model.rotary_emb.inv_freq[0:2]=}")
-
-            #print(f"check both devices: {model.model.rotary_emb.inv_freq.device=}")
-
-    #dist.barrier()
-    #assert False, "check"
-
     return model, fake_mode, config
 
 
@@ -134,7 +82,6 @@ def create_pipeline(model, inputs, world_size: int):
         },
         split_spec=split_spec,
     )
-
 
 def open_hf_safetensor(file_path: str):
     try:
@@ -163,62 +110,69 @@ def remove_pattern_prefix(s):
     else:
         return False, s
 
+# --- update init ----
+from typing import Dict, Callable, Optional
+import torch
+
 def init_buffers(
     stage_module: torch.nn.Module,
     device: torch.device,
     init_callbacks: Dict[str, Callable],
     model_config: Optional[Dict[str, str]] = None,
-):
+) -> None:
     """
-    Initialize buffers of `stage_module` per the callback in `init_callbacks`.
-    `init_callbacks` is a dictionary from a buffer's FQN to its init function.
+    Initialize buffers of `stage_module` using the callbacks in `init_callbacks`.
+
+    Args:
+        stage_module (torch.nn.Module): The module whose buffers are to be initialized.
+        device (torch.device): The device on which to initialize the buffers.
+        init_callbacks (Dict[str, Callable]): A dictionary mapping buffer FQNs to their init functions.
+        model_config (Optional[Dict[str, str]]): Additional model configuration (unused in this function).
+
+    Returns:
+        None
     """
-    print(f"checking {init_callbacks=}")
     for name, buf in stage_module.named_buffers():
-        print(f"****** checking {name=} and {buf=}")
-        fire_init: bool = False
-        for buffer_name_to_init, func_to_init in init_callbacks.items():
-            fire_init = False
-            print(f"checking {buffer_name_to_init=} and {func_to_init=}")
-            has_pattern, exact_buf_name = remove_pattern_prefix(buffer_name_to_init)
-            print(f"checking {has_pattern=} and {exact_buf_name=}")
-            if has_pattern:
-                if exact_buf_name in name:
-                    print(f"checkmate - Found *pattern* match buffer {name} via {exact_buf_name}")
-                    print(f"checkmate - looking for {init_callbacks=}")
-                    
-                    if "inv_freq" in name:
-                        fire_init = True
-                elif exact_buf_name == name:
-                    print(f"checkmate - Found *exact* match buffer {name} via {exact_buf_name}")
-                    print(f"checkmate - looking for {init_callbacks=}")
-                    fire_init = True
+        for buffer_name_to_init, init_func in init_callbacks.items():
+            if _should_initialize_buffer(name, buffer_name_to_init):
+                _initialize_buffer(stage_module, name, init_func, device)
+                break
 
-            if not fire_init:
-                continue
+def _should_initialize_buffer(buffer_name: str, pattern: str) -> bool:
+    """
+    Determine if a buffer should be initialized based on its name and a pattern.
 
-            print(f"checkmate - Found buffer {name}")
-            print(f"checkmate - looking for {init_callbacks=}")
-            
-            
-            print(f"about to call {name} on {device}")
-                
-            cb = func_to_init
-            print(f"checking cb: {cb=}")
-            
-            buf_val = cb(device,)
-            # Find the parent module
-            splits = name.split(".")
-            mod = stage_module
-            for atom in splits[: -1]:
-                mod = getattr(mod, atom)
-            print(f"checking mod: {mod=}")
-            print(f"checking buf_val: {buf_val=}")
-            print(f"{splits=}")
-            mod.register_buffer(
-                splits[-1], buf_val, persistent=False,
-            )
-            print(f"checking ====>>>> Initialized buffer {name}")
+    Args:
+        buffer_name (str): The name of the buffer.
+        pattern (str): The pattern to match against.
+
+    Returns:
+        bool: True if the buffer should be initialized, False otherwise.
+    """
+    has_pattern, exact_buf_name = remove_pattern_prefix(pattern)
+    if has_pattern:
+        return exact_buf_name in buffer_name or exact_buf_name == buffer_name
+    return False
+
+def _initialize_buffer(module: torch.nn.Module, buffer_name: str, init_func: Callable, device: torch.device) -> None:
+    """
+    Initialize a specific buffer in the module.
+
+    Args:
+        module (torch.nn.Module): The module containing the buffer.
+        buffer_name (str): The name of the buffer to initialize.
+        init_func (Callable): The initialization function.
+        device (torch.device): The device on which to initialize the buffer.
+
+    Returns:
+        None
+    """
+    buf_val = init_func(device)
+    module_path = buffer_name.split('.')
+    target_module = module
+    for submodule in module_path[:-1]:
+        target_module = getattr(target_module, submodule)
+    target_module.register_buffer(module_path[-1], buf_val, persistent=False)
 
 def load_safetensor_weights(
     stage_module: torch.nn.Module,
@@ -288,7 +242,7 @@ def main(model_size: str, world_size: int, device: str):
     world_size_dist = int(os.environ["WORLD_SIZE"])
     if world_size_dist != world_size:
         print(
-            f"Warning: world size mismatch: {world_size_dist} != {world_size}. "
+            f"Warning: world size mis-match: {world_size_dist} != {world_size}. "
             "Overriding with dist world size"
         )
         world_size = world_size_dist
