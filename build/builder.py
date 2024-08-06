@@ -158,6 +158,7 @@ class BuilderArgs:
             setup_caches=(output_dso_path or output_pte_path),
             use_distributed=args.distributed,
             is_chat_model=is_chat_model,
+            dynamic_shapes=args.dynamic_shapes,
         )
 
     @classmethod
