@@ -222,7 +222,7 @@ is plaintext and will not be formatted to the OpenAI API specification. If `stre
 [skip default]: begin
 
 ```
-curl http://127.0.0.1:5000/chat \
+curl http://127.0.0.1:5000/v1/chat \
   -H "Content-Type: application/json" \
   -d '{
     "model": "llama3.1",
