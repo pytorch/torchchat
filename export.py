@@ -37,7 +37,10 @@ default_device = "cpu"
 
 
 def export_for_server(
-    model: nn.Module, device: Optional[str] = "cpu", output_path: str = "model.dso"
+    model: nn.Module,
+    device: Optional[str] = "cpu",
+    output_path: str = "model.dso",
+    dynamic_shapes: bool = False,
 ) -> str:
     """
     Export the model using AOT Compile to get a .dso for server use cases.
@@ -49,16 +52,22 @@ def export_for_server(
     Returns:
         The path to the exported model.
     """
-    input = (
-        torch.tensor([[1, 9038, 2501, 263, 931]], dtype=torch.int, device=device),
-        torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
-    )
+    if dynamic_shapes:
+        input = (
+            torch.tensor([[1, 9038, 2501, 263, 931]], dtype=torch.int, device=device),
+            torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
+        )
 
-    seq = Dim("seq", min=1, max=model.config.max_seq_length)
-    # Specify that the first dimension of each input is that batch size
-    dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
+        seq = Dim("seq", min=1, max=model.config.max_seq_length)
+        # Specify that the first dimension of each input is that batch size
+        dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
+    else:
+        input = (
+            torch.tensor([[1]], dtype=torch.int, device=device),
+            torch.tensor([0], dtype=torch.int, device=device),
+        )
+        dynamic_shapes = None
 
-    model.to(device)
     so = torch._export.aot_compile(
         model,
         args=input,
@@ -143,7 +152,12 @@ def main(args):
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
             print(f"Exporting model using AOT Inductor to {output_dso_path}")
-            export_for_server(model_to_dso, builder_args.device, output_dso_path)
+            export_for_server(
+                model_to_dso,
+                builder_args.device,
+                output_dso_path,
+                builder_args.dynamic_shapes,
+            )
 
 
 if __name__ == "__main__":

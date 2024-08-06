@@ -185,6 +185,11 @@ def _add_export_output_path_args(parser) -> None:
         default=None,
         help="Output to the specified AOT Inductor .dso model file",
     )
+    parser.add_argument(
+        "--dynamic-shapes",
+        action="store_true",
+        help="Call torch.export with dynamic shapes",
+    )
 
 
 # Add CLI Args representing user provided exported model files

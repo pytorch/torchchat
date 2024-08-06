@@ -44,6 +44,7 @@ class BuilderArgs:
     use_distributed: bool = False
     is_chat_model: bool = False
     prefill_possible: bool = False
+    dynamic_shapes: bool = False
 
     def __post_init__(self):
         if self.device is None:
@@ -157,6 +158,7 @@ class BuilderArgs:
             setup_caches=(output_dso_path or output_pte_path),
             use_distributed=args.distributed,
             is_chat_model=is_chat_model,
+            dynamic_shapes=getattr(args, "dynamic_shapes", False),
         )
 
     @classmethod
