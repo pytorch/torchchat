@@ -19,6 +19,8 @@ from generate import Generator, GeneratorArgs
 See https://platform.openai.com/docs/api-reference/chat for the full specification and details.
 """
 
+OPENAI_API_DEFAULT_MAX_TOKENS = 16
+
 # Message classes and associated objects - see the types of Messages under "Create Chat Completion >>> Request body >>> messages"
 
 
@@ -105,20 +107,20 @@ class CompletionRequest:
     logit_bias: Optional[Dict[str, float]] = None  # unimplemented
     logprobs: Optional[bool] = None  # unimplemented
     top_logprobs: Optional[int] = None  # unimplemented
-    max_tokens: Optional[int] = None  # unimplemented
+    max_tokens: Optional[int] = None
     n: int = 1
     presence_penalty: float = 0  # unimplemented
     response_format: Optional[ResponseFormat] = None  # unimplemented
-    seed: Optional[int] = None  # unimplemented
+    seed: Optional[int] = None
     service_tier: Optional[str] = None  # unimplemented
     stop: Optional[List[str]] = None  # unimplemented
     stream: bool = False
     stream_options: Optional[StreamOptions] = None  # unimplemented
-    temperature: Optional[float] = 1.0  # unimplemented
+    temperature: Optional[float] = 1.0
     top_p: Optional[float] = 1.0  # unimplemented
-    tools: Optional[List[Any]] = None  # unimplemented
-    tool_choice: Optional[Union[str, Any]] = None  # unimplemented
-    parallel_tool_calls: Optional[bool] = None  # unimplemented
+    tools: Optional[List[Any]] = None  # unimplemented - Assistant features
+    tool_choice: Optional[Union[str, Any]] = None  # unimplemented - Assistant features
+    parallel_tool_calls: Optional[bool] = None  # unimplemented - Assistant features
     user: Optional[str] = None  # unimplemented
 
 
@@ -229,9 +231,8 @@ class OpenAiApiGenerator(Generator):
             else self.model.config.max_seq_length
         )
         # The System fingerprint is a unique identifier for the model and its configuration.
-        # Currently, this is not implemented in a
         self.system_fingerprint = (
-            self.builder_args.device + type(self.builder_args.precision).__name__
+            f"{self.builder_args.device}_{self.builder_args.precision}"
         )
 
     def chunked_completion(self, completion_request: CompletionRequest):
@@ -270,7 +271,13 @@ class OpenAiApiGenerator(Generator):
         )
         generator_args = GeneratorArgs(
             completion_request.messages[-1].get("content"),
+            max_new_tokens=(
+                int(completion_request.max_tokens)
+                if completion_request.max_tokens
+                else OPENAI_API_DEFAULT_MAX_TOKENS
+            ),
             encoded_prompt=encoded,
+            temperature=float(completion_request.temperature),
             chat_mode=False,
         )
 
@@ -295,6 +302,7 @@ class OpenAiApiGenerator(Generator):
             sequential_prefill=generator_args.sequential_prefill,
             start_pos=self.start_pos,
             max_seq_length=self.max_seq_length,
+            seed=int(completion_request.seed),
         ):
             if y is None:
                 continue
