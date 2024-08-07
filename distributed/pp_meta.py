@@ -348,7 +348,7 @@ def main(model_size: str, world_size: int, device: str):
 
     logger.info(f"{rank=} Completed stage building:  {stage=}...")
     #logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
-
+    logger.info(f"{Color.blue}{stage_module.print_readable()=}{Color.reset}")
 
     # Run
     # Run time inputs
@@ -365,24 +365,34 @@ def main(model_size: str, world_size: int, device: str):
     num_mbs = 4
     schedule = ScheduleGPipe(stage, num_mbs)
 
-    if rank == 0:
+    '''if rank == 0:
         args = inputs["input_ids"]
     else:
         args = None
+    '''
+    
+    
 
-    output = schedule.step(args)
-    #assert output is not None, "Output from schedule step is None"
+    if rank == 0:
+        output = schedule.step(inputs['input_ids'])
+    else:
+        output = schedule.step()
+    
+    #output = schedule.step(args)
 
     # Decode
     if output is not None:
         logger.info(f"Output from schedule step {output.shape=}")
         logger.info(f"Output from schedule step {output=}")
-        next_token_logits = output[0][:, -1, :]
+        next_token_logits = output[:, -1, :]
         next_token = torch.argmax(next_token_logits, dim=-1)
         logger.info(f"First Pass Generation------")
+        logger.info(f"{next_token=}")
         logger.info(f"Results = {tokenizer.batch_decode(next_token)}")
     #else:
     #    logger.info(f"Output from schedule step is None {output=}")
+    dist.barrier()
+    dist.destroy_process_group()
     
 
 if __name__ == "__main__":
