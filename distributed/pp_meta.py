@@ -1,27 +1,32 @@
 # $ torchrun --nproc-per-node 4 pp_meta.py
 
-# derived from Ke's PR:
-# https://github.com/pytorch/PiPPy/pull/1135
-
-
 import os
 import json
-from typing import Optional, Dict, Tuple, Callable, Any, List
+from typing import Optional, Dict, Tuple, Any, List
+import logging
+from argparse import ArgumentParser
+
 import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import pipeline, SplitPoint, ScheduleGPipe
 from torch._subclasses.fake_tensor import FakeTensorMode
 from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
-# TODO- this is only temp import for now
-from transformers.models.llama.modeling_llama import LlamaRotaryEmbedding
-from transformers.utils import cached_file
 from safetensors import safe_open
-from argparse import ArgumentParser
+from transformers.utils import cached_file
 
 from utils import Color
-from modeling_utils import reinit_layers, enumerate_transformer_llm, find_main_llama_rope_embeddings, init_on_meta_device, check_rope_embedding
+from modeling_utils import init_on_meta_device, check_rope_embedding
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+
+# derived from Ke's PR:
+# https://github.com/pytorch/PiPPy/pull/1135
 
 # Model configuration
+
 MODEL_CONFIGS = {
     "7b": "meta-llama/Llama-2-7b-chat-hf",
     "8b": "meta-llama/Meta-Llama-3-8B-Instruct",
@@ -32,32 +37,22 @@ MODEL_CONFIGS = {
     "22b": "mistralai/Codestral-22B-v0.1",
 }
 
+_DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
+_CONFIG_NAME = "config.json"
 
-
-_default_safetensor_file_name = "model.safetensors.index.json"
-_config_name = "config.json"
-_model_config = None
-
-def create_model(model_id: str, device: str = "cuda", rank: int=0,)-> Tuple[AutoModelForCausalLM, FakeTensorMode, Optional[Dict[str, str]]]:
+def create_model(model_id: str, device: str = "cuda", rank: int = 0) -> Tuple[AutoModelForCausalLM, FakeTensorMode, Optional[Dict[str, Any]]]:
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
-    config = None
-    #nonlocal _model_config
-
-    #with torch.device("meta"):
+    
     with init_on_meta_device(device="meta"):
         model = AutoModelForCausalLM.from_pretrained(model_id)
     model.eval()
 
     config = model.config
-    assert config is not None, "config is None"
-    # what we expect:
-    #model.model.rotary_emb=LlamaRotaryEmbedding()
-    #model.model.rotary_emb.inv_freq=tensor([1.0000e+00, 8.1462e-01, 6.6360e-01, 5.4058e-01, 4.4037e-01, 3.5873e-01,
-    #    2.9223e-01, 2.3805e-01, 1.9392e-01, 1.5797e-01, 1.2869e-01, 1.0483e-01,
-     
-    print(f"Model type: {type(model)}")
-    print(f"buf callback = {model.buf_init_callbacks}")
-    assert model.buf_init_callbacks is not None, "rope generation will not succeed - buf_init_callbacks is None"
+    assert config is not None, "Config is None"
+    
+    logger.info(f"Model type: {type(model)}")
+    logger.info(f"Buffer callback: {model.buf_init_callbacks}")
+    assert model.buf_init_callbacks is not None, "ROPE generation will not succeed - buf_init_callbacks is None"
     
     with fake_mode:
         model.to_empty(device='cuda')
@@ -120,39 +115,39 @@ def init_buffers(
     init_callbacks: Dict[str, Callable],
     model_config: Optional[Dict[str, str]] = None,
 ) -> None:
-    """
-    Initialize buffers of `stage_module` using the callbacks in `init_callbacks`.
+        """
+        Initialize buffers of `stage_module` using the callbacks in `init_callbacks`.
 
-    Args:
-        stage_module (torch.nn.Module): The module whose buffers are to be initialized.
-        device (torch.device): The device on which to initialize the buffers.
-        init_callbacks (Dict[str, Callable]): A dictionary mapping buffer FQNs to their init functions.
-        model_config (Optional[Dict[str, str]]): Additional model configuration (unused in this function).
+        Args:
+            stage_module (torch.nn.Module): The module whose buffers are to be initialized.
+            device (torch.device): The device on which to initialize the buffers.
+            init_callbacks (Dict[str, Callable]): A dictionary mapping buffer FQNs to their init functions.
+            model_config (Optional[Dict[str, str]]): Additional model configuration (unused in this function).
 
-    Returns:
-        None
-    """
-    for name, buf in stage_module.named_buffers():
-        for buffer_name_to_init, init_func in init_callbacks.items():
-            if _should_initialize_buffer(name, buffer_name_to_init):
-                _initialize_buffer(stage_module, name, init_func, device)
-                break
+        Returns:
+            None
+        """
+        for name, buf in stage_module.named_buffers():
+            for buffer_name_to_init, init_func in init_callbacks.items():
+                if _should_initialize_buffer(name, buffer_name_to_init):
+                    _initialize_buffer(stage_module, name, init_func, device)
+                    break
 
 def _should_initialize_buffer(buffer_name: str, pattern: str) -> bool:
-    """
-    Determine if a buffer should be initialized based on its name and a pattern.
+        """
+        Determine if a buffer should be initialized based on its name and a pattern.
 
-    Args:
-        buffer_name (str): The name of the buffer.
-        pattern (str): The pattern to match against.
+        Args:
+            buffer_name (str): The name of the buffer.
+            pattern (str): The pattern to match against.
 
-    Returns:
-        bool: True if the buffer should be initialized, False otherwise.
-    """
-    has_pattern, exact_buf_name = remove_pattern_prefix(pattern)
-    if has_pattern:
-        return exact_buf_name in buffer_name or exact_buf_name == buffer_name
-    return False
+        Returns:
+            bool: True if the buffer should be initialized, False otherwise.
+        """
+        has_pattern, exact_buf_name = remove_pattern_prefix(pattern)
+        if has_pattern:
+            return exact_buf_name in buffer_name or exact_buf_name == buffer_name
+        return False
 
 def _initialize_buffer(module: torch.nn.Module, buffer_name: str, init_func: Callable, device: torch.device) -> None:
     """
@@ -173,6 +168,7 @@ def _initialize_buffer(module: torch.nn.Module, buffer_name: str, init_func: Cal
     for submodule in module_path[:-1]:
         target_module = getattr(target_module, submodule)
     target_module.register_buffer(module_path[-1], buf_val, persistent=False)
+
 
 def load_safetensor_weights(
     stage_module: torch.nn.Module,
@@ -237,39 +233,32 @@ def read_weights_from_json(file_path: str) -> Optional[Dict[str, str]]:
 
 
 def main(model_size: str, world_size: int, device: str):
-
     rank = int(os.environ["RANK"])
     world_size_dist = int(os.environ["WORLD_SIZE"])
     if world_size_dist != world_size:
-        print(
-            f"Warning: world size mis-match: {world_size_dist} != {world_size}. "
-            "Overriding with dist world size"
-        )
+        logger.warning(f"World size mismatch: {world_size_dist} != {world_size}. Overriding with dist world size")
         world_size = world_size_dist
-    print(f"Rank: {rank} / {world_size}")
+    logger.info(f"Rank: {rank} / {world_size}")
 
     device = torch.device(f"cuda:{rank % torch.cuda.device_count()}")
-    torch.distributed.init_process_group(rank=rank, world_size=world_size)
+    dist.init_process_group(rank=rank, world_size=world_size)
 
     model_id = MODEL_CONFIGS[model_size]
-    print(f"Model ID: {model_id}")
+    logger.info(f"Model ID: {model_id}")
 
-    cfile = cached_file(model_id, _default_safetensor_file_name) # model.safetensors.index.json
-    config_file = cached_file(model_id, _config_name)  # config.json
+    cfile = cached_file(model_id, _DEFAULT_SAFETENSOR_FILE_NAME)
+    config_file = cached_file(model_id, _CONFIG_NAME)
     
-    
-    assert os.path.exists(cfile), f"safetensor index file {cfile} does not exist."
-    assert os.path.exists(config_file), f"config file {config_file} does not exist."
+    assert os.path.exists(cfile), f"Safetensor index file {cfile} does not exist."
+    assert os.path.exists(config_file), f"Config file {config_file} does not exist."
 
     with open(config_file, "r") as file:
-        config_file = json.load(file)
-
-    #print(f"Cache file: {cfile} and config file: {config_file}")
+        config_data = json.load(file)
 
     file_location = os.path.dirname(cfile)
 
-    # ========== Create model on meta device =================
-    model, fake_mode, model_config = create_model(model_id, device, rank,)
+    # Create model on meta device
+    model, fake_mode, model_config = create_model(model_id, device, rank)
     assert model.buf_init_callbacks is not None, "buffer_init_callbacks is None"
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
@@ -279,61 +268,46 @@ def main(model_size: str, world_size: int, device: str):
     inputs = tokenizer(prompts, return_tensors="pt", padding=True)
     fake_ids = fake_mode.from_tensor(inputs["input_ids"])
 
-
     weight_map = read_weights_from_json(cfile)
     if weight_map is None:
-        print(f"No weight map found in the JSON file {cfile}.")
+        logger.error(f"No weight map found in the JSON file {cfile}.")
         return
 
-    # =========== Create pipeline =================
-    print("Creating pipeline...")
+    # Create pipeline
+    logger.info("Creating pipeline...")
     pipe = create_pipeline(model, fake_ids, world_size)
 
-    # ---- stage materialization -------
-    print("Materializing each stage...")
+    # Stage materialization
+    logger.info("Materializing each stage...")
     stage_module = pipe.get_stage_module(rank)
     
-    print(f"Loading weights into stage {rank}")
+    logger.info(f"Loading weights into stage {rank}")
     load_safetensor_weights(stage_module, weight_map, file_location)
-    if rank==0:
-        print(f"after load safe tensor Stage module type: {type(stage_module)}")
-    
-    # TODO
-    #if hasattr(model, "buf_init_callbacks"):
-    print(f"about to try to init buffers")
-    if hasattr(model, "buf_init_callbacks"):
-        print(f"..... checkmate  - init buffers with {device=}, ")
-        init_buffers(stage_module, device, model.buf_init_callbacks, model_config)
-    #stage_module.print_readable()
-    #init_buffers(stage_module, "cuda", buf_init_callbacks, model_config)
-    print(f"Completed load of stage {rank}")
-    
-    print(
-        f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}"
-    )
-
-    # optional - check rope embedding (default rank 0)
-    # check_rope_embedding(stage_module)
-       
-    # Create schedule runtime
-    stage = pipe.build_stage(
-        rank,
-        device=device,
-    )
     if rank == 0:
-        #print(f"{stage_module.print_readable()=}")
-        #print(f"{Color.green}{rank=} {stage_module.model.rotary_emb=} {Color.reset}")
-        #print(f"{stage.device=}")
-        print(f"{rank=} Completed stage building:  {stage=}...")
-        print(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
-
-        #print(f"{dir(stage_module)=} {dir(stage_module.model)=} {dir(stage_module)}")
+        logger.info(f"After load safe tensor Stage module type: {type(stage_module)}")
     
-
+    logger.info("About to try to init buffers")
+    if hasattr(model, "buf_init_callbacks"):
+        logger.info(f"Initializing buffers with device={device}")
+        init_buffers(stage_module, device, model.buf_init_callbacks, model_config)
+    logger.info(f"Completed load of stage {rank}")
     
-    print(f"TODO = continue here....returning now via early stop for debugging")
-    assert False, "stop here"
-    return
+    logger.info(f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}")
+
+    # Create schedule runtime
+    stage = pipe.build_stage(rank, device=device)
+    if rank == 0:
+        logger.info(f"{rank=} Completed stage building:  {stage=}...")
+        logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
+
+    #logger.info("TODO = continue here....returning now via early stop for debugging")
+    #assert False, "stop here"
+
+    logger.info("Pipeline Complee ---- Running schedule...")
+
+    logger.info(f"{rank=} Completed stage building:  {stage=}...")
+    logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
+
 
     # Run
     # Run time inputs
@@ -354,12 +328,14 @@ def main(model_size: str, world_size: int, device: str):
         args = None
 
     output = schedule.step(args)
+    assert output is not None, "Output from schedule step is None"
 
     # Decode
     if output is not None:
         next_token_logits = output[0][:, -1, :]
         next_token = torch.argmax(next_token_logits, dim=-1)
-        print(tokenizer.batch_decode(next_token))
+        logger.info(f"First Pass Generation------")
+        logger.info(f"Results = {tokenizer.batch_decode(next_token)}")
     
 
 if __name__ == "__main__":
@@ -367,12 +343,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_size",
         type=str,
-        default="123b",
+        default="8b",
         choices=MODEL_CONFIGS.keys(),
         help="Model size",
     )
     parser.add_argument(
-        "--world_size", type=int, default=4, help="Number of gpus to use"
+        "--world_size", type=int, default=4, help="Number of GPUs to use"
     )
     parser.add_argument(
         "--device",
