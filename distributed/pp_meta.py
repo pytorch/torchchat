@@ -15,7 +15,7 @@ from safetensors import safe_open
 from transformers.utils import cached_file
 
 from utils import Color
-from modeling_utils import init_on_meta_device, check_rope_embedding
+from modeling_utils import init_on_meta_device, check_rope_embedding, print_model_structure
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -44,15 +44,35 @@ def create_model(model_id: str, device: str = "cuda", rank: int = 0) -> Tuple[Au
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
     
     with init_on_meta_device(device="meta"):
-        model = AutoModelForCausalLM.from_pretrained(model_id)
+        model = AutoModelForCausalLM.from_pretrained(model_id).to(torch.bfloat16)
     model.eval()
+    if rank==0:
+        #print(model.config)
+        print(f"{model=}")
+        #print(f"{model.model.embed_tokens.dtype=}")
+        print(f"{model.model.embed_tokens.weight.dtype=}")
+        print(f"{model.model.layers[0].self_attn.q_proj=}") 
+        print(f"{model.model.layers[0].self_attn.q_proj.weight.dtype=}")
+        #embed_tokens.weight.device=}")
+        
+        #print_model_structure(model)
+        #print(f"{model.model.rotary_emb.inv_freq.dtype=}")
+        #assert False, "check dtype"
+    #if rank == 0:
+    #    logger.info(f"Model: {model.model.rope_emb.inv_freq=}")
+    #    logger.info(f"Model: {model.model.rope_emb.inv_freq.dtype=}")
+    #    assert False, "check dtype"
+        #check_rope_embedding(model)
 
     config = model.config
+    # print(f"{config=}")
+   
     assert config is not None, "Config is None"
     
     logger.info(f"Model type: {type(model)}")
     logger.info(f"Buffer callback: {model.buf_init_callbacks}")
-    assert model.buf_init_callbacks is not None, "ROPE generation will not succeed - buf_init_callbacks is None"
+    if not model.buf_init_callbacks:
+        logger.warning("ROPE generation may not succeed - buf_init_callbacks is None")
     
     with fake_mode:
         model.to_empty(device='cuda')
@@ -114,6 +134,7 @@ def init_buffers(
     device: torch.device,
     init_callbacks: Dict[str, Callable],
     model_config: Optional[Dict[str, str]] = None,
+    buffer_dtype: Optional[torch.dtype] = None, # torch.bfloat16,
 ) -> None:
         """
         Initialize buffers of `stage_module` using the callbacks in `init_callbacks`.
@@ -128,9 +149,12 @@ def init_buffers(
             None
         """
         for name, buf in stage_module.named_buffers():
+            #logger.info(f"INSIDE - Checking buffer {name}, {buf=}")
             for buffer_name_to_init, init_func in init_callbacks.items():
+                #logger.info(f"INSIDE - Checking buffer {name} against {buffer_name_to_init}")
                 if _should_initialize_buffer(name, buffer_name_to_init):
-                    _initialize_buffer(stage_module, name, init_func, device)
+                    #logger.info(f"INSIDE - About to Initializing buffer {name} with {init_func}")
+                    _initialize_buffer(stage_module, name, init_func, device, buffer_dtype )
                     break
 
 def _should_initialize_buffer(buffer_name: str, pattern: str) -> bool:
@@ -146,10 +170,12 @@ def _should_initialize_buffer(buffer_name: str, pattern: str) -> bool:
         """
         has_pattern, exact_buf_name = remove_pattern_prefix(pattern)
         if has_pattern:
-            return exact_buf_name in buffer_name or exact_buf_name == buffer_name
+            return exact_buf_name in buffer_name
+        else:
+             return exact_buf_name == buffer_name
         return False
 
-def _initialize_buffer(module: torch.nn.Module, buffer_name: str, init_func: Callable, device: torch.device) -> None:
+def _initialize_buffer(module: torch.nn.Module, buffer_name: str, init_func: Callable, device: torch.device, buffer_dtype=None) -> None:
     """
     Initialize a specific buffer in the module.
 
@@ -162,12 +188,20 @@ def _initialize_buffer(module: torch.nn.Module, buffer_name: str, init_func: Cal
     Returns:
         None
     """
+    logger.info(f"INSIDE - Initializing buffer {buffer_name} with {init_func}")
     buf_val = init_func(device)
+    if buffer_dtype is not None:
+        buf_val = buf_val.to(buffer_dtype)
+        logger.info(f"Buffer dtype set to: {buf_val.dtype}")
     module_path = buffer_name.split('.')
     target_module = module
     for submodule in module_path[:-1]:
         target_module = getattr(target_module, submodule)
     target_module.register_buffer(module_path[-1], buf_val, persistent=False)
+    logger.info(f"Initialized buffer {buffer_name}")
+    logger.info(f"Buffer result: {target_module=}")
+    #logger.info(f"{target_module=}")
+    #assert False, "stop here"
 
 
 def load_safetensor_weights(
@@ -291,22 +325,29 @@ def main(model_size: str, world_size: int, device: str):
         logger.info(f"Initializing buffers with device={device}")
         init_buffers(stage_module, device, model.buf_init_callbacks, model_config)
     logger.info(f"Completed load of stage {rank}")
+    if rank == 0:
+        #logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
+        logger.info(f"{Color.blue}{stage_module.model.rotary_emb=}{Color.reset}")
+        logger.info(f"{Color.blue}{stage_module.model.rotary_emb.inv_freq.dtype=}{Color.reset}")
+        #assert False, "stop here"
+    #else:
+    #    logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
     
     logger.info(f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}")
 
     # Create schedule runtime
     stage = pipe.build_stage(rank, device=device)
-    if rank == 0:
-        logger.info(f"{rank=} Completed stage building:  {stage=}...")
-        logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
+    #if rank == 0:
+    #    logger.info(f"{rank=} Completed stage building:  {stage=}...")
+        #logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
 
     #logger.info("TODO = continue here....returning now via early stop for debugging")
     #assert False, "stop here"
 
-    logger.info("Pipeline Complee ---- Running schedule...")
+    logger.info("Pipeline Complete ---- Running schedule...")
 
     logger.info(f"{rank=} Completed stage building:  {stage=}...")
-    logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
+    #logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
 
 
     # Run
@@ -315,7 +356,9 @@ def main(model_size: str, world_size: int, device: str):
         "How do you", "I like to", "Can I help", "You need to",
         "The weather is", "I found a", "What is your", "You are so",
     )  # full batch size = 8
+    
     inputs = tokenizer(full_batch_prompts, return_tensors="pt", padding=True).to(device)
+
 
     # Attach to a schedule
     # number of microbatches = 8 // 2 = 4
@@ -328,20 +371,24 @@ def main(model_size: str, world_size: int, device: str):
         args = None
 
     output = schedule.step(args)
-    assert output is not None, "Output from schedule step is None"
+    #assert output is not None, "Output from schedule step is None"
 
     # Decode
     if output is not None:
+        logger.info(f"Output from schedule step {output.shape=}")
+        logger.info(f"Output from schedule step {output=}")
         next_token_logits = output[0][:, -1, :]
         next_token = torch.argmax(next_token_logits, dim=-1)
         logger.info(f"First Pass Generation------")
         logger.info(f"Results = {tokenizer.batch_decode(next_token)}")
+    #else:
+    #    logger.info(f"Output from schedule step is None {output=}")
     
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Model tracing and segmentation")
     parser.add_argument(
-        "--model_size",
+        "--model",
         type=str,
         default="8b",
         choices=MODEL_CONFIGS.keys(),
@@ -359,4 +406,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    main(args.model_size, args.world_size, args.device)
+    main(args.model, args.world_size, args.device)
