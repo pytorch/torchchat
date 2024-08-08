@@ -9,6 +9,8 @@ import json
 from dataclasses import asdict
 from typing import Dict, List, Union
 
+import torch
+
 from api.api import CompletionRequest, OpenAiApiGenerator
 from api.models import get_model_info_list, retrieve_model_info
 
@@ -50,6 +52,8 @@ def create_app(args):
         """
 
         print(" === Completion Request ===")
+        if seed := request.args.get("seed"):
+            torch.manual_seed(int(seed))
 
         # Parse the request in to a CompletionRequest object
         data = request.get_json()
