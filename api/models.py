@@ -28,7 +28,7 @@ class ModelInfo:
 
     id: str
     created: int
-    owner: str
+    owned_by: str
     object: str = "model"
 
 
@@ -56,9 +56,9 @@ def retrieve_model_info(args, model_id: str) -> Union[ModelInfo, None]:
         if is_model_downloaded(model_id, args.model_directory):
             path = args.model_directory / model_config.name
             created = int(os.path.getctime(path))
-            owner = getpwuid(os.stat(path).st_uid).pw_name
+            owned_by = getpwuid(os.stat(path).st_uid).pw_name
 
-            return ModelInfo(id=model_config.name, created=created, owner=owner)
+            return ModelInfo(id=model_config.name, created=created, owned_by=owned_by)
         return None
     return None
 
@@ -79,8 +79,10 @@ def get_model_info_list(args) -> ModelInfo:
         if is_model_downloaded(model_id, args.model_directory):
             path = args.model_directory / model_config.name
             created = int(os.path.getctime(path))
-            owner = getpwuid(os.stat(path).st_uid).pw_name
+            owned_by = getpwuid(os.stat(path).st_uid).pw_name
 
-            data.append(ModelInfo(id=model_config.name, created=created, owner=owner))
+            data.append(
+                ModelInfo(id=model_config.name, created=created, owned_by=owned_by)
+            )
     response = ModelInfoList(data=data)
     return response
