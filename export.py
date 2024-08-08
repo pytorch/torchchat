@@ -113,10 +113,19 @@ def main(args):
         except:
             tokenizer = None
 
+        if (
+            output_dso_path is not None
+            and builder_args.max_seq_length is None
+            and not builder_args.dynamic_shapes
+        ):
+            print("Setting max_seq_length to 300 for DSO export.")
+            builder_args.max_seq_length = 300
+
         model = _initialize_model(
             builder_args,
             quantize,
             tokenizer,
+            max_seq_length=builder_args.max_seq_length,
         )
         model_to_pte = model
         model_to_dso = model

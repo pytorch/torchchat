@@ -68,6 +68,7 @@ def add_arguments_for_verb(parser, verb: str) -> None:
         _add_generation_args(parser, verb)
     if verb == "export":
         _add_export_output_path_args(parser)
+        _add_export_args(parser)
     if verb == "eval":
         _add_exported_input_path_args(parser)
         _add_evaluation_args(parser)
@@ -185,10 +186,19 @@ def _add_export_output_path_args(parser) -> None:
         default=None,
         help="Output to the specified AOT Inductor .dso model file",
     )
+
+
+def _add_export_args(parser) -> None:
     parser.add_argument(
         "--dynamic-shapes",
         action="store_true",
         help="Call torch.export with dynamic shapes",
+    )
+    parser.add_argument(
+        "--max-seq-length",
+        type=int,
+        default=None,
+        help="Set maximum length sequence when before calling torch.export",
     )
 
 
