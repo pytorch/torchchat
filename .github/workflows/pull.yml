@@ -627,9 +627,12 @@ jobs:
       runner: macos-m1-stable  # neeps MPS, was macos-m1-stable
       script: |
         set -x
-        # NS: Remove previous installation  of torch first
-        # as this script does not isntall anything into conda env but rather as system dep
+        # NS: Remove previous installation of torch and torchao first
+        # as this script does not install anything into conda env but rather as system dep
         pip3 uninstall -y torch || true
+        set -eou pipefail
+
+        pip3 uninstall -y torchao || true
         set -eou pipefail
 
         echo "::group::Print machine info"
