@@ -201,7 +201,7 @@ streamlit run torchchat.py -- browser llama3.1
 <summary>This mode gives a REST API that matches the OpenAI API spec for interacting with a model</summary>
 
 The server follows the [OpenAI API specification](https://platform.openai.com/docs/api-reference/chat) for chat completions.
-Since this feature is under active development, it's possible not every parameter is consumed. See api/api.py for details on
+Since this feature is under active development, not every parameter is consumed. See api/api.py for details on
 which request parameters are implemented. If you encounter any issues, please comment on the [tracking Github issue](https://github.com/pytorch/torchchat/issues/973).
 
 To test out the REST API, **you'll need 2 terminals**: one to host the server, and one to send the request.
