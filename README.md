@@ -24,7 +24,7 @@ torchchat is a small codebase showcasing the ability to run large language model
   - Linux (x86)
   - Mac OS (M1/M2/M3)
   - Android (Devices that support XNNPACK)
-  - iOS 17+ (iPhone 13 Pro+)
+  - iOS 17+ and 8+ Gb of RAM (iPhone 15 Pro+ or iPad with Apple Silicon)
 - Multiple data types including: float32, float16, bfloat16
 - Multiple quantization schemes
 - Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
@@ -222,7 +222,7 @@ is plaintext and will not be formatted to the OpenAI API specification. If `stre
 [skip default]: begin
 
 ```
-curl http://127.0.0.1:5000/chat \
+curl http://127.0.0.1:5000/v1/chat \
   -H "Content-Type: application/json" \
   -d '{
     "model": "llama3.1",

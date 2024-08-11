@@ -44,6 +44,8 @@ class BuilderArgs:
     use_distributed: bool = False
     is_chat_model: bool = False
     prefill_possible: bool = False
+    dynamic_shapes: bool = False
+    max_seq_length: Optional[int] = None
 
     def __post_init__(self):
         if self.device is None:
@@ -157,6 +159,8 @@ class BuilderArgs:
             setup_caches=(output_dso_path or output_pte_path),
             use_distributed=args.distributed,
             is_chat_model=is_chat_model,
+            dynamic_shapes=getattr(args, "dynamic_shapes", False),
+            max_seq_length=getattr(args, "max_seq_length", None),
         )
 
     @classmethod
@@ -435,6 +439,7 @@ def _initialize_model(
     builder_args,
     quantize,
     tokenizer=None,
+    max_seq_length=None,
 ):
     print("Loading model...")
 
@@ -511,7 +516,7 @@ def _initialize_model(
         if builder_args.setup_caches:
             with torch.device(builder_args.device):
                 model.setup_caches(
-                    max_batch_size=1, max_seq_length=model.config.max_seq_length
+                    max_batch_size=1, max_seq_length=max_seq_length or model.config.max_seq_length
                 )
 
         model.to(dtype=builder_args.precision)

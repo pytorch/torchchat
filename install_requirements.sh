@@ -47,7 +47,7 @@ fi
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-NIGHTLY_VERSION=dev20240710
+NIGHTLY_VERSION=dev20240728
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 (
@@ -82,7 +82,7 @@ REQUIREMENTS_TO_INSTALL=(
 # TODO: Remove this and install nightly build, once it supports macos
 (
   set -x
-  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@d36de1b144b73bf753bd082109c2b5d0141abd5b
+  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@d477c0e59b458b5617dcb3e999290a87df3070d8
 )
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   (
