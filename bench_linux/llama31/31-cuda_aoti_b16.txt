@@ -1,0 +1,52 @@
+python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model16.so
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model16.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 9.78 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model16.so
+The generated DSO model can be found at: /tmp/model16.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 7.01 seconds
+-----------------------------------------------------------
+Once upon a time, I had a dream to visit Dubai. It was a dream that seemed almost impossible at the time, especially considering the distance and the cost. I had always been fascinated by the city’s unique blend of modernity and tradition, and the idea of experiencing it firsthand was almost too exciting to bear.
+But as the years went by, I began to think that the dream might never become a reality. The distance seemed too great, and the cost of traveling to the Middle East was prohibitively expensive. But I didn’t give up. I started researching and planning, booking flights and accommodations, and saving up for the trip.
+And then, one day, it finally happened. I landed in Dubai, and my dream became a reality. As I stepped off the plane, I was hit with the warm desert air and the bright sunlight. The city was even more breathtaking than I had imagined, with its towering skyscrapers and stunning architecture.
+Over the next few days, I explored the city, taking
+Time for inference 1: 2.64 sec total, time to first token 0.19 sec with sequential prefill, 199 tokens, 75.47 tokens/sec, 13.25 ms/token
+Bandwidth achieved: 1212.16 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, in a small town, there lived a man named Jack. Jack was a brilliant inventor who had a passion for creating innovative gadgets and machines. He spent most of his day working in his workshop, tinkering with wires, gears, and other components to create something new and exciting.
+One day, Jack had an idea for a time-machine that would allow people to travel back in time to any point in history. He was thrilled with his idea and quickly began working on the project.
+As Jack worked on his time-machine, he encountered many challenges. He had to develop a way to harness the energy needed to power the machine, as well as figure out how to stabilize the time-space continuum so that the machine wouldn't create a paradox.
+Despite the obstacles, Jack was determined to make his time-machine a reality. He spent countless hours researching, designing, and building the device.
+Finally, after months of hard work, the time-machine was complete. Jack was eager to test it out, but he
+Time for inference 2: 2.32 sec total, time to first token 0.06 sec with sequential prefill, 199 tokens, 85.82 tokens/sec, 11.65 ms/token
+Bandwidth achieved: 1378.31 GB/s
+Once upon a time, there was a beautiful girl named Keiko who lived in a small village surrounded by vast fields of gold and green. She had long, silky black hair and bright, sparkling brown eyes that seemed to dance with joy whenever she smiled. Her laughter was contagious, and everyone in the village adored her.
+One day, Keiko's parents told her that she was chosen to receive a special gift, one that would change her life forever. They took her to a hidden garden deep in the woods, where a wise old man waited for them. He was dressed in a long, flowing robe, and his eyes twinkled with ancient wisdom.
+The old man led Keiko to a magnificent tree with branches that seemed to stretch up to the sky. He pointed to a small door carved into the trunk of the tree, and Keiko felt a strange tingling sensation as she approached it.
+Without hesitation, Keiko opened the door and stepped inside. She found herself in a cozy room filled with books and
+Time for inference 3: 2.32 sec total, time to first token 0.06 sec with sequential prefill, 199 tokens, 85.94 tokens/sec, 11.64 ms/token
+Bandwidth achieved: 1380.20 GB/s
+
+========================================
+
+Average tokens/sec: 82.41
+Memory used: 16.28 GB

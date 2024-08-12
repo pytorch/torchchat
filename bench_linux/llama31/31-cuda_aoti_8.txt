@@ -1,0 +1,52 @@
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model8.so
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model8.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model8.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 9.95 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.27 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model8.so
+The generated DSO model can be found at: /tmp/model8.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model8.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 5.61 seconds
+-----------------------------------------------------------
+Once upon a time, there was a young boy named Max. Max was a curious and adventurous boy who loved exploring the world around him. One day, while wandering through the woods, he stumbled upon a beautiful garden filled with vibrant flowers, towering trees, and sparkling fountains. Max was immediately captivated by the garden's beauty and decided to explore it further.
+As he wandered through the garden, Max came across a magnificent tree with branches that seemed to stretch up to the sky. The tree was unlike any he had ever seen before, with leaves that shimmered in the sunlight like diamonds. Max was fascinated by the tree and decided to climb it.
+As he climbed higher and higher, Max began to notice that the leaves of the tree seemed to be whispering to him. At first, he thought it was just the wind, but as he listened more closely, he realized that the leaves were actually speaking to him in a soft, gentle voice.
+"Welcome, young Max," said the leaves. "We have
+Time for inference 1: 1.92 sec total, time to first token 0.16 sec with sequential prefill, 199 tokens, 103.63 tokens/sec, 9.65 ms/token
+Bandwidth achieved: 1664.31 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, in a small village nestled in the heart of a dense forest, there lived a young girl named Sophia. Sophia was a curious and adventurous child, with a heart full of wonder and a mind full of questions. She loved to explore the woods, climbing trees and chasing after the creatures that lived there.
+One day, as Sophia was wandering deeper into the forest than she had ever been before, she stumbled upon a clearing. In the center of the clearing stood an enormous tree, its trunk as wide as a house and its branches reaching up towards the sky like giant arms. Sophia felt drawn to the tree, as if it was calling to her.
+As she approached the tree, Sophia noticed that its trunk was covered in strange symbols, etched into the bark in a language she couldn't understand. But as she reached out to touch the symbols, they began to glow with a soft, pulsing light.
+Sophia felt a strange sensation wash over her, as if the tree was communicating with her
+Time for inference 2: 1.62 sec total, time to first token 0.04 sec with sequential prefill, 199 tokens, 122.62 tokens/sec, 8.16 ms/token
+Bandwidth achieved: 1969.32 GB/s
+Once upon a time, in a land far, far away, a young girl named Sophie decided to run for class president. Sophie was a hard worker, a good listener, and a kind soul, but she was also a bit of a introvert and often found it challenging to express herself in front of her peers.
+Despite her reservations, Sophie was encouraged by her parents and her teacher, Mrs. Johnson, to throw her hat into the ring. They saw something in her that she didn't see in herself: leadership potential.
+As the campaign season began, Sophie found herself in a sea of ambitious students, all vying for the top spot. She was nervous, feeling like she didn't quite measure up to the more outgoing and charismatic candidates.
+But then something unexpected happened. As Sophie was walking through the hallways, she noticed the struggles of her fellow students: the stress of exams, the pressure of social media, the anxiety of simply being a teenager.
+Sophie realized that her introverted nature was actually a
+Time for inference 3: 1.62 sec total, time to first token 0.04 sec with sequential prefill, 199 tokens, 123.10 tokens/sec, 8.12 ms/token
+Bandwidth achieved: 1977.11 GB/s
+
+========================================
+
+Average tokens/sec: 116.45
+Memory used: 16.28 GB

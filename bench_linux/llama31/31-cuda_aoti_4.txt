@@ -1,0 +1,53 @@
+python3 torchchat.py export llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model34.so
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model34.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model34.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 9.93 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.46 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model34.so
+The generated DSO model can be found at: /tmp/model34.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model34.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 6.55 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of Scotland, there lived a young woman named Sarah. Sarah was a beautiful and kind-hearted person, with long, curly brown hair and sparkling green eyes. She had grown up in the village, surrounded by the rolling hills and sparkling streams of the countryside, and had always felt a deep connection to the natural world.
+Sarah's life had been one of simple pleasures and quiet contentment, until the day that a mysterious stranger arrived in the village. He was a tall, dark-haired man with piercing blue eyes, and he rode into the village on a magnificent black horse. Sarah had never seen anyone like him before, and she couldn't help but feel a sense of wonder and excitement at his arrival.
+As it turned out, the stranger was a prince from a far-off kingdom, and he had come to Scotland on a diplomatic mission. He was charismatic and confident, with a quick wit and a charming smile, and he quickly won over the villagers with
+Time for inference 1: 1.72 sec total, time to first token 0.17 sec with sequential prefill, 199 tokens, 115.82 tokens/sec, 8.63 ms/token
+Bandwidth achieved: 1860.05 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, there was a big conference held in a beautiful city. It was about a new technology that was going to change the world. Many of the biggest tech companies had sent their top engineers and scientists to attend the conference and show off their latest innovations.
+One of the biggest presentations of the day was by John, a brilliant young engineer from a top tech company. John was going to show off his company's latest AI-powered robot, which could perform a variety of tasks with incredible precision and speed.
+However, just as John was about to step up to the podium, his robot suddenly sprang to life and began to perform a series of impressive tasks. John was caught off guard and didn't know what to do.
+The robot jumped onto the stage, did a few impressive flips and landed on the podium, where it began to spin around and around, creating a whirlwind of dust and debris. The audience gasped in shock and amazement.
+John was mortified. He had never anticipated that
+Time for inference 2: 1.36 sec total, time to first token 0.03 sec with sequential prefill, 199 tokens, 146.41 tokens/sec, 6.83 ms/token
+Bandwidth achieved: 2351.46 GB/s
+Once upon a time, there was a beautiful princess who lived in a castle surrounded by a lovely garden. The princess loved to spend her time in the garden, surrounded by flowers and trees. One day, she decided to go for a walk in the garden to see if she could find anything that would make her happy.
+As she walked through the garden, she saw a little worm who was crawling on a leaf. The worm looked so sad, and the princess felt sorry for it.
+“Why are you sad?” the princess asked the worm.
+The worm told the princess that he was sad because he was having a hard time getting to where he wanted to go. He had to crawl across the leaf, and it was very slippery. He kept falling off, and it was making him feel frustrated and upset.
+The princess said, “Don’t worry, little worm. I will help you get to where you want to go. I will lift you up and help you cross the leaf.”
+The worm was so grateful to
+Time for inference 3: 1.35 sec total, time to first token 0.03 sec with sequential prefill, 199 tokens, 147.10 tokens/sec, 6.80 ms/token
+Bandwidth achieved: 2362.58 GB/s
+
+========================================
+
+Average tokens/sec: 136.44
+Memory used: 16.28 GB

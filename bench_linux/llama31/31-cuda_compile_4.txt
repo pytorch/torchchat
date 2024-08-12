@@ -1,0 +1,43 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 6.19 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.58 seconds
+-----------------------------------------------------------
+Once upon a time, there was a beautiful city, surrounded by mountains and rivers. The city was called Paradise, and it was a place of natural beauty and tranquility. The inhabitants of Paradise lived in harmony with nature, respecting its power and protecting its resources.
+The city was ruled by a wise and just King, who had inherited the throne from his father. He was loved by his people, and he made sure to keep the city prosperous and happy.
+One day, a group of explorers came to Paradise, seeking to discover new wonders. They were a group of scientists, engineers, and inventors, and they were all very excited to see the city's beauty and to learn from its people.
+The King welcomed the explorers, and he showed them around the city. He took them to the river, where they saw a beautiful dam that harnessed the power of the water to generate electricity. He showed them the mountains, where the people of Paradise had built a series of windmills that generated
+Time for inference 1: 61.82 sec total, time to first token 0.82 sec with parallel prefill, 199 tokens, 3.22 tokens/sec, 310.67 ms/token
+Bandwidth achieved: 15.84 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 6.2e+01 seconds
+Once upon a time, a little girl named Lily was playing in her garden. She had just finished eating a big bowl of spaghetti for lunch, and she felt happy and content. As she wandered through the garden, she came across a big, beautiful flower that was blooming right before her eyes.
+The flower was unlike anything Lily had ever seen before. It was a deep purple color with white petals that were shaped like a crown. Lily gasped in wonder as she reached out to touch the flower.
+Just then, a friendly fairy appeared behind the flower. She had wings that sparkled like diamonds, and a kind smile that lit up her whole face.
+"Hello there, little one," said the fairy. "I see you've found my special flower. Isn't it beautiful?"
+Lily nodded eagerly, her eyes shining with excitement. "Yes! I've never seen a flower like it before," she said.
+The fairy chuckled. "Well, it's a special flower, indeed. It only blooms once
+Time for inference 2: 2.12 sec total, time to first token 0.10 sec with parallel prefill, 199 tokens, 93.75 tokens/sec, 10.67 ms/token
+Bandwidth achieved: 461.31 GB/s
+Once upon a time, in a small village nestled in the rolling hills of rural England, there lived a young girl named Emily. Emily was a kind and gentle soul, with a heart full of love for all living things. She spent her days exploring the countryside, collecting wildflowers, and tending to her pet rabbit, Benny.
+
+One day, while out on a walk, Emily stumbled upon a beautiful old oak tree that had been felled by a recent storm. The tree had been a landmark in the village for generations, and its loss was deeply felt by everyone who knew it.
+
+As Emily stood before the fallen tree, she felt a deep sense of sadness and loss. She sat down beside the tree, stroking Benny's soft fur as he sniffed curiously at the branches. Suddenly, Emily had an idea. She would use her creativity and skills to turn the fallen tree into something beautiful, something that would honor the memory of the tree and bring joy to the village.
+
+With the help of her friends
+Time for inference 3: 1.39 sec total, time to first token 0.10 sec with parallel prefill, 199 tokens, 143.45 tokens/sec, 6.97 ms/token
+Bandwidth achieved: 705.89 GB/s
+
+========================================
+
+Average tokens/sec: 80.14
+Memory used: 23.55 GB

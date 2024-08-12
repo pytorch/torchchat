@@ -1,0 +1,41 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.35 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in the heart of a bustling city, there was a small, quaint tea shop called "Steeped in Love". It was a cozy little haven where people from all walks of life gathered to sip on their favorite brews, feast on delicious treats, and indulge in heartwarming conversations.
+The tea shop was owned by a kind-hearted entrepreneur named Emma, who had a passion for tea and a gift for making everyone feel like they were part of the family. Emma took great pride in her shop, carefully selecting each tea blend from the finest estates around the world. She also baked the most scrumptious pastries and sandwiches that perfectly complemented the tea selection.
+As Emma poured steaming cups of golden-hued tea into delicate china cups, she shared stories of the tea's origins, its flavor profiles, and the cultural traditions behind it. The shop became a melting pot of stories, laughter, and friendship, where strangers turned into friends over cups of soothing tea.
+One day, a shy young artist named Lily stumbled upon the tea shop while exploring the city. She was immediately drawn to the warm atmosphere and the tantalizing aroma of freshly baked scones wafting from the oven. Emma welcomed Lily with a warm smile and introduced her to the world of tea
+Time for inference 1: 176.13 sec total, time to first token 3.41 sec with parallel prefill, 255 tokens, 1.45 tokens/sec, 690.72 ms/token
+Bandwidth achieved: 23.25 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 1.8e+02 seconds
+Once upon a time, there was a city called Busselton. It was a quaint little place, nestled between the Indian Ocean and a long stretch of coastline. The residents of Busselton were known for their passion for adventure and the outdoors, and the town had become a popular destination for tourists seeking to experience the natural beauty of Western Australia.
+One of the most iconic landmarks in Busselton was the Busselton Jetty, a 1,836-metre-long pier that stretched far out into the ocean. The jetty was a beloved symbol of the town, and locals and visitors alike would flock to it to watch the sunset over the water, take a leisurely stroll, or enjoy a seafood meal at one of the many restaurants and cafes located on or near the jetty.
+But one day, something strange began to happen. As the residents of Busselton would wake up each morning, they would notice that the jetty seemed to be...shrinking. It started with small changes, imperceptible to most people. But as the days went by, the jetty's length began to decrease at an alarming rate. By the end of the week, it was half its original length, and by the end of the month, it had shr
+Time for inference 2: 93.28 sec total, time to first token 0.46 sec with parallel prefill, 255 tokens, 2.73 tokens/sec, 365.81 ms/token
+Bandwidth achieved: 43.90 GB/s
+Once upon a time, I worked at a company that was acquired by a larger company. After the acquisition, the larger company decided to rebrand the acquired company and change all of its products to use a new naming convention.
+The company I worked for, which we’ll call GreenSky, had a product called GreenSky LITE. The product was a collaborative software tool that allowed customers to share and discuss documents in real-time. It was widely used and loved by our customers.
+After the acquisition, the parent company decided to rebrand GreenSky LITE to “DynamicDeck”. They also decided to change the name of another product called GreenSky Elite to “DynamicSuite”. The reasoning behind the rename was to make the products more consistent with the parent company’s branding and to make them easier to find in the market.
+Here are two logos, the original GreenSky LITE logo and the new DynamicDeck logo:
+The old logo for GreenSky LITE
+The new logo for DynamicDeck
+Notice anything different? The DynamicDeck logo looks almost identical to the GreenSky LITE logo! I couldn’t figure out why they didn’t make the logo a completely different design. Was it a deliberate design choice?
+I ended up asking one of the designers who worked on the project, and they told me
+Time for inference 3: 84.97 sec total, time to first token 0.51 sec with parallel prefill, 255 tokens, 3.00 tokens/sec, 333.20 ms/token
+Bandwidth achieved: 48.20 GB/s
+
+========================================
+
+Average tokens/sec: 2.39
+Memory used: 0.00 GB

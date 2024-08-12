@@ -1,0 +1,55 @@
+python3 torchchat.py export llama3 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model8.so
+python3 torchchat.py generate llama3 --dso-path /tmp/model8.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model8.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 8.60 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.27 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model8.so
+The generated DSO model can be found at: /tmp/model8.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3 --dso-path /tmp/model8.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 6.36 seconds
+-----------------------------------------------------------
+Once upon a time, I was a part of a team that worked on a project that had a complex, multi-step process involved. The process was intricate and required a lot of coordination, planning, and execution. It was a challenging project, but we were determined to make it work.
+
+As we began to work on the project, we quickly realized that the process was more complex than we had initially thought. There were many moving parts, and it was difficult to keep track of everything. We had to create spreadsheets, diagrams, and flowcharts just to help us understand the process. It was a lot of work, but we were determined to make it happen.
+
+One of the biggest challenges we faced was communication. There were so many people involved, and everyone had a different role to play. It was difficult to keep everyone on the same page, and misunderstandings were common. We had to have regular meetings and updates to ensure that everyone was aware of their tasks and deadlines.
+
+Despite the challenges, we persevered
+Time for inference 1: 1.92 sec total, time to first token 0.17 sec with sequential prefill, 199 tokens, 103.44 tokens/sec, 9.67 ms/token
+Bandwidth achieved: 1661.38 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, in a small town in rural India, there lived a young boy named Rohan. Rohan was a curious and adventurous boy who loved exploring the world around him. He spent most of his days playing in the fields and forests near his village, learning about the local flora and fauna.
+One day, while exploring the nearby forest, Rohan stumbled upon a hidden clearing. In the center of the clearing stood an ancient tree, its branches twisted and gnarled with age. The tree seemed to be calling to Rohan, and he felt an inexplicable connection to it.
+
+As he approached the tree, Rohan noticed that its trunk was covered in intricate carvings. The carvings depicted various animals and symbols, which seemed to tell a story. Rohan's curiosity was piqued, and he decided to investigate further.
+
+As he examined the carvings, Rohan began to notice a strange glow emanating from the tree. The glow grew brighter and brighter, until Roh
+Time for inference 2: 1.63 sec total, time to first token 0.04 sec with sequential prefill, 199 tokens, 121.97 tokens/sec, 8.20 ms/token
+Bandwidth achieved: 1958.94 GB/s
+Once upon a time, in a land far, far away, there was a magical kingdom ruled by a wise and just king. The king had a beautiful daughter, a princess named Sophia, who was loved by all the people in the kingdom. Sophia was kind, gentle, and had a heart of gold. She spent her days helping those in need and spreading joy and happiness throughout the kingdom.
+One day, a great drought struck the land, and the crops began to wither and die. The people of the kingdom were worried and scared, for they didn't know how they would survive the famine that was coming. The king called upon his wisest advisors to find a solution, but they were unable to come up with a solution.
+Sophia, who was determined to help her people, decided to take matters into her own hands. She went out into the fields and forests, gathering information and talking to the people. She discovered that the drought was caused by a wicked sorcerer who had cast a spell on the
+Time for inference 3: 1.63 sec total, time to first token 0.04 sec with sequential prefill, 199 tokens, 121.87 tokens/sec, 8.21 ms/token
+Bandwidth achieved: 1957.31 GB/s
+
+========================================
+
+Average tokens/sec: 115.76
+Memory used: 16.28 GB

@@ -1,0 +1,62 @@
+python3 torchchat.py export llama3 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model16.so
+python3 torchchat.py generate llama3 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model16.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cpu
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 0.39 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model16.so
+The generated DSO model can be found at: /tmp/model16.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.37 seconds
+-----------------------------------------------------------
+Once upon a time, when they were still young and full of energy, a group of friends decided to go on a camping trip to the beautiful mountains. They packed their bags, loaded up their cars with camping gear, and set off early in the morning.
+As they drove, the scenery changed from rolling hills to dense forests and finally, to towering mountain peaks. They arrived at the campsite in the late afternoon, just in time to set up their tents and start a fire.
+As they sat around the campsite, roasting marshmallows and swapping stories, they noticed a strange noise coming from the nearby woods. It sounded like someone or something was moving through the underbrush, but they couldn't quite see what it was.
+At first, they thought it might be a bear, but as the noise got closer and closer, they realized that it was actually a group of hikers, carrying heavy packs and looking like they had been on the trails for days.
+
+The friends invited the hikers to join them at their campsite, and they gratefully accepted. They introduced themselves as a group of thru-hikers, who were attempting to complete the entire Appalachian Trail in one season.
+
+The friends were amazed and a little jealous of the hikers' determination and dedication. They spent the rest
+Time for inference 1: 112.86 sec total, time to first token 3.37 sec with sequential prefill, 255 tokens, 2.26 tokens/sec, 442.58 ms/token
+Bandwidth achieved: 36.29 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, there was a young man named Jack who lived in a small village surrounded by a dense forest. Jack was a curious and adventurous person, always eager to explore the unknown and discover new things.
+One day, Jack decided to venture into the forest to see what wonders it held. He walked for hours, his eyes scanning the trees and underbrush for any sign of life. As the sun began to set, he came across a clearing and in the center of it stood an enormous, ancient tree.
+The tree was unlike any Jack had ever seen. Its trunk was twisted and gnarled, its branches reaching up towards the sky like giant arms. Jack felt drawn to the tree, as if it was calling to him. He approached it cautiously, feeling a strange sense of energy emanating from it.
+As he reached out to touch the tree, a low, rumbling voice spoke to him. "Welcome, young one," it said. "I am the guardian of this forest. I have been waiting for you."
+
+Jack was startled, but he felt no fear. He was curious, and he wanted to know what the tree meant. "What do you mean, you've been waiting for me?" he asked.
+
+"I have been waiting for a brave and curious soul like
+Time for inference 2: 92.46 sec total, time to first token 1.61 sec with sequential prefill, 255 tokens, 2.76 tokens/sec, 362.60 ms/token
+Bandwidth achieved: 44.29 GB/s
+Once upon a time, in a land far, far away, there was a magical kingdom ruled by a wise and just king named Arthur. The kingdom was called Camelot, and it was a place of beauty and wonder, where the sun always shone and the flowers never wilted.
+King Arthur was a great ruler, loved by his people, and he had a special sword called Excalibur, which was said to have been given to him by the Lady of the Lake. The sword had magical powers, and it was said that it could only be wielded by a true king.
+One day, a young girl named Guinevere came to Camelot, and she was chosen by the king to be his queen. She was a beautiful and kind-hearted girl, and she quickly won the hearts of everyone in the kingdom.
+
+But there was also a great knight named Lancelot, who was the most chivalrous and brave of all the knights in the kingdom. He was also the king's closest friend and advisor, and he was deeply in love with Queen Guinevere.
+
+As the years passed, Lancelot and Guinevere's love for each other grew stronger, but they knew that it was wrong for a knight to love the queen. They tried to fight their feelings
+Time for inference 3: 88.20 sec total, time to first token 2.35 sec with sequential prefill, 255 tokens, 2.89 tokens/sec, 345.88 ms/token
+Bandwidth achieved: 46.43 GB/s
+
+========================================
+
+Average tokens/sec: 2.64
+Memory used: 0.00 GB

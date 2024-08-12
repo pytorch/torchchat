@@ -1,0 +1,51 @@
+python3 torchchat.py export llama3 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model34.so
+python3 torchchat.py generate llama3 --dso-path /tmp/model34.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model34.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 9.51 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.43 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model34.so
+The generated DSO model can be found at: /tmp/model34.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3 --dso-path /tmp/model34.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 5.79 seconds
+-----------------------------------------------------------
+Once upon a time, a young king named King Henry VIII ruled England. He was married to his first wife, Catherine of Aragon. King Henry VIII and Queen Catherine had a daughter named Mary, but they did not have a son. King Henry wanted a son to continue his dynasty, and he began to seek help from other sources.
+King Henry VIII became obsessed with having a male heir, and he started looking for other wives. He sought the help of the Pope, but the Pope refused to annul his marriage to Queen Catherine, citing biblical canon that prohibited marriage between a brother and a sister (Catherine had been married to King Henry’s older brother, Arthur, before marrying King Henry).
+King Henry VIII became angry and decided to break away from the Catholic Church and create the Church of England, with himself as its head. He also declared that he was free to marry again, and he married Anne Boleyn, Catherine’s lady-in-waiting.
+Anne Boleyn was a vivacious and intelligent
+Time for inference 1: 1.70 sec total, time to first token 0.18 sec with sequential prefill, 199 tokens, 117.17 tokens/sec, 8.53 ms/token
+Bandwidth achieved: 1881.85 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, in the land of the rising sun, there was a talented young artist named Hokusai. He was a free spirit, a wanderer, always chasing his dreams. He was fascinated by the beauty of nature, especially the sea, which often inspired him in his art. His works were full of life, energy, and a sense of adventure.
+One day, Hokusai had an idea for a masterpiece. He wanted to create a painting that would capture the magic of the sea, the vastness of the ocean, and the spirits that dwelled within. He spent countless hours studying the art of the great Japanese masters, from the delicate ink strokes of the Song Dynasty to the bold, colorful scenes of the Edo period.
+Hokusai's masterpiece, "The Great Wave," took shape as a majestic, swirling wave, crashing dramatically against the shore. The wave was alive, with a sense of movement and power that seemed to pulsate from the very fibers of the painting. The
+Time for inference 2: 1.36 sec total, time to first token 0.03 sec with sequential prefill, 199 tokens, 146.25 tokens/sec, 6.84 ms/token
+Bandwidth achieved: 2348.91 GB/s
+Once upon a time, I was a coffee connoisseur. I had a ritualistic routine that began with the early morning arrival at the local coffee shop, where I would greet the barista with a warm smile and a hearty "good morning." I would carefully select a blend, usually a French Roast or an Espresso, and then proceed to sample the different roasts, savoring the complex flavors and aromas. I would often return home with a bag of freshly roasted beans, eager to brew my own coffee using an antique French press or a precise pour-over.
+
+That was until the pandemic hit, and I had to adapt to a new way of life. I found myself working from home, and my daily routine was disrupted. The local coffee shop was no more, replaced by a makeshift at-home coffee station, consisting of a French press and a pour-over. The aroma of freshly roasted beans was replaced by the distant sound of construction and the occasional noise from the neighbors.
+
+I tried to recreate my coffee
+Time for inference 3: 1.36 sec total, time to first token 0.03 sec with sequential prefill, 199 tokens, 146.79 tokens/sec, 6.81 ms/token
+Bandwidth achieved: 2357.60 GB/s
+
+========================================
+
+Average tokens/sec: 136.74
+Memory used: 16.28 GB

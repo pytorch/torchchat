@@ -1,0 +1,265 @@
+
+python3 torchchat.py generate llama3 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+linear: layers.0.attention.wq, in=4096, out=4096
+linear: layers.0.attention.wk, in=4096, out=1024
+linear: layers.0.attention.wv, in=4096, out=1024
+linear: layers.0.attention.wo, in=4096, out=4096
+linear: layers.0.feed_forward.w1, in=4096, out=14336
+linear: layers.0.feed_forward.w2, in=14336, out=4096
+linear: layers.0.feed_forward.w3, in=4096, out=14336
+linear: layers.1.attention.wq, in=4096, out=4096
+linear: layers.1.attention.wk, in=4096, out=1024
+linear: layers.1.attention.wv, in=4096, out=1024
+linear: layers.1.attention.wo, in=4096, out=4096
+linear: layers.1.feed_forward.w1, in=4096, out=14336
+linear: layers.1.feed_forward.w2, in=14336, out=4096
+linear: layers.1.feed_forward.w3, in=4096, out=14336
+linear: layers.2.attention.wq, in=4096, out=4096
+linear: layers.2.attention.wk, in=4096, out=1024
+linear: layers.2.attention.wv, in=4096, out=1024
+linear: layers.2.attention.wo, in=4096, out=4096
+linear: layers.2.feed_forward.w1, in=4096, out=14336
+linear: layers.2.feed_forward.w2, in=14336, out=4096
+linear: layers.2.feed_forward.w3, in=4096, out=14336
+linear: layers.3.attention.wq, in=4096, out=4096
+linear: layers.3.attention.wk, in=4096, out=1024
+linear: layers.3.attention.wv, in=4096, out=1024
+linear: layers.3.attention.wo, in=4096, out=4096
+linear: layers.3.feed_forward.w1, in=4096, out=14336
+linear: layers.3.feed_forward.w2, in=14336, out=4096
+linear: layers.3.feed_forward.w3, in=4096, out=14336
+linear: layers.4.attention.wq, in=4096, out=4096
+linear: layers.4.attention.wk, in=4096, out=1024
+linear: layers.4.attention.wv, in=4096, out=1024
+linear: layers.4.attention.wo, in=4096, out=4096
+linear: layers.4.feed_forward.w1, in=4096, out=14336
+linear: layers.4.feed_forward.w2, in=14336, out=4096
+linear: layers.4.feed_forward.w3, in=4096, out=14336
+linear: layers.5.attention.wq, in=4096, out=4096
+linear: layers.5.attention.wk, in=4096, out=1024
+linear: layers.5.attention.wv, in=4096, out=1024
+linear: layers.5.attention.wo, in=4096, out=4096
+linear: layers.5.feed_forward.w1, in=4096, out=14336
+linear: layers.5.feed_forward.w2, in=14336, out=4096
+linear: layers.5.feed_forward.w3, in=4096, out=14336
+linear: layers.6.attention.wq, in=4096, out=4096
+linear: layers.6.attention.wk, in=4096, out=1024
+linear: layers.6.attention.wv, in=4096, out=1024
+linear: layers.6.attention.wo, in=4096, out=4096
+linear: layers.6.feed_forward.w1, in=4096, out=14336
+linear: layers.6.feed_forward.w2, in=14336, out=4096
+linear: layers.6.feed_forward.w3, in=4096, out=14336
+linear: layers.7.attention.wq, in=4096, out=4096
+linear: layers.7.attention.wk, in=4096, out=1024
+linear: layers.7.attention.wv, in=4096, out=1024
+linear: layers.7.attention.wo, in=4096, out=4096
+linear: layers.7.feed_forward.w1, in=4096, out=14336
+linear: layers.7.feed_forward.w2, in=14336, out=4096
+linear: layers.7.feed_forward.w3, in=4096, out=14336
+linear: layers.8.attention.wq, in=4096, out=4096
+linear: layers.8.attention.wk, in=4096, out=1024
+linear: layers.8.attention.wv, in=4096, out=1024
+linear: layers.8.attention.wo, in=4096, out=4096
+linear: layers.8.feed_forward.w1, in=4096, out=14336
+linear: layers.8.feed_forward.w2, in=14336, out=4096
+linear: layers.8.feed_forward.w3, in=4096, out=14336
+linear: layers.9.attention.wq, in=4096, out=4096
+linear: layers.9.attention.wk, in=4096, out=1024
+linear: layers.9.attention.wv, in=4096, out=1024
+linear: layers.9.attention.wo, in=4096, out=4096
+linear: layers.9.feed_forward.w1, in=4096, out=14336
+linear: layers.9.feed_forward.w2, in=14336, out=4096
+linear: layers.9.feed_forward.w3, in=4096, out=14336
+linear: layers.10.attention.wq, in=4096, out=4096
+linear: layers.10.attention.wk, in=4096, out=1024
+linear: layers.10.attention.wv, in=4096, out=1024
+linear: layers.10.attention.wo, in=4096, out=4096
+linear: layers.10.feed_forward.w1, in=4096, out=14336
+linear: layers.10.feed_forward.w2, in=14336, out=4096
+linear: layers.10.feed_forward.w3, in=4096, out=14336
+linear: layers.11.attention.wq, in=4096, out=4096
+linear: layers.11.attention.wk, in=4096, out=1024
+linear: layers.11.attention.wv, in=4096, out=1024
+linear: layers.11.attention.wo, in=4096, out=4096
+linear: layers.11.feed_forward.w1, in=4096, out=14336
+linear: layers.11.feed_forward.w2, in=14336, out=4096
+linear: layers.11.feed_forward.w3, in=4096, out=14336
+linear: layers.12.attention.wq, in=4096, out=4096
+linear: layers.12.attention.wk, in=4096, out=1024
+linear: layers.12.attention.wv, in=4096, out=1024
+linear: layers.12.attention.wo, in=4096, out=4096
+linear: layers.12.feed_forward.w1, in=4096, out=14336
+linear: layers.12.feed_forward.w2, in=14336, out=4096
+linear: layers.12.feed_forward.w3, in=4096, out=14336
+linear: layers.13.attention.wq, in=4096, out=4096
+linear: layers.13.attention.wk, in=4096, out=1024
+linear: layers.13.attention.wv, in=4096, out=1024
+linear: layers.13.attention.wo, in=4096, out=4096
+linear: layers.13.feed_forward.w1, in=4096, out=14336
+linear: layers.13.feed_forward.w2, in=14336, out=4096
+linear: layers.13.feed_forward.w3, in=4096, out=14336
+linear: layers.14.attention.wq, in=4096, out=4096
+linear: layers.14.attention.wk, in=4096, out=1024
+linear: layers.14.attention.wv, in=4096, out=1024
+linear: layers.14.attention.wo, in=4096, out=4096
+linear: layers.14.feed_forward.w1, in=4096, out=14336
+linear: layers.14.feed_forward.w2, in=14336, out=4096
+linear: layers.14.feed_forward.w3, in=4096, out=14336
+linear: layers.15.attention.wq, in=4096, out=4096
+linear: layers.15.attention.wk, in=4096, out=1024
+linear: layers.15.attention.wv, in=4096, out=1024
+linear: layers.15.attention.wo, in=4096, out=4096
+linear: layers.15.feed_forward.w1, in=4096, out=14336
+linear: layers.15.feed_forward.w2, in=14336, out=4096
+linear: layers.15.feed_forward.w3, in=4096, out=14336
+linear: layers.16.attention.wq, in=4096, out=4096
+linear: layers.16.attention.wk, in=4096, out=1024
+linear: layers.16.attention.wv, in=4096, out=1024
+linear: layers.16.attention.wo, in=4096, out=4096
+linear: layers.16.feed_forward.w1, in=4096, out=14336
+linear: layers.16.feed_forward.w2, in=14336, out=4096
+linear: layers.16.feed_forward.w3, in=4096, out=14336
+linear: layers.17.attention.wq, in=4096, out=4096
+linear: layers.17.attention.wk, in=4096, out=1024
+linear: layers.17.attention.wv, in=4096, out=1024
+linear: layers.17.attention.wo, in=4096, out=4096
+linear: layers.17.feed_forward.w1, in=4096, out=14336
+linear: layers.17.feed_forward.w2, in=14336, out=4096
+linear: layers.17.feed_forward.w3, in=4096, out=14336
+linear: layers.18.attention.wq, in=4096, out=4096
+linear: layers.18.attention.wk, in=4096, out=1024
+linear: layers.18.attention.wv, in=4096, out=1024
+linear: layers.18.attention.wo, in=4096, out=4096
+linear: layers.18.feed_forward.w1, in=4096, out=14336
+linear: layers.18.feed_forward.w2, in=14336, out=4096
+linear: layers.18.feed_forward.w3, in=4096, out=14336
+linear: layers.19.attention.wq, in=4096, out=4096
+linear: layers.19.attention.wk, in=4096, out=1024
+linear: layers.19.attention.wv, in=4096, out=1024
+linear: layers.19.attention.wo, in=4096, out=4096
+linear: layers.19.feed_forward.w1, in=4096, out=14336
+linear: layers.19.feed_forward.w2, in=14336, out=4096
+linear: layers.19.feed_forward.w3, in=4096, out=14336
+linear: layers.20.attention.wq, in=4096, out=4096
+linear: layers.20.attention.wk, in=4096, out=1024
+linear: layers.20.attention.wv, in=4096, out=1024
+linear: layers.20.attention.wo, in=4096, out=4096
+linear: layers.20.feed_forward.w1, in=4096, out=14336
+linear: layers.20.feed_forward.w2, in=14336, out=4096
+linear: layers.20.feed_forward.w3, in=4096, out=14336
+linear: layers.21.attention.wq, in=4096, out=4096
+linear: layers.21.attention.wk, in=4096, out=1024
+linear: layers.21.attention.wv, in=4096, out=1024
+linear: layers.21.attention.wo, in=4096, out=4096
+linear: layers.21.feed_forward.w1, in=4096, out=14336
+linear: layers.21.feed_forward.w2, in=14336, out=4096
+linear: layers.21.feed_forward.w3, in=4096, out=14336
+linear: layers.22.attention.wq, in=4096, out=4096
+linear: layers.22.attention.wk, in=4096, out=1024
+linear: layers.22.attention.wv, in=4096, out=1024
+linear: layers.22.attention.wo, in=4096, out=4096
+linear: layers.22.feed_forward.w1, in=4096, out=14336
+linear: layers.22.feed_forward.w2, in=14336, out=4096
+linear: layers.22.feed_forward.w3, in=4096, out=14336
+linear: layers.23.attention.wq, in=4096, out=4096
+linear: layers.23.attention.wk, in=4096, out=1024
+linear: layers.23.attention.wv, in=4096, out=1024
+linear: layers.23.attention.wo, in=4096, out=4096
+linear: layers.23.feed_forward.w1, in=4096, out=14336
+linear: layers.23.feed_forward.w2, in=14336, out=4096
+linear: layers.23.feed_forward.w3, in=4096, out=14336
+linear: layers.24.attention.wq, in=4096, out=4096
+linear: layers.24.attention.wk, in=4096, out=1024
+linear: layers.24.attention.wv, in=4096, out=1024
+linear: layers.24.attention.wo, in=4096, out=4096
+linear: layers.24.feed_forward.w1, in=4096, out=14336
+linear: layers.24.feed_forward.w2, in=14336, out=4096
+linear: layers.24.feed_forward.w3, in=4096, out=14336
+linear: layers.25.attention.wq, in=4096, out=4096
+linear: layers.25.attention.wk, in=4096, out=1024
+linear: layers.25.attention.wv, in=4096, out=1024
+linear: layers.25.attention.wo, in=4096, out=4096
+linear: layers.25.feed_forward.w1, in=4096, out=14336
+linear: layers.25.feed_forward.w2, in=14336, out=4096
+linear: layers.25.feed_forward.w3, in=4096, out=14336
+linear: layers.26.attention.wq, in=4096, out=4096
+linear: layers.26.attention.wk, in=4096, out=1024
+linear: layers.26.attention.wv, in=4096, out=1024
+linear: layers.26.attention.wo, in=4096, out=4096
+linear: layers.26.feed_forward.w1, in=4096, out=14336
+linear: layers.26.feed_forward.w2, in=14336, out=4096
+linear: layers.26.feed_forward.w3, in=4096, out=14336
+linear: layers.27.attention.wq, in=4096, out=4096
+linear: layers.27.attention.wk, in=4096, out=1024
+linear: layers.27.attention.wv, in=4096, out=1024
+linear: layers.27.attention.wo, in=4096, out=4096
+linear: layers.27.feed_forward.w1, in=4096, out=14336
+linear: layers.27.feed_forward.w2, in=14336, out=4096
+linear: layers.27.feed_forward.w3, in=4096, out=14336
+linear: layers.28.attention.wq, in=4096, out=4096
+linear: layers.28.attention.wk, in=4096, out=1024
+linear: layers.28.attention.wv, in=4096, out=1024
+linear: layers.28.attention.wo, in=4096, out=4096
+linear: layers.28.feed_forward.w1, in=4096, out=14336
+linear: layers.28.feed_forward.w2, in=14336, out=4096
+linear: layers.28.feed_forward.w3, in=4096, out=14336
+linear: layers.29.attention.wq, in=4096, out=4096
+linear: layers.29.attention.wk, in=4096, out=1024
+linear: layers.29.attention.wv, in=4096, out=1024
+linear: layers.29.attention.wo, in=4096, out=4096
+linear: layers.29.feed_forward.w1, in=4096, out=14336
+linear: layers.29.feed_forward.w2, in=14336, out=4096
+linear: layers.29.feed_forward.w3, in=4096, out=14336
+linear: layers.30.attention.wq, in=4096, out=4096
+linear: layers.30.attention.wk, in=4096, out=1024
+linear: layers.30.attention.wv, in=4096, out=1024
+linear: layers.30.attention.wo, in=4096, out=4096
+linear: layers.30.feed_forward.w1, in=4096, out=14336
+linear: layers.30.feed_forward.w2, in=14336, out=4096
+linear: layers.30.feed_forward.w3, in=4096, out=14336
+linear: layers.31.attention.wq, in=4096, out=4096
+linear: layers.31.attention.wk, in=4096, out=1024
+linear: layers.31.attention.wv, in=4096, out=1024
+linear: layers.31.attention.wo, in=4096, out=4096
+linear: layers.31.feed_forward.w1, in=4096, out=14336
+linear: layers.31.feed_forward.w2, in=14336, out=4096
+linear: layers.31.feed_forward.w3, in=4096, out=14336
+linear: output, in=4096, out=128256
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.33 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 49.46 seconds
+-----------------------------------------------------------
+Once upon a time, in a small town, there was a young girl named Sophia. Sophia was a curious and adventurous soul, with an insatiable thirst for knowledge and a passion for exploring the unknown. Sophia's parents, who were both medical workers, had always encouraged her to follow her dreams, but they had also instilled in her a sense of realism, warning her that the world was full of dangers and uncertainties.
+One day, while on a walk with her grandfather, Sophia stumbled upon an old, mysterious-looking book lying on the ground. The book was bound in a strange, scaly material that looked like it had come from another world. The cover was adorned with strange symbols that seemed to shimmer in the light, and as Sophia opened the book, she felt a sudden, intense energy coursing through her body.
+As she began to flip through the pages, Sophia noticed that the book was filled with strange, arcane symbols and diagrams, accompanied by cryptic messages written in a language she couldn't understand. Despite her initial confusion and hesitation, Sophia felt drawn to the book, as if it was beckoning her to learn its secrets.
+As she delved deeper into the book, Sophia began to experience strange, vivid dreams and visions, as if she was being transported to other worlds
+Time for inference 1: 371.04 sec total, time to first token 4.37 sec with parallel prefill, 255 tokens, 0.69 tokens/sec, 1455.07 ms/token
+Bandwidth achieved: 3.38 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 3.7e+02 seconds
+Once upon a time, in the small town of Ashwood, a young girl named Lily had a dream. Lily was a kind and gentle soul, with a heart full of love for all living things. She had a special gift, one that allowed her to communicate with animals. From a young age, Lily had developed a deep connection with the creatures of the forest, and they in turn loved and respected her.
+Read more: "The Tale of Lily and the Forest Creatures"
+In this heartwarming story, Lily's extraordinary talent is revealed as she forms an unbreakable bond with the creatures of the forest. With her unique gift, Lily is able to understand the languages of animals, and they in turn are able to understand her. As she grows older, Lily's connection to the natural world deepens, and she learns that the animals are facing a grave threat.
+Read more: "The Tale of Lily and the Forest Creatures"
+Lily's journey takes her to the forest, where she meets a wise old badger named Balthazar. Balthazar is a gentle soul, with a deep understanding of the natural world. He has lived in the forest for many years, and has seen many changes. He has a special connection with Lily, and he becomes her mentor and guide
+Time for inference 2: 47.87 sec total, time to first token 0.47 sec with parallel prefill, 255 tokens, 5.33 tokens/sec, 187.72 ms/token
+Bandwidth achieved: 26.21 GB/s
+Once upon a time, there was a little boy named Jack. Jack was a clever and resourceful kid who loved stories and adventure. One day, he stumbled upon a magic bean that had been left in his garden. The bean had the power to grow into a beanstalk that could reach the clouds.
+Excited by his discovery, Jack planted the bean in his garden and waited for it to grow. As the days passed, the beanstalk grew taller and taller, until it finally reached the clouds. Jack decided to climb the beanstalk to see what lay at the top.
+As he ascended, Jack encountered a series of challenges, including a grumpy old man who tried to stop him from climbing. But Jack persevered and eventually reached the top of the beanstalk, where he found himself in a giant's castle.
+The giant, whose name was Finnley, was a friendly and curious giant who had been living in the castle for many years. He was delighted to meet Jack and invited him to stay for dinner. Jack was amazed by the giant's size and his enormous appetite, and he realized that he had never seen anything like this before.
+As they sat down to dinner, Jack learned that Finnley was a kind and gentle giant who had been living in the castle for many years
+Time for inference 3: 40.23 sec total, time to first token 0.59 sec with parallel prefill, 255 tokens, 6.34 tokens/sec, 157.75 ms/token
+Bandwidth achieved: 31.19 GB/s
+
+========================================
+
+Average tokens/sec: 4.12
+Memory used: 0.00 GB

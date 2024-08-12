@@ -1,0 +1,42 @@
+
+python3 torchchat.py generate llama3 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.38 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 45.50 seconds
+-----------------------------------------------------------
+Once upon a time, there was a small village nestled in the rolling hills of the countryside. The villagers lived simple lives, working the land and tending to their animals. They were a close-knit community, and everyone knew everyone else.
+One day, a strange and mysterious stranger appeared in the village. He was tall and thin, with pale skin and sunken eyes. He wore a long, black coat with a wide-brimmed hat, and carried a large, leather-bound book.
+The villagers were wary of the stranger, and they kept their distance. But he seemed friendly and curious, and he asked them many questions about their lives and their village. He wrote down their answers in his book, and then he would disappear for hours at a time, only to return with more questions.
+As the days passed, the villagers began to notice that their crops were withering and dying. Their animals fell ill, and the village itself seemed to be shrinking. The villagers were confused and frightened, and they didn't know what was happening.
+One night, they decided to confront the stranger. They followed him to his small, black house on the outskirts of the village, and they demanded to know what he was doing. The stranger smiled and said that he was writing the book of the village
+Time for inference 1: 293.35 sec total, time to first token 3.99 sec with parallel prefill, 255 tokens, 0.87 tokens/sec, 1150.38 ms/token
+Bandwidth achieved: 7.44 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2.9e+02 seconds
+Once upon a time, in a world where monsters and humans coexisted, there lived a young girl named Miao. She was an orphan who grew up in a small village surrounded by towering mountains, where the air was crisp and the forests were dense. Miao was a curious and adventurous child, with bright green eyes and hair as black as the night sky. She had a special gift – she could communicate with animals, and they could understand her.
+One day, while exploring the forest, Miao stumbled upon a hidden clearing. In the center of the clearing stood an ancient, gnarled tree, its branches twisted and tangled in a way that seemed almost magical. Miao felt an inexplicable pull towards the tree, as if it was calling to her. She approached the tree, and as she did, she noticed that the branches seemed to be whispering to her. The whispers grew louder, and Miao realized that the tree was speaking to her, telling her a story of ancient magic and forgotten secrets.
+Entranced by the tree's words, Miao spent hours listening to its whispers, learning about the world and the secrets it held. She discovered that the tree was a guardian of the forest, a keeper of ancient knowledge and magic. Miao felt a deep connection to
+Time for inference 2: 68.46 sec total, time to first token 0.37 sec with parallel prefill, 255 tokens, 3.73 tokens/sec, 268.45 ms/token
+Bandwidth achieved: 31.88 GB/s
+Once upon a time, in a small village surrounded by rolling hills and a babbling brook, there lived a young girl named Sophie. Sophie was a curious and adventurous child, with a mop of curly brown hair and a smile that could light up the darkest of rooms.
+Sophie loved to explore the world around her, and she spent hours wandering through the fields and forests, searching for hidden treasures and secrets. One day, while wandering through the woods, Sophie stumbled upon a hidden path she had never seen before. The path was overgrown with weeds and vines, and it looked as though it hadn't been used in years.
+
+Sophie's curiosity was piqued, and she decided to follow the path to see where it would lead. She walked for a while, the path winding and twisting through the trees, until she came to a clearing. In the center of the clearing stood an old, gnarled tree, its branches twisted and tangled in a way that seemed almost magical.
+
+Sophie approached the tree, feeling a strange sense of peace and calm wash over her. As she reached out to touch the trunk of the tree, she heard a soft whispering in her ear. The voice was low and melodious, and it seemed to be speaking directly to her heart.
+
+"
+Time for inference 3: 67.91 sec total, time to first token 0.63 sec with parallel prefill, 255 tokens, 3.75 tokens/sec, 266.33 ms/token
+Bandwidth achieved: 32.14 GB/s
+
+========================================
+
+Average tokens/sec: 2.78
+Memory used: 0.00 GB

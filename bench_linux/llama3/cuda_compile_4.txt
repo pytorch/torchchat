@@ -1,0 +1,39 @@
+
+python3 torchchat.py generate llama3 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 6.18 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.54 seconds
+-----------------------------------------------------------
+Once upon a time, two former friends. We were high school sweethearts, who grew apart as the years went by. We lost touch, and life took us in different directions. I moved to the city for college, while he stayed in our hometown.
+Years went by, and we both started our careers. I became a journalist, while he started his own business. We would occasionally meet up and reminisce about our past, but it was always in passing, never really connecting on a deeper level.
+That was until the day he called me out of nowhere, asking me to meet him at the old coffee shop where we first took our first date. I was hesitant at first, but something compelled me to say yes.
+I arrived at the coffee shop, and he was already sitting there, looking exactly the same as he had all those years ago. He still had those piercing blue eyes and that charming smile. My heart skipped a beat as I felt a rush of nostalgia wash over me.
+We talked for
+Time for inference 1: 110.61 sec total, time to first token 0.82 sec with parallel prefill, 199 tokens, 1.80 tokens/sec, 555.85 ms/token
+Bandwidth achieved: 8.85 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 1.1e+02 seconds
+Once upon a time, there was a young girl who was an orphan and living in a convent. She had been taken in by the nuns when she was just a little girl and was being raised alongside the other orphan girls who lived in the convent. The young girl, who was known as Maria, was a kind and gentle soul who had a love for learning and a passion for reading. She spent most of her days studying and reading in the convent's library, where she was surrounded by ancient books and manuscripts.
+One day, while Maria was reading in the library, she stumbled upon a mysterious book that had been hidden away for centuries. The book was bound in black leather and had a strange symbol etched onto the cover. As soon as Maria touched the book, she felt a sudden surge of energy and a sense of excitement that she had never felt before.
+As Maria opened the book, she discovered that it contained a series of ancient spells and incantations that had been passed down through generations of sorcer
+Time for inference 2: 2.88 sec total, time to first token 0.10 sec with parallel prefill, 199 tokens, 69.00 tokens/sec, 14.49 ms/token
+Bandwidth achieved: 339.51 GB/s
+Once upon a time, there was a remarkable woman named Hester Prynne. She was a beautiful, vibrant, and strong-willed individual who lived in the small Puritan settlement of Salem, Massachusetts, in the 17th century. Hester Prynne was known for her stunning beauty, her remarkable strength, and her unwavering determination. However, she was also infamous for her sin of bearing a child out of wedlock, which was considered a grave offense in the Puritan community.
+
+Hester Prynne's story is told in Nathaniel Hawthorne's novel "The Scarlet Letter," which is considered one of the greatest works of American literature. In the novel, Hester Prynne is portrayed as a complex and multi-dimensional character, who is both flawed and admirable. Hester's story is a powerful exploration of the human condition, morality, and the consequences of sin.
+
+Hester Prynne's sin was the result of a passionate and intense relationship she had with a man named
+Time for inference 3: 1.42 sec total, time to first token 0.10 sec with parallel prefill, 199 tokens, 139.82 tokens/sec, 7.15 ms/token
+Bandwidth achieved: 688.01 GB/s
+
+========================================
+
+Average tokens/sec: 70.20
+Memory used: 23.55 GB

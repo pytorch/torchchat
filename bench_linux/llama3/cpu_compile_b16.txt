@@ -1,0 +1,42 @@
+
+python3 torchchat.py generate llama3 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.39 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Sophie. Sophie was a curious and adventurous child, with a mop of curly brown hair and a smile that could light up the darkest of rooms. She lived with her parents in a small cottage on the outskirts of the village, surrounded by fields of wheat and barley that stretched as far as the eye could see.
+Sophie's days were filled with the simple pleasures of childhood: playing in the fields, chasing after butterflies, and helping her mother with the gardening. But Sophie was also a curious child, and she loved to explore the world around her. She would often sneak away from her chores to investigate the old, abandoned houses on the edge of the village, where she would imagine herself as a brave adventurer, braving the unknown and overcoming great challenges.
+One day, while out on a walk, Sophie stumbled upon a small, mysterious shop tucked away in a narrow alley. The sign above the door read "Curios and Wonders," and the windows were filled with a dazzling array of strange and exotic treasures. Sophie's curiosity was piqued, and she pushed open the door to venture inside.
+
+The shop was dimly lit, and the air was thick with the scent
+Time for inference 1: 324.56 sec total, time to first token 3.58 sec with parallel prefill, 255 tokens, 0.79 tokens/sec, 1272.77 ms/token
+Bandwidth achieved: 12.62 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 3.2e+02 seconds
+Once upon a time, in a small town, there lived a young boy named Max. Max was a curious and adventurous boy who loved exploring the outdoors. One day, while exploring the woods near his home, Max stumbled upon a hidden path he had never seen before. The path was overgrown with weeds and vines, and it looked like it hadn’t been used in a long time. But Max was intrigued, and he decided to follow it to see where it would lead.
+As he walked, the path began to wind its way up a steep hill, and Max had to climb over rocks and roots to continue. The air grew cooler and the trees grew taller, and Max could feel the magic of the forest all around him. Finally, after what felt like a long time, the path opened up into a clearing, and Max gasped in amazement at what he saw.
+
+In the center of the clearing stood an enormous tree, its trunk as wide as a house and its branches reaching up towards the sky like giant arms. The tree was unlike any Max had ever seen before, for its bark was covered in glittering gemstones and its leaves shone like emeralds in the sunlight. And at the base of the tree, there was a small door, adorned with intricate car
+Time for inference 2: 168.59 sec total, time to first token 0.61 sec with parallel prefill, 255 tokens, 1.51 tokens/sec, 661.12 ms/token
+Bandwidth achieved: 24.29 GB/s
+Once upon a time, there were two friends, John and Michael, who were deeply in love with their work, which was designing architecture. Both of them were passionate about creating something extraordinary and innovative, something that would make people stop and admire their work. They had been friends since their college days, and their love for architecture had brought them even closer. Over the years, they had honed their skills, experimented with different styles, and developed a deep understanding of the importance of sustainability in architecture.
+
+One day, they received an email from a well-known architecture firm, inviting them to participate in a prestigious international design competition. The challenge was to design a sustainable and eco-friendly building for a specific location in a remote area of the world. The winner would receive a significant prize and the opportunity to have their design built.
+
+John and Michael were thrilled at the opportunity and decided to collaborate on the project. They spent countless hours brainstorming, researching, and sketching out ideas. They pored over books, attended seminars, and consulted with experts in the field to gather as much knowledge as possible.
+
+As they worked on their design, they encountered several challenges. They had to consider the harsh climate, limited resources, and cultural sensitivities of the remote location. They also had to balance the need for sustainability
+Time for inference 3: 179.91 sec total, time to first token 1.20 sec with parallel prefill, 255 tokens, 1.42 tokens/sec, 705.51 ms/token
+Bandwidth achieved: 22.76 GB/s
+
+========================================
+
+Average tokens/sec: 1.24
+Memory used: 0.00 GB

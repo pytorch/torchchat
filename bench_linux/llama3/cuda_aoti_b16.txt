@@ -1,0 +1,53 @@
+python3 torchchat.py export llama3 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model16.so
+python3 torchchat.py generate llama3 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model16.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 9.05 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model16.so
+The generated DSO model can be found at: /tmp/model16.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 5.64 seconds
+-----------------------------------------------------------
+Once upon a time, there was a small town nestled in the rolling hills of the countryside. The town was surrounded by fields of golden wheat, green pastures, and dense forests. The people of the town were simple and hardworking, living off the land and relying on the rich soil for their livelihood.
+
+One day, a group of strangers arrived in the town, seeking refuge from the war that was raging in the distant lands. The strangers were tired, hungry, and weary from their journey, and the people of the town welcomed them with open arms.
+
+The strangers were led by a wise and kind-hearted man named Elijah. He was a healer, a warrior, and a leader, with a deep understanding of the natural world and the workings of the human heart. Elijah brought with him a small group of skilled craftsmen, who were skilled in the art of blacksmithing, weaving, and woodworking.
+
+Together, Elijah and his group set about helping the people of the town rebuild and restore their homes and their lives
+Time for inference 1: 2.64 sec total, time to first token 0.19 sec with sequential prefill, 199 tokens, 75.48 tokens/sec, 13.25 ms/token
+Bandwidth achieved: 1212.25 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, in a land far, far away, there was a magical kingdom where the inhabitants were known for their love of sweets. The kingdom was called Candytopia, and it was a place where the air was sweet with the scent of sugar and spices, and the ground was sticky with the gooey residue of candy canes and lollipops.
+The kingdom was ruled by a wise and just king, who was known for his love of all things sugary. He was a kind and generous ruler, and his people loved him dearly. But despite his many good qualities, the king had one major flaw: he had a sweet tooth.
+The king's love of sweets was so great that he would often spend hours in his throne room, surrounded by piles of candy and sweets, indulging in his favorite treats. His advisors would try to get him to focus on ruling the kingdom, but the king would simply wave them away, saying "Just one more piece of candy won't hurt!"
+As
+Time for inference 2: 2.36 sec total, time to first token 0.06 sec with sequential prefill, 199 tokens, 84.18 tokens/sec, 11.88 ms/token
+Bandwidth achieved: 1351.92 GB/s
+Once upon a time, in a small village in the mountains, there lived a wise old man named Kaito. Kaito was known throughout the land for his vast knowledge of the natural world and his ability to communicate with the animals. From the youngest child to the oldest elder, everyone in the village would come to Kaito for advice on how to live in harmony with nature.
+One day, a young girl named Akira came to Kaito's home, seeking his help. She was troubled by a recurring dream in which she was surrounded by darkness and felt a deep sense of sadness. Kaito listened attentively to Akira's story and then asked her to tell him more about the dream. Akira described the dream in detail, and Kaito listened intently, his eyes closed as if he were listening to the whispers of the forest.
+As the sun began to set, Kaito led Akira to a small clearing near his home. He asked her to close her eyes
+Time for inference 3: 2.38 sec total, time to first token 0.06 sec with sequential prefill, 199 tokens, 83.63 tokens/sec, 11.96 ms/token
+Bandwidth achieved: 1343.11 GB/s
+
+========================================
+
+Average tokens/sec: 81.10
+Memory used: 16.28 GB

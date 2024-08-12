@@ -1,0 +1,52 @@
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model8.so
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model8.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model8.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cpu
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 0.33 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 35.62 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model8.so
+The generated DSO model can be found at: /tmp/model8.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model8.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.34 seconds
+-----------------------------------------------------------
+Once upon a time, there lived a young girl named Sophia who lived in a small village surrounded by vast agricultural fields where farmers grew a variety of crops including wheat, corn, sugarcane, and vegetables.
+Sophia was fascinated by the soil and the way plants grew from it. She loved watching the seeds sprout, the roots grow deep, and the leaves stretch towards the sun. She spent hours playing in the fields, learning about the different types of soil, how they were formed, and what made them suitable for various crops.
+One day, Sophia's curiosity led her to a particular patch of soil that seemed different from the others. It was a dark, rich loam with a sweet, earthy smell. She noticed that the plants growing on it were healthier and more vibrant than those in other parts of the field. Her father, a seasoned farmer, noticed her fascination and decided to take her to meet the soil expert in their village, Mr. Patel.
+Mr. Patel was known for his deep understanding of the soil and its properties. He explained to Sophia that the dark, rich loam was a result of decades of composting, careful farming practices, and the use of natural fertilizers. He showed her how the microorganisms in the soil helped break down organic matter, creating
+Time for inference 1: 75.45 sec total, time to first token 2.00 sec with sequential prefill, 255 tokens, 3.38 tokens/sec, 295.87 ms/token
+Bandwidth achieved: 54.28 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, in the bustling streets of Tokyo, Japan, there lived a small, curious gecko named Takashi. Takashi was a bit of an oddball among his fellow geckos, as he dreamed of becoming a master of shibari, an ancient Japanese art of rope bondage. While his friends were content to spend their days basking in the warm sun and chasing after insects, Takashi would often slip away to watch the skilled Shibari artists practice their craft in the city's underground scenes.
+One day, while exploring the city, Takashi came across a mysterious, old Shibari master named Kaito. Kaito was known for his exceptional skills and his ability to create intricate, beautiful patterns with his ropes. Takashi was immediately drawn to Kaito's art and begged him to teach him the ways of Shibari.
+Kaito, seeing the determination in Takashi's eyes, decided to take him on as a student. Under Kaito's guidance, Takashi learned the basics of Shibari, from the careful selection of ropes to the delicate dance of knots and twists. As Takashi practiced, he found that his gecko agility and flexibility gave him an advantage when it came to mastering the more intricate patterns.
+But as Takashi's
+Time for inference 2: 62.74 sec total, time to first token 1.20 sec with sequential prefill, 255 tokens, 4.06 tokens/sec, 246.06 ms/token
+Bandwidth achieved: 65.27 GB/s
+Once upon a time, there was a magical forest filled with ancient trees, sparkling streams, and a vast array of wildlife. Among the trees, there lived a young squirrel named Squeaky, who was known for his mischievous personality and love for adventure.
+One sunny afternoon, while exploring the forest, Squeaky stumbled upon a hidden clearing. In the center of the clearing stood an enormous tree, unlike any he had ever seen before. The tree was covered in glittering gemstones, and its branches seemed to be singing a gentle melody.
+Squeaky was immediately drawn to the tree and scampered up its trunk to investigate. As he reached the first branch, he felt a strange sensation wash over him. The gemstones began to glow, and he felt a surge of magic flow through his body.
+Suddenly, he was transported to a world beyond his wildest dreams. He found himself standing in a beautiful garden filled with vibrant flowers, sparkling fountains, and towering trees that seemed to stretch up to the sky. A gentle voice spoke to him, saying, "Welcome, little squirrel. I have been waiting for you."
+Squeaky looked around in awe, taking in the sights and sounds of the enchanted garden. He saw a beautiful fairy perched on a toadst
+Time for inference 3: 74.17 sec total, time to first token 3.04 sec with sequential prefill, 255 tokens, 3.44 tokens/sec, 290.87 ms/token
+Bandwidth achieved: 55.22 GB/s
+
+========================================
+
+Average tokens/sec: 3.63
+Memory used: 0.00 GB

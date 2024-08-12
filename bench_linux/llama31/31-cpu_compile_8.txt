@@ -1,0 +1,46 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.37 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 36.28 seconds
+-----------------------------------------------------------
+Once upon a time, there was a beautiful princess named Sophia. She lived in a grand castle with her loving parents, the king and queen. They were the rulers of a magical kingdom filled with talking animals, enchanted forests, and sparkling rivers.
+Sophia was kind, gentle, and wise beyond her years. She loved nothing more than helping those in need and exploring the wonders of her kingdom. Her parents adored her and were proud of the compassionate and adventurous young woman she was becoming.
+One day, the kingdom was plagued by a severe drought. Crops began to wither, and the rivers dried up. The talking animals, who relied on the kingdom's resources for their survival, were growing desperate.
+The king and queen called upon the wise old wizard, Zephyr, to find a solution to the drought. Zephyr, with his long white beard and twinkling eyes, listened carefully to their plea. He gazed into his crystal ball, searching for an answer.
+After a moment of contemplation, Zephyr revealed that the drought was caused by a magical imbalance in the kingdom's energy. He explained that Sophia, with her pure heart and gentle spirit, was the key to restoring balance to the kingdom's energy.
+The king and queen were perplexed. How could their
+Time for inference 1: 206.79 sec total, time to first token 5.51 sec with parallel prefill, 255 tokens, 1.23 tokens/sec, 810.92 ms/token
+Bandwidth achieved: 10.55 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2.1e+02 seconds
+Once upon a time, I was an enthusiastic college student, always looking to save money. I remembered a friend telling me about a great way to save money by using cashback apps. At first, I was skeptical, but she assured me it was worth a try.
+So, I started downloading cashback apps like Ibotta, Rakuten (formerly known as Ebates), Google Opinion Reward, Fetch Rewards, and others. I discovered that these apps allowed me to earn cash or rewards on everyday purchases. The more I used them, the more I saved.
+
+I'd buy groceries and use Ibotta to get cash back on the things I needed. I'd browse my favorite stores on Rakuten and get a percentage back on my purchases. With Google Opinion Reward, I'd earn money for sharing my opinions on various topics. Fetch Rewards would give me points for buying certain products, which I could redeem for gift cards or cash.
+
+At first, it seemed like pennies on the dollar, but over time, those small rewards added up, and I was able to save hundreds of dollars. I even started looking forward to my daily shopping trips, knowing I'd get rewarded for them.
+
+As I continued to use these apps, I realized that cashback apps are more than just a way to save money
+Time for inference 2: 103.14 sec total, time to first token 0.90 sec with parallel prefill, 255 tokens, 2.47 tokens/sec, 404.48 ms/token
+Bandwidth achieved: 21.16 GB/s
+Once upon a time, there was a village where everyone was content with their simple lives. The villagers were honest, hardworking, and kind. They lived in harmony with nature, respecting the land and its resources.
+One day, a wise old man came to the village. He was a learned scholar who had traveled far and wide, gathering knowledge from various lands. The villagers were curious about this stranger, and they gathered around him to listen to his tales.
+The old man told them stories of great cities, bustling with people and activities. He spoke of towering buildings, fast horses, and luxurious goods. The villagers were amazed and intrigued, feeling as though they had been living in a small, isolated world.
+"Tell us more," the villagers asked, their eyes wide with wonder.
+The old man smiled and said, "In those great cities, people are often more concerned with their own lives than with the well-being of others. They rush to and fro, seeking to accumulate wealth and power. They are often dishonest and greedy, taking from others without giving back.
+"And yet," the old man continued, "these cities also have their wonders. They are hubs of innovation and discovery, where people from all walks of life come together to share ideas and create new things. They are places of learning
+Time for inference 3: 144.94 sec total, time to first token 0.55 sec with parallel prefill, 255 tokens, 1.76 tokens/sec, 568.39 ms/token
+Bandwidth achieved: 15.06 GB/s
+
+========================================
+
+Average tokens/sec: 1.82
+Memory used: 0.00 GB

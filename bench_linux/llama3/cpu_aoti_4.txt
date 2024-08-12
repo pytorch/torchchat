@@ -1,0 +1,278 @@
+python3 torchchat.py export llama3 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model34.so
+python3 torchchat.py generate llama3 --dso-path /tmp/model34.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model34.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+linear: layers.0.attention.wq, in=4096, out=4096
+linear: layers.0.attention.wk, in=4096, out=1024
+linear: layers.0.attention.wv, in=4096, out=1024
+linear: layers.0.attention.wo, in=4096, out=4096
+linear: layers.0.feed_forward.w1, in=4096, out=14336
+linear: layers.0.feed_forward.w2, in=14336, out=4096
+linear: layers.0.feed_forward.w3, in=4096, out=14336
+linear: layers.1.attention.wq, in=4096, out=4096
+linear: layers.1.attention.wk, in=4096, out=1024
+linear: layers.1.attention.wv, in=4096, out=1024
+linear: layers.1.attention.wo, in=4096, out=4096
+linear: layers.1.feed_forward.w1, in=4096, out=14336
+linear: layers.1.feed_forward.w2, in=14336, out=4096
+linear: layers.1.feed_forward.w3, in=4096, out=14336
+linear: layers.2.attention.wq, in=4096, out=4096
+linear: layers.2.attention.wk, in=4096, out=1024
+linear: layers.2.attention.wv, in=4096, out=1024
+linear: layers.2.attention.wo, in=4096, out=4096
+linear: layers.2.feed_forward.w1, in=4096, out=14336
+linear: layers.2.feed_forward.w2, in=14336, out=4096
+linear: layers.2.feed_forward.w3, in=4096, out=14336
+linear: layers.3.attention.wq, in=4096, out=4096
+linear: layers.3.attention.wk, in=4096, out=1024
+linear: layers.3.attention.wv, in=4096, out=1024
+linear: layers.3.attention.wo, in=4096, out=4096
+linear: layers.3.feed_forward.w1, in=4096, out=14336
+linear: layers.3.feed_forward.w2, in=14336, out=4096
+linear: layers.3.feed_forward.w3, in=4096, out=14336
+linear: layers.4.attention.wq, in=4096, out=4096
+linear: layers.4.attention.wk, in=4096, out=1024
+linear: layers.4.attention.wv, in=4096, out=1024
+linear: layers.4.attention.wo, in=4096, out=4096
+linear: layers.4.feed_forward.w1, in=4096, out=14336
+linear: layers.4.feed_forward.w2, in=14336, out=4096
+linear: layers.4.feed_forward.w3, in=4096, out=14336
+linear: layers.5.attention.wq, in=4096, out=4096
+linear: layers.5.attention.wk, in=4096, out=1024
+linear: layers.5.attention.wv, in=4096, out=1024
+linear: layers.5.attention.wo, in=4096, out=4096
+linear: layers.5.feed_forward.w1, in=4096, out=14336
+linear: layers.5.feed_forward.w2, in=14336, out=4096
+linear: layers.5.feed_forward.w3, in=4096, out=14336
+linear: layers.6.attention.wq, in=4096, out=4096
+linear: layers.6.attention.wk, in=4096, out=1024
+linear: layers.6.attention.wv, in=4096, out=1024
+linear: layers.6.attention.wo, in=4096, out=4096
+linear: layers.6.feed_forward.w1, in=4096, out=14336
+linear: layers.6.feed_forward.w2, in=14336, out=4096
+linear: layers.6.feed_forward.w3, in=4096, out=14336
+linear: layers.7.attention.wq, in=4096, out=4096
+linear: layers.7.attention.wk, in=4096, out=1024
+linear: layers.7.attention.wv, in=4096, out=1024
+linear: layers.7.attention.wo, in=4096, out=4096
+linear: layers.7.feed_forward.w1, in=4096, out=14336
+linear: layers.7.feed_forward.w2, in=14336, out=4096
+linear: layers.7.feed_forward.w3, in=4096, out=14336
+linear: layers.8.attention.wq, in=4096, out=4096
+linear: layers.8.attention.wk, in=4096, out=1024
+linear: layers.8.attention.wv, in=4096, out=1024
+linear: layers.8.attention.wo, in=4096, out=4096
+linear: layers.8.feed_forward.w1, in=4096, out=14336
+linear: layers.8.feed_forward.w2, in=14336, out=4096
+linear: layers.8.feed_forward.w3, in=4096, out=14336
+linear: layers.9.attention.wq, in=4096, out=4096
+linear: layers.9.attention.wk, in=4096, out=1024
+linear: layers.9.attention.wv, in=4096, out=1024
+linear: layers.9.attention.wo, in=4096, out=4096
+linear: layers.9.feed_forward.w1, in=4096, out=14336
+linear: layers.9.feed_forward.w2, in=14336, out=4096
+linear: layers.9.feed_forward.w3, in=4096, out=14336
+linear: layers.10.attention.wq, in=4096, out=4096
+linear: layers.10.attention.wk, in=4096, out=1024
+linear: layers.10.attention.wv, in=4096, out=1024
+linear: layers.10.attention.wo, in=4096, out=4096
+linear: layers.10.feed_forward.w1, in=4096, out=14336
+linear: layers.10.feed_forward.w2, in=14336, out=4096
+linear: layers.10.feed_forward.w3, in=4096, out=14336
+linear: layers.11.attention.wq, in=4096, out=4096
+linear: layers.11.attention.wk, in=4096, out=1024
+linear: layers.11.attention.wv, in=4096, out=1024
+linear: layers.11.attention.wo, in=4096, out=4096
+linear: layers.11.feed_forward.w1, in=4096, out=14336
+linear: layers.11.feed_forward.w2, in=14336, out=4096
+linear: layers.11.feed_forward.w3, in=4096, out=14336
+linear: layers.12.attention.wq, in=4096, out=4096
+linear: layers.12.attention.wk, in=4096, out=1024
+linear: layers.12.attention.wv, in=4096, out=1024
+linear: layers.12.attention.wo, in=4096, out=4096
+linear: layers.12.feed_forward.w1, in=4096, out=14336
+linear: layers.12.feed_forward.w2, in=14336, out=4096
+linear: layers.12.feed_forward.w3, in=4096, out=14336
+linear: layers.13.attention.wq, in=4096, out=4096
+linear: layers.13.attention.wk, in=4096, out=1024
+linear: layers.13.attention.wv, in=4096, out=1024
+linear: layers.13.attention.wo, in=4096, out=4096
+linear: layers.13.feed_forward.w1, in=4096, out=14336
+linear: layers.13.feed_forward.w2, in=14336, out=4096
+linear: layers.13.feed_forward.w3, in=4096, out=14336
+linear: layers.14.attention.wq, in=4096, out=4096
+linear: layers.14.attention.wk, in=4096, out=1024
+linear: layers.14.attention.wv, in=4096, out=1024
+linear: layers.14.attention.wo, in=4096, out=4096
+linear: layers.14.feed_forward.w1, in=4096, out=14336
+linear: layers.14.feed_forward.w2, in=14336, out=4096
+linear: layers.14.feed_forward.w3, in=4096, out=14336
+linear: layers.15.attention.wq, in=4096, out=4096
+linear: layers.15.attention.wk, in=4096, out=1024
+linear: layers.15.attention.wv, in=4096, out=1024
+linear: layers.15.attention.wo, in=4096, out=4096
+linear: layers.15.feed_forward.w1, in=4096, out=14336
+linear: layers.15.feed_forward.w2, in=14336, out=4096
+linear: layers.15.feed_forward.w3, in=4096, out=14336
+linear: layers.16.attention.wq, in=4096, out=4096
+linear: layers.16.attention.wk, in=4096, out=1024
+linear: layers.16.attention.wv, in=4096, out=1024
+linear: layers.16.attention.wo, in=4096, out=4096
+linear: layers.16.feed_forward.w1, in=4096, out=14336
+linear: layers.16.feed_forward.w2, in=14336, out=4096
+linear: layers.16.feed_forward.w3, in=4096, out=14336
+linear: layers.17.attention.wq, in=4096, out=4096
+linear: layers.17.attention.wk, in=4096, out=1024
+linear: layers.17.attention.wv, in=4096, out=1024
+linear: layers.17.attention.wo, in=4096, out=4096
+linear: layers.17.feed_forward.w1, in=4096, out=14336
+linear: layers.17.feed_forward.w2, in=14336, out=4096
+linear: layers.17.feed_forward.w3, in=4096, out=14336
+linear: layers.18.attention.wq, in=4096, out=4096
+linear: layers.18.attention.wk, in=4096, out=1024
+linear: layers.18.attention.wv, in=4096, out=1024
+linear: layers.18.attention.wo, in=4096, out=4096
+linear: layers.18.feed_forward.w1, in=4096, out=14336
+linear: layers.18.feed_forward.w2, in=14336, out=4096
+linear: layers.18.feed_forward.w3, in=4096, out=14336
+linear: layers.19.attention.wq, in=4096, out=4096
+linear: layers.19.attention.wk, in=4096, out=1024
+linear: layers.19.attention.wv, in=4096, out=1024
+linear: layers.19.attention.wo, in=4096, out=4096
+linear: layers.19.feed_forward.w1, in=4096, out=14336
+linear: layers.19.feed_forward.w2, in=14336, out=4096
+linear: layers.19.feed_forward.w3, in=4096, out=14336
+linear: layers.20.attention.wq, in=4096, out=4096
+linear: layers.20.attention.wk, in=4096, out=1024
+linear: layers.20.attention.wv, in=4096, out=1024
+linear: layers.20.attention.wo, in=4096, out=4096
+linear: layers.20.feed_forward.w1, in=4096, out=14336
+linear: layers.20.feed_forward.w2, in=14336, out=4096
+linear: layers.20.feed_forward.w3, in=4096, out=14336
+linear: layers.21.attention.wq, in=4096, out=4096
+linear: layers.21.attention.wk, in=4096, out=1024
+linear: layers.21.attention.wv, in=4096, out=1024
+linear: layers.21.attention.wo, in=4096, out=4096
+linear: layers.21.feed_forward.w1, in=4096, out=14336
+linear: layers.21.feed_forward.w2, in=14336, out=4096
+linear: layers.21.feed_forward.w3, in=4096, out=14336
+linear: layers.22.attention.wq, in=4096, out=4096
+linear: layers.22.attention.wk, in=4096, out=1024
+linear: layers.22.attention.wv, in=4096, out=1024
+linear: layers.22.attention.wo, in=4096, out=4096
+linear: layers.22.feed_forward.w1, in=4096, out=14336
+linear: layers.22.feed_forward.w2, in=14336, out=4096
+linear: layers.22.feed_forward.w3, in=4096, out=14336
+linear: layers.23.attention.wq, in=4096, out=4096
+linear: layers.23.attention.wk, in=4096, out=1024
+linear: layers.23.attention.wv, in=4096, out=1024
+linear: layers.23.attention.wo, in=4096, out=4096
+linear: layers.23.feed_forward.w1, in=4096, out=14336
+linear: layers.23.feed_forward.w2, in=14336, out=4096
+linear: layers.23.feed_forward.w3, in=4096, out=14336
+linear: layers.24.attention.wq, in=4096, out=4096
+linear: layers.24.attention.wk, in=4096, out=1024
+linear: layers.24.attention.wv, in=4096, out=1024
+linear: layers.24.attention.wo, in=4096, out=4096
+linear: layers.24.feed_forward.w1, in=4096, out=14336
+linear: layers.24.feed_forward.w2, in=14336, out=4096
+linear: layers.24.feed_forward.w3, in=4096, out=14336
+linear: layers.25.attention.wq, in=4096, out=4096
+linear: layers.25.attention.wk, in=4096, out=1024
+linear: layers.25.attention.wv, in=4096, out=1024
+linear: layers.25.attention.wo, in=4096, out=4096
+linear: layers.25.feed_forward.w1, in=4096, out=14336
+linear: layers.25.feed_forward.w2, in=14336, out=4096
+linear: layers.25.feed_forward.w3, in=4096, out=14336
+linear: layers.26.attention.wq, in=4096, out=4096
+linear: layers.26.attention.wk, in=4096, out=1024
+linear: layers.26.attention.wv, in=4096, out=1024
+linear: layers.26.attention.wo, in=4096, out=4096
+linear: layers.26.feed_forward.w1, in=4096, out=14336
+linear: layers.26.feed_forward.w2, in=14336, out=4096
+linear: layers.26.feed_forward.w3, in=4096, out=14336
+linear: layers.27.attention.wq, in=4096, out=4096
+linear: layers.27.attention.wk, in=4096, out=1024
+linear: layers.27.attention.wv, in=4096, out=1024
+linear: layers.27.attention.wo, in=4096, out=4096
+linear: layers.27.feed_forward.w1, in=4096, out=14336
+linear: layers.27.feed_forward.w2, in=14336, out=4096
+linear: layers.27.feed_forward.w3, in=4096, out=14336
+linear: layers.28.attention.wq, in=4096, out=4096
+linear: layers.28.attention.wk, in=4096, out=1024
+linear: layers.28.attention.wv, in=4096, out=1024
+linear: layers.28.attention.wo, in=4096, out=4096
+linear: layers.28.feed_forward.w1, in=4096, out=14336
+linear: layers.28.feed_forward.w2, in=14336, out=4096
+linear: layers.28.feed_forward.w3, in=4096, out=14336
+linear: layers.29.attention.wq, in=4096, out=4096
+linear: layers.29.attention.wk, in=4096, out=1024
+linear: layers.29.attention.wv, in=4096, out=1024
+linear: layers.29.attention.wo, in=4096, out=4096
+linear: layers.29.feed_forward.w1, in=4096, out=14336
+linear: layers.29.feed_forward.w2, in=14336, out=4096
+linear: layers.29.feed_forward.w3, in=4096, out=14336
+linear: layers.30.attention.wq, in=4096, out=4096
+linear: layers.30.attention.wk, in=4096, out=1024
+linear: layers.30.attention.wv, in=4096, out=1024
+linear: layers.30.attention.wo, in=4096, out=4096
+linear: layers.30.feed_forward.w1, in=4096, out=14336
+linear: layers.30.feed_forward.w2, in=14336, out=4096
+linear: layers.30.feed_forward.w3, in=4096, out=14336
+linear: layers.31.attention.wq, in=4096, out=4096
+linear: layers.31.attention.wk, in=4096, out=1024
+linear: layers.31.attention.wv, in=4096, out=1024
+linear: layers.31.attention.wo, in=4096, out=4096
+linear: layers.31.feed_forward.w1, in=4096, out=14336
+linear: layers.31.feed_forward.w2, in=14336, out=4096
+linear: layers.31.feed_forward.w3, in=4096, out=14336
+linear: output, in=4096, out=128256
+Using device=cpu
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 0.33 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 42.27 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model34.so
+The generated DSO model can be found at: /tmp/model34.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3 --dso-path /tmp/model34.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Warning: checkpoint path ignored because an exported DSO or PTE path specified
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.36 seconds
+-----------------------------------------------------------
+Once upon a time, there was a small, friendly tortoise named Toby. Toby loved to explore the world around him, and he spent most of his days crawling through the grass, searching for new and exciting things to discover.
+One day, Toby came across a small, shimmering pool of water. He had never seen anything like it before, and he was immediately intrigued. As he approached the pool, he noticed that it was filled with tiny, delicate aquatic plants and small, shiny pebbles.
+Toby was fascinated by the pool and decided to investigate further. He carefully crawled along the edge of the pool, examining the plants and pebbles more closely.
+As he explored, Toby discovered that the pool was home to a few tiny fish, which darted back and forth just beneath the surface of the water. Toby watched them with wide, curious eyes, mesmerized by the way they glided effortlessly through the water.
+As he watched, Toby began to feel a sense of peace and tranquility wash over him. He realized that the pool was a tiny, perfect world, untouched by the hustle and bustle of the outside world.
+Toby decided that he wanted to spend more time in this peaceful world, and he returned to the pool day after day, exploring and observing the
+Time for inference 1: 163.33 sec total, time to first token 16.99 sec with sequential prefill, 255 tokens, 1.56 tokens/sec, 640.51 ms/token
+Bandwidth achieved: 25.07 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, in a small village nestled between the rolling hills of Tuscany, there lived a young, passionate and creative soul named Nina. She was a beautiful and vibrant woman, with a fiery spirit and a heart full of love. Nina was a true artist, with a passion for painting, writing, and music. She was always drawn to the creative world, and she spent most of her days lost in her imagination, exploring the depths of her soul.
+As a child, Nina was always fascinated by the beauty of nature. She spent hours exploring the rolling hills, forests, and rivers of Tuscany, and she was captivated by the colors, shapes, and textures of the natural world. She would spend hours collecting seashells, pebbles, and feathers, which she would then arrange into beautiful collages on her canvas. Her love for nature was contagious, and she soon found herself surrounded by a group of friends who shared her passion for the outdoors.
+As Nina grew older, her love for nature only intensified. She began to create beautiful, detailed paintings of the landscapes she had seen, using her vivid imagination and her skills as an artist. Her paintings were so lifelike, that people would often mistake them for photographs. Her art was a reflection of
+Time for inference 2: 108.47 sec total, time to first token 1.20 sec with sequential prefill, 255 tokens, 2.35 tokens/sec, 425.38 ms/token
+Bandwidth achieved: 37.76 GB/s
+Once upon a time, there were two best friends who lived in the same neighborhood. They grew up together, explored the woods, and shared their deepest secrets. Their names were Emma and Olivia. Both of them had a passion for books, drawing, and music.
+The days were filled with laughter, stories, and adventures, but as they grew older, they began to diverge. Emma discovered a love for journalism and became the editor-in-chief of her school newspaper. Olivia, on the other hand, found solace in music and began to compose her own songs.
+As they entered college, their paths diverged even more. Emma started attending college in another state, while Olivia chose to pursue a degree in music from home. They kept in touch through phone calls, texts, and occasional visits.
+Years went by, and the once inseparable friends went their separate ways. Emma became a renowned journalist, traveling the world, and Olivia, a talented musician, formed her own band. Though they had drifted apart, the memories of their childhood remained dear to them.
+One day, Emma received an invitation to attend her high school reunion. She was hesitant at first, but something within her told her to go. She decided to make the trip, hoping to relive the memories and catch up with old
+Time for inference 3: 124.89 sec total, time to first token 2.10 sec with sequential prefill, 255 tokens, 2.04 tokens/sec, 489.75 ms/token
+Bandwidth achieved: 32.79 GB/s
+
+========================================
+
+Average tokens/sec: 1.98
+Memory used: 0.00 GB

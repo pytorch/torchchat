@@ -1,0 +1,35 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 9.73 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Emily. She was a curious and adventurous child, with a heart full of love for all living things. Emily lived with her family on a small farm, where they raised animals and grew their own vegetables and fruits.
+One day, while exploring the woods near her home, Emily stumbled upon a mysterious and ancient-looking tree. The tree was unlike any she had ever seen before, with branches that twisted and turned in impossible ways, and a trunk that seemed to glow with an otherworldly light.
+As she approached the tree, Emily felt a strange sensation wash over her. It was as if the tree was calling to her, beckoning her closer. She reached out a hand to touch the trunk, and as soon as she did, she felt a jolt of energy run through her body.
+Suddenly, Emily was transported to a completely different world. She found herself standing in a beautiful meadow,
+Time for inference 1: 65.96 sec total, time to first token 0.90 sec with parallel prefill, 199 tokens, 3.02 tokens/sec, 331.46 ms/token
+Bandwidth achieved: 48.45 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 6.6e+01 seconds
+Once upon a time, there was a little rabbit named Rosie. Rosie lived in a cozy burrow with her family and loved to hop around the forest. One day, she stumbled upon a beautiful garden filled with colorful flowers and delicious-looking vegetables. She was so excited to explore the garden that she forgot all about her friends and family waiting for her back home.
+Rosie spent the entire day hopping around the garden, eating all the tasty vegetables and flowers she could find. She even made friends with some of the garden's creatures, like a wise old owl and a friendly squirrel. As the sun began to set, Rosie realized she had lost all sense of time and got really scared because she was too far away from her burrow.
+Feeling anxious and alone, Rosie looked around and saw the wise old owl perched in a nearby tree. She called out to the owl for help and begged him to guide her back home. The owl looked at Rosie with kind eyes and said, "Don't worry, little rabbit
+Time for inference 2: 3.01 sec total, time to first token 0.05 sec with parallel prefill, 199 tokens, 66.01 tokens/sec, 15.15 ms/token
+Bandwidth achieved: 1060.13 GB/s
+Once upon a time, in the sun-kissed city of Miami, there existed a city within a city, known as Little Havana. This vibrant and colorful neighborhood was a melting pot of Cuban culture, rich history, and mouthwatering cuisine. At the heart of Little Havana, there stood a small, family-owned restaurant, called "La Casa de El Jefe." The restaurant was a humble, yet charming, eatery that served as a haven for locals and visitors alike, who sought to experience the authentic flavors of Cuba.
+The restaurant was run by a kind-hearted and warm-hearted woman named Ana, who was the proud owner and head chef. Ana was a true Cuban matriarch, with a heart of gold and a passion for cooking that rivaled the mighty Iguazu Falls. She took great pride in preparing traditional Cuban dishes, using secret family recipes that had been passed down through generations. Her kitchen was a symphony of aromas, where the scent of roasted coffee, the tang of citrus,
+Time for inference 3: 2.40 sec total, time to first token 0.05 sec with parallel prefill, 199 tokens, 82.89 tokens/sec, 12.06 ms/token
+Bandwidth achieved: 1331.30 GB/s
+
+========================================
+
+Average tokens/sec: 50.64
+Memory used: 16.82 GB

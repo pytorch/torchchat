@@ -1,0 +1,38 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 7.34 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.45 seconds
+-----------------------------------------------------------
+Once upon a time, in a far-off land, there lived a young boy named Max. Max was a curious and adventurous boy who loved to explore the world around him. One day, he stumbled upon an ancient-looking book in the attic of his family's old mansion.
+The book was bound in leather and adorned with strange symbols that glowed in the dim light. As Max opened the book, he discovered that it was filled with tales of magic, mythical creatures, and mysterious lands. The stories were so captivating that Max became completely absorbed in the book, reading it from cover to cover in one sitting.
+As he read, Max felt a strange sensation wash over him. He felt like he was being transported into the world of the book, where he became a part of the stories he was reading. He met magical creatures, fought battles, and went on quests with brave knights.
+But as the night wore on, Max began to realize that something was amiss. The stories in the book were changing, shifting and
+Time for inference 1: 151.23 sec total, time to first token 0.92 sec with parallel prefill, 199 tokens, 1.32 tokens/sec, 759.97 ms/token
+Bandwidth achieved: 11.26 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 1.5e+02 seconds
+Once upon a time, in a small village nestled in the rolling hills of Provence, there was a charming little shop called "La Belle Époque". The shop was run by a lovely woman named Sophie, who was known throughout the village for her exquisite taste and dedication to all things beautiful.
+Sophie's shop was a treasure trove of delights, filled with intricate lace, delicate porcelain, and exquisite linens. The villagers would often visit her shop to browse the latest arrivals and share stories of their daily lives. But what made Sophie's shop truly special was the way she could bring people together.
+Every week, Sophie would host a "Bijou Soirée" (a small gathering) in her shop, where she would invite a dozen or so friends to come and share a cup of coffee or tea, and simply enjoy each other's company. It was a time for laughter, gossip, and making new connections.
+One day, a young woman named Colette wandered into La Belle Époque
+Time for inference 2: 3.99 sec total, time to first token 0.07 sec with parallel prefill, 199 tokens, 49.87 tokens/sec, 20.05 ms/token
+Bandwidth achieved: 426.83 GB/s
+Once upon a time, in the bustling streets of Tokyo, there was a small, unassuming bakery that stood out from the rest. This was not just any bakery, for it produced the most scrumptious and delectable pastries that brought joy to all who tasted them.
+At the helm of this beloved bakery was a kind-hearted young baker named Yui. With a passion for her craft, Yui spent every waking moment perfecting her recipes and experimenting with new flavors to delight her customers. Her pastries were known for their light, airy texture and delectable combinations of sweet and savory flavors.
+Yui's bakery was a popular destination for both locals and tourists alike, who would come from far and wide to sample her famous melon pan, a sweet bread filled with a soft, airy melon-like interior. But Yui's true specialty was her seasonal treats, which she crafted with love and care using only the freshest, locally sourced ingredients.
+One day, a new bakery opened across the
+Time for inference 3: 1.79 sec total, time to first token 0.07 sec with parallel prefill, 199 tokens, 111.17 tokens/sec, 9.00 ms/token
+Bandwidth achieved: 951.46 GB/s
+
+========================================
+
+Average tokens/sec: 54.12
+Memory used: 28.81 GB

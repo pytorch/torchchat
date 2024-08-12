@@ -1,0 +1,43 @@
+
+python3 torchchat.py generate llama3 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 5.67 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.42 seconds
+-----------------------------------------------------------
+Once upon a time, a young prince from a far-off kingdom fell deeply in love with a beautiful princess from a neighboring kingdom. The prince would often visit the princess in her kingdom, and they would spend hours talking, laughing, and getting to know each other.
+As their love grew stronger, the prince decided to propose to the princess. He took her to a beautiful garden filled with roses, and on one knee, he asked her to be his queen.
+The princess was overjoyed and accepted the prince's proposal. But just as they were about to share their first kiss, a wicked witch appeared out of nowhere. She was jealous of their love and wanted to ruin their happiness.
+The witch cast a spell on the prince, turning him into a frog. The princess was devastated and begged the witch to break the spell. But the witch refused, saying that only true love could break the curse.
+The princess was heartbroken, but she refused to give up on her prince. She visited the frog prince every day
+Time for inference 1: 152.90 sec total, time to first token 0.96 sec with parallel prefill, 199 tokens, 1.30 tokens/sec, 768.36 ms/token
+Bandwidth achieved: 11.14 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 1.5e+02 seconds
+Once upon a time, in the beautiful city of Prague, there lived a young man named Jakub. Jakub was a curious and adventurous soul, always eager to explore the world around him and learn new things. He spent his days wandering through the narrow streets of the city, taking in the sights and sounds of the medieval architecture, the bustling markets, and the lively atmosphere of the city's many squares and courtyards.
+
+One day, while exploring the city's famous Charles Bridge, Jakub stumbled upon a small, mysterious shop tucked away between two larger buildings. The sign above the door read "Curios and Wonders," and the windows were filled with all manner of strange and exotic items: vintage dolls, antique clocks, rare books, and peculiar trinkets. Jakub's curiosity was piqued, and he pushed open the door to explore the shop.
+
+Inside, the shop was dimly lit, with rows of shelves stretching up to the ceiling, packed with an astonishing array of objects. There
+Time for inference 2: 4.06 sec total, time to first token 0.07 sec with parallel prefill, 199 tokens, 48.98 tokens/sec, 20.42 ms/token
+Bandwidth achieved: 419.21 GB/s
+Once upon a time, in a far-off land, there was a small village surrounded by dense forest. The villagers lived simple lives, farming the land and tending to their animals. Among them was a young girl named Maria, who was known for her bright smile and her love of stories.
+
+One day, while wandering in the forest, Maria stumbled upon a strange object – a small, intricately carved box. It was adorned with strange symbols and markings that seemed to shimmer in the sunlight. Without hesitation, Maria picked up the box, feeling an inexplicable connection to it.
+
+As she held the box, Maria began to feel a strange sensation, as if the box was imbuing her with a special power. She felt her senses sharpen, her thoughts clarify, and her imagination ignite. Suddenly, she was flooded with visions of fantastical creatures, magical landscapes, and epic quests.
+
+The next day, Maria returned to the village, eager to share her newfound gift with the others. At first, they were skeptical,
+Time for inference 3: 1.76 sec total, time to first token 0.07 sec with parallel prefill, 199 tokens, 113.25 tokens/sec, 8.83 ms/token
+Bandwidth achieved: 969.31 GB/s
+
+========================================
+
+Average tokens/sec: 54.51
+Memory used: 28.81 GB
