@@ -40,6 +40,7 @@ function formatted_export_and_generate {
   echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" >> $file
   echo $generate_cmd | tee -a $file
   eval $generate_cmd &>> $file
+  echo
 }
 
 
