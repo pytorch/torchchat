@@ -125,6 +125,9 @@ class CompletionRequest:
     parallel_tool_calls: Optional[bool] = None  # unimplemented - Assistant features
     user: Optional[str] = None  # unimplemented
 
+    def __post_init__(self):
+        self.stream = bool(self.stream)
+
 
 @dataclass
 class CompletionChoice:
@@ -204,7 +207,7 @@ class CompletionResponseChunk:
     choices: List[CompletionChoiceChunk]
     created: int
     model: str
-    system_fingerprint: str
+    system_fingerprint: Optional[str] = None
     service_tier: Optional[str] = None
     object: str = "chat.completion.chunk"
     usage: Optional[UsageStats] = None
@@ -311,7 +314,7 @@ class OpenAiApiGenerator(Generator):
             sequential_prefill=generator_args.sequential_prefill,
             start_pos=start_pos,
             max_seq_length=self.max_seq_length,
-            seed=int(completion_request.seed),
+            seed=int(completion_request.seed or 0),
         ):
             if y is None:
                 continue
@@ -333,9 +336,10 @@ class OpenAiApiGenerator(Generator):
             choice_chunk = CompletionChoiceChunk(
                 delta=chunk_delta,
                 index=idx,
+                finish_reason=None,
             )
             chunk_response = CompletionResponseChunk(
-                id=str(id),
+                id="chatcmpl-" + str(id),
                 choices=[choice_chunk],
                 created=int(time.time()),
                 model=completion_request.model,
@@ -351,7 +355,7 @@ class OpenAiApiGenerator(Generator):
         )
 
         yield CompletionResponseChunk(
-            id=str(id),
+            id="chatcmpl-" + str(id),
             choices=[end_chunk],
             created=int(time.time()),
             model=completion_request.model,
@@ -367,7 +371,7 @@ class OpenAiApiGenerator(Generator):
 
         message = AssistantMessage(content=output)
         return CompletionResponse(
-            id=str(uuid.uuid4()),
+            id="chatcmpl-" + str(uuid.uuid4()),
             choices=[
                 CompletionChoice(
                     finish_reason="stop",
