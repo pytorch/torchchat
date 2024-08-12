@@ -1,40 +1,66 @@
 import streamlit as st
 from openai import OpenAI
 
-with st.sidebar:
-    openai_api_key = st.text_input(
-        "OpenAI API Key", key="chatbot_api_key", type="password"
-    )
-    "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
-    "[View the source code](https://github.com/streamlit/llm-examples/blob/main/Chatbot.py)"
-    "[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)"
+st.title("torchchat")
 
-st.title("💬 Chatbot")
+start_state = [
+    {
+        "role": "system",
+        "content": "You're an assistant. Answer questions directly, be brief, and have fun.",
+    },
+    {"role": "assistant", "content": "How can I help you?"},
+]
+
+with st.sidebar:
+    response_max_tokens = st.slider(
+        "Max Response Tokens", min_value=10, max_value=1000, value=250, step=10
+    )
+    if st.button("Reset Chat", type="primary"):
+        st.session_state["messages"] = start_state
 
 if "messages" not in st.session_state:
-    st.session_state["messages"] = [
-        {
-            "role": "system",
-            "content": "You're an assistant. Be brief, no yapping. Use as few words as possible to respond to the users' questions.",
-        },
-        {"role": "assistant", "content": "How can I help you?"},
-    ]
+    st.session_state["messages"] = start_state
+
 
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
 if prompt := st.chat_input():
     client = OpenAI(
-        # This is the default and can be omitted
         base_url="http://127.0.0.1:5000/v1",
-        api_key="YOURMOTHER",
+        api_key="813",  # The OpenAI API requires an API key, but since we don't consume it, this can be any non-empty string.
     )
 
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
-    response = client.chat.completions.create(
-        model="stories15m", messages=st.session_state.messages, max_tokens=64
-    )
-    msg = response.choices[0].message.content
-    st.session_state.messages.append({"role": "assistant", "content": msg})
-    st.chat_message("assistant").write(msg)
+
+    with st.chat_message("assistant"), st.status(
+        "Generating... ", expanded=True
+    ) as status:
+
+        def get_streamed_completion(completion_generator):
+            start = time.time()
+            tokcount = 0
+            for chunk in completion_generator:
+                tokcount += 1
+                yield chunk.choices[0].delta.content
+
+            status.update(
+                label="Done, averaged {:.2f} tokens/second".format(
+                    tokcount / (time.time() - start)
+                ),
+                state="complete",
+            )
+
+        response = st.write_stream(
+            get_streamed_completion(
+                client.chat.completions.create(
+                    model="llama3",
+                    messages=st.session_state.messages,
+                    max_tokens=response_max_tokens,
+                    stream=True,
+                )
+            )
+        )[0]
+
+    st.session_state.messages.append({"role": "assistant", "content": response})
