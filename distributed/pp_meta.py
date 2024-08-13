@@ -22,9 +22,6 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-# derived from Ke's PR:
-# https://github.com/pytorch/PiPPy/pull/1135
-
 # Model configuration
 
 MODEL_CONFIGS = {
@@ -66,7 +63,6 @@ def create_model(model_id: str, device: str = "cuda", rank: int = 0) -> Tuple[Au
         print(f"{model.layers[0].attn.q_proj=}") 
         print(f"{model.layers[0].attn.q_proj.weight.dtype=}")
         
-
     
     logger.info(f"Model type: {type(model)}")
     #logger.info(f"Buffer callback: {model.buf_init_callbacks}")
@@ -77,7 +73,6 @@ def create_model(model_id: str, device: str = "cuda", rank: int = 0) -> Tuple[Au
         model.to_empty(device='cuda')
     
     return model, fake_mode, config
-
 
 def create_pipeline(model, inputs, world_size: int):
     layers_per_rank = model.config.num_hidden_layers // world_size
@@ -97,8 +92,6 @@ def create_pipeline(model, inputs, world_size: int):
         split_spec=split_spec,
     )
 
-
-
 # --- update init ----
 
 def main(model_id: str, world_size: int, device: str):
@@ -112,12 +105,9 @@ def main(model_id: str, world_size: int, device: str):
     device = torch.device(f"cuda:{rank % torch.cuda.device_count()}")
     dist.init_process_group(rank=rank, world_size=world_size)
 
-
-
     # Create model on meta device
-    model, fake_mode, model_config = create_model(model_id, device, rank)
-    #assert model.buf_init_callbacks is not None, "buffer_init_callbacks is None"
-
+    model, fake_mode = create_model(model_id, device, rank)
+    
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     tokenizer.pad_token = tokenizer.eos_token
 
@@ -152,7 +142,7 @@ def main(model_id: str, world_size: int, device: str):
         #logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
         logger.info(f"{Color.blue}{stage_module.model.rotary_emb=}{Color.reset}")
         logger.info(f"{Color.blue}{stage_module.model.rotary_emb.inv_freq.dtype=}{Color.reset}")
-        #assert False, "stop here"
+
     #else:
     #    logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
     
@@ -163,9 +153,6 @@ def main(model_id: str, world_size: int, device: str):
     #if rank == 0:
     #    logger.info(f"{rank=} Completed stage building:  {stage=}...")
         #logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
-
-    #logger.info("TODO = continue here....returning now via early stop for debugging")
-    #assert False, "stop here"
 
     logger.info("Pipeline Complete ---- Running schedule...")
 
@@ -188,20 +175,11 @@ def main(model_id: str, world_size: int, device: str):
     num_mbs = 4
     schedule = ScheduleGPipe(stage, num_mbs)
 
-    '''if rank == 0:
-        args = inputs["input_ids"]
-    else:
-        args = None
-    '''
-    
-    
-
     if rank == 0:
         output = schedule.step(inputs['input_ids'])
     else:
         output = schedule.step()
     
-    #output = schedule.step(args)
 
     # Decode
     if output is not None:
