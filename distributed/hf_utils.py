@@ -1,5 +1,5 @@
 
-from typing import Dict, Callable, Optional
+from typing import Dict, Callable, Optional, Tuple
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
 from safetensors import safe_open
@@ -12,6 +12,11 @@ logger = logging.getLogger(__name__)
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
 _CONFIG_NAME = "config.json"
 
+def get_hf_tokenizer(model_id: str) -> AutoTokenizer:
+    """ Get the HF tokenizer for a given model id """
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    assert tokenizer is not None, f"Tokenizer not found for model id {model_id}"
+    return tokenizer
 
 def init_buffers(
     stage_module: torch.nn.Module,

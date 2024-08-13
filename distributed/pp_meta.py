@@ -16,7 +16,7 @@ from modeling_utils import init_on_meta_device, check_rope_embedding, print_mode
 
 from torchtune.models.llama3 import llama3_8b, llama3_70b, Llama3Tokenizer
 from torchtune.models.llama3_1 import llama3_1_405b
-
+from hf_utils import get_hf_tokenizer, load_safetensor_weights, read_weights_from_json
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -36,7 +36,7 @@ MODEL_CONFIGS = {
 }
 
 TUNE_MODEL_CONFIGS = {
-    "8b": (llama3_8b, '/tmp/Meta-Llama-3-8B-Instruct/original/tokenizer.model'),
+    "8b": (llama3_8b, 'meta-llama/Meta-Llama-3-8B-Instruct'),  # '/tmp/Meta-Llama-3-8B-Instruct/original/tokenizer.model'),
     "70b": (llama3_70b, '/tmp/Meta-Llama-3-70B-Instruct/original/tokenizer.model'),
     "405b": (llama3_1_405b, '/tmp/Meta-Llama-3.1-405B-Instruct/original/mp16/tokenizer.model'),
 }
@@ -44,11 +44,11 @@ TUNE_MODEL_CONFIGS = {
 def create_model(model_id: str, device: str = "cuda", rank: int = 0) -> Tuple[Any, FakeTensorMode, Any]:
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
     
-    model_func, tokenizer_path = TUNE_MODEL_CONFIGS[model_id]
-    print(f"{model_func=}, {tokenizer_path=}")
+    model_func, hf_path = TUNE_MODEL_CONFIGS[model_id]
+    print(f"{model_func=}, {hf_path=}")
 
     assert model_func is not None, f"Model {model_id} not found in TUNE_MODEL_CONFIGS"
-    assert tokenizer_path is not None, f"Tokenizer path for {model_id} not found in TUNE_MODEL_CONFIGS"
+    assert hf_path is not None, f"hf path for {model_id} not found in TUNE_MODEL_CONFIGS"
 
     with init_on_meta_device(device="meta"):
         print(f"about to init model {model_id}")
@@ -73,8 +73,10 @@ def create_model(model_id: str, device: str = "cuda", rank: int = 0) -> Tuple[An
         model.to_empty(device='cuda')
     
     # create tokenizer
-    tokenizer = Llama3Tokenizer(tokenizer_path)
-    assert tokenizer is not None, f"Tokenizer for {model_id} not instantiated"
+    #tokenizer = Llama3Tokenizer(tokenizer_path)
+    tokenizer = get_hf_tokenizer
+    tokenizer.pad_token = tokenizer.eos_token
+    
     return model, fake_mode, tokenizer
 
 def create_pipeline(model, inputs, world_size: int):
