@@ -17,6 +17,9 @@ from transformers.utils import cached_file
 from utils import Color
 from modeling_utils import init_on_meta_device, check_rope_embedding, print_model_structure
 
+from torchtune.models.llama3 import llama3_8b, llama3_70b
+#from torchtune.models.llama3_1 import llama3_405b
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -28,13 +31,19 @@ logger = logging.getLogger(__name__)
 # Model configuration
 
 MODEL_CONFIGS = {
-    "7b": "meta-llama/Llama-2-7b-chat-hf",
-    "8b": "meta-llama/Meta-Llama-3-8B-Instruct",
-    "70b": "meta-llama/Meta-Llama-3-70B-Instruct",
-    "405b": "meta-llama/Meta-Llama-3.1-405B-Instruct",
-    "405base": "meta-llama/Meta-Llama-3.1-405B",
-    "123b": "mistralai/Mistral-Large-Instruct-2407",
-    "22b": "mistralai/Codestral-22B-v0.1",
+    "hf_7b": "meta-llama/Llama-2-7b-chat-hf",
+    "hf_8b": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "hf_70b": "meta-llama/Meta-Llama-3-70B-Instruct",
+    "hf_405b": "meta-llama/Meta-Llama-3.1-405B-Instruct",
+    "hf_405base": "meta-llama/Meta-Llama-3.1-405B",
+    "hf_123b": "mistralai/Mistral-Large-Instruct-2407",
+    "hf_22b": "mistralai/Codestral-22B-v0.1",
+}
+
+TUNE_MODEL_CONFIGS = {
+    "8b": llama3_8b,
+    "70b": llama3_70b,
+    "405b": llama3_70b,  # TODO: llama3_405b,
 }
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
@@ -42,17 +51,26 @@ _CONFIG_NAME = "config.json"
 
 def create_model(model_id: str, device: str = "cuda", rank: int = 0) -> Tuple[AutoModelForCausalLM, FakeTensorMode, Optional[Dict[str, Any]]]:
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
+    print(TUNE_MODEL_CONFIGS.keys())
     
+    print(f"{model_id=}")
+    model_func = TUNE_MODEL_CONFIGS[model_id]
+    print(f"{model_func=}")
+    dist.barrier()
+    # assert model_func is not None, f"Model {model_id} not found in TUNE_MODEL_CONFIGS"
+
     with init_on_meta_device(device="meta"):
-        model = AutoModelForCausalLM.from_pretrained(model_id).to(torch.bfloat16)
+        print(f"about to init model {model_id}")
+        model = model_func().to(torch.bfloat16)
     model.eval()
     if rank==0:
         #print(model.config)
         print(f"{model=}")
         #print(f"{model.model.embed_tokens.dtype=}")
-        print(f"{model.model.embed_tokens.weight.dtype=}")
-        print(f"{model.model.layers[0].self_attn.q_proj=}") 
-        print(f"{model.model.layers[0].self_attn.q_proj.weight.dtype=}")
+        # print(f"{model.layers[0].attn.pos_embeddings.weight.dtype=}")
+        print(f"{model.layers[0].attn.pos_embeddings=}")
+        print(f"{model.layers[0].attn.q_proj=}") 
+        print(f"{model.layers[0].attn.q_proj.weight.dtype=}")
         #embed_tokens.weight.device=}")
         
         #print_model_structure(model)
@@ -64,16 +82,13 @@ def create_model(model_id: str, device: str = "cuda", rank: int = 0) -> Tuple[Au
     #    assert False, "check dtype"
         #check_rope_embedding(model)
 
-    config = model.config
-    # print(f"{config=}")
-   
-    assert config is not None, "Config is None"
+    
     
     logger.info(f"Model type: {type(model)}")
-    logger.info(f"Buffer callback: {model.buf_init_callbacks}")
-    if not model.buf_init_callbacks:
-        logger.warning("ROPE generation may not succeed - buf_init_callbacks is None")
-    
+    #logger.info(f"Buffer callback: {model.buf_init_callbacks}")
+    #if not model.buf_init_callbacks:
+    #    logger.warning("ROPE generation may not succeed - buf_init_callbacks is None")
+    config = None  # TODO -remove
     with fake_mode:
         model.to_empty(device='cuda')
     
@@ -266,7 +281,7 @@ def read_weights_from_json(file_path: str) -> Optional[Dict[str, str]]:
         return None
 
 
-def main(model_size: str, world_size: int, device: str):
+def main(model_id: str, world_size: int, device: str):
     rank = int(os.environ["RANK"])
     world_size_dist = int(os.environ["WORLD_SIZE"])
     if world_size_dist != world_size:
@@ -277,23 +292,23 @@ def main(model_size: str, world_size: int, device: str):
     device = torch.device(f"cuda:{rank % torch.cuda.device_count()}")
     dist.init_process_group(rank=rank, world_size=world_size)
 
-    model_id = MODEL_CONFIGS[model_size]
-    logger.info(f"Model ID: {model_id}")
+    #model_id = TUNE_MODEL_CONFIGS[model_size]
+    #logger.info(f"Model ID: {model_id}")
 
-    cfile = cached_file(model_id, _DEFAULT_SAFETENSOR_FILE_NAME)
-    config_file = cached_file(model_id, _CONFIG_NAME)
+    # cfile = cached_file(model_id, _DEFAULT_SAFETENSOR_FILE_NAME)
+    # config_file = cached_file(model_id, _CONFIG_NAME)
     
-    assert os.path.exists(cfile), f"Safetensor index file {cfile} does not exist."
-    assert os.path.exists(config_file), f"Config file {config_file} does not exist."
+    #assert os.path.exists(cfile), f"Safetensor index file {cfile} does not exist."
+    #assert os.path.exists(config_file), f"Config file {config_file} does not exist."
 
-    with open(config_file, "r") as file:
-        config_data = json.load(file)
+    #with open(config_file, "r") as file:
+    #    config_data = json.load(file)
 
-    file_location = os.path.dirname(cfile)
+    #file_location = os.path.dirname(cfile)
 
     # Create model on meta device
     model, fake_mode, model_config = create_model(model_id, device, rank)
-    assert model.buf_init_callbacks is not None, "buffer_init_callbacks is None"
+    #assert model.buf_init_callbacks is not None, "buffer_init_callbacks is None"
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     tokenizer.pad_token = tokenizer.eos_token
@@ -401,7 +416,7 @@ if __name__ == "__main__":
         "--model",
         type=str,
         default="8b",
-        choices=MODEL_CONFIGS.keys(),
+        choices=TUNE_MODEL_CONFIGS.keys(),
         help="Model size",
     )
     parser.add_argument(
