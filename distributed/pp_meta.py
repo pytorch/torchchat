@@ -18,7 +18,7 @@ from utils import Color
 from modeling_utils import init_on_meta_device, check_rope_embedding, print_model_structure
 
 from torchtune.models.llama3 import llama3_8b, llama3_70b
-#from torchtune.models.llama3_1 import llama3_405b
+from torchtune.models.llama3_1 import llama3_1_405b
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
