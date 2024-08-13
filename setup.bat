@@ -1,65 +1,54 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 
-REM === Basic Setup ===
-
-echo Setting up the environment...
-REM Update the package manager (Assuming Chocolatey for Windows)
-choco upgrade chocolatey -y
-
-REM === Install Dependencies ===
-
-echo Installing dependencies...
-
-REM Install CMake
-choco install cmake -y
-
-REM Install Boost Libraries
-choco install boost-msvc-14.1 -y
-
-REM Install other required packages (example: Git, Python)
-choco install git -y
-choco install python -y
-
-REM === Install Project-Specific Tools ===
-
-echo Installing project-specific tools...
-
-REM Install specific Python packages using pip
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-
-REM === Project Configuration ===
-
-echo Configuring the project...
-
-REM Create build directory
-if not exist "build" (
-    mkdir build
+REM Check if Python 3.10+ is installed
+python --version 2>nul | findstr /r "^Python 3\.1[0-9]" >nul
+if errorlevel 1 (
+    echo Python 3.10 or higher is required. Please install it and try again.
+    pause
+    exit /b 1
 )
 
-REM Run CMake to configure the project
-cd build
-cmake ..
+REM Clone the torchchat repository if not already cloned
+if not exist "torchchat" (
+    git clone https://github.com/pytorch/torchchat.git
+    if errorlevel 1 (
+        echo Failed to clone the torchchat repository. Please check your internet connection.
+        pause
+        exit /b 1
+    )
+)
 
-REM === Build the Project ===
+cd torchchat
 
-echo Building the project...
-cmake --build .
+REM Set up the virtual environment
+python -m venv .venv
+if errorlevel 1 (
+    echo Failed to create a virtual environment.
+    pause
+    exit /b 1
+)
 
-REM === Post-Build Steps ===
+REM Activate the virtual environment
+call .venv\Scripts\activate.bat
 
-echo Running post-build steps...
+REM Upgrade pip and install dependencies
+python -m pip install --upgrade pip
+if errorlevel 1 (
+    echo Failed to upgrade pip.
+    pause
+    exit /b 1
+)
 
-REM Example: Running tests, setting environment variables, etc.
-REM Assuming you have a test script or command
-ctest
+REM Run the installation script
+.\install_requirements.sh
+if errorlevel 1 (
+    echo Installation of requirements failed. Please check the error messages above.
+    pause
+    exit /b 1
+)
 
-REM === Final Steps ===
-
-cd ..
-echo Setup completed successfully!
-
-REM === Keep the Command Prompt Open After Execution ===
-echo The script has completed. Press any key to exit...
-pause >nul
+echo.
+echo All setup steps have been completed successfully.
+echo You can now use torchchat by running the appropriate commands.
+pause
