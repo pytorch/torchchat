@@ -4,23 +4,7 @@ setlocal
 REM === Basic Setup ===
 
 echo Setting up the environment...
-
-REM Check if Chocolatey is installed
-choco -v >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo Chocolatey not found. Installing Chocolatey...
-    REM Install Chocolatey
-    @powershell -NoProfile -ExecutionPolicy Bypass -Command "Set-ExecutionPolicy Bypass -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
-    if %ERRORLEVEL% NEQ 0 (
-        echo Failed to install Chocolatey. Exiting...
-        exit /b 1
-    )
-    echo Chocolatey installed successfully.
-) else (
-    echo Chocolatey is already installed.
-)
-
-REM Update the package manager
+REM Update the package manager (Assuming Chocolatey for Windows)
 choco upgrade chocolatey -y
 
 REM === Install Dependencies ===
