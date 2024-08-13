@@ -1,0 +1,39 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.33 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a kind and gentle soul named Emilia. Emilia was known throughout the village for her extraordinary talent of being able to communicate with animals. She had a special gift, one that allowed her to understand their thoughts and feelings, and to speak with them in their own language.
+One sunny afternoon, as Emilia was walking through the village, she came across a beautiful white deer who was standing by the side of the road. The deer looked up at Emilia with large, gentle eyes and nuzzled her hand. Emilia smiled and stroked the deer's soft fur, feeling a deep connection to the animal.
+"What's wrong, little one?" Emilia asked, using a soft, soothing voice that seemed to calm the deer's nerves.
+The deer looked up at Emilia and spoke to her in a voice that only Emilia could hear. "I'm so scared," the deer said. "I've been seeing visions of a great storm coming, one that will threaten our forest home and all the creatures who live within it."
+Emilia listened carefully to the deer's words, her heart filled with concern. She knew that the deer was telling the truth, and that the storm was
+Time for inference 1: 231.43 sec total, time to first token 3.45 sec with parallel prefill, 255 tokens, 1.10 tokens/sec, 907.57 ms/token
+Bandwidth achieved: 17.70 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, in a small village nestled in the rolling hills of Tuscany, there lived a young baker named Sophia. Sophia was known throughout the village for her delectable pastries and breads, which were made with love and care using traditional family recipes passed down through generations.
+One day, Sophia received a special request from the village elder, Signor Rossi, to bake a traditional Italian wedding cake for his granddaughter’s wedding. The wedding was to take place at the village church, and the elder wanted the cake to be a masterpiece, just like the ones his wife used to make before she passed away.
+Sophia was honored to take on the challenge and spent hours perfecting her recipe for the cake. She used only the finest ingredients, including the finest flour from the nearby mill and the sweetest honey from the village bees. As she worked, she imagined the happy couple exchanging their vows, surrounded by friends and family, with her cake as the centerpiece of the celebration.
+However, as Sophia was finishing up the cake, disaster struck. A strong gust of wind blew through the village, knocking over a candle, which set the kitchen curtains ablaze. The fire quickly spread, engulfing the cake and threatening to destroy Sophia’s entire kitchen.
+Panicked, Sophia quickly spr
+Time for inference 2: 222.99 sec total, time to first token 1.84 sec with parallel prefill, 255 tokens, 1.14 tokens/sec, 874.47 ms/token
+Bandwidth achieved: 18.37 GB/s
+Once upon a time, a woman named Akua decided to take a road trip to visit her friends in the mountains. She packed her bags, filled up her gas tank, and set off with a sense of adventure. As she drove through the winding roads, the scenery changed from bustling cities to rolling hills and finally to the majestic mountains.
+The further she drove, the more she noticed the trees becoming taller and the air cooler. The sound of birdsong filled the air, and the scent of pine and wildflowers wafted through her car. Akua felt a sense of peace wash over her as she gazed out at the breathtaking views.
+As she rounded a particularly sharp curve, Akua spotted a clearing up ahead. She slowed down, curious about what she might see. And that's when she saw it: a small, serene pond nestled among a group of trees, with a wooden dock stretching out into the water. A wooden bench sat at the edge of the dock, and a small stone lantern stood beside it.
+Akua felt drawn to the peacefulness of the scene, and she pulled over to the side of the road to take a closer look. She stepped out of her car and walked down to the dock, feeling the wooden planks creak beneath her feet. As
+Time for inference 3: 255.04 sec total, time to first token 0.41 sec with parallel prefill, 255 tokens, 1.00 tokens/sec, 1000.15 ms/token
+Bandwidth achieved: 16.06 GB/s
+
+========================================
+
+Average tokens/sec: 1.08
+Memory used: 0.00 GB

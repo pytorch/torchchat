@@ -1,0 +1,35 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 6.78 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.42 seconds
+-----------------------------------------------------------
+Once upon a time, in a land far, far away, there was a magical realm called Naida. It was a world of breathtaking beauty, where the skies were painted with hues of sapphire and amethyst, and the air was sweet with the scent of blooming flowers. The inhabitants of Naida were a mystical people, with hearts full of wonder and minds filled with magic.
+In the heart of Naida, there was a magnificent castle, its spires reaching towards the heavens like shards of crystal. This was the domain of the kingdom's ruler, the wise and just Queen Lyra. She was a powerful sorceress, with a deep understanding of the ancient lore and a love for all living things.
+One day, a young traveler named Eira arrived in Naida. She was a brave and adventurous soul, with a heart full of curiosity and a spirit that yearned for discovery. Eira had heard tales of the magical realm and had come to explore its wonders.
+As Eira wandered through
+Time for inference 1: 14.97 sec total, time to first token 0.88 sec with parallel prefill, 199 tokens, 13.29 tokens/sec, 75.22 ms/token
+Bandwidth achieved: 113.78 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, a couple of friends, Jack and Rose, boarded the infamous RMS Titanic. They were from different worlds, but fate had other plans for them. As the ship set sail from Southampton, England, on its maiden voyage to New York City, Jack and Rose found themselves drawn to each other, despite their differences.
+As the ship navigated through the North Atlantic, Jack and Rose's friendship blossomed into romance. They spent countless hours exploring the ship's opulent decks, dancing under the stars, and sharing secrets. Rose, a high-society woman engaged to marry a wealthy man, felt trapped in her privileged life. Jack, a penniless artist, had a sense of freedom and adventure that drew Rose in.
+But their love was forbidden, and the ship's social hierarchy stood in their way. Rose's family and fiancé saw Jack as beneath them, and the class divide seemed insurmountable. As the ship approached its doomed fate, Jack and Rose's love became the only thing
+Time for inference 2: 14.32 sec total, time to first token 0.07 sec with parallel prefill, 199 tokens, 13.89 tokens/sec, 71.98 ms/token
+Bandwidth achieved: 118.91 GB/s
+Once upon a time, when I was still a young girl, I used to spend hours combing the beach and collecting interesting shells and other treasures that the ocean had washed up. One of my favorite shells was a beautiful piece of mother-of-pearl. It had a delicate sheen to it, and it seemed to glow in the sunlight.
+I took that shell and placed it carefully in a special box, where it sat alongside other treasures I had collected. As I grew older, I began to appreciate the beauty of mother-of-pearl even more. I learned that it was created by the layers of nacre, or mother-of-pearl, that accumulated inside the shell. The layers were made up of layers of crystalline material that reflected light and gave the shell its shimmering quality.
+To this day, I still have that shell in my box, and I sometimes take it out and hold it in my hand. I am reminded of the beauty of the ocean and the way it can create such
+Time for inference 3: 14.31 sec total, time to first token 0.06 sec with parallel prefill, 199 tokens, 13.91 tokens/sec, 71.91 ms/token
+Bandwidth achieved: 119.03 GB/s
+
+========================================
+
+Average tokens/sec: 13.70
+Memory used: 28.86 GB
