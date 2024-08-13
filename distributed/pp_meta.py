@@ -3,7 +3,7 @@
 import os
 import json
 from typing import Optional, Dict, Tuple, Any, List
-
+import logging
 from argparse import ArgumentParser
 
 import torch
@@ -14,8 +14,9 @@ from torch._subclasses.fake_tensor import FakeTensorMode
 from utils import Color
 from modeling_utils import init_on_meta_device, check_rope_embedding, print_model_structure
 
-from torchtune.models.llama3 import llama3_8b, llama3_70b
+from torchtune.models.llama3 import llama3_8b, llama3_70b, Llama3Tokenizer
 from torchtune.models.llama3_1 import llama3_1_405b
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -35,20 +36,19 @@ MODEL_CONFIGS = {
 }
 
 TUNE_MODEL_CONFIGS = {
-    "8b": llama3_8b,
-    "70b": llama3_70b,
-    "405b": llama3_1_405b,  
+    "8b": (llama3_8b, '/tmp/Meta-Llama-3-8B-Instruct/original/tokenizer.model'),
+    "70b": (llama3_70b, '/tmp/Meta-Llama-3-70B-Instruct/original/tokenizer.model'),
+    "405b": (llama3_1_405b, '/tmp/Meta-Llama-3.1-405B-Instruct/original/mp16/tokenizer.model'),
 }
 
-def create_model(model_id: str, device: str = "cuda", rank: int = 0) -> Tuple[AutoModelForCausalLM, FakeTensorMode, Optional[Dict[str, Any]]]:
+def create_model(model_id: str, device: str = "cuda", rank: int = 0) -> Tuple[Any, FakeTensorMode, Any]:
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
-    print(TUNE_MODEL_CONFIGS.keys())
     
-    print(f"{model_id=}")
-    model_func = TUNE_MODEL_CONFIGS[model_id]
-    print(f"{model_func=}")
-    dist.barrier()
-    # assert model_func is not None, f"Model {model_id} not found in TUNE_MODEL_CONFIGS"
+    model_func, tokenizer_path = TUNE_MODEL_CONFIGS[model_id]
+    print(f"{model_func=}, {tokenizer_path=}")
+
+    assert model_func is not None, f"Model {model_id} not found in TUNE_MODEL_CONFIGS"
+    assert tokenizer_path is not None, f"Tokenizer path for {model_id} not found in TUNE_MODEL_CONFIGS"
 
     with init_on_meta_device(device="meta"):
         print(f"about to init model {model_id}")
@@ -68,11 +68,14 @@ def create_model(model_id: str, device: str = "cuda", rank: int = 0) -> Tuple[Au
     #logger.info(f"Buffer callback: {model.buf_init_callbacks}")
     #if not model.buf_init_callbacks:
     #    logger.warning("ROPE generation may not succeed - buf_init_callbacks is None")
-    config = None  # TODO -remove
+    
     with fake_mode:
         model.to_empty(device='cuda')
     
-    return model, fake_mode, config
+    # create tokenizer
+    tokenizer = Llama3Tokenizer(tokenizer_path)
+    assert tokenizer is not None, f"Tokenizer for {model_id} not instantiated"
+    return model, fake_mode, tokenizer
 
 def create_pipeline(model, inputs, world_size: int):
     layers_per_rank = model.config.num_hidden_layers // world_size
@@ -106,10 +109,14 @@ def main(model_id: str, world_size: int, device: str):
     dist.init_process_group(rank=rank, world_size=world_size)
 
     # Create model on meta device
-    model, fake_mode = create_model(model_id, device, rank)
-    
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
-    tokenizer.pad_token = tokenizer.eos_token
+    model, fake_mode, tokenizer = create_model(model_id, device, rank)
+    print(f"{tokenizer=}")
+   
+    tokenizer.pad_token = tokenizer.eos_id
+    print(f"{tokenizer.pad_token=}")
+
+    assert False, "inspect tokenizer"
+
 
     prompts = ("How do you", "I like to")
     inputs = tokenizer(prompts, return_tensors="pt", padding=True)
