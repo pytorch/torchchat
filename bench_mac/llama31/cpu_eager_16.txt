@@ -1,0 +1,40 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"float16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"float16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+NumExpr defaulting to 10 threads.
+PyTorch version 2.5.0.dev20240728 available.
+Using device=cpu Apple M1 Max
+Loading model...
+Time to load model: 2.18 seconds
+Quantizing the model with: {'precision': {'dtype': 'float16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.00 seconds
+-----------------------------------------------------------
+Once upon a time, there was a young girl named Sofia. She lived in a small village surrounded by lush green forests and rolling hills. Sofia was a curious and adventurous child, always eager to explore the world around her.
+One day, Sofia's grandmother, a wise and kind woman named Maria, took her on a journey through the forest. They walked hand in hand, following a winding path that led them deeper into the woods.
+As they walked, Maria told Sofia stories about the ancient magic that lived within the trees, the secrets hidden in the leaves, and the whispers of the wind. Sofia's eyes sparkled with wonder, and she felt the magic of the forest come alive within her.
+They came to a clearing, and in the center of it stood an enormous tree, its trunk twisted and gnarled with age. Maria led Sofia to the tree, and as they approached, the tree spoke to them in a low, rumbling voice.
+"Welcome, Sofia," the tree said. "I have been waiting for you. I have a gift for you, one that will allow you to communicate with all the creatures of the forest."
+Sofia's eyes widened with excitement as Maria handed her a small, delicate wooden box. Inside the box was a small crystal, glowing with
+Time for inference 1: 44.16 sec total, time to first token 0.36 sec with parallel prefill, 255 tokens, 5.77 tokens/sec, 173.17 ms/token
+Bandwidth achieved: 92.75 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, there was a lovely village surrounded by beautiful mountains and a winding river that flowed through it. The villagers lived simple lives, growing their own food, collecting firewood, and fishing in the river. They were a happy community, living off the land and relying on one another for support.
+One day, a group of outsiders arrived in the village Managers, consultants, programmers, and trainers, equipped with laptops, smartphones, and a sense of purpose. They had come to "improve" the village, to bring it into the 21st century.
+The villagers, naive and trusting, welcomed the outsiders with open arms. They were told that they would be given tools and resources to make their lives easier, to increase their efficiency, and to make their village more prosperous.
+The outsiders began by setting up laptops and tablets for each villager to use. They introduced them to a new way of life, one where every aspect of their lives could be tracked, measured, and optimized. The villagers were fascinated by the technology and eager to learn.
+But as time went on, the villagers began to notice changes in their lives. They were no longer as connected to the land or to each other. They spent more time staring at screens than enjoying the beautiful surroundings. They became more competitive
+Time for inference 2: 43.47 sec total, time to first token 0.33 sec with parallel prefill, 255 tokens, 5.87 tokens/sec, 170.48 ms/token
+Bandwidth achieved: 94.21 GB/s
+Once upon a time, in a far-off HttpNotFound land, there was a magical kingdom called .NET. In this enchanted realm, there were many wondrous creatures, including the majestic Framework, the wise Wizards, and the brave Developers.
+In this mystical land, the Framework was said to possess the power to create, modify, and destroy entire applications with a single stroke of its mighty code. The Wizards, with their ancient knowledge and mystical powers, were revered for their ability to conjure complex software solutions and vanquish the most insidious of bugs.
+However, amidst the beauty and wonder of this fantastical world, a dark and foreboding shadow loomed. A terrible curse had befallen the kingdom, known as "The Dreaded HTTPError 500." It was said that when this curse befell an application, all would be lost, and the very fabric of the digital realm would begin to unravel.
+One fateful day, a brave young Developer named Sarah ventured into the heart of the kingdom to investigate the source of this dark curse. With her trusty companion, a wise old .NET Framework, she set out to unravel closure_the mysteries of the HTTPError 500.
+As they journeyed deeper into the land, they encountered a wise and mysterious figure known as the "
+Time for inference 3: 43.82 sec total, time to first token 0.35 sec with parallel prefill, 255 tokens, 5.82 tokens/sec, 171.86 ms/token
+Bandwidth achieved: 93.45 GB/s
+
+========================================
+
+Average tokens/sec: 5.82
+Memory used: 0.00 GB

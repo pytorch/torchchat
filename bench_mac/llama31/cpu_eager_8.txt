@@ -1,0 +1,37 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"float16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"float16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+NumExpr defaulting to 10 threads.
+PyTorch version 2.5.0.dev20240728 available.
+Using device=cpu Apple M1 Max
+Loading model...
+Time to load model: 2.21 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'float16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 8.68 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the heart of a vast and beautiful forest, there lived a young girl named Sophia. Sophia was a curious and adventurous child, with a heart full of wonder and a mind full of questions. She spent her days exploring the forest, discovering hidden clearings and secret streams, and learning about the magic that lay just beyond the edge of everyday life.
+One day, while wandering deeper into the forest than she had ever been before, Sophia stumbled upon a hidden glade. In the center of the glade stood an enormous tree, its trunk twisted and gnarled with age. The tree seemed to be... watching her.
+Sophia approached the tree cautiously, feeling a sense of awe and trepidation. As she drew closer, she noticed that the tree's bark was etched with strange symbols, glowing with a soft, ethereal light.
+"Who are you?" Sophia asked the tree, her voice barely above a whisper.
+"I am the Keeper of the Forest," the tree replied, its voice low and rumbling, like thunder on a summer day. "I have been watching you, Sophia. I have seen your curiosity, your sense of wonder, and your heart full of questions. I have a gift for you, one that will
+Time for inference 1: 51.21 sec total, time to first token 0.78 sec with parallel prefill, 255 tokens, 4.98 tokens/sec, 200.83 ms/token
+Bandwidth achieved: 42.62 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Sophie. Sophie was a curious and adventurous child, with a heart full of wonder and a mind full of questions. She loved to explore the world around her, to learn about the people and places that made up her community, and to discover the secrets that lay hidden in the natural world.
+One day, while wandering through the village, Sophie stumbled upon a small, mysterious shop that she had never seen before. The sign above the door read "Curios and Wonders," and the windows were filled with a dazzling array of strange and exotic objects. Sophie's curiosity was piqued, and she pushed open the door to venture inside.
+The shop was dimly lit, and the air was thick with the scent of old books and dust. Sophie's eyes adjusted slowly to the darkness, and as they did, she began to make out the shapes of the objects on the shelves. There were vintage taxidermy animals, antique scientific instruments, and peculiar artifacts from far-flung lands.
+Behind the counter, a bespectacled old man looked up from the book he was reading and smiled at Sophie. "Welcome to Curios and Wonders, my_brightness," he said
+Time for inference 2: 51.52 sec total, time to first token 0.80 sec with parallel prefill, 255 tokens, 4.95 tokens/sec, 202.05 ms/token
+Bandwidth achieved: 42.36 GB/s
+Once upon a time, there wasNoise, a tiny, furry creature that lived in a cozy little cave. Noise loved to explore the world outside her cave, but she was always moving at a snail's pace. She took her time, examining every detail of the world around her. She'd sniff a flower for an hour, watch ants marching for a day, and say hello to every bird for a week.
+One day, she discovered the thing that would set her on a wild adventure: a shiny, silver balloon floating gently in the breeze. Noise was intrigued. She'd never seen anything like it before. She approached the balloon slowly, watching it dance in the wind, fascinated by its sparkle.
+As she drew closer, the balloon suddenly slipped from the tree branch it was tied to and began to float away. Noise was both startled and thrilled. She decided to follow the balloon, and to her surprise, she found herself moving at a speed she'd never experienced before! The wind was carrying her along, and she felt a rush of exhilaration.
+The balloon floated over fields, rivers, and towns, and Noise laughed with joy, feeling the wind rushing past her. She met all sorts of creatures along the way, each one as unique and fascinating as the last. There were birds
+Time for inference 3: 56.67 sec total, time to first token 0.93 sec with parallel prefill, 255 tokens, 4.50 tokens/sec, 222.23 ms/token
+Bandwidth achieved: 38.51 GB/s
+
+========================================
+
+Average tokens/sec: 4.81
+Memory used: 0.00 GB

@@ -38,13 +38,13 @@ function formatted_export_and_generate {
   if [ ! -z "$compile_cmd" ]; then
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" >> $file
     echo "$compile_cmd" | tee -a $file
-    eval $compile_cmd 2>&1 >> $file 
+    eval $compile_cmd >> $file 2>&1
   fi
 
   # Generate using the Model
   echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" >> $file
   echo $generate_cmd | tee -a $file
-  eval $generate_cmd | tee -a $file
+  eval $generate_cmd >> $file 2>&1
   echo
 }
 
