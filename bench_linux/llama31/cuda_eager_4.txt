@@ -1,0 +1,35 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 6.89 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.56 seconds
+-----------------------------------------------------------
+Once upon a time, in a far-off galaxy, there was a beautiful and ancient tree called the Memory Tree. For millions of years, it stood tall, a witness to the birth and death of countless stars and planets. The Memory Tree was said to have the power to absorb and hold memories from every being in the universe.
+As the tree grew, its bark turned a deep, rich brown, and its leaves shimmered with a soft, ethereal glow. The leaves seemed to be infused with a mystical energy that allowed them to absorb the memories of all who came near. Over time, the tree's branches reached far and wide, creating a canopy that sheltered countless creatures seeking refuge from the dangers of the cosmos.
+One day, a young space traveler named Lyra stumbled upon the Memory Tree while on a mission to explore a distant planet. Lyra's ship had encountered severe engine trouble, and she was forced to make an emergency landing. As she emerged from her damaged ship, she saw the ancient tree towering
+Time for inference 1: 20.91 sec total, time to first token 0.79 sec with parallel prefill, 199 tokens, 9.52 tokens/sec, 105.07 ms/token
+Bandwidth achieved: 46.83 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, in a small town in the countryside, there was an old woman who lived in a small cottage on the edge of a forest. She was a witch, and she spent her days brewing potions and casting spells. One day, a young traveler came to the town, seeking shelter for the night. The old woman took pity on him and invited him to stay at her cottage. But as night began to fall, the traveler realized that he had made a terrible mistake.
+The old woman's cottage was surrounded by a thick fog, and the trees around it seemed to be twisted and gnarled. The air was thick with the smell of herbs and spices, and the traveler could hear the sound of bubbling water coming from a cauldron in the distance. As he looked around, he saw that the old woman's cottage was surrounded by a variety of strange and ominous objects: a hollowed-out tree trunk, a basket of old bones, and a cauldron hanging over a roaring fire
+Time for inference 2: 20.58 sec total, time to first token 0.10 sec with parallel prefill, 199 tokens, 9.67 tokens/sec, 103.41 ms/token
+Bandwidth achieved: 47.59 GB/s
+Once upon a time, in a land far far away, there was a magical kingdom hidden in a misty mountain range. This kingdom was called Eldrador. It was a place of wonder and enchantment, where magic was a part of everyday life.
+In the heart of Eldrador, there was a beautiful castle called Eldrador Castle. The castle was made of crystal clear white stone, which sparkled like diamonds in the sunlight. The castle had towers that stretched up to the clouds, and a beautiful moat filled with sparkling blue water, where swans swam lazily around the edges.
+At the center of Eldrador Castle, there was a magnificent courtyard with a grand fountain. The fountain was made of gleaming white marble, and it was surrounded by beautiful fountains, each one shaped like a different animal. The courtyard was the heart of the kingdom, where grand festivals and celebrations took place.
+
+In the midst of Eldrador Castle, there lived a brave and selfless princess named Princess Sophia. She had
+Time for inference 3: 20.91 sec total, time to first token 0.11 sec with parallel prefill, 199 tokens, 9.52 tokens/sec, 105.07 ms/token
+Bandwidth achieved: 46.83 GB/s
+
+========================================
+
+Average tokens/sec: 9.57
+Memory used: 23.60 GB

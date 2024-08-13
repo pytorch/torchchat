@@ -1,0 +1,36 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.5.0.dev20240728+cu121 available.
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 7.56 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in a small town nestled in the heart of the countryside, there lived a young girl named Sophie. Sophie was a bright and curious child, with a passion for learning and adventure. She spent most of her days exploring the rolling hills and dense forests surrounding her town, discovering new wonders and marvels at every turn.
+One day, while wandering through a particularly dense thicket, Sophie stumbled upon a hidden path she had never seen before. Her curiosity piqued, she decided to follow the path, which wound its way through the trees and led her to a clearing.
+In the center of the clearing stood an enormous tree, its trunk as wide as a house and its branches stretching up towards the sky like giant arms. Sophie approached the tree, feeling a sense of wonder and awe wash over her.
+As she drew closer, she noticed that the tree seemed to be... glowing. A soft, ethereal light emanated from its trunk, illuminating the surrounding area and casting a warm, golden
+Time for inference 1: 12.52 sec total, time to first token 1.01 sec with parallel prefill, 199 tokens, 15.89 tokens/sec, 62.92 ms/token
+Bandwidth achieved: 255.26 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+Once upon a time, in far-off lands, there were two beautiful eggs. One was blue, and the other was green. Both eggs were perfectly round in shape and had a delicate, thin shell that shone in the sunlight. They were placed side by side in a cozy little basket.
+As the days passed, the eggs began to feel a difference within them. The blue egg started to feel a little different, like there was something growing inside it. It was a miracle!
+The green egg, on the other hand, remained calm and peaceful, like a little green seed waiting to sprout. It didn’t feel any changes inside it.
+One day, a wise old hen came by and noticed the two eggs. She examined them carefully, tapping gently on the shells with her beak. After a while, she looked at the eggs and said, “Ah, I see! One of you is a boy and the other is a girl. The blue egg is a boy, and the green egg is a
+Time for inference 2: 11.58 sec total, time to first token 0.05 sec with parallel prefill, 199 tokens, 17.19 tokens/sec, 58.17 ms/token
+Bandwidth achieved: 276.10 GB/s
+Once upon a time, in a small village nestled in the rolling hills of Tuscany, there was a small, family-owned bakery. The bakery was famous for its delicious bread, fresh pastries, and warm, inviting atmosphere. It was a place where locals and visitors alike would gather to sample the day's offerings, share stories, and enjoy each other's company.
+The bakery was owned and operated by a kind-hearted couple, Giovanni and Elisabetta. Giovanni was the master baker, known for his skilled hands and attention to detail. He would rise before the sun to mix, knead, and shape the dough, his hands moving with a precision that was both soothing and mesmerizing. Elisabetta, on the other hand, was the heart of the bakery, her warmth and generosity making everyone feel at home.
+As the years passed, the bakery became a beloved institution in the village. People would come from all around to taste Giovanni's bread, which was renowned for its crusty texture and rich,
+Time for inference 3: 11.82 sec total, time to first token 0.06 sec with parallel prefill, 199 tokens, 16.84 tokens/sec, 59.37 ms/token
+Bandwidth achieved: 270.50 GB/s
+
+========================================
+
+Average tokens/sec: 16.64
+Memory used: 16.30 GB
