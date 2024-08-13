@@ -1,7 +1,8 @@
 
 RUN_MPS_EAGER=false
-RUN_CPU_AOTI=true
-RUN_CPU_COMPILE=true
+RUN_CPU_EAGER=true
+RUN_CPU_COMPILE=false
+RUN_CPU_AOTI=false
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Check and Set Up Args (model, out_directory) 
@@ -66,6 +67,28 @@ if [ "$RUN_MPS_EAGER" = "true" ]; then
   echo "MPS Eager int4"
   generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int4\": {\"groupsize\": 256}, \"precision\": {\"dtype\":\"float16\"}, \"executor\":{\"accelerator\":\"mps\"}}' --prompt \"Once upon a time,\" --max-new-tokens 256 --num-samples 3"
   file="mps_eager_4.txt"
+  formatted_export_and_generate "$file" "$generate_cmd"
+fi
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# CPU Eager
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+if [ "$RUN_CPU_EAGER" = "true" ]; then
+  echo "CPU Eager 16"
+  generate_cmd="python3 torchchat.py generate $model --quantize '{\"precision\": {\"dtype\":\"float16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --prompt \"Once upon a time,\" --max-new-tokens 256 --num-samples 3"
+  file="cpu_eager_16.txt"
+  formatted_export_and_generate "$file" "$generate_cmd"
+
+  echo "CPU Eager int8"
+  generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"float16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --prompt \"Once upon a time,\" --max-new-tokens 256 --num-samples 3" 
+  file="cpu_eager_8.txt"
+  formatted_export_and_generate "$file" "$generate_cmd"
+
+  echo "CPU Eager int4"
+  generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int4\": {\"groupsize\": 256}, \"precision\": {\"dtype\":\"float16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --prompt \"Once upon a time,\" --max-new-tokens 256 --num-samples 3"
+  file="cpu_eager_4.txt"
   formatted_export_and_generate "$file" "$generate_cmd"
 fi
 
