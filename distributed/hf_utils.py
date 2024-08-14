@@ -135,6 +135,8 @@ def load_safetensor_weights(
     stage_state_dict = stage_module.state_dict()
     if purge_model_prefix:
         stage_state_dict = {key.removeprefix('model.'): value for key, value in stage_state_dict.items()}
+        weight_map = {key.removeprefix('model.'): value for key, value in weight_map.items()}
+
     print(f"Stage state dict: {stage_state_dict.keys()}")
     updated_states = {}
 
@@ -156,7 +158,6 @@ def load_safetensor_weights(
         print(f"Loading file: {file}")
         full_path = os.path.join(file_location, file)
         checkpoint = open_hf_safetensor(full_path)
-        print(f"{checkpoint=}")
         if checkpoint is None:
             continue
 
@@ -165,9 +166,14 @@ def load_safetensor_weights(
             if not file_with_param:
                 print(f"Warning: {param} not found in weight map, skipping")
             elif weight_map.get(param) == file:
+                print(f"Loading param: {param}")
                 if param in checkpoint:
-                    stage_state_dict[param] = checkpoint[param]
-                    updated_states[param] = None
+                    print(f"matched!  {param=}")
+
+                #if param in checkpoint:
+                    # print(f"Loading param within: {param}")
+                stage_state_dict[param] = checkpoint[param]
+                updated_states[param] = None
                 
 
     print(
@@ -225,12 +231,12 @@ def remap_weight_keys(dictionary):
         'input_layernorm.weight': 'sa_norm.scale',
         'self_attn':'attn',
         'o_proj':'output_proj',
-        'post_attention_layernorm.weight':'mlp_norm',
+        'post_attention_layernorm.weight':'mlp_norm.scale',
         'down_proj':'w1',
         'gate_proj':'w2',
         'up_proj':'w3',
         'norm.weight':'norm',
-        'lm_head':'output,'
+        'lm_head':'output',
         
     }
     
