@@ -16,7 +16,7 @@ from modeling_utils import init_on_meta_device, check_rope_embedding, print_mode
 
 from torchtune.models.llama3 import llama3_8b, llama3_70b, Llama3Tokenizer
 from torchtune.models.llama3_1 import llama3_1_405b
-from hf_utils import get_hf_tokenizer, load_safetensor_weights, read_weights_from_json
+from hf_utils import get_hf_tokenizer, load_safetensor_weights, read_weights_from_json, get_hf_weight_map_and_path
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -74,10 +74,10 @@ def create_model(model_id: str, device: str = "cuda", rank: int = 0) -> Tuple[An
     
     # create tokenizer
     #tokenizer = Llama3Tokenizer(tokenizer_path)
-    tokenizer = get_hf_tokenizer
+    tokenizer = get_hf_tokenizer(hf_path)
     tokenizer.pad_token = tokenizer.eos_token
     
-    return model, fake_mode, tokenizer
+    return model, fake_mode, tokenizer, hf_path
 
 def create_pipeline(model, inputs, world_size: int):
     layers_per_rank = model.config.num_hidden_layers // world_size
@@ -89,11 +89,11 @@ def create_pipeline(model, inputs, world_size: int):
     return pipeline(
         model,
         mb_args=(inputs,),
-        mb_kwargs={
-            "output_attentions": False,
-            "output_hidden_states": False,
-            "use_cache": False,
-        },
+        mb_kwargs=None, # {
+        #    "output_attentions": False,
+        #    "output_hidden_states": False,
+        #    "use_cache": False,
+        #},
         split_spec=split_spec,
     )
 
@@ -111,23 +111,21 @@ def main(model_id: str, world_size: int, device: str):
     dist.init_process_group(rank=rank, world_size=world_size)
 
     # Create model on meta device
-    model, fake_mode, tokenizer = create_model(model_id, device, rank)
-    print(f"{tokenizer=}")
-   
-    tokenizer.pad_token = tokenizer.eos_id
+    model, fake_mode, tokenizer, hf_path = create_model(model_id, device, rank)
+    
     print(f"{tokenizer.pad_token=}")
-
-    assert False, "inspect tokenizer"
-
 
     prompts = ("How do you", "I like to")
     inputs = tokenizer(prompts, return_tensors="pt", padding=True)
     fake_ids = fake_mode.from_tensor(inputs["input_ids"])
 
-    weight_map = read_weights_from_json(cfile)
-    if weight_map is None:
-        logger.error(f"No weight map found in the JSON file {cfile}.")
-        return
+    weight_map, weight_path = get_hf_weight_map_and_path(hf_path)
+    logger.info(f"Weight map: {weight_map=}")
+    logger.info(f"Weight path: {weight_path=}")
+
+
+    dist.barrier()
+    assert False, "check paths"
 
     # Create pipeline
     logger.info("Creating pipeline...")

@@ -1,13 +1,18 @@
 
 from typing import Dict, Callable, Optional, Tuple
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
+from transformers import AutoTokenizer # AutoConfig
 from safetensors import safe_open
 from transformers.utils import cached_file
 import logging
+import os
+import json
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# default hf cache lives in ~/.cache/huggingface/hub
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
 _CONFIG_NAME = "config.json"
@@ -187,5 +192,17 @@ def get_config_file(model_id: str) -> Tuple[str,str]:
     assert os.path.exists(config_file), f"Config file {config_file} does not exist."
     with open(config_file, "r") as file:
         config_data = json.load(file)
-    file_location = os.path.dirname(cfile)
-    return config_file, file_location
+    file_location = os.path.dirname(config_file)
+    return config_data, file_location
+
+def get_hf_weight_map_and_path(model_id: str) -> Tuple[Dict[str, str], str,]:
+    """ Get the weight map for a given HF model id and also the cache path for loading the weights """
+    index_file = cached_file(model_id, _DEFAULT_SAFETENSOR_FILE_NAME)
+    print(f"Index file: {index_file}")
+    assert os.path.exists(index_file), f"Weight index file for {model_id} does not exist in HF cache...."
+    weight_map = read_weights_from_json(index_file)
+    assert weight_map is not None, f"Weight map not found in config file {index_file}"
+    weight_path = os.path.dirname(index_file)
+    assert os.path.exists(weight_path), f"Weight path {weight_path} does not exist"
+
+    return weight_map, weight_path
