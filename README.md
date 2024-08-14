@@ -200,6 +200,10 @@ streamlit run torchchat.py -- browser llama3.1
 <details>
 <summary>This mode gives a REST API that matches the OpenAI API spec for interacting with a model</summary>
 
+The server follows the [OpenAI API specification](https://platform.openai.com/docs/api-reference/chat) for chat completions.
+Since this feature is under active development, not every parameter is consumed. See api/api.py for details on
+which request parameters are implemented. If you encounter any issues, please comment on the [tracking Github issue](https://github.com/pytorch/torchchat/issues/973).
+
 To test out the REST API, **you'll need 2 terminals**: one to host the server, and one to send the request.
 
 In one terminal, start the server
@@ -213,8 +217,7 @@ python3 torchchat.py server llama3.1
 
 In another terminal, query the server using `curl`. Depending on the model configuration, this query might take a few minutes to respond.
 
-Setting `stream` to "true" in the request emits a response in chunks. Currently, this response
-is plaintext and will not be formatted to the OpenAI API specification. If `stream` is unset or not "true", then the client will await the full response from the server.
+Setting `stream` to "true" in the request emits a response in chunks. If `stream` is unset or not "true", then the client will await the full response from the server.
 
 
 **Example Input + Output**
@@ -227,6 +230,7 @@ curl http://127.0.0.1:5000/v1/chat \
   -d '{
     "model": "llama3.1",
     "stream": "true",
+    "max_tokens": 200,
     "messages": [
       {
         "role": "system",
