@@ -8,9 +8,9 @@ PyTorch version 2.5.0.dev20240728+cu121 available.
 Using device=cpu
 Setting max_seq_length to 300 for DSO export.
 Loading model...
-Time to load model: 0.41 seconds
+Time to load model: 0.39 seconds
 Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
-Time to quantize model: 35.19 seconds
+Time to quantize model: 31.53 seconds
 -----------------------------------------------------------
 Exporting model using AOT Inductor to /tmp/model8.so
 The generated DSO model can be found at: /tmp/model8.so
@@ -23,40 +23,43 @@ Warning: checkpoint path ignored because an exported DSO or PTE path specified
 Warning: checkpoint path ignored because an exported DSO or PTE path specified
 Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
 Loading model...
-Time to load model: 0.38 seconds
+Time to load model: 0.37 seconds
 -----------------------------------------------------------
-Once upon a time, there was a young boy named Jack who lived in a small village surrounded by a dense forest. Jack was a curious boy who loved to explore the forest and play in its many wonders.
-One day, Jack stumbled upon a hidden path he had never seen before. The path was winding and narrow, and it seemed to lead deep into the heart of the forest. Jack's curiosity got the better of him, and he decided to follow the path to see where it would take him.
+Once upon a time, there was a small village surrounded by a dense forest. The villagers lived simple lives, relying on the forest for their daily needs. They would venture into the forest every day to collect firewood, fruits, and other essential items.
+One day, a group of travelers stumbled upon the village. They were weary from their journey and asked for shelter and food. The villagers, being kind and hospitable, welcomed the travelers and offered them hospitality.
+As the travelers rested and ate, they began to share stories of their journey. They spoke of the vast lands they had traversed and the wonders they had seen. The villagers listened with wide eyes, fascinated by the tales of the outside world.
 
-As he walked, the path grew darker and more overgrown. The trees seemed to close in around him, casting long, ominous shadows on the ground. Jack began to feel a sense of unease, but he was determined to see what lay at the end of the path.
+Among the travelers was a young woman named Maria, who was a skilled healer. She had spent many years studying the art of healing and had developed a deep understanding of the natural world. Maria noticed that the villagers were fascinated by her stories and asked if she could share her knowledge with them.
 
-After a while, the path opened up into a clearing. In the center of the clearing stood an enormous tree, its trunk twisted and gnarled with age. The tree seemed to be... breathing? Its branches were swaying gently in the breeze, and Jack could have sworn he saw the trunk slowly expanding and contracting.
+The villagers eagerly accepted Maria's offer, and she began to teach them about the healing properties of the forest plants. She showed them how to identify the different species, how to prepare the remedies, and how to use them to treat various ailments.
 
-Suddenly, a figure appeared at the base of the tree. It was an old man with a long white beard and a twinkle in his eye. He beckoned to Jack, and Jack
-Time for inference 1: 157.46 sec total, time to first token 4.76 sec with sequential prefill, 255 tokens, 1.62 tokens/sec, 617.49 ms/token
-Bandwidth achieved: 26.01 GB/s
+As Maria shared her knowledge, the villagers began to take
+Time for inference 1: 67.23 sec total, time to first token 1.33 sec with sequential prefill, 255 tokens, 3.79 tokens/sec, 263.63 ms/token
+Bandwidth achieved: 60.92 GB/s
 *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
-Once upon a time, I was a freelance content writer. I wrote about a wide range of topics, from technology and business to lifestyle and entertainment. My writing was published on various platforms, including websites, blogs, and social media.
-One day, I received an email from a potential client who wanted me to write a series of articles for their company blog. They provided me with a list of topics and a brief overview of each one. I was excited to take on the project and get started.
-As I began writing, I realized that I had a lot of freedom to create content that was engaging and relevant to the client's audience. I was able to use my creativity and expertise to craft articles that were not only informative but also entertaining and easy to read.
-The client was thrilled with the final product and asked me to continue writing for their blog on a regular basis. I was happy to oblige and continued to write articles that were well-received by the client's audience.
-As a freelance content writer, I learned the importance of understanding my audience and creating content that resonates with them. I also learned the value of flexibility and being able to adapt to different topics and styles.
-Overall, my experience as a freelance content writer taught me the importance of writing engaging and relevant content that meets the
-Time for inference 2: 96.96 sec total, time to first token 1.61 sec with sequential prefill, 255 tokens, 2.63 tokens/sec, 380.24 ms/token
-Bandwidth achieved: 42.24 GB/s
-Once upon a time, in the land of the East, there was a young man named Anil. He was a skilled craftsman who specialized in creating intricate wooden carvings. Anil lived in a small village surrounded by lush green forests, where he spent most of his days working on his craft.
+Once upon a time, on a distant planet, there was a young girl named Aria. She lived in a small village surrounded by vast, open plains and towering mountains. Aria was a curious child, always eager to explore and learn about the world around her.
+One day, while wandering through the village, Aria stumbled upon a small, mysterious shop. The sign above the door read "Curios and Wonders," and the windows were filled with an assortment of strange and exotic items. Aria's curiosity was piqued, and she pushed open the door to venture inside.
 
-One day, while out on a walk, Anil stumbled upon a hidden clearing. In the center of the clearing stood an enormous tree, its trunk as wide as a house and its branches stretching towards the sky. The tree was unlike any Anil had ever seen before, its bark shimmering with a soft, ethereal light.
+The shop was dimly lit, and the air was thick with the scent of old books and dust. Aria's eyes adjusted slowly, and she saw that the shop was packed with all manner of peculiar objects. There were ancient tomes bound in worn leather, peculiar devices that looked like they belonged in a steampunk novel, and strange, glowing orbs that seemed to pulse with an otherworldly energy.
 
-As Anil approached the tree, he felt an inexplicable sense of peace wash over him. He reached out to touch the trunk, and as he did, he heard a gentle voice whispering in his ear.
+Aria wandered the aisles, running her fingers over the various objects and marveling at their strangeness. As she explored, she began to notice that the shop seemed to be... shifting. The shelves seemed to change, the objects rearranging themselves in impossible ways. Aria felt a
+Time for inference 2: 109.31 sec total, time to first token 1.12 sec with sequential prefill, 255 tokens, 2.33 tokens/sec, 428.65 ms/token
+Bandwidth achieved: 37.47 GB/s
+Once upon a time, there was a wise old man named Satish. Satish was known throughout the land for his wisdom, his kind heart, and his ability to help others. Many people would come to him for advice and guidance, and he would always offer them words of wisdom and compassion.
 
-"Welcome, Anil. I have been waiting for you. You possess a skill that is rare and precious, and I require your help. I am the guardian of this forest, and I need your expertise to create a magnificent wooden door for my abode."
+One day, a young man named Rohan came to Satish with a problem. Rohan was struggling in his studies and was feeling overwhelmed. He felt like he was failing and didn't know what to do.
 
-Anil was both amazed and honored by the tree's request. He accepted the task and set to work immediately. For many days and nights, he toiled, his ch
-Time for inference 3: 180.46 sec total, time to first token 1.18 sec with sequential prefill, 255 tokens, 1.41 tokens/sec, 707.68 ms/token
-Bandwidth achieved: 22.69 GB/s
+Satish listened carefully to Rohan's concerns and then offered him some advice. "Rohan, my young friend," he said, "the key to success is not to be found in your studies, but rather in your own thoughts and feelings. You must learn to manage your mind and cultivate a positive attitude."
+
+Rohan was intrigued by Satish's words and asked him to explain. Satish told him that the mind is like a garden and that we must tend to it with care. He taught Rohan how to use meditation and visualization to cultivate a positive and productive mindset.
+
+Rohan was amazed by the results he saw in his own life. He found that he was able to focus better and learn more easily. He also felt more confident and self-assured.
+
+As time
+Time for inference 3: 148.44 sec total, time to first token 4.21 sec with sequential prefill, 255 tokens, 1.72 tokens/sec, 582.11 ms/token
+Bandwidth achieved: 27.59 GB/s
 
 ========================================
 
-Average tokens/sec: 1.89
+Average tokens/sec: 2.61
 Memory used: 0.00 GB

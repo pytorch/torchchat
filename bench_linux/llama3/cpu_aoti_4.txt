@@ -233,9 +233,9 @@ linear: output, in=4096, out=128256
 Using device=cpu
 Setting max_seq_length to 300 for DSO export.
 Loading model...
-Time to load model: 0.33 seconds
+Time to load model: 0.39 seconds
 Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
-Time to quantize model: 42.27 seconds
+Time to quantize model: 54.73 seconds
 -----------------------------------------------------------
 Exporting model using AOT Inductor to /tmp/model34.so
 The generated DSO model can be found at: /tmp/model34.so
@@ -248,31 +248,34 @@ Warning: checkpoint path ignored because an exported DSO or PTE path specified
 Warning: checkpoint path ignored because an exported DSO or PTE path specified
 Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
 Loading model...
-Time to load model: 0.36 seconds
+Time to load model: 0.38 seconds
 -----------------------------------------------------------
-Once upon a time, there was a small, friendly tortoise named Toby. Toby loved to explore the world around him, and he spent most of his days crawling through the grass, searching for new and exciting things to discover.
-One day, Toby came across a small, shimmering pool of water. He had never seen anything like it before, and he was immediately intrigued. As he approached the pool, he noticed that it was filled with tiny, delicate aquatic plants and small, shiny pebbles.
-Toby was fascinated by the pool and decided to investigate further. He carefully crawled along the edge of the pool, examining the plants and pebbles more closely.
-As he explored, Toby discovered that the pool was home to a few tiny fish, which darted back and forth just beneath the surface of the water. Toby watched them with wide, curious eyes, mesmerized by the way they glided effortlessly through the water.
-As he watched, Toby began to feel a sense of peace and tranquility wash over him. He realized that the pool was a tiny, perfect world, untouched by the hustle and bustle of the outside world.
-Toby decided that he wanted to spend more time in this peaceful world, and he returned to the pool day after day, exploring and observing the
-Time for inference 1: 163.33 sec total, time to first token 16.99 sec with sequential prefill, 255 tokens, 1.56 tokens/sec, 640.51 ms/token
-Bandwidth achieved: 25.07 GB/s
+Once upon a time, in a small village, there lived a young boy named Kaito. Kaito was an ordinary boy, with an ordinary life. He had a loving family, a small gang of friends, and a job at a local bakery. He worked there, along with his best friend, a girl named Akira, helping his uncle, who was the owner of the bakery.
+One day, while Kaito and Akira were delivering bread to the villagers, they stumbled upon a mysterious, ancient-looking book buried deep in the earth. The book was bound in an unusual black leather, and it had an unusual symbol etched onto the cover.
+As soon as they picked up the book, they felt an unusual energy emanating from it. The book began to glow, and the symbol on the cover started to change, revealing a hidden message.
+Kaito and Akira were drawn to the book, as if it was calling them. They opened the book, and found that it was filled with strange, intricate pages. The pages were filled with diagrams, symbols, and strange, wispy writing.
+As they began to flip through the pages, they noticed that the pages were turning on their own, revealing hidden sections and messages. They discovered that the book was an
+Time for inference 1: 75.82 sec total, time to first token 2.70 sec with sequential prefill, 255 tokens, 3.36 tokens/sec, 297.34 ms/token
+Bandwidth achieved: 54.01 GB/s
 *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
-Once upon a time, in a small village nestled between the rolling hills of Tuscany, there lived a young, passionate and creative soul named Nina. She was a beautiful and vibrant woman, with a fiery spirit and a heart full of love. Nina was a true artist, with a passion for painting, writing, and music. She was always drawn to the creative world, and she spent most of her days lost in her imagination, exploring the depths of her soul.
-As a child, Nina was always fascinated by the beauty of nature. She spent hours exploring the rolling hills, forests, and rivers of Tuscany, and she was captivated by the colors, shapes, and textures of the natural world. She would spend hours collecting seashells, pebbles, and feathers, which she would then arrange into beautiful collages on her canvas. Her love for nature was contagious, and she soon found herself surrounded by a group of friends who shared her passion for the outdoors.
-As Nina grew older, her love for nature only intensified. She began to create beautiful, detailed paintings of the landscapes she had seen, using her vivid imagination and her skills as an artist. Her paintings were so lifelike, that people would often mistake them for photographs. Her art was a reflection of
-Time for inference 2: 108.47 sec total, time to first token 1.20 sec with sequential prefill, 255 tokens, 2.35 tokens/sec, 425.38 ms/token
-Bandwidth achieved: 37.76 GB/s
-Once upon a time, there were two best friends who lived in the same neighborhood. They grew up together, explored the woods, and shared their deepest secrets. Their names were Emma and Olivia. Both of them had a passion for books, drawing, and music.
-The days were filled with laughter, stories, and adventures, but as they grew older, they began to diverge. Emma discovered a love for journalism and became the editor-in-chief of her school newspaper. Olivia, on the other hand, found solace in music and began to compose her own songs.
-As they entered college, their paths diverged even more. Emma started attending college in another state, while Olivia chose to pursue a degree in music from home. They kept in touch through phone calls, texts, and occasional visits.
-Years went by, and the once inseparable friends went their separate ways. Emma became a renowned journalist, traveling the world, and Olivia, a talented musician, formed her own band. Though they had drifted apart, the memories of their childhood remained dear to them.
-One day, Emma received an invitation to attend her high school reunion. She was hesitant at first, but something within her told her to go. She decided to make the trip, hoping to relive the memories and catch up with old
-Time for inference 3: 124.89 sec total, time to first token 2.10 sec with sequential prefill, 255 tokens, 2.04 tokens/sec, 489.75 ms/token
-Bandwidth achieved: 32.79 GB/s
+Once upon a time, there was a world where women wore kilts and men wore skirts. It was a world where social norms were turned upside down, and people lived according to their own rules. It was a world where people were free to be who they truly were, without fear of judgment or persecution.
+This was the world that the people of Scotland lived in during the 18th century. During this time, Scotland was a place of great beauty and great turmoil. The country was ruled by the British, and the Scots were forced to wear kilts and tartan shirts, which were symbol of their nationality, but also of their subjugation.
+The people of Scotland were known for their bravery and their love of freedom. They were a proud people, who were determined to keep their identity and their culture alive, even in the face of oppression.
+One of the most famous Scottish heroes of this time was Rob Roy, a Scottish folk hero who lived in the 18th century. Rob Roy was a brave and a clever man, who was known for his cunning and his bravery. He was a natural leader, and he was loved by the people of Scotland for his bravery and his ability to inspire and to lead.
+Rob Roy was also a man of great intelligence and charisma. He was
+Time for inference 2: 88.38 sec total, time to first token 2.38 sec with sequential prefill, 255 tokens, 2.89 tokens/sec, 346.59 ms/token
+Bandwidth achieved: 46.34 GB/s
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Sophia. Sophia was known throughout the village for her extraordinary talent in baking. Every morning, she would wake up before dawn to mix, knead, and bake the most delicious pastries, cakes, and breads. The aroma of freshly baked goods wafting from her small bakery would fill the village streets, enticing everyone to come and sample her creations.
+
+Sophia's baking skills were honed by her mother, who had learned the secrets of traditional baking from her own mother and grandmother. It was as if the art of baking was passed down through the generations, and Sophia was now the latest guardian of this family tradition.
+
+One day, as Sophia was preparing the day's batch of freshly baked bread, a group of strangers passed by her bakery. They were a peculiar group, with faces that seemed from another time. They moved quickly, their eyes scanning the streets, their voices speaking in hushed tones.
+
+Sophia noticed that they seemed to be searching for something and decided to offer them some freshly baked bread to warm their spirits. As she handed them a warm baguette, she sensed that they were not like the villagers she knew. Their eyes seemed to hold a
+Time for inference 3: 39.35 sec total, time to first token 1.90 sec with sequential prefill, 255 tokens, 6.48 tokens/sec, 154.30 ms/token
+Bandwidth achieved: 104.09 GB/s
 
 ========================================
 
-Average tokens/sec: 1.98
+Average tokens/sec: 4.24
 Memory used: 0.00 GB
