@@ -7,6 +7,7 @@ from transformers.utils import cached_file
 import logging
 import os
 import json
+import torch.distributed as dist
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -129,8 +130,12 @@ def load_safetensor_weights(
     stage_module: torch.nn.Module,
     weight_map: Dict[str, str],
     file_location: str,
+    purge_model_prefix: bool = True,
 ):
     stage_state_dict = stage_module.state_dict()
+    if purge_model_prefix:
+        stage_state_dict = {key.removeprefix('model.'): value for key, value in stage_state_dict.items()}
+    print(f"Stage state dict: {stage_state_dict.keys()}")
     updated_states = {}
 
     needed_files = set() 
@@ -142,14 +147,16 @@ def load_safetensor_weights(
     # The file a param is saved in
     for param in stage_state_dict.keys():
         file = weight_map.setdefault(param, None)
+        print(f"mapping {file=}, {param=}")
         if file:
             needed_files.add(file)
+    print(f"Needed files: {needed_files=}")
 
     for file in needed_files:
-        #checkpoint = open_hf_safetensor(os.path.join(file_location, file))
         print(f"Loading file: {file}")
         full_path = os.path.join(file_location, file)
         checkpoint = open_hf_safetensor(full_path)
+        print(f"{checkpoint=}")
         if checkpoint is None:
             continue
 
@@ -170,7 +177,8 @@ def load_safetensor_weights(
     )
     stage_module.load_state_dict(stage_state_dict, assign=True)
     print(f"Loaded {len(updated_states)} weights into stage module")
-
+    dist.barrier()
+    assert False, "check weights"
 
 def read_weights_from_json(file_path: str) -> Optional[Dict[str, str]]:
     try:
@@ -201,8 +209,37 @@ def get_hf_weight_map_and_path(model_id: str) -> Tuple[Dict[str, str], str,]:
     print(f"Index file: {index_file}")
     assert os.path.exists(index_file), f"Weight index file for {model_id} does not exist in HF cache...."
     weight_map = read_weights_from_json(index_file)
+
     assert weight_map is not None, f"Weight map not found in config file {index_file}"
+    weight_map = remap_weight_keys(weight_map)
+    
     weight_path = os.path.dirname(index_file)
     assert os.path.exists(weight_path), f"Weight path {weight_path} does not exist"
 
     return weight_map, weight_path
+
+def remap_weight_keys(dictionary):
+    """ Remap the keys of a dictionary to match the expected format of the tune model. """
+    replacements = {
+        'embed_tokens': 'tok_embeddings',
+        'input_layernorm.weight': 'sa_norm.scale',
+        'self_attn':'attn',
+        'o_proj':'output_proj',
+        'post_attention_layernorm.weight':'mlp_norm',
+        'down_proj':'w1',
+        'gate_proj':'w2',
+        'up_proj':'w3',
+        'norm.weight':'norm',
+        'lm_head':'output,'
+        
+    }
+    
+    new_dict = {}
+    for key, value in dictionary.items():
+        new_key = key
+        for old_word, new_word in replacements.items():
+            if old_word in new_key:
+                new_key = new_key.replace(old_word, new_word)
+        new_dict[new_key] = value
+    print(f"updated weight map {new_dict=}")
+    return new_dict
