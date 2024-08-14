@@ -71,7 +71,7 @@ class GeneratorArgs:
     num_samples: int = 1
     max_new_tokens: int = 200
     top_k: int = 200
-    temperature: int = 0  # deterministic argmax
+    temperature: float = 0.0  # deterministic argmax if 0.0
     compile: bool = False
     compile_prefill: bool = False
     speculate_k: int = 5
@@ -105,9 +105,7 @@ class GeneratorArgs:
     def from_args(cls, args):
         dso_path = getattr(args, "dso_path", None)
         pte_path = getattr(args, "pte_path", None)
-        sequential_prefill = (
-            args.sequential_prefill or bool(dso_path) or bool(pte_path)
-        )
+        sequential_prefill = args.sequential_prefill or bool(dso_path) or bool(pte_path)
 
         return cls(
             prompt=getattr(args, "prompt", ""),
