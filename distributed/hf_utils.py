@@ -168,11 +168,12 @@ def load_safetensor_weights(
                 print(f"Warning: {param} not found in weight map, skipping")
             elif weight_map.get(param) == file:
                 print(f"Loading param: {param}")
-                old_param = new_to_old_keymap.get(param)
+                model_param = 'model.' + param 
+                old_param = new_to_old_keymap.get(model_param)
                 print(f"REMAPPED - {param=} -> {old_param=}")
-            
+                 
                 if old_param in checkpoint:
-                    print(f"Loading {old_param} param within: {param}")
+                    print(f"Loading {old_param} param for: {param}")
                     stage_state_dict[param] = checkpoint[old_param]
                     updated_states[param] = None
                 
