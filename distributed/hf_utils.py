@@ -174,7 +174,10 @@ def load_safetensor_weights(
                  
                 if old_param in checkpoint:
                     print(f"Loading {old_param} param for: {param}")
-                    stage_state_dict[param] = checkpoint[old_param]
+                    tsafe = checkpoint[old_param]
+                    tshell = stage_state_dict[param]
+                    tsafe = compare_and_reverse(tsafe, tshell)
+                    stage_state_dict[param] = tsafe
                     updated_states[param] = None
                 
 
@@ -257,4 +260,19 @@ def remap_weight_keys(dictionary):
     
     return new_dict, key_mapping
 
+def compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> torch.Tensor:
+    """ Compare the shapes of two tensors and permute second one to match the first one. 
+    This is expressly used for mapping safetensor weights to the tune models.
+    """
+    # Compare the shapes of the two tensors
+    shape1 = tensor1.shape
+    shape2 = tensor2.shape
+    
+    if len(shape1) == len(shape2):
+        return tensor2
+    
+    if shape1 == shape2[::-1]:
+        return tensor2.permute(*range(tensor2.dim() - 1, -1, -1))
+    
+    return tensor2
     
