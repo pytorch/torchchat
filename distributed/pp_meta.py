@@ -80,7 +80,12 @@ def create_model(model_id: str, device: str = "cuda", rank: int = 0) -> Tuple[An
     return model, fake_mode, tokenizer, hf_path
 
 def create_pipeline(model, inputs, world_size: int):
-    layers_per_rank = model.config.num_hidden_layers // world_size
+    # Split model into world_size stages
+    
+    layers_per_rank = len(model.layers) // world_size
+    
+    logger.info(f"Splitting model into {world_size} stages with {layers_per_rank} layers each")
+    
     split_spec = {
         f"model.layers.{i * layers_per_rank}": SplitPoint.BEGINNING
         for i in range(1, world_size)
@@ -123,24 +128,22 @@ def main(model_id: str, world_size: int, device: str):
     logger.info(f"Weight map: {weight_map=}")
     logger.info(f"Weight path: {weight_path=}")
 
-
-    dist.barrier()
-    assert False, "check paths"
-
     # Create pipeline
     logger.info("Creating pipeline...")
     pipe = create_pipeline(model, fake_ids, world_size)
+    logger.info(f"Pipeline created: {pipe=}")
 
     # Stage materialization
     logger.info("Materializing each stage...")
     stage_module = pipe.get_stage_module(rank)
+    logger.info(f"Stage module type: {type(stage_module)}")
     
     logger.info(f"Loading weights into stage {rank}")
-    load_safetensor_weights(stage_module, weight_map, file_location)
+    load_safetensor_weights(stage_module, weight_map, weight_path)
     if rank == 0:
         logger.info(f"After load safe tensor Stage module type: {type(stage_module)}")
     
-    logger.info("About to try to init buffers")
+    '''logger.info("About to try to init buffers")
     if hasattr(model, "buf_init_callbacks"):
         logger.info(f"Initializing buffers with device={device}")
         init_buffers(stage_module, device, model.buf_init_callbacks, model_config)
@@ -149,11 +152,12 @@ def main(model_id: str, world_size: int, device: str):
         #logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
         logger.info(f"{Color.blue}{stage_module.model.rotary_emb=}{Color.reset}")
         logger.info(f"{Color.blue}{stage_module.model.rotary_emb.inv_freq.dtype=}{Color.reset}")
-
+    '''
     #else:
     #    logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
     
-    logger.info(f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{MODEL_CONFIGS[model_size]}{Color.reset}")
+    logger.info(f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{model_id}{Color.reset}")
+
 
     # Create schedule runtime
     stage = pipe.build_stage(rank, device=device)
