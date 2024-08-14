@@ -124,7 +124,7 @@ def main(model_id: str, world_size: int, device: str):
     inputs = tokenizer(prompts, return_tensors="pt", padding=True)
     fake_ids = fake_mode.from_tensor(inputs["input_ids"])
 
-    weight_map, weight_path = get_hf_weight_map_and_path(hf_path)
+    weight_map, weight_path, new_to_old_keymap = get_hf_weight_map_and_path(hf_path)
     logger.info(f"Weight map: {weight_map=}")
     logger.info(f"Weight path: {weight_path=}")
 
@@ -139,7 +139,7 @@ def main(model_id: str, world_size: int, device: str):
     logger.info(f"Stage module type: {type(stage_module)}")
     
     logger.info(f"Loading weights into stage {rank}")
-    load_safetensor_weights(stage_module, weight_map, weight_path)
+    load_safetensor_weights(stage_module, weight_map, weight_path, new_to_old_keymap)
     if rank == 0:
         logger.info(f"After load safe tensor Stage module type: {type(stage_module)}")
     

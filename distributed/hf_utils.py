@@ -130,6 +130,7 @@ def load_safetensor_weights(
     stage_module: torch.nn.Module,
     weight_map: Dict[str, str],
     file_location: str,
+    new_to_old_keymap: Dict[str, str],
     purge_model_prefix: bool = True,
 ):
     stage_state_dict = stage_module.state_dict()
@@ -167,13 +168,13 @@ def load_safetensor_weights(
                 print(f"Warning: {param} not found in weight map, skipping")
             elif weight_map.get(param) == file:
                 print(f"Loading param: {param}")
-                if param in checkpoint:
-                    print(f"matched!  {param=}")
-
-                #if param in checkpoint:
-                    # print(f"Loading param within: {param}")
-                stage_state_dict[param] = checkpoint[param]
-                updated_states[param] = None
+                old_param = new_to_old_keymap.get(param)
+                print(f"REMAPPED - {param=} -> {old_param=}")
+            
+                if old_param in checkpoint:
+                    print(f"Loading {old_param} param within: {param}")
+                    stage_state_dict[param] = checkpoint[old_param]
+                    updated_states[param] = None
                 
 
     print(
@@ -217,12 +218,12 @@ def get_hf_weight_map_and_path(model_id: str) -> Tuple[Dict[str, str], str,]:
     weight_map = read_weights_from_json(index_file)
 
     assert weight_map is not None, f"Weight map not found in config file {index_file}"
-    weight_map = remap_weight_keys(weight_map)
+    weight_map, new_to_old_keymap = remap_weight_keys(weight_map)
     
     weight_path = os.path.dirname(index_file)
     assert os.path.exists(weight_path), f"Weight path {weight_path} does not exist"
 
-    return weight_map, weight_path
+    return weight_map, weight_path, new_to_old_keymap
 
 def remap_weight_keys(dictionary):
     """ Remap the keys of a dictionary to match the expected format of the tune model. """
@@ -241,11 +242,18 @@ def remap_weight_keys(dictionary):
     }
     
     new_dict = {}
-    for key, value in dictionary.items():
-        new_key = key
+    key_mapping = {}
+    
+    for old_key, value in dictionary.items():
+        new_key = old_key
         for old_word, new_word in replacements.items():
             if old_word in new_key:
                 new_key = new_key.replace(old_word, new_word)
+        
         new_dict[new_key] = value
-    print(f"updated weight map {new_dict=}")
-    return new_dict
+        # if new_key != old_key:
+        key_mapping[new_key] = old_key
+    
+    return new_dict, key_mapping
+
+    
