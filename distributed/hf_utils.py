@@ -177,10 +177,13 @@ def load_safetensor_weights(
 
     missing_keys = set(stage_state_dict.keys()) - updated_states
 
-    # ignore saying partial loading if only missing items are cache layers (we don't load cache layers)
+    # ignore saying partial loading, if only missing items are cache layers (we don't load cache layers)
     if ignore_cache_layers:
+        start_len = len(missing_keys)
         missing_keys = {k for k in missing_keys if not k.endswith(".cache")}
-        logger.info("Ignoring missing cache layers")
+        after_len = len(missing_keys)
+        if after_len < start_len:
+            logger.info(f"Ignoring {start_len - after_len} missing cache layers")
 
     if missing_keys:
         logger.warning(f"Partially updated state dict. Missing {len(missing_keys)} keys: {missing_keys}")
@@ -259,7 +262,6 @@ def remap_weight_keys(dictionary):
                 logger.info(f"Old key: {old_key}, {value=}, New key: {new_key}")
         
         new_dict[new_key] = value
-        # if new_key != old_key:
         key_mapping[new_key] = old_key
     return new_dict, key_mapping
 

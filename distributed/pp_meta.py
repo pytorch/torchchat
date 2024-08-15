@@ -159,10 +159,9 @@ def main(model_id: str, world_size: int, device: str):
     '''
     #else:
     #    logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
-    
-    logger.info(f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{model_id}{Color.reset}")
-    assert False, "check params load count"
-
+    dist.barrier()
+    logger.info(f"{Color.white}\n--->  {Color.yellow}{rank=} {Color.blue}Successfully traced, segmented and loaded weights for model {Color.green}{model_id}{Color.reset}")
+    dist.barrier()
     # Create schedule runtime
     stage = pipe.build_stage(rank, device=device)
     #if rank == 0:
