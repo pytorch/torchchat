@@ -43,7 +43,6 @@ from torchao.quantization.quant_api import (
     Int8DynActInt4WeightQuantizer,
     quantize_,
 )
-from torchao.utils import unwrap_tensor_subclass
 
 
 #########################################################################
@@ -74,7 +73,6 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
             # Use tensor subclass API for int4 weight only.
             if device == "cuda" and quantizer == "linear:int4":
                 quantize_(model, int4_weight_only(q_kwargs["groupsize"]))
-                unwrap_tensor_subclass(model)
                 continue
             # Use dtype precision specified in user config, else fallback on global precision.
             if "precision" in quantize_options:
