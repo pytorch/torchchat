@@ -132,63 +132,63 @@ def load_safetensor_weights(
     file_location: str,
     new_to_old_keymap: Dict[str, str],
     purge_model_prefix: bool = True,
-):
+    ignore_cache_layers: bool = True,
+) -> Tuple[int, int]:
+    """ Load safetensor weights into a stage module.  
+    Returns the number of weights loaded and the number of missing weights. 
+    """
+    def remove_model_prefix(d: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
+        return {k.removeprefix('model.'): v for k, v in d.items()}
+
     stage_state_dict = stage_module.state_dict()
     if purge_model_prefix:
-        stage_state_dict = {key.removeprefix('model.'): value for key, value in stage_state_dict.items()}
-        weight_map = {key.removeprefix('model.'): value for key, value in weight_map.items()}
+        stage_state_dict = remove_model_prefix(stage_state_dict)
+        weight_map = remove_model_prefix(weight_map)
 
-    print(f"Stage state dict: len = {len(stage_state_dict)}, {stage_state_dict.keys()=}")
-    updated_states = {}
+    logger.info(f"Stage state dict: len = {len(stage_state_dict)}, keys = {list(stage_state_dict.keys())}")
 
-    needed_files = set() 
-    #    weight_map.get(param, None)
-    #    for param in stage_state_dict.keys()
-    #    if weight_map.get(param, None)
-    #)
+    updated_states = set()
+    needed_files = {file for file in weight_map.values() if file is not None}
 
-    # The file a param is saved in
-    for param in stage_state_dict.keys():
-        file = weight_map.setdefault(param, None)
-        print(f"mapping {file=}, {param=}")
-        if file:
-            needed_files.add(file)
-    print(f"Needed files: {needed_files=}")
+    logger.info(f"Needed files: {needed_files}")
 
     for file in needed_files:
-        print(f"Loading file: {file}")
+        logger.info(f"Loading file: {file}")
         full_path = os.path.join(file_location, file)
-        checkpoint = open_hf_safetensor(full_path)
-        if checkpoint is None:
-            continue
+        try:
+            with safe_open(full_path, framework="pt", device="cuda") as checkpoint:
+                for param, file_with_param in weight_map.items():
+                    if file_with_param == file and param in stage_state_dict:
+                        model_param = 'model.' + param 
+                        old_param = new_to_old_keymap.get(model_param)
+                        
+                        if old_param in checkpoint.keys():
+                            checkpoint_tensor = checkpoint.get_tensor(old_param)
+                            stage_tensor = stage_state_dict[param]
+                            checkpoint_tensor = compare_and_reverse(checkpoint_tensor, stage_tensor)
+                            stage_state_dict[param] = checkpoint_tensor
+                            updated_states.add(param)
+                        else:
+                            logger.warning(f"Parameter {old_param} not found in checkpoint from {model_param}, skipping")
+        except FileNotFoundError:
+            logger.error(f"File not found: {full_path}")
+        except Exception as e:
+            logger.error(f"Error loading {full_path}: {str(e)}")
 
-        for param in stage_state_dict.keys():
-            file_with_param = weight_map.get(param, None)
-            if not file_with_param:
-                print(f"Warning: {param} not found in weight map, skipping")
-            elif weight_map.get(param) == file:
-                #print(f"Loading param: {param}")
-                model_param = 'model.' + param 
-                old_param = new_to_old_keymap.get(model_param)
-                #print(f"REMAPPED - {param=} -> {old_param=}")
-                 
-                if old_param in checkpoint:
-                    #print(f"Loading {old_param} param for: {param}")
-                    tsafe = checkpoint[old_param]
-                    tshell = stage_state_dict[param]
-                    tsafe = compare_and_reverse(tsafe, tshell)
-                    stage_state_dict[param] = tsafe
-                    updated_states[param] = None
-                
-
-    print(
-        "Fully updated state dict"
-        if stage_state_dict.keys() == updated_states.keys()
-        else "Partially updated state dict...missing {len(stage_state_dict.keys() - updated_states.keys())} keys"
-    )
-    stage_module.load_state_dict(stage_state_dict, assign=True)
-    # print(f"Loaded {len(updated_states)} weights into stage module")
+    missing_keys = set(stage_state_dict.keys()) - updated_states
     
+    if missing_keys:
+        if ignore_cache_layers:
+            missing_keys = {k for k in missing_keys if not k.endswith(".cache")}
+        logger.warning(f"Partially updated state dict. Missing {len(missing_keys)} keys: {missing_keys}")
+    else:
+        logger.info("Fully updated state dict")
+
+    stage_module.load_state_dict(stage_state_dict, strict=False)
+    logger.info(f"Loaded {len(updated_states)} weights into stage module")
+
+    return len(updated_states), len(missing_keys)
+  
 
 def read_weights_from_json(file_path: str) -> Optional[Dict[str, str]]:
     try:
