@@ -148,8 +148,8 @@ def main(model_id: str, world_size: int, device: str):
     fake_ids = fake_mode.from_tensor(inputs["input_ids"])
 
     weight_map, weight_path, new_to_old_keymap = get_hf_weight_map_and_path(hf_path)
-    logger.info(f"Weight map: {weight_map=}")
-    logger.info(f"Weight path: {weight_path=}")
+    #logger.info(f"Weight map: {weight_map=}")
+    #logger.info(f"Weight path: {weight_path=}")
 
     # Create pipeline
     logger.info("Creating pipeline...")
@@ -163,7 +163,7 @@ def main(model_id: str, world_size: int, device: str):
 
     logger.info(f"Loading weights into stage {rank}")
     total_weight_count, missing_weight_count = load_safetensor_weights(
-        stage_module, weight_map, weight_path, new_to_old_keymap
+        stage_module, weight_map, weight_path, new_to_old_keymap, device
     )
 
     logger.info(

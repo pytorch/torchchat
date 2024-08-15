@@ -143,6 +143,7 @@ def load_safetensor_weights(
     weight_map: Dict[str, str],
     file_location: str,
     new_to_old_keymap: Dict[str, str],
+    _device: torch.device,
     purge_model_prefix: bool = True,
     ignore_cache_layers: bool = True,
 ) -> Tuple[int, int]:
@@ -150,6 +151,10 @@ def load_safetensor_weights(
     Returns the number of weights loaded and the number of missing weights.
     weight_map = {model_param: file_with_param}  # output.weight: model.safetensors.index.json
     new_to_old_keymap = {model_param: old_param}  # output.weight: lm_head.weight
+    sample from safetensor:
+    "model.layers.31.self_attn.v_proj.weight": "model-00003-of-00004.safetensors",
+    vs tune:
+    "layers.31.attn.v_proj.weight"
     """
 
     def remove_model_prefix(d: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
@@ -160,6 +165,7 @@ def load_safetensor_weights(
         stage_state_dict = remove_model_prefix(stage_state_dict)
         weight_map = remove_model_prefix(weight_map)
 
+    logger.info(f"{_device=}")
     # logger.info(f"Stage state dict: len = {len(stage_state_dict)}, keys = {list(stage_state_dict.keys())}")
 
     updated_states = set()
@@ -179,6 +185,7 @@ def load_safetensor_weights(
                             logger.info(
                                 f"skipping model prefix for {param} from {file_with_param}"
                             )
+                            model_param = param
                         else:
                             model_param = "model." + param
 
@@ -193,9 +200,16 @@ def load_safetensor_weights(
                             stage_state_dict[param] = checkpoint_tensor
                             updated_states.add(param)
                         else:
-                            logger.warning(
-                                f"**** Parameter {old_param} not found in checkpoint from {model_param}, skipping"
-                            )
+                            # catastrophic...
+                            if param.endswith("weight"):
+                                logger.warning(
+                                    f"**** Parameter {param} / {old_param} not found in checkpoint from {file_with_param}, please check..."
+                                )
+                            else:
+                                # ignore cache and similar generated layers
+                                logger.info(
+                                    f"**** Parameter {old_param} not found in checkpoint from {model_param}, skipping"
+                                )
 
         except FileNotFoundError:
             logger.error(f"File not found: {full_path}")
@@ -216,6 +230,7 @@ def load_safetensor_weights(
         logger.warning(
             f"Partially updated state dict. Missing {len(missing_keys)} keys: {missing_keys}"
         )
+        logger.warning(f"debug info: \n\n{stage_state_dict=}\n\n{weight_map=}\n\n")
     else:
         logger.info("Fully updated state dict.")
 
@@ -296,7 +311,7 @@ def remap_weight_keys(dictionary):
         for old_word, new_word in replacements.items():
             if old_word in new_key:
                 new_key = new_key.replace(old_word, new_word)
-                logger.info(f"Old key: {old_key}, {value=}, New key: {new_key}")
+                #logger.info(f"Old key: {old_key}, {value=}, New key: {new_key}")
 
         new_dict[new_key] = value
         key_mapping[new_key] = old_key
