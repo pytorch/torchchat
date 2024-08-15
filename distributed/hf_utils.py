@@ -138,7 +138,7 @@ def load_safetensor_weights(
         stage_state_dict = {key.removeprefix('model.'): value for key, value in stage_state_dict.items()}
         weight_map = {key.removeprefix('model.'): value for key, value in weight_map.items()}
 
-    print(f"Stage state dict: {stage_state_dict.keys()}")
+    print(f"Stage state dict: len = {len(stage_state_dict)}, {stage_state_dict.keys()=}")
     updated_states = {}
 
     needed_files = set() 
@@ -167,13 +167,13 @@ def load_safetensor_weights(
             if not file_with_param:
                 print(f"Warning: {param} not found in weight map, skipping")
             elif weight_map.get(param) == file:
-                print(f"Loading param: {param}")
+                #print(f"Loading param: {param}")
                 model_param = 'model.' + param 
                 old_param = new_to_old_keymap.get(model_param)
-                print(f"REMAPPED - {param=} -> {old_param=}")
+                #print(f"REMAPPED - {param=} -> {old_param=}")
                  
                 if old_param in checkpoint:
-                    print(f"Loading {old_param} param for: {param}")
+                    #print(f"Loading {old_param} param for: {param}")
                     tsafe = checkpoint[old_param]
                     tshell = stage_state_dict[param]
                     tsafe = compare_and_reverse(tsafe, tshell)
@@ -184,12 +184,11 @@ def load_safetensor_weights(
     print(
         "Fully updated state dict"
         if stage_state_dict.keys() == updated_states.keys()
-        else "Partially updated state dict"
+        else "Partially updated state dict...missing {len(stage_state_dict.keys() - updated_states.keys())} keys"
     )
     stage_module.load_state_dict(stage_state_dict, assign=True)
-    print(f"Loaded {len(updated_states)} weights into stage module")
-    dist.barrier()
-    assert False, "check weights"
+    # print(f"Loaded {len(updated_states)} weights into stage module")
+    
 
 def read_weights_from_json(file_path: str) -> Optional[Dict[str, str]]:
     try:
@@ -240,8 +239,8 @@ def remap_weight_keys(dictionary):
         'down_proj':'w1',
         'gate_proj':'w2',
         'up_proj':'w3',
-        'norm.weight':'norm',
-        'lm_head':'output',
+        'norm.weight':'norm.scale',
+        'lm_head.weight':'output.weight',
         
     }
     
