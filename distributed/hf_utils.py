@@ -12,7 +12,7 @@ import torch.distributed as dist
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.INFO)
 # default hf cache lives in ~/.cache/huggingface/hub
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
@@ -176,13 +176,16 @@ def load_safetensor_weights(
             logger.error(f"Error loading {full_path}: {str(e)}")
 
     missing_keys = set(stage_state_dict.keys()) - updated_states
-    
+
+    # ignore saying partial loading if only missing items are cache layers (we don't load cache layers)
+    if ignore_cache_layers:
+        missing_keys = {k for k in missing_keys if not k.endswith(".cache")}
+        logger.info("Ignoring missing cache layers")
+
     if missing_keys:
-        if ignore_cache_layers:
-            missing_keys = {k for k in missing_keys if not k.endswith(".cache")}
         logger.warning(f"Partially updated state dict. Missing {len(missing_keys)} keys: {missing_keys}")
     else:
-        logger.info("Fully updated state dict")
+        logger.info("Fully updated state dict.")
 
     stage_module.load_state_dict(stage_state_dict, strict=False)
     logger.info(f"Loaded {len(updated_states)} weights into stage module")
