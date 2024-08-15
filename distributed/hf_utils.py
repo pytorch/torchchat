@@ -251,15 +251,16 @@ def remap_weight_keys(dictionary):
     key_mapping = {}
     
     for old_key, value in dictionary.items():
+        
         new_key = old_key
         for old_word, new_word in replacements.items():
             if old_word in new_key:
                 new_key = new_key.replace(old_word, new_word)
+                logger.info(f"Old key: {old_key}, {value=}, New key: {new_key}")
         
         new_dict[new_key] = value
         # if new_key != old_key:
         key_mapping[new_key] = old_key
-    
     return new_dict, key_mapping
 
 def compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> torch.Tensor:

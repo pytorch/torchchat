@@ -21,6 +21,7 @@ from hf_utils import get_hf_tokenizer, load_safetensor_weights, read_weights_fro
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 # Model configuration
@@ -139,10 +140,13 @@ def main(model_id: str, world_size: int, device: str):
     logger.info(f"Stage module type: {type(stage_module)}")
     
     logger.info(f"Loading weights into stage {rank}")
-    load_safetensor_weights(stage_module, weight_map, weight_path, new_to_old_keymap)
+    total_weight_count, missing_weight_count = load_safetensor_weights(stage_module, weight_map, weight_path, new_to_old_keymap)
+    logger.info(f"Loaded {total_weight_count} weights into stage {rank} with {missing_weight_count} missing")
+    
     if rank == 0:
         logger.info(f"After load safe tensor Stage module type: {type(stage_module)}")
-    
+
+    dist.barrier() # wait for all ranks to finish loading weights
     '''logger.info("About to try to init buffers")
     if hasattr(model, "buf_init_callbacks"):
         logger.info(f"Initializing buffers with device={device}")
@@ -157,7 +161,7 @@ def main(model_id: str, world_size: int, device: str):
     #    logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
     
     logger.info(f"{Color.blue}\n--->  {rank=} Successfully traced, segmented and loaded weights for model {Color.green}{model_id}{Color.reset}")
-
+    assert False, "check params load count"
 
     # Create schedule runtime
     stage = pipe.build_stage(rank, device=device)
