@@ -17,7 +17,7 @@ from modeling_utils import init_on_meta_device, check_rope_embedding, print_mode
 from torchtune.models.llama3 import llama3_8b, llama3_70b, Llama3Tokenizer
 from torchtune.models.llama3_1 import llama3_1_405b
 from hf_utils import get_hf_tokenizer, load_safetensor_weights, read_weights_from_json, get_hf_weight_map_and_path
-
+import time
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -141,7 +141,9 @@ def main(model_id: str, world_size: int, device: str):
     
     logger.info(f"Loading weights into stage {rank}")
     total_weight_count, missing_weight_count = load_safetensor_weights(stage_module, weight_map, weight_path, new_to_old_keymap)
+    
     logger.info(f"Loaded {total_weight_count} weights into stage {rank} with {missing_weight_count} missing")
+    assert missing_weight_count == 0, f"Missing {missing_weight_count} weights in stage {rank}"
     
     if rank == 0:
         logger.info(f"After load safe tensor Stage module type: {type(stage_module)}")
@@ -159,9 +161,10 @@ def main(model_id: str, world_size: int, device: str):
     '''
     #else:
     #    logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
+    
+    logger.info(f"{Color.green}\n--->  {Color.yellow}{rank=} {Color.blue}Successfully traced, segmented and loaded weights for model {Color.green}{model_id}{Color.reset}")
     dist.barrier()
-    logger.info(f"{Color.white}\n--->  {Color.yellow}{rank=} {Color.blue}Successfully traced, segmented and loaded weights for model {Color.green}{model_id}{Color.reset}")
-    dist.barrier()
+
     # Create schedule runtime
     stage = pipe.build_stage(rank, device=device)
     #if rank == 0:
@@ -172,7 +175,7 @@ def main(model_id: str, world_size: int, device: str):
 
     logger.info(f"{rank=} Completed stage building:  {stage=}...")
     #logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
-    logger.info(f"{Color.blue}{stage_module.print_readable()=}{Color.reset}")
+    #logger.info(f"{Color.blue}{stage_module.print_readable()=}{Color.reset}")
 
     # Run
     # Run time inputs

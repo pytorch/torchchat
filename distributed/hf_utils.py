@@ -8,6 +8,7 @@ import logging
 import os
 import json
 import torch.distributed as dist
+import time
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -136,6 +137,8 @@ def load_safetensor_weights(
 ) -> Tuple[int, int]:
     """ Load safetensor weights into a stage module.  
     Returns the number of weights loaded and the number of missing weights. 
+    weight_map = {model_param: file_with_param}  # output.weight: model.safetensors.index.json
+    new_to_old_keymap = {model_param: old_param}  # output.weight: lm_head.weight
     """
     def remove_model_prefix(d: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         return {k.removeprefix('model.'): v for k, v in d.items()}
@@ -145,7 +148,7 @@ def load_safetensor_weights(
         stage_state_dict = remove_model_prefix(stage_state_dict)
         weight_map = remove_model_prefix(weight_map)
 
-    logger.info(f"Stage state dict: len = {len(stage_state_dict)}, keys = {list(stage_state_dict.keys())}")
+    #logger.info(f"Stage state dict: len = {len(stage_state_dict)}, keys = {list(stage_state_dict.keys())}")
 
     updated_states = set()
     needed_files = {file for file in weight_map.values() if file is not None}
@@ -153,13 +156,18 @@ def load_safetensor_weights(
     logger.info(f"Needed files: {needed_files}")
 
     for file in needed_files:
-        logger.info(f"Loading file: {file}")
+        logger.info(f"Loading checkpoint file: {file}")
         full_path = os.path.join(file_location, file)
         try:
             with safe_open(full_path, framework="pt", device="cuda") as checkpoint:
                 for param, file_with_param in weight_map.items():
                     if file_with_param == file and param in stage_state_dict:
-                        model_param = 'model.' + param 
+                        # have to special case output.weight as only one not preceeded with model.
+                        if param =='output.weight':
+                            logger.info(f"skipping model prefix for {param} from {file_with_param}")
+                        else:
+                            model_param = 'model.' + param 
+
                         old_param = new_to_old_keymap.get(model_param)
                         
                         if old_param in checkpoint.keys():
@@ -169,7 +177,8 @@ def load_safetensor_weights(
                             stage_state_dict[param] = checkpoint_tensor
                             updated_states.add(param)
                         else:
-                            logger.warning(f"Parameter {old_param} not found in checkpoint from {model_param}, skipping")
+                            logger.warning(f"**** Parameter {old_param} not found in checkpoint from {model_param}, skipping")
+    
         except FileNotFoundError:
             logger.error(f"File not found: {full_path}")
         except Exception as e:
