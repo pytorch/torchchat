@@ -43,6 +43,7 @@ from torchao.quantization.quant_api import (
     Int8DynActInt4WeightQuantizer,
     quantize_,
 )
+from torchao.utils import unwrap_tensor_subclass
 
 
 #########################################################################
@@ -50,11 +51,11 @@ from torchao.quantization.quant_api import (
 
 
 def quantize_model(
-    model: nn.Module, 
-    device, 
-    quantize_options, 
-    tokenizer=None, 
-    support_tensor_subclass:bool=True
+    model: nn.Module,
+    device,
+    quantize_options,
+    tokenizer=None,
+    support_tensor_subclass: bool = True,
 ):
     """
     Quantize the specified model using the quantizers described by

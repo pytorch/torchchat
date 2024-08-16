@@ -126,6 +126,7 @@ def main(args):
             quantize,
             tokenizer,
             max_seq_length=builder_args.max_seq_length,
+            support_tensor_subclass=output_dso_path is None,
         )
         model_to_pte = model
         model_to_dso = model
