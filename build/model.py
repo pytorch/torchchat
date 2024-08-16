@@ -154,7 +154,8 @@ class Transformer(nn.Module):
             TransformerBlock(config) for _ in range(config.n_layers)
         )
         self.norm = RMSNorm(config.dim, eps=config.norm_eps)
-        self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
+        #self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
+        self.output = lambda x: torch.empty(x.shape[:-1] + (config.vocab_size,), dtype=x.dtype, device=x.device)
 
         # self.freqs_cis: Optional[Tensor] = None
         # self.mask_cache: Optional[Tensor] = None
@@ -247,15 +248,22 @@ class Attention(nn.Module):
         # key, query, value projections for all heads, but in a batch
         # total_head_dim = (config.n_heads + 2 * config.n_local_heads) * config.head_dim
         # self.wqkv = nn.Linear(config.dim, total_head_dim, bias=False)
-        self.wq = nn.Linear(config.dim, config.n_heads * config.head_dim, bias=False)
-        self.wk = nn.Linear(
-            config.dim, config.n_local_heads * config.head_dim, bias=False
-        )
-        self.wv = nn.Linear(
-            config.dim, config.n_local_heads * config.head_dim, bias=False
-        )
 
-        self.wo = nn.Linear(config.dim, config.dim, bias=False)
+        # self.wq = nn.Linear(config.dim, config.n_heads * config.head_dim, bias=False)
+        # self.wk = nn.Linear(
+        #     config.dim, config.n_local_heads * config.head_dim, bias=False
+        # )
+        # self.wv = nn.Linear(
+        #     config.dim, config.n_local_heads * config.head_dim, bias=False
+        # )
+
+        # self.wo = nn.Linear(config.dim, config.dim, bias=False)
+
+        self.wq = lambda x: torch.empty(x.shape[:-1] + (config.n_heads * config.head_dim,), dtype=x.dtype, device=x.device)
+        self.wk = lambda x: torch.empty(x.shape[:-1] + (config.n_local_heads * config.head_dim,), dtype=x.dtype, device=x.device)
+        self.wv = lambda x: torch.empty(x.shape[:-1] + (config.n_local_heads * config.head_dim,), dtype=x.dtype, device=x.device)
+        self.wo = lambda x: torch.empty(x.shape[:-1] + (config.dim,), dtype=x.dtype, device=x.device)
+
         self.kv_cache = None
 
         self.n_heads = config.n_heads
@@ -331,7 +339,8 @@ class Attention(nn.Module):
 
         k = k.repeat_interleave(self.n_heads // self.n_local_heads, dim=1)
         v = v.repeat_interleave(self.n_heads // self.n_local_heads, dim=1)
-        y = F.scaled_dot_product_attention(q, k, v, attn_mask=mask, dropout_p=0.0)
+        # y = F.scaled_dot_product_attention(q, k, v, attn_mask=mask, dropout_p=0.0)
+        y = q
 
         y = y.transpose(1, 2).contiguous().view(bsz, seqlen, self.dim)
 
@@ -342,9 +351,13 @@ class Attention(nn.Module):
 class FeedForward(nn.Module):
     def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
-        self.w1 = nn.Linear(config.dim, config.hidden_dim, bias=False)
-        self.w2 = nn.Linear(config.hidden_dim, config.dim, bias=False)
-        self.w3 = nn.Linear(config.dim, config.hidden_dim, bias=False)
+        # self.w1 = nn.Linear(config.dim, config.hidden_dim, bias=False)
+        # self.w2 = nn.Linear(config.hidden_dim, config.dim, bias=False)
+        # self.w3 = nn.Linear(config.dim, config.hidden_dim, bias=False)
+
+        self.w1 = lambda x: torch.empty(x.shape[:-1] + (config.hidden_dim,), dtype=x.dtype, device=x.device)
+        self.w2 = lambda x: torch.empty(x.shape[:-1] + (config.dim,), dtype=x.dtype, device=x.device)
+        self.w3 = lambda x: torch.empty(x.shape[:-1] + (config.hidden_dim,), dtype=x.dtype, device=x.device)
 
     def forward(self, x: Tensor) -> Tensor:
         return self.w2(F.silu(self.w1(x)) * self.w3(x))
