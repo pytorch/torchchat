@@ -440,6 +440,7 @@ def _initialize_model(
     quantize,
     tokenizer=None,
     max_seq_length=None,
+    support_tensor_subclass: bool = True,
 ):
     print("Loading model...")
 
@@ -510,7 +511,13 @@ def _initialize_model(
         if quantize:
             print(f"Quantizing the model with: {quantize}")
             with measure_time("Time to quantize model: {time:.02f} seconds"):
-                quantize_model(model, builder_args.device, quantize, tokenizer)
+                quantize_model(
+                    model,
+                    builder_args.device,
+                    quantize,
+                    tokenizer,
+                    support_tensor_subclass,
+                )
                 device_sync(device=builder_args.device)
 
         if builder_args.setup_caches:
