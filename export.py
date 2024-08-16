@@ -143,6 +143,7 @@ def main(args):
             model_to_dso = _initialize_model(
                 builder_args,
                 quantize,
+                support_tensor_subclass=False,
             )
             _unset_gguf_kwargs(builder_args)
 

@@ -49,7 +49,13 @@ from torchao.quantization.quant_api import (
 ###                  torchchat quantization API                       ###
 
 
-def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
+def quantize_model(
+    model: nn.Module, 
+    device, 
+    quantize_options, 
+    tokenizer=None, 
+    support_tensor_subclass:bool=True
+):
     """
     Quantize the specified model using the quantizers described by
     a quantization dict of the form:
@@ -73,6 +79,8 @@ def quantize_model(model: nn.Module, device, quantize_options, tokenizer=None):
             # Use tensor subclass API for int4 weight only.
             if device == "cuda" and quantizer == "linear:int4":
                 quantize_(model, int4_weight_only(q_kwargs["groupsize"]))
+                if not support_tensor_subclass:
+                    unwrap_tensor_subclass(model)
                 continue
             # Use dtype precision specified in user config, else fallback on global precision.
             if "precision" in quantize_options:
