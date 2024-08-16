@@ -8,6 +8,7 @@ import os
 import json
 import torch.distributed as dist
 import time
+from torch._subclasses import FakeTensor
 
 # Configure logging
 logging.basicConfig(
@@ -193,11 +194,16 @@ def load_safetensor_weights(
 
                         if old_param in checkpoint.keys():
                             checkpoint_tensor = checkpoint.get_tensor(old_param)
+                            assert checkpoint_tensor is not None, f"Tensor not found for {old_param}"
+                            if isinstance(checkpoint_tensor, FakeTensor):
+                                assert False, f"Fake checkpoint tensor found for {old_param}, {checkpoint_tensor=}"
                             stage_tensor = stage_state_dict[param]
                             checkpoint_tensor = compare_and_reverse(
                                 checkpoint_tensor, stage_tensor
                             )
+                            logger.info(f"**** pre load {stage_state_dict[param]=}, {checkpoint_tensor=}")
                             stage_state_dict[param] = checkpoint_tensor
+                            logger.info(f"**** post load {stage_state_dict[param]=}")
                             updated_states.add(param)
                         else:
                             # catastrophic...
@@ -234,7 +240,7 @@ def load_safetensor_weights(
     else:
         logger.info("Fully updated state dict.")
 
-    stage_module.load_state_dict(stage_state_dict, strict=False)
+    stage_module.load_state_dict(stage_state_dict, strict=False, assign=True)
     logger.info(f"Loaded {len(updated_states)} weights into stage module")
 
     return len(updated_states), len(missing_keys)

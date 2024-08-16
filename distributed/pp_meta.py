@@ -153,7 +153,7 @@ def main(model_id: str, world_size: int, device: str):
     inputs = tokenizer(prompts, return_tensors="pt", padding=True)
     fake_ids = fake_mode.from_tensor(inputs["input_ids"])
 
-    weight_map, weight_path, new_to_old_keymap = get_hf_weight_map_and_path(hf_path)
+    
     # logger.info(f"Weight map: {weight_map=}")
     # logger.info(f"Weight path: {weight_path=}")
 
@@ -168,6 +168,7 @@ def main(model_id: str, world_size: int, device: str):
     logger.info(f"Stage module type: {type(stage_module)}")
 
     logger.info(f"Loading weights into stage {rank}")
+    weight_map, weight_path, new_to_old_keymap = get_hf_weight_map_and_path(hf_path)
     total_weight_count, missing_weight_count = load_safetensor_weights(
         stage_module, weight_map, weight_path, new_to_old_keymap, device
     )
@@ -240,7 +241,7 @@ def main(model_id: str, world_size: int, device: str):
     )  # full batch size = 8
 
     inputs = tokenizer(full_batch_prompts, return_tensors="pt", padding=True).to(device)
-    logger.info(f"check {inputs=}")
+    #logger.info(f"check {inputs=}")
 
     # Attach to a schedule
     # number of microbatches = 8 // 2 = 4

@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 from typing import Callable
 import torch.fx as fx
-from torch._subclasses import FakeTensorruff
+from torch._subclasses import FakeTensor
 import logging
 from collections import defaultdict
 
