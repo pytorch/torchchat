@@ -4,14 +4,14 @@ import os
 from typing import Tuple, Any
 import logging
 from argparse import ArgumentParser
-
+import time
 import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import pipeline, SplitPoint, ScheduleGPipe
 from torch._subclasses.fake_tensor import FakeTensorMode
 
 from utils import Color
-from modeling_utils import init_on_meta_device
+from modeling_utils import init_on_meta_device, verify_graph_tensor_properties
 
 from torchtune.models.llama3 import llama3_8b, llama3_70b
 from torchtune.models.llama3_1 import llama3_1_405b
@@ -46,10 +46,10 @@ TUNE_MODEL_CONFIGS = {
         llama3_8b,
         "meta-llama/Meta-Llama-3-8B-Instruct",
     ),  # '/tmp/Meta-Llama-3-8B-Instruct/original/tokenizer.model'),
-    "70b": (llama3_70b, "/tmp/Meta-Llama-3-70B-Instruct/original/tokenizer.model"),
+    "70b": (llama3_70b, "meta-llama/Meta-Llama-3-70B-Instruct"),
     "405b": (
         llama3_1_405b,
-        "/tmp/Meta-Llama-3.1-405B-Instruct/original/mp16/tokenizer.model",
+        "meta-llama/Meta-Llama-3.1-405B-Instruct",
     ),
 }
 
@@ -68,8 +68,9 @@ def create_model(
     ), f"hf path for {model_id} not found in TUNE_MODEL_CONFIGS"
 
     with init_on_meta_device(device="meta"):
-        print(f"about to init model {model_id}")
+        logger.info(f"about to init model on meta device, {model_id=}")
         model = model_func().to(torch.bfloat16)
+
     model.eval()
     if rank == 0:
         # print(model.config)
@@ -193,8 +194,18 @@ def main(model_id: str, world_size: int, device: str):
     logger.info(
         f"{Color.green}\n--->  {Color.yellow}{rank=} {Color.blue}Successfully traced, segmented and loaded weights for model {Color.green}{model_id}{Color.reset}"
     )
-    dist.barrier()
+    
 
+    # Verify graph dtypes
+    proper_graph, error_list = verify_graph_tensor_properties(stage_module)
+    if not proper_graph:
+        logger.error(
+            f"Graph dtypes are not correct for stage {rank}. Errors: {error_list}"
+        )
+        assert False, f"Graph dtypes are not correct for stage {rank}. Errors: {error_list}"
+    logger.info(f"{proper_graph=}, {error_list=}")
+    dist.barrier()
+    time.sleep(5)
     # Create schedule runtime
     stage = pipe.build_stage(rank, device=device)
     # if rank == 0:

@@ -6,7 +6,20 @@ import torch.nn as nn
 from contextlib import contextmanager
 import torch
 import torch.nn as nn
-from typing import Dict, Callable
+from typing import Dict, Callable, List, Tuple
+import torch.fx as fx
+import torch
+import torch.fx as fx
+from torch._subclasses.fake_tensor import FakeTensorMode, FakeTensor
+from torch._subclasses import FakeTensor
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 @contextmanager
 def init_on_meta_device(device: torch.device):
@@ -46,6 +59,66 @@ def init_on_meta_device(device: torch.device):
         nn.Module.register_parameter = old_register_parameter
         for torch_function_name, old_torch_function in tensor_constructors_to_proxy.items():
             setattr(torch, torch_function_name, old_torch_function)
+
+def verify_graph_tensor_properties(graph_module: fx.GraphModule) -> Tuple[bool, List[str]]:
+    """
+    Verify that all tensors in the given fx.GraphModule have either float32 or bfloat16 dtypes,
+    and are not fake or meta tensors.
+    
+    Args:
+        graph_module (fx.GraphModule): The graph module to verify.
+    
+    Returns:
+        Tuple[bool, List[str]]: A tuple containing:
+            - A boolean indicating whether all tensors meet the criteria.
+            - A list of error messages for any tensors that don't meet the criteria.
+    """
+    allowed_dtypes = {torch.float32, torch.bfloat16}
+    all_correct = True
+    error_messages = []
+
+    def check_tensor(tensor: torch.Tensor, name: str):
+        logger.info(f"checking tensor {name} {tensor=} with {tensor.dtype=}")
+        nonlocal all_correct, error_messages
+        if tensor.dtype not in allowed_dtypes:
+            all_correct = False
+            error_messages.append(f"Tensor '{name}' has dtype {tensor.dtype}, which is not allowed.")
+        
+        if isinstance(tensor, FakeTensor):
+            all_correct = False
+            error_messages.append(f"Tensor '{name}' is a fake tensor.")
+        
+        if tensor.is_meta:
+            all_correct = False
+            error_messages.append(f"Tensor '{name}' is a meta tensor.")
+
+    for node in graph_module.graph.nodes:
+        if node.op == 'get_attr':
+            attr_value = getattr(graph_module, node.target)
+            if isinstance(attr_value, torch.Tensor):
+                check_tensor(attr_value, f"{node.op}:{node.target}")
+        elif node.op in ['call_function', 'call_method', 'call_module']:
+            # Check input tensors
+            for arg in node.args:
+                if isinstance(arg, torch.Tensor):
+                    check_tensor(arg, f"{node.op}:{node.target} input")
+            for kwarg in node.kwargs.values():
+                if isinstance(kwarg, torch.Tensor):
+                    check_tensor(kwarg, f"{node.op}:{node.target} input")
+            
+            # Check output tensor
+            if isinstance(node.meta.get('val'), torch.Tensor):
+                check_tensor(node.meta['val'], f"{node.op}:{node.target} output")
+        elif node.op == 'output':
+            # Check output tensors
+            if isinstance(node.args[0], (tuple, list)):
+                for i, arg in enumerate(node.args[0]):
+                    if isinstance(arg, torch.Tensor):
+                        check_tensor(arg, f"output[{i}]")
+            elif isinstance(node.args[0], torch.Tensor):
+                check_tensor(node.args[0], "output")
+
+    return all_correct, error_messages
 
 
 def find_main_llama_rope_embeddings(model):
