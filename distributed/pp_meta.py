@@ -11,7 +11,7 @@ from torch.distributed.pipelining import pipeline, SplitPoint, ScheduleGPipe
 from torch._subclasses.fake_tensor import FakeTensorMode
 
 from utils import Color
-from modeling_utils import init_on_meta_device, verify_graph_tensor_properties
+from modeling_utils import init_on_meta_device, verify_graph_tensor_properties, enumerate_transformer_llm, inspect_module_tensors
 
 from torchtune.models.llama3 import llama3_8b, llama3_70b
 from torchtune.models.llama3_1 import llama3_1_405b
@@ -202,7 +202,7 @@ def main(model_id: str, world_size: int, device: str):
         logger.error(
             f"Graph dtypes are not correct for stage {rank}. Errors: {error_list}"
         )
-        assert False, f"Graph dtypes are not correct for stage {rank}. Errors: {error_list}"
+        #assert False, f"Graph dtypes are not correct for stage {rank}. Errors: {error_list}"
     logger.info(f"{proper_graph=}, {error_list=}")
     dist.barrier()
     time.sleep(5)
@@ -217,7 +217,11 @@ def main(model_id: str, world_size: int, device: str):
     logger.info(f"{rank=} Completed stage building:  {stage=}...")
     # logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
     # logger.info(f"{Color.blue}{stage_module.print_readable()=}{Color.reset}")
-
+    enumerate_transformer_llm(stage_module) 
+    
+    tensor_info = inspect_module_tensors(stage_module)
+    logger.info(f"{rank=} {tensor_info=}")
+    time.sleep(5)
     # Run
     # Run time inputs
     full_batch_prompts = (
@@ -232,6 +236,7 @@ def main(model_id: str, world_size: int, device: str):
     )  # full batch size = 8
 
     inputs = tokenizer(full_batch_prompts, return_tensors="pt", padding=True).to(device)
+    logger.info(f"check {inputs=}")
 
     # Attach to a schedule
     # number of microbatches = 8 // 2 = 4

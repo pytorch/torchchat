@@ -13,6 +13,7 @@ import torch.fx as fx
 from torch._subclasses.fake_tensor import FakeTensorMode, FakeTensor
 from torch._subclasses import FakeTensor
 import logging
+from collections import defaultdict
 
 # Configure logging
 logging.basicConfig(
@@ -120,6 +121,43 @@ def verify_graph_tensor_properties(graph_module: fx.GraphModule) -> Tuple[bool, 
 
     return all_correct, error_messages
 
+def inspect_module_tensors(module: nn.Module) -> Dict[str, List[Tuple[str, torch.dtype]]]:
+    """
+    Inspect an nn.Module and return information about its tensor types.
+
+    Args:
+        module (nn.Module): The module to inspect.
+
+    Returns:
+        Dict[str, List[Tuple[str, torch.dtype]]]: A dictionary with keys 'parameters', 'buffers', and 'submodules',
+        each containing a list of (name, dtype) tuples for the respective tensors.
+    """
+    result = defaultdict(list)
+
+    def get_tensor_info(tensor: torch.Tensor, name: str) -> Tuple[str, str]:
+        tensor_type = "Regular"
+        if isinstance(tensor, FakeTensor):
+            tensor_type = "Fake"
+        elif tensor.is_meta:
+            tensor_type = "Meta"
+        return f"{name} ({tensor_type})", str(tensor.dtype)
+
+    # parameters
+    for name, param in module.named_parameters(recurse=False):
+        result['parameters'].append(get_tensor_info(param, name))
+
+    # buffers
+    for name, buffer in module.named_buffers(recurse=False):
+        result['buffers'].append(get_tensor_info(buffer, name))
+
+    # Recursively inspect submodules
+    for name, submodule in module.named_children():
+        submodule_info = inspect_module_tensors(submodule)
+        for key, value in submodule_info.items():
+            result['submodules'].extend([(f"{name}.{item[0]}", item[1]) for item in value])
+
+    return dict(result)
+
 
 def find_main_llama_rope_embeddings(model):
     rope_embeddings = []
@@ -185,10 +223,14 @@ def enumerate_transformer_llm(model, prefix='', output_file=None):
         if list(module.parameters()):
             for param_name, param in module.named_parameters():
                 print_info(f"  Parameter: {full_name}.{param_name}, Shape: {param.shape}")
+                if isinstance(param, FakeTensor):
+                    print_info(f" ***** Fake Tensor: {param_name}")
         
         if list(module.buffers()):
             for buffer_name, buffer in module.named_buffers():
                 print_info(f"  Buffer: {full_name}.{buffer_name}, Shape: {buffer.shape}")
+                if isinstance(buffer, FakeTensor):
+                    print_info(f" ***** Fake Tensor: {buffer_name}")
         
         if list(module.children()):
             enumerate_transformer_llm(module, full_name, output_file)
