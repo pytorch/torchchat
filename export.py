@@ -6,8 +6,10 @@
 
 import argparse
 import os
+from typing import Optional
 
 import torch
+import torch.nn as nn
 
 from build.builder import (
     _initialize_model,
@@ -20,7 +22,8 @@ from build.builder import (
 
 from build.utils import set_backend, set_precision
 from cli import add_arguments_for_verb, arg_init, check_args
-from export_util.export_aoti import export_model as export_model_aoti
+
+from torch.export import Dim
 
 try:
     executorch_export_available = True
@@ -31,6 +34,49 @@ except Exception as e:
 
 
 default_device = "cpu"
+
+
+def export_for_server(
+    model: nn.Module,
+    device: Optional[str] = "cpu",
+    output_path: str = "model.dso",
+    dynamic_shapes: bool = False,
+) -> str:
+    """
+    Export the model using AOT Compile to get a .dso for server use cases.
+
+    Args:
+        model: The model to be exported.
+        device: The device to run the model on.
+        output_path: The path to save the exported model.
+    Returns:
+        The path to the exported model.
+    """
+    if dynamic_shapes:
+        input = (
+            torch.tensor([[1, 9038, 2501, 263, 931]], dtype=torch.int, device=device),
+            torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
+        )
+
+        seq = Dim("seq", min=1, max=model.config.max_seq_length)
+        # Specify that the first dimension of each input is that batch size
+        dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
+    else:
+        input = (
+            torch.tensor([[1]], dtype=torch.int, device=device),
+            torch.tensor([0], dtype=torch.int, device=device),
+        )
+        dynamic_shapes = None
+
+    with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]):
+        so = torch._export.aot_compile(
+            model,
+            args=input,
+            options={"aot_inductor.output_path": output_path},
+            dynamic_shapes=dynamic_shapes,
+        )
+    print(f"The generated DSO model can be found at: {so}")
+    return so
 
 
 def main(args):
@@ -67,10 +113,20 @@ def main(args):
         except:
             tokenizer = None
 
+        if (
+            output_dso_path is not None
+            and builder_args.max_seq_length is None
+            and not builder_args.dynamic_shapes
+        ):
+            print("Setting max_seq_length to 300 for DSO export.")
+            builder_args.max_seq_length = 300
+
         model = _initialize_model(
             builder_args,
             quantize,
             tokenizer,
+            max_seq_length=builder_args.max_seq_length,
+            support_tensor_subclass=output_dso_path is None,
         )
         model_to_pte = model
         model_to_dso = model
@@ -88,6 +144,7 @@ def main(args):
             model_to_dso = _initialize_model(
                 builder_args,
                 quantize,
+                support_tensor_subclass=False,
             )
             _unset_gguf_kwargs(builder_args)
 
@@ -107,7 +164,12 @@ def main(args):
         if output_dso_path:
             output_dso_path = str(os.path.abspath(output_dso_path))
             print(f"Exporting model using AOT Inductor to {output_dso_path}")
-            export_model_aoti(model_to_dso, builder_args.device, output_dso_path, args)
+            export_for_server(
+                model_to_dso,
+                builder_args.device,
+                output_dso_path,
+                builder_args.dynamic_shapes,
+            )
 
 
 if __name__ == "__main__":

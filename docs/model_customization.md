@@ -45,7 +45,17 @@ To reduce the memory bandwidth requirement and to take advantage of higher densi
 the model can use lower precision floating point representations.
 For example, many GPUs and some of the CPUs have good support for bfloat16 and float16.
 
-See the [precision guide](quantization.md#model-precision-dtype-precision-setting) for more details.
+Unlike gpt-fast which uses bfloat16 as default, torchchat uses the dtype
+"fast16". This picks the best performing 16-bit floating point type
+available (for execution with Executorch, macOS/ARM and Linux/x86 platforms).
+For example on macOS, support depends on the OS version, with versions starting
+with 14.0 supporting bfloat16 as support, and float16 for earlier OS version
+based on system support for these data types.
+
+The "fast" data type is also provided as a virtual data type that defaults
+to the best floating point data type available on the selected device.
+Currently, this behaves the same as "fast16", but with "fp32" when exporting
+to ExecuTorch.
 
 
 ## Quantization

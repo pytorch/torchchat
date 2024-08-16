@@ -71,7 +71,7 @@ class GeneratorArgs:
     num_samples: int = 1
     max_new_tokens: int = 200
     top_k: int = 200
-    temperature: int = 0  # deterministic argmax
+    temperature: float = 0.0  # deterministic argmax if 0.0
     compile: bool = False
     compile_prefill: bool = False
     speculate_k: int = 5
@@ -103,16 +103,16 @@ class GeneratorArgs:
 
     @classmethod
     def from_args(cls, args):
-        sequential_prefill = (
-            args.sequential_prefill or bool(args.dso_path) or bool(args.pte_path)
-        )
+        dso_path = getattr(args, "dso_path", None)
+        pte_path = getattr(args, "pte_path", None)
+        sequential_prefill = args.sequential_prefill or bool(dso_path) or bool(pte_path)
 
         return cls(
-            prompt=args.prompt,
+            prompt=getattr(args, "prompt", ""),
             encoded_prompt=None,
             chat_mode=args.chat,
             gui_mode=args.gui,
-            num_samples=args.num_samples,
+            num_samples=getattr(args, "num_samples", 1),
             max_new_tokens=args.max_new_tokens,
             top_k=args.top_k,
             temperature=args.temperature,
@@ -160,9 +160,9 @@ class Generator:
         # global print
         #    from tp import maybe_init_dist
         #    rank = maybe_init_dist()
-        # use_tp = False
+        # use_distributed = False
         self.rank: Optional[int] = None
-        #    if use_tp:
+        #    if use_distributed:
         #        if rank != 0:
         #            # only print on rank 0
         #            print = lambda *args, **kwargs: None
@@ -450,11 +450,15 @@ class Generator:
         sequential_prefill=True,
         callback=lambda x: x,
         max_seq_length: int,
+        seed: Optional[int] = None,
         **sampling_kwargs,
     ) -> torch.Tensor:
         """
         Takes a conditioning sequence (prompt) as input and continues to generate as many tokens as requested.
         """
+        if seed:
+            torch.manual_seed(seed)
+
         is_speculative = draft_model is not None
         device, dtype = prompt.device, prompt.dtype
 
@@ -607,7 +611,7 @@ class Generator:
         )
         if generator_args.compile:
             if (
-                self.is_speculative and self.builder_args.use_tp
+                self.is_speculative and self.builder_args.use_distributed
             ):  # and ("cuda" in builder_args.device):
                 torch._inductor.config.triton.cudagraph_trees = (
                     False  # Bug with cudagraph trees in this case
@@ -736,7 +740,7 @@ class Generator:
                     )
 
             if (i != generator_args.num_samples - 1 or not self.profile) or (
-                self.builder_args.use_tp and self.rank != 0
+                self.builder_args.use_distributed and self.rank != 0
             ):
                 import contextlib
 
@@ -773,7 +777,7 @@ class Generator:
             )
             compilation_time = time.perf_counter() - t0
             if hasattr(prof, "export_chrome_trace"):
-                if self.builder_args.use_tp:
+                if self.builder_args.use_distributed:
                     prof.export_chrome_trace(f"{self.profile}_rank_{self.rank}.json")
                 else:
                     prof.export_chrome_trace(f"{self.profile}.json")

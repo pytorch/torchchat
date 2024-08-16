@@ -162,7 +162,7 @@ After exporting a model, you will want to verify that the model
 delivers output of high quality, and works as expected.  Both can be
 achieved with the Python environment.  All torchchat Python comands
 can work with exported models.  Instead of loading the model from a
-checkpoint or GGUF file, use the the `--dso-path model.so` and
+checkpoint or GGUF file, use the `--dso-path model.so` and
 `--pte-path model.pte` for loading both types of exported models. This
 enables you to verify the quality of the exported models, and run any
 tests that you may have developed in conjunction with exported models

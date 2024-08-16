@@ -170,8 +170,9 @@ def load_model_and_state_dict(
             if load_state_dict:
                 q, s, z = Q4_0.unpack(t)
                 scales_and_zeros = pack_scales_and_zeros(s, z)
+                q_uint8 = (q[::, ::2] << 4 | q[::, 1::2]).to(torch.uint8)
                 weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
-                    q, inner_k_tiles
+                    q_uint8, inner_k_tiles
                 )
                 state_dict[f"{fqn}.weight"] = weight_int4pack
                 state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros
