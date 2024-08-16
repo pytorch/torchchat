@@ -11,7 +11,12 @@ from torch.distributed.pipelining import pipeline, SplitPoint, ScheduleGPipe
 from torch._subclasses.fake_tensor import FakeTensorMode
 
 from utils import Color
-from modeling_utils import init_on_meta_device, verify_graph_tensor_properties, enumerate_transformer_llm, inspect_module_tensors
+from modeling_utils import (
+    init_on_meta_device,
+    verify_graph_tensor_properties,
+    enumerate_transformer_llm,
+    inspect_module_tensors,
+)
 
 from torchtune.models.llama3 import llama3_8b, llama3_70b
 from torchtune.models.llama3_1 import llama3_1_405b
@@ -149,8 +154,8 @@ def main(model_id: str, world_size: int, device: str):
     fake_ids = fake_mode.from_tensor(inputs["input_ids"])
 
     weight_map, weight_path, new_to_old_keymap = get_hf_weight_map_and_path(hf_path)
-    #logger.info(f"Weight map: {weight_map=}")
-    #logger.info(f"Weight path: {weight_path=}")
+    # logger.info(f"Weight map: {weight_map=}")
+    # logger.info(f"Weight path: {weight_path=}")
 
     # Create pipeline
     logger.info("Creating pipeline...")
@@ -194,7 +199,6 @@ def main(model_id: str, world_size: int, device: str):
     logger.info(
         f"{Color.green}\n--->  {Color.yellow}{rank=} {Color.blue}Successfully traced, segmented and loaded weights for model {Color.green}{model_id}{Color.reset}"
     )
-    
 
     # Verify graph dtypes
     proper_graph, error_list = verify_graph_tensor_properties(stage_module)
@@ -202,7 +206,7 @@ def main(model_id: str, world_size: int, device: str):
         logger.error(
             f"Graph dtypes are not correct for stage {rank}. Errors: {error_list}"
         )
-        #assert False, f"Graph dtypes are not correct for stage {rank}. Errors: {error_list}"
+        # assert False, f"Graph dtypes are not correct for stage {rank}. Errors: {error_list}"
     logger.info(f"{proper_graph=}, {error_list=}")
     dist.barrier()
     time.sleep(5)
@@ -217,8 +221,8 @@ def main(model_id: str, world_size: int, device: str):
     logger.info(f"{rank=} Completed stage building:  {stage=}...")
     # logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
     # logger.info(f"{Color.blue}{stage_module.print_readable()=}{Color.reset}")
-    enumerate_transformer_llm(stage_module) 
-    
+    enumerate_transformer_llm(stage_module)
+
     tensor_info = inspect_module_tensors(stage_module)
     logger.info(f"{rank=} {tensor_info=}")
     time.sleep(5)
