@@ -126,6 +126,7 @@ def main(args):
             quantize,
             tokenizer,
             max_seq_length=builder_args.max_seq_length,
+            support_tensor_subclass=output_dso_path is None,
         )
         model_to_pte = model
         model_to_dso = model
@@ -143,6 +144,7 @@ def main(args):
             model_to_dso = _initialize_model(
                 builder_args,
                 quantize,
+                support_tensor_subclass=False,
             )
             _unset_gguf_kwargs(builder_args)
 
