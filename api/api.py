@@ -10,6 +10,8 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
+import torch
+
 from build.utils import device_sync
 
 from generate import Generator, GeneratorArgs
@@ -222,7 +224,6 @@ class OpenAiApiGenerator(Generator):
         """
 
         super().__init__(*args, **kwargs)
-        self.start_pos = 0
         self.max_seq_length = (
             self.model.config.max_seq_length
             + self.speculative_builder_args.speculate_k
@@ -257,20 +258,25 @@ class OpenAiApiGenerator(Generator):
             CompletionResponseChunk objects in response to completion_request as tokens are generated.
 
         """
-        device_sync(device=self.builder_args.device)
 
         # Initialize counters for chunk responses and encode the prompt.
         id = str(uuid.uuid4())
 
         idx = 0
-        buffer = []
-        encoded = self.encode_tokens(
-            completion_request.messages[-1].get("content"),
-            bos=True,
-            device=self.builder_args.device,
+        tokens = self.chat_formatter.encode_dialog_prompt(
+            dialog=[
+                {"role": message["role"], "content": message["content"]}
+                for message in completion_request.messages
+            ]
         )
+
+        encoded = torch.tensor(tokens, dtype=torch.int, device=self.builder_args.device)
+        print(self.tokenizer.decode(tokens))
+
+        start_pos = 0
+
         generator_args = GeneratorArgs(
-            completion_request.messages[-1].get("content"),
+            None,
             max_new_tokens=(
                 int(completion_request.max_tokens)
                 if completion_request.max_tokens
@@ -279,20 +285,23 @@ class OpenAiApiGenerator(Generator):
             encoded_prompt=encoded,
             temperature=float(completion_request.temperature),
             chat_mode=False,
+            sequential_prefill=True,
         )
 
         def callback(x, *, done_generating=False):
             return self._callback(
                 x,
-                buffer=buffer,
+                buffer=None,
                 done_generating=done_generating,
             )
 
+        device_sync(device=self.builder_args.device)
+
         # Process each token, metrics tuple yielded by Generator.generate.
         for y, _ in self.generate(
-            self.model,
-            encoded,
-            generator_args.max_new_tokens,
+            model=self.model,
+            prompt=encoded,
+            max_new_tokens=generator_args.max_new_tokens,
             draft_model=self.draft_model,
             speculate_k=generator_args.speculate_k,
             chat_mode=generator_args.chat_mode,
@@ -300,12 +309,15 @@ class OpenAiApiGenerator(Generator):
             temperature=generator_args.temperature,
             top_k=generator_args.top_k,
             sequential_prefill=generator_args.sequential_prefill,
-            start_pos=self.start_pos,
+            start_pos=start_pos,
             max_seq_length=self.max_seq_length,
             seed=int(completion_request.seed),
         ):
             if y is None:
                 continue
+            elif y.item() == self.tokenizer.eos_id:
+                # Stop generation if the EOS token is generated.
+                break
 
             # Decode the torch.Tensor token to a string and append to the buffer. Separate the sequences with a period token.
             content = "".join(
@@ -330,7 +342,7 @@ class OpenAiApiGenerator(Generator):
                 system_fingerprint=self.system_fingerprint,
             )
             yield chunk_response
-            self.start_pos += y.size(0)
+            start_pos += y.size(0)
             idx += 1
 
         # Yield an ending chunk indicating the generation has completed.
@@ -369,10 +381,4 @@ class OpenAiApiGenerator(Generator):
         )
 
     def _callback(self, x, *, buffer, done_generating):
-        period_id = self.tokenizer.encode(".")[0]
-        buffer.append(self.tokenizer.decode([period_id] + x.tolist())[1:])
-        if (
-            self.is_llama3_model
-            and x.item() == self.tokenizer.special_tokens["<|eot_id|>"]
-        ):
-            buffer = buffer[:-1]  # drop the eot_id from the output buffer
+        pass

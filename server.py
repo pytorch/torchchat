@@ -6,6 +6,10 @@
 
 import json
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 from dataclasses import asdict
 from typing import Dict, List, Union
 
@@ -21,7 +25,7 @@ from generate import GeneratorArgs
 OPENAI_API_VERSION = "v1"
 
 
-def create_app(args):
+def create_app(args):  # noqa: C901
     """
     Creates a flask app that can be used to serve the model as a chat API.
     """
@@ -69,7 +73,7 @@ def create_app(args):
                 for chunk in chunked_completion_generator:
                     if (next_tok := chunk.choices[0].delta.content) is None:
                         next_tok = ""
-                    print(next_tok, end="")
+                    print(next_tok, end="", flush=True)
                     yield json.dumps(_del_none(asdict(chunk)))
 
             return Response(

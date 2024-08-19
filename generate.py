@@ -9,6 +9,8 @@ import logging
 import os
 import textwrap
 import time
+
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -28,24 +30,33 @@ from build.utils import device_sync, set_precision
 from cli import add_arguments_for_verb, arg_init, check_args
 from utils.device_info import get_device_info
 
-B_INST, E_INST = "[INST]", "[/INST]"
-B_SYS, E_SYS = "<<SYS>>", "<</SYS>>"
 
-
-class ChatFormat:
+class _ChatFormatter(ABC):
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
 
-    def encode_header(self, message) -> List[int]:
+    @abstractmethod
+    def encode_dialog_prompt(self, dialog) -> List[int]:
+        raise NotImplementedError()
+
+
+class Llama3ChatFormatter(_ChatFormatter):
+    """Format a chat prompt using special tokens to demarcate roles and messages.
+
+    Refer to the LLaMA3 documentation for more details https://llama.meta.com/docs/model-cards-and-prompt-formats/meta-llama-3
+
+    """
+
+    def encode_header(self, role) -> List[int]:
         tokens = []
         tokens.append(self.tokenizer.special_tokens["<|start_header_id|>"])
-        tokens.extend(self.tokenizer.encode(message["role"], bos=False, eos=False))
+        tokens.extend(self.tokenizer.encode(role, bos=False, eos=False))
         tokens.append(self.tokenizer.special_tokens["<|end_header_id|>"])
         tokens.extend(self.tokenizer.encode("\n\n", bos=False, eos=False))
         return tokens
 
     def encode_message(self, message) -> List[int]:
-        tokens = self.encode_header(message)
+        tokens = self.encode_header(message.role)
         tokens.extend(
             self.tokenizer.encode(message["content"].strip(), bos=False, eos=False)
         )
@@ -62,9 +73,37 @@ class ChatFormat:
         return tokens
 
 
+B_INST, E_INST = "[INST]", "[/INST]"
+B_SYS, E_SYS = "<<SYS>>", "<</SYS>>"
+
+
+class Llama2ChatFormatter(_ChatFormatter):
+    def encode_dialog_prompt(self, dialog) -> List[int]:
+        tokens = self.tokenizer.encode(f"{B_INST} ")
+        first_message = True  # Bool to handle placing the B_INST token. Behavior is weird - the system prompt should have the B_INST, but not the first user message. All following user messages *should* have it. Also, if there is no system prompt, then the user message should have it.
+        for message in dialog:
+            content = message["content"].strip()
+            if message["role"] == "system":
+                encoded = self.tokenizer.encode(f"{B_SYS}\n{content}\n{E_SYS}")
+                first_message = False
+            elif message["role"] == "user":
+                encoded = [self.tokenizer.bos_id()] + self.tokenizer.encode(
+                    f"{B_INST if first_message else ''} {content} {E_INST} "
+                )
+                first_message = True
+            elif message["role"] == "assistant":
+                encoded = self.tokenizer.encode(f"{content}\n\n") + [
+                    self.tokenizer.eos_id()
+                ]
+            tokens += encoded
+        return tokens
+
+
 @dataclass
 class GeneratorArgs:
-    prompt: str = "torchchat is pronounced torch-chat and is so cool because"
+    prompt: Optional[str] = (
+        None  # When passed into the Generator, this will be used as the system prompt
+    )
     encoded_prompt: Optional[torch.Tensor] = None
     chat_mode: bool = False
     gui_mode: bool = False
@@ -188,7 +227,7 @@ class Generator:
             ))
             # fmt: on
             # raise RuntimeError("You need to use --is-chat-model to indicate model has chat support.")
-
+        self.system_prompt = generator_args.prompt
         self.tokenizer = _initialize_tokenizer(self.tokenizer_args)
 
         # Right now the assumption is only llama3 uses tiktokenizer and it
@@ -200,6 +239,11 @@ class Generator:
             logging.debug(
                 "Llama3 model detected in chat mode. Using updated sentence schemas"
             )
+        self.chat_formatter = (
+            Llama3ChatFormatter(self.tokenizer)
+            if self.is_llama3_model
+            else Llama2ChatFormatter(self.tokenizer)
+        )
 
         self.builder_args.setup_caches = False
         self.model = _initialize_model(self.builder_args, self.quantize, self.tokenizer)
@@ -641,8 +685,7 @@ class Generator:
             )
             if get_system_prompt == "y" or get_system_prompt == "Y":
                 self.system_prompt = input("What is your system prompt? \n")
-            if self.is_llama3_model:
-                self.chat_formatter = ChatFormat(self.tokenizer)
+
         else:
             max_seq_length = min(
                 encoded.size(0) + generator_args.max_new_tokens,
@@ -685,7 +728,7 @@ class Generator:
                         prompt, bos=True, device=self.builder_args.device
                     )
                 else:
-                    if self.system_prompt is not None:
+                    if self.system_prompt:
                         encoded = self.chat_formatter.encode_dialog_prompt(
                             [
                                 {"role": "system", "content": self.system_prompt},
