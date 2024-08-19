@@ -13,7 +13,9 @@ import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional, Tuple
+from PIL import Image
+from typing import Any, List, Optional, Tuple, Union, Dict
+from os import PathLike
 
 import torch
 import torch._dynamo.config
@@ -25,11 +27,17 @@ from torchchat.cli.builder import (
     BuilderArgs,
     TokenizerArgs,
 )
-from torchchat.cli.cli import add_arguments_for_verb, arg_init, check_args
-from torchchat.model import Model
+from torchchat.model import Model, ModelType
 from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
 
+# torchtune model definition dependencies
+from torchtune.data import Message    
+from torchtune.models.llama3 import llama3_tokenizer
+from torchtune.training import set_default_dtype
+from torchtune.generation._generation import sample
+
+from _torchchat_test_script import flamingo_transform, padded_collate
 
 class _ChatFormatter(ABC):
     def __init__(self, tokenizer):
@@ -57,9 +65,13 @@ class Llama3ChatFormatter(_ChatFormatter):
 
     def encode_message(self, message) -> List[int]:
         tokens = self.encode_header(message["role"]) 
-        tokens.extend(
-            self.tokenizer.encode(message["content"].strip(), bos=False, eos=False)
-        )
+        if type(message["content"]) is str:
+            tokens.extend(self.tokenizer.encode(message["content"], bos=False, eos=False))
+        elif type(message["content"]) is list:
+            for content in message["content"]:
+                if content["type"] == "text":
+                    tokens.extend(self.tokenizer.encode(content["text"], bos=False, eos=False))
+
         tokens.append(self.tokenizer.special_tokens["<|eot_id|>"])
         return tokens
 
@@ -105,6 +117,7 @@ class GeneratorArgs:
         None  # When passed into the Generator, this will be used as the system prompt
     )
     encoded_prompt: Optional[torch.Tensor] = None
+    image_prompts: Optional[List[Union[str, PathLike, bytes]]] = None # string or Path to an image file or the raw base64 bytes of an image
     chat_mode: bool = False
     gui_mode: bool = False
     num_samples: int = 1
@@ -146,9 +159,16 @@ class GeneratorArgs:
         pte_path = getattr(args, "pte_path", None)
         sequential_prefill = args.sequential_prefill or bool(dso_path) or bool(pte_path)
 
+        image_prompts = getattr(args, "image_prompts", None)
+        if image_prompts:
+            for image_prompt in image_prompts:
+                if type(image_prompt) in [str, PathLike]:
+                    if not os.path.exists(image_prompt):
+                        raise RuntimeError(f"Image prompt {image_prompt} does not exist")
         return cls(
             prompt=getattr(args, "prompt", ""),
             encoded_prompt=None,
+            image_prompts=image_prompts,
             chat_mode=args.chat,
             gui_mode=args.gui,
             num_samples=getattr(args, "num_samples", 1),
@@ -235,15 +255,14 @@ class Generator:
         # Piggy backing off of this flag then for now to identify llama3
         # without prompting user.
         self.is_llama3_model = self.tokenizer_args.is_tiktoken
-        if generator_args.chat_mode and self.is_llama3_model:
-            logging.debug(
-                "Llama3 model detected in chat mode. Using updated sentence schemas"
-            )
-        self.chat_formatter = (
-            Llama3ChatFormatter(self.tokenizer)
-            if self.is_llama3_model
-            else Llama2ChatFormatter(self.tokenizer)
-        )
+        if self.is_llama3_model:
+            self.chat_formatter = Llama3ChatFormatter(self.tokenizer)
+            if generator_args.chat_mode:
+                logging.debug(
+                    "Llama3 model detected in chat mode. Using updated sentence schemas"
+                )
+        else:
+            self.chat_formatter = Llama2ChatFormatter(self.tokenizer)
 
         self.builder_args.setup_caches = False
         self.model = _initialize_model(self.builder_args, self.quantize, self.tokenizer)
@@ -291,7 +310,7 @@ class Generator:
         self,
         logits,
         need_probs: bool,
-        temperature: float = 1.0,
+        temperature: float = 0,
         top_k: Optional[int] = None,
     ):
         if temperature == 0 and not need_probs:
@@ -306,6 +325,7 @@ class Generator:
         model: Model,
         x: torch.Tensor,
         input_pos: torch.Tensor,
+        batch: Optional[Dict[str, Any]] = None, # Inputs for multimodal models
         *,
         sequential_prefill=True,
         **sampling_kwargs,
@@ -319,6 +339,10 @@ class Generator:
                 x_sliced, ip_sliced = x[:, i].view(-1, 1), input_pos[i].view(-1)
                 # logging.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
                 logits = model(x_sliced, ip_sliced)  # (x[:, i], input_pos[i])
+        elif batch is not None:
+            logits = model(**batch)[:, -1]
+            print("logits", logits)
+            return sample(logits, 0, 500)
         else:
             # input_pos: [B, S]
             logits = model(x, input_pos)
@@ -333,11 +357,16 @@ class Generator:
         x: torch.Tensor,
         input_pos: torch.Tensor,
         need_probs: bool,
+        batch: Optional[Dict[str, Any]] = None, # Inputs for multimodal models
         **sampling_kwargs,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         # input_pos: [B, 1]
         assert input_pos.shape[-1] == 1
-        logits = model(x.view(1, -1), input_pos)
+        if model.config.model_type == ModelType.Flamingo and batch is not None:
+            x = x.view(1, -1)
+            logits = model(x, encoder_mask=batch["encoder_mask"][:, -1:])
+        else:
+            logits = model(x.view(1, -1), input_pos)
         # print(f"x: {x},\n  input_pos: {input_pos}\n")
         return self.sample(logits, need_probs=need_probs, **sampling_kwargs)
 
@@ -354,6 +383,7 @@ class Generator:
         input_pos: torch.Tensor,
         num_new_tokens: int,
         need_probs: bool,
+        batch=Optional[Dict[str, Any]], # Inputs for multimodal models
         callback=lambda _: _,
         eos_token_id: int = 2,
         eot_id: Optional[int] = None,
@@ -372,6 +402,7 @@ class Generator:
                     model,
                     out_token,
                     input_pos,
+                    batch=batch,
                     need_probs=need_probs,
                     **sampling_kwargs,
                 )
@@ -391,7 +422,7 @@ class Generator:
                 ):
                     encountered_eos = True
                     final_token, next_prob = self.decode_one_token(
-                        model, cur_token, input_pos, need_probs, **sampling_kwargs
+                        model, cur_token, input_pos, need_probs, batch=batch, **sampling_kwargs
                     )
                     input_pos += 1
                     break
@@ -404,7 +435,7 @@ class Generator:
             )
             new_tokens.append(eos_token.clone())
             eos_token, next_prob = self.decode_one_token(
-                model, eos_token.view(1, -1), input_pos, need_probs, **sampling_kwargs
+                model, eos_token.view(1, -1), input_pos, need_probs, batch=batch, **sampling_kwargs
             )
             input_pos += 1
             yield eos_token.clone(), (
@@ -423,6 +454,7 @@ class Generator:
         cur_token: torch.Tensor,
         input_pos: int,
         speculate_k: int,
+        batch: Optional[Dict[str, Any]] = None, # Inputs for multimodal models
         **sampling_kwargs,
     ) -> torch.Tensor:
         # draft model inference sequentially
@@ -435,6 +467,7 @@ class Generator:
             cur_token,
             orig_input_pos.clone(),
             speculate_k,
+            batch=batch,
             need_probs=True,
             **sampling_kwargs,
         )
@@ -488,6 +521,7 @@ class Generator:
         max_new_tokens: int,
         *,
         chat_mode: bool,
+        batch: Optional[Dict[str, Any]] = None, # List of Image prompt tensors for multimodal models
         start_pos: int = 0,
         draft_model: Model,
         speculate_k: Optional[int] = 8,
@@ -508,6 +542,8 @@ class Generator:
 
         # create an empty tensor of the expected final shape and
         # fill in the current tokens
+        if len(prompt.shape) > 1:
+            prompt = prompt.squeeze(0)
         T = prompt.size(0)
         max_new_tokens = min(max_new_tokens, max_seq_length - start_pos - T)
         T_new = T + max_new_tokens
@@ -515,16 +551,20 @@ class Generator:
         if start_pos == 0:
             model = model.to(device=device)
             with torch.device(device):
-                model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+                model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length, dtype=torch.bfloat16)
                 if is_speculative and draft_model is not model:
                     draft_model.setup_caches(
-                        max_batch_size=1, max_seq_length=max_seq_length
+                        max_batch_size=1, max_seq_length=max_seq_length, dtype=torch.bfloat16
                     )
+            if model.config.model_type == ModelType.Flamingo:
+                model.reset_caches()
 
         # create an empty tensor of the expected final shape and
         # fill in the current tokens
         empty = torch.empty(T_new, dtype=dtype, device=device)
+        
         empty[:T] = prompt
+        
         seq = empty
         input_pos = torch.arange(
             start_pos, T + start_pos, device=device, dtype=torch.int
@@ -535,6 +575,7 @@ class Generator:
             model,
             prompt.view(1, -1),
             input_pos,
+            batch=batch,
             sequential_prefill=sequential_prefill,
             **sampling_kwargs,
         )
@@ -546,8 +587,10 @@ class Generator:
                 sequential_prefill=sequential_prefill,
                 **sampling_kwargs,
             )
+
         time_to_first_token = time.perf_counter() - prefill_t0
         yield None, {"time_to_first_token": time_to_first_token}
+        print(next_token)
         seq[T] = next_token
         # max_new_tokens <= 2 means we are effectively not calling decode_n_tokens().
         callback(next_token.clone().view(-1), done_generating=max_new_tokens <= 2)
@@ -570,6 +613,7 @@ class Generator:
                     cur_token,
                     input_pos,
                     speculate_k,
+                    batch=batch,
                     **sampling_kwargs,
                 )
 
@@ -588,6 +632,7 @@ class Generator:
                 next_token,
                 input_pos,
                 max_new_tokens - 1,
+                batch=batch,
                 callback=callback,
                 need_probs=False,
                 eos_token_id=self.tokenizer.eos_id() if self.tokenizer else 2,
@@ -598,13 +643,8 @@ class Generator:
                 ),
                 **sampling_kwargs,
             ):
-                generated_tokens.append(generated_token)
+                generated_tokens.append(generated_token.view(-1))
                 yield generated_token, None
-
-            seq[T + 1 : T + 1 + len(generated_tokens)] = torch.cat(generated_tokens)
-            seq = seq[
-                : T + 1 + len(generated_tokens)
-            ]  # If we dont generate all the way to max_new_tokens slice off the extra space we allocated.
 
         generate_stats = {
             "accept_counts": accept_counts,
@@ -642,10 +682,37 @@ class Generator:
     ):
         if generator_args.chat_mode:
             print("Starting Interactive Chat")
-        encoded = self.encode_tokens(
-            generator_args.prompt, bos=True, device=self.builder_args.device
-        )
-        logging.debug(encoded)
+
+        if generator_args.image_prompts is not None:
+            print("image prompts", generator_args.image_prompts)
+            transform = flamingo_transform(str(self.tokenizer_args.tokenizer_path))
+            
+            messages = [
+                Message(
+                    role="user",
+                    content=[
+                        {"type": "image"},
+                        {"type": "text", "content": generator_args.prompt},
+                    ],
+                    eot=True,
+                ),
+                Message(role="assistant", content="")
+            ]
+
+            images = [Image.open(generator_args.image_prompts[0])]
+
+            data = transform({"images": images, "messages": messages}, inference=True)
+            batch = padded_collate([data], self.builder_args.device)
+            batch.pop("mask")
+            encoded = batch["tokens"]
+
+        else:
+            encoded = self.encode_tokens(
+                generator_args.prompt, bos=True, device=self.builder_args.device
+            )
+            logging.debug(encoded)
+            batch = None
+
 
         model_size = sum(
             [
@@ -676,7 +743,7 @@ class Generator:
         self.system_prompt = None
         # Set up our max_seq_length
         if generator_args.chat_mode:
-            max_seq_length = self.model.config.transformer_args["text"].max_seq_length
+            max_seq_length = self.model.config.transformer_args.get("text", {}).get("max_seq_length", 2048)
             print(
                 f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye"
             )
@@ -689,7 +756,7 @@ class Generator:
         else:
             max_seq_length = min(
                 encoded.size(0) + generator_args.max_new_tokens,
-                self.model.config.transformer_args["text"].block_size,
+                2048
             )
 
         max_seq_length = (
@@ -799,6 +866,7 @@ class Generator:
                     draft_model=self.draft_model,
                     speculate_k=generator_args.speculate_k,
                     chat_mode=generator_args.chat_mode,
+                    batch=batch,
                     callback=callback,
                     temperature=generator_args.temperature,
                     top_k=generator_args.top_k,

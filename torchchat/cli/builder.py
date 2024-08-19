@@ -21,9 +21,16 @@ from distributed import (
     ParallelDims,
     parallelize_llama,
 )
+
+from torchtune.training import set_default_dtype
+
 from torch.distributed.device_mesh import DeviceMesh
 
-from torchchat.model import Model
+from torchchat.model import Model, ModelType
+try:
+    from _torchchat_test_script import flamingo_meta_to_tune
+catch:
+    print("failed to import _torchchat_test_script")
 
 from torchchat.model_config.model_config import resolve_model_config
 from torchchat.utils.build_utils import (
@@ -230,7 +237,11 @@ class TokenizerArgs:
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
-        use_tiktoken = model.config.transformer_args["text"].use_tiktoken
+        text_args = model.config.transformer_args.get("text")
+        if text_args is None:
+            use_tiktoken = model.config.model_type == ModelType.Flamingo
+        else:
+            use_tiktoken = text_args.use_tiktoken
 
         if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
             raise RuntimeError(
@@ -262,7 +273,7 @@ class TokenizerArgs:
             raise RuntimeError("cannot find tokenizer model")
 
         if not tokenizer_path.is_file():
-            raise RuntimeError(f"did not find tokenizer at {tokenizer_path}")
+            raise RuntimeError(f"did not find tokenizer at {os.path.abspath(tokenizer_path)}")
 
         return cls(
             tokenizer_path=tokenizer_path,
@@ -328,8 +339,8 @@ def _load_model_default(builder_args, only_config=False):
     assert not builder_args.gguf_path
 
     model = _init_model_on_meta_device(builder_args)
-    # checkpoint = torch.load(str(builder_args.checkpoint_path), mmap=True, weights_only=True)
     cps = []
+
     if builder_args.checkpoint_dir is not None:
         # Load multiple checkpoint; ignore the single path.
         builder_args.checkpoint_path = None
@@ -364,9 +375,17 @@ def _load_model_default(builder_args, only_config=False):
     if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
         checkpoint = checkpoint["model"]
     
-    checkpoint = {"text_transformer." + k: v for k, v in checkpoint.items()}
 
-    model.load_state_dict(checkpoint, assign=True, strict=True)
+    if model.config.model_type == ModelType.Flamingo:
+        with set_default_dtype(builder_args.precision), torch.device(builder_args.device):
+            model = Model.from_params(builder_args.params_path)        
+        state_dict = flamingo_meta_to_tune(checkpoint)
+        model.model.load_state_dict(state_dict)
+    else:
+        checkpoint = {"text_transformer." + k: v for k, v in checkpoint.items()}
+        model.load_state_dict(checkpoint, assign=True, strict=True)
+        
+
     return model
 
 
@@ -477,9 +496,9 @@ def _initialize_model(
         #     quantize is None or quantize == "{ }"
         # ), "quantize not valid for exported DSO model. Specify quantization during export."
 
-        with measure_time("Time to load model: {time:.02f} seconds"):
-            model = _load_model(builder_args, only_config=True)
-            device_sync(device=builder_args.device)
+        # with measure_time("Time to load model: {time:.02f} seconds"):
+        model = _load_model(builder_args, only_config=True)
+        device_sync(device=builder_args.device)
 
         try:
             # Replace model forward with the AOT-compiled forward

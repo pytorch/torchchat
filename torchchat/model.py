@@ -144,7 +144,9 @@ class ModelArgs:
             # try to interpret as a single transformer config
             transformer_args: Dict[str, TransformerArgs] = {}
             transformer_args["text"] = TransformerArgs.from_params(loaded_params)
-            model_type = ModelType.TextOnly
+            if model_type := loaded_params.get("model_type", None) is None:
+                model_type = ModelType.TextOnly
+            
         except TypeError:
             # try to interpret as a dict of transformer configs
             model_type = ModelType(loaded_params["model_type"])
@@ -258,7 +260,7 @@ class Model(nn.Module):
             return self.text_transformer(tokens, input_pos)
         else:
             assert self.config.model_type == ModelType.Flamingo
-            if input_pos:
+            if input_pos is not None:
                 warnings.warn("input_pos is not used for Flamingo model. Ignoring it.")
             if encoder_input is None:
                 return self.model(tokens, encoder_mask = encoder_mask)

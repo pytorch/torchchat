@@ -46,7 +46,7 @@ def check_args(args, verb: str) -> None:
     # different semantics.
     if (
         verb not in INVENTORY_VERBS
-        and args.model
+        and vars(args).get("model", None)
         and not is_model_downloaded(args.model, args.model_directory)
     ):
         download_and_convert(args.model, args.model_directory, args.hf_token)
@@ -319,7 +319,14 @@ def _add_generation_args(parser, verb: str) -> None:
             default=1,
             help="Number of samples",
         )
-
+    
+    generator_parser.add_argument(
+        "--image-prompts",
+        nargs="+",
+        type=str,
+        default=None,
+        help="Paths to image files used as image prompts for multimodal models.",
+    )
     generator_parser.add_argument(
         "--chat",
         action="store_true",
