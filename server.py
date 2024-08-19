@@ -75,9 +75,6 @@ def create_app(args):  # noqa: C901
                         next_tok = ""
                     print(next_tok, end="", flush=True)
                     yield f"data:{json.dumps(_del_none(asdict(chunk)))}\n\n"
-                    # wasda = json.dumps(asdict(chunk))
-                    # print(wasda)
-                    # yield wasda
 
             resp = Response(
                 chunk_processor(gen.chunked_completion(req)),
