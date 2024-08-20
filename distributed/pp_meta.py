@@ -81,19 +81,22 @@ def create_model(
         hf_path is not None
     ), f"hf path for {model_id} not found in TUNE_MODEL_CONFIGS"
 
-    with torch.device("meta"):  # init_on_meta_device(device="meta"):
+    with init_on_meta_device(device="meta"):  # torch.device("meta")):
         logger.info(f"about to init model on meta device, {model_id=}")
         model = model_func()
+        model = model.to(torch.bfloat16)
+        
 
     model.eval()
 
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
     with fake_mode:
-        model.to_empty(device="cuda")
+        model.to_empty(device=device)
+        
         logger.info(f"Torch in fake mode: {torch_in_fake_mode()=}")
-
+    
     logger.info(f"exited context - Torch in fake mode: {torch_in_fake_mode()=}")
-
+    
     # res = inspect_module_tensors(model)
     # logger.info(f"Model tensors: {res=}")
     # assert False, "Stop here"
@@ -169,6 +172,7 @@ def main(model_id: str, world_size: int, device: str):
     # Stage materialization
     logger.info("Materializing each stage...")
     stage_module = pipe.get_stage_module(rank)
+    # stage_module.to(torch.bfloat16)
     # logger.info(f"Stage module: {rank=} {stage_module=}")
     # res = inspect_module_tensors(stage_module)
     # logger.info(f"Stage tensors: {rank=},  {res=}")
@@ -189,8 +193,8 @@ def main(model_id: str, world_size: int, device: str):
         missing_weight_count == 0
     ), f"Missing {missing_weight_count} weights in stage {rank}"
 
-    if rank == 0:
-        logger.info(f"After load safe tensor Stage module type: {type(stage_module)}")
+    #if rank == 0:
+    #    logger.info(f"After load safe tensor Stage module type: {type(stage_module)}")
 
     dist.barrier()  # wait for all ranks to finish loading weights
     """logger.info("About to try to init buffers")
@@ -218,24 +222,25 @@ def main(model_id: str, world_size: int, device: str):
         )
         # assert False, f"Graph dtypes are not correct for stage {rank}. Errors: {error_list}"
     logger.info(f"{proper_graph=}, {error_list=}")
-    dist.barrier()
-    time.sleep(5)
+    # dist.barrier()
+    # time.sleep(5)
     # Create schedule runtime
     stage = pipe.build_stage(rank, device=device)
     # if rank == 0:
     #    logger.info(f"{rank=} Completed stage building:  {stage=}...")
     # logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
-
+    
     logger.info("Pipeline Complete ---- Running schedule...")
-
+    # stage = stage.to(torch.bfloat16)
     logger.info(f"{rank=} Completed stage building:  {stage=}...")
+    
     # logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
     # logger.info(f"{Color.blue}{stage_module.print_readable()=}{Color.reset}")
-    enumerate_transformer_llm(stage_module)
+    # enumerate_transformer_llm(stage_module)
 
-    tensor_info = inspect_module_tensors(stage_module)
-    logger.info(f"{rank=} {tensor_info=}")
-    time.sleep(5)
+    # tensor_info = inspect_module_tensors(stage_module)
+    # logger.info(f"{rank=} {tensor_info=}")
+    # time.sleep(5)
     # Run
     # Run time inputs
     full_batch_prompts = (

@@ -442,7 +442,10 @@ def update_state_dict(
 
 
 def log_tensor_info(param: str, tensor: torch.Tensor):
-    logger.info(f"**** post-load {param}[0] = {tensor[0]}")
+    tensor_type = get_tensor_type(tensor)
+    if tensor_type == "Fake":
+        assert False, f"name: {param=}, {tensor=} is fake tensor"
+    logger.info(f"**** post-load {param}[0] = Tensor Type: {tensor_type} {tensor[0]}")
     state_param_details = format_tensor_info(tensor)
     logger.info(f"**** post-load {param} {state_param_details}")
 
