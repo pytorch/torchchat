@@ -245,6 +245,7 @@ def reinit_layers(
     print(f"Total reinitialized modules: {reinitialized_count}")
 
 def get_tensor_type(tensor)-> str:
+    """ Returns the type of a tensor - fake / meta / regular. """
     if isinstance(tensor, FakeTensor):
         return "Fake"
     elif tensor.is_meta:

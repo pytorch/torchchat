@@ -11,6 +11,7 @@ import time
 from torch._subclasses import FakeTensor
 
 from safetensors.torch import load_file
+from modeling_utils import torch_in_fake_mode, get_tensor_type
 
 
 # Configure logging
@@ -113,7 +114,7 @@ def _initialize_buffer(
     logger.info(f"Buffer result: {target_module=}")
 
 
-def open_hf_safetensor(file_path: str) -> Tuple[Dict[str, torch.Tensor], List[str]]:
+def open_hf_safetensor(file_path: str) -> Dict[str, torch.Tensor]:
     """
     Open a SafeTensors file, return all its contents in a dictionary, and check for fake tensors.
 
@@ -130,30 +131,21 @@ def open_hf_safetensor(file_path: str) -> Tuple[Dict[str, torch.Tensor], List[st
         ValueError: If there's an issue reading the SafeTensors file.
     """
     try:
-        # Using safe_open
-        tensors = {}
-        #with safe_open(file_path, framework="pt", device="cpu") as f:
-        #    for key in f.keys():
-        #        tensors[key] = f.get_tensor(key)
+        tensors = load_file(file_path)
+        #for name, tensor in tensors.items():
+        #    logger.info(f"Loaded tensor '{name}' with shape {tensor.shape}")
         
-        # fallback
-        if not tensors:
-            tensors = load_file(file_path)
-        
-        # Check for fake tensors
-        fake_tensors = []
-        for name, tensor in tensors.items():
-            if isinstance(tensor, FakeTensor):
-                fake_tensors.append(name)
-        
-        return tensors, fake_tensors
+        return tensors
 
     except FileNotFoundError:
         raise FileNotFoundError(f"The file {file_path} does not exist.")
     except Exception as e:
-        raise ValueError(f"Error reading SafeTensors file: {str(e)}")
+        #logger.info(f"Error in open_hf_safetensor: reading SafeTensors file: {str(e)}")
+        raise ValueError(f"Error in open_hf_safetensor for {file_path}: reading SafeTensors file: {str(e)}")
 
-def open_hf_safetensor_old(file_path: str):
+        
+
+'''def open_hf_safetensor_old(file_path: str):
     try:
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File not found: {file_path}")
@@ -176,7 +168,7 @@ def open_hf_safetensor_old(file_path: str):
     except Exception as e:
         print(f"An error occurred while opening the safetensor file: {str(e)}")
         return None
-
+'''
 
 def remove_pattern_prefix(s):
     """Remove the prefix 'pattern.' from a string and return bool re: if it was present
@@ -188,6 +180,53 @@ def remove_pattern_prefix(s):
     else:
         return False, s
 
+
+
+def format_tensor_info(tensor: torch.Tensor) -> str:
+    """
+    Format tensor information including shape, dtype, device, and type for debugging.
+    
+    Args:
+    tensor (torch.Tensor): The input tensor to analyze.
+    
+    Returns:
+    str: A formatted string containing tensor information.
+    """
+    # Get shape
+    shape = str(tensor.shape)
+    
+    # Get dtype
+    dtype = str(tensor.dtype)
+    
+    # Get device
+    device = str(tensor.device)
+    
+    # Determine tensor type
+    if tensor.is_meta:
+        tensor_type = "Meta"
+    elif isinstance(tensor, FakeTensor):
+        tensor_type = "Fake"
+    else:
+        tensor_type = "Regular"
+    
+    # Format the information
+    info = f"Shape: {shape}, Dtype: {dtype}, Device: {device}, Type: {tensor_type}"
+    
+    return info
+
+def new_compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> torch.Tensor:
+    t1 = tensor1.shape
+    t2 = tensor2.shape
+    if t1 == t2:
+        return tensor2
+
+    if tensor1.shape == tensor2.shape[::-1]:
+        start_shape = tensor2.shape
+        tensor2.copy_(tensor2.flip(dims=tuple(range(tensor2.dim()))))
+        logger.info(f"Reversed tensor2 from {start_shape} =====>>>> {tensor2.shape=}")
+        return tensor2
+    else:
+        assert False, f"tensor1.shape {tensor1.shape} != tensor2.shape {tensor2.shape} and no match if reversed."
 
 def load_safetensor_weights(
     stage_module: torch.nn.Module,
@@ -224,61 +263,92 @@ def load_safetensor_weights(
 
     logger.info(f"Needed files: {needed_files}")
 
+    # generic check that we have no ambient fake mode
+    torch_mode_fake = torch_in_fake_mode()
+    assert torch_mode_fake is False, f"torch_in_fake_mode is {torch_mode_fake}"
+
     for file in needed_files:
         logger.info(f"Loading checkpoint file: {file}")
         full_path = os.path.join(file_location, file)
         try:
-            # verify if fake context is live or not...abs
-            
-            logger.info(f"Ambient Fakemode is... {torch._C._get_dispatch_mode(torch._C._TorchDispatchModeKey.FAKE)}")
-            
-            # checkpoint, fake_tensor_list = open_hf_safetensor(full_path)
-            # if fake_tensor_list:
-            #     logger.warning(f"Found {len(fake_tensor_list)} fake tensors in {file}")
-            #     assert False, f"Found {len(fake_tensor_list)} fake tensors in {file}"
-            with safe_open(full_path, framework="pt", device="cpu") as checkpoint:
-                for param, file_with_param in weight_map.items():
-                    if file_with_param == file and param in stage_state_dict:
-                        # have to special case output.weight as only one not preceeded with model.
-                        if param == "output.weight":
+            #checkpoint = open_hf_safetensor(full_path)
+
+            tensors = {}
+            with safe_open("model.safetensors", framework="pt", device=0) as f:
+                for k in f.keys():
+                    tensors[k] = f.get_tensor(k)
+            logger.info(f"Loaded {len(tensors)} tensors from {file}")
+            checkpoint = tensors
+            #with safe_open(full_path, framework="pt", device="cpu") as checkpoint:
+            for param, file_with_param in weight_map.items():
+                if file_with_param == file and param in stage_state_dict:
+                    # have to special case output.weight as only one not preceeded with model.
+                    if param == "output.weight":
+                        logger.info(
+                            f"skipping model prefix for {param} from {file_with_param}"
+                        )
+                        model_param = param
+                    else:
+                        model_param = "model." + param
+
+                    old_param = new_to_old_keymap.get(model_param)
+                    if not old_param in checkpoint.keys():
+                        logger.info(f"missing {old_param} in {checkpoint.keys()}")
+                        assert False, f"missing {old_param}"
+
+                    if old_param in checkpoint.keys():
+                        checkpoint_tensor = checkpoint[old_param]
+                        # checktensor_start_info = format_tensor_info(checkpoint_tensor)
+                        # logger.info(f"checkpoint tensor before to: {checktensor_start_info}")
+                        # checkpoint_tensor = checkpoint_tensor.to(_device)
+                        # checktensor_after_to_info = format_tensor_info(checkpoint_tensor)
+                        # logger.info(f"checkpoint tensor after to: {checktensor_after_to_info}")
+
+                        assert checkpoint_tensor is not None, f"Tensor not found for {old_param}"
+                        #checktensor_type = get_tensor_type(checkpoint_tensor)
+                        #if checktensor_type == "Fake":
+                        #    logger.info(f"Fake checkpoint tensor found for {old_param}, {checkpoint_tensor=}")
+                        #    assert False, f"Fake checkpoint tensor found for {old_param}, {checkpoint_tensor=}"
+                        stage_tensor = stage_state_dict[param]
+                        #stagetensor_type = get_tensor_type(stage_tensor)
+                        #if stagetensor_type == "Fake":
+                        #    logger.info(f"Fake stage tensor found for {old_param}, {stage_tensor=}")
+                            
+                        # temp in place reverse
+                        checkpoint_tensor = new_compare_and_reverse(stage_tensor, checkpoint_tensor)
+                        #reversed_checkpoint_tensor_info = format_tensor_info(checkpoint_tensor)
+                        #logger.info(f"checkpoint tensor after reverse: {reversed_checkpoint_tensor_info}")
+
+
+
+
+                        #checkpoint_tensor = compare_and_reverse(
+                        #    checkpoint_tensor, stage_tensor
+                        #)
+                        #logger.info(f"checkpoint tensor after reverse: {checkpoint_tensor=}")
+                        #checkpoint_tensor = checkpoint_tensor.to(_device)
+                        #logger.info(f"checkpoint tensor after to: {checkpoint_tensor=}")
+                        #logger.info(f"\n**** pre-load {old_param=}\n {stage_state_dict[param]=}\n{checkpoint_tensor=}\n")
+                        #if isinstance(checkpoint_tensor, FakeTensor):
+                        #    logger.info(f"Fake checkpoint tensor found for {old_param}, {checkpoint_tensor=}")
+                        #    assert False, f"Fake checkpoint tensor found for {old_param}, {checkpoint_tensor=}"
+                        stage_state_dict[param] = checkpoint_tensor
+                        logger.info(f"**** post-load {stage_state_dict[param][0]=}\n")
+                        state_param_details = format_tensor_info(stage_state_dict[param])
+                        logger.info(f"**** post-load {param} {state_param_details}\n")
+                        updated_states.add(param)
+                        
+                    else:
+                        # potentially catastrophic...
+                        if param.endswith("weight"):
+                            logger.warning(
+                                f"**** Parameter {param} / {old_param} not found in checkpoint from {file_with_param}, please check..."
+                            )
+                        else:
+                            # ignore cache and similar generated layers
                             logger.info(
-                                f"skipping model prefix for {param} from {file_with_param}"
+                                f"**** Parameter {old_param} not found in checkpoint from {model_param}, skipping"
                             )
-                            model_param = param
-                        else:
-                            model_param = "model." + param
-
-                        old_param = new_to_old_keymap.get(model_param)
-                        if not old_param in checkpoint.keys():
-                            logger.info(f"missing {old_param} in {checkpoint.keys()}")
-                            assert False, f"missing {old_param}"
-
-                        if old_param in checkpoint.keys():
-                            checkpoint_tensor = checkpoint.get_tensor(old_param)
-                            assert checkpoint_tensor is not None, f"Tensor not found for {old_param}"
-                            if isinstance(checkpoint_tensor, FakeTensor):
-                                assert False, f"Fake checkpoint tensor found for {old_param}, {checkpoint_tensor=}"
-                            stage_tensor = stage_state_dict[param]
-                            checkpoint_tensor = compare_and_reverse(
-                                checkpoint_tensor, stage_tensor
-                            )
-                            logger.info(f"\n**** pre-load {old_param=}\n {stage_state_dict[param]=}\n{checkpoint_tensor=}\n")
-                            if isinstance(checkpoint_tensor, FakeTensor):
-                                logger.info(f"Fake checkpoint tensor found for {old_param}, {checkpoint_tensor=}")
-                            stage_state_dict[param] = checkpoint_tensor
-                            logger.info(f"**** post-load {stage_state_dict[param][0]=}\n")
-                            updated_states.add(param)
-                        else:
-                            # potentially catastrophic...
-                            if param.endswith("weight"):
-                                logger.warning(
-                                    f"**** Parameter {param} / {old_param} not found in checkpoint from {file_with_param}, please check..."
-                                )
-                            else:
-                                # ignore cache and similar generated layers
-                                logger.info(
-                                    f"**** Parameter {old_param} not found in checkpoint from {model_param}, skipping"
-                                )
 
         except FileNotFoundError:
             logger.error(f"File not found: {full_path}")
