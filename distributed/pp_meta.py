@@ -26,9 +26,12 @@ from hf_utils import (
     load_safetensor_weights,
     get_hf_weight_map_and_path,
     get_hf_path_from_model_id,
-    new_load_safetensor_weights
 )
-from safetensor_utils import (analyze_safetensor_file, analyze_safetensor_directory, summarize_results)
+from safetensor_utils import (
+    analyze_safetensor_file,
+    analyze_safetensor_directory,
+    summarize_results,
+)
 
 # Configure logging
 logging.basicConfig(
@@ -66,37 +69,34 @@ TUNE_MODEL_CONFIGS = {
 def create_model(
     model_id: str, device: str = "cuda", rank: int = 0
 ) -> Tuple[Any, FakeTensorMode, Any]:
-
     logger.info(f"Torch is currently in fake mode: {torch_in_fake_mode()=}")
-    
-    
+
     model_func, hf_model_id = TUNE_MODEL_CONFIGS[model_id]
     logger.info(f"{model_func=}, {hf_model_id=}")
     hf_path = get_hf_path_from_model_id(hf_model_id)
     logger.info(f"hf path: {hf_path}")
-    
+
     assert model_func is not None, f"Model {model_id} not found in TUNE_MODEL_CONFIGS"
     assert (
         hf_path is not None
     ), f"hf path for {model_id} not found in TUNE_MODEL_CONFIGS"
 
-    with torch.device('meta'): # init_on_meta_device(device="meta"):
+    with torch.device("meta"):  # init_on_meta_device(device="meta"):
         logger.info(f"about to init model on meta device, {model_id=}")
         model = model_func()
 
     model.eval()
-    
+
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
     with fake_mode:
-       model.to_empty(device="cuda")
-       logger.info(f"Torch in fake mode: {torch_in_fake_mode()=}")
-    
+        model.to_empty(device="cuda")
+        logger.info(f"Torch in fake mode: {torch_in_fake_mode()=}")
+
     logger.info(f"exited context - Torch in fake mode: {torch_in_fake_mode()=}")
 
-    #res = inspect_module_tensors(model)
-    #logger.info(f"Model tensors: {res=}")
+    # res = inspect_module_tensors(model)
+    # logger.info(f"Model tensors: {res=}")
     # assert False, "Stop here"
-    
 
     # create tokenizer
     # tokenizer = Llama3Tokenizer(tokenizer_path)
@@ -158,7 +158,6 @@ def main(model_id: str, world_size: int, device: str):
     real_ids = inputs["input_ids"]
     fake_ids = fake_mode.from_tensor(inputs["input_ids"])
 
-    
     # logger.info(f"Weight map: {weight_map=}")
     # logger.info(f"Weight path: {weight_path=}")
 
@@ -167,21 +166,19 @@ def main(model_id: str, world_size: int, device: str):
     pipe = create_pipeline(model, fake_ids, world_size)
     logger.info(f"Pipeline created: {rank=} {pipe=}")
 
-
-
     # Stage materialization
     logger.info("Materializing each stage...")
     stage_module = pipe.get_stage_module(rank)
-    #logger.info(f"Stage module: {rank=} {stage_module=}")
-    #res = inspect_module_tensors(stage_module)
-    #logger.info(f"Stage tensors: {rank=},  {res=}")
-    #time.sleep(5)
-    #assert False, "check stage module"
+    # logger.info(f"Stage module: {rank=} {stage_module=}")
+    # res = inspect_module_tensors(stage_module)
+    # logger.info(f"Stage tensors: {rank=},  {res=}")
+    # time.sleep(5)
+    # assert False, "check stage module"
 
     logger.info(f"Loading weights into stage {rank}")
     weight_map, weight_path, new_to_old_keymap = get_hf_weight_map_and_path(hf_path)
-    
-    total_weight_count, missing_weight_count = new_load_safetensor_weights(
+
+    total_weight_count, missing_weight_count = load_safetensor_weights(
         stage_module, weight_map, weight_path, new_to_old_keymap, device
     )
 
@@ -253,7 +250,7 @@ def main(model_id: str, world_size: int, device: str):
     )  # full batch size = 8
 
     inputs = tokenizer(full_batch_prompts, return_tensors="pt", padding=True).to(device)
-    #logger.info(f"check {inputs=}")
+    # logger.info(f"check {inputs=}")
 
     # Attach to a schedule
     # number of microbatches = 8 // 2 = 4
@@ -280,7 +277,6 @@ def main(model_id: str, world_size: int, device: str):
     dist.destroy_process_group()
 
 
-
 def verify_safetensor_weights(directory_path: str):
     logger.info(f"Verifying safetensor weights for {directory_path}")
     all_results = analyze_safetensor_directory(directory_path)
@@ -288,11 +284,11 @@ def verify_safetensor_weights(directory_path: str):
 
     print("Summary of all safetensor files in the directory:")
     print("\nDtype distribution:")
-    for dtype, count in summary['dtypes'].items():
+    for dtype, count in summary["dtypes"].items():
         print(f"  {dtype}: {count}")
 
     print("\nTensor type distribution:")
-    for tensor_type, count in summary['tensor_types'].items():
+    for tensor_type, count in summary["tensor_types"].items():
         print(f"  {tensor_type}: {count}")
 
     print("\nDetailed results for each file:")
@@ -302,6 +298,7 @@ def verify_safetensor_weights(directory_path: str):
             print(f"  Tensor: {tensor_name}")
             print(f"    dtype: {dtype}")
             print(f"    type: {tensor_type}")
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Model tracing and segmentation")

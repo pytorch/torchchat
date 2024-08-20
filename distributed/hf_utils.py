@@ -132,20 +132,21 @@ def open_hf_safetensor(file_path: str) -> Dict[str, torch.Tensor]:
     """
     try:
         tensors = load_file(file_path)
-        #for name, tensor in tensors.items():
+        # for name, tensor in tensors.items():
         #    logger.info(f"Loaded tensor '{name}' with shape {tensor.shape}")
-        
+
         return tensors
 
     except FileNotFoundError:
         raise FileNotFoundError(f"The file {file_path} does not exist.")
     except Exception as e:
-        #logger.info(f"Error in open_hf_safetensor: reading SafeTensors file: {str(e)}")
-        raise ValueError(f"Error in open_hf_safetensor for {file_path}: reading SafeTensors file: {str(e)}")
+        # logger.info(f"Error in open_hf_safetensor: reading SafeTensors file: {str(e)}")
+        raise ValueError(
+            f"Error in open_hf_safetensor for {file_path}: reading SafeTensors file: {str(e)}"
+        )
 
-        
 
-'''def open_hf_safetensor_old(file_path: str):
+"""def open_hf_safetensor_old(file_path: str):
     try:
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File not found: {file_path}")
@@ -168,7 +169,8 @@ def open_hf_safetensor(file_path: str) -> Dict[str, torch.Tensor]:
     except Exception as e:
         print(f"An error occurred while opening the safetensor file: {str(e)}")
         return None
-'''
+"""
+
 
 def remove_pattern_prefix(s):
     """Remove the prefix 'pattern.' from a string and return bool re: if it was present
@@ -181,26 +183,25 @@ def remove_pattern_prefix(s):
         return False, s
 
 
-
 def format_tensor_info(tensor: torch.Tensor) -> str:
     """
     Format tensor information including shape, dtype, device, and type for debugging.
-    
+
     Args:
     tensor (torch.Tensor): The input tensor to analyze.
-    
+
     Returns:
     str: A formatted string containing tensor information.
     """
     # Get shape
     shape = str(tensor.shape)
-    
+
     # Get dtype
     dtype = str(tensor.dtype)
-    
+
     # Get device
     device = str(tensor.device)
-    
+
     # Determine tensor type
     if tensor.is_meta:
         tensor_type = "Meta"
@@ -208,186 +209,27 @@ def format_tensor_info(tensor: torch.Tensor) -> str:
         tensor_type = "Fake"
     else:
         tensor_type = "Regular"
-    
+
     # Format the information
     info = f"Shape: {shape}, Dtype: {dtype}, Device: {device}, Type: {tensor_type}"
-    
+
     return info
 
-def new_compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> torch.Tensor:
+
+def compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> torch.Tensor:
     t1 = tensor1.shape
     t2 = tensor2.shape
     if t1 == t2:
         return tensor2
 
     if tensor1.shape == tensor2.shape[::-1]:
-        start_shape = tensor2.shape
+        # start_shape = tensor2.shape
         # tensor2.copy_(tensor2.flip(dims=tuple(range(tensor2.dim()))))
         tensor2 = tensor2.permute(*reversed(range(tensor2.dim())))
-        logger.info(f"Reversed tensor2 from {start_shape} =====>>>> {tensor2.shape=}")
+        # logger.info(f"Reversed tensor2 from {start_shape} =====>>>> {tensor2.shape=}")
         return tensor2
     else:
         assert False, f"tensor1.shape {tensor1.shape} != tensor2.shape {tensor2.shape} and no match if reversed."
-
-def load_safetensor_weights(
-    stage_module: torch.nn.Module,
-    weight_map: Dict[str, str],
-    file_location: str,
-    new_to_old_keymap: Dict[str, str],
-    _device: torch.device,
-    purge_model_prefix: bool = True,
-    ignore_cache_layers: bool = True,
-) -> Tuple[int, int]:
-    """Load safetensor weights into a stage module.
-    Returns the number of weights loaded and the number of missing weights.
-    weight_map = {model_param: file_with_param}  # output.weight: model.safetensors.index.json
-    new_to_old_keymap = {model_param: old_param}  # output.weight: lm_head.weight
-    sample from safetensor:
-    "model.layers.31.self_attn.v_proj.weight": "model-00003-of-00004.safetensors",
-    vs tune:
-    "layers.31.attn.v_proj.weight"
-    """
-
-    def remove_model_prefix(d: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
-        return {k.removeprefix("model."): v for k, v in d.items()}
-
-    stage_state_dict = stage_module.state_dict()
-    if purge_model_prefix:
-        stage_state_dict = remove_model_prefix(stage_state_dict)
-        weight_map = remove_model_prefix(weight_map)
-
-    logger.info(f"{_device=}")
-    # logger.info(f"Stage state dict: len = {len(stage_state_dict)}, keys = {list(stage_state_dict.keys())}")
-
-    updated_states = set()
-    needed_files = set()
-    for param in stage_state_dict.keys():
-        file = weight_map.get(param)
-        if file:
-            needed_files.add(file)
-        else:
-            if param.endswith("weight"):
-                    logger.warning(
-                        f"**** Parameter {param} not found in weight map, please check..."
-                    )
-                    assert False, f"Missing file for {param} in {weight_map.keys()}"
-
-    logger.info(f"Needed files: {needed_files}")
-    
-    # generic check that we have no ambient fake mode
-    torch_mode_fake = torch_in_fake_mode()
-    assert torch_mode_fake is False, f"torch_in_fake_mode is {torch_mode_fake}"
-
-    for file in needed_files:
-        logger.info(f"Loading checkpoint file: {file}")
-        full_path = os.path.join(file_location, file)
-        try:
-            #checkpoint = open_hf_safetensor(full_path)
-
-            tensors = {}
-            with safe_open(full_path, framework="pt", device=0) as f:
-                for k in f.keys():
-                    tensors[k] = f.get_tensor(k)
-            logger.info(f"Loaded {len(tensors)} tensors from {file}")
-            checkpoint = tensors
-            #with safe_open(full_path, framework="pt", device="cpu") as checkpoint:
-            for param, file_with_param in weight_map.items():
-                if file_with_param == file and param in stage_state_dict:
-                    # have to special case output.weight as only one not preceeded with model.
-                    if param == "output.weight":
-                        logger.info(
-                            f"skipping model prefix for {param} from {file_with_param}"
-                        )
-                        model_param = param
-                    else:
-                        model_param = "model." + param
-
-                    old_param = new_to_old_keymap.get(model_param)
-                    if not old_param in checkpoint.keys():
-                        logger.info(f"missing {old_param} in {checkpoint.keys()}")
-                        assert False, f"missing {old_param}"
-
-                    if old_param in checkpoint.keys():
-                        checkpoint_tensor = checkpoint[old_param]
-                        # checktensor_start_info = format_tensor_info(checkpoint_tensor)
-                        # logger.info(f"checkpoint tensor before to: {checktensor_start_info}")
-                        # checkpoint_tensor = checkpoint_tensor.to(_device)
-                        # checktensor_after_to_info = format_tensor_info(checkpoint_tensor)
-                        # logger.info(f"checkpoint tensor after to: {checktensor_after_to_info}")
-
-                        assert checkpoint_tensor is not None, f"Tensor not found for {old_param}"
-                        #checktensor_type = get_tensor_type(checkpoint_tensor)
-                        #if checktensor_type == "Fake":
-                        #    logger.info(f"Fake checkpoint tensor found for {old_param}, {checkpoint_tensor=}")
-                        #    assert False, f"Fake checkpoint tensor found for {old_param}, {checkpoint_tensor=}"
-                        stage_tensor = stage_state_dict[param]
-                        #stagetensor_type = get_tensor_type(stage_tensor)
-                        #if stagetensor_type == "Fake":
-                        #    logger.info(f"Fake stage tensor found for {old_param}, {stage_tensor=}")
-                            
-                        # temp in place reverse
-                        checkpoint_tensor = new_compare_and_reverse(stage_tensor, checkpoint_tensor)
-                        #reversed_checkpoint_tensor_info = format_tensor_info(checkpoint_tensor)
-                        #logger.info(f"checkpoint tensor after reverse: {reversed_checkpoint_tensor_info}")
-
-
-
-
-                        #checkpoint_tensor = compare_and_reverse(
-                        #    checkpoint_tensor, stage_tensor
-                        #)
-                        #logger.info(f"checkpoint tensor after reverse: {checkpoint_tensor=}")
-                        #checkpoint_tensor = checkpoint_tensor.to(_device)
-                        #logger.info(f"checkpoint tensor after to: {checkpoint_tensor=}")
-                        #logger.info(f"\n**** pre-load {old_param=}\n {stage_state_dict[param]=}\n{checkpoint_tensor=}\n")
-                        #if isinstance(checkpoint_tensor, FakeTensor):
-                        #    logger.info(f"Fake checkpoint tensor found for {old_param}, {checkpoint_tensor=}")
-                        #    assert False, f"Fake checkpoint tensor found for {old_param}, {checkpoint_tensor=}"
-                        stage_state_dict[param] = checkpoint_tensor
-                        logger.info(f"**** post-load {stage_state_dict[param][0]=}\n")
-                        state_param_details = format_tensor_info(stage_state_dict[param])
-                        logger.info(f"**** post-load {param} {state_param_details}\n")
-                        updated_states.add(param)
-                        
-                    else:
-                        # potentially catastrophic...
-                        if param.endswith("weight"):
-                            logger.warning(
-                                f"**** Parameter {param} / {old_param} not found in checkpoint from {file_with_param}, please check..."
-                            )
-                        else:
-                            # ignore cache and similar generated layers
-                            logger.info(
-                                f"**** Parameter {old_param} not found in checkpoint from {model_param}, skipping"
-                            )
-
-        except FileNotFoundError:
-            logger.error(f"File not found: {full_path}")
-        except Exception as e:
-            logger.error(f"Error loading {full_path}: {str(e)}")
-
-    missing_keys = set(stage_state_dict.keys()) - updated_states
-
-    # ignore saying partial loading, if only missing items are cache layers (we don't load cache layers)
-    if ignore_cache_layers:
-        start_len = len(missing_keys)
-        missing_keys = {k for k in missing_keys if not k.endswith(".cache")}
-        after_len = len(missing_keys)
-        if after_len < start_len:
-            logger.info(f"Ignoring {start_len - after_len} missing cache layers")
-
-    if missing_keys:
-        logger.warning(
-            f"Partially updated state dict. Missing {len(missing_keys)} keys: {missing_keys}"
-        )
-        #logger.warning(f"debug info: \n\n{stage_state_dict=}\n\n{weight_map=}\n\n")
-    else:
-        logger.info("Fully updated state dict.")
-
-    stage_module.load_state_dict(stage_state_dict, strict=False, assign=True)
-    logger.info(f"Loaded {len(updated_states)} weights into stage module")
-
-    return len(updated_states), len(missing_keys)
 
 
 def read_weights_from_json(file_path: str) -> Optional[Dict[str, str]]:
@@ -414,12 +256,15 @@ def get_config_file(model_id: str) -> Tuple[str, str]:
     file_location = os.path.dirname(config_file)
     return config_data, file_location
 
+
 def get_hf_path_from_model_id(model_id: str) -> str:
     """Get the HF path for a given HF model id"""
     config_data, file_location = get_config_file(model_id)
-    assert os.path.exists(file_location), f"HF path {file_location} for {model_id} does not exist."
+    assert os.path.exists(
+        file_location
+    ), f"HF path {file_location} for {model_id} does not exist."
     return file_location
-     
+
 
 def get_hf_weight_map_and_path(
     model_id: str,
@@ -467,31 +312,14 @@ def remap_weight_keys(dictionary):
         for old_word, new_word in replacements.items():
             if old_word in new_key:
                 new_key = new_key.replace(old_word, new_word)
-                #logger.info(f"Old key: {old_key}, {value=}, New key: {new_key}")
+                # logger.info(f"Old key: {old_key}, {value=}, New key: {new_key}")
 
         new_dict[new_key] = value
         key_mapping[new_key] = old_key
     return new_dict, key_mapping
 
 
-def compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> torch.Tensor:
-    """Compare the shapes of two tensors and permute second one to match the first one.
-    This is expressly used for mapping safetensor weights to the tune models.
-    """
-    # Compare the shapes of the two tensors
-    shape1 = tensor1.shape
-    shape2 = tensor2.shape
-
-    if len(shape1) == len(shape2):
-        return tensor2
-
-    if shape1 == shape2[::-1]:
-        return tensor2.permute(*range(tensor2.dim() - 1, -1, -1))
-
-    return tensor2
-
-
-def new_load_safetensor_weights(
+def load_safetensor_weights(
     stage_module: Module,
     weight_map: Dict[str, str],
     file_location: str,
@@ -515,7 +343,9 @@ def new_load_safetensor_weights(
     Returns:
         Tuple[int, int]: Number of updated weights and number of missing weights.
     """
-    stage_state_dict, weight_map = prepare_state_dict(stage_module, weight_map, purge_model_prefix)
+    stage_state_dict, weight_map = prepare_state_dict(
+        stage_module, weight_map, purge_model_prefix
+    )
     needed_files = get_needed_files(stage_state_dict, weight_map)
     updated_states: Set[str] = set()
 
@@ -523,37 +353,55 @@ def new_load_safetensor_weights(
         full_path = os.path.join(file_location, file)
         logger.info(f"Loading checkpoint file: {full_path}")
         try:
-            checkpoint = load_checkpoint(full_path, "cpu") # device)
-            update_state_dict(stage_state_dict, checkpoint, weight_map, new_to_old_keymap, file, updated_states)
+            checkpoint = load_checkpoint(full_path, "cpu")  # device)
+            update_state_dict(
+                stage_state_dict,
+                checkpoint,
+                weight_map,
+                new_to_old_keymap,
+                file,
+                updated_states,
+            )
         except FileNotFoundError:
             logger.error(f"File not found: {full_path}")
         except Exception as e:
             logger.error(f"Error loading {full_path}: {str(e)}")
 
-    missing_keys = handle_missing_keys(stage_state_dict, updated_states, ignore_cache_layers)
+    missing_keys = handle_missing_keys(
+        stage_state_dict, updated_states, ignore_cache_layers
+    )
     log_loading_status(missing_keys, updated_states)
-    
+
     stage_module.load_state_dict(stage_state_dict, strict=False, assign=True)
     return len(updated_states), len(missing_keys)
 
-def prepare_state_dict(module: Module, weight_map: Dict[str, str], purge_model_prefix: bool) -> Dict[str, torch.Tensor]:
+
+def prepare_state_dict(
+    module: Module, weight_map: Dict[str, str], purge_model_prefix: bool
+) -> Dict[str, torch.Tensor]:
     state_dict = module.state_dict()
     if purge_model_prefix:
         state_dict = {k.removeprefix("model."): v for k, v in state_dict.items()}
         weight_map = {k.removeprefix("model."): v for k, v in weight_map.items()}
     return state_dict, weight_map
 
-def get_needed_files(state_dict: Dict[str, torch.Tensor], weight_map: Dict[str, str]) -> Set[str]:
+
+def get_needed_files(
+    state_dict: Dict[str, torch.Tensor], weight_map: Dict[str, str]
+) -> Set[str]:
     needed_files = set()
     for param in state_dict.keys():
         file = weight_map.get(param)
         if file:
             needed_files.add(file)
         elif param.endswith("weight"):
-            logger.warning(f"Parameter {param} not found in weight map, please check...")
+            logger.warning(
+                f"Parameter {param} not found in weight map, please check..."
+            )
             raise ValueError(f"Missing file for {param} in {weight_map.keys()}")
     logger.info(f"Needed files: {needed_files}")
     return needed_files
+
 
 def load_checkpoint(full_path: str, device: torch.device) -> Dict[str, torch.Tensor]:
     tensors = {}
@@ -563,44 +411,50 @@ def load_checkpoint(full_path: str, device: torch.device) -> Dict[str, torch.Ten
     logger.info(f"Loaded {len(tensors)} tensors from {full_path}")
     return tensors
 
+
 def update_state_dict(
     state_dict: Dict[str, torch.Tensor],
     checkpoint: Dict[str, torch.Tensor],
     weight_map: Dict[str, str],
     new_to_old_keymap: Dict[str, str],
     file: str,
-    updated_states: Set[str]
+    updated_states: Set[str],
 ):
     for param, file_with_param in weight_map.items():
         if file_with_param == file and param in state_dict:
-            model_param = "output.weight" if param == "output.weight" else f"model.{param}"
+            model_param = (
+                "output.weight" if param == "output.weight" else f"model.{param}"
+            )
             old_param = new_to_old_keymap.get(model_param)
-            
+
             if old_param not in checkpoint:
                 logger.warning(f"Missing {old_param} in checkpoint")
                 continue
 
             checkpoint_tensor = checkpoint[old_param]
             stage_tensor = state_dict[param]
-            
-            checkpoint_tensor = new_compare_and_reverse(stage_tensor, checkpoint_tensor)
+
+            checkpoint_tensor = compare_and_reverse(stage_tensor, checkpoint_tensor)
             state_dict[param] = checkpoint_tensor
-            
+
             log_tensor_info(param, state_dict[param])
             updated_states.add(param)
+
 
 def log_tensor_info(param: str, tensor: torch.Tensor):
     logger.info(f"**** post-load {param}[0] = {tensor[0]}")
     state_param_details = format_tensor_info(tensor)
     logger.info(f"**** post-load {param} {state_param_details}")
 
+
 def format_tensor_info(tensor: torch.Tensor) -> str:
     return f"Shape: {tensor.shape}, Dtype: {tensor.dtype}, Device: {tensor.device}"
+
 
 def handle_missing_keys(
     state_dict: Dict[str, torch.Tensor],
     updated_states: Set[str],
-    ignore_cache_layers: bool
+    ignore_cache_layers: bool,
 ) -> Set[str]:
     missing_keys = set(state_dict.keys()) - updated_states
     if ignore_cache_layers:
@@ -611,9 +465,12 @@ def handle_missing_keys(
             logger.info(f"Ignoring {start_len - after_len} missing cache layers")
     return missing_keys
 
+
 def log_loading_status(missing_keys: Set[str], updated_states: Set[str]):
     if missing_keys:
-        logger.warning(f"Partially updated state dict. Missing {len(missing_keys)} keys: {missing_keys}")
+        logger.warning(
+            f"Partially updated state dict. Missing {len(missing_keys)} keys: {missing_keys}"
+        )
     else:
         logger.info("Fully updated state dict.")
     logger.info(f"Loaded {len(updated_states)} weights into stage module")
