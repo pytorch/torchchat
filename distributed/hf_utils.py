@@ -1,4 +1,4 @@
-from typing import Dict, Callable, Optional, Tuple
+from typing import Dict, Callable, Optional, Tuple, List
 import torch
 from transformers import AutoTokenizer  # AutoConfig
 from safetensors import safe_open
@@ -9,6 +9,9 @@ import json
 import torch.distributed as dist
 import time
 from torch._subclasses import FakeTensor
+
+from safetensors.torch import load_file
+
 
 # Configure logging
 logging.basicConfig(
@@ -110,17 +113,64 @@ def _initialize_buffer(
     logger.info(f"Buffer result: {target_module=}")
 
 
-def open_hf_safetensor(file_path: str):
+def open_hf_safetensor(file_path: str) -> Tuple[Dict[str, torch.Tensor], List[str]]:
+    """
+    Open a SafeTensors file, return all its contents in a dictionary, and check for fake tensors.
+
+    Args:
+        file_path (str): The path to the SafeTensors file.
+
+    Returns:
+        Tuple[Dict[str, torch.Tensor], List[str]]: A tuple containing:
+            - A dictionary where keys are tensor names and values are the corresponding tensors.
+            - A list of names of any fake tensors found.
+
+    Raises:
+        FileNotFoundError: If the specified file does not exist.
+        ValueError: If there's an issue reading the SafeTensors file.
+    """
+    try:
+        # Using safe_open
+        tensors = {}
+        #with safe_open(file_path, framework="pt", device="cpu") as f:
+        #    for key in f.keys():
+        #        tensors[key] = f.get_tensor(key)
+        
+        # fallback
+        if not tensors:
+            tensors = load_file(file_path)
+        
+        # Check for fake tensors
+        fake_tensors = []
+        for name, tensor in tensors.items():
+            if isinstance(tensor, FakeTensor):
+                fake_tensors.append(name)
+        
+        return tensors, fake_tensors
+
+    except FileNotFoundError:
+        raise FileNotFoundError(f"The file {file_path} does not exist.")
+    except Exception as e:
+        raise ValueError(f"Error reading SafeTensors file: {str(e)}")
+
+def open_hf_safetensor_old(file_path: str):
     try:
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File not found: {file_path}")
 
         if not file_path.endswith(".safetensors"):
             raise ValueError("File does not have .safetensors extension")
+        
+        tensors = {}
 
         with safe_open(file_path, framework="pt", device="cpu") as f:
-            tensors = {k: f.get_tensor(k) for k in f.keys()}
+            for key in f.keys():
+                tensors[key] = f.get_tensor(key)
 
+        #logger.info(f"Loaded {len(tensors)} tensors from {file_path}")
+        #logger.info(f"Tensor keys: {list(tensors.keys())}")
+        #logger.info(f"Tensor shapes: {[t.shape for t in tensors.values()]}")
+        
         return tensors
 
     except Exception as e:
@@ -178,7 +228,15 @@ def load_safetensor_weights(
         logger.info(f"Loading checkpoint file: {file}")
         full_path = os.path.join(file_location, file)
         try:
-            with safe_open(full_path, framework="pt", device="cuda") as checkpoint:
+            # verify if fake context is live or not...abs
+            
+            logger.info(f"Ambient Fakemode is... {torch._C._get_dispatch_mode(torch._C._TorchDispatchModeKey.FAKE)}")
+            
+            # checkpoint, fake_tensor_list = open_hf_safetensor(full_path)
+            # if fake_tensor_list:
+            #     logger.warning(f"Found {len(fake_tensor_list)} fake tensors in {file}")
+            #     assert False, f"Found {len(fake_tensor_list)} fake tensors in {file}"
+            with safe_open(full_path, framework="pt", device="cpu") as checkpoint:
                 for param, file_with_param in weight_map.items():
                     if file_with_param == file and param in stage_state_dict:
                         # have to special case output.weight as only one not preceeded with model.
@@ -191,6 +249,9 @@ def load_safetensor_weights(
                             model_param = "model." + param
 
                         old_param = new_to_old_keymap.get(model_param)
+                        if not old_param in checkpoint.keys():
+                            logger.info(f"missing {old_param} in {checkpoint.keys()}")
+                            assert False, f"missing {old_param}"
 
                         if old_param in checkpoint.keys():
                             checkpoint_tensor = checkpoint.get_tensor(old_param)
@@ -201,12 +262,14 @@ def load_safetensor_weights(
                             checkpoint_tensor = compare_and_reverse(
                                 checkpoint_tensor, stage_tensor
                             )
-                            logger.info(f"**** pre load {stage_state_dict[param]=}, {checkpoint_tensor=}")
+                            logger.info(f"\n**** pre-load {old_param=}\n {stage_state_dict[param]=}\n{checkpoint_tensor=}\n")
+                            if isinstance(checkpoint_tensor, FakeTensor):
+                                logger.info(f"Fake checkpoint tensor found for {old_param}, {checkpoint_tensor=}")
                             stage_state_dict[param] = checkpoint_tensor
-                            logger.info(f"**** post load {stage_state_dict[param]=}")
+                            logger.info(f"**** post-load {stage_state_dict[param][0]=}\n")
                             updated_states.add(param)
                         else:
-                            # catastrophic...
+                            # potentially catastrophic...
                             if param.endswith("weight"):
                                 logger.warning(
                                     f"**** Parameter {param} / {old_param} not found in checkpoint from {file_with_param}, please check..."
@@ -236,7 +299,7 @@ def load_safetensor_weights(
         logger.warning(
             f"Partially updated state dict. Missing {len(missing_keys)} keys: {missing_keys}"
         )
-        logger.warning(f"debug info: \n\n{stage_state_dict=}\n\n{weight_map=}\n\n")
+        #logger.warning(f"debug info: \n\n{stage_state_dict=}\n\n{weight_map=}\n\n")
     else:
         logger.info("Fully updated state dict.")
 
@@ -270,6 +333,12 @@ def get_config_file(model_id: str) -> Tuple[str, str]:
     file_location = os.path.dirname(config_file)
     return config_data, file_location
 
+def get_hf_path_from_model_id(model_id: str) -> str:
+    """Get the HF path for a given HF model id"""
+    config_data, file_location = get_config_file(model_id)
+    assert os.path.exists(file_location), f"HF path {file_location} for {model_id} does not exist."
+    return file_location
+     
 
 def get_hf_weight_map_and_path(
     model_id: str,

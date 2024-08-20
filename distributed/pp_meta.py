@@ -24,7 +24,9 @@ from hf_utils import (
     get_hf_tokenizer,
     load_safetensor_weights,
     get_hf_weight_map_and_path,
+    get_hf_path_from_model_id,
 )
+from safetensor_utils import (analyze_safetensor_file, analyze_safetensor_directory, summarize_results)
 
 # Configure logging
 logging.basicConfig(
@@ -58,14 +60,43 @@ TUNE_MODEL_CONFIGS = {
     ),
 }
 
+def verify_safetensor_weights(directory_path: str):
+    logger.info(f"Verifying safetensor weights for {directory_path}")
+    all_results = analyze_safetensor_directory(directory_path)
+    summary = summarize_results(all_results)
+
+    print("Summary of all safetensor files in the directory:")
+    print("\nDtype distribution:")
+    for dtype, count in summary['dtypes'].items():
+        print(f"  {dtype}: {count}")
+
+    print("\nTensor type distribution:")
+    for tensor_type, count in summary['tensor_types'].items():
+        print(f"  {tensor_type}: {count}")
+
+    print("\nDetailed results for each file:")
+    for filename, file_results in all_results.items():
+        print(f"\nFile: {filename}")
+        for tensor_name, (dtype, tensor_type) in file_results.items():
+            print(f"  Tensor: {tensor_name}")
+            print(f"    dtype: {dtype}")
+            print(f"    type: {tensor_type}")
 
 def create_model(
     model_id: str, device: str = "cuda", rank: int = 0
 ) -> Tuple[Any, FakeTensorMode, Any]:
+
+    
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
 
-    model_func, hf_path = TUNE_MODEL_CONFIGS[model_id]
-    print(f"{model_func=}, {hf_path=}")
+    model_func, hf_model_id = TUNE_MODEL_CONFIGS[model_id]
+    logger.info(f"{model_func=}, {hf_model_id=}")
+    hf_path = get_hf_path_from_model_id(hf_model_id)
+    logger.info(f"hf path: {hf_path}")
+    if rank == 0:
+        verify_safetensor_weights(hf_path)
+    time.sleep(5)
+    assert False, "hf path"
 
     assert model_func is not None, f"Model {model_id} not found in TUNE_MODEL_CONFIGS"
     assert (
@@ -75,6 +106,7 @@ def create_model(
     with init_on_meta_device(device="meta"):
         logger.info(f"about to init model on meta device, {model_id=}")
         model = model_func().to(torch.bfloat16)
+        logger.info(f"meta model {model=}")
 
     model.eval()
     if rank == 0:
@@ -112,7 +144,7 @@ def create_pipeline(model, inputs, world_size: int):
     )
 
     split_spec = {
-        f"model.layers.{i * layers_per_rank}": SplitPoint.BEGINNING
+        f"layers.{i * layers_per_rank}": SplitPoint.BEGINNING
         for i in range(1, world_size)
     }
 
