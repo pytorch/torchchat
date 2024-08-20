@@ -488,3 +488,135 @@ def compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> torch.T
         return tensor2.permute(*range(tensor2.dim() - 1, -1, -1))
 
     return tensor2
+
+
+
+
+def new_load_safetensor_weights(
+    stage_module: Module,
+    weight_map: Dict[str, str],
+    file_location: str,
+    new_to_old_keymap: Dict[str, str],
+    device: torch.device,
+    purge_model_prefix: bool = True,
+    ignore_cache_layers: bool = True,
+) -> Tuple[int, int]:
+    """
+    Load safetensor weights into a stage module.
+
+    Args:
+        stage_module (Module): The PyTorch module to load weights into.
+        weight_map (Dict[str, str]): Mapping of model parameters to file names.
+        file_location (str): Directory containing the weight files.
+        new_to_old_keymap (Dict[str, str]): Mapping of new parameter names to old ones.
+        device (torch.device): The device to load tensors onto.
+        purge_model_prefix (bool): Whether to remove 'model.' prefix from keys.
+        ignore_cache_layers (bool): Whether to ignore cache layers when reporting missing keys.
+
+    Returns:
+        Tuple[int, int]: Number of updated weights and number of missing weights.
+    """
+    stage_state_dict = prepare_state_dict(stage_module, weight_map, purge_model_prefix)
+    needed_files = get_needed_files(stage_state_dict, weight_map)
+    updated_states: Set[str] = set()
+
+    for file in needed_files:
+        full_path = os.path.join(file_location, file)
+        try:
+            checkpoint = load_checkpoint(full_path, device)
+            update_state_dict(stage_state_dict, checkpoint, weight_map, new_to_old_keymap, file, updated_states)
+        except FileNotFoundError:
+            logger.error(f"File not found: {full_path}")
+        except Exception as e:
+            logger.error(f"Error loading {full_path}: {str(e)}")
+
+    missing_keys = handle_missing_keys(stage_state_dict, updated_states, ignore_cache_layers)
+    log_loading_status(missing_keys, updated_states)
+    
+    stage_module.load_state_dict(stage_state_dict, strict=False, assign=True)
+    return len(updated_states), len(missing_keys)
+
+def prepare_state_dict(module: Module, weight_map: Dict[str, str], purge_model_prefix: bool) -> Dict[str, torch.Tensor]:
+    state_dict = module.state_dict()
+    if purge_model_prefix:
+        state_dict = {k.removeprefix("model."): v for k, v in state_dict.items()}
+        weight_map = {k.removeprefix("model."): v for k, v in weight_map.items()}
+    return state_dict
+
+def get_needed_files(state_dict: Dict[str, torch.Tensor], weight_map: Dict[str, str]) -> Set[str]:
+    needed_files = set()
+    for param in state_dict.keys():
+        file = weight_map.get(param)
+        if file:
+            needed_files.add(file)
+        elif param.endswith("weight"):
+            logger.warning(f"Parameter {param} not found in weight map, please check...")
+            raise ValueError(f"Missing file for {param} in {weight_map.keys()}")
+    logger.info(f"Needed files: {needed_files}")
+    return needed_files
+
+def load_checkpoint(full_path: str, device: torch.device) -> Dict[str, torch.Tensor]:
+    tensors = {}
+    with safe_open(full_path, framework="pt", device=device) as f:
+        for k in f.keys():
+            tensors[k] = f.get_tensor(k)
+    logger.info(f"Loaded {len(tensors)} tensors from {full_path}")
+    return tensors
+
+def update_state_dict(
+    state_dict: Dict[str, torch.Tensor],
+    checkpoint: Dict[str, torch.Tensor],
+    weight_map: Dict[str, str],
+    new_to_old_keymap: Dict[str, str],
+    file: str,
+    updated_states: Set[str]
+):
+    for param, file_with_param in weight_map.items():
+        if file_with_param == file and param in state_dict:
+            model_param = "output.weight" if param == "output.weight" else f"model.{param}"
+            old_param = new_to_old_keymap.get(model_param)
+            
+            if old_param not in checkpoint:
+                logger.warning(f"Missing {old_param} in checkpoint")
+                continue
+
+            checkpoint_tensor = checkpoint[old_param]
+            stage_tensor = state_dict[param]
+            
+            checkpoint_tensor = new_compare_and_reverse(stage_tensor, checkpoint_tensor)
+            state_dict[param] = checkpoint_tensor
+            
+            log_tensor_info(param, state_dict[param])
+            updated_states.add(param)
+
+def log_tensor_info(param: str, tensor: torch.Tensor):
+    logger.info(f"**** post-load {param}[0] = {tensor[0]}")
+    state_param_details = format_tensor_info(tensor)
+    logger.info(f"**** post-load {param} {state_param_details}")
+
+def format_tensor_info(tensor: torch.Tensor) -> str:
+    return f"Shape: {tensor.shape}, Dtype: {tensor.dtype}, Device: {tensor.device}"
+
+def handle_missing_keys(
+    state_dict: Dict[str, torch.Tensor],
+    updated_states: Set[str],
+    ignore_cache_layers: bool
+) -> Set[str]:
+    missing_keys = set(state_dict.keys()) - updated_states
+    if ignore_cache_layers:
+        start_len = len(missing_keys)
+        missing_keys = {k for k in missing_keys if not k.endswith(".cache")}
+        after_len = len(missing_keys)
+        if after_len < start_len:
+            logger.info(f"Ignoring {start_len - after_len} missing cache layers")
+    return missing_keys
+
+def log_loading_status(missing_keys: Set[str], updated_states: Set[str]):
+    if missing_keys:
+        logger.warning(f"Partially updated state dict. Missing {len(missing_keys)} keys: {missing_keys}")
+    else:
+        logger.info("Fully updated state dict.")
+    logger.info(f"Loaded {len(updated_states)} weights into stage module")
+
+
+
