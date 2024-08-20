@@ -8,7 +8,9 @@ import time
 import uuid
 from abc import ABC
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
+
+import torch
 
 from build.utils import device_sync
 
@@ -18,6 +20,8 @@ from generate import Generator, GeneratorArgs
 
 See https://platform.openai.com/docs/api-reference/chat for the full specification and details.
 """
+
+OPENAI_API_DEFAULT_MAX_TOKENS = 16
 
 # Message classes and associated objects - see the types of Messages under "Create Chat Completion >>> Request body >>> messages"
 
@@ -88,30 +92,41 @@ class StreamOptions:
 
 
 @dataclass
+class ResponseFormat:
+    type: Optional[str] = None
+
+
+@dataclass
 class CompletionRequest:
     """A full chat completion request.
 
     See the "Create Chat Completion >>> Request body" section of the OpenAI API docs for more details.
     """
 
+    messages: List[_AbstractMessage]
     model: str
-    prompt: str
-    messages: Optional[List[_AbstractMessage]]
-    frequency_penalty: float = 0.0
-    temperature: float = 0.0
-    stop: Optional[List[str]] = None
-    stream: bool = False
-    stream_options: Optional[StreamOptions] = None
-    echo: bool = False
-    frequency_penalty: float = 0.0
-    guided_decode_json_schema: str = None
-    guided_decode_json_schema_path: str = None
-    n: int = 1
-    presence_penalty: float = 0
-    logit_bias: Optional[Dict[str, float]] = None
-    logprobs: Optional[bool] = None
-    top_logprobs: Optional[int] = None
+    frequency_penalty: float = 0.0  # unimplemented
+    logit_bias: Optional[Dict[str, float]] = None  # unimplemented
+    logprobs: Optional[bool] = None  # unimplemented
+    top_logprobs: Optional[int] = None  # unimplemented
     max_tokens: Optional[int] = None
+    n: int = 1
+    presence_penalty: float = 0  # unimplemented
+    response_format: Optional[ResponseFormat] = None  # unimplemented
+    seed: Optional[int] = None
+    service_tier: Optional[str] = None  # unimplemented
+    stop: Optional[List[str]] = None  # unimplemented
+    stream: bool = False
+    stream_options: Optional[StreamOptions] = None  # unimplemented
+    temperature: Optional[float] = 1.0
+    top_p: Optional[float] = 1.0  # unimplemented
+    tools: Optional[List[Any]] = None  # unimplemented - Assistant features
+    tool_choice: Optional[Union[str, Any]] = None  # unimplemented - Assistant features
+    parallel_tool_calls: Optional[bool] = None  # unimplemented - Assistant features
+    user: Optional[str] = None  # unimplemented
+
+    def __post_init__(self):
+        self.stream = bool(self.stream)
 
 
 @dataclass
@@ -121,10 +136,10 @@ class CompletionChoice:
     See the "The chat completion object >>> choices" section of the OpenAI API docs for more details.
     """
 
-    finish_reason: str
     index: int
     message: AssistantMessage
-    logprobs: Optional[List[Any]]
+    finish_reason: str = None
+    logprobs: Optional[List[Any]] = None
 
 
 @dataclass
@@ -151,9 +166,9 @@ class CompletionResponse:
     created: int
     model: str
     system_fingerprint: str
-    usage: UsageStats
-    object: str = "chat.completion"
     service_tier: Optional[str] = None
+    usage: Optional[UsageStats] = None
+    object: str = "chat.completion"
 
 
 @dataclass
@@ -192,9 +207,9 @@ class CompletionResponseChunk:
     choices: List[CompletionChoiceChunk]
     created: int
     model: str
-    system_fingerprint: str
-    object: str = "chat.completion.chunk"
+    system_fingerprint: Optional[str] = None
     service_tier: Optional[str] = None
+    object: str = "chat.completion.chunk"
     usage: Optional[UsageStats] = None
 
 
@@ -212,7 +227,6 @@ class OpenAiApiGenerator(Generator):
         """
 
         super().__init__(*args, **kwargs)
-        self.start_pos = 0
         self.max_seq_length = (
             self.model.config.text_transformer_args.max_seq_length
             + self.speculative_builder_args.speculate_k
@@ -220,9 +234,25 @@ class OpenAiApiGenerator(Generator):
             if self.draft_model is not None
             else self.model.config.text_transformer_args.max_seq_length
         )
+        # The System fingerprint is a unique identifier for the model and its configuration.
+        self.system_fingerprint = (
+            f"{self.builder_args.device}_{self.builder_args.precision}"
+        )
 
-    def completion(self, completion_request: CompletionRequest):
+    def chunked_completion(self, completion_request: CompletionRequest):
         """Handle a chat completion request and yield a chunked response.
+
+        ** Warning ** : Not all arguments of the CompletionRequest are consumed as the server isn't completely implemented.
+        Current treatment of parameters is described below.
+
+        - messages: The server consumes the final element of the array as the prompt.
+        - model: This has no impact on the server state, i.e. changing the model in the request
+        will not change which model is responding. Instead, use the --model flag to seelect the model when starting the server.
+        - temperature: This is used to control the randomness of the response.
+        - system_fingerprint: A unique identifier for the model and its configuration. Currently unimplemented - subject to change.
+
+        See https://github.com/pytorch/torchchat/issues/973 for more details.
+
 
         Args:
             completion_request: Request object with prompt and other parameters.
@@ -231,33 +261,50 @@ class OpenAiApiGenerator(Generator):
             CompletionResponseChunk objects in response to completion_request as tokens are generated.
 
         """
-        device_sync(device=self.builder_args.device)
 
         # Initialize counters for chunk responses and encode the prompt.
         id = str(uuid.uuid4())
+
         idx = 0
-        buffer = []
-        encoded = self.encode_tokens(
-            completion_request.prompt, bos=True, device=self.builder_args.device
+        tokens = self.chat_formatter.encode_dialog_prompt(
+            dialog=[
+                {"role": message["role"], "content": message["content"]}
+                for message in completion_request.messages
+            ]
         )
+
+        encoded = torch.tensor(tokens, dtype=torch.int, device=self.builder_args.device)
+        print(self.tokenizer.decode(tokens))
+
+        start_pos = 0
+
         generator_args = GeneratorArgs(
-            completion_request.prompt,
+            None,
+            max_new_tokens=(
+                int(completion_request.max_tokens)
+                if completion_request.max_tokens
+                else OPENAI_API_DEFAULT_MAX_TOKENS
+            ),
             encoded_prompt=encoded,
+            temperature=float(completion_request.temperature),
             chat_mode=False,
+            sequential_prefill=True,
         )
 
         def callback(x, *, done_generating=False):
             return self._callback(
                 x,
-                buffer=buffer,
+                buffer=None,
                 done_generating=done_generating,
             )
 
+        device_sync(device=self.builder_args.device)
+
         # Process each token, metrics tuple yielded by Generator.generate.
         for y, _ in self.generate(
-            self.model,
-            encoded,
-            generator_args.max_new_tokens,
+            model=self.model,
+            prompt=encoded,
+            max_new_tokens=generator_args.max_new_tokens,
             draft_model=self.draft_model,
             speculate_k=generator_args.speculate_k,
             chat_mode=generator_args.chat_mode,
@@ -265,11 +312,15 @@ class OpenAiApiGenerator(Generator):
             temperature=generator_args.temperature,
             top_k=generator_args.top_k,
             sequential_prefill=generator_args.sequential_prefill,
-            start_pos=self.start_pos,
+            start_pos=start_pos,
             max_seq_length=self.max_seq_length,
+            seed=int(completion_request.seed or 0),
         ):
             if y is None:
                 continue
+            elif y.item() == self.tokenizer.eos_id:
+                # Stop generation if the EOS token is generated.
+                break
 
             # Decode the torch.Tensor token to a string and append to the buffer. Separate the sequences with a period token.
             content = "".join(
@@ -285,34 +336,53 @@ class OpenAiApiGenerator(Generator):
             choice_chunk = CompletionChoiceChunk(
                 delta=chunk_delta,
                 index=idx,
+                finish_reason=None,
             )
             chunk_response = CompletionResponseChunk(
-                id=str(id),
+                id="chatcmpl-" + str(id),
                 choices=[choice_chunk],
                 created=int(time.time()),
                 model=completion_request.model,
-                system_fingerprint=uuid.UUID(int=uuid.getnode()),
+                system_fingerprint=self.system_fingerprint,
             )
             yield chunk_response
-            self.start_pos += y.size(0)
+            start_pos += y.size(0)
             idx += 1
 
         # Yield an ending chunk indicating the generation has completed.
-        end_chunk = CompletionChoiceChunk(ChunkDelta(None, None, None), idx, "eos")
+        end_chunk = CompletionChoiceChunk(
+            ChunkDelta(None, None, None), idx, finish_reason="stop"
+        )
 
         yield CompletionResponseChunk(
-            id=str(id),
+            id="chatcmpl-" + str(id),
             choices=[end_chunk],
             created=int(time.time()),
             model=completion_request.model,
-            system_fingerprint=uuid.UUID(int=uuid.getnode()),
+            system_fingerprint=self.system_fingerprint,
+        )
+
+    def sync_completion(self, request: CompletionRequest):
+        """Handle a chat completion request and yield a single, non-chunked response"""
+        output = ""
+        for chunk in self.chunked_completion(request):
+            if not chunk.choices[0].finish_reason:
+                output += chunk.choices[0].delta.content
+
+        message = AssistantMessage(content=output)
+        return CompletionResponse(
+            id="chatcmpl-" + str(uuid.uuid4()),
+            choices=[
+                CompletionChoice(
+                    finish_reason="stop",
+                    index=0,
+                    message=message,
+                )
+            ],
+            created=int(time.time()),
+            model=request.model,
+            system_fingerprint=self.system_fingerprint,
         )
 
     def _callback(self, x, *, buffer, done_generating):
-        period_id = self.tokenizer.encode(".")[0]
-        buffer.append(self.tokenizer.decode([period_id] + x.tolist())[1:])
-        if (
-            self.is_llama3_model
-            and x.item() == self.tokenizer.special_tokens["<|eot_id|>"]
-        ):
-            buffer = buffer[:-1]  # drop the eot_id from the output buffer
+        pass

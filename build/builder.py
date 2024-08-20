@@ -48,6 +48,8 @@ class BuilderArgs:
     use_distributed: bool = False
     is_chat_model: bool = False
     prefill_possible: bool = False
+    dynamic_shapes: bool = False
+    max_seq_length: Optional[int] = None
 
     def __post_init__(self):
         if self.device is None:
@@ -161,6 +163,8 @@ class BuilderArgs:
             setup_caches=(output_dso_path or output_pte_path),
             use_distributed=args.distributed,
             is_chat_model=is_chat_model,
+            dynamic_shapes=getattr(args, "dynamic_shapes", False),
+            max_seq_length=getattr(args, "max_seq_length", None),
         )
 
     @classmethod
@@ -441,6 +445,8 @@ def _initialize_model(
     builder_args,
     quantize,
     tokenizer=None,
+    max_seq_length=None,
+    support_tensor_subclass: bool = True,
 ):
     print("Loading model...")
 
@@ -511,13 +517,19 @@ def _initialize_model(
         if quantize:
             print(f"Quantizing the model with: {quantize}")
             with measure_time("Time to quantize model: {time:.02f} seconds"):
-                quantize_model(model, builder_args.device, quantize, tokenizer)
+                quantize_model(
+                    model,
+                    builder_args.device,
+                    quantize,
+                    tokenizer,
+                    support_tensor_subclass,
+                )
                 device_sync(device=builder_args.device)
 
         if builder_args.setup_caches:
             with torch.device(builder_args.device):
                 model.setup_caches(
-                    max_batch_size=1, max_seq_length=model.config.text_transformer_args.max_seq_length
+                    max_batch_size=1, max_seq_length=max_seq_length or model.config.text_transformer_args.max_seq_length
                 )
 
         model.to(dtype=builder_args.precision)
