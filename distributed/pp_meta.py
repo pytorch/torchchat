@@ -58,6 +58,10 @@ TUNE_MODEL_CONFIGS = {
         llama3_8b,
         "meta-llama/Meta-Llama-3-8B-Instruct",
     ),  # '/tmp/Meta-Llama-3-8B-Instruct/original/tokenizer.model'),
+    "8b31": (
+        llama3_1_8b,
+        "meta-llama/Meta-Llama-3.1-8B-Instruct",
+    ),
     "70b": (llama3_70b, "meta-llama/Meta-Llama-3-70B-Instruct"),
     "405b": (
         llama3_1_405b,
