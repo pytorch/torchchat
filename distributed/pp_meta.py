@@ -85,21 +85,20 @@ def create_model(
         hf_path is not None
     ), f"hf path for {model_id} not found in TUNE_MODEL_CONFIGS"
 
-    with init_on_meta_device(device="meta"):  # torch.device("meta")):
+    #with init_on_meta_device('meta'): # 
+    with torch.device("meta"):
         logger.info(f"about to init model on meta device, {model_id=}")
         model = model_func()
-        model = model.to(torch.bfloat16)
+        #model = model.to(torch.bfloat16)
         
 
     model.eval()
 
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
-    with fake_mode:
-        model.to_empty(device=device)
-        
-        logger.info(f"Torch in fake mode: {torch_in_fake_mode()=}")
-    
-    logger.info(f"exited context - Torch in fake mode: {torch_in_fake_mode()=}")
+    # with fake_mode:
+    #     model.to_empty(device='cuda')  
+    #     logger.info(f"Torch in fake mode: {torch_in_fake_mode()=}")
+    #logger.info(f"exited context - Torch in fake mode: {torch_in_fake_mode()=}")
     
     # res = inspect_module_tensors(model)
     # logger.info(f"Model tensors: {res=}")
@@ -161,16 +160,20 @@ def main(model_id: str, world_size: int, device: str):
     print(f"{tokenizer.pad_token=}")
 
     prompts = ("How do you", "I like to")
-    inputs = tokenizer(prompts, return_tensors="pt", padding=True)
-    real_ids = inputs["input_ids"]
-    fake_ids = fake_mode.from_tensor(inputs["input_ids"])
+    
+    with torch.device("meta"):
+        inputs = tokenizer(prompts, return_tensors="pt", padding=True)
+        meta_ids = inputs["input_ids"]
+    #real_ids = real_ids.to('meta')
+    #with torch.device("meta"):
+    #    fake_ids = fake_mode.from_tensor(inputs["input_ids"])
 
     # logger.info(f"Weight map: {weight_map=}")
     # logger.info(f"Weight path: {weight_path=}")
 
     # Create pipeline
     logger.info("Creating pipeline...")
-    pipe = create_pipeline(model, fake_ids, world_size)
+    pipe = create_pipeline(model, meta_ids, world_size)
     logger.info(f"Pipeline created: {rank=} {pipe=}")
 
     # Stage materialization
@@ -259,7 +262,8 @@ def main(model_id: str, world_size: int, device: str):
     )  # full batch size = 8
 
     inputs = tokenizer(full_batch_prompts, return_tensors="pt", padding=True).to(device)
-    # logger.info(f"check {inputs=}")
+    logger.info(f"check {inputs=}")
+    assert False, "check inputs"
 
     # Attach to a schedule
     # number of microbatches = 8 // 2 = 4
