@@ -20,7 +20,7 @@ from modeling_utils import (
 )
 
 from torchtune.models.llama3 import llama3_8b, llama3_70b
-from torchtune.models.llama3_1 import llama3_1_405b
+from torchtune.models.llama3_1 import llama3_1_405b, llama3_1_8b
 from hf_utils import (
     get_hf_tokenizer,
     load_safetensor_weights,
