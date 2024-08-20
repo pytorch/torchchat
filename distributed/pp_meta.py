@@ -92,6 +92,10 @@ def create_model(
     
     logger.info(f"exited context - Torch in fake mode: {torch_in_fake_mode()=}")
 
+    # res = inspect_module_tensors(model)
+    # logger.info(f"Model tensors: {res=}")
+    
+
     # create tokenizer
     # tokenizer = Llama3Tokenizer(tokenizer_path)
     tokenizer = get_hf_tokenizer(hf_path)
