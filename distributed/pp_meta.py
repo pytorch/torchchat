@@ -79,7 +79,7 @@ def create_model(
         hf_path is not None
     ), f"hf path for {model_id} not found in TUNE_MODEL_CONFIGS"
 
-    with init_on_meta_device(device="meta"):
+    with torch.device('meta'): # init_on_meta_device(device="meta"):
         logger.info(f"about to init model on meta device, {model_id=}")
         model = model_func()
 
@@ -87,13 +87,14 @@ def create_model(
     
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
     with fake_mode:
-        model.to_empty(device="cuda")
-        logger.info(f"Torch in fake mode: {torch_in_fake_mode()=}")
+       model.to_empty(device="cuda")
+       logger.info(f"Torch in fake mode: {torch_in_fake_mode()=}")
     
     logger.info(f"exited context - Torch in fake mode: {torch_in_fake_mode()=}")
 
-    # res = inspect_module_tensors(model)
-    # logger.info(f"Model tensors: {res=}")
+    #res = inspect_module_tensors(model)
+    #logger.info(f"Model tensors: {res=}")
+    # assert False, "Stop here"
     
 
     # create tokenizer
@@ -153,6 +154,7 @@ def main(model_id: str, world_size: int, device: str):
 
     prompts = ("How do you", "I like to")
     inputs = tokenizer(prompts, return_tensors="pt", padding=True)
+    real_ids = inputs["input_ids"]
     fake_ids = fake_mode.from_tensor(inputs["input_ids"])
 
     
@@ -162,12 +164,18 @@ def main(model_id: str, world_size: int, device: str):
     # Create pipeline
     logger.info("Creating pipeline...")
     pipe = create_pipeline(model, fake_ids, world_size)
-    logger.info(f"Pipeline created: {pipe=}")
+    logger.info(f"Pipeline created: {rank=} {pipe=}")
+
+
 
     # Stage materialization
     logger.info("Materializing each stage...")
     stage_module = pipe.get_stage_module(rank)
-    logger.info(f"Stage module type: {type(stage_module)}")
+    #logger.info(f"Stage module: {rank=} {stage_module=}")
+    #res = inspect_module_tensors(stage_module)
+    #logger.info(f"Stage tensors: {rank=},  {res=}")
+    #time.sleep(5)
+    #assert False, "check stage module"
 
     logger.info(f"Loading weights into stage {rank}")
     weight_map, weight_path, new_to_old_keymap = get_hf_weight_map_and_path(hf_path)

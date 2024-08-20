@@ -165,7 +165,7 @@ def inspect_module_tensors(
             tensor_type = "Fake"
         elif tensor.is_meta:
             tensor_type = "Meta"
-        return f"{name} ({tensor_type})", str(tensor.dtype)
+        return f"{name} ({tensor_type}) ({tensor.device})", str(tensor.dtype)
 
     # parameters
     for name, param in module.named_parameters(recurse=False):
@@ -244,6 +244,13 @@ def reinit_layers(
     recursive_reinit(model)
     print(f"Total reinitialized modules: {reinitialized_count}")
 
+def get_tensor_type(tensor)-> str:
+    if isinstance(tensor, FakeTensor):
+        return "Fake"
+    elif tensor.is_meta:
+        return "Meta"
+    else:
+        return "Regular"
 
 def enumerate_transformer_llm(model, prefix="", output_file=None):
     """Prints information about the model's modules and parameters."""
@@ -260,19 +267,19 @@ def enumerate_transformer_llm(model, prefix="", output_file=None):
 
         if list(module.parameters()):
             for param_name, param in module.named_parameters():
+                param_type = get_tensor_type(param)
                 print_info(
-                    f"  Parameter: {full_name}.{param_name}, Shape: {param.shape}"
+                    f"  Parameter: {full_name}.{param_name}, Type: {param_type}, Shape: {param.shape}, Device: {param.device}"
                 )
-                if isinstance(param, FakeTensor):
-                    print_info(f" ***** Fake Tensor: {param_name}")
+                
 
         if list(module.buffers()):
             for buffer_name, buffer in module.named_buffers():
+                buffer_type = get_tensor_type(buffer)
                 print_info(
-                    f"  Buffer: {full_name}.{buffer_name}, Shape: {buffer.shape}"
+                    f"  Buffer: {full_name}.{buffer_name}, Type: {buffer_type}, Shape: {buffer.shape}, Device: {buffer.device}"
                 )
-                if isinstance(buffer, FakeTensor):
-                    print_info(f" ***** Fake Tensor: {buffer_name}")
+                
 
         if list(module.children()):
             enumerate_transformer_llm(module, full_name, output_file)
