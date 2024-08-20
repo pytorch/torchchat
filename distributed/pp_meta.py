@@ -26,6 +26,7 @@ from hf_utils import (
     load_safetensor_weights,
     get_hf_weight_map_and_path,
     get_hf_path_from_model_id,
+    new_load_safetensor_weights
 )
 from safetensor_utils import (analyze_safetensor_file, analyze_safetensor_directory, summarize_results)
 
@@ -179,7 +180,8 @@ def main(model_id: str, world_size: int, device: str):
 
     logger.info(f"Loading weights into stage {rank}")
     weight_map, weight_path, new_to_old_keymap = get_hf_weight_map_and_path(hf_path)
-    total_weight_count, missing_weight_count = load_safetensor_weights(
+    
+    total_weight_count, missing_weight_count = new_load_safetensor_weights(
         stage_module, weight_map, weight_path, new_to_old_keymap, device
     )
 

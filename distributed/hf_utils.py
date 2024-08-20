@@ -1,4 +1,4 @@
-from typing import Dict, Callable, Optional, Tuple, List
+from typing import Dict, Callable, Optional, Tuple, List, Set
 import torch
 from transformers import AutoTokenizer  # AutoConfig
 from safetensors import safe_open
@@ -12,7 +12,7 @@ from torch._subclasses import FakeTensor
 
 from safetensors.torch import load_file
 from modeling_utils import torch_in_fake_mode, get_tensor_type
-
+from torch.nn import Module
 
 # Configure logging
 logging.basicConfig(
@@ -222,7 +222,8 @@ def new_compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> tor
 
     if tensor1.shape == tensor2.shape[::-1]:
         start_shape = tensor2.shape
-        tensor2.copy_(tensor2.flip(dims=tuple(range(tensor2.dim()))))
+        # tensor2.copy_(tensor2.flip(dims=tuple(range(tensor2.dim()))))
+        tensor2 = tensor2.permute(*reversed(range(tensor2.dim())))
         logger.info(f"Reversed tensor2 from {start_shape} =====>>>> {tensor2.shape=}")
         return tensor2
     else:
@@ -490,8 +491,6 @@ def compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> torch.T
     return tensor2
 
 
-
-
 def new_load_safetensor_weights(
     stage_module: Module,
     weight_map: Dict[str, str],
@@ -516,14 +515,15 @@ def new_load_safetensor_weights(
     Returns:
         Tuple[int, int]: Number of updated weights and number of missing weights.
     """
-    stage_state_dict = prepare_state_dict(stage_module, weight_map, purge_model_prefix)
+    stage_state_dict, weight_map = prepare_state_dict(stage_module, weight_map, purge_model_prefix)
     needed_files = get_needed_files(stage_state_dict, weight_map)
     updated_states: Set[str] = set()
 
     for file in needed_files:
         full_path = os.path.join(file_location, file)
+        logger.info(f"Loading checkpoint file: {full_path}")
         try:
-            checkpoint = load_checkpoint(full_path, device)
+            checkpoint = load_checkpoint(full_path, "cpu") # device)
             update_state_dict(stage_state_dict, checkpoint, weight_map, new_to_old_keymap, file, updated_states)
         except FileNotFoundError:
             logger.error(f"File not found: {full_path}")
@@ -541,7 +541,7 @@ def prepare_state_dict(module: Module, weight_map: Dict[str, str], purge_model_p
     if purge_model_prefix:
         state_dict = {k.removeprefix("model."): v for k, v in state_dict.items()}
         weight_map = {k.removeprefix("model."): v for k, v in weight_map.items()}
-    return state_dict
+    return state_dict, weight_map
 
 def get_needed_files(state_dict: Dict[str, torch.Tensor], weight_map: Dict[str, str]) -> Set[str]:
     needed_files = set()
@@ -617,6 +617,3 @@ def log_loading_status(missing_keys: Set[str], updated_states: Set[str]):
     else:
         logger.info("Fully updated state dict.")
     logger.info(f"Loaded {len(updated_states)} weights into stage module")
-
-
-
