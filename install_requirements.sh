@@ -77,6 +77,11 @@ REQUIREMENTS_TO_INSTALL=(
   $PIP_EXECUTABLE install --extra-index-url "${TORCH_NIGHTLY_URL}" \
     "${REQUIREMENTS_TO_INSTALL[@]}"
 )
+# Install torchtune separately with the --pre flag
+(
+    set -x
+    $PIP_EXECUTABLE install --pre torchtune --extra-index-url "${TORCH_NIGHTLY_URL}" --no-cache-dir
+)
 
 # For torchao need to install from github since nightly build doesn't have macos build.
 # TODO: Remove this and install nightly build, once it supports macos
