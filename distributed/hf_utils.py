@@ -259,10 +259,20 @@ def load_safetensor_weights(
     # logger.info(f"Stage state dict: len = {len(stage_state_dict)}, keys = {list(stage_state_dict.keys())}")
 
     updated_states = set()
-    needed_files = {file for file in weight_map.values() if file is not None}
+    needed_files = set()
+    for param in stage_state_dict.keys():
+        file = weight_map.get(param)
+        if file:
+            needed_files.add(file)
+        else:
+            if param.endswith("weight"):
+                    logger.warning(
+                        f"**** Parameter {param} not found in weight map, please check..."
+                    )
+                    assert False, f"Missing file for {param} in {weight_map.keys()}"
 
     logger.info(f"Needed files: {needed_files}")
-
+    
     # generic check that we have no ambient fake mode
     torch_mode_fake = torch_in_fake_mode()
     assert torch_mode_fake is False, f"torch_in_fake_mode is {torch_mode_fake}"
@@ -274,7 +284,7 @@ def load_safetensor_weights(
             #checkpoint = open_hf_safetensor(full_path)
 
             tensors = {}
-            with safe_open("model.safetensors", framework="pt", device=0) as f:
+            with safe_open(full_path, framework="pt", device=0) as f:
                 for k in f.keys():
                     tensors[k] = f.get_tensor(k)
             logger.info(f"Loaded {len(tensors)} tensors from {file}")
