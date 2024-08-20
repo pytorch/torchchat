@@ -16,6 +16,7 @@ from modeling_utils import (
     verify_graph_tensor_properties,
     enumerate_transformer_llm,
     inspect_module_tensors,
+    torch_in_fake_mode,
 )
 
 from torchtune.models.llama3 import llama3_8b, llama3_70b
@@ -60,44 +61,19 @@ TUNE_MODEL_CONFIGS = {
     ),
 }
 
-def verify_safetensor_weights(directory_path: str):
-    logger.info(f"Verifying safetensor weights for {directory_path}")
-    all_results = analyze_safetensor_directory(directory_path)
-    summary = summarize_results(all_results)
-
-    print("Summary of all safetensor files in the directory:")
-    print("\nDtype distribution:")
-    for dtype, count in summary['dtypes'].items():
-        print(f"  {dtype}: {count}")
-
-    print("\nTensor type distribution:")
-    for tensor_type, count in summary['tensor_types'].items():
-        print(f"  {tensor_type}: {count}")
-
-    print("\nDetailed results for each file:")
-    for filename, file_results in all_results.items():
-        print(f"\nFile: {filename}")
-        for tensor_name, (dtype, tensor_type) in file_results.items():
-            print(f"  Tensor: {tensor_name}")
-            print(f"    dtype: {dtype}")
-            print(f"    type: {tensor_type}")
 
 def create_model(
     model_id: str, device: str = "cuda", rank: int = 0
 ) -> Tuple[Any, FakeTensorMode, Any]:
 
+    logger.info(f"Torch is currently in fake mode: {torch_in_fake_mode()=}")
     
-    fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
-
+    
     model_func, hf_model_id = TUNE_MODEL_CONFIGS[model_id]
     logger.info(f"{model_func=}, {hf_model_id=}")
     hf_path = get_hf_path_from_model_id(hf_model_id)
     logger.info(f"hf path: {hf_path}")
-    if rank == 0:
-        verify_safetensor_weights(hf_path)
-    time.sleep(5)
-    assert False, "hf path"
-
+    
     assert model_func is not None, f"Model {model_id} not found in TUNE_MODEL_CONFIGS"
     assert (
         hf_path is not None
@@ -105,26 +81,16 @@ def create_model(
 
     with init_on_meta_device(device="meta"):
         logger.info(f"about to init model on meta device, {model_id=}")
-        model = model_func().to(torch.bfloat16)
-        logger.info(f"meta model {model=}")
+        model = model_func()
 
     model.eval()
-    if rank == 0:
-        # print(model.config)
-        print(f"{model=}")
-        # print(f"{model.model.embed_tokens.dtype=}")
-        # print(f"{model.layers[0].attn.pos_embeddings.weight.dtype=}")
-        print(f"{model.layers[0].attn.pos_embeddings=}")
-        print(f"{model.layers[0].attn.q_proj=}")
-        print(f"{model.layers[0].attn.q_proj.weight.dtype=}")
-
-    logger.info(f"Model type: {type(model)}")
-    # logger.info(f"Buffer callback: {model.buf_init_callbacks}")
-    # if not model.buf_init_callbacks:
-    #    logger.warning("ROPE generation may not succeed - buf_init_callbacks is None")
-
+    
+    fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
     with fake_mode:
         model.to_empty(device="cuda")
+        logger.info(f"Torch in fake mode: {torch_in_fake_mode()=}")
+    
+    logger.info(f"exited context - Torch in fake mode: {torch_in_fake_mode()=}")
 
     # create tokenizer
     # tokenizer = Llama3Tokenizer(tokenizer_path)
@@ -299,6 +265,29 @@ def main(model_id: str, world_size: int, device: str):
     dist.barrier()
     dist.destroy_process_group()
 
+
+
+def verify_safetensor_weights(directory_path: str):
+    logger.info(f"Verifying safetensor weights for {directory_path}")
+    all_results = analyze_safetensor_directory(directory_path)
+    summary = summarize_results(all_results)
+
+    print("Summary of all safetensor files in the directory:")
+    print("\nDtype distribution:")
+    for dtype, count in summary['dtypes'].items():
+        print(f"  {dtype}: {count}")
+
+    print("\nTensor type distribution:")
+    for tensor_type, count in summary['tensor_types'].items():
+        print(f"  {tensor_type}: {count}")
+
+    print("\nDetailed results for each file:")
+    for filename, file_results in all_results.items():
+        print(f"\nFile: {filename}")
+        for tensor_name, (dtype, tensor_type) in file_results.items():
+            print(f"  Tensor: {tensor_name}")
+            print(f"    dtype: {dtype}")
+            print(f"    type: {tensor_type}")
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Model tracing and segmentation")

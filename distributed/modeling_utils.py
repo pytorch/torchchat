@@ -72,6 +72,12 @@ def init_on_meta_device(device: torch.device):
         ) in tensor_constructors_to_proxy.items():
             setattr(torch, torch_function_name, old_torch_function)
 
+def torch_in_fake_mode() -> bool:
+    """
+    Check if torch is in fake mode.
+    """
+    fake_mode = torch._C._get_dispatch_mode(torch._C._TorchDispatchModeKey.FAKE)
+    return fake_mode is not None
 
 def verify_graph_tensor_properties(
     graph_module: fx.GraphModule,
