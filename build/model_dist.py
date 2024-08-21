@@ -17,12 +17,12 @@ from torch import Tensor
 from torch.nn import functional as F
 from torch.distributed._tensor import DTensor, Replicate
 
-from utils import find_multiple
+from build.utils import find_multiple
 
-from model import TransformerArgs, KVCache, apply_rotary_emb, precompute_freqs_cis
+from build.model import TransformerArgs, KVCache, apply_rotary_emb, precompute_freqs_cis
 
-from parallel_blocks.linear import ColumnWiseLinear, RowWiseLinear
-from parallel_blocks.embedding import RowWiseEmbedding
+from build.parallel_blocks.linear import ColumnWiseLinear, RowWiseLinear
+from build.parallel_blocks.embedding import RowWiseEmbedding
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 

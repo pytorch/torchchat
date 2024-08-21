@@ -7,8 +7,8 @@
 import torch
 import torch.distributed as dist
 
-from model import TransformerArgs
-from model_dist import Transformer
+from build.model import TransformerArgs
+from build.model_dist import Transformer
 
 # Model config
 config = TransformerArgs.from_name("Transformer-2-7b-chat-hf")
