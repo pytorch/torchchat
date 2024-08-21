@@ -373,15 +373,9 @@ def load_safetensor_weights(
     log_loading_status(missing_keys, updated_states)
 
     stage_module.load_state_dict(stage_state_dict, strict=False, assign=True)
-    logger.info(f"{stage_module=}")
-    for param in stage_module.buffers():
-        logger.info(f"{param=}")
-        if isinstance(param, FakeTensor):
-            log_tensor_info(f"FAKE TENSOR in buffer: {param.name}")
-            assert False, "found fake tensor"
+    #logger.info(f"{stage_module=}")
+
     
-    time.sleep(5)
-    assert False, "check stage module"
     return len(updated_states), len(missing_keys)
 
 
@@ -454,9 +448,9 @@ def log_tensor_info(param: str, tensor: torch.Tensor):
     tensor_type = get_tensor_type(tensor)
     if tensor_type == "Fake":
         assert False, f"name: {param=}, {tensor=} is fake tensor"
-    logger.info(f"**** post-load {param}[0] = Tensor Type: {tensor_type} {tensor[0]}")
-    state_param_details = format_tensor_info(tensor)
-    logger.info(f"**** post-load {param} {state_param_details}")
+    #logger.info(f"**** post-load {param}[0] = Tensor Type: {tensor_type} {tensor[0]}")
+    #state_param_details = format_tensor_info(tensor)
+    #logger.info(f"**** post-load {param} {state_param_details}")
 
 
 def format_tensor_info(tensor: torch.Tensor) -> str:

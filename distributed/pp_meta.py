@@ -17,6 +17,7 @@ from modeling_utils import (
     enumerate_transformer_llm,
     inspect_module_tensors,
     torch_in_fake_mode,
+    stage_check_buffers
 )
 
 from torchtune.models.llama3 import llama3_8b, llama3_70b
@@ -93,6 +94,8 @@ def create_model(
         
 
     model.eval()
+    
+    
 
     fake_mode = FakeTensorMode(allow_non_fake_inputs=True)
     # with fake_mode:
@@ -193,6 +196,19 @@ def main(model_id: str, world_size: int, device: str):
         stage_module, weight_map, weight_path, new_to_old_keymap, device
     )
 
+    stage_check_buffers(stage_module, rank)
+
+    # init buffers
+    #if hasattr(model, "buffer_init_callbacks"):
+    #     stage_init_buffers(stage_module, device, model.buf_init_callbacks, model_config)
+    #logger.info(f"Completed load of stage {rank}")
+
+    #if rank == 0:
+         #logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
+    #     logger.info(f"{Color.blue}{stage_module.layers[0].self_attn.pos_embeddings=}{Color.reset}")
+    
+    stage_check_buffers(stage_module, rank)
+
     logger.info(
         f"Loaded {total_weight_count} weights into stage {rank} with {missing_weight_count} missing"
     )
@@ -222,20 +238,21 @@ def main(model_id: str, world_size: int, device: str):
     )
 
     # Verify graph dtypes
-    proper_graph, error_list = verify_graph_tensor_properties(stage_module)
+    '''proper_graph, error_list = verify_graph_tensor_properties(stage_module)
     if not proper_graph:
         logger.error(
             f"Graph dtypes are not correct for stage {rank}. Errors: {error_list}"
         )
         # assert False, f"Graph dtypes are not correct for stage {rank}. Errors: {error_list}"
     logger.info(f"{proper_graph=}, {error_list=}")
+    '''
     # dist.barrier()
     # time.sleep(5)
     # Create schedule runtime
     stage = pipe.build_stage(rank, device=device)
     # if rank == 0:
     #    logger.info(f"{rank=} Completed stage building:  {stage=}...")
-    # logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
+    logger.info(f"{Color.blue}{type(stage_module)=} {dir(stage_module)=}{Color.reset}")
     
     logger.info("Pipeline Complete ---- Running schedule...")
     # stage = stage.to(torch.bfloat16)

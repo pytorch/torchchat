@@ -244,6 +244,60 @@ def reinit_layers(
     recursive_reinit(model)
     print(f"Total reinitialized modules: {reinitialized_count}")
 
+# buffer check
+def stage_check_buffers(stage_module, rank: int = 0)-> None:
+    """check buffers of stage module"""
+    logger.info(f"Checking buffers of stage {rank}")
+    param_meta_count = 0
+    '''for param in stage_module.parameters():
+        if param.is_meta:
+            param_meta_count += 1
+            logger.info(f"Meta param: {param.name}, {param=}")
+        elif isinstance(param, FakeTensor):
+            log_tensor_info(f"FAKE TENSOR in buffers:  {param.name}, {param=}")
+    
+    '''
+    buffer_meta_count = 0
+    
+    for buffer in stage_module.buffers():
+        if buffer.is_meta:
+            buffer_meta_count += 1
+            logger.info(f"Meta buffer: {buffer.name}, {buffer=}")
+        elif isinstance(buffer, FakeTensor):
+            log_tensor_info(f"FAKE TENSOR in buffer: {buffer.name}")
+            assert False, "found fake tensor"
+        else:
+            logger.info(f"buffer: {buffer=}")
+    logger.info(f"Buffer meta count: {buffer_meta_count}")
+    
+
+# from Ke:
+def stage_init_buffers(
+    stage_module: torch.nn.Module,
+    init_callbacks: Dict[str, Callable],
+    device: torch.device = torch.device("cpu"),
+    dtype: Optional[torch.dtype] = torch.bfloat16,
+):
+    """
+    Initialize buffers of `stage_module` per the callback in `init_callbacks`.
+    `init_callbacks` is a dictionary from a buffer's FQN to its init function.
+    """
+    for name, buf in stage_module.named_buffers():
+        if name in init_callbacks:
+            cb = init_callbacks[name]
+            buf_val = cb(device)
+            if dtype:
+                buf_val = buf_val.to(dtype)
+            # Find the parent module
+            splits = name.split(".")
+            mod = stage_module
+            for atom in splits[: -1]:
+                mod = getattr(mod, atom)
+            mod.register_buffer(
+                splits[-1], buf_val, persistent=False,
+            )
+            print(f"Initialized buffer {name}, {buf_val.dtype}, {buf_val.device}")
+
 def get_tensor_type(tensor)-> str:
     """ Returns the type of a tensor - fake / meta / regular. """
     if isinstance(tensor, FakeTensor):
