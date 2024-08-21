@@ -400,7 +400,7 @@ def _maybe_parellelize_model(
     if the user specifies using distributed inference. If not, this is a no-op.
 
     Args:
-        module (:class:`nn.Module`):
+        model (:class:`nn.Module`):
             Module to be parallelized.
         builder_args (:class:`BuilderArgs`):
             Command args for model building.
