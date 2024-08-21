@@ -7,3 +7,6 @@
 [submodule "tokenizer/third-party/sentencepiece"]
 	path = tokenizer/third-party/sentencepiece
 	url = https://github.com/google/sentencepiece.git
+[submodule "build/parallel_blocks"]
+	path = build/parallel_blocks
+	url = git@github.com:kwen2501/parallel_blocks.git
