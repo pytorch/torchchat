@@ -108,7 +108,7 @@ def load_checkpoints_to_model(
     We parallelize the module and load the distributed checkpoint to the model.
 
     Args:
-        module (:class:`nn.Module`):
+        model (:class:`nn.Module`):
             Module to be parallelized.
         builder_args (:class:`BuilderArgs`):
             Command args for model building.
