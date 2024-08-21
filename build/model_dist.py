@@ -71,7 +71,7 @@ class Transformer(nn.Module):
         assert self.freqs_cis is not None, "Caches must be initialized first"
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
-        x = self.tok_embeddings(idx)
+        x: DTensor = self.tok_embeddings(idx)
         # Gather back
         # TODO: sequence parallelize this
         x = x.full_tensor()
@@ -193,9 +193,9 @@ class Attention(nn.Module):
     ) -> Tensor:
         bsz, seqlen, _ = x.shape
 
-        q = self.wq(x)
-        k = self.wk(x)
-        v = self.wv(x)
+        q: DTensor = self.wq(x)
+        k: DTensor = self.wk(x)
+        v: DTensor = self.wv(x)
         # We use `to_local()` to convert DTensor back to regular Tensor
         q, k, v = q.to_local(), k.to_local(), v.to_local()
         # kv_size = self.n_local_heads * self.head_dim
@@ -219,7 +219,7 @@ class Attention(nn.Module):
 
         y = y.transpose(1, 2).contiguous().view(bsz, seqlen, -1)
 
-        y = self.wo(y)
+        y: DTensor = self.wo(y)
         # TODO: sequence parallelize this
         return y.full_tensor()
 
@@ -232,7 +232,7 @@ class FeedForward(nn.Module):
         self.w3 = ColumnWiseLinear(config.dim, config.hidden_dim, bias=False)
 
     def forward(self, x: Tensor) -> Tensor:
-        y = self.w2(F.silu(self.w1(x)) * self.w3(x))
+        y: DTensor = self.w2(F.silu(self.w1(x)) * self.w3(x))
         # y is a DTensor with Partial placement;
         # we convert its placement to Replicate and convert it back to a regular
         # Tensor. `full_tensor` is the API that does both.
