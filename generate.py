@@ -56,7 +56,7 @@ class Llama3ChatFormatter(_ChatFormatter):
         return tokens
 
     def encode_message(self, message) -> List[int]:
-        tokens = self.encode_header(message.role)
+        tokens = self.encode_header(message["role"]) 
         tokens.extend(
             self.tokenizer.encode(message["content"].strip(), bos=False, eos=False)
         )
@@ -69,7 +69,7 @@ class Llama3ChatFormatter(_ChatFormatter):
         for message in dialog:
             tokens.extend(self.encode_message(message))
         # Add the start of an assistant message for the model to complete.
-        tokens.extend(self.encode_header({"role": "assistant", "content": ""}))
+        tokens.extend(self.encode_header("assistant"))  # Pass role directly as a string
         return tokens
 
 
@@ -905,3 +905,4 @@ if __name__ == "__main__":
     check_args(args, verb)
     args = arg_init(args)
     main(args)
+
