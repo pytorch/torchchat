@@ -15,7 +15,7 @@ from typing import Dict, List, Union
 
 import torch
 
-from api.api import (
+from api.openai_api import (
     CompletionRequest,
     get_model_info_list,
     OpenAiApiGenerator,
