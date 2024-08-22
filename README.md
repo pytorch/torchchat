@@ -215,7 +215,7 @@ Setting `stream` to "true" in the request emits a response in chunks. If `stream
 [skip default]: begin
 
 ```
-curl http://127.0.0.1:5000/v1/chat \
+curl http://127.0.0.1:5000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "model": "llama3.1",
