@@ -498,7 +498,7 @@ def _initialize_model(
             device_sync(device=builder_args.device)
 
         try:
-            from build.model_et import PTEModel
+            from build.model import PTEModel
 
             model = PTEModel(model.config, builder_args.pte_path)
         except Exception:
