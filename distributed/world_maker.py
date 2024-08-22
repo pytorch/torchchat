@@ -24,7 +24,7 @@ def launch_distributed(
     using distributed inference. If not, this is a no-op.
 
     Args:
-        config: str:
+        toml_config: str:
             toml file for the inference config.
     Returns:
         Tuple[Optional[DeviceMesh], Optional[ParallelDims]]: 

@@ -1,91 +1,67 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# All rights reserved.
-
-# This source code is licensed under the license found in the
-# LICENSE file in the root directory of this source tree.
-
 import time
-
 import streamlit as st
-from api.api import CompletionRequest, OpenAiApiGenerator
+from openai import OpenAI
 
-from build.builder import BuilderArgs, TokenizerArgs
+st.title("torchchat")
 
-from generate import GeneratorArgs
+start_state = [
+    {
+        "role": "system",
+        "content": "You're an assistant. Answer questions directly, be brief, and have fun.",
+    },
+    {"role": "assistant", "content": "How can I help you?"},
+]
+
+with st.sidebar:
+    response_max_tokens = st.slider(
+        "Max Response Tokens", min_value=10, max_value=1000, value=250, step=10
+    )
+    if st.button("Reset Chat", type="primary"):
+        st.session_state["messages"] = start_state
+
+if "messages" not in st.session_state:
+    st.session_state["messages"] = start_state
 
 
-def main(args):
-    builder_args = BuilderArgs.from_args(args)
-    speculative_builder_args = BuilderArgs.from_speculative_args(args)
-    tokenizer_args = TokenizerArgs.from_args(args)
-    generator_args = GeneratorArgs.from_args(args)
-    generator_args.chat_mode = False
+for msg in st.session_state.messages:
+    st.chat_message(msg["role"]).write(msg["content"])
 
-    @st.cache_resource
-    def initialize_generator() -> OpenAiApiGenerator:
-        return OpenAiApiGenerator(
-            builder_args,
-            speculative_builder_args,
-            tokenizer_args,
-            generator_args,
-            args.profile,
-            args.quantize,
-            args.draft_quantize,
-        )
+if prompt := st.chat_input():
+    client = OpenAI(
+        base_url="http://127.0.0.1:5000/v1",
+        api_key="813",  # The OpenAI API requires an API key, but since we don't consume it, this can be any non-empty string.
+    )
 
-    gen = initialize_generator()
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.chat_message("user").write(prompt)
 
-    st.title("torchchat")
+    with st.chat_message("assistant"), st.status(
+        "Generating... ", expanded=True
+    ) as status:
 
-    # Initialize chat history
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+        def get_streamed_completion(completion_generator):
+            start = time.time()
+            tokcount = 0
+            for chunk in completion_generator:
+                tokcount += 1
+                yield chunk.choices[0].delta.content
 
-    # Display chat messages from history on app rerun
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    # Accept user input
-    if prompt := st.chat_input("What is up?"):
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        # Display user message in chat message container
-        with st.chat_message("user"):
-            st.markdown(prompt)
-
-        # Display assistant response in chat message container
-        with st.chat_message("assistant"), st.status(
-            "Generating... ", expanded=True
-        ) as status:
-
-            req = CompletionRequest(
-                model=gen.builder_args.checkpoint_path,
-                prompt=prompt,
-                temperature=generator_args.temperature,
-                messages=[],
+            status.update(
+                label="Done, averaged {:.2f} tokens/second".format(
+                    tokcount / (time.time() - start)
+                ),
+                state="complete",
             )
 
-            def unwrap(completion_generator):
-                start = time.time()
-                tokcount = 0
-                for chunk_response in completion_generator:
-                    content = chunk_response.choices[0].delta.content
-                    if not gen.is_llama3_model or content not in set(
-                        gen.tokenizer.special_tokens.keys()
-                    ):
-                        yield content
-                    if content == gen.tokenizer.eos_id():
-                        yield "."
-                    tokcount += 1
-                status.update(
-                    label="Done, averaged {:.2f} tokens/second".format(
-                        tokcount / (time.time() - start)
-                    ),
-                    state="complete",
+        response = st.write_stream(
+            get_streamed_completion(
+                client.chat.completions.create(
+                    model="llama3",
+                    messages=st.session_state.messages,
+                    max_tokens=response_max_tokens,
+                    stream=True,
                 )
+            )
+        )[0]
 
-            response = st.write_stream(unwrap(gen.completion(req)))
-
-        # Add assistant response to chat history
-        st.session_state.messages.append({"role": "assistant", "content": response})
+    st.session_state.messages.append({"role": "assistant", "content": response})

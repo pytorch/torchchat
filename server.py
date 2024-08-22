@@ -6,6 +6,10 @@
 
 import json
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 from dataclasses import asdict
 from typing import Dict, List, Union
 
@@ -21,7 +25,7 @@ from generate import GeneratorArgs
 OPENAI_API_VERSION = "v1"
 
 
-def create_app(args):
+def create_app(args):  # noqa: C901
     """
     Creates a flask app that can be used to serve the model as a chat API.
     """
@@ -37,7 +41,7 @@ def create_app(args):
             return [_del_none(v) for v in d if v]
         return d
 
-    @app.route(f"/{OPENAI_API_VERSION}/chat", methods=["POST"])
+    @app.route(f"/{OPENAI_API_VERSION}/chat/completions", methods=["POST"])
     def chat_endpoint():
         """
         Endpoint for the Chat API. This endpoint is used to generate a response to a user prompt.
@@ -59,7 +63,7 @@ def create_app(args):
         data = request.get_json()
         req = CompletionRequest(**data)
 
-        if data.get("stream") == "true":
+        if req.stream:
 
             def chunk_processor(chunked_completion_generator):
                 """Inline function for postprocessing CompletionResponseChunk objects.
@@ -69,15 +73,17 @@ def create_app(args):
                 for chunk in chunked_completion_generator:
                     if (next_tok := chunk.choices[0].delta.content) is None:
                         next_tok = ""
-                    print(next_tok, end="")
-                    yield json.dumps(_del_none(asdict(chunk)))
+                    print(next_tok, end="", flush=True)
+                    yield f"data:{json.dumps(_del_none(asdict(chunk)))}\n\n"
 
-            return Response(
+            resp = Response(
                 chunk_processor(gen.chunked_completion(req)),
                 mimetype="text/event-stream",
             )
+            return resp
         else:
             response = gen.sync_completion(req)
+            print(response.choices[0].message.content)
 
             return json.dumps(_del_none(asdict(response)))
 
