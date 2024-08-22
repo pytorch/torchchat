@@ -1,3 +1,3 @@
-from torchchat import usages
+from torchchat.usages import browser, openai_api, server
 
-__all__ = [usages]
+__all__ = [browser, openai_api, server]
