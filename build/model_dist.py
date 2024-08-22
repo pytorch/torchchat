@@ -12,15 +12,18 @@ import torch.nn as nn
 from torch import Tensor
 from torch.nn import functional as F
 from torch.distributed._tensor import DTensor, Replicate
+from torch.distributed.tensor.parallel import parallelize_module, ColwiseParallel, RowwiseParallel
 
 from build.utils import find_multiple
 
 from build.model import TransformerArgs, KVCache, apply_rotary_emb, precompute_freqs_cis
 
-from build.parallel_blocks.linear import ColumnWiseLinear, RowWiseLinear
-from build.parallel_blocks.embedding import RowWiseEmbedding
-
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
+
+
+# Use DTensor as output, by default
+Colwise = ColwiseParallel(use_local_output=False)
+Rowwise = RowwiseParallel(use_local_output=False)
 
 
 class Transformer(nn.Module):
@@ -28,7 +31,10 @@ class Transformer(nn.Module):
         super().__init__()
         self.config = config
 
-        self.tok_embeddings = RowWiseEmbedding(config.vocab_size, config.dim)
+        tok_embeddings = nn.Embedding(config.vocab_size, config.dim)
+        self.tok_embeddings = parallelize_module(
+            tok_embeddings, RowwiseParallel(input_layouts=Replicate())
+        )
         self.layers = nn.ModuleList(
             TransformerBlock(config) for _ in range(config.n_layers)
         )
@@ -72,9 +78,7 @@ class Transformer(nn.Module):
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
         x: DTensor = self.tok_embeddings(idx)
-        # Gather back
         # TODO: sequence parallelize this
-        x = x.full_tensor()
 
         for _, layer in enumerate(self.layers):
             x = layer(x, input_pos, freqs_cis, mask)
@@ -129,15 +133,20 @@ class Attention(nn.Module):
         # key, query, value projections for all heads, but in a batch
         # total_head_dim = (config.n_heads + 2 * config.n_local_heads) * config.head_dim
         # self.wqkv = nn.Linear(config.dim, total_head_dim, bias=False)
-        self.wq = ColumnWiseLinear(config.dim, config.n_heads * config.head_dim, bias=False)
-        self.wk = ColumnWiseLinear(
+        wq = nn.Linear(config.dim, config.n_heads * config.head_dim, bias=False)
+        wk = nn.Linear(
             config.dim, config.n_local_heads * config.head_dim, bias=False
         )
-        self.wv = ColumnWiseLinear(
+        wv = nn.Linear(
             config.dim, config.n_local_heads * config.head_dim, bias=False
         )
+        wo = nn.Linear(config.dim, config.dim, bias=False)
 
-        self.wo = RowWiseLinear(config.dim, config.dim, bias=False)
+        self.wq = parallelize_module(wq, Colwise)
+        self.wk = parallelize_module(wk, Colwise)
+        self.wv = parallelize_module(wv, Colwise)
+        self.wo = parallelize_module(wo, Rowwise)
+
         self.kv_cache = None
 
         self.n_heads = config.n_heads
@@ -227,9 +236,12 @@ class Attention(nn.Module):
 class FeedForward(nn.Module):
     def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
-        self.w1 = ColumnWiseLinear(config.dim, config.hidden_dim, bias=False)
-        self.w2 = RowWiseLinear(config.hidden_dim, config.dim, bias=False)
-        self.w3 = ColumnWiseLinear(config.dim, config.hidden_dim, bias=False)
+        w1 = nn.Linear(config.dim, config.hidden_dim, bias=False)
+        w2 = nn.Linear(config.hidden_dim, config.dim, bias=False)
+        w3 = nn.Linear(config.dim, config.hidden_dim, bias=False)
+        self.w1 = parallelize_module(w1, Colwise)
+        self.w2 = parallelize_module(w2, Rowwise)
+        self.w3 = parallelize_module(w3, Colwise)
 
     def forward(self, x: Tensor) -> Tensor:
         y: DTensor = self.w2(F.silu(self.w1(x)) * self.w3(x))
