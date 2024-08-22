@@ -15,8 +15,12 @@ from typing import Dict, List, Union
 
 import torch
 
-from api.api import CompletionRequest, OpenAiApiGenerator
-from api.models import get_model_info_list, retrieve_model_info
+from api.openai_api import (
+    CompletionRequest,
+    get_model_info_list,
+    OpenAiApiGenerator,
+    retrieve_model_info,
+)
 
 from build.builder import BuilderArgs, TokenizerArgs
 from flask import Flask, request, Response
