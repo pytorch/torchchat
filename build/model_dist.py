@@ -33,7 +33,8 @@ class Transformer(nn.Module):
 
         tok_embeddings = nn.Embedding(config.vocab_size, config.dim)
         self.tok_embeddings = parallelize_module(
-            tok_embeddings, RowwiseParallel(input_layouts=Replicate())
+            tok_embeddings,
+            plan=RowwiseParallel(input_layouts=Replicate()),
         )
         self.layers = nn.ModuleList(
             TransformerBlock(config) for _ in range(config.n_layers)
@@ -142,10 +143,10 @@ class Attention(nn.Module):
         )
         wo = nn.Linear(config.dim, config.dim, bias=False)
 
-        self.wq = parallelize_module(wq, Colwise)
-        self.wk = parallelize_module(wk, Colwise)
-        self.wv = parallelize_module(wv, Colwise)
-        self.wo = parallelize_module(wo, Rowwise)
+        self.wq = parallelize_module(wq, plan=Colwise)
+        self.wk = parallelize_module(wk, plan=Colwise)
+        self.wv = parallelize_module(wv, plan=Colwise)
+        self.wo = parallelize_module(wo, plan=Rowwise)
 
         self.kv_cache = None
 
@@ -239,9 +240,9 @@ class FeedForward(nn.Module):
         w1 = nn.Linear(config.dim, config.hidden_dim, bias=False)
         w2 = nn.Linear(config.hidden_dim, config.dim, bias=False)
         w3 = nn.Linear(config.dim, config.hidden_dim, bias=False)
-        self.w1 = parallelize_module(w1, Colwise)
-        self.w2 = parallelize_module(w2, Rowwise)
-        self.w3 = parallelize_module(w3, Colwise)
+        self.w1 = parallelize_module(w1, plan=Colwise)
+        self.w2 = parallelize_module(w2, plan=Rowwise)
+        self.w3 = parallelize_module(w3, plan=Colwise)
 
     def forward(self, x: Tensor) -> Tensor:
         y: DTensor = self.w2(F.silu(self.w1(x)) * self.w3(x))
