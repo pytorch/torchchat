@@ -115,6 +115,7 @@ class GeneratorArgs:
     compile_prefill: bool = False
     speculate_k: int = 5
     sequential_prefill: bool = False
+    max_autotune: bool = False
 
     def __post_init__(self):
         if self.compile_prefill and self.sequential_prefill:
@@ -159,6 +160,7 @@ class GeneratorArgs:
             compile_prefill=args.compile_prefill,
             speculate_k=args.speculate_k,
             sequential_prefill=sequential_prefill,
+            max_autotune=args.max_autotune,
         )
 
 
@@ -615,6 +617,7 @@ class Generator:
         tokens = self.tokenizer.encode(string)
         if bos:
             tokens = [self.tokenizer.bos_id()] + tokens
+        print("size after encode_tokens:", len(tokens))
         return torch.tensor(tokens, dtype=torch.int, device=device)
 
     def _callback(self, x, *, buffer, done_generating):
@@ -661,13 +664,18 @@ class Generator:
                     False  # Bug with cudagraph trees in this case
                 )
 
+            if self.builder_args.device == "cpu":
+                kwargs = {"mode": "max-autotune"} if generator_args.max_autotune else {}
+            else:
+                kwargs = {"mode": "reduce-overhead"}
+
             if self.is_speculative:
                 self.model_forward = torch.compile(
-                    self.model_forward, mode="reduce-overhead", fullgraph=True
+                    self.model_forward, fullgraph=True, **kwargs
                 )
 
             self.decode_one_token = torch.compile(
-                self.decode_one_token, mode="reduce-overhead", fullgraph=True
+                self.decode_one_token, fullgraph=True, **kwargs
             )
 
             if generator_args.compile_prefill:
@@ -780,6 +788,10 @@ class Generator:
                         done_generating=done_generating,
                     )
 
+            if self.profile:
+                from torch._inductor import config as inductor_config
+                torch._inductor.config.profiler_mark_wrapper_call = True
+                torch._inductor.config.cpp.enable_kernel_profile = True
             if (i != generator_args.num_samples - 1 or not self.profile) or (
                 self.builder_args.use_distributed and self.rank != 0
             ):
@@ -818,6 +830,10 @@ class Generator:
             )
             compilation_time = time.perf_counter() - t0
             if hasattr(prof, "export_chrome_trace"):
+                if self.builder_args.device == "cpu":
+                    print(prof.key_averages().table(sort_by="self_cpu_time_total"))
+                else:
+                    print(prof.key_averages().table(sort_by="self_cuda_time_total"))
                 if self.builder_args.use_distributed:
                     prof.export_chrome_trace(f"{self.profile}_rank_{self.rank}.json")
                 else:
@@ -831,7 +847,8 @@ class Generator:
                 )
                 print("---------------------------------------------------")
 
-            tokens_sec = num_tokens_generated / t
+            tokens_sec = (num_tokens_generated + 1) / t
+            next_tokens_sec = num_tokens_generated / (t - aggregate_metrics.get('time_to_first_token', -1.0))
             aggregate_metrics["tokens_per_sec"].append(tokens_sec)
 
             if jit_compile:
@@ -842,7 +859,14 @@ class Generator:
                 # continue
 
             logging.info(
-                f"\nTime for inference {i + 1}: {t:.02f} sec total, time to first token {aggregate_metrics.get('time_to_first_token', -1.0):.02f} sec with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill, {num_tokens_generated} tokens, {tokens_sec:.02f} tokens/sec, {1000 / tokens_sec:.02f} ms/token"
+                f"\nTime for inference {i + 1}: {t:.02f} sec total, \n\
+                    time to first token {aggregate_metrics.get('time_to_first_token', -1.0):.02f} sec \n\
+                    with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill,\n\
+                    generate {num_tokens_generated} tokens, in total {tokens_sec:.02f} tokens/sec, \n\
+                    latency_per_token_seconds: {1 / tokens_sec:.04f} s/token\n\
+                    first_token_latency_seconds: {aggregate_metrics.get('time_to_first_token', -1.0):.02f} s/token \n\
+                    next_token_latency_seconds: {1 / next_tokens_sec:.04f} s/token \n\
+                    "
             )
             logging.info(
                 f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s"

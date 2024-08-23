@@ -353,6 +353,11 @@ def _add_generation_args(parser, verb: str) -> None:
         # help="Whether to perform prefill sequentially. Only used for model debug.",
         help=argparse.SUPPRESS,
     )
+    generator_parser.add_argument(
+        "--max-autotune",
+        action="store_true",
+        help="Whether to use max-autotune.",
+    )
 
 
 # Add CLI Args specific to Model Evaluation
