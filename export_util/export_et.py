@@ -5,25 +5,35 @@
 # LICENSE file in the root directory of this source tree.
 
 
+import logging
+
+from typing import Any, Dict, Optional, Tuple, Union
+
+import executorch.exir as exir
+
 import torch
-from build.model import Transformer
+from build.model import apply_rotary_emb, Attention, Transformer
 from build.utils import get_precision
 
 from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
     XnnpackDynamicallyQuantizedPartitioner,
 )
-
-# TODO: change back to executorch.examples.portable.utils
-# when executorch installs correctly
+from executorch.exir import EdgeProgramManager, to_edge
 
 from executorch.exir.capture._config import EdgeCompileConfig, ExecutorchBackendConfig
 from executorch.exir.passes.quant_fusion_pass import QuantFusionPass
 from executorch.exir.passes.sym_shape_eval_pass import ConstraintBasedSymShapeEvalPass
-from export_util.executorch_portable_utils import export_to_edge
-from export_util.export_et_util import replace_attention_with_custom_sdpa_attention
+from executorch.exir.tracer import Value
+
+from torch import nn
 from torch._export import capture_pre_autograd_graph
+from torch.export import export, ExportedProgram
 
 default_device = "cpu"
+
+_EDGE_COMPILE_CONFIG = exir.EdgeCompileConfig(
+    _check_ir_validity=True,
+)
 
 
 def materialze_broadcast_of_rope_freq_cis(
@@ -50,6 +60,146 @@ def materialze_broadcast_of_rope_freq_cis(
     module.freqs_sin = module.freqs_sin.view(dim0, 1, dim1)
     module.freqs_sin = module.freqs_sin.expand(dim0, num_heads, dim1).contiguous()
     return module
+
+
+class CustomKVCache(nn.Module):
+    def __init__(self, max_batch_size, max_seq_length, n_heads, head_dim, dtype):
+        super().__init__()
+
+        dtype = torch.float
+
+        # This is flipped around from what is in build.model's KVCache
+        cache_shape = (max_batch_size, max_seq_length, n_heads, head_dim)
+        self.register_buffer(
+            "k_cache", torch.zeros(cache_shape, dtype=dtype, device="cpu")
+        )
+        self.register_buffer(
+            "v_cache", torch.zeros(cache_shape, dtype=dtype, device="cpu")
+        )
+
+    def update(self, input_pos, k_val, v_val):
+        k_out = self.k_cache
+        v_out = self.v_cache
+        k_out[:, :, input_pos] = k_val.float()
+        v_out[:, :, input_pos] = v_val.float()
+
+        return k_out, v_out
+
+
+class CustomSDPAAttention(nn.Module):
+    def __init__(self, attention: Attention):
+        super().__init__()
+
+        self.wq = attention.wq
+        self.wk = attention.wk
+        self.wv = attention.wv
+
+        self.wo = attention.wo
+
+        max_batch_size, n_heads, max_seq_length, head_dim = (
+            attention.kv_cache.k_cache.shape
+        )
+        cache_dtype = attention.kv_cache.k_cache.dtype
+        self.kv_cache = CustomKVCache(
+            max_batch_size, max_seq_length, n_heads, head_dim, cache_dtype
+        )
+
+        self.n_heads = attention.n_heads
+        self.head_dim = attention.head_dim
+        self.n_local_heads = attention.n_local_heads
+        self.dim = attention.dim
+
+    def forward(self, x, freqs_cis, mask, input_pos=None):
+        bsz, seqlen, _ = x.shape
+
+        q = self.wq(x)
+        k = self.wk(x)
+        v = self.wv(x)
+
+        q = q.view(bsz, seqlen, self.n_heads, self.head_dim)
+        k = k.view(bsz, seqlen, self.n_local_heads, self.head_dim)
+        v = v.view(bsz, seqlen, self.n_local_heads, self.head_dim)
+
+        q = apply_rotary_emb(q, freqs_cis).to(dtype=torch.float)
+        k = apply_rotary_emb(k, freqs_cis).to(dtype=torch.float)
+        v = v.to(dtype=torch.float)
+
+        # KV cache should always be enabled
+        assert self.kv_cache is not None
+        output = torch.ops.llama.sdpa_with_kv_cache(
+            q,
+            k,
+            v,
+            self.kv_cache.k_cache,
+            self.kv_cache.v_cache,
+            input_pos[-1].item(),
+            seqlen,
+        )
+        output = output.view(bsz, seqlen, self.dim).to(dtype=q.dtype)
+        return self.wo(output)
+
+
+def replace_attention_with_custom_sdpa_attention(module: nn.Module):
+    from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache  # noqa
+
+    for name, child in module.named_children():
+        if isinstance(child, Attention):
+            setattr(module, name, CustomSDPAAttention(child))
+        else:
+            replace_attention_with_custom_sdpa_attention(child)
+
+
+def _to_core_aten(
+    model: Union[torch.fx.GraphModule, torch.nn.Module],
+    example_inputs: Tuple[Value, ...],
+    dynamic_shapes: Optional[Union[Dict[str, Any], Tuple[Any]]] = None,
+    verbose=True,
+) -> ExportedProgram:
+    # post autograd export. eventually this will become .to_core_aten
+    if not isinstance(model, torch.fx.GraphModule) and not isinstance(
+        model, torch.nn.Module
+    ):
+        raise ValueError(
+            f"Expected passed in model to be an instance of fx.GraphModule, got {type(model)}"
+        )
+    core_aten_ep = export(model, example_inputs, dynamic_shapes=dynamic_shapes)
+    if verbose:
+        logging.info(f"Core ATen graph:\n{core_aten_ep.graph}")
+    return core_aten_ep
+
+
+def _core_aten_to_edge(
+    core_aten_exir_ep: ExportedProgram,
+    edge_constant_methods: Optional[Dict[str, Any]] = None,
+    edge_compile_config=None,
+    verbose=True,
+) -> EdgeProgramManager:
+    if not edge_compile_config:
+        edge_compile_config = exir.EdgeCompileConfig(
+            _check_ir_validity=False,  # quant ops currently break ir verification
+        )
+    edge_manager: EdgeProgramManager = to_edge(
+        core_aten_exir_ep,
+        constant_methods=edge_constant_methods,
+        compile_config=edge_compile_config,
+    )
+    if verbose:
+        logging.info(f"Exported graph:\n{edge_manager.exported_program().graph}")
+    return edge_manager
+
+
+def export_to_edge(
+    model: Union[torch.fx.GraphModule, torch.nn.Module],
+    example_inputs: Tuple[Value, ...],
+    dynamic_shapes: Optional[Union[Dict[str, Any], Tuple[Any]]] = None,
+    edge_constant_methods: Optional[Dict[str, Any]] = None,
+    edge_compile_config=_EDGE_COMPILE_CONFIG,
+    verbose=True,
+) -> EdgeProgramManager:
+    core_aten_ep = _to_core_aten(model, example_inputs, dynamic_shapes, verbose=verbose)
+    return _core_aten_to_edge(
+        core_aten_ep, edge_constant_methods, edge_compile_config, verbose=verbose
+    )
 
 
 def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
