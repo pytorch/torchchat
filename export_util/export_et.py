@@ -12,7 +12,7 @@ from typing import Any, Dict, Optional, Tuple, Union
 import executorch.exir as exir
 
 import torch
-from build.model import apply_rotary_emb, Attention, Transformer
+from build.model import apply_rotary_emb, Attention
 from build.utils import get_precision
 
 from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
@@ -34,32 +34,6 @@ default_device = "cpu"
 _EDGE_COMPILE_CONFIG = exir.EdgeCompileConfig(
     _check_ir_validity=True,
 )
-
-
-def materialze_broadcast_of_rope_freq_cis(
-    module: torch.nn.Module,
-):
-    assert isinstance(module, Transformer)
-    assert module.freqs_cos.dim() == 2
-    dim0 = module.freqs_cos.size(0)
-    dim1 = module.freqs_cos.size(1)
-    assert (
-        module.layers[0].attention.n_local_kv_heads
-        == module.layers[0].attention.n_local_heads
-    ), f"For rope freqs to be materialzed for broadcast q, k, v num heads must match. For q got {module.attention.n_kv_heads} for k got {module.attention.n_local_heads} and v got {module.attention.n_local_kv_heads}"
-    num_heads = module.layers[0].attention.n_local_heads
-    module.freqs_cos = module.freqs_cos.view(dim0, 1, dim1)
-    module.freqs_cos = module.freqs_cos.expand(dim0, num_heads, dim1).contiguous()
-    assert module.freqs_sin.dim() == 2
-    assert dim0 == module.freqs_sin.size(
-        0
-    ), f"sin and cos freq table sizes must match. Mismatch found at dim 0: {dim0} vs {module.freqs_sin.size(0)}"
-    assert dim1 == module.freqs_sin.size(
-        1
-    ), f"sin and cos freq table sizes must match. Mismatch found at dim 1: {dim1} vs {module.freqs_sin.size(1)}"
-    module.freqs_sin = module.freqs_sin.view(dim0, 1, dim1)
-    module.freqs_sin = module.freqs_sin.expand(dim0, num_heads, dim1).contiguous()
-    return module
 
 
 class CustomKVCache(nn.Module):
@@ -248,13 +222,6 @@ def export_model(model, device, output_path, args=None) -> str:  # noqa: C901
             edge_compile_config=edge_config,
         )
     edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
-    # Delegation visualization APIs: https://pytorch.org/executorch/main/debug-backend-delegate.html
-    # from executorch.exir.backend.utils import get_delegation_info, format_delegated_graph
-    # from tabulate import tabulate
-    # graph_module = edge_manager.exported_program().graph_module
-    # delegation_info = get_delegation_info(graph_module)
-    # print(delegation_info.get_summary())
-    # print(format_delegated_graph(graph_module))
     export_program = edge_manager.to_executorch(
         ExecutorchBackendConfig(
             extract_constant_segment=True,
