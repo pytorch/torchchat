@@ -86,11 +86,10 @@ try:
 
     import logging
 
-    from typing import Any, Dict, Optional, Tuple, Union
+    from typing import Any, Dict, Tuple, Union
 
     import executorch.exir as exir
 
-    import torch
     from build.model import apply_rotary_emb, Attention
     from build.utils import get_precision
 
@@ -109,7 +108,6 @@ try:
     )
     from executorch.exir.tracer import Value
 
-    from torch import nn
     from torch._export import capture_pre_autograd_graph
     from torch.export import export, ExportedProgram
 
