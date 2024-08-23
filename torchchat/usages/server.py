@@ -15,16 +15,16 @@ from typing import Dict, List, Union
 
 import torch
 
-from api.openai_api import (
+from build.builder import BuilderArgs, TokenizerArgs
+from flask import Flask, request, Response
+from generate import GeneratorArgs
+
+from torchchat.usages.openai_api import (
     CompletionRequest,
     get_model_info_list,
     OpenAiApiGenerator,
     retrieve_model_info,
 )
-
-from build.builder import BuilderArgs, TokenizerArgs
-from flask import Flask, request, Response
-from generate import GeneratorArgs
 
 OPENAI_API_VERSION = "v1"
 

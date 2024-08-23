@@ -68,17 +68,12 @@ if __name__ == "__main__":
 
         generate_main(args)
     elif args.command == "browser":
-        # enable "chat" and "gui" when entering "browser"
-        args.chat = True
-        args.gui = True
-        check_args(args, "browser")
-
-        from browser.browser import main as browser_main
-
-        browser_main(args)
+        print(
+            "\nTo test out the browser please use: streamlit run torchchat/usages/browser.py <args>\n"
+        )
     elif args.command == "server":
         check_args(args, "server")
-        from server import main as server_main
+        from torchchat.usages.server import main as server_main
 
         server_main(args)
     elif args.command == "generate":
