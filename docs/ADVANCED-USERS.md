@@ -77,7 +77,7 @@ Interactive chat | `torchchat.py chat`   | n/a | 🚧 |
 GUI-based chat | `torchchat.py browser`   | n/a | ⚠️ |
 Generate text | `torchchat.py generate` |`generate.py` | ✅ |
 Evaluate model | `torchchat.py eval` | `eval.py` | 🚧 |
-Export model  | `torchchat.py export` | `export.py` | ✅ |
+Export model  | `torchchat.py export` | `torchchat/export.py` | ✅ |
 Exported model test (dso,pte) | `torchchat --chat` | n/a  | 🚧 |
 Exported model test (dso,pte) | `torchchat --generate` |`generate.py` | ✅ |
 Evaluate exported model (dso,pte) | `torchchat --eval` | `eval.py` | 🚧 |
@@ -284,7 +284,7 @@ variety of Python-free native execution environments.
 Let's start by exporting and running a small model like stories15M
 with ExecuTorch to generate a portable compact model representation,
 and AOT Inductor for native optimized performance on CPUs and GPUs.
-We export the model with the `export.py` or `torchchat.py export`
+We export the model with the `torchchat/export.py` or `torchchat.py export`
 command.
 
 Export for mobile backends requires that you first install executorch
@@ -300,7 +300,7 @@ execution with the ExecuTorch runtime (and enabling execution on a
 wide range of community and vendor supported backends):
 
 ```
-python3 export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_NAME}.pte
+python3 torchchat/export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_NAME}.pte
 ```
 
 Alternatively, we may generate a native instruction stream binary
@@ -308,7 +308,7 @@ using AOT Inductor for CPU oor GPUs (the latter using Triton for
 optimizations such as operator fusion):
 
 ```
-python3 export.py --checkpoint-path ${MODEL_PATH} --device [ cuda | cpu ] --output-dso-path ${MODEL_NAME}.so
+python3 torchchat/export.py --checkpoint-path ${MODEL_PATH} --device [ cuda | cpu ] --output-dso-path ${MODEL_NAME}.so
 ```
 
 
@@ -395,7 +395,7 @@ have good support for bfloat16 and float16. This can be taken advantage of via `
 [skip default]: begin
 ```
 python3 generate.py --dtype [bf16 | fp16 | fp32] ...
-python3 export.py --dtype [bf16 | fp16 | fp32] ...
+python3 torchchat/export.py --dtype [bf16 | fp16 | fp32] ...
 ```
 [skip default]: end
 
@@ -417,7 +417,7 @@ into native torchchat models by using the load-gguf option:
 
 [skip default]: begin
 ```
-python3 [ export.py | generate.py | ... ] --gguf-path <gguf_filename>
+python3 [ torchchat/export.py | generate.py | ... ] --gguf-path <gguf_filename>
 ```
 [skip default]: end
 

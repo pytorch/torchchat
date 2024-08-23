@@ -378,7 +378,7 @@ jobs:
 
         echo "::group::Run inference with quantize file"
         if [ $(uname -s) == Darwin ]; then
-          python3 export.py --output-dso-path /tmp/model.so --quantize config/data/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+          python3 torchchat/export.py --output-dso-path /tmp/model.so --quantize config/data/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
              python3 generate.py --dso-path /tmp/model.so --checkpoint "./checkpoints/${REPO_NAME}/model.pth"~
         fi
         echo "::endgroup::"
@@ -483,7 +483,7 @@ jobs:
 
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0  --device cpu
 
-          python export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
+          python torchchat/export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${PWD}/${MODEL_NAME}.pte
 
           echo "Tests complete."
@@ -497,62 +497,62 @@ jobs:
           echo "******************************************"
           echo "***               vanilla              ***"
           echo "******************************************"
-          python export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat/export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "*** --quantize config/data/mobile.json ***"
           echo "******************************************"
-          # python export.py --quantize config/data/mobile.json --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python torchchat/export.py --quantize config/data/mobile.json --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           # python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
 
           echo "******************************************"
           echo "******* Emb: channel-wise quantized ******"
           echo "******************************************"
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat/export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******** Emb: group-wise quantized *******"
           echo "******************************************"
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat/export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "**** Emb 4bit: channel-wise quantized ****"
           echo "******************************************"
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat/export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "****** Emb 4bit: group-wise quantized ****"
           echo "******************************************"
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat/export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******* INT8 channel-wise quantized ******"
           echo "******************************************"
-          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat/export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******** INT8 group-wise quantized *******"
           echo "******************************************"
-          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat/export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******** ET: a8w4dq INT4 group-wise quantized *******"
           echo "******************************************"
-          python export.py --quant '{"linear:a8w4dq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat/export.py --quant '{"linear:a8w4dq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******** INT4 group-wise quantized *******"
           echo "******************************************"
-          # python export.py --quant '{"linear:int4" : {"groupsize": 32}}' --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python torchchat/export.py --quant '{"linear:int4" : {"groupsize": 32}}' --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           # python3 torchchat.py generate --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "tests complete"

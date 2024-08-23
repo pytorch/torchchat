@@ -1,3 +1,3 @@
-from torchchat import usages
+from torchchat import export, usages 
 
-__all__ = [usages]
+__all__ = [export, usages]

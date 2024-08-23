@@ -79,6 +79,9 @@ def export_for_server(
 
 """
 Export for ExecuTorch
+
+TODO (https://github.com/pytorch/torchchat/issues/1058): Replace 
+replace_attention_with_custom_sdpa_attention with ET's implementation
 """
 
 try:
