@@ -745,9 +745,7 @@ class Generator:
                             {"role": "user", "content": prompt}
                         )
                         encoded.extend(
-                            self.chat_formatter.encode_header(
-                                {"role": "assistant", "content": ""}
-                            )
+                            self.chat_formatter.encode_header("assistant")
                         )
                     encoded = torch.tensor(
                         encoded, dtype=torch.int, device=self.builder_args.device
