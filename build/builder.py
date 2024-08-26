@@ -406,7 +406,7 @@ def _maybe_parellelize_model(
     if the user specifies using distributed inference. If not, this is a no-op.
 
     Args:
-        module (:class:`nn.Module`):
+        model (:class:`nn.Module`):
             Module to be parallelized.
         builder_args (:class:`BuilderArgs`):
             Command args for model building.
@@ -504,7 +504,7 @@ def _initialize_model(
             device_sync(device=builder_args.device)
 
         try:
-            from build.model_et import PTEModel
+            from build.model import PTEModel
 
             model = PTEModel(model.config, builder_args.pte_path)
         except Exception:

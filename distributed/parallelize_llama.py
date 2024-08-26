@@ -28,7 +28,7 @@ def apply_tp(
 
 
     Args:
-        module (:class:`nn.Module`):
+        model (:class:`nn.Module`):
             Module to be parallelized.
         world_mesh (:class:`DeviceMesh`):
             Object which describes the mesh topology
@@ -104,7 +104,7 @@ def parallelize_llama(
     the model must fit on GPU or CPU memory.
 
     Args:
-        module (:class:`nn.Module`):
+        model (:class:`nn.Module`):
             Module to be parallelized.
         world_mesh (:class:`DeviceMesh`):
             Object which describes the mesh topology
