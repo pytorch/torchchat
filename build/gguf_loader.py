@@ -18,7 +18,7 @@ from gguf import GGUFValueType
 from quantization.quantize import pack_scales_and_zeros
 
 from build.gguf_util import Q4_0, to_float
-from build.model import Transformer, TransformerArgs
+from torchchat.model import Transformer, TransformerArgs
 from build.utils import find_multiple, get_precision
 
 logger: logging.Logger = logging.getLogger(__name__)

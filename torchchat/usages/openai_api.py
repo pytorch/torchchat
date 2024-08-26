@@ -16,7 +16,7 @@ from typing import Any, Dict, List, Optional, Union
 import torch
 
 from build.utils import device_sync
-from download import is_model_downloaded, load_model_configs
+from torchchat.cli.download import is_model_downloaded, load_model_configs
 from generate import Generator, GeneratorArgs
 
 

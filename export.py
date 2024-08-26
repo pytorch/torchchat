@@ -11,7 +11,7 @@ from typing import Optional
 import torch
 import torch.nn as nn
 
-from build.builder import (
+from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
     _set_gguf_kwargs,
@@ -21,7 +21,7 @@ from build.builder import (
 )
 
 from build.utils import set_backend, set_precision
-from cli import add_arguments_for_verb, arg_init, check_args
+from torchchat.cli.cli import add_arguments_for_verb, arg_init, check_args
 
 from torch.export import Dim
 
@@ -93,7 +93,7 @@ try:
 
     import executorch.exir as exir
 
-    from build.model import apply_rotary_emb, Attention
+    from torchchat.model import apply_rotary_emb, Attention
     from build.utils import get_precision
 
     from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
@@ -126,7 +126,7 @@ try:
 
             dtype = torch.float
 
-            # This is flipped around from what is in build.model's KVCache
+            # This is flipped around from what is in torchchat.model's KVCache
             cache_shape = (max_batch_size, max_seq_length, n_heads, head_dim)
             self.register_buffer(
                 "k_cache", torch.zeros(cache_shape, dtype=dtype, device="cpu")

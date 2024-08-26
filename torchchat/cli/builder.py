@@ -22,7 +22,7 @@ from distributed import init_distributed, ParallelDims, parallelize_llama
 from quantization.quantize import quantize_model
 from utils.measure_time import measure_time
 
-from build.model import Transformer
+from torchchat.model import Transformer
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
 from distributed import launch_distributed
 
@@ -498,7 +498,7 @@ def _initialize_model(
             device_sync(device=builder_args.device)
 
         try:
-            from build.model import PTEModel
+            from torchchat.model import PTEModel
 
             model = PTEModel(model.config, builder_args.pte_path)
         except Exception:

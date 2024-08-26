@@ -9,7 +9,7 @@ import logging
 import subprocess
 import sys
 
-from cli import (
+from torchchat.cli.cli import (
     add_arguments_for_verb,
     arg_init,
     check_args,
@@ -92,22 +92,22 @@ if __name__ == "__main__":
         export_main(args)
     elif args.command == "download":
         check_args(args, "download")
-        from download import download_main
+        from torchchat.cli.download import download_main
 
         download_main(args)
     elif args.command == "list":
         check_args(args, "list")
-        from download import list_main
+        from torchchat.cli.download import list_main
 
         list_main(args)
     elif args.command == "where":
         check_args(args, "where")
-        from download import where_main
+        from torchchat.cli.download import where_main
 
         where_main(args)
     elif args.command == "remove":
         check_args(args, "remove")
-        from download import remove_main
+        from torchchat.cli.download import remove_main
 
         remove_main(args)
     else:

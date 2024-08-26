@@ -19,15 +19,15 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 
-from build.builder import (
+from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
     BuilderArgs,
     TokenizerArgs,
 )
-from build.model import Transformer
+from torchchat.model import Transformer
 from build.utils import device_sync, set_precision
-from cli import add_arguments_for_verb, arg_init, check_args
+from torchchat.cli.cli import add_arguments_for_verb, arg_init, check_args
 from utils.device_info import get_device_info
 
 
@@ -903,4 +903,3 @@ if __name__ == "__main__":
     check_args(args, verb)
     args = arg_init(args)
     main(args)
-
