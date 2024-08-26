@@ -47,8 +47,8 @@ on-device usecases.
 ## Quantization API
 
 Quantization options are passed in json format either as a config file
-(see [cuda.json](../config/data/cuda.json) and
-[mobile.json](../config/data/mobile.json)) or a JSON string.
+(see [cuda.json](../torchchat/quant_config/cuda.json) and
+[mobile.json](../torchchat/quant_config/mobile.json)) or a JSON string.
 
 The expected JSON format is described below. Refer to the tables above
 for valid `bitwidth` and `groupsize` values.
@@ -120,7 +120,7 @@ python3 generate.py llama3 --pte-path llama3.pte  --prompt "Hello my name is"
 
 ## Quantization Profiles
 
-Four [sample profiles](https://github.com/pytorch/torchchat/tree/main/config/data) are included with the torchchat distribution: `cuda.json`, `desktop.json`, `mobile.json`, `pi5.json`
+Four [sample profiles](https://github.com/pytorch/torchchat/tree/main/torchchat/quant_config/) are included with the torchchat distribution: `cuda.json`, `desktop.json`, `mobile.json`, `pi5.json`
 with profiles optimizing for execution on cuda, desktop, mobile and
 raspberry Pi devices.
 
