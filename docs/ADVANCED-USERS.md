@@ -116,7 +116,7 @@ through `Transformer.from_name()` to perform a fuzzy match against a
 table of known model architectures. Alternatively, you can specify the
 index into that table with the option `--params-table ${INDEX}` where
 the index is the lookup key key in the [the list of known
-pconfigurations](https://github.com/pytorch/torchchat/tree/main/build/known_model_params)
+pconfigurations](https://github.com/pytorch/torchchat/tree/main/torchchat/model_params)
 For example, for the stories15M model, this would be expressed as
 `--params-table stories15M`. (We use the model constructor
 `Transformer.from_table()`)
