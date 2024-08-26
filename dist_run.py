@@ -21,7 +21,7 @@ _name_to_hf_model_id = {
 }
 
 # Model config
-def main():_
+def main():
     config = TransformerArgs.from_name(_model_name)
     print(config)
     _mesh_dimensions = (2, 2)
