@@ -230,6 +230,7 @@ class Attention(nn.Module):
 
         q, k, v = (x.transpose(1, 2) for x in (q, k, v))
 
+        # TODO: enable kv cache
         #if self.kv_cache is not None:
         #    k, v = self.kv_cache.update(input_pos, k, v)
 
