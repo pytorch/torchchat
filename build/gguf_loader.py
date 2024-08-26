@@ -14,10 +14,7 @@ import gguf
 import torch
 
 from gguf import GGUFValueType
-from quantization.quantize import (
-    LinearInt4 as WeightOnlyInt4Linear,
-    pack_scales_and_zeros,
-)
+from quantization.quantize import pack_scales_and_zeros
 
 from build.gguf_util import Q4_0, to_float
 from build.model import Transformer, TransformerArgs
@@ -129,7 +126,7 @@ def linear_int4(input, weight_int4pack, scales_and_zeros, out_features, groupsiz
     return c
 
 
-class LinearInt4(torch.nn.Module):
+class WeightOnlyInt4Linear(torch.nn.Module):
     __constants__ = ["in_features", "out_features"]
     in_features: int
     out_features: int
