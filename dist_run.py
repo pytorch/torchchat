@@ -7,8 +7,8 @@
 import torch
 import torch.distributed as dist
 
-from build.model import TransformerArgs
-from build.model_dist import Transformer
+from torchchat.model import TransformerArgs
+from distributed.model_dist import Transformer
 
 # Model config
 def main():

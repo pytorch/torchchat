@@ -22,7 +22,7 @@ from quantization.quantize import (
 
 from torchchat.model import Transformer, TransformerArgs
 
-from build.utils import find_multiple, get_precision
+from torchchat.utils.build_utils import find_multiple, get_precision
 
 logger: logging.Logger = logging.getLogger(__name__)
 

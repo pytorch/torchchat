@@ -15,9 +15,9 @@ from torch.distributed._tensor import DTensor, Replicate
 from torch.distributed.device_mesh import _mesh_resources, DeviceMesh
 from torch.distributed.tensor.parallel import parallelize_module, ColwiseParallel, RowwiseParallel
 
-from build.utils import find_multiple
+from torchchat.utils.build_utils import find_multiple
 
-from build.model import TransformerArgs, KVCache, apply_rotary_emb, precompute_freqs_cis
+from torchchat.model import TransformerArgs, KVCache, apply_rotary_emb, precompute_freqs_cis
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
@@ -112,7 +112,7 @@ class Transformer(nn.Module):
 
     @classmethod
     def from_gguf(cls, gguf_path: str, **kwargs):
-        from build.gguf_loader import load_model_and_state_dict
+        from torchchat.utils.gguf_loader import load_model_and_state_dict
 
         model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
         if state_dict != {}:

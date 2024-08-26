@@ -16,9 +16,9 @@ import torch.nn as nn
 from torch import Tensor
 from torch.nn import functional as F
 
-from build.utils import find_multiple, get_precision
+from torchchat.utils.build_utils import find_multiple, get_precision
 
-config_path = Path(f"{str(Path(__file__).parent.parent)}/torchchat/model_params")
+config_path = Path(f"{str(Path(__file__).parent)}/model_params")
 
 
 @dataclass
@@ -215,7 +215,7 @@ class Transformer(nn.Module):
 
     @classmethod
     def from_gguf(cls, gguf_path: str, **kwargs):
-        from build.gguf_loader import load_model_and_state_dict
+        from torchchat.utils.gguf_loader import load_model_and_state_dict
 
         model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
         if state_dict != {}:

@@ -20,7 +20,7 @@ from torchchat.cli.builder import (
     TokenizerArgs,
 )
 
-from build.utils import set_backend, set_precision
+from torchchat.utils.build_utils import set_backend, set_precision
 from torchchat.cli.cli import add_arguments_for_verb, arg_init, check_args
 
 from torch.export import Dim
@@ -94,7 +94,7 @@ try:
     import executorch.exir as exir
 
     from torchchat.model import apply_rotary_emb, Attention
-    from build.utils import get_precision
+    from torchchat.utils.build_utils import get_precision
 
     from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
         XnnpackDynamicallyQuantizedPartitioner,

@@ -69,8 +69,8 @@ function run_validation_e2e() {
     fi
     download_checkpoint "$MODEL_REPO"
 
-    if [ ! -f "build/convert_hf_checkpoint.py" ]; then
-        echo "build/convert_hf_checkpoint.py doesn't exist."
+    if [ ! -f "torchchat/utils/convert_hf_checkpoint.py" ]; then
+        echo "torchchat/utils/convert_hf_checkpoint.py doesn't exist."
         exit 1
     fi
     bash .ci/scripts/convert_checkpoint.sh "$MODEL_REPO"

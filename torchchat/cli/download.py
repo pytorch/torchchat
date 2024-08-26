@@ -10,7 +10,7 @@ import urllib.request
 from pathlib import Path
 from typing import Optional
 
-from build.convert_hf_checkpoint import convert_hf_checkpoint
+from torchchat.utils.convert_hf_checkpoint import convert_hf_checkpoint
 from config.model_config import (
     load_model_configs,
     ModelConfig,

@@ -23,7 +23,7 @@ from quantization.quantize import quantize_model
 from utils.measure_time import measure_time
 
 from torchchat.model import Transformer
-from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
+from torchchat.utils.build_utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
 from distributed import launch_distributed
 
 

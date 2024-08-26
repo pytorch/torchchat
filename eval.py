@@ -17,7 +17,7 @@ from torchchat.cli.builder import (
 )
 
 from torchchat.model import Transformer
-from build.utils import set_precision
+from torchchat.utils.build_utils import set_precision
 from torchchat.cli.cli import add_arguments_for_verb, arg_init
 from utils.measure_time import measure_time
 

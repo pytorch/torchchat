@@ -13,7 +13,7 @@ from pathlib import Path
 
 import torch
 
-from build.utils import allowable_dtype_names, allowable_params_table, get_device_str
+from torchchat.utils.build_utils import allowable_dtype_names, allowable_params_table, get_device_str
 from torchchat.cli.download import download_and_convert, is_model_downloaded
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
