@@ -14,13 +14,20 @@ from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 from build.model import TransformerArgs
 from build.model_dist import TransformerStage
 
+_model_name = "Transformer-2-7b-chat-hf"
+
+_name_to_hf_model_id = {
+    "Transformer-2-7b-chat-hf": "meta-llama/Llama-2-7b-chat-hf",
+}
+
 # Model config
-def main():
-    config = TransformerArgs.from_name("Transformer-2-7b-chat-hf")
+def main():_
+    config = TransformerArgs.from_name(_model_name)
     print(config)
+    _mesh_dimensions = (2, 2)
 
     # Construct a device mesh with available devices (multi-host or single host)
-    device_mesh = dist.init_device_mesh("cuda", (2, 2), mesh_dim_names=("pp", "tp"))
+    device_mesh = dist.init_device_mesh("cuda", _mesh_dimensions, mesh_dim_names=("pp", "tp"))
     tp_mesh = device_mesh["tp"]
     pp_mesh = device_mesh["pp"]
     pp_rank = pp_mesh.get_local_rank()
