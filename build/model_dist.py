@@ -30,27 +30,35 @@ Rowwise = RowwiseParallel(use_local_output=False)
 device_mesh = None
 
 
-class Transformer(nn.Module):
-    def __init__(self, config: TransformerArgs) -> None:
+class TransformerStage(nn.Module):
+    def __init__(self, config: TransformerArgs, stage_idx: int, n_stages: int) -> None:
         super().__init__()
         self.config = config
+        self.stage_idx = stage_idx
+        self.n_stages = n_stages
+        self.layers_per_stage = config.n_layers // n_stages
 
         # Get device mesh
         global device_mesh
         if device_mesh is None:
             device_mesh = _mesh_resources.get_current_mesh()
 
-        tok_embeddings = nn.Embedding(config.vocab_size, config.dim)
-        self.tok_embeddings = parallelize_module(
-            tok_embeddings,
-            device_mesh,
-            RowwiseParallel(input_layouts=Replicate()),
-        )
-        self.layers = nn.ModuleList(
-            TransformerBlock(config) for _ in range(config.n_layers)
-        )
-        self.norm = RMSNorm(config.dim, eps=config.norm_eps)
-        self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
+        if stage_idx == 0:
+            tok_embeddings = nn.Embedding(config.vocab_size, config.dim)
+            self.tok_embeddings = parallelize_module(
+                tok_embeddings,
+                device_mesh,
+                RowwiseParallel(input_layouts=Replicate()),
+            )
+
+        # Use ModuleDict so that each layer can be assigned its layer ID in the original model
+        self.layers = nn.ModuleDict()
+        for layer_id in range(self.layers_per_stage * stage_idx, self.layers_per_stage * (stage_idx + 1)):
+            self.layers[str(layer_id)] = TransformerBlock(config)
+
+        if stage_idx == n_stages - 1:
+            self.norm = RMSNorm(config.dim, eps=config.norm_eps)
+            self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
 
         # self.freqs_cis: Optional[Tensor] = None
         # self.mask_cache: Optional[Tensor] = None
@@ -67,7 +75,7 @@ class Transformer(nn.Module):
         max_seq_length = find_multiple(max_seq_length, 8)
         self.max_seq_length = max_seq_length
         self.max_batch_size = max_batch_size
-        for b in self.layers:
+        for b in self.layers.values():
             b.attention.kv_cache = KVCache(
                 max_batch_size, max_seq_length, self.config.n_local_heads, head_dim
             )
@@ -84,19 +92,26 @@ class Transformer(nn.Module):
         )
         self.register_buffer("causal_mask", causal_mask, persistent=True)
 
-    def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
+    def forward(self, x: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
+        if input_pos is None:
+            input_pos = torch.arange(x.shape[1], device=x.device, dtype=torch.long)
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
-        x: DTensor = self.tok_embeddings(idx)
-        # TODO: sequence parallelize this
 
-        for _, layer in enumerate(self.layers):
+        if self.stage_idx == 0:
+            x: DTensor = self.tok_embeddings(x)
+            # TODO: sequence parallelize this
+
+        for _, layer in self.layers.items():
             x = layer(x, input_pos, freqs_cis, mask)
-        x = self.norm(x)
-        logits = self.output(x)
-        # print(f"logits shape: {logits.shape}")
-        return logits
+
+        if self.stage_idx == self.n_stages - 1:
+            x = self.norm(x)
+            x = self.output(x)
+
+        # print(f"stage output shape: {x.shape}")
+        return x
 
     @classmethod
     def from_name(cls, name: str):
