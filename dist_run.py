@@ -11,25 +11,29 @@ from build.model import TransformerArgs
 from build.model_dist import Transformer
 
 # Model config
-config = TransformerArgs.from_name("Transformer-2-7b-chat-hf")
-print(config)
+def main():
+    config = TransformerArgs.from_name("Transformer-2-7b-chat-hf")
+    print(config)
 
-# Construct a device mesh with available devices (multi-host or single host)
-device_mesh = dist.init_device_mesh("cuda", (2,), mesh_dim_names=("tp",))
-rank = dist.get_rank()
-device = torch.device(f"cuda:{rank}")
+    # Construct a device mesh with available devices (multi-host or single host)
+    device_mesh = dist.init_device_mesh("cuda", (2,), mesh_dim_names=("tp",))
+    rank = dist.get_rank()
+    device = torch.device(f"cuda:{rank}")
 
-# Create parallel model with device_mesh context
-with device:
-    with device_mesh:
-        model = Transformer(config)
-        model.setup_caches(1, 4096)
+    # Create parallel model with device_mesh context
+    with device:
+        with device_mesh:
+            model = Transformer(config)
+            model.setup_caches(1, 4096)
 
-print(model)
+    print(model)
 
-# Distributed run
-input_ids = torch.randint(0, config.vocab_size, (1, 4096), device=device)
-input_pos = torch.arange(0, 4096, device=device)
-output = model(input_ids, input_pos)
-dist.destroy_process_group()
-print(f"Rank {rank} completes.")
+    # Distributed run
+    input_ids = torch.randint(0, config.vocab_size, (1, 4096), device=device)
+    input_pos = torch.arange(0, 4096, device=device)
+    output = model(input_ids, input_pos)
+    dist.destroy_process_group()
+    print(f"Rank {rank} completes.")
+
+if __name__ == "__main__":
+    main()
