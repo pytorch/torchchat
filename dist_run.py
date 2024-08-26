@@ -14,6 +14,8 @@ from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 from build.model import TransformerArgs
 from build.model_dist import TransformerStage
 
+from distributed.logging_utils import setup_logging
+
 _model_name = "Transformer-2-7b-chat-hf"
 
 _name_to_hf_model_id = {
@@ -22,6 +24,9 @@ _name_to_hf_model_id = {
 
 # Model config
 def main():
+    logger = setup_logging(__name__)
+    logger.info("Starting distributed run.")
+    assert False, "check logging"
     config = TransformerArgs.from_name(_model_name)
     print(config)
     _mesh_dimensions = (2, 2)
