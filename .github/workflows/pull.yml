@@ -727,7 +727,7 @@ jobs:
       - name: Load files
         run: |
           touch test.py
-          echo "from build.gguf_util import test_by_to_float" >> test.py
+          echo "from build.gguf_loader import test_by_to_float" >> test.py
           echo "test_by_to_float(\"gguf_files/llama-2-7b.Q4_0.gguf\", \"gguf_files/llama-2-7b.Q4_0.requant_F32.gguf\")" >> test.py
           cat test.py
           python test.py
