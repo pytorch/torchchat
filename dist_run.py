@@ -15,7 +15,10 @@ from build.model import TransformerArgs
 from build.model_dist import TransformerStage
 
 from distributed.logging_utils import setup_logging
-from distributed.safetensor_utils import get_hf_config_file 
+from distributed.safetensor_utils import (
+    get_hf_config_file,
+    get_hf_weight_map_and_path,
+)
 
 _model_name = "Transformer-2-7b-chat-hf"
 
@@ -26,18 +29,17 @@ _name_to_hf_model_id = {
 # Model config
 def main():
     logger = setup_logging(__name__)
-    logger.info("Starting distributed run.")
     
     config = TransformerArgs.from_name(_model_name)
-    print(config)
+    logger.info(config)
 
     # make sure we have valid HF cache for weights and tokenizer
     hf_model_name = _name_to_hf_model_id[_model_name]
     hf_config = get_hf_config_file(hf_model_name)
-    logger.info(f"Using HF model {hf_model_name} with config {hf_config}.")
+    logger.info(f"Using HF model weights from {hf_model_name}")
 
-    assert False, "check hf"
-    _mesh_dimensions = (2, 2)
+
+    _mesh_dimensions = (2, 2)  
 
     # Construct a device mesh with available devices (multi-host or single host)
     device_mesh = dist.init_device_mesh("cuda", _mesh_dimensions, mesh_dim_names=("pp", "tp"))
@@ -55,7 +57,7 @@ def main():
             model = TransformerStage(config, pp_rank, nstages)
             model.setup_caches(1, 4096)
 
-    print(model)
+    logger.info(model)
 
     # Distributed run
     mbs = 2                         # number of micro-batches
@@ -70,11 +72,21 @@ def main():
     example_args = mb_ids if pp_rank == 0 else activation
 
     # Create pipeline stages
+    logger.info(f"Creating pipeline stage {pp_rank=}, {nstages=}")
     stage = PipelineStage(
         model, pp_rank, nstages, device,
         input_args=(example_args,),
         group=pp_mesh.get_group(),
     )
+
+    # load weights
+    stage_module = stage.submod
+    #logger.info(f"{stage.submod=}")
+    logger.info(f"{stage_module=}")
+    weight_map, weight_path, key_map = get_hf_weight_map_and_path(hf_model_name)
+    logger.info(f"{weight_map=}, {weight_path=}, {key_map=}")
+
+    assert False, "check weightmap"
 
     # Run pipeline
     schedule = ScheduleGPipe(stage, mbs)
