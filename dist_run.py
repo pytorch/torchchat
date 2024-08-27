@@ -15,6 +15,7 @@ from build.model import TransformerArgs
 from build.model_dist import TransformerStage
 
 from distributed.logging_utils import setup_logging
+from distributed.safetensor_utils import get_hf_config_file 
 
 _model_name = "Transformer-2-7b-chat-hf"
 
@@ -26,9 +27,16 @@ _name_to_hf_model_id = {
 def main():
     logger = setup_logging(__name__)
     logger.info("Starting distributed run.")
-    assert False, "check logging"
+    
     config = TransformerArgs.from_name(_model_name)
     print(config)
+
+    # make sure we have valid HF cache for weights and tokenizer
+    hf_model_name = _name_to_hf_model_id[_model_name]
+    hf_config = get_hf_config_file(hf_model_name)
+    logger.info(f"Using HF model {hf_model_name} with config {hf_config}.")
+
+    assert False, "check hf"
     _mesh_dimensions = (2, 2)
 
     # Construct a device mesh with available devices (multi-host or single host)
