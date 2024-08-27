@@ -232,7 +232,8 @@ def update_state_dict(
     new_to_old_keymap: Dict[str, str],
     file: str,
     updated_states: Set[str],
-):
+):  
+    count_dtensors_loaded = 0
     for param, file_with_param in weight_map.items():
         if file_with_param == file and param in state_dict:
             model_param = (
@@ -258,6 +259,7 @@ def update_state_dict(
                 model_tensor = load_into_dtensor(checkpoint_tensor, stage_tensor)
                 logger.info(f"DTensor: Loaded {param} into {model_tensor=}")
                 state_dict[param] = model_tensor
+                count_dtensors_loaded += 1
                 
             else:
                 # regular tensor, just update directly
@@ -267,6 +269,7 @@ def update_state_dict(
             # log_tensor_info(param, state_dict[param])
             # logger.info(f"Loaded {param} from {file}")
             updated_states.add(param)
+            logger.info(f"Count of loaded DTensors: {count_dtensors_loaded}")
 
 
 def format_tensor_info(tensor: torch.Tensor) -> str:

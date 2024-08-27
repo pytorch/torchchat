@@ -15,6 +15,7 @@ def load_into_dtensor(weight_tensor, model_dtensor):
     """ Adjust a loaded tensor to match the shape/placement of the model DTensor and copy the data into it """
 
     weight_tensor = weight_tensor.to(model_dtensor.device)
+    logger.info(f"Loading into DTensor: {weight_tensor.shape=} {model_dtensor.shape=}")
 
     if weight_tensor.shape != model_dtensor.shape:
         raise ValueError(f"Shape mismatch: weight tensor shape {weight_tensor.shape} "
@@ -22,14 +23,20 @@ def load_into_dtensor(weight_tensor, model_dtensor):
 
     placements = model_dtensor.placements
     mesh = model_dtensor.device_mesh
+    # Get the mesh dimensions
+    mesh_dims = mesh.ndim
 
-    # Handle sharding...nothing to do for replicated tensors
-    # Handle sharding if necessary
+    # Handle sharding 
     for dim, placement in enumerate(placements):
         if isinstance(placement, Shard):
             shard_dim = placement.dim
+            if shard_dim >= mesh_dims:
+                print(f"Warning: Shard dimension {shard_dim} is out of range for mesh with {mesh_dims} dimensions. "
+                      f"Treating as replicated.")
+                continue  # Treat as replicated
+
             num_shards = mesh.size(shard_dim)
-            shard_size = weight_tensor.size(shard_dim) // num_shards
+            shard_size = weight_tensor.size(dim) // num_shards
             shard_index = mesh.get_coordinate()[shard_dim]
             
             # Calculate start and end indices for this shard
@@ -41,7 +48,7 @@ def load_into_dtensor(weight_tensor, model_dtensor):
 
             # Create a list of slice objects, with ':' for all dims except the sharded one
             slice_list = [slice(None)] * weight_tensor.dim()
-            slice_list[shard_dim] = dim_slice
+            slice_list[dim] = dim_slice
 
             # Apply the slice to get the shard for this device
             weight_tensor = weight_tensor[tuple(slice_list)]
@@ -51,8 +58,21 @@ def load_into_dtensor(weight_tensor, model_dtensor):
         else:
             raise ValueError(f"Unsupported placement type: {type(placement)}")
 
-    # Create a new DTensor from the (potentially sharded) weight tensor
+    # Create a new DTensor from the weight tensor
     new_dtensor = DTensor.from_local(weight_tensor, mesh, placements)
+
+    # debug - TODO remove
+    local_tensor = new_dtensor.to_local()
+    local_shard_shape = local_tensor.shape
+    placements = new_dtensor.placements
+    global_shape = new_dtensor.shape
+    logger.info("================================================\n")
+    logger.info(f"New DTensor: {global_shape=}, Local shard shape: {local_shard_shape}, Placements: {placements}")
+    model_shard_shape = model_dtensor.to_local().shape
+    model_global_shape = model_dtensor.shape
+    logger.info(f"Model DTensor: {model_global_shape=}, Local shard shape: {model_shard_shape}, Placements {model_dtensor.placements}")
+    assert local_shard_shape == model_shard_shape, f"Local shard shape {local_shard_shape} does not match model shard shape {model_shard_shape}"
+    logger.info("================================================\n")
 
     # Copy data from new_dtensor to model_dtensor
     model_dtensor.copy_(new_dtensor)
