@@ -105,10 +105,10 @@ def main():
     logger.info(f"Loading weights for {pp_rank=}")
     load_model_weights(stage.submod, hf_model_name, logger)
 
-    assert False, "verify loaded weights count"
     schedule = ScheduleGPipe(stage, mbs)
+    logger.info(f"Created schedule: {schedule}")
     input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
-
+    logger.info(f"Input: {input_ids}")
     if pp_rank == 0:
         schedule.step(input_ids)
     else:

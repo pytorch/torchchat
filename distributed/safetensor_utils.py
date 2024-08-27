@@ -250,7 +250,7 @@ def update_state_dict(
             state_dict[param] = checkpoint_tensor
 
             # log_tensor_info(param, state_dict[param])
-            logger.info(f"Loaded {param} from {file}")
+            # logger.info(f"Loaded {param} from {file}")
             updated_states.add(param)
 
 
