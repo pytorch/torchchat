@@ -17,7 +17,7 @@ import torch
 
 from torchchat.utils.build_utils import device_sync
 from torchchat.cli.download import is_model_downloaded, load_model_configs
-from generate import Generator, GeneratorArgs
+from torchchat.generate import Generator, GeneratorArgs
 
 
 """Dataclasses defined around the objects used the OpenAI API Chat specification.

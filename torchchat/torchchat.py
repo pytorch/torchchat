@@ -20,7 +20,7 @@ from torchchat.cli.cli import (
 default_device = "cpu"
 
 
-if __name__ == "__main__":
+def main():
     # Initialize the top-level parser
     parser = argparse.ArgumentParser(
         prog="torchchat",
@@ -64,7 +64,7 @@ if __name__ == "__main__":
         # enable "chat"
         args.chat = True
         check_args(args, "chat")
-        from generate import main as generate_main
+        from torchchat.generate import main as generate_main
 
         generate_main(args)
     elif args.command == "browser":
@@ -78,16 +78,16 @@ if __name__ == "__main__":
         server_main(args)
     elif args.command == "generate":
         check_args(args, "generate")
-        from generate import main as generate_main
+        from torchchat.generate import main as generate_main
 
         generate_main(args)
     elif args.command == "eval":
-        from eval import main as eval_main
+        from torchchat.usages.eval import main as eval_main
 
         eval_main(args)
     elif args.command == "export":
         check_args(args, "export")
-        from export import main as export_main
+        from torchchat.export import main as export_main
 
         export_main(args)
     elif args.command == "download":
@@ -112,3 +112,7 @@ if __name__ == "__main__":
         remove_main(args)
     else:
         parser.print_help()
+
+
+if __name__ == "__main__":
+    main()
