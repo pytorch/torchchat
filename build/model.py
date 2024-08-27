@@ -29,7 +29,7 @@ class ModelType(Enum):
 
 class ModelSource(Enum):
     Native = "native"
-    Gguf = "gguf"
+    Torchtune = "torchtune"
 
 
 @dataclass
@@ -79,9 +79,9 @@ class TransformerArgs:
 
 @dataclass
 class ModelArgs:
-    model_source: ModelSource = ModelSource.Native
-    model_type: ModelType = ModelType.TextOnly
-    transformer_args: Dict[str, TransformerArgs] = None
+    model_source: ModelSource
+    model_type: ModelType
+    transformer_args: Dict[str, TransformerArgs]
 
     def __post_init__(self):
         assert self.text_transformer_args is not None
@@ -94,19 +94,21 @@ class ModelArgs:
 
         try:
             # try to interpret as a single transformer config
+            transformer_args: Dict[str, TransformerArgs] = {}
             transformer_args['text'] = TransformerArgs.from_params(
                 loaded_params
             )
         except TypeError:
             # try to interpret as a dict of transformer configs
             # now only support flamingo model
+            assert False, "flamingo model is not supported yet"
             for name, params in loaded_params.items():
                 if name == "text":
                     text_transformer_args = TransformerArgs.from_params(params)
                 else:
                     raise ValueError(f"Unknown transformer name {name}")
 
-        return cls(text_transformer_args)
+        return cls(model_source, model_type, transformer_args)
 
     @classmethod
     def from_table(cls, name: str):
