@@ -6,15 +6,15 @@ from distributed.logging_utils import setup_logging
 
 logger = setup_logging(__name__)
 
-
 def is_dtensor(tensor):
     """ Check if a tensor is a DTensor by class or has a placements attribute (not sure if we want to use attr check) """
     return isinstance(tensor, DTensor) or hasattr(tensor, 'placements')
 
-def load_into_dtensor(weight_tensor, model_dtensor):
+def load_into_dtensor(weight_tensor, model_dtensor, debug=False):
     """ Adjust a loaded tensor to match the shape/placement of the model DTensor and copy the data into it """
     weight_tensor = weight_tensor.to(model_dtensor.device)
-    logger.info(f"Loading into DTensor: {weight_tensor.shape=} {model_dtensor.shape=}")
+    if debug:
+        logger.info(f"Loading into DTensor: {weight_tensor.shape=} {model_dtensor.shape=}")
     
     if weight_tensor.shape != model_dtensor.shape:
         raise ValueError(f"Shape mismatch: weight tensor shape {weight_tensor.shape} "
@@ -24,13 +24,15 @@ def load_into_dtensor(weight_tensor, model_dtensor):
     mesh = model_dtensor.device_mesh
     mesh_dims = mesh.ndim
     
-    logger.info(f"DTensor: Placements: {placements}")
-    logger.info(f"DTensor: Mesh: {mesh}, mesh_dims={mesh_dims}")
+    if debug:
+        logger.info(f"DTensor: Placements: {placements}")
+        logger.info(f"DTensor: Mesh: {mesh}, mesh_dims={mesh_dims}")
 
     for placement in placements:
         if isinstance(placement, Shard):
             shard_dim = placement.dim
-            logger.info(f"DTensor Sharding dimension: {shard_dim}")
+            if debug:
+                logger.info(f"DTensor Sharding dimension: {shard_dim}")
             
             if shard_dim >= weight_tensor.dim():
                 raise ValueError(f"Shard dimension {shard_dim} is out of range for tensor with {weight_tensor.dim()} dimensions.")
@@ -46,26 +48,29 @@ def load_into_dtensor(weight_tensor, model_dtensor):
             slice_list[shard_dim] = slice(start_idx, end_idx)
             weight_tensor = weight_tensor[tuple(slice_list)]
             
-            logger.info(f"Sharded tensor shape: {weight_tensor.shape}")
+            if debug:
+                logger.info(f"Sharded tensor shape: {weight_tensor.shape}")
         
         elif isinstance(placement, Replicate):
-            logger.info("Placement is Replicate, no sharding needed.")
+            if debug:
+                logger.info("Placement is Replicate, no sharding needed.")
         else:
             raise ValueError(f"Unsupported placement type: {type(placement)}")
     
     new_dtensor = DTensor.from_local(weight_tensor, mesh, placements)
     
     # Debug information
-    local_tensor = new_dtensor.to_local()
-    local_shard_shape = local_tensor.shape
-    global_shape = new_dtensor.shape
-    logger.info("=" * 50)
-    logger.info(f"New DTensor: {global_shape=}, Local shard shape: {local_shard_shape}, Placements: {placements}")
-    model_shard_shape = model_dtensor.to_local().shape
-    model_global_shape = model_dtensor.shape
-    logger.info(f"Model DTensor: {model_global_shape=}, Local shard shape: {model_shard_shape}, Placements {model_dtensor.placements}")
-    assert local_shard_shape == model_shard_shape, f"Local shard shape {local_shard_shape} does not match model shard shape {model_shard_shape}"
-    logger.info("=" * 50)
+    if debug
+        local_tensor = new_dtensor.to_local()
+        local_shard_shape = local_tensor.shape
+        global_shape = new_dtensor.shape
+        logger.info("=" * 50)
+        logger.info(f"New DTensor: {global_shape=}, Local shard shape: {local_shard_shape}, Placements: {placements}")
+        model_shard_shape = model_dtensor.to_local().shape
+        model_global_shape = model_dtensor.shape
+        logger.info(f"Model DTensor: {model_global_shape=}, Local shard shape: {model_shard_shape}, Placements {model_dtensor.placements}")
+        assert local_shard_shape == model_shard_shape, f"Local shard shape {local_shard_shape} does not match model shard shape {model_shard_shape}"
+        logger.info("=" * 50)
     
     model_dtensor.copy_(new_dtensor)
     return model_dtensor

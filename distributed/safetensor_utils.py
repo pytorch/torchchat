@@ -247,9 +247,9 @@ def update_state_dict(
 
             checkpoint_tensor = checkpoint[old_param]
             stage_tensor = state_dict[param]
-            logger.info(f"{param=}, {stage_tensor.shape=}")
+            #logger.info(f"{param=}, {stage_tensor.shape=}")
             stage_is_dtensor = is_dtensor(stage_tensor)
-            logger.info(f"{stage_is_dtensor=}")
+            #@logger.info(f"{stage_is_dtensor=}")
             
 
             checkpoint_tensor = compare_and_reverse(stage_tensor, checkpoint_tensor)
@@ -257,7 +257,7 @@ def update_state_dict(
             # shape and placement to match the model DTensor.  
             if is_dtensor(stage_tensor):
                 model_tensor = load_into_dtensor(checkpoint_tensor, stage_tensor)
-                logger.info(f"DTensor: Loaded {param} into {model_tensor=}")
+                # logger.info(f"DTensor: Loaded {param} into {model_tensor=}")
                 state_dict[param] = model_tensor
                 count_dtensors_loaded += 1
                 
@@ -269,7 +269,7 @@ def update_state_dict(
             # log_tensor_info(param, state_dict[param])
             # logger.info(f"Loaded {param} from {file}")
             updated_states.add(param)
-            logger.info(f"Count of loaded DTensors: {count_dtensors_loaded}")
+    logger.info(f"Count of loaded DTensors: {count_dtensors_loaded}")
 
 
 def format_tensor_info(tensor: torch.Tensor) -> str:

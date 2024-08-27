@@ -100,8 +100,6 @@ def main():
     
     logger.info(f"Loading weights for {pp_rank=}")
     load_model_weights(stage.submod, hf_model_name, logger)
-    assert False, "103: check first tensor load"
-    stage.rewrap_embeddings()
 
     schedule = ScheduleGPipe(stage, mbs)
     logger.info(f"Created schedule: {schedule}")
