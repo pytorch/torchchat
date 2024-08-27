@@ -17,6 +17,7 @@ from torch import Tensor
 from torch.nn import functional as F
 
 from build.utils import find_multiple, get_precision
+from enum import Enum
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
