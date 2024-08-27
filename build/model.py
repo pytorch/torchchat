@@ -21,6 +21,16 @@ from build.utils import find_multiple, get_precision
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
 
+class ModelType(Enum):
+    TextOnly = "text_only"
+    Flamingo = "flamingo"
+
+
+class ModelSource(Enum):
+    Native = "native"
+    Gguf = "gguf"
+
+
 @dataclass
 class TransformerArgs:
     block_size: int = 2048
@@ -68,7 +78,9 @@ class TransformerArgs:
 
 @dataclass
 class ModelArgs:
-    text_transformer_args: TransformerArgs
+    model_source: ModelSource = ModelSource.Native
+    model_type: ModelType = ModelType.TextOnly
+    transformer_args: Dict[str, TransformerArgs] = None
 
     def __post_init__(self):
         assert self.text_transformer_args is not None
@@ -81,11 +93,12 @@ class ModelArgs:
 
         try:
             # try to interpret as a single transformer config
-            text_transformer_args = TransformerArgs.from_params(
+            transformer_args['text'] = TransformerArgs.from_params(
                 loaded_params
             )
         except TypeError:
             # try to interpret as a dict of transformer configs
+            # now only support flamingo model
             for name, params in loaded_params.items():
                 if name == "text":
                     text_transformer_args = TransformerArgs.from_params(params)
@@ -173,7 +186,9 @@ class Model(nn.Module):
     def __init__(self, config: ModelArgs) -> None:
         super().__init__()
         self.config = config
-        self.text_transformer = Transformer(config.text_transformer_args)
+        if config.source == "native":
+            assert config.model_type == ModelType.TextOnly, "only text-only model is supported natively. For Flamingo, use torchtune"
+            self.text_transformer = Transformer(config.transformer_args["text"])
 
     def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         return self.text_transformer(idx, input_pos)
