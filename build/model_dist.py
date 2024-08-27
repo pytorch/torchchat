@@ -21,6 +21,8 @@ from build.model import TransformerArgs, KVCache, apply_rotary_emb, precompute_f
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
+from distributed.logging_utils import setup_logging
+logger = setup_logging(__name__)
 
 # Use DTensor as output, by default
 Colwise = ColwiseParallel(use_local_output=False)
@@ -298,5 +300,6 @@ class RMSNorm(nn.Module):
         return x * torch.rsqrt(torch.mean(x * x, dim=-1, keepdim=True) + self.eps)
 
     def forward(self, x: Tensor) -> Tensor:
+        logger.info(f"RMSNorm input shape: {x.shape}, {x.device=}, self.weight.device={self.weight.device}")
         output = self._norm(x.float()).type_as(x)
         return output * self.weight

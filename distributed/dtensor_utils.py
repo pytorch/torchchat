@@ -60,7 +60,7 @@ def load_into_dtensor(weight_tensor, model_dtensor, debug=False):
     new_dtensor = DTensor.from_local(weight_tensor, mesh, placements)
     
     # Debug information
-    if debug
+    if debug:
         local_tensor = new_dtensor.to_local()
         local_shard_shape = local_tensor.shape
         global_shape = new_dtensor.shape
