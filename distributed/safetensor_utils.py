@@ -4,14 +4,15 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-from typing import Dict, Callable, Optional, Tuple, List, Set
 import torch
-from transformers import AutoTokenizer  # AutoConfig
+from transformers import AutoTokenizer
 from safetensors import safe_open
 from transformers.utils import cached_file
 import os
 import json
 from torch.nn import Module
+from typing import Dict, Tuple, Set, Optional
+import logging
 
 
 
@@ -22,21 +23,13 @@ from distributed.logging_utils import setup_logging
 logger = setup_logging(__name__)
 
 
-
 def compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> torch.Tensor:
-    t1 = tensor1.shape
-    t2 = tensor2.shape
-    if t1 == t2:
+    """ Used to compare and reverse the tensors for loading from safetensor shapes, if needed """
+    if tensor1.shape == tensor2.shape:
         return tensor2
-
     if tensor1.shape == tensor2.shape[::-1]:
-        # start_shape = tensor2.shape
-        # tensor2.copy_(tensor2.flip(dims=tuple(range(tensor2.dim()))))
-        tensor2 = tensor2.permute(*reversed(range(tensor2.dim())))
-        # logger.info(f"Reversed tensor2 from {start_shape} =====>>>> {tensor2.shape=}")
-        return tensor2
-    else:
-        assert False, f"tensor1.shape {tensor1.shape} != tensor2.shape {tensor2.shape} and no match if reversed."
+        return tensor2.permute(*reversed(range(tensor2.dim())))
+    raise ValueError(f"Tensor shapes {tensor1.shape} and {tensor2.shape} are incompatible.")
 
 
 def read_weights_from_json(file_path: str) -> Optional[Dict[str, str]]:
