@@ -18,6 +18,9 @@ from torch.nn import Module
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
 _CONFIG_NAME = "config.json"
 
+from distributed.logging_utils import setup_logging
+logger = setup_logging(__name__)
+
 
 
 def compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> torch.Tensor:
@@ -102,17 +105,22 @@ def get_hf_weight_map_and_path(
 
 def remap_weight_keys(dictionary):
     """Remap the keys of a dictionary to match the expected format of the tune model."""
+    # hf_key : dist_model_key
     replacements = {
         "embed_tokens": "tok_embeddings",
-        "input_layernorm.weight": "sa_norm.scale",
-        "self_attn": "attn",
-        "o_proj": "output_proj",
-        "post_attention_layernorm.weight": "mlp_norm.scale",
+        "input_layernorm.weight": "attention_norm",
+        "self_attn": "attention",
+        "o_proj": "wo",
+        "k_proj":"wk",
+        "v_proj":"wv",
+        "q_proj":"wq",
+        "post_attention_layernorm.weight": "ffn_norm",
         "down_proj": "w1",
         "gate_proj": "w3",
         "up_proj": "w2",
         "norm.weight": "norm.scale",
         "lm_head.weight": "output.weight",
+        "mlp":"feed_forward",
     }
 
     new_dict = {}
@@ -135,7 +143,7 @@ def load_safetensor_weights(
     weight_map: Dict[str, str],
     file_location: str,
     new_to_old_keymap: Dict[str, str],
-    device: torch.device,
+    device: torch.device = torch.device("cpu"),
     purge_model_prefix: bool = True,
     ignore_cache_layers: bool = True,
 ) -> Tuple[int, int]:
@@ -164,7 +172,7 @@ def load_safetensor_weights(
         full_path = os.path.join(file_location, file)
         logger.info(f"Loading checkpoint file: {full_path}")
         try:
-            checkpoint = load_checkpoint(full_path, "cpu")  # device)
+            checkpoint = load_checkpoint(full_path, device)  # device)
             update_state_dict(
                 stage_state_dict,
                 checkpoint,

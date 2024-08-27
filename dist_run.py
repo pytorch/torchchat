@@ -18,6 +18,7 @@ from distributed.logging_utils import setup_logging
 from distributed.safetensor_utils import (
     get_hf_config_file,
     get_hf_weight_map_and_path,
+    load_safetensor_weights,
 )
 
 _model_name = "Transformer-2-7b-chat-hf"
@@ -36,8 +37,8 @@ def main():
     # make sure we have valid HF cache for weights and tokenizer
     hf_model_name = _name_to_hf_model_id[_model_name]
     hf_config = get_hf_config_file(hf_model_name)
+    assert hf_config is not None, f"Config file not found for model id {hf_model_name}"
     logger.info(f"Using HF model weights from {hf_model_name}")
-
 
     _mesh_dimensions = (2, 2)  
 
@@ -80,14 +81,18 @@ def main():
     )
 
     # load weights
+    logger.info(f"Loading weights for {pp_rank=}")
     stage_module = stage.submod
-    #logger.info(f"{stage.submod=}")
-    logger.info(f"{stage_module=}")
+    
     weight_map, weight_path, key_map = get_hf_weight_map_and_path(hf_model_name)
-    logger.info(f"{weight_map=}, {weight_path=}, {key_map=}")
+    #logger.info(f"{key_map=}")
 
-    assert False, "check weightmap"
-
+    
+    num_loaded_weights, num_missing_weights = load_safetensor_weights(stage_module, weight_map, weight_path, key_map)
+    logger.info(f"Loaded {num_loaded_weights} weights, {num_missing_weights} missing weights")
+    assert num_missing_weights == 0, f"Missing {num_missing_weights} weights"
+    
+    assert False, "check num_loaded_weights"
     # Run pipeline
     schedule = ScheduleGPipe(stage, mbs)
     input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
