@@ -258,7 +258,7 @@ def update_state_dict(
                 model_tensor = load_into_dtensor(checkpoint_tensor, stage_tensor)
                 logger.info(f"DTensor: Loaded {param} into {model_tensor=}")
                 state_dict[param] = model_tensor
-                assert False, "check first dtensor load"
+                
             else:
                 # regular tensor, just update directly
                 state_dict[param] = checkpoint_tensor

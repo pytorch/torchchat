@@ -24,14 +24,13 @@ def load_into_dtensor(weight_tensor, model_dtensor):
     mesh = model_dtensor.device_mesh
 
     # Handle sharding...nothing to do for replicated tensors
+    # Handle sharding if necessary
     for dim, placement in enumerate(placements):
-        if placement.type == 'shard':
-            shard_dim = placement.sharding_spec.dim
-            num_shards = mesh.size(placement.sharding_spec.dim)
+        if isinstance(placement, Shard):
+            shard_dim = placement.dim
+            num_shards = mesh.size(shard_dim)
             shard_size = weight_tensor.size(shard_dim) // num_shards
-            logger.info(f"Shard dim: {shard_dim}")
-            shard_index = mesh.get_coordinate()[placement.sharding_spec.dim]
-            logger.info(f"Shard index: {shard_index}")
+            shard_index = mesh.get_coordinate()[shard_dim]
             
             # Calculate start and end indices for this shard
             start_idx = shard_index * shard_size
@@ -39,7 +38,6 @@ def load_into_dtensor(weight_tensor, model_dtensor):
 
             # Create a slice object for this dimension
             dim_slice = slice(start_idx, end_idx)
-            logger.info(f"Dim slice: {dim_slice.shape}")
 
             # Create a list of slice objects, with ':' for all dims except the sharded one
             slice_list = [slice(None)] * weight_tensor.dim()
@@ -47,6 +45,11 @@ def load_into_dtensor(weight_tensor, model_dtensor):
 
             # Apply the slice to get the shard for this device
             weight_tensor = weight_tensor[tuple(slice_list)]
+        elif isinstance(placement, Replicate):
+            # No action needed for replicated dimensions
+            pass
+        else:
+            raise ValueError(f"Unsupported placement type: {type(placement)}")
 
     # Create a new DTensor from the (potentially sharded) weight tensor
     new_dtensor = DTensor.from_local(weight_tensor, mesh, placements)
