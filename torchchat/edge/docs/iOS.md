@@ -3,7 +3,7 @@
 
 # Running LLaMA models on iOS
 
-On a Mac set-up [ExecuTorch](executorch_setup.md) and open the LLaMA app project with Xcode:
+On a Mac set-up [ExecuTorch](torchchat/edge/docs/executorch_setup.md) and open the LLaMA app project with Xcode:
 
 ```
 open et-build/src/executorch/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj
