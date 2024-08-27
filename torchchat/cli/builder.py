@@ -19,7 +19,7 @@ import torch._inductor.config
 
 from config.model_config import resolve_model_config
 from distributed import init_distributed, ParallelDims, parallelize_llama
-from quantization.quantize import quantize_model
+from torchchat.utils.quantize import quantize_model
 from utils.measure_time import measure_time
 
 from torchchat.model import Transformer
