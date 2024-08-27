@@ -12,19 +12,23 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Union
 
 import torch
-import torch.nn as nn
-from torch.distributed.device_mesh import DeviceMesh
 import torch._dynamo.config
 import torch._inductor.config
+import torch.nn as nn
 
 from config.model_config import resolve_model_config
-from distributed import init_distributed, ParallelDims, parallelize_llama
+from distributed import (
+    init_distributed,
+    launch_distributed,
+    ParallelDims,
+    parallelize_llama,
+)
 from quantization.quantize import quantize_model
+from torch.distributed.device_mesh import DeviceMesh
 from utils.measure_time import measure_time
 
-from build.model import Transformer
+from build.model import Model
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
-from distributed import launch_distributed
 
 
 @dataclass
@@ -210,7 +214,7 @@ class TokenizerArgs:
 
     def validate_model(
         self,
-        model: Transformer,
+        model: Model,
         model_description: str = "model",
     ) -> None:
         if model is None:
@@ -221,7 +225,7 @@ class TokenizerArgs:
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
-        use_tiktoken = model.config.use_tiktoken
+        use_tiktoken = model.config.text_transformer_args.use_tiktoken
 
         if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
             raise RuntimeError(
@@ -298,11 +302,11 @@ def _unset_gguf_kwargs(builder_args):
 def _init_model_on_meta_device(builder_args):
     with torch.device("meta"):
         if builder_args.params_path:
-            return Transformer.from_params(builder_args.params_path)
+            return Model.from_params(builder_args.params_path)
         elif builder_args.params_table:
-            return Transformer.from_table(builder_args.params_table)
+            return Model.from_table(builder_args.params_table)
         else:
-            return Transformer.from_name(builder_args.checkpoint_path.parent.name)
+            return Model.from_name(builder_args.checkpoint_path.parent.name)
 
 
 def _load_model_gguf(builder_args, only_config=False):
@@ -311,7 +315,7 @@ def _load_model_gguf(builder_args, only_config=False):
         kwargs = {}
     else:
         kwargs = builder_args.gguf_kwargs
-    model = Transformer.from_gguf(builder_args.gguf_path, **kwargs)
+    model = Model.from_gguf(builder_args.gguf_path, **kwargs)
     return model
 
 
@@ -334,7 +338,6 @@ def _load_model_default(builder_args, only_config=False):
                     mmap=True,
                 )
             )
-
         checkpoint = {}
         for key in cps[0].keys():
             if not torch.allclose(cps[0][key], cps[1][key]):
@@ -355,9 +358,10 @@ def _load_model_default(builder_args, only_config=False):
 
     if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
         checkpoint = checkpoint["model"]
+    
+    checkpoint = {"text_transformer." + k: v for k, v in checkpoint.items()}
 
-    model.load_state_dict(checkpoint, assign=True, strict=False)
-
+    model.load_state_dict(checkpoint, assign=True, strict=True)
     return model
 
 
@@ -380,11 +384,13 @@ def _maybe_init_distributed(
     """
     if not builder_args.use_distributed:
         return None, None
-    dist_config = 'llama3_8B.toml'  # TODO - integrate with chat cmd line
+    dist_config = "llama3_8B.toml"  # TODO - integrate with chat cmd line
 
     world_mesh, parallel_dims = launch_distributed(dist_config)
 
-    assert world_mesh is not None and parallel_dims is not None, f"failed to launch distributed using {dist_config}"
+    assert (
+        world_mesh is not None and parallel_dims is not None
+    ), f"failed to launch distributed using {dist_config}"
 
     return world_mesh, parallel_dims
 
@@ -523,7 +529,7 @@ def _initialize_model(
         if builder_args.setup_caches:
             with torch.device(builder_args.device):
                 model.setup_caches(
-                    max_batch_size=1, max_seq_length=max_seq_length or model.config.max_seq_length
+                    max_batch_size=1, max_seq_length=max_seq_length or model.config.text_transformer_args.max_seq_length
                 )
 
         model.to(dtype=builder_args.precision)
