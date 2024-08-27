@@ -12,24 +12,25 @@ import os
 import json
 from torch.nn import Module
 from typing import Dict, Tuple, Set, Optional
-import logging
 
+from distributed.logging_utils import setup_logging
 
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
 _CONFIG_NAME = "config.json"
 
-from distributed.logging_utils import setup_logging
 logger = setup_logging(__name__)
 
 
 def compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> torch.Tensor:
-    """ Used to compare and reverse the tensors for loading from safetensor shapes, if needed """
+    """Used to compare and reverse the tensors for loading from safetensor shapes, if needed"""
     if tensor1.shape == tensor2.shape:
         return tensor2
     if tensor1.shape == tensor2.shape[::-1]:
         return tensor2.permute(*reversed(range(tensor2.dim())))
-    raise ValueError(f"Tensor shapes {tensor1.shape} and {tensor2.shape} are incompatible.")
+    raise ValueError(
+        f"Tensor shapes {tensor1.shape} and {tensor2.shape} are incompatible."
+    )
 
 
 def read_weights_from_json(file_path: str) -> Optional[Dict[str, str]]:
@@ -50,23 +51,24 @@ def read_weights_from_json(file_path: str) -> Optional[Dict[str, str]]:
 def get_hf_tokenizer(model_id: str) -> AutoTokenizer:
     """Get the HF tokenizer for a given model id"""
     tokenizer = AutoTokenizer.from_pretrained(model_id)
-    assert tokenizer is not None, f"Tokenizer not found for model id {model_id}"
+    if tokenizer is None:
+        raise ValueError(f"Tokenizer not found for model id {model_id}")
     return tokenizer
 
 
-def get_hf_config_file(model_id: str) -> Tuple[str, str]:
+def get_hf_config_file(model_id: str) -> Tuple[Dict, str]:
     """Get the config file and file location for a given HF model id"""
     config_file = cached_file(model_id, _CONFIG_NAME)
-    assert os.path.exists(config_file), f"Config file {config_file} does not exist."
+    if not os.path.exists(config_file):
+        raise FileNotFoundError(f"Config file {config_file} does not exist.")
     with open(config_file, "r") as file:
         config_data = json.load(file)
-    file_location = os.path.dirname(config_file)
-    return config_data, file_location
+    return config_data, os.path.dirname(config_file)
 
 
 def get_hf_path_from_model_id(model_id: str) -> str:
     """Get the HF path for a given HF model id"""
-    config_data, file_location = get_config_file(model_id)
+    config_data, file_location = get_hf_config_file(model_id)
     assert os.path.exists(
         file_location
     ), f"HF path {file_location} for {model_id} does not exist."
@@ -75,24 +77,20 @@ def get_hf_path_from_model_id(model_id: str) -> str:
 
 def get_hf_weight_map_and_path(
     model_id: str,
-) -> Tuple[
-    Dict[str, str],
-    str,
-]:
+) -> Tuple[Dict[str, str], str, Dict[str, str]]:
     """Get the weight map for a given HF model id and also the cache path for loading the weights"""
     index_file = cached_file(model_id, _DEFAULT_SAFETENSOR_FILE_NAME)
-    print(f"Index file: {index_file}")
-    assert os.path.exists(
-        index_file
-    ), f"Weight index file for {model_id} does not exist in HF cache...."
+    if not os.path.exists(index_file):
+        raise FileNotFoundError(
+            f"Weight index file for {model_id} does not exist in HF cache."
+        )
     weight_map = read_weights_from_json(index_file)
-
-    assert weight_map is not None, f"Weight map not found in config file {index_file}"
+    if weight_map is None:
+        raise ValueError(f"Weight map not found in config file {index_file}")
     weight_map, new_to_old_keymap = remap_weight_keys(weight_map)
-
     weight_path = os.path.dirname(index_file)
-    assert os.path.exists(weight_path), f"Weight path {weight_path} does not exist"
-
+    if not os.path.exists(weight_path):
+        raise FileNotFoundError(f"Weight path {weight_path} does not exist")
     return weight_map, weight_path, new_to_old_keymap
 
 
@@ -104,16 +102,15 @@ def remap_weight_keys(dictionary):
         "input_layernorm.weight": "attention_norm.weight",
         "self_attn": "attention",
         "o_proj": "wo",
-        "k_proj":"wk",
-        "v_proj":"wv",
-        "q_proj":"wq",
+        "k_proj": "wk",
+        "v_proj": "wv",
+        "q_proj": "wq",
         "post_attention_layernorm.weight": "ffn_norm.weight",
         "down_proj": "w1",
         "gate_proj": "w3",
         "up_proj": "w2",
-        #"norm.weight": "norm.scale",
         "lm_head.weight": "output.weight",
-        "mlp":"feed_forward",
+        "mlp": "feed_forward",
     }
 
     new_dict = {}
@@ -124,11 +121,11 @@ def remap_weight_keys(dictionary):
         for old_word, new_word in replacements.items():
             if old_word in new_key:
                 new_key = new_key.replace(old_word, new_word)
-                #logger.info(f"Old key: {old_key}, {value=}, New key: {new_key}")
+                # logger.info(f"Old key: {old_key}, {value=}, New key: {new_key}")
 
         new_dict[new_key] = value
         key_mapping[new_key] = old_key
-    
+
     return new_dict, key_mapping
 
 
@@ -166,7 +163,6 @@ def load_safetensor_weights(
         full_path = os.path.join(file_location, file)
         logger.info(f"Loading checkpoint file: {full_path}")
         try:
-
             checkpoint = load_checkpoint(full_path, device)  # device)
 
             update_state_dict(
@@ -188,9 +184,7 @@ def load_safetensor_weights(
     log_loading_status(missing_keys, updated_states)
 
     stage_module.load_state_dict(stage_state_dict, strict=False, assign=True)
-    #logger.info(f"{stage_module=}")
 
-    
     return len(updated_states), len(missing_keys)
 
 
@@ -255,7 +249,7 @@ def update_state_dict(
             checkpoint_tensor = compare_and_reverse(stage_tensor, checkpoint_tensor)
             state_dict[param] = checkpoint_tensor
 
-            #log_tensor_info(param, state_dict[param])
+            # log_tensor_info(param, state_dict[param])
             logger.info(f"Loaded {param} from {file}")
             updated_states.add(param)
 
@@ -263,16 +257,14 @@ def update_state_dict(
 def format_tensor_info(tensor: torch.Tensor) -> str:
     return f"Shape: {tensor.shape}, Dtype: {tensor.dtype}, Device: {tensor.device}"
 
-def clean_cache_keys(input_set):
-    """ clean any cache related keys from the input set """
-    to_remove = set()
-    for item in input_set:
-        if isinstance(item, str):
-            if item.endswith("cache") or item in ["freqs_cis", "causal_mask"]:
-                to_remove.add(item)
-    # In-place removal of items
-    input_set.difference_update(to_remove)
-    return input_set
+
+def clean_cache_keys(input_set: Set[str]) -> Set[str]:
+    return {
+        item
+        for item in input_set
+        if not (item.endswith("cache") or item in ["freqs_cis", "causal_mask"])
+    }
+
 
 def handle_missing_keys(
     state_dict: Dict[str, torch.Tensor],
@@ -280,13 +272,15 @@ def handle_missing_keys(
     ignore_cache_layers: bool,
 ) -> Set[str]:
     missing_keys = set(state_dict.keys()) - updated_states
-    
+
     if ignore_cache_layers:
         start_len = len(missing_keys)
         missing_keys = clean_cache_keys(missing_keys)
         after_len = len(missing_keys)
         if after_len < start_len:
-            logger.info(f"Ignoring {start_len - after_len} missing cache, freqs, mask layers")
+            logger.info(
+                f"Ignoring {start_len - after_len} missing cache, freqs, mask layers"
+            )
     return missing_keys
 
 
