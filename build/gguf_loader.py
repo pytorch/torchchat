@@ -14,12 +14,14 @@ import gguf
 import torch
 import torch.nn.functional as F
 
+from build.gguf_util import Q4_0, to_float
+from build.model import Model, ModelArgs, TransformerArgs
+
 from gguf import GGUFValueType
 from quantization.quantize import pack_scales_and_zeros
 
-from build.gguf_util import Q4_0, to_float
-from build.model import Transformer, TransformerArgs
 from build.utils import find_multiple, get_precision
+
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -43,6 +45,7 @@ def _convert_gguf_tensor_name_to_llama_nn(gguf_name: str) -> str:
     result = copy.deepcopy(gguf_name)
     for gguf_string, replacement in _name_replacements:
         result = result.replace(gguf_string, replacement)
+    result = "text_transformer." + result
     return result
 
 
@@ -246,14 +249,16 @@ def load_model(gguf_file: str) -> torch.nn.Module:
     arch = metadata["general.architecture"]
     assert arch == "llama", "Only LLaMa models are supported by this converter."
 
-    model_args = TransformerArgs(
-        dim=metadata[f"{arch}.embedding_length"],
-        n_layers=metadata[f"{arch}.block_count"],
-        n_heads=metadata[f"{arch}.attention.head_count"],
-        n_local_heads=metadata[f"{arch}.attention.head_count_kv"],
-        vocab_size=len(metadata["tokenizer.ggml.tokens"]),
-        norm_eps=metadata[f"{arch}.attention.layer_norm_rms_epsilon"],
-        hidden_dim=metadata[f"{arch}.feed_forward_length"],
+    model_args = ModelArgs(
+        TransformerArgs(
+            dim=metadata[f"{arch}.embedding_length"],
+            n_layers=metadata[f"{arch}.block_count"],
+            n_heads=metadata[f"{arch}.attention.head_count"],
+            n_local_heads=metadata[f"{arch}.attention.head_count_kv"],
+            vocab_size=len(metadata["tokenizer.ggml.tokens"]),
+            norm_eps=metadata[f"{arch}.attention.layer_norm_rms_epsilon"],
+            hidden_dim=metadata[f"{arch}.feed_forward_length"],
+        )
     )
 
     # TODO: what to do with rope args like
@@ -261,7 +266,7 @@ def load_model(gguf_file: str) -> torch.nn.Module:
     # metadata.get(f"{arch}.rope.dimension_count", None)
 
     with torch.device("meta"):
-        model = Transformer(model_args)
+        model = Model(model_args)
     return model
 
 
