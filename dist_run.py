@@ -48,16 +48,6 @@ def load_model_weights(stage_module, hf_model_name, logger):
         raise ValueError(f"Missing {num_missing_weights} weights")
 
 
-def create_pipeline_stage(model, pp_rank, nstages, device, example_args, pp_mesh):
-    return PipelineStage(
-        model,
-        pp_rank,
-        nstages,
-        device,
-        input_args=(example_args,),
-        group=pp_mesh.get_group(),
-    )
-
 
 def main():
     rank, world_size = init_distributed()
@@ -98,12 +88,20 @@ def main():
     example_args = mb_ids if pp_rank == 0 else activation
 
     logger.info(f"Creating pipeline stage {pp_rank=}, {nstages=}")
-    stage = create_pipeline_stage(
-        model, pp_rank, nstages, device, example_args, pp_mesh
+    stage = PipelineStage(
+        model,
+        pp_rank,
+        nstages,
+        device,
+        input_args=(example_args,),
+        group=pp_mesh.get_group(),
     )
 
+    
     logger.info(f"Loading weights for {pp_rank=}")
     load_model_weights(stage.submod, hf_model_name, logger)
+    assert False, "103: check first tensor load"
+    stage.rewrap_embeddings()
 
     schedule = ScheduleGPipe(stage, mbs)
     logger.info(f"Created schedule: {schedule}")

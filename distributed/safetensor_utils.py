@@ -14,6 +14,7 @@ from torch.nn import Module
 from typing import Dict, Tuple, Set, Optional
 
 from distributed.logging_utils import setup_logging
+from distributed.dtensor_utils import is_dtensor, load_into_dtensor
 
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
@@ -41,10 +42,10 @@ def read_weights_from_json(file_path: str) -> Optional[Dict[str, str]]:
         if "weight_map" in data and isinstance(data["weight_map"], dict):
             return data["weight_map"]
         else:
-            print("No 'weight_map' dictionary found in the JSON file.")
+            logger.info("No 'weight_map' dictionary found in the JSON file.")
             return None
     except (FileNotFoundError, json.JSONDecodeError, Exception) as e:
-        print(f"An error occurred while reading the JSON file: {str(e)}")
+        logger.info(f"An error occurred while reading the JSON file: {str(e)}")
         return None
 
 
@@ -245,9 +246,23 @@ def update_state_dict(
 
             checkpoint_tensor = checkpoint[old_param]
             stage_tensor = state_dict[param]
+            logger.info(f"{param=}, {stage_tensor.shape=}")
+            stage_is_dtensor = is_dtensor(stage_tensor)
+            logger.info(f"{stage_is_dtensor=}")
+            
 
             checkpoint_tensor = compare_and_reverse(stage_tensor, checkpoint_tensor)
-            state_dict[param] = checkpoint_tensor
+            # here we need to check if the tensor is a DTensor and if so, adjust the 
+            # shape and placement to match the model DTensor.  
+            if is_dtensor(stage_tensor):
+                model_tensor = load_into_dtensor(checkpoint_tensor, stage_tensor)
+                logger.info(f"DTensor: Loaded {param} into {model_tensor=}")
+                state_dict[param] = model_tensor
+                assert False, "check first dtensor load"
+            else:
+                # regular tensor, just update directly
+                state_dict[param] = checkpoint_tensor
+                
 
             # log_tensor_info(param, state_dict[param])
             # logger.info(f"Loaded {param} from {file}")
@@ -265,6 +280,27 @@ def clean_cache_keys(input_set: Set[str]) -> Set[str]:
         if not (item.endswith("cache") or item in ["freqs_cis", "causal_mask"])
     }
 
+def inspect_dtensor_sharding(dtensor):
+    if not hasattr(dtensor, 'placements'):
+        logger.info("This tensor is not a DTensor")
+        return
+
+    placements = dtensor.placements
+    logger.info(f"DTensor shape: {dtensor.shape}")
+    logger.info(f"Number of dimensions: {len(placements)}")
+    
+    for dim, placement in enumerate(placements):
+        logger.info(f"Dimension {dim}:")
+        logger.info(f"  Placement type: {placement.type}")
+        if placement.type == 'shard':
+            logger.info(f"  Sharding spec: {placement.sharding_spec}")
+        elif placement.type == 'replicate':
+            logger.info("  Replicated across devices")
+        else:
+            logger.info(f"  Other placement type: {placement.type}")
+
+    logger.info(f"Device mesh shape: {dtensor.device_mesh.shape}")
+    logger.info(f"Device mesh devices: {dtensor.device_mesh.device_type}")
 
 def handle_missing_keys(
     state_dict: Dict[str, torch.Tensor],

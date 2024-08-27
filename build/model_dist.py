@@ -91,7 +91,16 @@ class TransformerStage(nn.Module):
             torch.ones(self.max_seq_length, self.max_seq_length, dtype=torch.bool)
         )
         self.register_buffer("causal_mask", causal_mask, persistent=True)
-
+    
+    def rewrap_embeddings(self,):
+        """After loading weights, we need to rewrap the embeddings as DTensors """
+        if self.stage_idx == 0:
+            self.tok_embeddings = parallelize_module(
+                self.tok_embeddings,
+                device_mesh,
+                RowwiseParallel(input_layouts=Replicate()),
+            )
+            
     def forward(self, x: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
         if input_pos is None:
