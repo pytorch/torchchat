@@ -108,17 +108,17 @@ def remap_weight_keys(dictionary):
     # hf_key : dist_model_key
     replacements = {
         "embed_tokens": "tok_embeddings",
-        "input_layernorm.weight": "attention_norm",
+        "input_layernorm.weight": "attention_norm.weight",
         "self_attn": "attention",
         "o_proj": "wo",
         "k_proj":"wk",
         "v_proj":"wv",
         "q_proj":"wq",
-        "post_attention_layernorm.weight": "ffn_norm",
+        "post_attention_layernorm.weight": "ffn_norm.weight",
         "down_proj": "w1",
         "gate_proj": "w3",
         "up_proj": "w2",
-        "norm.weight": "norm.scale",
+        #"norm.weight": "norm.scale",
         "lm_head.weight": "output.weight",
         "mlp":"feed_forward",
     }
@@ -131,10 +131,11 @@ def remap_weight_keys(dictionary):
         for old_word, new_word in replacements.items():
             if old_word in new_key:
                 new_key = new_key.replace(old_word, new_word)
-                # logger.info(f"Old key: {old_key}, {value=}, New key: {new_key}")
+                #logger.info(f"Old key: {old_key}, {value=}, New key: {new_key}")
 
         new_dict[new_key] = value
         key_mapping[new_key] = old_key
+    
     return new_dict, key_mapping
 
 
@@ -143,7 +144,7 @@ def load_safetensor_weights(
     weight_map: Dict[str, str],
     file_location: str,
     new_to_old_keymap: Dict[str, str],
-    device: torch.device = torch.device("cpu"),
+    device: torch.device = "cpu",
     purge_model_prefix: bool = True,
     ignore_cache_layers: bool = True,
 ) -> Tuple[int, int]:
@@ -172,7 +173,9 @@ def load_safetensor_weights(
         full_path = os.path.join(file_location, file)
         logger.info(f"Loading checkpoint file: {full_path}")
         try:
+
             checkpoint = load_checkpoint(full_path, device)  # device)
+
             update_state_dict(
                 stage_state_dict,
                 checkpoint,
@@ -259,22 +262,24 @@ def update_state_dict(
             checkpoint_tensor = compare_and_reverse(stage_tensor, checkpoint_tensor)
             state_dict[param] = checkpoint_tensor
 
-            log_tensor_info(param, state_dict[param])
+            #log_tensor_info(param, state_dict[param])
+            logger.info(f"Loaded {param} from {file}")
             updated_states.add(param)
-
-
-def log_tensor_info(param: str, tensor: torch.Tensor):
-    tensor_type = get_tensor_type(tensor)
-    if tensor_type == "Fake":
-        assert False, f"name: {param=}, {tensor=} is fake tensor"
-    #logger.info(f"**** post-load {param}[0] = Tensor Type: {tensor_type} {tensor[0]}")
-    #state_param_details = format_tensor_info(tensor)
-    #logger.info(f"**** post-load {param} {state_param_details}")
 
 
 def format_tensor_info(tensor: torch.Tensor) -> str:
     return f"Shape: {tensor.shape}, Dtype: {tensor.dtype}, Device: {tensor.device}"
 
+def clean_cache_keys(input_set):
+    """ clean any cache related keys from the input set """
+    to_remove = set()
+    for item in input_set:
+        if isinstance(item, str):
+            if item.endswith("cache") or item in ["freqs_cis", "causal_mask"]:
+                to_remove.add(item)
+    # In-place removal of items
+    input_set.difference_update(to_remove)
+    return input_set
 
 def handle_missing_keys(
     state_dict: Dict[str, torch.Tensor],
@@ -282,12 +287,13 @@ def handle_missing_keys(
     ignore_cache_layers: bool,
 ) -> Set[str]:
     missing_keys = set(state_dict.keys()) - updated_states
+    
     if ignore_cache_layers:
         start_len = len(missing_keys)
-        missing_keys = {k for k in missing_keys if not k.endswith(".cache")}
+        missing_keys = clean_cache_keys(missing_keys)
         after_len = len(missing_keys)
         if after_len < start_len:
-            logger.info(f"Ignoring {start_len - after_len} missing cache layers")
+            logger.info(f"Ignoring {start_len - after_len} missing cache, freqs, mask layers")
     return missing_keys
 
 
