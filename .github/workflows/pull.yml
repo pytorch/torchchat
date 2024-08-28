@@ -450,6 +450,10 @@ jobs:
       - name: Install requirements
         run: |
           echo "Intalling pip3 packages"
+          echo "Debug ls"
+          ls
+          echo "Debug ls install"
+          ls install
           ./install/install_requirements.sh
 
           export TORCHCHAT_ROOT=$PWD
