@@ -78,18 +78,19 @@ REQUIREMENTS_TO_INSTALL=(
     "${REQUIREMENTS_TO_INSTALL[@]}"
 )
 
-# Install torchtune separately with the --pre flag
-(
-    set -x
-    $PIP_EXECUTABLE install --pre torchtune --extra-index-url "${TORCH_NIGHTLY_URL}" --no-cache-dir
-)
-
-# For torchao need to install from github since nightly build doesn't have macos build.
-# TODO: Remove this and install nightly build, once it supports macos
+# Install torchtune from Philip forked repository due to flamingo components have not been landed yet.
+# TODO: Use torchtune official repository instead, when flamingo components have been merged.
 (
   set -x
-  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@e11201a62669f582d81cdb33e031a07fb8dfc4f3
+  $PIP_EXECUTABLE install git+https://github.com/pbontrager/torchtune.git@flamingo_components
 )
+
+# # For torchao need to install from github since nightly build doesn't have macos build.
+# # TODO: Remove this and install nightly build, once it supports macos
+# (
+#   set -x
+#   $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@e11201a62669f582d81cdb33e031a07fb8dfc4f3
+# )
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   (
     set -x
