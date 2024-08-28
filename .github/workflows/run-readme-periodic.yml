@@ -29,7 +29,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Create script to run README"
-        python3 torchchat/utils/scripts/updown.sh --create-sections --file README.md > ./run-readme.sh
+        python3 torchchat/utils/scripts/updown.py --create-sections --file README.md > ./run-readme.sh
         # for good measure, if something happened to updown processor,
         # and it did not error out, fail with an exit 1
         echo "exit 1" >> ./run-readme.sh
@@ -62,7 +62,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Create script to run quantization"
-        python3 torchchat/utils/scripts/updown.sh --create-sections --file docs/quantization.md > ./run-quantization.sh
+        python3 torchchat/utils/scripts/updown.py --create-sections --file docs/quantization.md > ./run-quantization.sh
         # for good measure, if something happened to updown processor,
         # and it did not error out, fail with an exit 1
         echo "exit 1" >> ./run-quantization.sh
@@ -95,7 +95,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Create script to run gguf"
-        python3 torchchat/utils/scripts/updown.sh --file docs/GGUF.md > ./run-gguf.sh
+        python3 torchchat/utils/scripts/updown.py --file docs/GGUF.md > ./run-gguf.sh
         # for good measure, if something happened to updown processor,
         # and it did not error out, fail with an exit 1
         echo "exit 1" >> ./run-gguf.sh
