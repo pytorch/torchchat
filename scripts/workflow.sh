@@ -51,7 +51,7 @@ function download_checkpoint() {
     if [ "$FORCE_DOWNLOAD" = true ] || [ ! -d "$CHECKPOINT_DIR" ] || [ -z "$(ls -A "$CHECKPOINT_DIR")" ]; then
         echo "Download checkpoint for $MODEL_REPO"
         rm -rf "$CHECKPOINT_DIR"
-        python3 download.py --repo-id "$MODEL_REPO"
+        python3 torchchat.py download --repo-id "$MODEL_REPO"
     else
         echo "Checkpoint directory for $MODEL_REPO is not empty. Skipping download."
     fi
