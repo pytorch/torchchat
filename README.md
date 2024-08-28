@@ -44,11 +44,11 @@ python3 -m venv .venv
 source .venv/bin/activate
 
 # install dependencies
-./install_requirements.sh
+./install/install_requirements.sh
 ```
 [skip default]: end
 
-[shell default]: ./install_requirements.sh
+[shell default]: ./install/install_requirements.sh
 
 ## Commands
 

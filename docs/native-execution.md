@@ -3,7 +3,7 @@
 
 # Native Execution
 
-[shell default]: ./install_requirements.sh
+[shell default]: ./install/install_requirements.sh
 
 While Python offers a great environment for training models and
 experimentation and research with models, developers often are looking

@@ -11,7 +11,7 @@ install_pip_dependencies() {
   echo "Intalling common pip packages"
   pip3 install wheel "cmake>=3.19" ninja zstd
   pushd ${TORCHCHAT_ROOT}
-  pip3 install -r ./requirements.txt
+  pip3 install -r .install/requirements.txt
   popd
 }
 
@@ -47,10 +47,10 @@ install_executorch_python_libs() {
   echo "Building and installing python libraries"
   if [ "${ENABLE_ET_PYBIND}" = false ]; then
       echo "Not installing pybind"
-      bash ./install_requirements.sh
+      bash ./install/install_requirements.sh
   else
       echo "Installing pybind"
-      bash ./install_requirements.sh --pybind xnnpack
+      bash ./install/install_requirements.sh --pybind xnnpack
   fi
   pip3 list
   popd
