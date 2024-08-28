@@ -11,7 +11,7 @@ install_pip_dependencies() {
   echo "Intalling common pip packages"
   pip3 install wheel "cmake>=3.19" ninja zstd
   pushd ${TORCHCHAT_ROOT}
-  pip3 install -r .install/requirements.txt
+  pip3 install -r install/requirements.txt
   popd
 }
 
