@@ -25,7 +25,7 @@ from build.builder import (
     BuilderArgs,
     TokenizerArgs,
 )
-from build.model import Model
+from torchchat.model import Model
 from build.utils import device_sync, set_precision
 from cli import add_arguments_for_verb, arg_init, check_args
 from utils.device_info import get_device_info
@@ -903,4 +903,3 @@ if __name__ == "__main__":
     check_args(args, verb)
     args = arg_init(args)
     main(args)
-

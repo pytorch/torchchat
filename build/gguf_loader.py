@@ -15,7 +15,7 @@ import torch
 import torch.nn.functional as F
 
 from build.gguf_util import Q4_0, to_float
-from build.model import Model, ModelArgs, TransformerArgs
+from torchchat.model import Model, ModelArgs, TransformerArgs
 
 from gguf import GGUFValueType
 from quantization.quantize import pack_scales_and_zeros
