@@ -1,1 +1,1 @@
-import model_params.model_config
+from torchchat.model_params import model_config

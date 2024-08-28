@@ -1,1 +1,1 @@
-from cli import builder, cli, download
+from torchchat.cli import builder, cli, download

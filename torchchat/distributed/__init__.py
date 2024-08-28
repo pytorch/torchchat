@@ -4,11 +4,11 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-import distributed.model_dist
+import torchchat.distributed.model_dist
 
-from distributed.checkpoint import load_checkpoints_to_model
-from distributed.logging_utils import logger
-from distributed.parallel_config import ParallelDims
-from distributed.parallelize_llama import parallelize_llama
-from distributed.utils import init_distributed
-from distributed.world_maker import launch_distributed
+from torchchat.distributed.checkpoint import load_checkpoints_to_model
+from torchchat.distributed.logging_utils import logger
+from torchchat.distributed.parallel_config import ParallelDims
+from torchchat.distributed.parallelize_llama import parallelize_llama
+from torchchat.distributed.utils import init_distributed
+from torchchat.distributed.world_maker import launch_distributed
