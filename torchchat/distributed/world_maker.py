@@ -9,9 +9,9 @@ from typing import Optional, Tuple
 
 from torch.distributed.device_mesh import DeviceMesh
 
-from distributed.logging_utils import logger
-from distributed.parallel_config import ParallelDims
-from distributed.utils import init_distributed
+from torchchat.distributed.logging_utils import logger
+from torchchat.distributed.parallel_config import ParallelDims
+from torchchat.distributed.utils import init_distributed
 
 from .config_manager import InferenceConfig
 

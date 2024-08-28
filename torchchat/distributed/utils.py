@@ -10,7 +10,7 @@ from datetime import timedelta
 
 import torch
 
-from distributed.logging_utils import logger
+from torchchat.distributed.logging_utils import logger
 
 def _warn_overwrite_env(env, val):
     if env in os.environ:

@@ -12,7 +12,7 @@ import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 
 from torchchat.model import TransformerArgs
-from distributed.model_dist import TransformerStage
+from trochchat.distributed.model_dist import TransformerStage
 
 # Model config
 def main():

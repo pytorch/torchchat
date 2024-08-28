@@ -30,14 +30,14 @@ else
 fi
 
 #
-# First install requirements in requirements.txt. Older torch may be
+# First install requirements in install/requirements.txt. Older torch may be
 # installed from the dependency of other models. It will be overridden by
 # newer version of torch nightly installed later in this script.
 #
 
 (
   set -x
-  $PIP_EXECUTABLE install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cu121
+  $PIP_EXECUTABLE install -r install/requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cu121
 )
 
 # Since torchchat often uses main-branch features of pytorch, only the nightly

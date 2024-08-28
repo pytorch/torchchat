@@ -10,8 +10,8 @@ from torch.distributed.tensor.parallel import (ColwiseParallel,
                                                RowwiseParallel,
                                                parallelize_module)
 
-from distributed.logging_utils import logger
-from distributed.parallel_config import ParallelDims
+from torchchat.distributed.logging_utils import logger
+from torchchat.distributed.parallel_config import ParallelDims
 
 
 def apply_tp(

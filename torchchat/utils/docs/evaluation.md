@@ -4,7 +4,7 @@
 
 # Evaluation Features
 
-[shell default]: ./install_requirements.sh
+[shell default]: ./install/install_requirements.sh
 
 
 Torchchat provides evaluation functionality for your language model on
