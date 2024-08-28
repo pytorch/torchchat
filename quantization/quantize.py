@@ -583,7 +583,7 @@ class CustomHandler(QuantHandler):
         import sys
         spec = importlib.util.spec_from_file_location(
             "torch_custom_op",
-            "/Users/scroy/fbsource/fbcode/pytorch/ao/torchao/experimental/kernels/cpu/linear/examples/torch_custom_op_v2.py"
+            "/Users/scroy/fbsource/fbcode/pytorch/ao/torchao/experimental/kernels/cpu/linear/examples/torch_custom_op/torch_custom_op.py"
         )
         torch_custom_op = importlib.util.module_from_spec(spec)
         sys.modules["torch_custom_op"] = torch_custom_op

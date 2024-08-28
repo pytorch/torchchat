@@ -30,6 +30,8 @@ from build.utils import device_sync, set_precision
 from cli import add_arguments_for_verb, arg_init, check_args
 from utils.device_info import get_device_info
 
+torch.ops.load_library("/tmp/cmake-out/torch_ao/examples/torch_custom_op/libtorch_custom_op.dylib")
+torch.set_num_threads(6) # 6 threads is better perf on my machine and is what I used for ET tests too
 
 class _ChatFormatter(ABC):
     def __init__(self, tokenizer):
