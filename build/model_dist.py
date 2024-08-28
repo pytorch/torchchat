@@ -17,7 +17,7 @@ from torch.distributed.tensor.parallel import parallelize_module, ColwiseParalle
 
 from build.utils import find_multiple
 
-from build.model import TransformerArgs, KVCache, apply_rotary_emb, precompute_freqs_cis
+from torchchat.model import TransformerArgs, KVCache, apply_rotary_emb, precompute_freqs_cis
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
