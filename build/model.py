@@ -59,21 +59,46 @@ class TransformerArgs:
             self.use_tiktoken = self.use_tiktoken == "True"
 
     @classmethod
-    def from_params(cls, params_path):
+    def from_params(cls, params):
         replace = [("rope_theta", "rope_base"), ("n_kv_heads", "n_local_heads")]
-        with open(params_path, "r") as f:
-            params = json.loads(f.read())
-            # Patch for llama3
-            for _from, _to in replace:
-                if _from in params:
-                    params[_to] = params.pop(_from)
+        for _from, _to in replace:
+            if _from in params:
+                params[_to] = params.pop(_from)
         return cls(**params)
+
+@dataclass
+class ModelArgs:
+    text_transformer_args: TransformerArgs
+
+    def __post_init__(self):
+        assert self.text_transformer_args is not None
+        assert type(self.text_transformer_args) == TransformerArgs
+
+    @classmethod
+    def from_params(cls, params_path):
+        with open(params_path, "r") as f:
+            loaded_params = json.loads(f.read())
+
+        try:
+            # try to interpret as a single transformer config
+            text_transformer_args = TransformerArgs.from_params(
+                loaded_params
+            )
+        except TypeError:
+            # try to interpret as a dict of transformer configs
+            for name, params in loaded_params.items():
+                if name == "text":
+                    text_transformer_args = TransformerArgs.from_params(params)
+                else:
+                    raise ValueError(f"Unknown transformer name {name}")
+
+        return cls(text_transformer_args)
 
     @classmethod
     def from_table(cls, name: str):
         json_path = config_path / f"{name}.json"
         if json_path.is_file():
-            return TransformerArgs.from_params(json_path)
+            return ModelArgs.from_params(json_path)
         else:
             known_model_params = [
                 config.replace(".json", "") for config in os.listdir(config_path)
@@ -86,7 +111,7 @@ class TransformerArgs:
     def from_name(cls, name: str):
         json_path = config_path / f"{name}.json"
         if Path(json_path).is_file():
-            return TransformerArgs.from_params(json_path)
+            return ModelArgs.from_params(json_path)
 
         known_model_params = [
             config.replace(".json", "") for config in os.listdir(config_path)
@@ -113,7 +138,7 @@ class TransformerArgs:
                 f"Unknown model directory name {name}. Must be one of {known_model_params}."
             )
 
-        return TransformerArgs.from_params(config_path / f"{config[0]}.json")
+        return ModelArgs.from_params(config_path / f"{config[0]}.json")
 
 
 class KVCache(nn.Module):
@@ -142,6 +167,40 @@ class KVCache(nn.Module):
         v_out = torch.ops.aten.index_put_(self.v_cache, [None, None, input_pos], v_val)
 
         return k_out, v_out
+
+
+class Model(nn.Module):
+    def __init__(self, config: ModelArgs) -> None:
+        super().__init__()
+        self.config = config
+        self.text_transformer = Transformer(config.text_transformer_args)
+
+    def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
+        return self.text_transformer(idx, input_pos)
+    
+    def setup_caches(self, max_batch_size, max_seq_length):
+        self.text_transformer.setup_caches(max_batch_size, max_seq_length)
+
+    @classmethod
+    def from_name(cls, name: str):
+        return cls(ModelArgs.from_name(name))
+
+    @classmethod
+    def from_table(cls, name: str):
+        return cls(ModelArgs.from_table(name))
+
+    @classmethod
+    def from_params(cls, params_path: str):
+        return cls(ModelArgs.from_params(params_path))
+
+    @classmethod
+    def from_gguf(cls, gguf_path: str, **kwargs):
+        from build.gguf_loader import load_model_and_state_dict
+
+        model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
+        if state_dict != {}:
+            model.load_state_dict(state_dict, assign=True)
+        return model
 
 
 class Transformer(nn.Module):
@@ -180,7 +239,7 @@ class Transformer(nn.Module):
             self.config.dim // self.config.n_heads,
             self.config.block_size * 2,
             self.config.rope_base,
-            use_scaled = self.config.use_scaled_rope,
+            use_scaled=self.config.use_scaled_rope,
         )
         self.register_buffer("freqs_cis", freqs_cis, persistent=True)
         causal_mask = torch.tril(
@@ -200,27 +259,6 @@ class Transformer(nn.Module):
         logits = self.output(x)
         # print(f"logits shape: {logits.shape}")
         return logits
-
-    @classmethod
-    def from_name(cls, name: str):
-        return cls(TransformerArgs.from_name(name))
-
-    @classmethod
-    def from_table(cls, name: str):
-        return cls(TransformerArgs.from_table(name))
-
-    @classmethod
-    def from_params(cls, params_path: str):
-        return cls(TransformerArgs.from_params(params_path))
-
-    @classmethod
-    def from_gguf(cls, gguf_path: str, **kwargs):
-        from build.gguf_loader import load_model_and_state_dict
-
-        model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
-        if state_dict != {}:
-            model.load_state_dict(state_dict, assign=True)
-        return model
 
 
 class TransformerBlock(nn.Module):
@@ -387,6 +425,7 @@ def apply_scaling(freqs: torch.Tensor):
             )
             new_freqs.append((1 - smooth) * freq / scale_factor + smooth * freq)
     return torch.tensor(new_freqs, dtype=freqs.dtype, device=freqs.device)
+
 
 def precompute_freqs_cis(
     n_elem: int, seq_len: int, base: int = 10000, dtype=None, use_scaled: bool = False

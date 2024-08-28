@@ -16,7 +16,7 @@ from build.builder import (
     TokenizerArgs,
 )
 
-from build.model import Transformer
+from build.model import Model
 from build.utils import set_precision
 from cli import add_arguments_for_verb, arg_init
 from utils.measure_time import measure_time
@@ -35,7 +35,7 @@ from lm_eval.tasks import get_task_dict
 
 
 def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
-    model: Transformer,
+    model: Model,
     prompt: torch.Tensor,
     max_new_tokens: int,
     max_seq_length: Optional[int] = None,
@@ -58,7 +58,7 @@ def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
     T = prompt.size(0)
     T_new = T + max_new_tokens
     if max_seq_length is None:
-        max_seq_length = min(T_new, model.config.block_size)
+        max_seq_length = min(T_new, model.config.text_transformer_args.block_size)
 
     device, dtype = prompt.device, prompt.dtype
     # create an empty tensor of the expected final shape and
@@ -81,11 +81,12 @@ class GPTFastEvalWrapper(eval_wrapper):
 
     def __init__(
         self,
-        model: Transformer,
+        model: Model,
         tokenizer,
         model_forward: Optional[Callable] = None,
         max_seq_length: Optional[int] = None,
         device="cpu",
+        is_pte_model: bool = False,
     ):
         super().__init__(device=device)
         self._model = model
@@ -98,6 +99,7 @@ class GPTFastEvalWrapper(eval_wrapper):
         self._device = torch.device(device)
         self._max_seq_length = 2048 if max_seq_length is None else max_seq_length
         self.times = []
+        self.is_pte_model = is_pte_model
 
     @property
     def eot_token_id(self):
@@ -143,7 +145,21 @@ class GPTFastEvalWrapper(eval_wrapper):
         )
         x = seq.index_select(0, input_pos).view(1, -1)
         with measure_time(message=None) as measure:
-            logits = self._model_forward(x, input_pos)
+            if (
+                self.is_pte_model
+            ):  # Sequential Prefill required for ExecuTorch (.pte) models since the prompt length can introduce dynamism
+                width = x.size(1)
+                assert input_pos.size(0) == width
+                logits = torch.zeros(1, width, self._model.config.vocab_size).to(
+                    x.device
+                )
+                for i in range(width):
+                    x_sliced, ip_sliced = x[:, i].view(1, -1), input_pos[i].view(-1)
+                    logits[0, i] = self._model_forward(
+                        x_sliced, ip_sliced
+                    )  # (x[:, i], input_pos[i])
+            else:
+                logits = self._model_forward(x, input_pos)
         self.times.append(measure.get_time())
         return logits
 
@@ -153,19 +169,20 @@ class GPTFastEvalWrapper(eval_wrapper):
 
 @torch.no_grad()
 def eval(
-    model: Transformer,
+    model: Model,
     model_forward: Callable,
     tokenizer,
     tasks: Optional[list] = None,
     limit: Optional[int] = None,
     max_seq_length: Optional[int] = None,
     device: str = "cpu",
+    is_pte_model: bool = False,
 ) -> dict:
     """
     Evaluates a language model on a specified task using the lm-evaluation-harness library.
 
     Args:
-        model (Transformer): The pre-trained language model to evaluate.
+        model (Model): The pre-trained language model to evaluate.
         tokenizer: The tokenizer to use for encoding/decoding text.
         tasks (Optional[list]): The names of the evaluation tasks to perform.
         limit (Optional[int]): The maximum number of samples to evaluate (None for all available).
@@ -183,6 +200,7 @@ def eval(
         model_forward=model_forward,
         max_seq_length=max_seq_length,
         device=device,
+        is_pte_model=is_pte_model,
     )
 
     try:
@@ -257,6 +275,7 @@ def main(args) -> None:
             limit,
             max_seq_length,
             device=builder_args.device,
+            is_pte_model=builder_args.pte_path is not None,
         )
 
     times = torch.tensor(result["times"])
