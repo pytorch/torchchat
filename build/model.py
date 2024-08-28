@@ -7,6 +7,7 @@ import json
 import os
 
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -17,7 +18,6 @@ from torch import Tensor
 from torch.nn import functional as F
 
 from build.utils import find_multiple, get_precision
-from enum import Enum
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
@@ -77,11 +77,25 @@ class TransformerArgs:
                 params[_to] = params.pop(_from)
         return cls(**params)
 
+
 @dataclass
 class ModelArgs:
     model_source: ModelSource
     model_type: ModelType
     transformer_args: Dict[str, TransformerArgs]
+
+    def __init__(
+        self,
+        transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
+        model_source: ModelSource = ModelSource.Native,
+        model_type: ModelType = ModelType.TextOnly,
+    ) -> None:
+        self.model_source = model_source
+        self.model_type = model_type
+        if isinstance(transformer_args, TransformerArgs):
+            self.transformer_args = {"text": transformer_args}
+        else:
+            self.transformer_args = transformer_args
 
     def __post_init__(self):
         assert self.text_transformer_args is not None
@@ -95,9 +109,7 @@ class ModelArgs:
         try:
             # try to interpret as a single transformer config
             transformer_args: Dict[str, TransformerArgs] = {}
-            transformer_args['text'] = TransformerArgs.from_params(
-                loaded_params
-            )
+            transformer_args["text"] = TransformerArgs.from_params(loaded_params)
         except TypeError:
             # try to interpret as a dict of transformer configs
             # now only support flamingo model
@@ -190,12 +202,14 @@ class Model(nn.Module):
         super().__init__()
         self.config = config
         if config.source == "native":
-            assert config.model_type == ModelType.TextOnly, "only text-only model is supported natively. For Flamingo, use torchtune"
+            assert (
+                config.model_type == ModelType.TextOnly
+            ), "only text-only model is supported natively. For Flamingo, use torchtune"
             self.text_transformer = Transformer(config.transformer_args["text"])
 
     def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         return self.text_transformer(idx, input_pos)
-    
+
     def setup_caches(self, max_batch_size, max_seq_length):
         self.text_transformer.setup_caches(max_batch_size, max_seq_length)
 
@@ -481,11 +495,10 @@ def apply_rotary_emb(x: Tensor, freqs_cis: Tensor) -> Tensor:
 # ExecuTorch model components
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-try: 
-    from executorch.extension.pybindings import portable_lib as exec_lib
-
+try:
     # ET changed the way it's loading the custom ops so it's not included in portable_lib but has to be loaded separately.
-    from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache # no-qa
+    from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache  # no-qa
+    from executorch.extension.pybindings import portable_lib as exec_lib
 
     class PTEModel(nn.Module):
         def __init__(self, config, path) -> None:
@@ -506,5 +519,6 @@ try:
 
         def setup_caches(self, max_batch_size, max_seq_length):
             pass
+
 except:
     pass
