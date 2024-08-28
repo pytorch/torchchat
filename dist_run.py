@@ -11,12 +11,12 @@ import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 
-from torchchat.model import TransformerArgs
+from torchchat.model import ModelArgs 
 from torchchat.distributed.model_dist import TransformerStage
 
 # Model config
 def main():
-    config = TransformerArgs.from_name("Transformer-2-7b-chat-hf")
+    config = ModelArgs.from_name("Transformer-2-7b-chat-hf").text_transformer_args
     print(config)
 
     # Construct a device mesh with available devices (multi-host or single host)

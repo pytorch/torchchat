@@ -17,7 +17,7 @@ wd = Path(__file__).parent.parent
 sys.path.append(str(wd.resolve()))
 sys.path.append(str((wd / "build").resolve()))
 
-from torchchat.model import TransformerArgs
+from torchchat.model import ModelArgs 
 
 
 @torch.inference_mode()
@@ -32,7 +32,7 @@ def convert_hf_checkpoint(
     if model_name is None:
         model_name = model_dir.name
 
-    config = TransformerArgs.from_name(model_name)
+    config = ModelArgs.from_name(model_name).text_transformer_args
     print(f"Model config {config.__dict__}")
 
     # Load the json file containing weight mapping
