@@ -47,7 +47,6 @@ jobs:
       - name: Install dependencies
         run: |
           ./install/install_requirements.sh
-          python -m pip install .
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -83,7 +82,6 @@ jobs:
       - name: Install dependencies
         run: |
           ./install/install_requirements.sh
-          python -m pip install .
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -118,7 +116,6 @@ jobs:
       - name: Install dependencies
         run: |
           ./install/install_requirements.sh
-          python -m pip install .
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -154,7 +151,6 @@ jobs:
       - name: Install dependencies
         run: |
           ./install/install_requirements.sh
-          python -m pip install .
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -190,7 +186,6 @@ jobs:
       - name: Install dependencies
         run: |
           ./install/install_requirements.sh
-          python -m pip install .
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -237,7 +232,6 @@ jobs:
 
         echo "::group::Install required packages"
         ./install/install_requirements.sh cuda
-        python -m pip install .
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -279,7 +273,6 @@ jobs:
 
         echo "::group::Install required packages"
         ./install/install_requirements.sh cuda
-        python -m pip install .
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -320,7 +313,6 @@ jobs:
 
         echo "::group::Install required packages"
         ./install/install_requirements.sh cuda
-        python -m pip install .
         pip list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -367,7 +359,6 @@ jobs:
 
         echo "::group::Install required packages"
         ./install/install_requirements.sh cuda
-        python -m pip install .
         pip list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -415,7 +406,6 @@ jobs:
 
         echo "::group::Install required packages"
         ./install/install_requirements.sh cuda
-        python -m pip install .
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -461,7 +451,6 @@ jobs:
         run: |
           echo "Intalling pip3 packages"
           ./install/install_requirements.sh
-          python -m pip install .
 
           export TORCHCHAT_ROOT=$PWD
           ./torchchat/utils/scripts/install_et.sh
@@ -601,7 +590,6 @@ jobs:
         run: |
           echo "Installing pip3 packages"
           ./install/install_requirements.sh
-          python -m pip install .
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
@@ -656,7 +644,6 @@ jobs:
         echo "::group::Install requirements"
         # Install requirements
         ./install/install_requirements.sh
-        python -m pip install .
         ls -la
         pwd
         pip3 list
@@ -723,7 +710,6 @@ jobs:
           echo "Intalling pip3 packages"
           pip3 install gguf
           ./install/install_requirements.sh
-          python -m pip install .
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
@@ -770,7 +756,6 @@ jobs:
         echo "::group::Install requirements"
         # Install requirements
         ./install/install_requirements.sh
-        python -m pip install .
         ls -la
         pwd
         pip3 list
@@ -830,7 +815,6 @@ jobs:
       - name: Install requirements
         run: |
           ./install/install_requirements.sh
-          python -m pip install .
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download GGUF
@@ -910,7 +894,6 @@ jobs:
         run: |
           echo "Intalling pip3 packages"
           ./install/install_requirements.sh
-          python -m pip install .
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Set ET git sha
@@ -998,7 +981,6 @@ jobs:
       - name: Install dependencies
         run: |
           ./install/install_requirements.sh
-          python -m pip install .
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
@@ -1039,7 +1021,6 @@ jobs:
             sysctl machdep.cpu.core_count
           fi
           ./install/install_requirements.sh
-          python -m pip install .
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
