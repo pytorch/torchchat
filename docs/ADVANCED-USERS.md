@@ -123,14 +123,14 @@ For example, for the stories15M model, this would be expressed as
 
 For models using a configuration not in the list of known
 configurations, you can construct the model by initializing the
-`TransformerArgs` dataclass that controls model construction from a
+`ModelArgs` dataclass that controls model construction from a
 parameter json using the `params-path ${PARAMS_PATH}` containing the
 appropriate model parameters to initialize the `ModelArgs` for the
 model. (We use the model constructor `Model.from_params()`).
 
 The parameter file should be in JSON format specifying these
-parameters. You can find the `TransformerArgs` data class in
-[`model.py`](https://github.com/pytorch/torchchat/blob/main/model.py#L22).
+parameters. You can find the `ModelArgs` data class in
+[`model.py`](https://github.com/pytorch/torchchat/blob/main/build/model.py#L70).
 
 The final way to initialize a torchchat model is from GGUF. You load a
 GGUF model with the option `--load-gguf ${MODELNAME}.gguf`. Presently,
