@@ -55,7 +55,7 @@ source .venv/bin/activate
 The interfaces of torchchat are leveraged through **Python Commands** and **Native Runners**. While the Python Commands are enumerable in the --help menu, the latter are explored in their respective sections.
 
 ```bash
-python3 torchchat.py --help
+torchchat --help
 ```
 
 [skip default]: begin
@@ -117,7 +117,7 @@ Once this is done, torchchat will be able to download model artifacts from
 Hugging Face.
 
 ```
-python3 torchchat.py download llama3.1
+torchchat download llama3.1
 ```
 
 > [!NOTE]
@@ -132,13 +132,13 @@ python3 torchchat.py download llama3.1
 ### List
 This subcommands shows the available models
 ```bash
-python3 torchchat.py list
+torchchat list
 ```
 
 ### Where
 This subcommands shows location of a particular model.
 ```bash
-python3 torchchat.py list
+torchchat list
 ```
 This is useful in scripts when you do not want to hard-code paths
 
@@ -146,7 +146,7 @@ This is useful in scripts when you do not want to hard-code paths
 ### Remove
 This subcommands removes the specified model
 ```bash
-python3 torchchat.py remove llama3.1
+torchchat remove llama3.1
 ```
 
 More information about these commands can be found by adding the `--help` option.
@@ -171,14 +171,14 @@ This mode allows you to chat with an LLM in an interactive fashion.
 
 [skip default]: begin
 ```bash
-python3 torchchat.py chat llama3.1
+torchchat chat llama3.1
 ```
 [skip default]: end
 
 ### Generate
 This mode generates text based on an input prompt.
 ```bash
-python3 torchchat.py generate llama3.1 --prompt "write me a story about a boy and his bear"
+torchchat generate llama3.1 --prompt "write me a story about a boy and his bear"
 ```
 
 [skip default]: end
@@ -201,7 +201,7 @@ In one terminal, start the server
 [skip default]: begin
 
 ```bash
-python3 torchchat.py server llama3.1
+torchchat server llama3.1
 ```
 [skip default]: end
 
@@ -265,7 +265,7 @@ that is then loaded for inference. This can be done with both Python and C++ env
 The following example exports and executes the Llama3.1 8B Instruct
 model.  The first command compiles and performs the actual export.
 ```
-python3 torchchat.py export llama3.1 --output-dso-path exportedModels/llama3.1.so
+torchchat export llama3.1 --output-dso-path exportedModels/llama3.1.so
 ```
 
 > [!NOTE]
@@ -280,7 +280,7 @@ case visit our [customization guide](docs/model_customization.md).
 To run in a python enviroment, use the generate subcommand like before, but include the dso file.
 
 ```
-python3 torchchat.py generate llama3.1 --dso-path exportedModels/llama3.1.so --prompt "Hello my name is"
+torchchat generate llama3.1 --dso-path exportedModels/llama3.1.so --prompt "Hello my name is"
 ```
 **Note:** Depending on which accelerator is used to generate the .dso file, the command may need the device specified: `--device (cuda | cpu)`.
 
@@ -294,7 +294,7 @@ torchchat/utils/scripts/build_native.sh aoti
 
 Then run the compiled executable, with the exported DSO from earlier.
 ```bash
-cmake-out/aoti_run exportedModels/llama3.1.so -z `python3 torchchat.py where llama3.1`/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/aoti_run exportedModels/llama3.1.so -z `torchchat where llama3.1`/tokenizer.model -l 3 -i "Once upon a time"
 ```
 **Note:** Depending on which accelerator is used to generate the .dso file, the runner may need the device specified: `-d (CUDA | CPU)`.
 
@@ -327,7 +327,7 @@ Similar to AOTI, to deploy onto device, we first export the PTE artifact, then w
 The following example uses the Llama3.1 8B Instruct model.
 ```
 # Export
-python3 torchchat.py export llama3.1 --quantize torchchat/quant_config/mobile.json --output-pte-path llama3.1.pte
+torchchat export llama3.1 --quantize torchchat/quant_config/mobile.json --output-pte-path llama3.1.pte
 ```
 
 > [!NOTE]
@@ -351,7 +351,7 @@ Specifically there are 2 ways of doing so: Pure Python and via a Runner
 
 ```
 # Execute
-python3 torchchat.py generate llama3.1 --device cpu --pte-path llama3.1.pte --prompt "Hello my name is"
+torchchat generate llama3.1 --device cpu --pte-path llama3.1.pte --prompt "Hello my name is"
 ```
 
 </details>
@@ -367,7 +367,7 @@ torchchat/utils/scripts/build_native.sh et
 
 Execute using the runner
 ```bash
-cmake-out/et_run llama3.1.pte -z `python3 torchchat.py where llama3.1`/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/et_run llama3.1.pte -z `torchchat where llama3.1`/tokenizer.model -l 3 -i "Once upon a time"
 ```
 
 </details>
@@ -409,7 +409,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 3. To run on a device, ensure you have it set up for development and a provisioning profile with the `increased-memory-limit` entitlement. Update the app's bundle identifier to match your provisioning profile with the required capability.
 
-4. After successfully launching the app, copy the exported ExecuTorch model (`.pte`) and tokenizer (`.model`) files to the iLLaMA folder. You can find the model file called `llama3.1.pte` in the current `torchchat` directory and the tokenizer file at `$(python3 torchchat.py where llama3.1)/tokenizer.model` path.
+4. After successfully launching the app, copy the exported ExecuTorch model (`.pte`) and tokenizer (`.model`) files to the iLLaMA folder. You can find the model file called `llama3.1.pte` in the current `torchchat` directory and the tokenizer file at `$(torchchat where llama3.1)/tokenizer.model` path.
 
     - **For the Simulator:** Drag and drop both files onto the Simulator window and save them in the `On My iPhone > iLLaMA` folder.
     - **For a device:** Open a separate Finder window, navigate to the Files tab, drag and drop both files into the iLLaMA folder, and wait for the copying to finish.
@@ -448,7 +448,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 2. Rename the downloaded AAR file to `executorch.aar` and move the file to `torchchat/edge/android/torchchat/app/libs/`. You may need to create directory `torchchat/edge/android/torchchat/app/libs/` if it does not exist.
 
-3. Push the model and tokenizer file to your device. You can find the model file called `llama3.1.pte` in the current `torchchat` directory and the tokenizer file at `$(python3 torchchat.py where llama3.1)/tokenizer.model` path.
+3. Push the model and tokenizer file to your device. You can find the model file called `llama3.1.pte` in the current `torchchat` directory and the tokenizer file at `$(torchchat where llama3.1)/tokenizer.model` path.
     ```
     adb shell mkdir -p /data/local/tmp/llama
     adb push <model.pte> /data/local/tmp/llama
@@ -500,14 +500,14 @@ tasks and limit args. See [Evaluation](torchchat/utils/docs/evaluation.md)
 
 Eager mode:
 ```
-python3 torchchat.py eval llama3.1 --dtype fp32 --limit 5
+torchchat eval llama3.1 --dtype fp32 --limit 5
 ```
 
 To test the perplexity for a lowered or quantized model, pass it in
 the same way you would to generate:
 
 ```
-python3 torchchat.py eval llama3.1 --pte-path llama3.1.pte --limit 5
+torchchat eval llama3.1 --pte-path llama3.1.pte --limit 5
 ```
 
 

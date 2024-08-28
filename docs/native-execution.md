@@ -76,8 +76,8 @@ Let us try using it with an example.
 We first download stories15M and export it to AOTI.
 
 ```
-python3 torchchat.py download stories15M
-python3 torchchat.py export stories15M --output-dso-path ./model.so
+torchchat download stories15M
+torchchat export stories15M --output-dso-path ./model.so
 ```
 
 We can now execute the runner with:
@@ -124,8 +124,8 @@ Let us try using it with an example.
 We first download stories15M and export it to ExecuTorch.
 
 ```
-python3 torchchat.py download stories15M
-python3 torchchat.py export stories15M --output-pte-path ./model.pte
+torchchat download stories15M
+torchchat export stories15M --output-pte-path ./model.pte
 ```
 
 We can now execute the runner with:

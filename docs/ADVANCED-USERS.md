@@ -72,12 +72,12 @@ and ExecuTorch), and standalone C++ runtimes.
 
 | Function | Torchchat Command | Direct Command | Tested |
 |---|----|----|-----|
-Download model | `torchchat.py download` | n/a | 🚧 |
-Interactive chat | `torchchat.py chat`   | n/a | 🚧 |
-GUI-based chat | `torchchat.py browser`   | n/a | ⚠️ |
-Generate text | `torchchat.py generate` |`generate.py` | ✅ |
-Evaluate model | `torchchat.py eval` | `eval.py` | 🚧 |
-Export model  | `torchchat.py export` | `export.py` | ✅ |
+Download model | `torchchat download` | n/a | 🚧 |
+Interactive chat | `torchchat chat`   | n/a | 🚧 |
+GUI-based chat | `torchchat browser`   | n/a | ⚠️ |
+Generate text | `torchchat generate` |`generate.py` | ✅ |
+Evaluate model | `torchchat eval` | `eval.py` | 🚧 |
+Export model  | `torchchat export` | `export.py` | ✅ |
 Exported model test (dso,pte) | `torchchat --chat` | n/a  | 🚧 |
 Exported model test (dso,pte) | `torchchat --generate` |`generate.py` | ✅ |
 Evaluate exported model (dso,pte) | `torchchat --eval` | `eval.py` | 🚧 |
@@ -90,7 +90,7 @@ Mobile C++ runtime | n/a | app + AOTI | 🚧 |
 
 [skip default]: begin
 ```
-python3 torchchat.py [ export | generate | chat | eval | ... ] --help
+torchchat [ export | generate | chat | eval | ... ] --help
 ```
 [skip default]: end
 
@@ -284,7 +284,7 @@ variety of Python-free native execution environments.
 Let's start by exporting and running a small model like stories15M
 with ExecuTorch to generate a portable compact model representation,
 and AOT Inductor for native optimized performance on CPUs and GPUs.
-We export the model with the `export.py` or `torchchat.py export`
+We export the model with the `export.py` or `torchchat export`
 command.
 
 Export for mobile backends requires that you first install executorch

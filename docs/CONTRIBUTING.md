@@ -36,7 +36,7 @@ Installations can be tested by
 
 ```bash
 # ensure everything installed correctly
-python3 torchchat.py --help
+torchchat --help
 ```
 
 &nbsp;

@@ -158,7 +158,7 @@ def remove_main(args) -> None:
     # model as an optional named parameter for all subcommands, so we'd
     # probably need to move it to be registered per-command.
     if not args.model:
-        print("Usage: torchchat.py remove <model-or-alias>")
+        print("Usage: torchchat remove <model-or-alias>")
         return
 
     model_config = resolve_model_config(args.model)
@@ -180,7 +180,7 @@ def where_main(args) -> None:
     # model as an optional named parameter for all subcommands, so we'd
     # probably need to move it to be registered per-command.
     if not args.model:
-        print("Usage: torchchat.py where <model-or-alias>")
+        print("Usage: torchchat where <model-or-alias>")
         return
 
     model_config = resolve_model_config(args.model)

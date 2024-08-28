@@ -128,7 +128,7 @@ setup_avd() {
 }
 
 export_model() {
-  python torchchat.py export stories15M --output-pte-path ./build/android/model.pte
+  torchchat export stories15M --output-pte-path ./build/android/model.pte
   curl -fsSL https://github.com/karpathy/llama2.c/raw/master/tokenizer.model -o ./build/android/tokenizer.model
   python ./et-build/src/executorch/examples/models/llama2/tokenizer/tokenizer.py -t ./build/android/tokenizer.model -o build/android/tokenizer.bin
 }

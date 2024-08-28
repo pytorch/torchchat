@@ -31,6 +31,7 @@ jobs:
         # Install requirements
 
         ./install/install_requirements.sh cuda
+        python -m pip install .
         bash torchchat/utils/scripts/build_native.sh aoti
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
@@ -54,9 +55,9 @@ jobs:
         export PROMPT="Once upon a time in a land far away"
 
         for DTYPE in bfloat16; do
-            python torchchat.py generate --dtype ${DTYPE} --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}" --device cuda
+            torchchat generate --dtype ${DTYPE} --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}" --device cuda
 
-            python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-dso-path /tmp/model.so
+            torchchat export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-dso-path /tmp/model.so
 
             ./cmake-out/aoti_run /tmp/model.so -d CUDA -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}"
 
