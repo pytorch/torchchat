@@ -18,13 +18,13 @@ import torch._dynamo.config
 import torch._inductor.config
 
 from torchchat.model_params.model_config import resolve_model_config
-from distributed import init_distributed, ParallelDims, parallelize_llama
+from torchchat.distributed import init_distributed, ParallelDims, parallelize_llama
 from torchchat.utils.quantize import quantize_model
 from torchchat.utils.measure_time import measure_time
 
 from torchchat.model import Transformer
 from torchchat.utils.build_utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
-from distributed import launch_distributed
+from torchchat.distributed import launch_distributed
 
 
 @dataclass
