@@ -27,7 +27,7 @@ from quantization.quantize import quantize_model
 from torch.distributed.device_mesh import DeviceMesh
 from torchchat.utils.measure_time import measure_time
 
-from build.model import Model
+from torchchat.model import Model
 from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
 
 
@@ -504,7 +504,7 @@ def _initialize_model(
             device_sync(device=builder_args.device)
 
         try:
-            from build.model import PTEModel
+            from torchchat.model import PTEModel
 
             model = PTEModel(model.config, builder_args.pte_path)
         except Exception:

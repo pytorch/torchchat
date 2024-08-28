@@ -93,7 +93,7 @@ try:
 
     import executorch.exir as exir
 
-    from build.model import apply_rotary_emb, Attention
+    from torchchat.model import apply_rotary_emb, Attention
     from build.utils import get_precision
 
     from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
