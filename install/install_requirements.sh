@@ -87,6 +87,6 @@ REQUIREMENTS_TO_INSTALL=(
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   (
     set -x
-    $PYTHON_EXECUTABLE scripts/patch_triton.py
+    $PYTHON_EXECUTABLE torchchat/utils/scripts/patch_triton.sh
   )
 fi

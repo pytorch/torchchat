@@ -15,7 +15,7 @@ Torchchat is currently in a pre-release state and under extensive development.
 
 [shell default]: ./install/install_requirements.sh
 
-[shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
+[shell default]: TORCHCHAT_ROOT=${PWD} ./torchchat/utils/scripts/install_et.sh
 
 
 This is the advanced users guide, if you're looking to get started
