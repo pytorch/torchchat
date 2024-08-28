@@ -244,7 +244,7 @@ ExecuTorch-exported PTE models.
 
 ## PyTorch eager mode and JIT-compiled execution
 ```
-python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --device [ cuda | mps | cpu ]
+python3 torchchat.py generate [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --device [ cuda | mps | cpu ]
 ```
 
 To improve performance, you can compile the model with `--compile`
@@ -300,7 +300,7 @@ execution with the ExecuTorch runtime (and enabling execution on a
 wide range of community and vendor supported backends):
 
 ```
-python3 export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_NAME}.pte
+python3 torchchat.py export --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_NAME}.pte
 ```
 
 Alternatively, we may generate a native instruction stream binary
@@ -308,7 +308,7 @@ using AOT Inductor for CPU oor GPUs (the latter using Triton for
 optimizations such as operator fusion):
 
 ```
-python3 export.py --checkpoint-path ${MODEL_PATH} --device [ cuda | cpu ] --output-dso-path ${MODEL_NAME}.so
+python3 torchchat.py export --checkpoint-path ${MODEL_PATH} --device [ cuda | cpu ] --output-dso-path ${MODEL_NAME}.so
 ```
 
 
@@ -325,7 +325,7 @@ Jupyter notebooks and/or Google colab.
 Here is how to load an exported model into the python environment on the example of using an exported model with `generate.oy`.
 
 ```
-python3 generate.py --checkpoint-path ${MODEL_PATH} --pte-path ${MODEL_NAME}.pte --device cpu --prompt "Once upon a time"
+python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --pte-path ${MODEL_NAME}.pte --device cpu --prompt "Once upon a time"
 ```
 
 After you have exported the model, you can test the model with the
@@ -336,7 +336,7 @@ tests against the exported model with the same interface, and support
 additional experiments to confirm model quality and speed.
 
 ```
-python3 generate.py --device [ cuda | cpu ] --dso-path ${MODEL_NAME}.so --prompt "Once upon a time"
+python3 torchchat.py generate --device [ cuda | cpu ] --dso-path ${MODEL_NAME}.so --prompt "Once upon a time"
 ```
 
 
@@ -394,8 +394,8 @@ have good support for bfloat16 and float16. This can be taken advantage of via `
 
 [skip default]: begin
 ```
-python3 generate.py --dtype [bf16 | fp16 | fp32] ...
-python3 export.py --dtype [bf16 | fp16 | fp32] ...
+python3 torchchat.py generate --dtype [bf16 | fp16 | fp32] ...
+python3 torchchat.py export --dtype [bf16 | fp16 | fp32] ...
 ```
 [skip default]: end
 
@@ -417,7 +417,7 @@ into native torchchat models by using the load-gguf option:
 
 [skip default]: begin
 ```
-python3 [ export.py | generate.py | ... ] --gguf-path <gguf_filename>
+python3 torchchat.py [ export | generate | ... ] --gguf-path <gguf_filename>
 ```
 [skip default]: end
 
