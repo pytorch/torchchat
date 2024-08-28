@@ -676,7 +676,7 @@ class Generator:
         self.system_prompt = None
         # Set up our max_seq_length
         if generator_args.chat_mode:
-            max_seq_length = self.model.config.text_transformer_args.max_seq_length
+            max_seq_length = self.model.text_transformer.config.max_seq_length
             print(
                 f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye"
             )
@@ -689,7 +689,7 @@ class Generator:
         else:
             max_seq_length = min(
                 encoded.size(0) + generator_args.max_new_tokens,
-                self.model.config.text_transformer_args.block_size,
+                self.model.text_transformer.config.block_size,
             )
 
         max_seq_length = (
@@ -903,4 +903,3 @@ if __name__ == "__main__":
     check_args(args, verb)
     args = arg_init(args)
     main(args)
-

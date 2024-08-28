@@ -9,7 +9,7 @@ import os
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 import torch
 import torch.nn as nn
@@ -90,6 +90,8 @@ class ModelArgs:
         model_source: ModelSource = ModelSource.Native,
         model_type: ModelType = ModelType.TextOnly,
     ) -> None:
+        self._sanity_check(transformer_args, model_source, model_type)
+        
         self.model_source = model_source
         self.model_type = model_type
         if isinstance(transformer_args, TransformerArgs):
@@ -100,6 +102,23 @@ class ModelArgs:
     def __post_init__(self):
         assert self.text_transformer_args is not None
         assert type(self.text_transformer_args) == TransformerArgs
+    
+    def _sanity_check(
+        self,
+        transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
+        model_source: ModelSource,
+        model_type: ModelType,
+    ) -> None:
+
+        assert isinstance(model_source, ModelSource)
+        assert isinstance(model_type, ModelType)
+        assert isinstance(transformer_args, (TransformerArgs, dict))
+
+        assert model_source in [ModelSource.Native],  "only native model is supported"
+        assert (
+            model_type == ModelType.TextOnly
+        ), "only text-only model is supported natively. For Flamingo, use torchtune"
+
 
     @classmethod
     def from_params(cls, params_path):
@@ -110,17 +129,21 @@ class ModelArgs:
             # try to interpret as a single transformer config
             transformer_args: Dict[str, TransformerArgs] = {}
             transformer_args["text"] = TransformerArgs.from_params(loaded_params)
+            model_source = ModelSource.Native
+            model_type = ModelType.TextOnly
         except TypeError:
             # try to interpret as a dict of transformer configs
             # now only support flamingo model
             assert False, "flamingo model is not supported yet"
+            model_source = loaded_params["model_source"]
+            model_type = loaded_params["model_type"]
             for name, params in loaded_params.items():
                 if name == "text":
                     text_transformer_args = TransformerArgs.from_params(params)
                 else:
                     raise ValueError(f"Unknown transformer name {name}")
 
-        return cls(model_source, model_type, transformer_args)
+        return cls(transformer_args, model_source, model_type)
 
     @classmethod
     def from_table(cls, name: str):
@@ -201,11 +224,13 @@ class Model(nn.Module):
     def __init__(self, config: ModelArgs) -> None:
         super().__init__()
         self.config = config
-        if config.source == "native":
+        if config.model_source == ModelSource.Native:
             assert (
                 config.model_type == ModelType.TextOnly
             ), "only text-only model is supported natively. For Flamingo, use torchtune"
             self.text_transformer = Transformer(config.transformer_args["text"])
+        else:
+            assert False, "only native model is supported"
 
     def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         return self.text_transformer(idx, input_pos)

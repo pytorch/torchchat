@@ -225,7 +225,7 @@ class TokenizerArgs:
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
-        use_tiktoken = model.config.text_transformer_args.use_tiktoken
+        use_tiktoken = model.text_transformer.config.use_tiktoken
 
         if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
             raise RuntimeError(
@@ -529,7 +529,7 @@ def _initialize_model(
         if builder_args.setup_caches:
             with torch.device(builder_args.device):
                 model.setup_caches(
-                    max_batch_size=1, max_seq_length=max_seq_length or model.config.text_transformer_args.max_seq_length
+                    max_batch_size=1, max_seq_length=max_seq_length or model.text_transformer.config.max_seq_length
                 )
 
         model.to(dtype=builder_args.precision)
