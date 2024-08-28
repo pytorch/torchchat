@@ -17,6 +17,7 @@ from distributed.safetensor_utils import (
     get_hf_weight_map_and_path,
     load_safetensor_weights,
 )
+from distributed.dtensor_utils import find_cpu_tensors
 
 MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID = {
@@ -36,10 +37,10 @@ def create_device_mesh(mesh_dimensions):
     return dist.init_device_mesh("cuda", mesh_dimensions, mesh_dim_names=("pp", "tp"))
 
 
-def load_model_weights(stage_module, hf_model_name, logger):
+def load_model_weights(stage_module, hf_model_name, device, logger):
     weight_map, weight_path, key_map = get_hf_weight_map_and_path(hf_model_name)
     num_loaded_weights, num_missing_weights = load_safetensor_weights(
-        stage_module, weight_map, weight_path, key_map
+        stage_module, weight_map, weight_path, key_map, device
     )
     logger.info(
         f"Success - Loaded {num_loaded_weights} weights, {num_missing_weights} missing weights"
@@ -97,10 +98,25 @@ def main():
         group=pp_mesh.get_group(),
     )
 
-    
-    logger.info(f"Loading weights for {pp_rank=}")
-    load_model_weights(stage.submod, hf_model_name, logger)
+    # TODO - remove this...just debugging issue
+    cpu_tensors = find_cpu_tensors(stage.submod)
+    logger.info(f"Found {len(cpu_tensors)} cpu tensors: {cpu_tensors}")
+    if len(cpu_tensors) > 0:
+        raise ValueError("Found cpu tensors in stage")
 
+    # Load weights
+    logger.info(f"Loading weights for {pp_rank=} on {device=}")
+    load_model_weights(stage.submod, hf_model_name, device=device, logger=logger)
+
+
+    # TODO - remove this...just debugging issue
+    cpu_tensors = find_cpu_tensors(stage.submod)
+    logger.info(f"Found {len(cpu_tensors)} cpu tensors: {cpu_tensors}")
+    if len(cpu_tensors) > 0:
+        raise ValueError("Found cpu tensors in stage")
+    
+
+    
     schedule = ScheduleGPipe(stage, mbs)
     logger.info(f"Created schedule: {schedule}")
     input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)

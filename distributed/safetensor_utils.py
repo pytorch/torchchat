@@ -135,7 +135,7 @@ def load_safetensor_weights(
     weight_map: Dict[str, str],
     file_location: str,
     new_to_old_keymap: Dict[str, str],
-    device: torch.device = "cpu",
+    device: torch.device = "cuda",
     purge_model_prefix: bool = True,
     ignore_cache_layers: bool = True,
 ) -> Tuple[int, int]:
@@ -164,7 +164,7 @@ def load_safetensor_weights(
         full_path = os.path.join(file_location, file)
         logger.info(f"Loading checkpoint file: {full_path}")
         try:
-            checkpoint = load_checkpoint(full_path, device)  # device)
+            checkpoint = load_checkpoint(full_path, "cpu")  # device)
 
             update_state_dict(
                 stage_state_dict,
@@ -173,6 +173,7 @@ def load_safetensor_weights(
                 new_to_old_keymap,
                 file,
                 updated_states,
+                device,
             )
         except FileNotFoundError:
             logger.error(f"File not found: {full_path}")
@@ -232,6 +233,7 @@ def update_state_dict(
     new_to_old_keymap: Dict[str, str],
     file: str,
     updated_states: Set[str],
+    device: torch.device,
 ):  
     count_dtensors_loaded = 0
     for param, file_with_param in weight_map.items():
@@ -263,6 +265,7 @@ def update_state_dict(
                 
             else:
                 # regular tensor, just update directly
+                checkpoint_tensor = checkpoint_tensor.to(device)
                 state_dict[param] = checkpoint_tensor
                 
 

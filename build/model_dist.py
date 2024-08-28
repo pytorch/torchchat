@@ -93,15 +93,6 @@ class TransformerStage(nn.Module):
             torch.ones(self.max_seq_length, self.max_seq_length, dtype=torch.bool)
         )
         self.register_buffer("causal_mask", causal_mask, persistent=True)
-    
-    def rewrap_embeddings(self,):
-        """After loading weights, we need to rewrap the embeddings as DTensors """
-        if self.stage_idx == 0:
-            self.tok_embeddings = parallelize_module(
-                self.tok_embeddings,
-                device_mesh,
-                RowwiseParallel(input_layouts=Replicate()),
-            )
             
     def forward(self, x: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
@@ -300,6 +291,7 @@ class RMSNorm(nn.Module):
         return x * torch.rsqrt(torch.mean(x * x, dim=-1, keepdim=True) + self.eps)
 
     def forward(self, x: Tensor) -> Tensor:
-        logger.info(f"RMSNorm input shape: {x.shape}, {x.device=}, self.weight.device={self.weight.device}")
+        if x.device != self.weight.device:
+            logger.info(f"RMSNorm weight mismatch -  input shape: {x.shape}, {x.device=}, self.weight.device={self.weight.device}")
         output = self._norm(x.float()).type_as(x)
         return output * self.weight
