@@ -19,6 +19,9 @@ from torch.nn import functional as F
 
 from build.utils import find_multiple, get_precision
 
+from torchtune.models.flamingo import flamingo_decoder, flamingo_vision_encoder
+from torchtune.modules.model_fusion import DeepFusionModel 
+
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
 
@@ -30,7 +33,6 @@ class ModelType(Enum):
 class ModelSource(Enum):
     Native = "native"
     Torchtune = "torchtune"
-
 
 @dataclass
 class TransformerArgs:
@@ -82,7 +84,7 @@ class TransformerArgs:
 class ModelArgs:
     model_source: ModelSource
     model_type: ModelType
-    transformer_args: Dict[str, TransformerArgs]
+    transformer_args: Dict[str, Union[Dict, TransformerArgs]]
 
     def __init__(
         self,
@@ -98,10 +100,6 @@ class ModelArgs:
             self.transformer_args = {"text": transformer_args}
         else:
             self.transformer_args = transformer_args
-
-    def __post_init__(self):
-        assert self.text_transformer_args is not None
-        assert type(self.text_transformer_args) == TransformerArgs
     
     def _sanity_check(
         self,
@@ -133,15 +131,12 @@ class ModelArgs:
             model_type = ModelType.TextOnly
         except TypeError:
             # try to interpret as a dict of transformer configs
-            # now only support flamingo model
-            assert False, "flamingo model is not supported yet"
             model_source = loaded_params["model_source"]
             model_type = loaded_params["model_type"]
-            for name, params in loaded_params.items():
-                if name == "text":
-                    text_transformer_args = TransformerArgs.from_params(params)
-                else:
-                    raise ValueError(f"Unknown transformer name {name}")
+
+            # now only support flamingo model
+            assert model_source == ModelSource.Torchtune and model_type == ModelType.Flamingo
+            transformer_args = {k: v for k, v in loaded_params.items() if k != "model_source" and k != "model_type"}
 
         return cls(transformer_args, model_source, model_type)
 
@@ -230,7 +225,22 @@ class Model(nn.Module):
             ), "only text-only model is supported natively. For Flamingo, use torchtune"
             self.text_transformer = Transformer(config.transformer_args["text"])
         else:
-            assert False, "only native model is supported"
+            assert config.model_source == ModelSource.Torchtune
+            assert config.model_type == ModelType.Flamingo, "currently only Flamingo model is supported from torchtune"
+
+            assert "encoder" in config.transformer_args and "decoder" in config.transformer_args, "config is missing essential transformer args for Flamingo model"
+            encoder = flamingo_vision_encoder(
+                *config.transformer_args["encoder"]
+            )
+            decoder = flamingo_decoder(
+                *config.transformer_args["decoder"]
+            )
+            self.model = DeepFusionModel(
+                encoder=encoder,
+                decoder=decoder,
+            )
+
+
 
     def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         return self.text_transformer(idx, input_pos)
