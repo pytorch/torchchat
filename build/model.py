@@ -18,7 +18,7 @@ from torch.nn import functional as F
 
 from build.utils import find_multiple, get_precision
 
-config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
+config_path = Path(f"{str(Path(__file__).parent.parent)}/torchchat/model_params")
 
 
 @dataclass
