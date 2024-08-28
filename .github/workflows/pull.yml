@@ -379,7 +379,7 @@ jobs:
         echo "::group::Run inference with quantize file"
         if [ $(uname -s) == Darwin ]; then
           python3 export.py --output-dso-path /tmp/model.so --quantize torchchat/quant_config/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
-             python3 torchchat.py generate --dso-path /tmp/model.so --checkpoint "./checkpoints/${REPO_NAME}/model.pth"~
+          python3 torchchat.py generate --dso-path /tmp/model.so --checkpoint "./checkpoints/${REPO_NAME}/model.pth"~
         fi
         echo "::endgroup::"
 
@@ -507,7 +507,7 @@ jobs:
           echo "******************************************"
           echo "*** --quantize torchchat/quant_config/mobile.json ***"
           echo "******************************************"
-          # python3 torchchat.py export --quantize torchchat/quant_config/mobile.json --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python torchchat.py export --quantize torchchat/quant_config/mobile.json --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           # python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
 

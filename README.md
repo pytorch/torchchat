@@ -327,7 +327,7 @@ Similar to AOTI, to deploy onto device, we first export the PTE artifact, then w
 The following example uses the Llama3.1 8B Instruct model.
 ```
 # Export
-torchchat export llama3.1 --quantize torchchat/quant_config/mobile.json --output-pte-path llama3.1.pte
+python3 torchchat.py export llama3.1 --quantize torchchat/quant_config/mobile.json --output-pte-path llama3.1.pte
 ```
 
 > [!NOTE]
