@@ -249,7 +249,7 @@ def update_state_dict(
 
             checkpoint_tensor = checkpoint[old_param]
             stage_tensor = state_dict[param]
-            #logger.info(f"{param=}, {stage_tensor.shape=}")
+            #logger.info(f"DType Check: {param=}, {checkpoint_tensor.dtype=}, {stage_tensor.dtype=}")
             stage_is_dtensor = is_dtensor(stage_tensor)
             #@logger.info(f"{stage_is_dtensor=}")
             
@@ -267,8 +267,11 @@ def update_state_dict(
                 # regular tensor, just update directly
                 checkpoint_tensor = checkpoint_tensor.to(device)
                 state_dict[param] = checkpoint_tensor
-                
 
+            # TODO - review this...  
+            if state_dict[param].dtype != checkpoint_tensor.dtype:
+                state_dict[param] = state_dict[param].to(checkpoint_tensor.dtype)
+                
             # log_tensor_info(param, state_dict[param])
             # logger.info(f"Loaded {param} from {file}")
             updated_states.add(param)

@@ -110,6 +110,7 @@ class TransformerStage(nn.Module):
 
         if self.stage_idx == self.n_stages - 1:
             x = self.norm(x)
+            logger.info(f"final stage output info: {x.dtype=}, {x.shape=}, {x.device=}\n {self.output.weight.dtype=}, {self.output.weight.shape=},")
             x = self.output(x)
 
         # print(f"stage output shape: {x.shape}")

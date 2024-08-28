@@ -3,6 +3,8 @@ import safetensors
 from torch.distributed._tensor import DeviceMesh, DTensor, Shard, Replicate
 
 from distributed.logging_utils import setup_logging
+import torch.nn as nn
+from collections import defaultdict
 
 logger = setup_logging(__name__)
 
@@ -34,6 +36,31 @@ def find_cpu_tensors(module):
 
     recurse(module)
     return cpu_tensors
+
+def record_module_dtypes(module):
+    """ Record the dtypes of all parameters and buffers in a module and return a dictionary of dtype -> list of names"""
+    dtype_count = defaultdict(int)
+    dtype_locations = defaultdict(list)
+
+    def recurse(mod, prefix=''):
+        for name, param in mod.named_parameters(recurse=False):
+            full_name = f"{prefix}.{name}" if prefix else name
+            dtype = param.dtype
+            dtype_count[dtype] += 1
+            dtype_locations[dtype].append(full_name)
+
+        for name, buf in mod.named_buffers(recurse=False):
+            full_name = f"{prefix}.{name}" if prefix else name
+            dtype = buf.dtype
+            dtype_count[dtype] += 1
+            dtype_locations[dtype].append(full_name)
+
+        for name, child in mod.named_children():
+            child_prefix = f"{prefix}.{name}" if prefix else name
+            recurse(child, child_prefix)
+
+    recurse(module)
+    return dtype_count, dtype_locations
 
 
 def load_into_dtensor(weight_tensor, model_dtensor, debug=False):
