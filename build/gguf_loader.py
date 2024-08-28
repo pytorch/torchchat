@@ -14,7 +14,7 @@ import gguf
 import torch
 import torch.nn.functional as F
 
-from build.model import Model, ModelArgs, TransformerArgs
+from torchchat.model import Model, ModelArgs, TransformerArgs
 
 from gguf import GGUFValueType
 from quantization.quantize import group_dequantize_tensor_from_qparams, pack_scales_and_zeros
