@@ -397,6 +397,13 @@ class Generator:
                     )
                     input_pos += 1
                     break
+            if _i == 1:
+                t0 = time.time()
+            if _i == num_new_tokens - 2:
+                t1 = time.time()
+                print(f"\nTime to generate {num_new_tokens-2} tokens: {t1-t0}")
+                print(f"\nTokens/sec to generate {num_new_tokens-2} tokens: {(num_new_tokens-2) / (t1-t0)}")
+
 
         if not encountered_eos:
             eos_token = torch.tensor(
