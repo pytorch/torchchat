@@ -16,7 +16,7 @@ import torch._dynamo.config
 import torch._inductor.config
 import torch.nn as nn
 
-from config.model_config import resolve_model_config
+from torchchat.model_config.model_config import resolve_model_config
 from distributed import (
     init_distributed,
     launch_distributed,
