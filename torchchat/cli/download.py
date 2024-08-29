@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Optional
 
 from torchchat.cli.convert_hf_checkpoint import convert_hf_checkpoint
-from config.model_config import (
+from torchchat.model_config.model_config import (
     load_model_configs,
     ModelConfig,
     ModelDistributionChannel,
