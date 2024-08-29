@@ -494,7 +494,7 @@ sh scripts/android_example.sh
 
 Uses the lm_eval library to evaluate model accuracy on a variety of
 tasks. Defaults to wikitext and can be manually controlled using the
-tasks and limit args. See [Evaluation](docs/evaluation.md)
+tasks and limit args. See [Evaluation](torchchat/utils/docs/evaluation.md)
 
 **Examples**
 

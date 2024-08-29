@@ -16,10 +16,10 @@ from build.builder import (
     TokenizerArgs,
 )
 
-from build.model import Model
+from torchchat.model import Model
 from build.utils import set_precision
 from cli import add_arguments_for_verb, arg_init
-from utils.measure_time import measure_time
+from torchchat.utils.measure_time import measure_time
 
 torch._dynamo.config.automatic_dynamic_shapes = True
 torch._inductor.config.triton.unique_kernel_names = True
