@@ -100,13 +100,11 @@ class TransformerStage(nn.Module):
             input_pos = torch.arange(x.shape[1], device=x.device, dtype=torch.long)
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
-        #x_input_dtype = x.dtype
+        
 
         if self.stage_idx == 0:
-            #x = x.to(torch.float32)
             x: DTensor = self.tok_embeddings(x)
             # TODO: sequence parallelize this
-            #x = x.to(x_input_dtype)
 
         for _, layer in self.layers.items():
             x = layer(x, input_pos, freqs_cis, mask)
