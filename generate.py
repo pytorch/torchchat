@@ -19,7 +19,7 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 
-from build.builder import (
+from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
     BuilderArgs,
@@ -27,7 +27,7 @@ from build.builder import (
 )
 from torchchat.model import Model
 from build.utils import device_sync, set_precision
-from cli import add_arguments_for_verb, arg_init, check_args
+from torchchat.cli.cli import add_arguments_for_verb, arg_init, check_args
 from torchchat.utils.device_info import get_device_info
 
 

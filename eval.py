@@ -9,7 +9,7 @@ from typing import Callable, Optional
 import torch
 import torch._dynamo.config
 import torch._inductor.config
-from build.builder import (
+from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
     BuilderArgs,
@@ -18,7 +18,7 @@ from build.builder import (
 
 from torchchat.model import Model
 from build.utils import set_precision
-from cli import add_arguments_for_verb, arg_init
+from torchchat.cli.cli import add_arguments_for_verb, arg_init
 from torchchat.utils.measure_time import measure_time
 
 torch._dynamo.config.automatic_dynamic_shapes = True
