@@ -28,7 +28,7 @@ from build.builder import (
 from torchchat.model import Model
 from build.utils import device_sync, set_precision
 from cli import add_arguments_for_verb, arg_init, check_args
-from utils.device_info import get_device_info
+from torchchat.utils.device_info import get_device_info
 
 
 class _ChatFormatter(ABC):

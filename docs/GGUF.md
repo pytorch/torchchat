@@ -65,7 +65,7 @@ python3 torchchat.py generate --gguf-path ${GGUF_MODEL_PATH} --dso-path ${GGUF_S
 ```
 
 ### ExecuTorch export + generate
-Before running this example, you must first [Set-up ExecuTorch](executorch_setup.md).
+Before running this example, you must first [Set-up ExecuTorch](torchchat/edge/docs/executorch_setup.md).
 ```
 # Convert the model for use
 python3 torchchat.py export --gguf-path ${GGUF_MODEL_PATH} --output-pte-path ${GGUF_PTE_PATH}
