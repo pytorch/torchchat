@@ -15,7 +15,7 @@ from torch.distributed._tensor import DTensor, Replicate
 from torch.distributed.device_mesh import _mesh_resources, DeviceMesh
 from torch.distributed.tensor.parallel import parallelize_module, ColwiseParallel, RowwiseParallel
 
-from build.utils import find_multiple
+from torchchat.utils.build_utils import find_multiple
 
 from torchchat.model import TransformerArgs, KVCache, apply_rotary_emb, precompute_freqs_cis
 
