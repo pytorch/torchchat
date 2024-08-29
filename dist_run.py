@@ -56,6 +56,7 @@ def _cleanup():
 
 
 def main():
+
     rank, world_size = init_distributed()
     logger = setup_logging(__name__)
 

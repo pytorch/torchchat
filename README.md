@@ -270,7 +270,7 @@ python3 torchchat.py export llama3.1 --output-dso-path exportedModels/llama3.1.s
 
 > [!NOTE]
 > If your machine has cuda add this flag for performance
-`--quantize config/data/cuda.json` when exporting.
+`--quantize torchchat/quant_config/cuda.json` when exporting.
 
 For more details on quantization and what settings to use for your use
 case visit our [customization guide](docs/model_customization.md).
@@ -327,11 +327,11 @@ Similar to AOTI, to deploy onto device, we first export the PTE artifact, then w
 The following example uses the Llama3.1 8B Instruct model.
 ```
 # Export
-python3 torchchat.py export llama3.1 --quantize config/data/mobile.json --output-pte-path llama3.1.pte
+python3 torchchat.py export llama3.1 --quantize torchchat/quant_config/mobile.json --output-pte-path llama3.1.pte
 ```
 
 > [!NOTE]
-> We use `--quantize config/data/mobile.json` to quantize the
+> We use `--quantize torchchat/quant_config/mobile.json` to quantize the
 llama3.1 model to reduce model size and improve performance for
 on-device use cases.
 
