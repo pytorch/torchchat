@@ -18,6 +18,7 @@ from distributed.safetensor_utils import (
     load_safetensor_weights,
 )
 from distributed.dtensor_utils import find_cpu_tensors, record_module_dtypes
+from distributed.utils import Color as color
 
 MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID = {
@@ -106,10 +107,17 @@ def main():
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    load_model_weights(stage.submod, hf_model_name, device=device, logger=logger)
+    # load_model_weights(stage.submod, hf_model_name, device=device, logger=logger)
 
-    # stage.submod.to(torch.float16)
+    # this will set the kvcache layers to float16...
+    stage.submod.eval()
+    #stage.submod = stage.submod.to(torch.float16)
+    #if stage.submod.stage_idx == 0:
+        #tok_embeddings = nn.Embedding(config.vocab_size, config.dim)
+    #    stage.submod.tok_embeddings = stage.submod.tok_embeddings.to(torch.float32)
+                
     
+
     # TODO - remove this...just debugging issue
     cpu_tensors = find_cpu_tensors(stage.submod)
     logger.info(f"Found {len(cpu_tensors)} cpu tensors: {cpu_tensors}")
@@ -117,8 +125,8 @@ def main():
         raise ValueError("Found cpu tensors in stage")
     
     # verify dtypes
-    dtype_count, dtype_locations, fp32_locations = record_module_dtypes(stage.submod)
-    logger.info(f"Found {len(dtype_count)} dtypes: {dtype_count.items()}")
+    #dtype_count, dtype_locations, fp32_locations = record_module_dtypes(stage.submod)
+    #logger.info(f"Found {len(dtype_count)} dtypes: {dtype_count.items()}")
     #logger.info(f"checkme: Found fp32 {len(fp32_locations)} values: {fp32_locations.keys()}")
     # for name, param in stage.submod.named_parameters():
     #    logger.info(f"{name}: {param.dtype=}")
@@ -153,14 +161,14 @@ def main():
     schedule = ScheduleGPipe(stage, mbs)
     logger.info(f"Created schedule: {schedule}")
 
-    with torch.inference_mode():
+    with torch.no_grad(): # .inference_mode():
         if pp_rank == 0:
             schedule.step(input_ids)
         else:
             output = schedule.step()
             logger.info(f"Output: {output}")
 
-    logger.info(f"Rank {rank} has completed.")
+    logger.info(f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}")
 
     dist.barrier()
     dist.destroy_process_group()

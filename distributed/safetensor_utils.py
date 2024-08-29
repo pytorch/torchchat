@@ -162,7 +162,7 @@ def load_safetensor_weights(
 
     for file in needed_files:
         full_path = os.path.join(file_location, file)
-        logger.info(f"Loading checkpoint file: {full_path}")
+        # logger.info(f"Loading checkpoint file: {full_path}")
         try:
             checkpoint = load_checkpoint(full_path, "cpu")  # device)
 
@@ -178,7 +178,7 @@ def load_safetensor_weights(
         except FileNotFoundError:
             logger.error(f"File not found: {full_path}")
         except Exception as e:
-            logger.error(f"Error loading {full_path}: {str(e)}")
+            logger.error(f"Error during checkpoint processing of {full_path}: {str(e)}")
 
     missing_keys = handle_missing_keys(
         stage_state_dict, updated_states, ignore_cache_layers
@@ -256,19 +256,18 @@ def update_state_dict(
             stage_tensor = state_dict[param]
             
             stage_is_dtensor = is_dtensor(stage_tensor)
-            logger.info(f"cme DType Check: {param=}, {stage_is_dtensor=}, {checkpoint_tensor.dtype=}, {stage_tensor.dtype=}")
+            # logger.info(f"cme DType Check: {param=}, {stage_is_dtensor=}, {checkpoint_tensor.dtype=}, {stage_tensor.dtype=}")
             
 
             checkpoint_tensor = compare_and_reverse(stage_tensor, checkpoint_tensor)
-            logger.info(f"cme Type Check after reverse: {param=}, {stage_is_dtensor=}, {checkpoint_tensor.dtype=}, {stage_tensor.dtype=}")
+            # logger.info(f"cme Type Check after reverse: {param=}, {stage_is_dtensor=}, {checkpoint_tensor.dtype=}, {stage_tensor.dtype=}")
             
             # here we need to check if the tensor is a DTensor and if so, adjust the 
             # shape and placement to match the model DTensor.  
             if is_dtensor(stage_tensor):
                 model_tensor = load_into_dtensor(checkpoint_tensor, stage_tensor)
-                logger.info(f"DTensor: Loaded {param} into {model_tensor=}")
-                if 'norm' in param:
-                    assert False, "check {param.dtype=}, {model_tensor.dtype=}"
+                # logger.info(f"DTensor: Loaded {param} into {model_tensor=}")
+                
                 state_dict[param] = model_tensor
                 count_dtensors_loaded += 1
                 
@@ -277,11 +276,10 @@ def update_state_dict(
                 checkpoint_tensor = checkpoint_tensor.to(device)
                 state_dict[param] = checkpoint_tensor
 
-            # TODO - review this... 
-            logger.info(f"Loaded {param} with dtype {checkpoint_tensor.dtype=}")
+            # logger.info(f"Loaded {param} with dtype {checkpoint_tensor.dtype=}")
             # if state_dict[param].dtype != checkpoint_tensor.dtype:
             state_dict[param] = state_dict[param].to(checkpoint_tensor.dtype)
-            logger.info(f"checkme {param} is now {state_dict[param].dtype=}, {state_dict[param]=}")
+            #logger.info(f"checkme {param} is now {state_dict[param].dtype=}, {state_dict[param]=}")
             
             assert state_dict[param].dtype == checkpoint_tensor.dtype
             assert state_dict[param].dtype == torch.float16, f"{param} dtype is not fp16"
@@ -292,8 +290,6 @@ def update_state_dict(
     logger.info(f"Count of loaded DTensors: {count_dtensors_loaded}")
     
     
-
-
 def format_tensor_info(tensor: torch.Tensor) -> str:
     return f"Shape: {tensor.shape}, Dtype: {tensor.dtype}, Device: {tensor.device}"
 
