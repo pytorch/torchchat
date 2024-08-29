@@ -50,7 +50,6 @@ install_executorch_python_libs() {
       bash ./install_requirements.sh
   else
       echo "Installing pybind"
-      echo "Current directory"
       bash ./install_requirements.sh --pybind xnnpack
   fi
   pip3 list
