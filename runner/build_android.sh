@@ -7,7 +7,7 @@
 
 set -ex
 
-source "$(dirname "${BASH_SOURCE[0]}")/../scripts/install_utils.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../torchchat/scripts/install_utils.sh"
 
 if ["${ANDROID_NDK}" == ""]; then
   echo "Please set ANDROID_NDK enviornment variable."
