@@ -16,7 +16,7 @@ from build.model_dist import TransformerStage
 
 # Model config
 def main():
-    config = ModelArgs.from_name("Transformer-2-7b-chat-hf").text_transformer_args
+    config = ModelArgs.from_name("Transformer-2-7b-chat-hf").transformer_args['text']
     print(config)
 
     # Construct a device mesh with available devices (multi-host or single host)

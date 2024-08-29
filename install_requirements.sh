@@ -67,7 +67,8 @@ fi
 
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
-  torch=="2.5.0.${NIGHTLY_VERSION}"
+  torch=="2.4.0"
+  torchvision
 )
 
 # Install the requirements. `--extra-index-url` tells pip to look for package
@@ -89,7 +90,7 @@ REQUIREMENTS_TO_INSTALL=(
 # # TODO: Remove this and install nightly build, once it supports macos
 # (
 #   set -x
-#   $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@e11201a62669f582d81cdb33e031a07fb8dfc4f3
+#   $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@cfabc13e72fd03934e62a2a03903bc1678235bed
 # )
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   (
