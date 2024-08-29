@@ -19,7 +19,7 @@ from torchchat.model import Model, ModelArgs, TransformerArgs
 from gguf import GGUFValueType
 from quantization.quantize import group_dequantize_tensor_from_qparams, pack_scales_and_zeros
 
-from build.utils import find_multiple, get_precision
+from torchchat.utils.build_utils import find_multiple, get_precision
 
 
 logger: logging.Logger = logging.getLogger(__name__)

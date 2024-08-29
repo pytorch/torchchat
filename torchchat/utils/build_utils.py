@@ -171,7 +171,7 @@ name_to_dtype_dict = {
 
 
 def allowable_params_table() -> List[str]:
-    config_path = Path(f"{str(Path(__file__).parent.parent)}/torchchat/model_params")
+    config_path = Path(f"{str(Path(__file__).parent.parent)}/model_params")
     known_model_params = [
         config.replace(".json", "") for config in os.listdir(config_path)
     ]

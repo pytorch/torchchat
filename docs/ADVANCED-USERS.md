@@ -205,7 +205,7 @@ We use `[ optional input ]` to indicate optional inputs, and `[ choice
 ## Torchchat Overview
 
 The torchchat Model definition may be found in `build/model.py`, the
-code to build the model in `build/builder.py` and sequence generation
+code to build the model in `torchchat/cli/builder.py` and sequence generation
 code for prompted sequence generation and chat in `generate.py`. The
 model checkpoint will commonly have extensions `pth` (checkpoint and model
 definition) or `pt` (model checkpoint).  At present, we always use the

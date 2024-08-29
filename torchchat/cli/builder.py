@@ -28,7 +28,7 @@ from torch.distributed.device_mesh import DeviceMesh
 from torchchat.utils.measure_time import measure_time
 
 from torchchat.model import Model
-from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
+from torchchat.utils.build_utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
 
 
 @dataclass
