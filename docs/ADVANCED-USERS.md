@@ -273,7 +273,7 @@ run any tests and evaluations that you want to run on the exported
 models without requiring changes to your test harnesses and evaluation
 scripts.
 
-Learn more about model evaluation in [evaluation.md].
+Learn more about model evaluation in [torchchat/utils/evaluation.md].
 
 
 ## Model Export for Native Execution
@@ -467,7 +467,7 @@ significant impact on accuracy.
 Refer to the [README](README.md] for an introduction toNative
 execution on servers, desktops and laptops is described under
 [runner-build.md].  Mobile and Edge executipon for Android and iOS are
-described under [Android.md] and [iOS.md], respectively.
+described under [torchchat/edge/docs/Android.md] and [torchchat/edge/docs/iOS.md], respectively.
 
 
 
