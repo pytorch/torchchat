@@ -116,18 +116,19 @@ class TransformerStage(nn.Module):
 
         # print(f"stage output shape: {x.shape}")
         return x
+        
+    # temporary disable them due to miss essential input
+    # @classmethod
+    # def from_name(cls, name: str):
+    #     return cls(TransformerArgs.from_name(name))
 
-    @classmethod
-    def from_name(cls, name: str):
-        return cls(TransformerArgs.from_name(name))
+    # @classmethod
+    # def from_table(cls, name: str):
+    #     return cls(TransformerArgs.from_table(name))
 
-    @classmethod
-    def from_table(cls, name: str):
-        return cls(TransformerArgs.from_table(name))
-
-    @classmethod
-    def from_params(cls, params_path: str):
-        return cls(TransformerArgs.from_params(params_path))
+    # @classmethod
+    # def from_params(cls, params_path: str):
+    #     return cls(TransformerArgs.from_params(params_path))
 
     @classmethod
     def from_gguf(cls, gguf_path: str, **kwargs):
