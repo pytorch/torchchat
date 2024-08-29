@@ -26,7 +26,7 @@ NAME_TO_HF_MODEL_ID_AND_DTYPE = {
 }
 
 
-def init_distributed():
+def _init_distributed():
     dist.init_process_group("nccl")
     rank = dist.get_rank()
     world_size = dist.get_world_size()
@@ -34,11 +34,11 @@ def init_distributed():
     return rank, world_size
 
 
-def create_device_mesh(mesh_dimensions):
+def _create_device_mesh(mesh_dimensions):
     return dist.init_device_mesh("cuda", mesh_dimensions, mesh_dim_names=("pp", "tp"))
 
 
-def load_model_weights(stage_module, hf_model_name, device, logger):
+def _load_model_weights(stage_module, hf_model_name, device, logger):
     weight_map, weight_path, key_map = get_hf_weight_map_and_path(hf_model_name)
     num_loaded_weights, num_missing_weights = load_safetensor_weights(
         stage_module, weight_map, weight_path, key_map, device
@@ -56,7 +56,7 @@ def _cleanup():
 
 
 def main():
-    rank, world_size = init_distributed()
+    rank, world_size = _init_distributed()
     logger = setup_logging(__name__)
 
     config = TransformerArgs.from_name(MODEL_NAME)
@@ -71,7 +71,7 @@ def main():
     logger.info(f"Using HF model weights from {hf_model_name}")
 
     mesh_dimensions = (2, 2)
-    device_mesh = create_device_mesh(mesh_dimensions)
+    device_mesh = _create_device_mesh(mesh_dimensions)
 
     tp_mesh = device_mesh["tp"]
     pp_mesh = device_mesh["pp"]
@@ -113,7 +113,7 @@ def main():
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    load_model_weights(stage.submod, hf_model_name, device=device, logger=logger)
+    _load_model_weights(stage.submod, hf_model_name, device=device, logger=logger)
 
     stage.submod.eval()
 
