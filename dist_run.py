@@ -17,13 +17,14 @@ from distributed.safetensor_utils import (
     get_hf_weight_map_and_path,
     load_safetensor_weights,
 )
-from distributed.dtensor_utils import find_cpu_tensors
+from distributed.dtensor_utils import find_cpu_tensors, record_module_dtypes
 from distributed.utils import Color as color
 
 MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
     "Transformer-2-7b-chat-hf": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
 }
+
 
 def init_distributed():
     dist.init_process_group("nccl")
@@ -49,6 +50,11 @@ def load_model_weights(stage_module, hf_model_name, device, logger):
         raise ValueError(f"Missing {num_missing_weights} weights")
 
 
+def _cleanup():
+    dist.barrier()
+    dist.destroy_process_group()
+
+
 def main():
     rank, world_size = init_distributed()
     logger = setup_logging(__name__)
@@ -58,7 +64,7 @@ def main():
 
     hf_model_name, model_dtype = NAME_TO_HF_MODEL_ID_AND_DTYPE[MODEL_NAME]
     logger.info(f"Using HF model weights from {hf_model_name} and dtype {model_dtype}")
-    
+
     hf_config = get_hf_config_file(hf_model_name)
     if hf_config is None:
         raise ValueError(f"Config file not found for model id {hf_model_name}")
@@ -73,12 +79,12 @@ def main():
     nstages = pp_mesh.size()
     device = torch.device(f"cuda:{rank}")
 
-
     with device:
         with tp_mesh:
             model = TransformerStage(config, pp_rank, nstages)
-            model = model.to(model_dtype)
             model.setup_caches(1, 4096)
+            # TODO: refine this .to once we start using fp8 for KV cache
+            model = model.to(model_dtype)
     logger.info(f"Model: {model}")
 
     mbs = 2  # number of micro-batches
@@ -86,8 +92,6 @@ def main():
     batch_size = mbs * mb_size  # total batch size
     seqlen = 4096  # sequence length
     dim = 4096  # embedding dimension
-
-    
 
     mb_ids = torch.randint(0, config.vocab_size, (mb_size, seqlen), device=device)
     activation = torch.rand(mb_size, seqlen, dim, device=device, dtype=model_dtype)
@@ -103,9 +107,7 @@ def main():
         group=pp_mesh.get_group(),
     )
 
-    # TODO - remove this...just debugging issue
     cpu_tensors = find_cpu_tensors(stage.submod)
-    logger.info(f"Found {len(cpu_tensors)} cpu tensors: {cpu_tensors}")
     if len(cpu_tensors) > 0:
         raise ValueError("Found cpu tensors in stage")
 
@@ -115,20 +117,20 @@ def main():
 
     stage.submod.eval()
 
-    # this will set the kvcache layers to checkpoint dtype ala float16...
-    #stage.submod = stage.submod.to(global_dtype)
-
     # this check confirms that there are no cpu tensors in the model..we expect this to be true.
     cpu_tensors = find_cpu_tensors(stage.submod)
     # logger.info(f"Found {len(cpu_tensors)} cpu tensors: {cpu_tensors}")
     if len(cpu_tensors) > 0:
         raise ValueError("Found cpu tensors in stage")
 
-    # verify dtypes
-    # dtype_count, dtype_locations, fp32_locations = record_module_dtypes(stage.submod)
-    # logger.info(f"Found {len(dtype_count)} dtypes: {dtype_count.items()}")
-    # logger.info(f"checkme: Found fp32 {len(fp32_locations)} values: {fp32_locations.keys()}")
-    # logger.info(f"Found {len(dtype_locations)} dtypes: {dtype_locations.items()}")
+    # verify dtypes for model - expect all to be model_dtype except for bool causal_mask atm.
+    dtype_count, dtype_locations, fp32_locations = record_module_dtypes(stage.submod)
+    logger.info(
+        f"Stage Dtypes - Found {len(dtype_count)} dtypes: {dtype_count.items()}"
+    )
+    assert (
+        len(dtype_count) == 2
+    ), f"Expected 2 dtypes in model after checkpoint loading: {model_dtype} and {torch.bool}"
 
     input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
     logger.info(f"Input: {input_ids.dtype=}, {input_ids.shape=}, {input_ids.device=}")
@@ -147,8 +149,7 @@ def main():
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
     )
 
-    dist.barrier()
-    dist.destroy_process_group()
+    _cleanup()
 
 
 if __name__ == "__main__":

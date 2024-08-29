@@ -14,7 +14,7 @@ from torch.nn import Module
 from typing import Dict, Tuple, Set, Optional
 
 from distributed.logging_utils import setup_logging
-from distributed.dtensor_utils import is_dtensor, load_into_dtensor, record_module_dtypes
+from distributed.dtensor_utils import is_dtensor, load_into_dtensor
 
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
@@ -255,12 +255,10 @@ def update_state_dict(
             checkpoint_tensor = checkpoint[old_param]
             stage_tensor = state_dict[param]
             
-            stage_is_dtensor = is_dtensor(stage_tensor)
+            # stage_is_dtensor = is_dtensor(stage_tensor)
             # logger.info(f"cme DType Check: {param=}, {stage_is_dtensor=}, {checkpoint_tensor.dtype=}, {stage_tensor.dtype=}")
             
-
             checkpoint_tensor = compare_and_reverse(stage_tensor, checkpoint_tensor)
-            # logger.info(f"cme Type Check after reverse: {param=}, {stage_is_dtensor=}, {checkpoint_tensor.dtype=}, {stage_tensor.dtype=}")
             
             # here we need to check if the tensor is a DTensor and if so, adjust the 
             # shape and placement to match the model DTensor.  
@@ -276,10 +274,7 @@ def update_state_dict(
                 checkpoint_tensor = checkpoint_tensor.to(device)
                 state_dict[param] = checkpoint_tensor
 
-            # logger.info(f"Loaded {param} with dtype {checkpoint_tensor.dtype=}")
-            # if state_dict[param].dtype != checkpoint_tensor.dtype:
             state_dict[param] = state_dict[param].to(checkpoint_tensor.dtype)
-            #logger.info(f"checkme {param} is now {state_dict[param].dtype=}, {state_dict[param]=}")
             
             assert state_dict[param].dtype == checkpoint_tensor.dtype
             assert state_dict[param].dtype == torch.float16, f"{param} dtype is not fp16"
@@ -287,7 +282,7 @@ def update_state_dict(
             # log_tensor_info(param, state_dict[param])
             # logger.info(f"Loaded {param} from {file}")
             updated_states.add(param)
-    logger.info(f"Count of loaded DTensors: {count_dtensors_loaded}")
+    # logger.info(f"Count of loaded DTensors: {count_dtensors_loaded}")
     
     
 def format_tensor_info(tensor: torch.Tensor) -> str:
@@ -295,33 +290,12 @@ def format_tensor_info(tensor: torch.Tensor) -> str:
 
 
 def clean_cache_keys(input_set: Set[str]) -> Set[str]:
+    """Remove cache, freqs, mask params from checkpoint update set...we expect these to be generated """
     return {
         item
         for item in input_set
         if not (item.endswith("cache") or item in ["freqs_cis", "causal_mask"])
     }
-
-def inspect_dtensor_sharding(dtensor):
-    if not hasattr(dtensor, 'placements'):
-        logger.info("This tensor is not a DTensor")
-        return
-
-    placements = dtensor.placements
-    logger.info(f"DTensor shape: {dtensor.shape}")
-    logger.info(f"Number of dimensions: {len(placements)}")
-    
-    for dim, placement in enumerate(placements):
-        logger.info(f"Dimension {dim}:")
-        logger.info(f"  Placement type: {placement.type}")
-        if placement.type == 'shard':
-            logger.info(f"  Sharding spec: {placement.sharding_spec}")
-        elif placement.type == 'replicate':
-            logger.info("  Replicated across devices")
-        else:
-            logger.info(f"  Other placement type: {placement.type}")
-
-    logger.info(f"Device mesh shape: {dtensor.device_mesh.shape}")
-    logger.info(f"Device mesh devices: {dtensor.device_mesh.device_type}")
 
 def handle_missing_keys(
     state_dict: Dict[str, torch.Tensor],
@@ -348,4 +322,4 @@ def log_loading_status(missing_keys: Set[str], updated_states: Set[str]):
         )
     else:
         logger.info("Fully updated state dict.")
-    logger.info(f"Loaded {len(updated_states)} weights into stage module")
+    logger.info(f"Successfully loaded {len(updated_states)} weights into stage module")

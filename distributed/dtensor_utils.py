@@ -1,9 +1,7 @@
 import torch
-import safetensors
-from torch.distributed._tensor import DeviceMesh, DTensor, Shard, Replicate
+from torch.distributed._tensor import DTensor, Shard, Replicate
 
 from distributed.logging_utils import setup_logging
-import torch.nn as nn
 from collections import defaultdict
 
 logger = setup_logging(__name__)
@@ -132,3 +130,27 @@ def load_into_dtensor(weight_tensor, model_dtensor, debug=False):
     
     # model_dtensor.copy_(new_dtensor)
     return new_dtensor
+
+
+def inspect_dtensor_sharding(dtensor):
+    """ hepful debug util for inspecting DTensor sharding """
+    if not is_dtensor(dtensor):
+        logger.info(f"This tensor {dtensor} is not a DTensor")
+        return
+
+    placements = dtensor.placements
+    logger.info(f"DTensor shape: {dtensor.shape}")
+    logger.info(f"Number of dimensions: {len(placements)}")
+    
+    for dim, placement in enumerate(placements):
+        logger.info(f"Dimension {dim}:")
+        logger.info(f"  Placement type: {placement.type}")
+        if placement.type == 'shard':
+            logger.info(f"  Sharding spec: {placement.sharding_spec}")
+        elif placement.type == 'replicate':
+            logger.info("  Replicated across devices")
+        else:
+            logger.info(f"  Other placement type: {placement.type}")
+
+    logger.info(f"Device mesh shape: {dtensor.device_mesh.shape}")
+    logger.info(f"Device mesh devices: {dtensor.device_mesh.device_type}")
