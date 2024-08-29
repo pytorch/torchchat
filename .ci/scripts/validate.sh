@@ -215,7 +215,7 @@ function eval_model() {
         echo "******************************************"
         echo "************** non-quantized *************"
         echo "******************************************"
-        python -W ignore eval.py --compile --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
+        python -W ignore torchchat.py eval --compile --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
         cat "$MODEL_DIR/eval"
         # extract perplexity number and compare with a constant
         export REF_PERPLEXITY=100000
@@ -233,7 +233,7 @@ function eval_model() {
             echo "******************************************"
 
             export QUANT_OPTIONS='{"linear:int4" : {"groupsize": 32}}'
-            python -W ignore eval.py --compile --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
+            python -W ignore torchchat.py eval --compile --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" > "$MODEL_DIR/eval" || exit 1
             cat "$MODEL_DIR/eval"
             export REF_PERPLEXITY=100000
             export PERPLEXITY=cat "$MODEL_DIR/eval" | tail -n 1 log | awk -F '[, ]' '{print $4}'
@@ -261,7 +261,7 @@ function eval_model_sanity_check() {
         echo "******************************************"
         echo "************** non-quantized *************"
         echo "******************************************"
-        python -W ignore eval.py --compile --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval" || exit 1
+        python -W ignore torchchat.py eval --compile --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval" || exit 1
         cat "$MODEL_DIR/eval"
 
         if [[ "$TARGET_DEVICE" != "cuda" || "$DTYPE" == "bfloat16" ]]; then
@@ -270,14 +270,14 @@ function eval_model_sanity_check() {
             echo "******************************************"
 
             export QUANT_OPTIONS='{"linear:int4" : {"groupsize": 32}}'
-            python -W ignore eval.py --compile --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval" || exit 1
+            python -W ignore torchchat.py eval --compile --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval" || exit 1
             cat "$MODEL_DIR/eval"
 
             echo "**************************************************"
             echo "******** INT4 group-wise quantized (eager) *******"
             echo "**************************************************"
 
-            python -W ignore eval.py --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval_eager" || exit 1
+            python -W ignore torchchat.py eval --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/eval_eager" || exit 1
             cat "$MODEL_DIR/eval_eager"
 
             # there is some issues with AOTI cpu and cuda, need to fix and enable the test for cuda as well
@@ -286,7 +286,7 @@ function eval_model_sanity_check() {
             echo "*************************************************"
             if [ "$DTYPE" != "float16" ]; then
                 python3 -W ignore export.py --dtype ${DTYPE} --quant "$QUANT_OPTIONS" --checkpoint-path "$CHECKPOINT_PATH" --output-dso-path ${MODEL_DIR}/${MODEL_NAME}.so --dynamic-shapes --device "$TARGET_DEVICE" || exit 1
-                python3 -W ignore eval.py --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/output_eval_aoti" || exit 1
+                python3 -W ignore torchchat.py eval --dtype ${DTYPE} --checkpoint-path "$CHECKPOINT_PATH" --dso-path ${MODEL_DIR}/${MODEL_NAME}.so --device "$TARGET_DEVICE" --limit 5 > "$MODEL_DIR/output_eval_aoti" || exit 1
                 cat "$MODEL_DIR/output_eval_aoti"
             fi;
         fi;

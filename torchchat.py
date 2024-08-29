@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
         generate_main(args)
     elif args.command == "eval":
-        from eval import main as eval_main
+        from torchchat.usages.eval import main as eval_main
 
         eval_main(args)
     elif args.command == "export":

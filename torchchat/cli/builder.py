@@ -23,7 +23,7 @@ from distributed import (
     ParallelDims,
     parallelize_llama,
 )
-from quantization.quantize import quantize_model
+from torchchat.utils.quantize import quantize_model
 from torch.distributed.device_mesh import DeviceMesh
 from torchchat.utils.measure_time import measure_time
 
