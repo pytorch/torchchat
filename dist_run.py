@@ -108,7 +108,8 @@ def main():
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
     load_model_weights(stage.submod, hf_model_name, device=device, logger=logger)
 
-
+    # stage.submod.to(torch.float16)
+    
     # TODO - remove this...just debugging issue
     cpu_tensors = find_cpu_tensors(stage.submod)
     logger.info(f"Found {len(cpu_tensors)} cpu tensors: {cpu_tensors}")
@@ -116,8 +117,13 @@ def main():
         raise ValueError("Found cpu tensors in stage")
     
     # verify dtypes
-    dtype_count, dtype_locations = record_module_dtypes(stage.submod)
+    dtype_count, dtype_locations, fp32_locations = record_module_dtypes(stage.submod)
     logger.info(f"Found {len(dtype_count)} dtypes: {dtype_count.items()}")
+    #logger.info(f"checkme: Found fp32 {len(fp32_locations)} values: {fp32_locations.keys()}")
+    # for name, param in stage.submod.named_parameters():
+    #    logger.info(f"{name}: {param.dtype=}")
+    #    if 'norm' in name:
+    #        logger.info(f"**************   {name=}: {param.dtype=}")
     # logger.info(f"Found {len(dtype_locations)} dtypes: {dtype_locations.items()}")
     #assert False, "inspect dtypes"
 
@@ -147,12 +153,12 @@ def main():
     schedule = ScheduleGPipe(stage, mbs)
     logger.info(f"Created schedule: {schedule}")
 
-
-    if pp_rank == 0:
-        schedule.step(input_ids)
-    else:
-        output = schedule.step()
-        logger.info(f"Output: {output}")
+    with torch.inference_mode():
+        if pp_rank == 0:
+            schedule.step(input_ids)
+        else:
+            output = schedule.step()
+            logger.info(f"Output: {output}")
 
     logger.info(f"Rank {rank} has completed.")
 

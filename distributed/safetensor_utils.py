@@ -14,7 +14,7 @@ from torch.nn import Module
 from typing import Dict, Tuple, Set, Optional
 
 from distributed.logging_utils import setup_logging
-from distributed.dtensor_utils import is_dtensor, load_into_dtensor
+from distributed.dtensor_utils import is_dtensor, load_into_dtensor, record_module_dtypes
 
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
@@ -184,8 +184,13 @@ def load_safetensor_weights(
         stage_state_dict, updated_states, ignore_cache_layers
     )
     log_loading_status(missing_keys, updated_states)
-
+    logger.info(f"Loading {len(updated_states)} weights into stage module")
+    #precount, premap = record_module_dtypes(stage_module)
     stage_module.load_state_dict(stage_state_dict, strict=False, assign=True)
+    #postcount, postmap = record_module_dtypes(stage_module)
+    #logger.info(f"{precount=}, {postcount=}")
+    #logger.info(f"{premap=}, {postmap=}")
+    #assert False, "checkme"
 
     return len(updated_states), len(missing_keys)
 
@@ -249,17 +254,21 @@ def update_state_dict(
 
             checkpoint_tensor = checkpoint[old_param]
             stage_tensor = state_dict[param]
-            #logger.info(f"DType Check: {param=}, {checkpoint_tensor.dtype=}, {stage_tensor.dtype=}")
+            
             stage_is_dtensor = is_dtensor(stage_tensor)
-            #@logger.info(f"{stage_is_dtensor=}")
+            logger.info(f"cme DType Check: {param=}, {stage_is_dtensor=}, {checkpoint_tensor.dtype=}, {stage_tensor.dtype=}")
             
 
             checkpoint_tensor = compare_and_reverse(stage_tensor, checkpoint_tensor)
+            logger.info(f"cme Type Check after reverse: {param=}, {stage_is_dtensor=}, {checkpoint_tensor.dtype=}, {stage_tensor.dtype=}")
+            
             # here we need to check if the tensor is a DTensor and if so, adjust the 
             # shape and placement to match the model DTensor.  
             if is_dtensor(stage_tensor):
                 model_tensor = load_into_dtensor(checkpoint_tensor, stage_tensor)
-                # logger.info(f"DTensor: Loaded {param} into {model_tensor=}")
+                logger.info(f"DTensor: Loaded {param} into {model_tensor=}")
+                if 'norm' in param:
+                    assert False, "check {param.dtype=}, {model_tensor.dtype=}"
                 state_dict[param] = model_tensor
                 count_dtensors_loaded += 1
                 
@@ -268,14 +277,21 @@ def update_state_dict(
                 checkpoint_tensor = checkpoint_tensor.to(device)
                 state_dict[param] = checkpoint_tensor
 
-            # TODO - review this...  
-            if state_dict[param].dtype != checkpoint_tensor.dtype:
-                state_dict[param] = state_dict[param].to(checkpoint_tensor.dtype)
-                
+            # TODO - review this... 
+            logger.info(f"Loaded {param} with dtype {checkpoint_tensor.dtype=}")
+            # if state_dict[param].dtype != checkpoint_tensor.dtype:
+            state_dict[param] = state_dict[param].to(checkpoint_tensor.dtype)
+            logger.info(f"checkme {param} is now {state_dict[param].dtype=}, {state_dict[param]=}")
+            
+            assert state_dict[param].dtype == checkpoint_tensor.dtype
+            assert state_dict[param].dtype == torch.float16, f"{param} dtype is not fp16"
+            
             # log_tensor_info(param, state_dict[param])
             # logger.info(f"Loaded {param} from {file}")
             updated_states.add(param)
     logger.info(f"Count of loaded DTensors: {count_dtensors_loaded}")
+    
+    
 
 
 def format_tensor_info(tensor: torch.Tensor) -> str:

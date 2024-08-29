@@ -41,6 +41,7 @@ def record_module_dtypes(module):
     """ Record the dtypes of all parameters and buffers in a module and return a dictionary of dtype -> list of names"""
     dtype_count = defaultdict(int)
     dtype_locations = defaultdict(list)
+    fp32_locations = defaultdict(list)
 
     def recurse(mod, prefix=''):
         for name, param in mod.named_parameters(recurse=False):
@@ -48,19 +49,23 @@ def record_module_dtypes(module):
             dtype = param.dtype
             dtype_count[dtype] += 1
             dtype_locations[dtype].append(full_name)
+            if dtype == torch.float32:
+                fp32_locations[full_name] = param
 
         for name, buf in mod.named_buffers(recurse=False):
             full_name = f"{prefix}.{name}" if prefix else name
             dtype = buf.dtype
             dtype_count[dtype] += 1
             dtype_locations[dtype].append(full_name)
+            if dtype == torch.float32:
+                fp32_locations[full_name] = buf
 
         for name, child in mod.named_children():
             child_prefix = f"{prefix}.{name}" if prefix else name
             recurse(child, child_prefix)
 
     recurse(module)
-    return dtype_count, dtype_locations
+    return dtype_count, dtype_locations, fp32_locations
 
 
 def load_into_dtensor(weight_tensor, model_dtensor, debug=False):
@@ -125,5 +130,5 @@ def load_into_dtensor(weight_tensor, model_dtensor, debug=False):
         assert local_shard_shape == model_shard_shape, f"Local shard shape {local_shard_shape} does not match model shard shape {model_shard_shape}"
         logger.info("=" * 50)
     
-    model_dtensor.copy_(new_dtensor)
-    return model_dtensor
+    # model_dtensor.copy_(new_dtensor)
+    return new_dtensor
