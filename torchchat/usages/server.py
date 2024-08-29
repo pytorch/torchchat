@@ -17,7 +17,7 @@ import torch
 
 from torchchat.cli.builder import BuilderArgs, TokenizerArgs
 from flask import Flask, request, Response
-from generate import GeneratorArgs
+from torchchat.generate import GeneratorArgs
 
 from torchchat.usages.openai_api import (
     CompletionRequest,
