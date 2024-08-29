@@ -31,7 +31,7 @@ from typing import Dict, Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from build.utils import (
+from torchchat.utils.build_utils import (
     find_multiple,
     get_device_str,
     get_precision,
