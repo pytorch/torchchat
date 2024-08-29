@@ -11,7 +11,7 @@ root directory*.
 
 ```
 export TORCHCHAT_ROOT=$PWD
-./scripts/install_et.sh
+./torchchat/utils/scripts/install_et.sh
 ```
 
 This will download the ExecuTorch repo to ./et-build/src and install

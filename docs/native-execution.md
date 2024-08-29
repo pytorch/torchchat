@@ -67,7 +67,7 @@ To build runner-aoti, run the following commands *from the torchchat
 root directory*
 
 ```
-./scripts/build_native.sh aoti
+./torchchat/utils/scripts/build_native.sh aoti
 ```
 
 After running these, the runner-aoti binary is located at ./cmake-out/aoti_run.
@@ -100,7 +100,7 @@ To build runner-et, run the following commands *from the torchchat
 root directory*
 
 ```
-./scripts/build_native.sh et
+./torchchat/utils/scripts/build_native.sh et
 ```
 
 Note: the above script will wipe ./et-build if present and re-install

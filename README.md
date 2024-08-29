@@ -289,7 +289,7 @@ python3 torchchat.py generate llama3.1 --dso-path exportedModels/llama3.1.so --p
 
 To run in a C++ enviroment, we need to build the runner binary.
 ```bash
-scripts/build_native.sh aoti
+torchchat/utils/scripts/build_native.sh aoti
 ```
 
 Then run the compiled executable, with the exported DSO from earlier.
@@ -317,7 +317,7 @@ ExecuTorch repo to ./et-build/src and install various ExecuTorch libraries to
 
 ```
 export TORCHCHAT_ROOT=${PWD}
-./scripts/install_et.sh
+./torchchat/utils/scripts/install_et.sh
 ```
 
 
@@ -362,7 +362,7 @@ python3 torchchat.py generate llama3.1 --device cpu --pte-path llama3.1.pte --pr
 
 Build the runner
 ```bash
-scripts/build_native.sh et
+torchchat/utils/scripts/build_native.sh et
 ```
 
 Execute using the runner
@@ -478,12 +478,12 @@ for sentencepiece tokenizer (e.g. Llama 2): [executorch-llama-bpe-rc3-0719.aar](
 <details>
 <summary>Approach 2: E2E Script</summary>
 
-Alternatively, you can run `scripts/android_example.sh` which sets up Java, Android SDK Manager, Android SDK, Android emulator (if no physical device is found), builds the app, and launches it for you. It can be used if you don't have a GUI.
+Alternatively, you can run `torchchat/utils/scripts/android_example.sh` which sets up Java, Android SDK Manager, Android SDK, Android emulator (if no physical device is found), builds the app, and launches it for you. It can be used if you don't have a GUI.
 
 ```
 export TORCHCHAT_ROOT=$(pwd)
 export USE_TIKTOKEN=ON # Set this only for tiktoken tokenizer
-sh scripts/android_example.sh
+sh torchchat/utils/scripts/android_example.sh
 ```
 
 </details>
@@ -584,7 +584,7 @@ link provided in the error to get access.
 
 **Failed Building Wheel**
 
-If `./scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
+If `./torchchat/utils/scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
 
 **CERTIFICATE_VERIFY_FAILED**
 
