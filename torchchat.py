@@ -78,7 +78,7 @@ if __name__ == "__main__":
         server_main(args)
     elif args.command == "generate":
         check_args(args, "generate")
-        from generate import main as generate_main
+        from torchchat.generate import main as generate_main
 
         generate_main(args)
     elif args.command == "eval":
@@ -87,7 +87,7 @@ if __name__ == "__main__":
         eval_main(args)
     elif args.command == "export":
         check_args(args, "export")
-        from export import main as export_main
+        from torchchat.export import main as export_main
 
         export_main(args)
     elif args.command == "download":
