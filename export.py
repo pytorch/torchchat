@@ -11,7 +11,7 @@ from typing import Optional
 import torch
 import torch.nn as nn
 
-from build.builder import (
+from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
     _set_gguf_kwargs,
@@ -21,7 +21,7 @@ from build.builder import (
 )
 
 from build.utils import set_backend, set_precision
-from cli import add_arguments_for_verb, arg_init, check_args
+from torchchat.cli.cli import add_arguments_for_verb, arg_init, check_args
 
 from torch.export import Dim
 
