@@ -60,7 +60,7 @@ if [ -z "${ET_BUILD_DIR}" ]; then
     ET_BUILD_DIR="et-build"
 fi
 
-source "$TORCHCHAT_ROOT/scripts/install_utils.sh"
+source "$TORCHCHAT_ROOT/utils/scripts/install_utils.sh"
 
 pushd ${TORCHCHAT_ROOT}
 git submodule update --init
