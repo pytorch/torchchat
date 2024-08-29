@@ -17,7 +17,7 @@ import torch.nn.functional as F
 from torchchat.model import Model, ModelArgs, TransformerArgs
 
 from gguf import GGUFValueType
-from quantization.quantize import group_dequantize_tensor_from_qparams, pack_scales_and_zeros
+from torchchat.utils.quantize import group_dequantize_tensor_from_qparams, pack_scales_and_zeros
 
 from torchchat.utils.build_utils import find_multiple, get_precision
 
@@ -215,7 +215,7 @@ class WeightOnlyInt4Linear(torch.nn.Module):
     def _prepare_weight_and_scales_and_zeros(
         cls, weight_bf16, groupsize, inner_k_tiles
     ):
-        from quantization.quantize import group_quantize_tensor
+        from torchchat.utils.quantize import group_quantize_tensor
 
         weight_int32, scales_and_zeros = group_quantize_tensor(
             weight_bf16, n_bit=4, groupsize=groupsize

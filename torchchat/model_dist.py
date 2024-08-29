@@ -128,7 +128,7 @@ class TransformerStage(nn.Module):
 
     @classmethod
     def from_gguf(cls, gguf_path: str, **kwargs):
-        from build.gguf_loader import load_model_and_state_dict
+        from torchchat.utils.gguf_loader import load_model_and_state_dict
 
         model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
         if state_dict != {}:
