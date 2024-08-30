@@ -8,7 +8,7 @@
 
 [shell default]: ./install/install_requirements.sh
 
-[shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
+[shell default]: TORCHCHAT_ROOT=${PWD} ./torchchat/utils/scripts/install_et.sh
 -->
 
 We support parsing [GGUF](https://github.com/ggerganov/ggml/blob/master/docs/gguf.md) files with
