@@ -138,7 +138,7 @@ python3 torchchat.py list
 ### Where
 This subcommands shows location of a particular model.
 ```bash
-python3 torchchat.py list
+python3 torchchat.py where llama3.1
 ```
 This is useful in scripts when you do not want to hard-code paths
 
