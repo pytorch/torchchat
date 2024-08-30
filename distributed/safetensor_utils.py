@@ -183,14 +183,22 @@ def load_safetensor_weights(
     missing_keys = handle_missing_keys(
         stage_state_dict, updated_states, ignore_cache_layers
     )
-    log_loading_status(missing_keys, updated_states)
-    logger.info(f"Loading {len(updated_states)} weights into stage module")
-    #precount, premap = record_module_dtypes(stage_module)
+    # log_loading_status(missing_keys, updated_states)
+    if missing_keys:
+        logger.warning(
+            f"Partially updated state dict. Missing {len(missing_keys)} keys: {missing_keys}"
+        )
+    else:
+        logger.info("Fully updated state dict.")
+
+    logger.info(f"Loading {len(updated_states)} weights into stage dict")
+    # precount, premap = record_module_dtypes(stage_module)
     stage_module.load_state_dict(stage_state_dict, strict=False, assign=True)
-    #postcount, postmap = record_module_dtypes(stage_module)
-    #logger.info(f"{precount=}, {postcount=}")
-    #logger.info(f"{premap=}, {postmap=}")
-    #assert False, "checkme"
+    # postcount, postmap = record_module_dtypes(stage_module)
+    # logger.info(f"{precount=}, {postcount=}")
+    # logger.info(f"{premap=}, {postmap=}")
+
+    logger.info(f"Successfully loaded {len(updated_states)} weights into stage module")
 
     return len(updated_states), len(missing_keys)
 
@@ -239,7 +247,7 @@ def update_state_dict(
     file: str,
     updated_states: Set[str],
     device: torch.device,
-):  
+):
     count_dtensors_loaded = 0
     for param, file_with_param in weight_map.items():
         if file_with_param == file and param in state_dict:
@@ -254,56 +262,58 @@ def update_state_dict(
 
             checkpoint_tensor = checkpoint[old_param]
             stage_tensor = state_dict[param]
-            
+
             # stage_is_dtensor = is_dtensor(stage_tensor)
             # logger.info(f"cme DType Check: {param=}, {stage_is_dtensor=}, {checkpoint_tensor.dtype=}, {stage_tensor.dtype=}")
-            
+
             checkpoint_tensor = compare_and_reverse(stage_tensor, checkpoint_tensor)
-            
-            # here we need to check if the tensor is a DTensor and if so, adjust the 
-            # shape and placement to match the model DTensor.  
+
+            # here we need to check if the tensor is a DTensor and if so, adjust the
+            # shape and placement to match the model DTensor.
             if is_dtensor(stage_tensor):
                 model_tensor = load_into_dtensor(checkpoint_tensor, stage_tensor)
                 # logger.info(f"DTensor: Loaded {param} into {model_tensor=}")
-                
+
                 state_dict[param] = model_tensor
                 count_dtensors_loaded += 1
-                
+
             else:
                 # regular tensor, just update directly
+                checkpoint_tensor = checkpoint_tensor.to(device)
                 state_dict[param] = checkpoint_tensor
 
             # ensure matching dtypes
             state_dict[param] = state_dict[param].to(checkpoint_tensor.dtype)
-            
+
             assert state_dict[param].dtype == checkpoint_tensor.dtype
-            
+
             # log_tensor_info(param, state_dict[param])
             # logger.info(f"Loaded {param} from {file}")
             updated_states.add(param)
     # logger.info(f"Count of loaded DTensors: {count_dtensors_loaded}")
-    
-    
+
+
 def format_tensor_info(tensor: torch.Tensor) -> str:
     return f"Shape: {tensor.shape}, Dtype: {tensor.dtype}, Device: {tensor.device}"
 
 
 def clean_cache_keys(input_set: Set[str]) -> Set[str]:
-    """Remove cache, freqs, mask params from checkpoint update set...we expect these to be generated """
+    """Remove cache, freqs, mask params from checkpoint update set...we expect these to be generated"""
     return {
         item
         for item in input_set
         if not (item.endswith("cache") or item in ["freqs_cis", "causal_mask"])
     }
 
+
 def handle_missing_keys(
     state_dict: Dict[str, torch.Tensor],
     updated_states: Set[str],
     ignore_cache_layers: bool,
 ) -> Set[str]:
-    """ This function handles 'expected' missing keys from the checkpoint update set.
+    """This function handles 'expected' missing keys from the checkpoint update set.
     This is used for ignoring cache, rope freqs, and mask layers that are generated, rather than persisted
-    in the checkpoint. """
+    in the checkpoint."""
     missing_keys = set(state_dict.keys()) - updated_states
 
     if ignore_cache_layers:

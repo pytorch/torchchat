@@ -12,6 +12,7 @@ from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 from build.model import TransformerArgs, ModelArgs
 from build.model_dist import TransformerStage
 from distributed.logging_utils import setup_logging
+
 # TODO - these are not distributed specific, consider moving to new package
 from distributed.safetensor_utils import (
     get_hf_config_file,
@@ -65,7 +66,6 @@ def main():
     logger.info(f"Chat Model Config: {config}")
     # TODO - should we make this work...atm returns float32
     # torchchat_precision = get_precision()
-    
 
     hf_model_name, model_dtype = NAME_TO_HF_MODEL_ID_AND_DTYPE[MODEL_NAME]
     logger.info(f"Using HF model weights from {hf_model_name} and dtype {model_dtype}")
@@ -102,6 +102,12 @@ def main():
     activation = torch.rand(mb_size, seqlen, dim, device=device, dtype=model_dtype)
     example_args = mb_ids if pp_rank == 0 else activation
 
+    # Load weights
+    logger.info(f"Loading weights for {pp_rank=} on {device=}")
+    _load_model_weights(model, hf_model_name, device=device, logger=logger)
+
+    model.eval()
+
     logger.info(f"Creating pipeline stage {pp_rank=}, {nstages=}")
     stage = PipelineStage(
         model,
@@ -111,13 +117,6 @@ def main():
         input_args=(example_args,),
         group=pp_mesh.get_group(),
     )
-
-    
-    # Load weights
-    logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    _load_model_weights(stage.submod, hf_model_name, device=device, logger=logger)
-
-    stage.submod.eval()
 
     # this check confirms that there are no cpu tensors in the model..we expect this to be true.
     cpu_tensors = find_cpu_tensors(stage.submod)
