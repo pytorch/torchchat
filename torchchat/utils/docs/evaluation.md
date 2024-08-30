@@ -4,7 +4,7 @@
 
 # Evaluation Features
 
-[shell default]: ./install_requirements.sh
+[shell default]: ./install/install_requirements.sh
 
 
 Torchchat provides evaluation functionality for your language model on
@@ -31,7 +31,7 @@ python3 torchchat.py eval stories15M --pte-path stories15M.pte
 
 Running multiple tasks and calling eval.py directly:
 ```
-python3 eval.py stories15M --pte-path stories15M.pte --tasks wikitext hellaswag
+python3 torchchat.py eval stories15M --pte-path stories15M.pte --tasks wikitext hellaswag
 ```
 
 For more information and a list of tasks/metrics see [lm-evaluation-harness](https://github.com/facebookresearch/lm_eval).

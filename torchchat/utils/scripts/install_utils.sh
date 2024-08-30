@@ -11,7 +11,7 @@ install_pip_dependencies() {
   echo "Intalling common pip packages"
   pip3 install wheel "cmake>=3.19" ninja zstd
   pushd ${TORCHCHAT_ROOT}
-  pip3 install -r ./requirements.txt
+  pip3 install -r install/requirements.txt
   popd
 }
 
@@ -27,7 +27,7 @@ clone_executorch() {
   pushd ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
   git clone https://github.com/pytorch/executorch.git
   cd executorch
-  git checkout $(cat ${TORCHCHAT_ROOT}/.pins/et-pin.txt)
+  git checkout $(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt)
   echo "Install executorch: submodule update"
   git submodule sync
   git submodule update --init

@@ -9,17 +9,18 @@ from typing import Callable, Optional
 import torch
 import torch._dynamo.config
 import torch._inductor.config
-from build.builder import (
+
+from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
     BuilderArgs,
     TokenizerArgs,
 )
+from torchchat.cli.cli import add_arguments_for_verb, arg_init
 
-from build.model import Model
-from build.utils import set_precision
-from cli import add_arguments_for_verb, arg_init
-from utils.measure_time import measure_time
+from torchchat.model import Model
+from torchchat.utils.build_utils import set_precision
+from torchchat.utils.measure_time import measure_time
 
 torch._dynamo.config.automatic_dynamic_shapes = True
 torch._inductor.config.triton.unique_kernel_names = True
@@ -301,11 +302,3 @@ def main(args) -> None:
         for metric, val in res.items():
             if val != "N/A":
                 print(f" {metric}: {val if isinstance(val, str) else f'{val:0.4f}'}")
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="torchchat eval CLI")
-    add_arguments_for_verb(parser, "eval")
-    args = parser.parse_args()
-    args = arg_init(args)
-    main(args)

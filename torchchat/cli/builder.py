@@ -15,20 +15,25 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 import torch.nn as nn
-
-from config.model_config import resolve_model_config
 from distributed import (
     init_distributed,
     launch_distributed,
     ParallelDims,
     parallelize_llama,
 )
-from quantization.quantize import quantize_model
 from torch.distributed.device_mesh import DeviceMesh
-from utils.measure_time import measure_time
 
-from build.model import Model
-from build.utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
+from torchchat.model import Model
+
+from torchchat.model_config.model_config import resolve_model_config
+from torchchat.utils.build_utils import (
+    device_sync,
+    is_cpu_device,
+    is_cuda_or_cpu_device,
+    name_to_dtype,
+)
+from torchchat.utils.measure_time import measure_time
+from torchchat.utils.quantize import quantize_model
 
 
 @dataclass
@@ -504,7 +509,7 @@ def _initialize_model(
             device_sync(device=builder_args.device)
 
         try:
-            from build.model import PTEModel
+            from torchchat.model import PTEModel
 
             model = PTEModel(model.config, builder_args.pte_path)
         except Exception:

@@ -54,13 +54,15 @@ if [ -z "${TORCHCHAT_ROOT}" ]; then
     SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
     # Get the absolute path of the parent directory
     TORCHCHAT_ROOT="$(dirname "$SCRIPT_PATH")"
+    source "$TORCHCHAT_ROOT/scripts/install_utils.sh"
+else
+    source "$TORCHCHAT_ROOT/torchchat/utils/scripts/install_utils.sh"
 fi
 
 if [ -z "${ET_BUILD_DIR}" ]; then
     ET_BUILD_DIR="et-build"
 fi
 
-source "$TORCHCHAT_ROOT/scripts/install_utils.sh"
 
 pushd ${TORCHCHAT_ROOT}
 git submodule update --init

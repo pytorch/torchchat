@@ -51,7 +51,7 @@ function download_checkpoint() {
     if [ "$FORCE_DOWNLOAD" = true ] || [ ! -d "$CHECKPOINT_DIR" ] || [ -z "$(ls -A "$CHECKPOINT_DIR")" ]; then
         echo "Download checkpoint for $MODEL_REPO"
         rm -rf "$CHECKPOINT_DIR"
-        python3 download.py --repo-id "$MODEL_REPO"
+        python3 torchchat.py download --repo-id "$MODEL_REPO"
     else
         echo "Checkpoint directory for $MODEL_REPO is not empty. Skipping download."
     fi
@@ -69,8 +69,8 @@ function run_validation_e2e() {
     fi
     download_checkpoint "$MODEL_REPO"
 
-    if [ ! -f "build/convert_hf_checkpoint.py" ]; then
-        echo "build/convert_hf_checkpoint.py doesn't exist."
+    if [ ! -f "torchchat/cli/convert_hf_checkpoint.py" ]; then
+        echo "torchchat/cli/convert_hf_checkpoint.py doesn't exist."
         exit 1
     fi
     bash .ci/scripts/convert_checkpoint.sh "$MODEL_REPO"

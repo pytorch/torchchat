@@ -3,7 +3,7 @@
 
 # Native Execution
 
-[shell default]: ./install_requirements.sh
+[shell default]: ./install/install_requirements.sh
 
 While Python offers a great environment for training models and
 experimentation and research with models, developers often are looking
@@ -67,7 +67,7 @@ To build runner-aoti, run the following commands *from the torchchat
 root directory*
 
 ```
-./scripts/build_native.sh aoti
+./torchchat/utils/scripts/build_native.sh aoti
 ```
 
 After running these, the runner-aoti binary is located at ./cmake-out/aoti_run.
@@ -93,14 +93,14 @@ The `-l 2` indicates that the model and tokenizer use the llama2 architecture.  
 ## Building and running runner-et
 
 Before building runner-et, you must first setup ExecuTorch by
-following [setup ExecuTorch steps](executorch_setup.md).
+following [setup ExecuTorch steps](torchchat/edge/docs/executorch_setup.md).
 
 
 To build runner-et, run the following commands *from the torchchat
 root directory*
 
 ```
-./scripts/build_native.sh et
+./torchchat/utils/scripts/build_native.sh et
 ```
 
 Note: the above script will wipe ./et-build if present and re-install

@@ -2,8 +2,8 @@
 
 <!--
 [shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
-[shell default]: ./install_requirements.sh
-[shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
+[shell default]: ./install/install_requirements.sh
+[shell default]: TORCHCHAT_ROOT=${PWD} ./torchchat/utils/scripts/install_et.sh
 -->
 
 ## Introduction
@@ -59,7 +59,7 @@ for valid `bitwidth` and `groupsize` values.
 | linear with dynamic activations (symmetric) | `'{"linear:a8w4dq" : {"groupsize" : <groupsize>}}'`|
 | embedding | `'{"embedding": {"bitwidth": <bitwidth>, "groupsize":<groupsize>}}'` |
 
-See the available quantization schemes [here](https://github.com/pytorch/torchchat/blob/main/quantization/quantize.py#L1260-L1266).
+See the available quantization schemes [here](https://github.com/pytorch/torchchat/blob/main/torchchat/utils/quantize.py#L1260-L1266).
 
 In addition to quantization, the [accelerator](model_customization.md#device)
 and [precision](model_customization.md#model-precision) can also be specified.
@@ -105,17 +105,17 @@ with `export`.
 
 ### Eager mode
 ```
-python3 generate.py llama3 --prompt "Hello, my name is" --quantize '{"embedding" : {"bitwidth": 8, "groupsize": 0}}'
+python3 torchchat.py generate llama3 --prompt "Hello, my name is" --quantize '{"embedding" : {"bitwidth": 8, "groupsize": 0}}'
 ```
 ### AOTI
 ```
 python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:int4": {"groupsize" : 256}}' --output-dso-path llama3.so
-python3 generate.py llama3 --dso-path llama3.so  --prompt "Hello my name is"
+python3 torchchat.py generate llama3 --dso-path llama3.so  --prompt "Hello my name is"
 ```
 ### ExecuTorch
 ```
 python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}' --output-pte-path llama3.pte
-python3 generate.py llama3 --pte-path llama3.pte  --prompt "Hello my name is"
+python3 torchchat.py generate llama3 --pte-path llama3.pte  --prompt "Hello my name is"
 ```
 
 ## Quantization Profiles

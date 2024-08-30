@@ -31,14 +31,6 @@ from typing import Dict, Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from build.utils import (
-    find_multiple,
-    get_device_str,
-    get_precision,
-    name_to_dtype,
-    state_dict_device,
-    use_et_backend,
-)
 
 # AttributeError: '_OpNamespace' 'quantized_decomposed' object has no attribute 'quantize_per_channel_group'
 from torch.ao.quantization.fx._decomposed import quantized_decomposed_lib  # noqa
@@ -49,6 +41,14 @@ from torchao.quantization.quant_api import (
     quantize_,
 )
 from torchao.utils import unwrap_tensor_subclass
+from torchchat.utils.build_utils import (
+    find_multiple,
+    get_device_str,
+    get_precision,
+    name_to_dtype,
+    state_dict_device,
+    use_et_backend,
+)
 
 
 #########################################################################
@@ -398,6 +398,7 @@ def group_dequantize_tensor(w_int32, scales_and_zeros, n_bit=4, groupsize=128):
 #########################################################################
 #####          Weight-only int8 per-channel quantized code         ######
 ###               (unify with torchao in future)                      ###
+
 
 def linear_int8_aoti(input, weight, scales):
     n_groups = scales.numel() // scales.shape[0]

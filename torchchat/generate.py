@@ -19,16 +19,16 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 
-from build.builder import (
+from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
     BuilderArgs,
     TokenizerArgs,
 )
-from build.model import Model
-from build.utils import device_sync, set_precision
-from cli import add_arguments_for_verb, arg_init, check_args
-from utils.device_info import get_device_info
+from torchchat.cli.cli import add_arguments_for_verb, arg_init, check_args
+from torchchat.model import Model
+from torchchat.utils.build_utils import device_sync, set_precision
+from torchchat.utils.device_info import get_device_info
 
 
 class _ChatFormatter(ABC):
@@ -893,14 +893,3 @@ def main(args):
         torch.cuda.reset_peak_memory_stats()
     for _ in gen.chat(generator_args):
         pass
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="torchchat generate CLI")
-    verb = "generate"
-    add_arguments_for_verb(parser, verb)
-    args = parser.parse_args()
-    check_args(args, verb)
-    args = arg_init(args)
-    main(args)
-

@@ -10,18 +10,23 @@ import torch
 import torch.nn as nn
 
 from torch import Tensor
-from torch.nn import functional as F
 from torch.distributed._tensor import DTensor, Replicate
 from torch.distributed.device_mesh import _mesh_resources, DeviceMesh
 from torch.distributed.tensor.parallel import (
-    parallelize_module,
     ColwiseParallel,
+    parallelize_module,
     RowwiseParallel,
 )
+from torch.nn import functional as F
 
-from build.utils import find_multiple
+from torchchat.model import (
+    apply_rotary_emb,
+    KVCache,
+    precompute_freqs_cis,
+    TransformerArgs,
+)
 
-from build.model import TransformerArgs, KVCache, apply_rotary_emb, precompute_freqs_cis
+from torchchat.utils.build_utils import find_multiple
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
@@ -138,7 +143,7 @@ class TransformerStage(nn.Module):
 
     @classmethod
     def from_gguf(cls, gguf_path: str, **kwargs):
-        from build.gguf_loader import load_model_and_state_dict
+        from torchchat.utils.gguf_loader import load_model_and_state_dict
 
         model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
         if state_dict != {}:
