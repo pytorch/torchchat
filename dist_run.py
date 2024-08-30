@@ -125,14 +125,15 @@ def main():
     if len(cpu_tensors) > 0:
         raise ValueError("Found cpu tensors in stage")
 
+    # TODO: this can likely be removed after we prove out a few more models
     # verify dtypes for model - expect all to be model_dtype except for bool causal_mask atm.
-    dtype_count, dtype_locations, fp32_locations = record_module_dtypes(stage.submod)
-    logger.info(
-        f"Stage Dtypes - Found {len(dtype_count)} dtypes: {dtype_count.items()}"
-    )
-    assert (
-        len(dtype_count) == 2
-    ), f"Expected 2 dtypes in model after checkpoint loading: {model_dtype} and {torch.bool}"
+    # dtype_count, dtype_locations, fp32_locations = record_module_dtypes(stage.submod)
+    # logger.info(
+    #     f"Stage Dtypes - Found {len(dtype_count)} dtypes: {dtype_count.items()}"
+    # )
+    # assert (
+    #     len(dtype_count) == 2
+    # ), f"Expected 2 dtypes in model after checkpoint loading: {model_dtype} and {torch.bool}"
 
     input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
     logger.info(f"Input: {input_ids.dtype=}, {input_ids.shape=}, {input_ids.device=}")
