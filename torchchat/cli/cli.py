@@ -13,8 +13,13 @@ from pathlib import Path
 
 import torch
 
-from torchchat.utils.build_utils import allowable_dtype_names, allowable_params_table, get_device_str
 from torchchat.cli.download import download_and_convert, is_model_downloaded
+
+from torchchat.utils.build_utils import (
+    allowable_dtype_names,
+    allowable_params_table,
+    get_device_str,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
