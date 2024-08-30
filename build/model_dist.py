@@ -13,7 +13,11 @@ from torch import Tensor
 from torch.nn import functional as F
 from torch.distributed._tensor import DTensor, Replicate
 from torch.distributed.device_mesh import _mesh_resources, DeviceMesh
-from torch.distributed.tensor.parallel import parallelize_module, ColwiseParallel, RowwiseParallel
+from torch.distributed.tensor.parallel import (
+    parallelize_module,
+    ColwiseParallel,
+    RowwiseParallel,
+)
 
 from build.utils import find_multiple
 
@@ -21,6 +25,9 @@ from build.model import TransformerArgs, KVCache, apply_rotary_emb, precompute_f
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
+from distributed.logging_utils import setup_logging
+
+logger = setup_logging(__name__)
 
 # Use DTensor as output, by default
 Colwise = ColwiseParallel(use_local_output=False)
@@ -53,7 +60,10 @@ class TransformerStage(nn.Module):
 
         # Use ModuleDict so that each layer can be assigned its layer ID in the original model
         self.layers = nn.ModuleDict()
-        for layer_id in range(self.layers_per_stage * stage_idx, self.layers_per_stage * (stage_idx + 1)):
+
+        for layer_id in range(
+            self.layers_per_stage * stage_idx, self.layers_per_stage * (stage_idx + 1)
+        ):
             self.layers[str(layer_id)] = TransformerBlock(config)
 
         if stage_idx == n_stages - 1:
@@ -84,7 +94,7 @@ class TransformerStage(nn.Module):
             self.config.dim // self.config.n_heads,
             self.config.block_size * 2,
             self.config.rope_base,
-            use_scaled = self.config.use_scaled_rope,
+            use_scaled=self.config.use_scaled_rope,
         )
         self.register_buffer("freqs_cis", freqs_cis, persistent=True)
         causal_mask = torch.tril(
@@ -112,7 +122,7 @@ class TransformerStage(nn.Module):
 
         # print(f"stage output shape: {x.shape}")
         return x
-        
+
     # temporary disable them due to miss essential input
     # @classmethod
     # def from_name(cls, name: str):
@@ -161,12 +171,8 @@ class Attention(nn.Module):
         # total_head_dim = (config.n_heads + 2 * config.n_local_heads) * config.head_dim
         # self.wqkv = nn.Linear(config.dim, total_head_dim, bias=False)
         wq = nn.Linear(config.dim, config.n_heads * config.head_dim, bias=False)
-        wk = nn.Linear(
-            config.dim, config.n_local_heads * config.head_dim, bias=False
-        )
-        wv = nn.Linear(
-            config.dim, config.n_local_heads * config.head_dim, bias=False
-        )
+        wk = nn.Linear(config.dim, config.n_local_heads * config.head_dim, bias=False)
+        wv = nn.Linear(config.dim, config.n_local_heads * config.head_dim, bias=False)
         wo = nn.Linear(config.dim, config.dim, bias=False)
 
         self.wq = parallelize_module(wq, device_mesh, Colwise)
@@ -247,7 +253,7 @@ class Attention(nn.Module):
         q, k, v = (x.transpose(1, 2) for x in (q, k, v))
 
         # TODO: enable kv cache
-        #if self.kv_cache is not None:
+        # if self.kv_cache is not None:
         #    k, v = self.kv_cache.update(input_pos, k, v)
 
         k = k.repeat_interleave(self.n_heads // self.n_local_heads, dim=1)
