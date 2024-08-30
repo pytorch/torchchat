@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 import json
 import os
+import warnings
 
 from dataclasses import dataclass
 from enum import Enum
@@ -112,12 +113,6 @@ class ModelArgs:
         assert isinstance(model_type, ModelType)
         assert isinstance(transformer_args, (TransformerArgs, dict))
 
-        assert model_source in [ModelSource.Native],  "only native model is supported"
-        assert (
-            model_type == ModelType.TextOnly
-        ), "only text-only model is supported natively. For Flamingo, use torchtune"
-
-
     @classmethod
     def from_params(cls, params_path):
         with open(params_path, "r") as f:
@@ -131,8 +126,8 @@ class ModelArgs:
             model_type = ModelType.TextOnly
         except TypeError:
             # try to interpret as a dict of transformer configs
-            model_source = loaded_params["model_source"]
-            model_type = loaded_params["model_type"]
+            model_source = ModelSource(loaded_params["model_source"])
+            model_type = ModelType(loaded_params["model_type"])
 
             # now only support flamingo model
             assert model_source == ModelSource.Torchtune and model_type == ModelType.Flamingo
@@ -230,23 +225,37 @@ class Model(nn.Module):
 
             assert "encoder" in config.transformer_args and "decoder" in config.transformer_args, "config is missing essential transformer args for Flamingo model"
             encoder = flamingo_vision_encoder(
-                *config.transformer_args["encoder"]
+                **config.transformer_args["encoder"]
             )
             decoder = flamingo_decoder(
-                *config.transformer_args["decoder"]
+                **config.transformer_args["decoder"]
             )
             self.model = DeepFusionModel(
                 encoder=encoder,
                 decoder=decoder,
             )
 
+    def forward(self, idx: Tensor, imgs: Optional[Tensor] = None, aspect_ratio: Optional[Tensor] = None, input_pos: Optional[Tensor] = None) -> Tensor:
+        if self.config.model_type == ModelType.TextOnly:
+            return self.text_transformer(idx, input_pos)
+        else:
+            assert self.config.model_type == ModelType.Flamingo
+            if imgs is None:
+                return self.model(idx, input_pos = input_pos)
+            return self.model(idx, encoder_input={"images": imgs, "aspect_ratio": aspect_ratio}, input_pos = input_pos)
 
-
-    def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
-        return self.text_transformer(idx, input_pos)
-
-    def setup_caches(self, max_batch_size, max_seq_length):
-        self.text_transformer.setup_caches(max_batch_size, max_seq_length)
+    def setup_caches(self, max_batch_size, max_seq_length=None, dtype=None):
+        if self.config.model_type == ModelType.TextOnly:
+            self.text_transformer.setup_caches(max_batch_size, max_seq_length)
+        else:
+            assert self.config.model_type == ModelType.Flamingo
+            if max_seq_length is not None:
+                warnings.warn("max_seq_length is not used for Flamingo model. Ignoring it.")
+            self.model.setup_caches(max_batch_size, dtype=dtype)
+    
+    def reset_caches(self):
+        assert self.config.model_type == ModelType.Flamingo
+        self.model.reset_caches()
 
     @classmethod
     def from_name(cls, name: str):
