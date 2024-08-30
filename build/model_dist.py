@@ -118,9 +118,6 @@ class TransformerStage(nn.Module):
 
         if self.stage_idx == self.n_stages - 1:
             x = self.norm(x)
-            logger.info(
-                f"final stage output info: {x.dtype=}, {x.shape=}, {x.device=}\n {self.output.weight.dtype=}, {self.output.weight.shape=},"
-            )
             x = self.output(x)
 
         # print(f"stage output shape: {x.shape}")
@@ -299,9 +296,5 @@ class RMSNorm(nn.Module):
         return x * torch.rsqrt(torch.mean(x * x, dim=-1, keepdim=True) + self.eps)
 
     def forward(self, x: Tensor) -> Tensor:
-        if x.device != self.weight.device:
-            logger.info(
-                f"RMSNorm weight mismatch -  input shape: {x.shape}, {x.device=}, self.weight.device={self.weight.device}"
-            )
         output = self._norm(x.float()).type_as(x)
         return output * self.weight
