@@ -10,7 +10,9 @@ from datetime import timedelta
 
 import torch
 
-from distributed.logging_utils import logger
+from distributed.logging_utils import setup_logging
+
+logger = setup_logging(__name__)
 
 def _warn_overwrite_env(env, val):
     if env in os.environ:

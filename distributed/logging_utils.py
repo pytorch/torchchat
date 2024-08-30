@@ -6,19 +6,26 @@
 
 import logging
 import os
+from datetime import datetime
 
-logger = logging.getLogger()
+def millisecond_timestamp(*args):
+    return datetime.now().strftime('%m-%d %H:%M:%S.%f')[:-3]
 
+def setup_logging(name=None, log_level=logging.INFO):
+    logger = logging.getLogger(name)
+    logger.setLevel(log_level)
 
-def init_logger():
-    logger.setLevel(logging.INFO)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
+    if not logger.handlers:
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(log_level)
 
-    # suppress verbose torch.profiler logging
-    os.environ["KINETO_LOG_LEVEL"] = "5"
+        formatter = logging.Formatter('%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(message)s')
+        formatter.formatTime = millisecond_timestamp
+
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
+
+        # suppress verbose torch.profiler logging
+        os.environ["KINETO_LOG_LEVEL"] = "5"
+
+    return logger
