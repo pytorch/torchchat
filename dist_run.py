@@ -28,6 +28,12 @@ NAME_TO_HF_MODEL_ID_AND_DTYPE = {
     "Transformer-2-7b-chat-hf": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
 }
 
+def _get_tokenizer(hf_model_name):
+    """Load tokenizer from HF model id.  TODO - use torchchat tokenizer?"""
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
+    assert tokenizer is not None, f"Failed to load tokenizer for {hf_model_name}"
+    return tokenizer
 
 def _init_distributed():
     dist.init_process_group("nccl")
