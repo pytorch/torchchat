@@ -271,13 +271,12 @@ def update_state_dict(
                 
             else:
                 # regular tensor, just update directly
-                checkpoint_tensor = checkpoint_tensor.to(device)
                 state_dict[param] = checkpoint_tensor
 
+            # ensure matching dtypes
             state_dict[param] = state_dict[param].to(checkpoint_tensor.dtype)
             
             assert state_dict[param].dtype == checkpoint_tensor.dtype
-            assert state_dict[param].dtype == torch.float16, f"{param} dtype is not fp16"
             
             # log_tensor_info(param, state_dict[param])
             # logger.info(f"Loaded {param} from {file}")
@@ -302,6 +301,9 @@ def handle_missing_keys(
     updated_states: Set[str],
     ignore_cache_layers: bool,
 ) -> Set[str]:
+    """ This function handles 'expected' missing keys from the checkpoint update set.
+    This is used for ignoring cache, rope freqs, and mask layers that are generated, rather than persisted
+    in the checkpoint. """
     missing_keys = set(state_dict.keys()) - updated_states
 
     if ignore_cache_layers:

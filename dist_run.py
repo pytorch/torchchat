@@ -61,7 +61,7 @@ def main():
     rank, world_size = _init_distributed()
     logger = setup_logging(__name__)
 
-    config = ModelArgs.from_name(MODEL_NAME)
+    config = ModelArgs.from_name(MODEL_NAME).text_transformer_args
     logger.info(f"Chat Model Config: {config}")
     # TODO - should we make this work...atm returns float32
     # torchchat_precision = get_precision()
