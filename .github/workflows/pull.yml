@@ -453,7 +453,7 @@ jobs:
           ./install_requirements.sh
 
           export TORCHCHAT_ROOT=$PWD
-          ./scripts/install_et.sh
+          ./torchchat/utils/scripts/install_et.sh
 
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
@@ -915,7 +915,7 @@ jobs:
         continue-on-error: true
         run: |
           echo "Installing ExecuTorch"
-          bash scripts/build_native.sh et
+          bash torchchat/utils/scripts/build_native.sh et
       - name: Install ET pip
         run: |
           echo "ET build directory"
@@ -984,7 +984,7 @@ jobs:
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
-          bash scripts/build_native.sh aoti
+          bash torchchat/utils/scripts/build_native.sh aoti
 
       - name: Download checkpoint
         run: |

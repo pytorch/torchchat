@@ -13,7 +13,7 @@ and give your torchchat models a spin.
 ![Screenshot](https://pytorch.org/executorch/main/_static/img/android_llama_app.png "Android app running Llama model")
 
 Detailed step by step in conjunction with ET Android build, to run on
-simulator for Android. `scripts/android_example.sh` for running a
+simulator for Android. `torchchat/utils/scripts/android_example.sh` for running a
 model on an Android simulator (on Mac)
 
 ## Option 2: Integrate the Java API with your own app
@@ -23,11 +23,11 @@ See [this file](https://github.com/pytorch/executorch/blob/main/extension/androi
 for Java APIs.
 
 To add the Java library to your app, use helper functions `download_aar_library`
-from `scripts/android_example.sh` to download the prebuilt libraries.
+from `torchchat/utils/scripts/android_example.sh` to download the prebuilt libraries.
 
 ```bash
 # my_build_script.sh
-source scripts/android_example.sh
+source torchchat/utils/scripts/android_example.sh
 download_aar_library
 ```
 
