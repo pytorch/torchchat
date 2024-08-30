@@ -893,13 +893,3 @@ def main(args):
         torch.cuda.reset_peak_memory_stats()
     for _ in gen.chat(generator_args):
         pass
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="torchchat generate CLI")
-    verb = "generate"
-    add_arguments_for_verb(parser, verb)
-    args = parser.parse_args()
-    check_args(args, verb)
-    args = arg_init(args)
-    main(args)
