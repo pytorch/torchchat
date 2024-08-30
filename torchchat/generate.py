@@ -848,7 +848,7 @@ class Generator:
                 print("---------------------------------------------------")
 
             tokens_sec = (num_tokens_generated + 1) / t
-            next_tokens_sec = num_tokens_generated / (t - aggregate_metrics.get('time_to_first_token', -1.0))
+            next_tokens_sec = num_tokens_generated / (t - aggregate_metrics.get('time_to_first_token', 0))
             aggregate_metrics["tokens_per_sec"].append(tokens_sec)
 
             if jit_compile:
@@ -859,13 +859,12 @@ class Generator:
                 # continue
 
             logging.info(
-                f"\nTime for inference {i + 1}: {t:.02f} sec total, \n\
-                    time to first token {aggregate_metrics.get('time_to_first_token', -1.0):.02f} sec \n\
+                f"\nTime for inference {i + 1}: {t:.04f} sec total, \n\
+                    time to first token {aggregate_metrics.get('time_to_first_token', 0):.04f} sec \n\
                     with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill,\n\
-                    generate {num_tokens_generated} tokens, in total {tokens_sec:.02f} tokens/sec, \n\
-                    latency_per_token_seconds: {1 / tokens_sec:.04f} s/token\n\
-                    first_token_latency_seconds: {aggregate_metrics.get('time_to_first_token', -1.0):.02f} s/token \n\
-                    next_token_latency_seconds: {1 / next_tokens_sec:.04f} s/token \n\
+                    generate {num_tokens_generated} tokens, \n\
+                    with first token, {tokens_sec:.04f} tokens/sec, {1 / tokens_sec:.04f} s/token \n\
+                    without first token, {next_tokens_sec:.04f} tokens/sec, {1 / next_tokens_sec:.04f} s/token \n\
                     "
             )
             logging.info(
