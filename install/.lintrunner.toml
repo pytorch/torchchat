@@ -19,7 +19,7 @@ init_command = [
     'run',
     'pip_init',
     '--dry-run={{DRYRUN}}',
-    '--requirement=requirements-lintrunner.txt',
+    '--requirement=install/requirements-lintrunner.txt',
 ]
 
 # Black + usort
@@ -46,7 +46,7 @@ init_command = [
     'pip_init',
     '--dry-run={{DRYRUN}}',
     '--no-black-binary',
-    '--requirement=requirements-lintrunner.txt',
+    '--requirement=install/requirements-lintrunner.txt',
 ]
 is_formatter = true
 
@@ -75,6 +75,6 @@ init_command = [
     'run',
     'pip_init',
     '--dry-run={{DRYRUN}}',
-    '--requirement=requirements-lintrunner.txt',
+    '--requirement=install/requirements-lintrunner.txt',
 ]
 is_formatter = true
