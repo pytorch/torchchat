@@ -9,9 +9,10 @@
 import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
-from build.model import TransformerArgs
+from build.model import TransformerArgs, ModelArgs
 from build.model_dist import TransformerStage
 from distributed.logging_utils import setup_logging
+# TODO - these are not distributed specific, consider moving to new package
 from distributed.safetensor_utils import (
     get_hf_config_file,
     get_hf_weight_map_and_path,
@@ -19,6 +20,7 @@ from distributed.safetensor_utils import (
 )
 from distributed.dtensor_utils import find_cpu_tensors, record_module_dtypes
 from distributed.utils import Color as color
+from build.utils import get_precision
 
 MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
@@ -59,8 +61,11 @@ def main():
     rank, world_size = _init_distributed()
     logger = setup_logging(__name__)
 
-    config = TransformerArgs.from_name(MODEL_NAME)
+    config = ModelArgs.from_name(MODEL_NAME)
     logger.info(f"Chat Model Config: {config}")
+    # TODO - should we make this work...atm returns float32
+    # torchchat_precision = get_precision()
+    
 
     hf_model_name, model_dtype = NAME_TO_HF_MODEL_ID_AND_DTYPE[MODEL_NAME]
     logger.info(f"Using HF model weights from {hf_model_name} and dtype {model_dtype}")
@@ -107,10 +112,7 @@ def main():
         group=pp_mesh.get_group(),
     )
 
-    cpu_tensors = find_cpu_tensors(stage.submod)
-    if len(cpu_tensors) > 0:
-        raise ValueError("Found cpu tensors in stage")
-
+    
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
     _load_model_weights(stage.submod, hf_model_name, device=device, logger=logger)
