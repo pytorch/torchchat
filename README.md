@@ -44,11 +44,11 @@ python3 -m venv .venv
 source .venv/bin/activate
 
 # install dependencies
-./install_requirements.sh
+./install/install_requirements.sh
 ```
 [skip default]: end
 
-[shell default]: ./install_requirements.sh
+[shell default]: ./install/install_requirements.sh
 
 ## Commands
 
@@ -270,7 +270,7 @@ python3 torchchat.py export llama3.1 --output-dso-path exportedModels/llama3.1.s
 
 > [!NOTE]
 > If your machine has cuda add this flag for performance
-`--quantize config/data/cuda.json` when exporting.
+`--quantize torchchat/quant_config/cuda.json` when exporting.
 
 For more details on quantization and what settings to use for your use
 case visit our [customization guide](docs/model_customization.md).
@@ -289,7 +289,7 @@ python3 torchchat.py generate llama3.1 --dso-path exportedModels/llama3.1.so --p
 
 To run in a C++ enviroment, we need to build the runner binary.
 ```bash
-scripts/build_native.sh aoti
+torchchat/utils/scripts/build_native.sh aoti
 ```
 
 Then run the compiled executable, with the exported DSO from earlier.
@@ -317,7 +317,7 @@ ExecuTorch repo to ./et-build/src and install various ExecuTorch libraries to
 
 ```
 export TORCHCHAT_ROOT=${PWD}
-./scripts/install_et.sh
+./torchchat/utils/scripts/install_et.sh
 ```
 
 
@@ -327,11 +327,11 @@ Similar to AOTI, to deploy onto device, we first export the PTE artifact, then w
 The following example uses the Llama3.1 8B Instruct model.
 ```
 # Export
-python3 torchchat.py export llama3.1 --quantize config/data/mobile.json --output-pte-path llama3.1.pte
+python3 torchchat.py export llama3.1 --quantize torchchat/quant_config/mobile.json --output-pte-path llama3.1.pte
 ```
 
 > [!NOTE]
-> We use `--quantize config/data/mobile.json` to quantize the
+> We use `--quantize torchchat/quant_config/mobile.json` to quantize the
 llama3.1 model to reduce model size and improve performance for
 on-device use cases.
 
@@ -362,7 +362,7 @@ python3 torchchat.py generate llama3.1 --device cpu --pte-path llama3.1.pte --pr
 
 Build the runner
 ```bash
-scripts/build_native.sh et
+torchchat/utils/scripts/build_native.sh et
 ```
 
 Execute using the runner
@@ -446,7 +446,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
    - [executorch-llama-tiktoken-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc3-0719.aar) (SHASUM: c3e5d2a97708f033c2b1839a89f12f737e3bbbef)
 
-2. Rename the downloaded AAR file to `executorch.aar` and move the file to `torchchat/edge/android/torchchat/app/libs/`. You may need to create directory `torchchat/edge/android/torchchat/app/libs/` if it does not exist.
+2. Rename the downloaded AAR file to `executorch.aar` and move the file to `android/torchchat/app/libs/`. You may need to create directory `android/torchchat/app/libs/` if it does not exist.
 
 3. Push the model and tokenizer file to your device. You can find the model file called `llama3.1.pte` in the current `torchchat` directory and the tokenizer file at `$(python3 torchchat.py where llama3.1)/tokenizer.model` path.
     ```
@@ -478,12 +478,12 @@ for sentencepiece tokenizer (e.g. Llama 2): [executorch-llama-bpe-rc3-0719.aar](
 <details>
 <summary>Approach 2: E2E Script</summary>
 
-Alternatively, you can run `scripts/android_example.sh` which sets up Java, Android SDK Manager, Android SDK, Android emulator (if no physical device is found), builds the app, and launches it for you. It can be used if you don't have a GUI.
+Alternatively, you can run `torchchat/utils/scripts/android_example.sh` which sets up Java, Android SDK Manager, Android SDK, Android emulator (if no physical device is found), builds the app, and launches it for you. It can be used if you don't have a GUI.
 
 ```
 export TORCHCHAT_ROOT=$(pwd)
 export USE_TIKTOKEN=ON # Set this only for tiktoken tokenizer
-sh scripts/android_example.sh
+sh torchchat/utils/scripts/android_example.sh
 ```
 
 </details>
@@ -494,7 +494,7 @@ sh scripts/android_example.sh
 
 Uses the lm_eval library to evaluate model accuracy on a variety of
 tasks. Defaults to wikitext and can be manually controlled using the
-tasks and limit args. See [Evaluation](docs/evaluation.md)
+tasks and limit args. See [Evaluation](torchchat/utils/docs/evaluation.md)
 
 **Examples**
 
@@ -584,7 +584,7 @@ link provided in the error to get access.
 
 **Failed Building Wheel**
 
-If `./scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
+If `./torchchat/utils/scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
 
 **CERTIFICATE_VERIFY_FAILED**
 

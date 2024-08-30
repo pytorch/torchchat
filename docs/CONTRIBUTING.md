@@ -29,7 +29,7 @@ source .venv/bin/activate
 [skip default]: end
 ```
 # install dependencies
-./install_requirements.sh
+./install/install_requirements.sh
 ```
 
 Installations can be tested by

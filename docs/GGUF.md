@@ -6,9 +6,9 @@
 <!--
 [shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
 
-[shell default]: ./install_requirements.sh
+[shell default]: ./install/install_requirements.sh
 
-[shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
+[shell default]: TORCHCHAT_ROOT=${PWD} ./torchchat/utils/scripts/install_et.sh
 -->
 
 We support parsing [GGUF](https://github.com/ggerganov/ggml/blob/master/docs/gguf.md) files with
@@ -65,7 +65,7 @@ python3 torchchat.py generate --gguf-path ${GGUF_MODEL_PATH} --dso-path ${GGUF_S
 ```
 
 ### ExecuTorch export + generate
-Before running this example, you must first [Set-up ExecuTorch](executorch_setup.md).
+Before running this example, you must first [Set-up ExecuTorch](torchchat/edge/docs/executorch_setup.md).
 ```
 # Convert the model for use
 python3 torchchat.py export --gguf-path ${GGUF_MODEL_PATH} --output-pte-path ${GGUF_PTE_PATH}

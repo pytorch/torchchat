@@ -9,12 +9,13 @@ from typing import Optional, Tuple
 
 from torch.distributed.device_mesh import DeviceMesh
 
-from distributed.logging_utils import logger
+from distributed.logging_utils import setup_logging
 from distributed.parallel_config import ParallelDims
 from distributed.utils import init_distributed
 
 from .config_manager import InferenceConfig
 
+logger = setup_logging(__name__)
 
 def launch_distributed(
     toml_config: str,

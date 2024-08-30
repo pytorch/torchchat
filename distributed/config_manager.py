@@ -12,7 +12,9 @@ from typing import Tuple
 
 import torch
 
-from distributed.logging_utils import logger
+from distributed.logging_utils import setup_logging
+
+logger = setup_logging(__name__)
 
 try:
     import tomllib
