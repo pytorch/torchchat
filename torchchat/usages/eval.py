@@ -302,11 +302,3 @@ def main(args) -> None:
         for metric, val in res.items():
             if val != "N/A":
                 print(f" {metric}: {val if isinstance(val, str) else f'{val:0.4f}'}")
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="torchchat eval CLI")
-    add_arguments_for_verb(parser, "eval")
-    args = parser.parse_args()
-    args = arg_init(args)
-    main(args)

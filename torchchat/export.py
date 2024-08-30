@@ -422,12 +422,3 @@ def main(args):
                 output_dso_path,
                 builder_args.dynamic_shapes,
             )
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="torchchat export CLI")
-    add_arguments_for_verb(parser, "export")
-    args = parser.parse_args()
-    check_args(args, "export")
-    args = arg_init(args)
-    main(args)
