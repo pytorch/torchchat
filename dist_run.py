@@ -28,11 +28,13 @@ NAME_TO_HF_MODEL_ID_AND_DTYPE = {
     "Transformer-2-7b-chat-hf": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
 }
 
-def _get_tokenizer(hf_model_name):
+def _get_tokenizer(hf_model_name, logger):
     """Load tokenizer from HF model id.  TODO - use torchchat tokenizer?"""
     from transformers import AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
     assert tokenizer is not None, f"Failed to load tokenizer for {hf_model_name}"
+    logger.info(f"Loaded tokenizer for {hf_model_name}")
+    tokenizer.pad_token = tokenizer.eos_token
     return tokenizer
 
 def _init_distributed():
@@ -81,6 +83,8 @@ def main():
         raise ValueError(f"Config file not found for model id {hf_model_name}")
     logger.info(f"Using HF model weights from {hf_model_name}")
 
+    tokenizer = _get_tokenizer(hf_model_name, logger)
+    
     mesh_dimensions = (2, 2)
     device_mesh = _create_device_mesh(mesh_dimensions)
 
@@ -104,9 +108,6 @@ def main():
     seqlen = 4096  # sequence length
     dim = 4096  # embedding dimension
 
-    mb_ids = torch.randint(0, config.vocab_size, (mb_size, seqlen), device=device)
-    activation = torch.rand(mb_size, seqlen, dim, device=device, dtype=model_dtype)
-    example_args = mb_ids if pp_rank == 0 else activation
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
@@ -115,6 +116,15 @@ def main():
     model.eval()
 
     logger.info(f"Creating pipeline stage {pp_rank=}, {nstages=}")
+    mb_prompts = (
+    "How do you",# "I like to",
+    )    # microbatch size = 1
+    mb_ids = tokenizer(mb_prompts, return_tensors="pt", padding=True).to(device)
+
+    mb_ids = torch.randint(0, config.vocab_size, (mb_size, seqlen), device=device)
+    activation = torch.rand(mb_size, seqlen, dim, device=device, dtype=model_dtype)
+    example_args = mb_ids if pp_rank == 0 else activation
+
     stage = PipelineStage(
         model,
         pp_rank,
@@ -140,18 +150,45 @@ def main():
     #     len(dtype_count) == 2
     # ), f"Expected 2 dtypes in model after checkpoint loading: {model_dtype} and {torch.bool}"
 
-    input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
-    logger.info(f"Input: {input_ids.dtype=}, {input_ids.shape=}, {input_ids.device=}")
+    # real input
+    
+    #mb_prompts = (
+    #    "How do you", "I like to",
+    #)  # microbatch size = 2
+    # Run time inputs
+    full_batch_prompts = (
+        "How do you", "I like to", "Can I help", "You need to",
+        "The weather is", "I found a", "What is your", "You are so",
+    )  # full batch size = 8
+    inputs = tokenizer(full_batch_prompts,padding="max_length", max_length=seqlen, return_tensors="pt",).to(device)
+    input_ids = inputs["input_ids"]
+    logger.info(f"Input: {input_ids.dtype=}, {input_ids.shape=}, {input_ids=}")
+    
+    
+    # Attach to a schedule
+    # number of microbatches = 4 // 2 = 2
+    num_mbs = 8
+    #input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
+    #logger.info(f"Input: {input_ids.dtype=}, {input_ids.shape=}, {input_ids.device=}")
 
-    schedule = ScheduleGPipe(stage, mbs)
+    schedule = ScheduleGPipe(stage, num_mbs)
     logger.info(f"Created schedule: {schedule}")
+    output=None
 
+    # Run the model
     with torch.no_grad():  # .inference_mode():
         if pp_rank == 0:
             schedule.step(input_ids)
         else:
             output = schedule.step()
-            logger.info(f"Output: {output}")
+            #logger.info(f"Output: {output.shape=}")
+    
+    # Decode
+    if output is not None:
+        logger.info(f"Output: {output.shape=}")
+        next_token_logits = output[:, -1, :]
+        next_token = torch.argmax(next_token_logits, dim=-1)
+        logger.info(f"{next_token=}, {(tokenizer.batch_decode(next_token))}")
 
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
