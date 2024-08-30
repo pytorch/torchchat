@@ -25,9 +25,9 @@ from torchchat.cli.builder import (
     BuilderArgs,
     TokenizerArgs,
 )
+from torchchat.cli.cli import add_arguments_for_verb, arg_init, check_args
 from torchchat.model import Model
 from torchchat.utils.build_utils import device_sync, set_precision
-from torchchat.cli.cli import add_arguments_for_verb, arg_init, check_args
 from torchchat.utils.device_info import get_device_info
 
 

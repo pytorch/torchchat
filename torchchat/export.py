@@ -11,6 +11,8 @@ from typing import Optional
 import torch
 import torch.nn as nn
 
+from torch.export import Dim
+
 from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
@@ -19,11 +21,9 @@ from torchchat.cli.builder import (
     BuilderArgs,
     TokenizerArgs,
 )
-
-from torchchat.utils.build_utils import set_backend, set_precision
 from torchchat.cli.cli import add_arguments_for_verb, arg_init, check_args
 
-from torch.export import Dim
+from torchchat.utils.build_utils import set_backend, set_precision
 
 
 default_device = "cpu"
@@ -93,9 +93,6 @@ try:
 
     import executorch.exir as exir
 
-    from torchchat.model import apply_rotary_emb, Attention
-    from torchchat.utils.build_utils import get_precision
-
     from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
         XnnpackDynamicallyQuantizedPartitioner,
     )
@@ -113,6 +110,9 @@ try:
 
     from torch._export import capture_pre_autograd_graph
     from torch.export import export, ExportedProgram
+
+    from torchchat.model import apply_rotary_emb, Attention
+    from torchchat.utils.build_utils import get_precision
 
     default_device = "cpu"
 

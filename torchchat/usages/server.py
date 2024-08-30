@@ -14,9 +14,9 @@ from dataclasses import asdict
 from typing import Dict, List, Union
 
 import torch
+from flask import Flask, request, Response
 
 from torchchat.cli.builder import BuilderArgs, TokenizerArgs
-from flask import Flask, request, Response
 from torchchat.generate import GeneratorArgs
 
 from torchchat.usages.openai_api import (

@@ -60,9 +60,7 @@ def load_model_configs() -> Dict[str, ModelConfig]:
     model_aliases = {}
     model_configs = {}
 
-    with open(
-        Path(__file__).parent/ "models.json", "r"
-    ) as f:
+    with open(Path(__file__).parent / "models.json", "r") as f:
         model_config_dict = json.load(f)
 
     for key, value in model_config_dict.items():

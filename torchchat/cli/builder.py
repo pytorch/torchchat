@@ -15,20 +15,25 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 import torch.nn as nn
-
-from torchchat.model_config.model_config import resolve_model_config
 from distributed import (
     init_distributed,
     launch_distributed,
     ParallelDims,
     parallelize_llama,
 )
-from torchchat.utils.quantize import quantize_model
 from torch.distributed.device_mesh import DeviceMesh
-from torchchat.utils.measure_time import measure_time
 
 from torchchat.model import Model
-from torchchat.utils.build_utils import device_sync, is_cpu_device, is_cuda_or_cpu_device, name_to_dtype
+
+from torchchat.model_config.model_config import resolve_model_config
+from torchchat.utils.build_utils import (
+    device_sync,
+    is_cpu_device,
+    is_cuda_or_cpu_device,
+    name_to_dtype,
+)
+from torchchat.utils.measure_time import measure_time
+from torchchat.utils.quantize import quantize_model
 
 
 @dataclass

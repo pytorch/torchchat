@@ -14,12 +14,15 @@ import gguf
 import torch
 import torch.nn.functional as F
 
+from gguf import GGUFValueType
+
 from torchchat.model import Model, ModelArgs, TransformerArgs
 
-from gguf import GGUFValueType
-from torchchat.utils.quantize import group_dequantize_tensor_from_qparams, pack_scales_and_zeros
-
 from torchchat.utils.build_utils import find_multiple, get_precision
+from torchchat.utils.quantize import (
+    group_dequantize_tensor_from_qparams,
+    pack_scales_and_zeros,
+)
 
 
 logger: logging.Logger = logging.getLogger(__name__)
