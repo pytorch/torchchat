@@ -278,6 +278,7 @@ class FeedForward(nn.Module):
         self.w3 = parallelize_module(w3, device_mesh, Colwise)
 
     def forward(self, x: Tensor) -> Tensor:
+        # gate = w1, up = w3, down = w2 
         y: DTensor = self.w2(F.silu(self.w1(x)) * self.w3(x))
         # y is a DTensor with Partial placement;
         # we convert its placement to Replicate and convert it back to a regular

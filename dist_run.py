@@ -26,6 +26,8 @@ from build.utils import get_precision
 MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
     "Transformer-2-7b-chat-hf": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
+    "Transformer-3-8b-chat-hf": ("meta-llama/Meta-Llama-3.1-8B-Instruct", torch.bfloat16),
+
 }
 
 def _get_tokenizer(hf_model_name, logger):
@@ -157,8 +159,8 @@ def main():
     #)  # microbatch size = 2
     # Run time inputs
     full_batch_prompts = (
-        "How do you", "I like to", "Can I help", "You need to",
-        "The weather is", "I found a", "What is your", "You are so",
+        "What is Snow" #"How do you", #"I like to", "Can I help", "You need to",
+        #"The weather is", "I found a", "What is your", "You are so",
     )  # full batch size = 8
     inputs = tokenizer(full_batch_prompts,padding="max_length", max_length=seqlen, return_tensors="pt",).to(device)
     input_ids = inputs["input_ids"]
@@ -167,7 +169,7 @@ def main():
     
     # Attach to a schedule
     # number of microbatches = 4 // 2 = 2
-    num_mbs = 8
+    num_mbs = 1
     #input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
     #logger.info(f"Input: {input_ids.dtype=}, {input_ids.shape=}, {input_ids.device=}")
 
@@ -187,8 +189,13 @@ def main():
     if output is not None:
         logger.info(f"Output: {output.shape=}")
         next_token_logits = output[:, -1, :]
+        full_batch_logits = output[:, 0:-1, :]
+        logger.info(f"{next_token_logits.shape=}")
         next_token = torch.argmax(next_token_logits, dim=-1)
+        next_full_batch = torch.argmax(full_batch_logits, dim=-1)
         logger.info(f"{next_token=}, {(tokenizer.batch_decode(next_token))}")
+        logger.info(f"{full_batch_logits=}, {(tokenizer.batch_decode(next_full_batch))}")
+
 
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"

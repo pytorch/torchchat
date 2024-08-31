@@ -107,9 +107,9 @@ def remap_weight_keys(dictionary):
         "v_proj": "wv",
         "q_proj": "wq",
         "post_attention_layernorm.weight": "ffn_norm.weight",
-        "down_proj": "w1",
-        "gate_proj": "w3",
-        "up_proj": "w2",
+        "down_proj": "w2",
+        "gate_proj": "w1",
+        "up_proj": "w3",
         "lm_head.weight": "output.weight",
         "mlp": "feed_forward",
     }
