@@ -131,7 +131,7 @@ def get_hf_weight_map_and_path(
 
 def chat_remap_weight_keys(hf_dictionary):
     """Remap the keys of a dictionary to match the expected format of the chat model."""
-    # hf_dictionary format:
+    # hf_dictionary format arrives as:
     # hf_dictionary =  {'lm_head.weight': 'model-00002-of-00002.safetensors',
     #  'model.embed_tokens.weight': 'model-00001-of-00002.safetensors'
     # becomes this format:
