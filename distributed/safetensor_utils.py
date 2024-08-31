@@ -9,6 +9,7 @@ from transformers import AutoTokenizer
 from safetensors import safe_open
 from transformers.utils import cached_file
 import os
+import re
 import json
 from torch.nn import Module
 from typing import Dict, Tuple, Set, Optional
@@ -75,6 +76,34 @@ def get_hf_path_from_model_id(model_id: str) -> str:
     ), f"HF path {file_location} for {model_id} does not exist."
     return file_location
 
+def compare_dicts(dict1, dict2):
+    """
+    Compare two dictionaries and return their differences.
+    
+    Args:
+    dict1 (dict): The first dictionary
+    dict2 (dict): The second dictionary
+    
+    Returns:
+    dict: A dictionary containing the differences
+    """
+    differences = {}
+    
+    # Check keys present in dict1 but not in dict2
+    for key in dict1.keys() - dict2.keys():
+        differences[key] = (dict1[key], "<not present>")
+    
+    # Check keys present in dict2 but not in dict1
+    for key in dict2.keys() - dict1.keys():
+        differences[key] = ("<not present>", dict2[key])
+    
+    # Check values for keys present in both dictionaries
+    for key in dict1.keys() & dict2.keys():
+        if dict1[key] != dict2[key]:
+            differences[key] = (dict1[key], dict2[key])
+    
+    return differences
+
 
 def get_hf_weight_map_and_path(
     model_id: str,
@@ -88,12 +117,63 @@ def get_hf_weight_map_and_path(
     weight_map = read_weights_from_json(index_file)
     if weight_map is None:
         raise ValueError(f"Weight map not found in config file {index_file}")
-    weight_map, new_to_old_keymap = remap_weight_keys(weight_map)
+    weight_map_sf, new_to_old_keymap = remap_weight_keys(weight_map)
+    chat_map = chat_remap_weight_keys(weight_map)
+
+    weight_diff = compare_dicts(chat_map, weight_map_sf)
+    logger.info(f"Weight map differences: {weight_diff}")
+    assert False, "check weight diff"
+
     weight_path = os.path.dirname(index_file)
     if not os.path.exists(weight_path):
         raise FileNotFoundError(f"Weight path {weight_path} does not exist")
     return weight_map, weight_path, new_to_old_keymap
 
+def chat_remap_weight_keys(hf_dictionary):
+    """Remap the keys of a dictionary to match the expected format of the chat model."""
+    # hf_dictionary format:
+    # hf_dictionary =  {'lm_head.weight': 'model-00002-of-00002.safetensors',
+    #  'model.embed_tokens.weight': 'model-00001-of-00002.safetensors'
+    # becomes this format:
+    # final_result = {'output.weight': 'model-00002-of-00002.safetensors',
+    #  'tok_embeddings.weight': 'model-00001-of-00002.safetensors'...
+    # need to also create a mapping from the new key to the old key
+    # i.e. new_to_old_keymap = {'output.weight': 'lm_head.weight',
+    
+    weight_map = {
+            "model.embed_tokens.weight": "tok_embeddings.weight",
+            "model.layers.{}.self_attn.q_proj.weight": "layers.{}.attention.wq.weight",
+            "model.layers.{}.self_attn.k_proj.weight": "layers.{}.attention.wk.weight",
+            "model.layers.{}.self_attn.v_proj.weight": "layers.{}.attention.wv.weight",
+            "model.layers.{}.self_attn.o_proj.weight": "layers.{}.attention.wo.weight",
+            "model.layers.{}.self_attn.rotary_emb.inv_freq": None,
+            "model.layers.{}.mlp.gate_proj.weight": "layers.{}.feed_forward.w1.weight",
+            "model.layers.{}.mlp.up_proj.weight": "layers.{}.feed_forward.w3.weight",
+            "model.layers.{}.mlp.down_proj.weight": "layers.{}.feed_forward.w2.weight",
+            "model.layers.{}.input_layernorm.weight": "layers.{}.attention_norm.weight",
+            "model.layers.{}.post_attention_layernorm.weight": "layers.{}.ffn_norm.weight",
+            "model.norm.weight": "norm.weight",
+            "lm_head.weight": "output.weight",
+        }
+
+
+    # Rename keys
+    final_result = {}
+    for key, value in hf_dictionary.items():
+        if "layers" in key:
+            abstract_key = re.sub(r"(\d+)", "{}", key)
+            layer_num = re.search(r"\d+", key).group(0)
+            new_key = weight_map.get(abstract_key)
+            if new_key is None:
+                continue
+            new_key = new_key.format(layer_num)
+        else:
+            new_key = weight_map.get(key)
+        if new_key:
+            final_result[new_key] = value
+    
+    return final_result
+    
 
 def remap_weight_keys(dictionary):
     """Remap the keys of a dictionary to match the expected format of the tune model."""
@@ -138,6 +218,7 @@ def load_safetensor_weights(
     device: torch.device = "cuda",
     purge_model_prefix: bool = True,
     ignore_cache_layers: bool = True,
+    model_config: Optional[Dict] = None,
 ) -> Tuple[int, int]:
     """
     Load safetensor weights into a stage module.
@@ -174,6 +255,7 @@ def load_safetensor_weights(
                 file,
                 updated_states,
                 device,
+                model_config,
             )
         except FileNotFoundError:
             logger.error(f"File not found: {full_path}")
@@ -238,6 +320,14 @@ def load_checkpoint(full_path: str, device: torch.device) -> Dict[str, torch.Ten
     logger.info(f"Loaded {len(tensors)} tensors from {full_path}")
     return tensors
 
+def permute_weight_to_attn_heads(w, n_heads, head_dim, model_dim):
+    """Permute the weight tensor to match the attention heads."""
+    # TODO - this is borrowed from chat/convert_hf...we should expose this as a direct function
+    return (
+        w.view(n_heads, 2, head_dim // 2, model_dim)
+        .transpose(1, 2)
+        .reshape(head_dim * n_heads, model_dim)
+    )
 
 def update_state_dict(
     state_dict: Dict[str, torch.Tensor],
@@ -247,7 +337,10 @@ def update_state_dict(
     file: str,
     updated_states: Set[str],
     device: torch.device,
+    model_config: Optional[Dict] = None,
 ):
+    """Update the state dict with weights from the checkpoint."""
+
     count_dtensors_loaded = 0
     for param, file_with_param in weight_map.items():
         if file_with_param == file and param in state_dict:
@@ -263,14 +356,28 @@ def update_state_dict(
             checkpoint_tensor = checkpoint[old_param]
             stage_tensor = state_dict[param]
 
-            # stage_is_dtensor = is_dtensor(stage_tensor)
+            stage_is_dtensor = is_dtensor(stage_tensor)
             # logger.info(f"cme DType Check: {param=}, {stage_is_dtensor=}, {checkpoint_tensor.dtype=}, {stage_tensor.dtype=}")
+            if "wq" in param or "wk" in param:
+                logger.info(f"Adjusting {param=} to match {model_param=}")
+                logger.info(f"model_config: {model_config=}")
+                
+                num_heads = model_config.n_heads
+                dim = model_config.dim
+                num_layers = model_config.n_layers
+                num_local_heads = model_config.n_local_heads
+                head_dim = model_config.head_dim
+                logger.info(f"permuting {param} with num_heads: {num_heads}, dim: {dim}, num_layers: {num_layers}, num_local_heads: {num_local_heads}, head_dim: {head_dim}")  
+                if "wq" in param:
+                    checkpoint_tensor = permute_weight_to_attn_heads(checkpoint_tensor, num_heads, head_dim, dim)
+                elif "wk" in param:
+                    checkpoint_tensor = permute_weight_to_attn_heads(checkpoint_tensor, num_local_heads, head_dim, dim)
 
             checkpoint_tensor = compare_and_reverse(stage_tensor, checkpoint_tensor)
 
             # here we need to check if the tensor is a DTensor and if so, adjust the
             # shape and placement to match the model DTensor.
-            if is_dtensor(stage_tensor):
+            if stage_is_dtensor:
                 model_tensor = load_into_dtensor(checkpoint_tensor, stage_tensor)
                 # logger.info(f"DTensor: Loaded {param} into {model_tensor=}")
 

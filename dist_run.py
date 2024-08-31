@@ -51,10 +51,10 @@ def _create_device_mesh(mesh_dimensions):
     return dist.init_device_mesh("cuda", mesh_dimensions, mesh_dim_names=("pp", "tp"))
 
 
-def _load_model_weights(stage_module, hf_model_name, device, logger):
+def _load_model_weights(stage_module, hf_model_name, device, logger, config):
     weight_map, weight_path, key_map = get_hf_weight_map_and_path(hf_model_name)
     num_loaded_weights, num_missing_weights = load_safetensor_weights(
-        stage_module, weight_map, weight_path, key_map, device
+        stage_module, weight_map, weight_path, key_map, device, model_config=config
     )
     logger.info(
         f"Success - Loaded {num_loaded_weights} weights, {num_missing_weights} missing weights"
@@ -87,7 +87,7 @@ def main():
 
     tokenizer = _get_tokenizer(hf_model_name, logger)
     
-    mesh_dimensions = (2, 2)
+    mesh_dimensions = (2,2)
     device_mesh = _create_device_mesh(mesh_dimensions)
 
     tp_mesh = device_mesh["tp"]
@@ -113,7 +113,7 @@ def main():
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    _load_model_weights(model, hf_model_name, device=device, logger=logger)
+    _load_model_weights(model, hf_model_name, device=device, logger=logger, config=config)
 
     model.eval()
 
@@ -159,7 +159,7 @@ def main():
     #)  # microbatch size = 2
     # Run time inputs
     full_batch_prompts = (
-        "What is Snow" #"How do you", #"I like to", "Can I help", "You need to",
+        "What is Snow?","How do you", #"I like to", "Can I help", "You need to",
         #"The weather is", "I found a", "What is your", "You are so",
     )  # full batch size = 8
     inputs = tokenizer(full_batch_prompts,padding="max_length", max_length=seqlen, return_tensors="pt",).to(device)
@@ -169,7 +169,7 @@ def main():
     
     # Attach to a schedule
     # number of microbatches = 4 // 2 = 2
-    num_mbs = 1
+    num_mbs = 2
     #input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
     #logger.info(f"Input: {input_ids.dtype=}, {input_ids.shape=}, {input_ids.device=}")
 
