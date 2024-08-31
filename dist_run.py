@@ -85,11 +85,14 @@ def main():
     device = torch.device(f"cuda:{rank}")
 
     with device:
-        with tp_mesh:
-            model = TransformerStage(config, pp_rank, nstages)
-            model.setup_caches(1, 4096)
-            # TODO: refine this .to once we start using fp8 for KV cache
-            model = model.to(model_dtype)
+        model = TransformerStage(config, pp_rank, nstages)
+
+    model.setup_caches(1, 4096)
+    # TODO: refine this .to once we start using fp8 for KV cache
+    model = model.to(model_dtype)
+
+    # Distribute model on TP mesh
+    model.distribute(tp_mesh)
     logger.info(f"Model: {model}")
 
     mbs = 2  # number of micro-batches
