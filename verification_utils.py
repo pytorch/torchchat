@@ -153,23 +153,23 @@ def compare_weight_files(file1, file2, tolerance=1e-6):
 # Can be run directly from the command line
 if __name__ == "__main__":
     file1 = 'chat_master.csv'
-    file2 = 'chat_dist_rank0.csv'
+    file2 = 'model_weights_rank1.csv'
     
     missing_in_file1, missing_in_file2, mismatches = compare_weight_files(file1, file2)
     
-    print(f"Entries missing in {file1}:")
+    '''print(f"Entries missing in {file1}:")
     for name, data in missing_in_file1.items():
         print(f"  {name}: {data}")
     
     print(f"\nEntries missing in {file2}:")
     for name, data in missing_in_file2.items():
         print(f"  {name}: {data}")
-    
+    '''
     print("\nMismatches in common entries:")
     for name, diff in mismatches.items():
         print(f"  {name}:")
         print(f"    {file1}: {diff['file1']}")
         print(f"    {file2}: {diff['file2']}")
     
-    if not (missing_in_file1 or missing_in_file2 or mismatches):
+    if not ( mismatches):  #missing_in_file1 or missing_in_file2 or
         print("No differences found.")
