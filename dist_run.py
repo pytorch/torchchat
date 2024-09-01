@@ -21,6 +21,7 @@ from distributed.safetensor_utils import (
 )
 from distributed.dtensor_utils import find_cpu_tensors, record_module_dtypes
 from distributed.utils import Color as color
+from distributed.verification_utils import extract_and_save_weights
 from build.utils import get_precision
 
 MODEL_NAME = "Transformer-2-7b-chat-hf"
@@ -116,6 +117,10 @@ def main():
     _load_model_weights(model, hf_model_name, device=device, logger=logger, config=config)
 
     model.eval()
+
+    # verify weights by tracing
+    #output_file = f"model_weights_rank{rank}.csv"
+    #extract_and_save_weights(model, output_file)
 
     logger.info(f"Creating pipeline stage {pp_rank=}, {nstages=}")
     mb_prompts = (
