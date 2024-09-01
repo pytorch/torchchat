@@ -16,6 +16,7 @@ from typing import Dict, Tuple, Set, Optional
 
 from distributed.logging_utils import setup_logging
 from distributed.dtensor_utils import is_dtensor, load_into_dtensor
+import time
 
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
@@ -24,11 +25,12 @@ _CONFIG_NAME = "config.json"
 logger = setup_logging(__name__)
 
 
-def compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> torch.Tensor:
+def compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor, param_name) -> torch.Tensor:
     """Used to compare and reverse the tensors for loading from safetensor shapes, if needed"""
     if tensor1.shape == tensor2.shape:
         return tensor2
     if tensor1.shape == tensor2.shape[::-1]:
+        logger.info(f"Reversing tensor {param_name} to match shape {tensor1.shape}")
         return tensor2.permute(*reversed(range(tensor2.dim())))
     raise ValueError(
         f"Tensor shapes {tensor1.shape} and {tensor2.shape} are incompatible."
@@ -117,48 +119,65 @@ def get_hf_weight_map_and_path(
     weight_map = read_weights_from_json(index_file)
     if weight_map is None:
         raise ValueError(f"Weight map not found in config file {index_file}")
-    weight_map_sf, new_to_old_keymap = remap_weight_keys(weight_map)
-    chat_map = chat_remap_weight_keys(weight_map)
+    weight_map, new_to_old_keymap = remap_weight_keys(weight_map)
 
-    weight_diff = compare_dicts(chat_map, weight_map_sf)
-    logger.info(f"Weight map differences: {weight_diff}")
-    assert False, "check weight diff"
+    chat_map, chat_new_to_old = chat_remap_weight_keys(weight_map)
+    #logger.info(f"{new_to_old_keymap=}\n\n")
+    #logger.info(f"=====================\n\n")
+    #logger.info(f"{chat_new_to_old=}\n\n")
+    
+    # stripped_new_to_old = {k.removeprefix("model."): v for k, v in new_to_old_keymap.items()}
+    # final_new_to_old = {k: v for k, v in stripped_new_to_old.items() if not k.endswith('.inv_freq')}
+    # weight_diff = compare_dicts(chat_new_to_old, final_new_to_old)
 
+    
+    '''if len(weight_diff) == 0:
+        logger.info(f"\nSUCCESS: Zero Weight map differences\n")
+    else:
+        logger.info(f"\n\nFAILURE: Weight map differences")
+        logger.info(f"{weight_diff=}")
+        assert False, "check weight diff\n\n"
+    '''
+    
     weight_path = os.path.dirname(index_file)
     if not os.path.exists(weight_path):
         raise FileNotFoundError(f"Weight path {weight_path} does not exist")
-    return weight_map, weight_path, new_to_old_keymap
+    return weight_map, weight_path, new_to_old_keymap # chat_map, weight_path, chat_new_to_old
 
 def chat_remap_weight_keys(hf_dictionary):
-    """Remap the keys of a dictionary to match the expected format of the chat model."""
+    """
+    Remap the keys of a dictionary to match the expected format of the chat model.
+    Also creates a mapping from new keys to old keys.
+    """
     # hf_dictionary format arrives as:
-    # hf_dictionary =  {'lm_head.weight': 'model-00002-of-00002.safetensors',
-    #  'model.embed_tokens.weight': 'model-00001-of-00002.safetensors'
+    # hf_dictionary = {'lm_head.weight': 'model-00002-of-00002.safetensors',
+    # 'model.embed_tokens.weight': 'model-00001-of-00002.safetensors'
     # becomes this format:
     # final_result = {'output.weight': 'model-00002-of-00002.safetensors',
-    #  'tok_embeddings.weight': 'model-00001-of-00002.safetensors'...
+    # 'tok_embeddings.weight': 'model-00001-of-00002.safetensors'...
     # need to also create a mapping from the new key to the old key
     # i.e. new_to_old_keymap = {'output.weight': 'lm_head.weight',
     
     weight_map = {
-            "model.embed_tokens.weight": "tok_embeddings.weight",
-            "model.layers.{}.self_attn.q_proj.weight": "layers.{}.attention.wq.weight",
-            "model.layers.{}.self_attn.k_proj.weight": "layers.{}.attention.wk.weight",
-            "model.layers.{}.self_attn.v_proj.weight": "layers.{}.attention.wv.weight",
-            "model.layers.{}.self_attn.o_proj.weight": "layers.{}.attention.wo.weight",
-            "model.layers.{}.self_attn.rotary_emb.inv_freq": None,
-            "model.layers.{}.mlp.gate_proj.weight": "layers.{}.feed_forward.w1.weight",
-            "model.layers.{}.mlp.up_proj.weight": "layers.{}.feed_forward.w3.weight",
-            "model.layers.{}.mlp.down_proj.weight": "layers.{}.feed_forward.w2.weight",
-            "model.layers.{}.input_layernorm.weight": "layers.{}.attention_norm.weight",
-            "model.layers.{}.post_attention_layernorm.weight": "layers.{}.ffn_norm.weight",
-            "model.norm.weight": "norm.weight",
-            "lm_head.weight": "output.weight",
-        }
-
-
+        "model.embed_tokens.weight": "tok_embeddings.weight",
+        "model.layers.{}.self_attn.q_proj.weight": "layers.{}.attention.wq.weight",
+        "model.layers.{}.self_attn.k_proj.weight": "layers.{}.attention.wk.weight",
+        "model.layers.{}.self_attn.v_proj.weight": "layers.{}.attention.wv.weight",
+        "model.layers.{}.self_attn.o_proj.weight": "layers.{}.attention.wo.weight",
+        "model.layers.{}.self_attn.rotary_emb.inv_freq": None,
+        "model.layers.{}.mlp.gate_proj.weight": "layers.{}.feed_forward.w1.weight",
+        "model.layers.{}.mlp.up_proj.weight": "layers.{}.feed_forward.w3.weight",
+        "model.layers.{}.mlp.down_proj.weight": "layers.{}.feed_forward.w2.weight",
+        "model.layers.{}.input_layernorm.weight": "layers.{}.attention_norm.weight",
+        "model.layers.{}.post_attention_layernorm.weight": "layers.{}.ffn_norm.weight",
+        "model.norm.weight": "norm.weight",
+        "lm_head.weight": "output.weight",
+    }
+    
     # Rename keys
     final_result = {}
+    new_to_old_keymap = {}
+    
     for key, value in hf_dictionary.items():
         if "layers" in key:
             abstract_key = re.sub(r"(\d+)", "{}", key)
@@ -169,10 +188,12 @@ def chat_remap_weight_keys(hf_dictionary):
             new_key = new_key.format(layer_num)
         else:
             new_key = weight_map.get(key)
+        
         if new_key:
             final_result[new_key] = value
+            new_to_old_keymap[new_key] = key
     
-    return final_result
+    return final_result, new_to_old_keymap
     
 
 def remap_weight_keys(dictionary):
@@ -238,7 +259,9 @@ def load_safetensor_weights(
     stage_state_dict, weight_map = prepare_state_dict(
         stage_module, weight_map, purge_model_prefix
     )
+
     needed_files = get_needed_files(stage_state_dict, weight_map)
+
     updated_states: Set[str] = set()
 
     for file in needed_files:
@@ -373,7 +396,7 @@ def update_state_dict(
                 elif "wk" in param:
                     checkpoint_tensor = permute_weight_to_attn_heads(checkpoint_tensor, num_local_heads, head_dim, dim)
 
-            checkpoint_tensor = compare_and_reverse(stage_tensor, checkpoint_tensor)
+            # checkpoint_tensor = compare_and_reverse(stage_tensor, checkpoint_tensor, param)
 
             # here we need to check if the tensor is a DTensor and if so, adjust the
             # shape and placement to match the model DTensor.
