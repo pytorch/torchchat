@@ -35,26 +35,24 @@ config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 Colwise = ColwiseParallel(use_local_output=False)
 Rowwise = RowwiseParallel(use_local_output=False)
 
-class TransformerStage(nn.Module):
-    def __init__(self, config: TransformerArgs, stage_idx: int, n_stages: int) -> None:
+class Transformer(nn.Module):
+    def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
         self.config = config
-        self.stage_idx = stage_idx
-        self.n_stages = n_stages
-        self.layers_per_stage = config.n_layers // n_stages
+        layers_per_stage = config.n_layers // config.n_stages
 
-        if stage_idx == 0:
+        if config.stage_idx == 0:
             self.tok_embeddings = nn.Embedding(config.vocab_size, config.dim)
 
         # Use ModuleDict so that each layer can be assigned its layer ID in the original model
         self.layers = nn.ModuleDict()
 
         for layer_id in range(
-            self.layers_per_stage * stage_idx, self.layers_per_stage * (stage_idx + 1)
+            layers_per_stage * config.stage_idx, layers_per_stage * (config.stage_idx + 1)
         ):
             self.layers[str(layer_id)] = TransformerBlock(config)
 
-        if stage_idx == n_stages - 1:
+        if config.stage_idx == config.n_stages - 1:
             self.norm = RMSNorm(config.dim, eps=config.norm_eps)
             self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
 
@@ -112,15 +110,16 @@ class TransformerStage(nn.Module):
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
 
-        if self.stage_idx == 0:
+        if hasattr(self, "tok_embeddings"):
             x = self.tok_embeddings(x)
-            # TODO: sequence parallelize this
 
         for _, layer in self.layers.items():
             x = layer(x, input_pos, freqs_cis, mask)
 
-        if self.stage_idx == self.n_stages - 1:
+        if hasattr(self, "norm"):
             x = self.norm(x)
+
+        if hasattr(self, "output"):
             x = self.output(x)
 
         # print(f"stage output shape: {x.shape}")

@@ -19,8 +19,8 @@ from distributed.safetensor_utils import (
 )
 from distributed.utils import Color as color
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
-from torchchat.model import ModelArgs, TransformerArgs
-from torchchat.model_dist import TransformerStage
+from torchchat.model import ModelArgs
+from torchchat.model_dist import Transformer
 from torchchat.utils.build_utils import get_precision
 
 MODEL_NAME = "Transformer-2-7b-chat-hf"
@@ -84,8 +84,12 @@ def main():
     nstages = pp_mesh.size()
     device = torch.device(f"cuda:{rank}")
 
+    # Fill in PP configs
+    config.stage_idx = pp_rank
+    config.n_stages = nstages
+
     with device:
-        model = TransformerStage(config, pp_rank, nstages)
+        model = Transformer(config)
 
     model.setup_caches(1, 4096)
     # TODO: refine this .to once we start using fp8 for KV cache
