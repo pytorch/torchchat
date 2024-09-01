@@ -105,7 +105,7 @@ def main():
             model = model.to(model_dtype)
     logger.info(f"Model: {model}")
 
-    mbs = 2  # number of micro-batches
+    mbs = 1  # number of micro-batches
     mb_size = 1  # micro-batch size
     batch_size = mbs * mb_size  # total batch size
     seqlen = 4096  # sequence length
@@ -119,8 +119,8 @@ def main():
     model.eval()
 
     # verify weights by tracing
-    output_file = f"model_weights_rank{rank}.csv"
-    extract_and_save_weights(model, output_file)
+    #output_file = f"model_weights_rank{rank}.csv"
+    #extract_and_save_weights(model, output_file)
 
     logger.info(f"Creating pipeline stage {pp_rank=}, {nstages=}")
     mb_prompts = (
@@ -164,17 +164,18 @@ def main():
     #)  # microbatch size = 2
     # Run time inputs
     full_batch_prompts = (
-        "What is Snow?","How do you", #"I like to", "Can I help", "You need to",
+        "What is Snow?"#,"How do you", #"I like to", "Can I help", "You need to",
         #"The weather is", "I found a", "What is your", "You are so",
     )  # full batch size = 8
+    torch.set_printoptions(threshold=30, edgeitems=10)
     inputs = tokenizer(full_batch_prompts,padding="max_length", max_length=seqlen, return_tensors="pt",).to(device)
     input_ids = inputs["input_ids"]
-    logger.info(f"Input: {input_ids.dtype=}, {input_ids.shape=}, {input_ids=}")
+    logger.info(f"Input: {input_ids.dtype=}, {input_ids[0:10]=}")
     
     
     # Attach to a schedule
     # number of microbatches = 4 // 2 = 2
-    num_mbs = 2
+    num_mbs = 1
     #input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
     #logger.info(f"Input: {input_ids.dtype=}, {input_ids.shape=}, {input_ids.device=}")
 

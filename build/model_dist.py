@@ -111,9 +111,11 @@ class TransformerStage(nn.Module):
 
         if self.stage_idx == 0:
             x: DTensor = self.tok_embeddings(x)
+            logger.info(f"tok_embeddings output: {x[0:1]}")
             # TODO: sequence parallelize this
 
         for _, layer in self.layers.items():
+            logger.info(f"layer {layer}, x: {x[0:1]}, {freqs_cis.shape=}, freqs_cis: {freqs_cis[0:1]}")
             x = layer(x, input_pos, freqs_cis, mask)
 
         if self.stage_idx == self.n_stages - 1:

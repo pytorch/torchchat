@@ -253,12 +253,6 @@ class Generator:
         self.builder_args.setup_caches = False
         self.model = _initialize_model(self.builder_args, self.quantize, self.tokenizer)
 
-        # TODO - remove this  - just temp debugging...
-        output_file = "model_weighs_CHAT.csv"
-        extract_and_save_weights(self.model, output_file)
-        logger.info(f"Saved model weights to {output_file}")
-        assert False, "check weights"
-        
         if self.is_speculative:
             self.draft_model = _initialize_model(
                 self.speculative_builder_args,
@@ -624,8 +618,10 @@ class Generator:
 
     def encode_tokens(self, string, bos=True, device="cpu"):
         tokens = self.tokenizer.encode(string)
+        logger.info(f"Encoded tokens: {tokens}")
         if bos:
             tokens = [self.tokenizer.bos_id()] + tokens
+            logger.info(f"Tokens with BOS: {tokens}")
         return torch.tensor(tokens, dtype=torch.int, device=device)
 
     def _callback(self, x, *, buffer, done_generating):
@@ -738,6 +734,8 @@ class Generator:
                     encoded = self.encode_tokens(
                         prompt, bos=True, device=self.builder_args.device
                     )
+                    logger.info(f"Encoded tokens: {encoded}")
+                    logger.info(f"{prompt=}")
                 else:
                     if self.system_prompt:
                         encoded = self.chat_formatter.encode_dialog_prompt(

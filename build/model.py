@@ -20,6 +20,9 @@ from build.utils import find_multiple, get_precision
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
+from distributed.logging_utils import setup_logging
+logger = setup_logging(__name__)
+
 
 @dataclass
 class TransformerArgs:
@@ -252,9 +255,11 @@ class Transformer(nn.Module):
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
         x = self.tok_embeddings(idx)
+        logger.info(f"tok_embeddings output: {x[0:1]}")
 
         for _, layer in enumerate(self.layers):
             x = layer(x, input_pos, freqs_cis, mask)
+            logger.info(f"layer {layer}, x: {x[0:1]}, {freqs_cis.shape=}, freqs_cis: {freqs_cis[0:5]}")
         x = self.norm(x)
         logits = self.output(x)
         # print(f"logits shape: {logits.shape}")
