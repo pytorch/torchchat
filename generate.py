@@ -30,6 +30,11 @@ from build.utils import device_sync, set_precision
 from cli import add_arguments_for_verb, arg_init, check_args
 from utils.device_info import get_device_info
 
+# temp
+from distributed.verification_utils import extract_and_save_weights
+from distributed.logging_utils import setup_logging
+
+logger = setup_logging(__name__)
 
 class _ChatFormatter(ABC):
     def __init__(self, tokenizer):
@@ -248,6 +253,12 @@ class Generator:
         self.builder_args.setup_caches = False
         self.model = _initialize_model(self.builder_args, self.quantize, self.tokenizer)
 
+        # TODO - remove this  - just temp debugging...
+        output_file = "model_weighs_CHAT.csv"
+        extract_and_save_weights(self.model, output_file)
+        logger.info(f"Saved model weights to {output_file}")
+        assert False, "check weights"
+        
         if self.is_speculative:
             self.draft_model = _initialize_model(
                 self.speculative_builder_args,
@@ -903,4 +914,3 @@ if __name__ == "__main__":
     check_args(args, verb)
     args = arg_init(args)
     main(args)
-

@@ -119,8 +119,8 @@ def main():
     model.eval()
 
     # verify weights by tracing
-    #output_file = f"model_weights_rank{rank}.csv"
-    #extract_and_save_weights(model, output_file)
+    output_file = f"model_weights_rank{rank}.csv"
+    extract_and_save_weights(model, output_file)
 
     logger.info(f"Creating pipeline stage {pp_rank=}, {nstages=}")
     mb_prompts = (
