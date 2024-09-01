@@ -10,12 +10,13 @@ import torch
 import torch.nn as nn
 
 from torch import Tensor
-from torch.distributed._tensor import Replicate
+from torch.distributed._tensor import Replicate, Shard, DTensor
 from torch.distributed.device_mesh import DeviceMesh
 from torch.distributed.tensor.parallel import (
     ColwiseParallel,
     parallelize_module,
     RowwiseParallel,
+    SequenceParallel,
 )
 from torch.nn import functional as F
 
@@ -30,10 +31,6 @@ from torchchat.utils.build_utils import find_multiple
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
-
-# Use DTensor as output, by default
-Colwise = ColwiseParallel(use_local_output=False)
-Rowwise = RowwiseParallel(use_local_output=False)
 
 class Transformer(nn.Module):
     def __init__(self, config: TransformerArgs) -> None:
@@ -98,19 +95,27 @@ class Transformer(nn.Module):
     def distribute(self, device_mesh: DeviceMesh):
         if self.tok_embeddings:
             parallelize_module(
-                self.tok_embeddings,
-                device_mesh,
-                RowwiseParallel(input_layouts=Replicate()),
+                self.tok_embeddings, device_mesh,
+                RowwiseParallel(
+                    input_layouts=Replicate(),
+                    output_layouts=Shard(1),
+                ),
             )
+
         for layer in self.layers.values():
             layer.distribute(device_mesh)
-        # TODO (kwen2501) : parallelize these
-        """
+
         if self.norm:
-            parallelize_module(self.norm, device_mesh, ...)
+            parallelize_module(self.norm, device_mesh, SequenceParallel())
+
         if self.output:
-            parallelize_module(self.output, device_mesh, ...)
-        """
+            parallelize_module(
+                self.output, device_mesh,
+                ColwiseParallel(
+                    input_layouts=Shard(1),
+                    output_layouts=Replicate(),
+                ),
+            )
 
     def forward(self, x: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
@@ -168,8 +173,8 @@ class TransformerBlock(nn.Module):
     def distribute(self, device_mesh: DeviceMesh):
         self.attention.distribute(device_mesh)
         self.feed_forward.distribute(device_mesh)
-        self.ffn_norm.distribute(device_mesh)
-        self.attention_norm.distribute(device_mesh)
+        parallelize_module(self.ffn_norm, device_mesh, SequenceParallel())
+        parallelize_module(self.attention_norm, device_mesh, SequenceParallel())
 
     def forward(
         self, x: Tensor, input_pos: Tensor, freqs_cis: Tensor, mask: Tensor
@@ -239,10 +244,11 @@ class Attention(nn.Module):
         _unfuse_wqkv_state_dict(state_dict, self.dim)
 
     def distribute(self, device_mesh: DeviceMesh):
-        parallelize_module(self.wq, device_mesh, Colwise)
-        parallelize_module(self.wk, device_mesh, Colwise)
-        parallelize_module(self.wv, device_mesh, Colwise)
-        parallelize_module(self.wo, device_mesh, Rowwise)
+        self.device_mesh = device_mesh
+        parallelize_module(self.wq, device_mesh, ColwiseParallel())
+        parallelize_module(self.wk, device_mesh, ColwiseParallel())
+        parallelize_module(self.wv, device_mesh, ColwiseParallel())
+        parallelize_module(self.wo, device_mesh, RowwiseParallel(output_layouts=Shard(1)))
 
     def forward(
         self,
@@ -251,13 +257,14 @@ class Attention(nn.Module):
         mask: Tensor,
         input_pos: Optional[Tensor] = None,
     ) -> Tensor:
+        if isinstance(x, DTensor):
+            x = x.redistribute(self.device_mesh, [Replicate()])
+
         bsz, seqlen, _ = x.shape
 
         q = self.wq(x)
         k = self.wk(x)
         v = self.wv(x)
-        # We use `to_local()` to convert DTensor back to regular Tensor
-        q, k, v = q.to_local(), k.to_local(), v.to_local()
         # kv_size = self.n_local_heads * self.head_dim
         # q, k, v = self.wqkv(x).split([self.dim, kv_size, kv_size], dim=-1)
 
@@ -280,9 +287,7 @@ class Attention(nn.Module):
 
         y = y.transpose(1, 2).contiguous().view(bsz, seqlen, -1)
 
-        y = self.wo(y)
-        # TODO: sequence parallelize this
-        return y.full_tensor()
+        return self.wo(y)
 
 
 class FeedForward(nn.Module):
@@ -293,17 +298,16 @@ class FeedForward(nn.Module):
         self.w3 = nn.Linear(config.dim, config.hidden_dim, bias=False)
 
     def distribute(self, device_mesh: DeviceMesh):
-        parallelize_module(self.w1, device_mesh, Colwise)
-        parallelize_module(self.w2, device_mesh, Rowwise)
-        parallelize_module(self.w3, device_mesh, Colwise)
+        self.device_mesh = device_mesh
+        parallelize_module(self.w1, device_mesh, ColwiseParallel())
+        parallelize_module(self.w2, device_mesh, RowwiseParallel(output_layouts=Shard(1)))
+        parallelize_module(self.w3, device_mesh, ColwiseParallel())
 
     def forward(self, x: Tensor) -> Tensor:
-        y = self.w2(F.silu(self.w1(x)) * self.w3(x))
-        # y is a DTensor with Partial placement;
-        # we convert its placement to Replicate and convert it back to a regular
-        # Tensor. `full_tensor` is the API that does both.
-        # TODO: sequence parallelize this
-        return y.full_tensor()
+        if isinstance(x, DTensor):
+            x = x.redistribute(self.device_mesh, [Replicate()])
+
+        return self.w2(F.silu(self.w1(x)) * self.w3(x))
 
 
 class RMSNorm(nn.Module):
@@ -311,13 +315,6 @@ class RMSNorm(nn.Module):
         super().__init__()
         self.eps = eps
         self.weight = nn.Parameter(torch.ones(dim))
-
-    def distribute(self, device_mesh: DeviceMesh):
-        # TODO (kwen2501): parallelize this
-        """
-        parallelize_module(self.weight, device_mesh, Colwise)
-        """
-        pass
 
     def _norm(self, x):
         return x * torch.rsqrt(torch.mean(x * x, dim=-1, keepdim=True) + self.eps)
