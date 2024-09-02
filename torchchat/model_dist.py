@@ -64,6 +64,8 @@ class Transformer(nn.Module):
         # self.mask_cache: Optional[Tensor] = None
         self.max_batch_size = -1
         self.max_seq_length = -1
+        # For supporting sequence parallel (default is off, thus value of 1)
+        self.seq_parallel_degree = 1
 
     def setup_caches(self, max_batch_size, max_seq_length):
         if (
@@ -117,15 +119,21 @@ class Transformer(nn.Module):
                 ),
             )
 
+        self.seq_parallel_degree = device_mesh.size()
+
     def forward(self, x: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
-        if input_pos is None:
-            input_pos = torch.arange(x.shape[1], device=x.device, dtype=torch.long)
-        mask = self.causal_mask[None, None, input_pos]
-        freqs_cis = self.freqs_cis[input_pos]
 
         if self.tok_embeddings:
             x = self.tok_embeddings(x)
+
+        if input_pos is None:
+            # `x` would be of partial seq length in sequence parallel case; yet
+            # `input_pos` should be of full seq length as per original semantics
+            full_seq_len = x.shape[1] * self.seq_parallel_degree
+            input_pos = torch.arange(full_seq_len, device=x.device, dtype=torch.long)
+        mask = self.causal_mask[None, None, input_pos]
+        freqs_cis = self.freqs_cis[input_pos]
 
         for _, layer in self.layers.items():
             x = layer(x, input_pos, freqs_cis, mask)
@@ -257,6 +265,7 @@ class Attention(nn.Module):
         mask: Tensor,
         input_pos: Optional[Tensor] = None,
     ) -> Tensor:
+        # Gather sequence back in case of sequence parallelism before attention
         if isinstance(x, DTensor):
             x = x.redistribute(self.device_mesh, [Replicate()])
 
@@ -304,6 +313,7 @@ class FeedForward(nn.Module):
         parallelize_module(self.w3, device_mesh, ColwiseParallel())
 
     def forward(self, x: Tensor) -> Tensor:
+        # Gather sequence back in case of sequence parallelism
         if isinstance(x, DTensor):
             x = x.redistribute(self.device_mesh, [Replicate()])
 
