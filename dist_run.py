@@ -8,7 +8,7 @@
 # torchrun --nproc-per-node 4 dist_run.py
 import torch
 import torch.distributed as dist
-from distributed.dtensor_utils import find_cpu_tensors, record_module_dtypes
+from distributed.verification_utils import find_cpu_tensors
 from distributed.logging_utils import setup_logging
 
 # TODO - these are not distributed specific, consider moving to new package
@@ -19,9 +19,8 @@ from distributed.safetensor_utils import (
 )
 from distributed.utils import Color as color
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
-from torchchat.model import ModelArgs, TransformerArgs
+from torchchat.model import ModelArgs
 from torchchat.model_dist import TransformerStage
-from torchchat.utils.build_utils import get_precision
 
 MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
