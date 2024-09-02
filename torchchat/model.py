@@ -40,6 +40,9 @@ class TransformerArgs:
     use_tiktoken: bool = False
     max_seq_length: int = 8192
     use_scaled_rope: bool = False
+    # For pipeline parallel
+    n_stages: int = 1
+    stage_idx: int = 0
 
     def __post_init__(self):
         if self.n_local_heads == -1:

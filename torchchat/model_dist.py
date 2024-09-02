@@ -10,8 +10,8 @@ import torch
 import torch.nn as nn
 
 from torch import Tensor
-from torch.distributed._tensor import DTensor, Replicate
-from torch.distributed.device_mesh import _mesh_resources, DeviceMesh
+from torch.distributed._tensor import Replicate
+from torch.distributed.device_mesh import DeviceMesh
 from torch.distributed.tensor.parallel import (
     ColwiseParallel,
     parallelize_module,
@@ -30,50 +30,38 @@ from torchchat.utils.build_utils import find_multiple
 
 config_path = Path(f"{str(Path(__file__).parent)}/known_model_params")
 
-from distributed.logging_utils import setup_logging
-
-logger = setup_logging(__name__)
 
 # Use DTensor as output, by default
 Colwise = ColwiseParallel(use_local_output=False)
 Rowwise = RowwiseParallel(use_local_output=False)
 
-# Device mesh context
-device_mesh = None
-
-
-class TransformerStage(nn.Module):
-    def __init__(self, config: TransformerArgs, stage_idx: int, n_stages: int) -> None:
+class Transformer(nn.Module):
+    def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
         self.config = config
-        self.stage_idx = stage_idx
-        self.n_stages = n_stages
-        self.layers_per_stage = config.n_layers // n_stages
+        layers_per_stage = config.n_layers // config.n_stages
 
-        # Get device mesh
-        global device_mesh
-        if device_mesh is None:
-            device_mesh = _mesh_resources.get_current_mesh()
-
-        if stage_idx == 0:
-            tok_embeddings = nn.Embedding(config.vocab_size, config.dim)
-            self.tok_embeddings = parallelize_module(
-                tok_embeddings,
-                device_mesh,
-                RowwiseParallel(input_layouts=Replicate()),
-            )
+        self.tok_embeddings = (
+            nn.Embedding(config.vocab_size, config.dim)
+            if config.stage_idx == 0 else None
+        )
 
         # Use ModuleDict so that each layer can be assigned its layer ID in the original model
         self.layers = nn.ModuleDict()
 
         for layer_id in range(
-            self.layers_per_stage * stage_idx, self.layers_per_stage * (stage_idx + 1)
+            layers_per_stage * config.stage_idx, layers_per_stage * (config.stage_idx + 1)
         ):
             self.layers[str(layer_id)] = TransformerBlock(config)
 
-        if stage_idx == n_stages - 1:
-            self.norm = RMSNorm(config.dim, eps=config.norm_eps)
-            self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
+        self.norm = (
+            RMSNorm(config.dim, eps=config.norm_eps)
+            if config.stage_idx == config.n_stages - 1 else None
+        )
+        self.output = (
+            nn.Linear(config.dim, config.vocab_size, bias=False)
+            if config.stage_idx == config.n_stages - 1 else None
+        )
 
         # self.freqs_cis: Optional[Tensor] = None
         # self.mask_cache: Optional[Tensor] = None
@@ -107,6 +95,23 @@ class TransformerStage(nn.Module):
         )
         self.register_buffer("causal_mask", causal_mask, persistent=True)
 
+    def distribute(self, device_mesh: DeviceMesh):
+        if self.tok_embeddings:
+            parallelize_module(
+                self.tok_embeddings,
+                device_mesh,
+                RowwiseParallel(input_layouts=Replicate()),
+            )
+        for layer in self.layers.values():
+            layer.distribute(device_mesh)
+        # TODO (kwen2501) : parallelize these
+        """
+        if self.norm:
+            parallelize_module(self.norm, device_mesh, ...)
+        if self.output:
+            parallelize_module(self.output, device_mesh, ...)
+        """
+
     def forward(self, x: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
         if input_pos is None:
@@ -114,15 +119,16 @@ class TransformerStage(nn.Module):
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
 
-        if self.stage_idx == 0:
-            x: DTensor = self.tok_embeddings(x)
-            # TODO: sequence parallelize this
+        if self.tok_embeddings:
+            x = self.tok_embeddings(x)
 
         for _, layer in self.layers.items():
             x = layer(x, input_pos, freqs_cis, mask)
 
-        if self.stage_idx == self.n_stages - 1:
+        if self.norm:
             x = self.norm(x)
+
+        if self.output:
             x = self.output(x)
 
         # print(f"stage output shape: {x.shape}")
@@ -159,6 +165,12 @@ class TransformerBlock(nn.Module):
         self.ffn_norm = RMSNorm(config.dim, config.norm_eps)
         self.attention_norm = RMSNorm(config.dim, config.norm_eps)
 
+    def distribute(self, device_mesh: DeviceMesh):
+        self.attention.distribute(device_mesh)
+        self.feed_forward.distribute(device_mesh)
+        self.ffn_norm.distribute(device_mesh)
+        self.attention_norm.distribute(device_mesh)
+
     def forward(
         self, x: Tensor, input_pos: Tensor, freqs_cis: Tensor, mask: Tensor
     ) -> Tensor:
@@ -175,15 +187,10 @@ class Attention(nn.Module):
         # key, query, value projections for all heads, but in a batch
         # total_head_dim = (config.n_heads + 2 * config.n_local_heads) * config.head_dim
         # self.wqkv = nn.Linear(config.dim, total_head_dim, bias=False)
-        wq = nn.Linear(config.dim, config.n_heads * config.head_dim, bias=False)
-        wk = nn.Linear(config.dim, config.n_local_heads * config.head_dim, bias=False)
-        wv = nn.Linear(config.dim, config.n_local_heads * config.head_dim, bias=False)
-        wo = nn.Linear(config.dim, config.dim, bias=False)
-
-        self.wq = parallelize_module(wq, device_mesh, Colwise)
-        self.wk = parallelize_module(wk, device_mesh, Colwise)
-        self.wv = parallelize_module(wv, device_mesh, Colwise)
-        self.wo = parallelize_module(wo, device_mesh, Rowwise)
+        self.wq = nn.Linear(config.dim, config.n_heads * config.head_dim, bias=False)
+        self.wk = nn.Linear(config.dim, config.n_local_heads * config.head_dim, bias=False)
+        self.wv = nn.Linear(config.dim, config.n_local_heads * config.head_dim, bias=False)
+        self.wo = nn.Linear(config.dim, config.dim, bias=False)
 
         self.kv_cache = None
 
@@ -231,6 +238,12 @@ class Attention(nn.Module):
 
         _unfuse_wqkv_state_dict(state_dict, self.dim)
 
+    def distribute(self, device_mesh: DeviceMesh):
+        parallelize_module(self.wq, device_mesh, Colwise)
+        parallelize_module(self.wk, device_mesh, Colwise)
+        parallelize_module(self.wv, device_mesh, Colwise)
+        parallelize_module(self.wo, device_mesh, Rowwise)
+
     def forward(
         self,
         x: Tensor,
@@ -240,9 +253,9 @@ class Attention(nn.Module):
     ) -> Tensor:
         bsz, seqlen, _ = x.shape
 
-        q: DTensor = self.wq(x)
-        k: DTensor = self.wk(x)
-        v: DTensor = self.wv(x)
+        q = self.wq(x)
+        k = self.wk(x)
+        v = self.wv(x)
         # We use `to_local()` to convert DTensor back to regular Tensor
         q, k, v = q.to_local(), k.to_local(), v.to_local()
         # kv_size = self.n_local_heads * self.head_dim
@@ -267,7 +280,7 @@ class Attention(nn.Module):
 
         y = y.transpose(1, 2).contiguous().view(bsz, seqlen, -1)
 
-        y: DTensor = self.wo(y)
+        y = self.wo(y)
         # TODO: sequence parallelize this
         return y.full_tensor()
 
@@ -275,15 +288,17 @@ class Attention(nn.Module):
 class FeedForward(nn.Module):
     def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
-        w1 = nn.Linear(config.dim, config.hidden_dim, bias=False)
-        w2 = nn.Linear(config.hidden_dim, config.dim, bias=False)
-        w3 = nn.Linear(config.dim, config.hidden_dim, bias=False)
-        self.w1 = parallelize_module(w1, device_mesh, Colwise)
-        self.w2 = parallelize_module(w2, device_mesh, Rowwise)
-        self.w3 = parallelize_module(w3, device_mesh, Colwise)
+        self.w1 = nn.Linear(config.dim, config.hidden_dim, bias=False)
+        self.w2 = nn.Linear(config.hidden_dim, config.dim, bias=False)
+        self.w3 = nn.Linear(config.dim, config.hidden_dim, bias=False)
+
+    def distribute(self, device_mesh: DeviceMesh):
+        parallelize_module(self.w1, device_mesh, Colwise)
+        parallelize_module(self.w2, device_mesh, Rowwise)
+        parallelize_module(self.w3, device_mesh, Colwise)
 
     def forward(self, x: Tensor) -> Tensor:
-        y: DTensor = self.w2(F.silu(self.w1(x)) * self.w3(x))
+        y = self.w2(F.silu(self.w1(x)) * self.w3(x))
         # y is a DTensor with Partial placement;
         # we convert its placement to Replicate and convert it back to a regular
         # Tensor. `full_tensor` is the API that does both.
@@ -296,6 +311,13 @@ class RMSNorm(nn.Module):
         super().__init__()
         self.eps = eps
         self.weight = nn.Parameter(torch.ones(dim))
+
+    def distribute(self, device_mesh: DeviceMesh):
+        # TODO (kwen2501): parallelize this
+        """
+        parallelize_module(self.weight, device_mesh, Colwise)
+        """
+        pass
 
     def _norm(self, x):
         return x * torch.rsqrt(torch.mean(x * x, dim=-1, keepdim=True) + self.eps)
