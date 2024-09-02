@@ -41,8 +41,10 @@ class Transformer(nn.Module):
         self.config = config
         layers_per_stage = config.n_layers // config.n_stages
 
-        if config.stage_idx == 0:
-            self.tok_embeddings = nn.Embedding(config.vocab_size, config.dim)
+        self.tok_embeddings = (
+            nn.Embedding(config.vocab_size, config.dim)
+            if config.stage_idx == 0 else None
+        )
 
         # Use ModuleDict so that each layer can be assigned its layer ID in the original model
         self.layers = nn.ModuleDict()
@@ -52,9 +54,14 @@ class Transformer(nn.Module):
         ):
             self.layers[str(layer_id)] = TransformerBlock(config)
 
-        if config.stage_idx == config.n_stages - 1:
-            self.norm = RMSNorm(config.dim, eps=config.norm_eps)
-            self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
+        self.norm = (
+            RMSNorm(config.dim, eps=config.norm_eps)
+            if config.stage_idx == config.n_stages - 1 else None
+        )
+        self.output = (
+            nn.Linear(config.dim, config.vocab_size, bias=False)
+            if config.stage_idx == config.n_stages - 1 else None
+        )
 
         # self.freqs_cis: Optional[Tensor] = None
         # self.mask_cache: Optional[Tensor] = None
@@ -89,7 +96,7 @@ class Transformer(nn.Module):
         self.register_buffer("causal_mask", causal_mask, persistent=True)
 
     def distribute(self, device_mesh: DeviceMesh):
-        if hasattr(self, "tok_embeddings"):
+        if self.tok_embeddings:
             parallelize_module(
                 self.tok_embeddings,
                 device_mesh,
@@ -99,8 +106,10 @@ class Transformer(nn.Module):
             layer.distribute(device_mesh)
         # TODO (kwen2501) : parallelize these
         """
-        parallelize_module(self.norm, device_mesh, ...)
-        parallelize_module(self.output, device_mesh, ...)
+        if self.norm:
+            parallelize_module(self.norm, device_mesh, ...)
+        if self.output:
+            parallelize_module(self.output, device_mesh, ...)
         """
 
     def forward(self, x: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
@@ -110,16 +119,16 @@ class Transformer(nn.Module):
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
 
-        if hasattr(self, "tok_embeddings"):
+        if self.tok_embeddings:
             x = self.tok_embeddings(x)
 
         for _, layer in self.layers.items():
             x = layer(x, input_pos, freqs_cis, mask)
 
-        if hasattr(self, "norm"):
+        if self.norm:
             x = self.norm(x)
 
-        if hasattr(self, "output"):
+        if self.output:
             x = self.output(x)
 
         # print(f"stage output shape: {x.shape}")
