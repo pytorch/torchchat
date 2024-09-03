@@ -14,6 +14,14 @@ import torch
 import torch.nn as nn
 
 from torch import Tensor
+from torch.distributed._tensor import Replicate, Shard, DTensor
+from torch.distributed.device_mesh import DeviceMesh
+from torch.distributed.tensor.parallel import (
+    ColwiseParallel,
+    parallelize_module,
+    RowwiseParallel,
+    SequenceParallel,
+)
 from torch.nn import functional as F
 
 from torchchat.utils.build_utils import find_multiple, get_precision
@@ -210,18 +218,34 @@ class Transformer(nn.Module):
     def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
         self.config = config
+        layers_per_stage = config.n_layers // config.n_stages
 
-        self.tok_embeddings = nn.Embedding(config.vocab_size, config.dim)
-        self.layers = nn.ModuleList(
-            TransformerBlock(config) for _ in range(config.n_layers)
+        self.tok_embeddings = (
+            nn.Embedding(config.vocab_size, config.dim)
+            if config.stage_idx == 0 else None
         )
-        self.norm = RMSNorm(config.dim, eps=config.norm_eps)
-        self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
+
+        # Use ModuleDict so that each layer can be assigned its layer ID in the original model
+        self.layers = nn.ModuleDict()
+
+        for layer_id in range(
+            layers_per_stage * config.stage_idx, layers_per_stage * (config.stage_idx + 1)
+        ):
+            self.layers[str(layer_id)] = TransformerBlock(config)
+
+        if config.stage_idx == config.n_stages - 1:
+            self.norm = RMSNorm(config.dim, eps=config.norm_eps)
+            self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
+        else:
+            self.norm = None
+            self.output = None
 
         # self.freqs_cis: Optional[Tensor] = None
         # self.mask_cache: Optional[Tensor] = None
         self.max_batch_size = -1
         self.max_seq_length = -1
+        # For supporting sequence parallel (default is off, thus value of 1)
+        self.seq_parallel_degree = 1
 
     def setup_caches(self, max_batch_size, max_seq_length):
         if (
@@ -233,7 +257,7 @@ class Transformer(nn.Module):
         max_seq_length = find_multiple(max_seq_length, 8)
         self.max_seq_length = max_seq_length
         self.max_batch_size = max_batch_size
-        for b in self.layers:
+        for b in self.layers.values():
             b.attention.kv_cache = KVCache(
                 max_batch_size, max_seq_length, self.config.n_local_heads, head_dim
             )
@@ -250,18 +274,56 @@ class Transformer(nn.Module):
         )
         self.register_buffer("causal_mask", causal_mask, persistent=True)
 
-    def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
+    def distribute(self, device_mesh: DeviceMesh):
+        if self.tok_embeddings:
+            parallelize_module(
+                self.tok_embeddings, device_mesh,
+                RowwiseParallel(
+                    input_layouts=Replicate(),
+                    output_layouts=Shard(1),
+                ),
+            )
+
+        for layer in self.layers.values():
+            layer.distribute(device_mesh)
+
+        if self.norm:
+            parallelize_module(self.norm, device_mesh, SequenceParallel())
+
+        if self.output:
+            parallelize_module(
+                self.output, device_mesh,
+                ColwiseParallel(
+                    input_layouts=Shard(1),
+                    output_layouts=Replicate(),
+                ),
+            )
+
+        self.seq_parallel_degree = device_mesh.size()
+
+    # This is a temporary solution to pass input_pos to non-0 pipeline stages
+    # TODO: make `step()` function of dist.pipelining accept args for non-0 stages
+    def setup_input_pos(self, input_pos: Tensor) -> None:
+        self._input_pos = input_pos
+
+    def forward(self, x: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
+        # TODO: find a better way to pass input_pos to non-0 pipeline stages
+        input_pos = input_pos if input_pos is not None else self._input_pos
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
-        x = self.tok_embeddings(idx)
+        if self.tok_embeddings:
+            x = self.tok_embeddings(x)
 
-        for _, layer in enumerate(self.layers):
+        for _, layer in self.layers.items():
             x = layer(x, input_pos, freqs_cis, mask)
-        x = self.norm(x)
-        logits = self.output(x)
-        # print(f"logits shape: {logits.shape}")
-        return logits
+
+        if self.norm:
+            x = self.norm(x)
+        if self.output:
+            x = self.output(x)
+        # print(f"output shape: {x.shape}")
+        return x
 
 
 class TransformerBlock(nn.Module):
@@ -271,6 +333,12 @@ class TransformerBlock(nn.Module):
         self.feed_forward = FeedForward(config)
         self.ffn_norm = RMSNorm(config.dim, config.norm_eps)
         self.attention_norm = RMSNorm(config.dim, config.norm_eps)
+
+    def distribute(self, device_mesh: DeviceMesh):
+        self.attention.distribute(device_mesh)
+        self.feed_forward.distribute(device_mesh)
+        parallelize_module(self.ffn_norm, device_mesh, SequenceParallel())
+        parallelize_module(self.attention_norm, device_mesh, SequenceParallel())
 
     def forward(
         self, x: Tensor, input_pos: Tensor, freqs_cis: Tensor, mask: Tensor
@@ -343,6 +411,15 @@ class Attention(nn.Module):
 
         _unfuse_wqkv_state_dict(state_dict, self.dim)
 
+    def distribute(self, device_mesh: DeviceMesh):
+        self.device_mesh = device_mesh
+        parallelize_module(self.wq, device_mesh, ColwiseParallel())
+        parallelize_module(self.wk, device_mesh, ColwiseParallel())
+        parallelize_module(self.wv, device_mesh, ColwiseParallel())
+        parallelize_module(self.wo, device_mesh, RowwiseParallel(output_layouts=Shard(1)))
+        # TODO: enable kv cache in distributed case
+        self.kv_cache = None
+
     def forward(
         self,
         x: Tensor,
@@ -350,6 +427,10 @@ class Attention(nn.Module):
         mask: Tensor,
         input_pos: Optional[Tensor] = None,
     ) -> Tensor:
+        # Gather sequence back in case of sequence parallelism before attention
+        if isinstance(x, DTensor):
+            x = x.redistribute(self.device_mesh, [Replicate()])
+
         bsz, seqlen, _ = x.shape
 
         q = self.wq(x)
@@ -358,9 +439,15 @@ class Attention(nn.Module):
         # kv_size = self.n_local_heads * self.head_dim
         # q, k, v = self.wqkv(x).split([self.dim, kv_size, kv_size], dim=-1)
 
-        q = q.view(bsz, seqlen, self.n_heads, self.head_dim)
-        k = k.view(bsz, seqlen, self.n_local_heads, self.head_dim)
-        v = v.view(bsz, seqlen, self.n_local_heads, self.head_dim)
+        # Giving "-1" to view ops so that they infer the correct number of heads
+        # from the input tensor.  This is done to support both TP and non-TP
+        # cases where the former would divide n_heads by tp_degree.
+        # -1 = self.n_heads
+        q = q.view(bsz, seqlen, -1, self.head_dim)
+        # -1 = self.n_local_heads
+        k = k.view(bsz, seqlen, -1, self.head_dim)
+        # -1 = self.n_local_heads
+        v = v.view(bsz, seqlen, -1, self.head_dim)
 
         q = apply_rotary_emb(q, freqs_cis)
         k = apply_rotary_emb(k, freqs_cis)
@@ -374,7 +461,8 @@ class Attention(nn.Module):
         v = v.repeat_interleave(self.n_heads // self.n_local_heads, dim=1)
         y = F.scaled_dot_product_attention(q, k, v, attn_mask=mask, dropout_p=0.0)
 
-        y = y.transpose(1, 2).contiguous().view(bsz, seqlen, self.dim)
+        # -1 = self.dim
+        y = y.transpose(1, 2).contiguous().view(bsz, seqlen, -1)
 
         y = self.wo(y)
         return y
@@ -387,7 +475,17 @@ class FeedForward(nn.Module):
         self.w2 = nn.Linear(config.hidden_dim, config.dim, bias=False)
         self.w3 = nn.Linear(config.dim, config.hidden_dim, bias=False)
 
+    def distribute(self, device_mesh: DeviceMesh):
+        self.device_mesh = device_mesh
+        parallelize_module(self.w1, device_mesh, ColwiseParallel())
+        parallelize_module(self.w2, device_mesh, RowwiseParallel(output_layouts=Shard(1)))
+        parallelize_module(self.w3, device_mesh, ColwiseParallel())
+
     def forward(self, x: Tensor) -> Tensor:
+        # Gather sequence back in case of sequence parallelism
+        if isinstance(x, DTensor):
+            x = x.redistribute(self.device_mesh, [Replicate()])
+
         return self.w2(F.silu(self.w1(x)) * self.w3(x))
 
 

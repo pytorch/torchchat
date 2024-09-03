@@ -19,8 +19,7 @@ from distributed.safetensor_utils import (
 )
 from distributed.utils import Color as color
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
-from torchchat.model import ModelArgs
-from torchchat.model_dist import Transformer
+from torchchat.model import ModelArgs, Transformer
 
 logger = setup_logging(__name__)
 
@@ -138,6 +137,10 @@ def main():
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
     _load_model_weights(model, hf_model_name, device=device, model_config=config)
 
+    # Setup input position
+    # input_pos for prefill: a list of increasing integers from 0 to seqlen
+    input_pos = torch.arange(seqlen, device=device)
+    model.setup_input_pos(input_pos)
     model.eval()
 
     logger.info(f"Creating pipeline stage {pp_rank=}, {pp_degree=}")
