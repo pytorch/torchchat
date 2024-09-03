@@ -665,7 +665,11 @@ class Generator:
                 )
 
             if self.builder_args.device == "cpu":
-                kwargs = {"mode": "max-autotune"} if generator_args.max_autotune else {}
+                if generator_args.max_autotune:
+                    kwargs = {"mode": "max-autotune"}
+                    torch._inductor.config.trace.log_autotuning_results = True
+                else:
+                    kwargs = {}
             else:
                 kwargs = {"mode": "reduce-overhead"}
 
