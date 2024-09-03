@@ -75,18 +75,30 @@ def main():
         raise ValueError(f"Config file not found for model id {hf_model_name}")
     logger.info(f"Using HF model weights from {hf_model_name}")
 
-    mesh_dimensions = (2, 2)
-    device_mesh = _create_device_mesh(mesh_dimensions)
+    # Assuming 2 pipeline stages, feel free to change this as long as the
+    # asserts are satisfied
+    pp_degree = 2
+    assert world_size % pp_degree == 0
+    assert config.n_layers % pp_degree == 0
 
+    # Sequence parallel is enabled in this program
+    # Sequence parallel = Tensor parallel + dividing sequence by tp_degree at layer boundary
+    sp_degree = world_size // pp_degree
+
+    # Create device mesh
+    mesh_dimensions = (pp_degree, sp_degree)
+    device_mesh = _create_device_mesh(mesh_dimensions)
     tp_mesh = device_mesh["tp"]
     pp_mesh = device_mesh["pp"]
+    tp_rank = tp_mesh.get_local_rank()
     pp_rank = pp_mesh.get_local_rank()
-    nstages = pp_mesh.size()
-    device = torch.device(f"cuda:{rank}")
+
+    # Assuming same number of GPUs per node
+    device = torch.device(f"cuda:{rank % torch.cuda.device_count()}")
 
     # Fill in PP configs
     config.stage_idx = pp_rank
-    config.n_stages = nstages
+    config.n_stages = pp_degree
 
     with device:
         model = Transformer(config)
@@ -104,9 +116,10 @@ def main():
     batch_size = mbs * mb_size  # total batch size
     seqlen = 4096  # sequence length
     dim = 4096  # embedding dimension
+    assert seqlen % sp_degree == 0
 
     mb_ids = torch.randint(0, config.vocab_size, (mb_size, seqlen), device=device)
-    activation = torch.rand(mb_size, seqlen, dim, device=device, dtype=model_dtype)
+    activation = torch.rand(mb_size, seqlen // sp_degree, dim, device=device, dtype=model_dtype)
     example_args = mb_ids if pp_rank == 0 else activation
 
     # Load weights
@@ -115,11 +128,11 @@ def main():
 
     model.eval()
 
-    logger.info(f"Creating pipeline stage {pp_rank=}, {nstages=}")
+    logger.info(f"Creating pipeline stage {pp_rank=}, {pp_degree=}")
     stage = PipelineStage(
         model,
         pp_rank,
-        nstages,
+        pp_degree,
         device,
         input_args=(example_args,),
         group=pp_mesh.get_group(),
@@ -152,7 +165,9 @@ def main():
             schedule.step(input_ids)
         else:
             output = schedule.step()
-            logger.info(f"Output: {output}")
+
+    if pp_rank == pp_degree - 1 and tp_rank == 0:
+        logger.info(f"Output: {output}")
 
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
