@@ -25,15 +25,43 @@ from torchtune.modules.model_fusion import DeepFusionModel
 
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
 
-
 class ModelType(Enum):
     TextOnly = "text_only"
     Flamingo = "flamingo"
 
 
-class ModelSource(Enum):
-    Native = "native"
-    Torchtune = "torchtune"
+@dataclass
+class ModelRecipe:
+    model_type: ModelType
+    modules: dict
+    fusion_class: torch.nn.Module
+
+    @classmethod
+    def text_only(cls):
+        return cls(
+            model_type=ModelType.TextOnly,
+            modules={'text_transformer': Transformer},
+            fusion_class=nn.Identity,
+        )
+    @classmethod
+    def flamingo(cls):
+        return cls(
+            model_type=ModelType.Flamingo,
+            modules={
+                'encoder': flamingo_vision_encoder,
+                'decoder': flamingo_decoder
+            },
+            fusion_class=DeepFusionModel,
+        )
+    
+    @classmethod
+    def get_recipe(cls, model_type):
+        if model_type == ModelType.TextOnly:
+            return cls.text_only()
+        elif model_type == ModelType.Flamingo:
+            return cls.flamingo()
+        else:
+            raise ValueError(f"Can not find the model recipe for {model_type}")
 
 @dataclass
 class TransformerArgs:
@@ -83,19 +111,16 @@ class TransformerArgs:
 
 @dataclass
 class ModelArgs:
-    model_source: ModelSource
     model_type: ModelType
     transformer_args: Dict[str, Union[Dict, TransformerArgs]]
 
     def __init__(
         self,
         transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
-        model_source: ModelSource = ModelSource.Native,
         model_type: ModelType = ModelType.TextOnly,
     ) -> None:
-        self._sanity_check(transformer_args, model_source, model_type)
+        self._sanity_check(transformer_args, model_type)
         
-        self.model_source = model_source
         self.model_type = model_type
         if isinstance(transformer_args, TransformerArgs):
             self.transformer_args = {"text": transformer_args}
@@ -105,11 +130,8 @@ class ModelArgs:
     def _sanity_check(
         self,
         transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
-        model_source: ModelSource,
         model_type: ModelType,
     ) -> None:
-
-        assert isinstance(model_source, ModelSource)
         assert isinstance(model_type, ModelType)
         assert isinstance(transformer_args, (TransformerArgs, dict))
 
@@ -122,18 +144,16 @@ class ModelArgs:
             # try to interpret as a single transformer config
             transformer_args: Dict[str, TransformerArgs] = {}
             transformer_args["text"] = TransformerArgs.from_params(loaded_params)
-            model_source = ModelSource.Native
             model_type = ModelType.TextOnly
         except TypeError:
             # try to interpret as a dict of transformer configs
-            model_source = ModelSource(loaded_params["model_source"])
             model_type = ModelType(loaded_params["model_type"])
 
             # now only support flamingo model
-            assert model_source == ModelSource.Torchtune and model_type == ModelType.Flamingo
-            transformer_args = {k: v for k, v in loaded_params.items() if k != "model_source" and k != "model_type"}
+            assert model_type == ModelType.Flamingo
+            transformer_args = {k: v for k, v in loaded_params.items() if k != "model_type"}
 
-        return cls(transformer_args, model_source, model_type)
+        return cls(transformer_args, model_type)
 
     @classmethod
     def from_table(cls, name: str):
@@ -214,26 +234,19 @@ class Model(nn.Module):
     def __init__(self, config: ModelArgs) -> None:
         super().__init__()
         self.config = config
-        if config.model_source == ModelSource.Native:
-            assert (
-                config.model_type == ModelType.TextOnly
-            ), "only text-only model is supported natively. For Flamingo, use torchtune"
+        # TODO: unify the model init logic
+        if config.model_type == ModelType.TextOnly:
             self.text_transformer = Transformer(config.transformer_args["text"])
         else:
-            assert config.model_source == ModelSource.Torchtune
-            assert config.model_type == ModelType.Flamingo, "currently only Flamingo model is supported from torchtune"
-
-            assert "encoder" in config.transformer_args and "decoder" in config.transformer_args, "config is missing essential transformer args for Flamingo model"
-            encoder = flamingo_vision_encoder(
-                **config.transformer_args["encoder"]
-            )
-            decoder = flamingo_decoder(
-                **config.transformer_args["decoder"]
-            )
-            self.model = DeepFusionModel(
-                encoder=encoder,
-                decoder=decoder,
-            )
+            self.model = self.build_model()
+    
+    def build_model(self):
+        recipe = ModelRecipe.get_recipe(self.config.model_type)
+        modules = {}
+        for name, module_class in recipe.modules.items():
+            modules[name] = module_class(**self.config.transformer_args[name])
+        
+        return recipe.fusion_class(**modules)
 
     def forward(self, idx: Tensor, imgs: Optional[Tensor] = None, aspect_ratio: Optional[Tensor] = None, input_pos: Optional[Tensor] = None) -> Tensor:
         if self.config.model_type == ModelType.TextOnly:
