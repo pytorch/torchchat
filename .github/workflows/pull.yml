@@ -722,13 +722,13 @@ jobs:
         run: |
           mkdir gguf_files
           wget -O gguf_files/TinyLlama-1.1B-openorca.Q4_0.gguf "https://huggingface.co/TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF/resolve/main/tinyllama-1.1b-1t-openorca.Q4_0.gguf?download=true"
-          ./llama.cpp/llama-quantize --allow-requantize gguf_files/TinyLlama-1.1B-openorca.Q4_0.gguf gguf_files/TinyLlama-1.1B-openorca.Q4_0.gguf.requant_F32.gguf F32
+          ./llama.cpp/llama-quantize --allow-requantize gguf_files/TinyLlama-1.1B-openorca.Q4_0.gguf gguf_files/TinyLlama-1.1B-openorca.Q4_0.requant_F32.gguf F32
 
       - name: Load files
         run: |
           touch test.py
           echo "from torchchat.utils.gguf_loader import test_by_to_float" >> test.py
-          echo "test_by_to_float(\"gguf_files/TinyLlama-1.1B-openorca.Q4_0.gguf\", \"gguf_files/TinyLlama-1.1B-openorca.Q4_0.Q4_0.requant_F32.gguf\")" >> test.py
+          echo "test_by_to_float(\"gguf_files/TinyLlama-1.1B-openorca.Q4_0.gguf\", \"gguf_files/TinyLlama-1.1B-openorca.Q4_0.requant_F32.gguf\")" >> test.py
           cat test.py
           python test.py
 
