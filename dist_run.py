@@ -21,7 +21,8 @@ from distributed.utils import Color as color
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 from torchchat.model import ModelArgs
 from torchchat.model_dist import Transformer
-from torchchat.utils.build_utils import get_precision
+
+logger = setup_logging(__name__)
 
 MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
@@ -41,8 +42,11 @@ def _create_device_mesh(mesh_dimensions):
     return dist.init_device_mesh("cuda", mesh_dimensions, mesh_dim_names=("pp", "tp"))
 
 
-def _load_model_weights(stage_module, hf_model_name, device, logger, model_config):
-    """load the weights from the safetensor file into the model stage"""
+def _load_model_weights(stage_module, hf_model_name, device, model_config):
+    """Load the weights from the safetensor file(s) into the model stage.
+    Model config is needed b/c we permute wq and wk weights based on attn heads.
+    """
+
     weight_map, weight_path, key_map = get_hf_weight_map_and_path(hf_model_name)
 
     num_loaded_weights, num_missing_weights = load_safetensor_weights(
@@ -67,7 +71,6 @@ def _cleanup():
 
 def main():
     rank, world_size = _init_distributed()
-    logger = setup_logging(__name__)
 
     config = ModelArgs.from_name(MODEL_NAME).text_transformer_args
     logger.info(f"Chat Model Config: {config}")
@@ -126,14 +129,14 @@ def main():
     assert seqlen % sp_degree == 0
 
     mb_ids = torch.randint(0, config.vocab_size, (mb_size, seqlen), device=device)
-    activation = torch.rand(mb_size, seqlen // sp_degree, dim, device=device, dtype=model_dtype)
+    activation = torch.rand(
+        mb_size, seqlen // sp_degree, dim, device=device, dtype=model_dtype
+    )
     example_args = mb_ids if pp_rank == 0 else activation
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    _load_model_weights(
-        model, hf_model_name, device=device, logger=logger, model_config=config
-    )
+    _load_model_weights(model, hf_model_name, device=device, model_config=config)
 
     model.eval()
 
