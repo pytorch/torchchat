@@ -8,7 +8,8 @@
 # torchrun --nproc-per-node 4 dist_run.py
 import torch
 import torch.distributed as dist
-from distributed.dtensor_utils import find_cpu_tensors
+
+from distributed.verification_utils import find_cpu_tensors
 from distributed.logging_utils import setup_logging
 
 # TODO - these are not distributed specific, consider moving to new package
