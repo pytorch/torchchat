@@ -24,10 +24,12 @@ from torch.distributed.tensor.parallel import (
 )
 from torch.nn import functional as F
 
-from torchchat.utils.build_utils import find_multiple, get_precision
+from torchchat.utils.build_utils import find_multiple, get_precision, set_precision
 
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
 
+from distributed.logging_utils import setup_logging
+logger = setup_logging(__name__)
 
 @dataclass
 class TransformerArgs:
@@ -71,6 +73,7 @@ class TransformerArgs:
 
     @classmethod
     def from_params(cls, params):
+        logger.info(f"Rope params from params: {params}")
         replace = [("rope_theta", "rope_base"), ("n_kv_heads", "n_local_heads")]
         for _from, _to in replace:
             if _from in params:
@@ -248,6 +251,7 @@ class Transformer(nn.Module):
         self.seq_parallel_degree = 1
 
     def setup_caches(self, max_batch_size, max_seq_length):
+        
         if (
             self.max_seq_length >= max_seq_length
             and self.max_batch_size >= max_batch_size
@@ -268,7 +272,15 @@ class Transformer(nn.Module):
             self.config.rope_base,
             use_scaled=self.config.use_scaled_rope,
         )
+        logger.info(f"freqs_cis shape: {freqs_cis.shape}")
+        logger.info(f"freqs_cis dtype: {freqs_cis.dtype}")
+        logger.info(f"freqs_cis first slice: {freqs_cis[0][0:5]=}")
+        #logger.info(f"freqs_cis last slice: {freqs_cis[-1]=}")
+        logger.info(f"freqs_cis last slice: {freqs_cis[1][0:5]=}")
+        # assert False, "check freqs_cis"
+
         self.register_buffer("freqs_cis", freqs_cis, persistent=True)
+
         causal_mask = torch.tril(
             torch.ones(self.max_seq_length, self.max_seq_length, dtype=torch.bool)
         )

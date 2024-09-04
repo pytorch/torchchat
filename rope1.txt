@@ -1,0 +1,7 @@
+[rank0]:known configs: ['13B', '30B', '34B', '70B', '7B', 'CodeLlama-7b-Python-hf', 'Meta-Llama-3-70B', 'Meta-Llama-3-8B', 'Meta-Llama-3.1-70B', 'Meta-Llama-3.1-8B', 'Mistral-7B', 'stories110M', 'stories15M', 'stories42M']
+[rank2]:known configs: ['13B', '30B', '34B', '70B', '7B', 'CodeLlama-7b-Python-hf', 'Meta-Llama-3-70B', 'Meta-Llama-3-8B', 'Meta-Llama-3.1-70B', 'Meta-Llama-3.1-8B', 'Mistral-7B', 'stories110M', 'stories15M', 'stories42M']
+[rank1]:known configs: ['13B', '30B', '34B', '70B', '7B', 'CodeLlama-7b-Python-hf', 'Meta-Llama-3-70B', 'Meta-Llama-3-8B', 'Meta-Llama-3.1-70B', 'Meta-Llama-3.1-8B', 'Mistral-7B', 'stories110M', 'stories15M', 'stories42M']
+[rank3]:known configs: ['13B', '30B', '34B', '70B', '7B', 'CodeLlama-7b-Python-hf', 'Meta-Llama-3-70B', 'Meta-Llama-3-8B', 'Meta-Llama-3.1-70B', 'Meta-Llama-3.1-8B', 'Mistral-7B', 'stories110M', 'stories15M', 'stories42M']
+[rank0]:NCCL version 2.21.5+cuda12.4
+[rank2]:NCCL version 2.21.5+cuda12.4
+[rank1]:NCCL version 2.21.5+cuda12.4

@@ -21,6 +21,9 @@ from distributed.safetensor_utils import (
 from distributed.utils import Color as color
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 from torchchat.model import ModelArgs, Transformer
+from torchchat.utils.build_utils import set_precision
+
+from transformers import AutoTokenizer
 
 logger = setup_logging(__name__)
 
@@ -28,6 +31,7 @@ MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
     "Transformer-2-7b-chat-hf": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
 }
+CACHE_PRECISION = torch.bfloat16
 
 
 def _init_distributed():
@@ -37,6 +41,15 @@ def _init_distributed():
     torch.cuda.set_device(rank)
     return rank, world_size
 
+
+def _get_tokenizer(hf_model_name, logger):
+    """Load tokenizer from HF model id.  TODO - use torchchat tokenizer?"""
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
+    assert tokenizer is not None, f"Failed to load tokenizer for {hf_model_name}"
+    logger.info(f"Loaded tokenizer for {hf_model_name}")
+    tokenizer.pad_token = tokenizer.eos_token
+    return tokenizer
 
 def _create_device_mesh(mesh_dimensions):
     return dist.init_device_mesh("cuda", mesh_dimensions, mesh_dim_names=("pp", "tp"))
@@ -79,11 +92,17 @@ def main():
 
     hf_model_name, model_dtype = NAME_TO_HF_MODEL_ID_AND_DTYPE[MODEL_NAME]
     logger.info(f"Using HF model weights from {hf_model_name} and dtype {model_dtype}")
+    set_precision(CACHE_PRECISION)
+    logger.info(f"Using cache precision {CACHE_PRECISION}")
 
     hf_config = get_hf_config_file(hf_model_name)
     if hf_config is None:
         raise ValueError(f"Config file not found for model id {hf_model_name}")
     logger.info(f"Using HF model weights from {hf_model_name}")
+
+
+    tokenizer = _get_tokenizer(hf_model_name, logger)
+    logger.info(f"Using HF tokenizer from {hf_model_name}")
 
     # Assuming 2 pipeline stages, feel free to change this as long as the
     # asserts are satisfied
@@ -112,16 +131,22 @@ def main():
 
     with device:
         model = Transformer(config)
-
+    
+    
     model.setup_caches(1, 4096)
+
+    for name, buffer in model.named_buffers(recurse=True):
+        logger.info(f"{name=}, {buffer.shape=}, {buffer.dtype=}")
+    #assert False, "Stop here"
+
     # TODO: refine this .to once we start using fp8 for KV cache
-    model = model.to(model_dtype)
+    # model = model.to(model_dtype)
 
     # Distribute model on TP mesh
     model.distribute(tp_mesh)
-    logger.info(f"Model: {model}")
+    #logger.info(f"Model: {model}")
 
-    mbs = 2  # number of micro-batches
+    mbs = 1  # number of micro-batches
     mb_size = 1  # micro-batch size
     batch_size = mbs * mb_size  # total batch size
     seqlen = 4096  # sequence length
@@ -173,6 +198,16 @@ def main():
     input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
     logger.info(f"Input: {input_ids.dtype=}, {input_ids.shape=}, {input_ids.device=}")
 
+    full_batch_prompts = (
+        "What is Snow?"#,"How do you", #"I like to", "Can I help", "You need to",
+        #"The weather is", "I found a", "What is your", "You are so",
+    )  # full batch size = 8
+    torch.set_printoptions(threshold=30, edgeitems=10)
+    inputs = tokenizer(full_batch_prompts,padding="max_length", max_length=seqlen, return_tensors="pt",).to(device)
+    input_ids = inputs["input_ids"]
+    logger.info(f"Input: {input_ids.dtype=}, {input_ids[0:10]=}")
+    
+
     schedule = ScheduleGPipe(stage, mbs)
     logger.info(f"Created schedule: {schedule}")
 
@@ -183,7 +218,18 @@ def main():
             output = schedule.step()
 
     if pp_rank == pp_degree - 1 and tp_rank == 0:
-        logger.info(f"Output: {output}")
+        # logger.info(f"Output: {output}")
+    
+    # Decode
+    # if output is not None:
+        logger.info(f"Output: {output.shape=}")
+        next_token_logits = output[:, -1, :]
+        full_batch_logits = output[:, 0:-1, :]
+        logger.info(f"{next_token_logits.shape=}")
+        next_token = torch.argmax(next_token_logits, dim=-1)
+        next_full_batch = torch.argmax(full_batch_logits, dim=-1)
+        logger.info(f"{next_token=}, {(tokenizer.batch_decode(next_token))}")
+        logger.info(f"{full_batch_logits=}, {(tokenizer.batch_decode(next_full_batch))}")
 
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
