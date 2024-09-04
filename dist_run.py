@@ -8,6 +8,7 @@
 # torchrun --nproc-per-node 4 dist_run.py
 import torch
 import torch.distributed as dist
+
 from distributed.verification_utils import find_cpu_tensors
 from distributed.logging_utils import setup_logging
 
@@ -19,8 +20,9 @@ from distributed.safetensor_utils import (
 )
 from distributed.utils import Color as color
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
-from torchchat.model import ModelArgs
-from torchchat.model_dist import TransformerStage
+from torchchat.model import ModelArgs, Transformer
+
+logger = setup_logging(__name__)
 
 MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
@@ -40,10 +42,20 @@ def _create_device_mesh(mesh_dimensions):
     return dist.init_device_mesh("cuda", mesh_dimensions, mesh_dim_names=("pp", "tp"))
 
 
-def _load_model_weights(stage_module, hf_model_name, device, logger):
+def _load_model_weights(stage_module, hf_model_name, device, model_config):
+    """Load the weights from the safetensor file(s) into the model stage.
+    Model config is needed b/c we permute wq and wk weights based on attn heads.
+    """
+
     weight_map, weight_path, key_map = get_hf_weight_map_and_path(hf_model_name)
+
     num_loaded_weights, num_missing_weights = load_safetensor_weights(
-        stage_module, weight_map, weight_path, key_map, device
+        stage_module,
+        weight_map,
+        weight_path,
+        key_map,
+        device,
+        model_config=model_config,
     )
     logger.info(
         f"Success - Loaded {num_loaded_weights} weights, {num_missing_weights} missing weights"
@@ -59,7 +71,6 @@ def _cleanup():
 
 def main():
     rank, world_size = _init_distributed()
-    logger = setup_logging(__name__)
 
     config = ModelArgs.from_name(MODEL_NAME).text_transformer_args
     logger.info(f"Chat Model Config: {config}")
@@ -74,21 +85,40 @@ def main():
         raise ValueError(f"Config file not found for model id {hf_model_name}")
     logger.info(f"Using HF model weights from {hf_model_name}")
 
-    mesh_dimensions = (2, 2)
-    device_mesh = _create_device_mesh(mesh_dimensions)
+    # Assuming 2 pipeline stages, feel free to change this as long as the
+    # asserts are satisfied
+    pp_degree = 2
+    assert world_size % pp_degree == 0
+    assert config.n_layers % pp_degree == 0
 
+    # Sequence parallel is enabled in this program
+    # Sequence parallel = Tensor parallel + dividing sequence by tp_degree at layer boundary
+    sp_degree = world_size // pp_degree
+
+    # Create device mesh
+    mesh_dimensions = (pp_degree, sp_degree)
+    device_mesh = _create_device_mesh(mesh_dimensions)
     tp_mesh = device_mesh["tp"]
     pp_mesh = device_mesh["pp"]
+    tp_rank = tp_mesh.get_local_rank()
     pp_rank = pp_mesh.get_local_rank()
-    nstages = pp_mesh.size()
-    device = torch.device(f"cuda:{rank}")
+
+    # Assuming same number of GPUs per node
+    device = torch.device(f"cuda:{rank % torch.cuda.device_count()}")
+
+    # Fill in PP configs
+    config.stage_idx = pp_rank
+    config.n_stages = pp_degree
 
     with device:
-        with tp_mesh:
-            model = TransformerStage(config, pp_rank, nstages)
-            model.setup_caches(1, 4096)
-            # TODO: refine this .to once we start using fp8 for KV cache
-            model = model.to(model_dtype)
+        model = Transformer(config)
+
+    model.setup_caches(1, 4096)
+    # TODO: refine this .to once we start using fp8 for KV cache
+    model = model.to(model_dtype)
+
+    # Distribute model on TP mesh
+    model.distribute(tp_mesh)
     logger.info(f"Model: {model}")
 
     mbs = 2  # number of micro-batches
@@ -96,22 +126,29 @@ def main():
     batch_size = mbs * mb_size  # total batch size
     seqlen = 4096  # sequence length
     dim = 4096  # embedding dimension
+    assert seqlen % sp_degree == 0
 
     mb_ids = torch.randint(0, config.vocab_size, (mb_size, seqlen), device=device)
-    activation = torch.rand(mb_size, seqlen, dim, device=device, dtype=model_dtype)
+    activation = torch.rand(
+        mb_size, seqlen // sp_degree, dim, device=device, dtype=model_dtype
+    )
     example_args = mb_ids if pp_rank == 0 else activation
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    _load_model_weights(model, hf_model_name, device=device, logger=logger)
+    _load_model_weights(model, hf_model_name, device=device, model_config=config)
 
+    # Setup input position
+    # input_pos for prefill: a list of increasing integers from 0 to seqlen
+    input_pos = torch.arange(seqlen, device=device)
+    model.setup_input_pos(input_pos)
     model.eval()
 
-    logger.info(f"Creating pipeline stage {pp_rank=}, {nstages=}")
+    logger.info(f"Creating pipeline stage {pp_rank=}, {pp_degree=}")
     stage = PipelineStage(
         model,
         pp_rank,
-        nstages,
+        pp_degree,
         device,
         input_args=(example_args,),
         group=pp_mesh.get_group(),
@@ -144,7 +181,9 @@ def main():
             schedule.step(input_ids)
         else:
             output = schedule.step()
-            logger.info(f"Output: {output}")
+
+    if pp_rank == pp_degree - 1 and tp_rank == 0:
+        logger.info(f"Output: {output}")
 
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
