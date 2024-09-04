@@ -119,7 +119,7 @@ def main():
         model = Transformer(config)
 
     model.setup_caches(1, 4096)
-    
+
     # Distribute model on TP mesh
     model.distribute(tp_mesh)
     logger.info(f"Model: {model}")
