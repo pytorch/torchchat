@@ -866,7 +866,7 @@ ao_quantizer_class_dict = {
 def main(args: Namespace):
     from argparse import Namespace
     from torchchat.cli.builder import (
-        _load_model,
+        _initialize_model,
         _initialize_tokenizer,
         BuilderArgs,
         TokenizerArgs,
@@ -876,16 +876,17 @@ def main(args: Namespace):
     builder_args: BuilderArgs = BuilderArgs.from_args(args)
 
     print(f"Using device={builder_args.device}")
-    set_precision(builder_args.precision)
+    # set_precision(builder_args.precision)
 
     tokenizer_args: TokenizerArgs = TokenizerArgs.from_args(args)
     tokenizer = _initialize_tokenizer(tokenizer_args)
 
-    model = _load_model(builder_args)
+    model = _initialize_model(builder_args, args.quantize, tokenizer, builder_args.max_seq_length)
     quantize_model(
         model,
         builder_args.device,
         args.quantize,
         tokenizer,
     )
+    model.to(dtype=builder_args.precision)
     torch.save(model.state_dict(), "quantized_model.pt")

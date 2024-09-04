@@ -136,7 +136,7 @@ def _add_model_config_args(parser, verb: str) -> None:
         "Model Configuration", "Specify model configurations"
     )
 
-    if verb != "export":
+    if verb not in {"export", "quantize"} :
         model_config_parser.add_argument(
             "--compile",
             action="store_true",
@@ -159,8 +159,8 @@ def _add_model_config_args(parser, verb: str) -> None:
         type=str,
         default="{ }",
         help=(
-            'Quantization options. pass in as \'{"<mode>" : {"<argname1>" : <argval1>, "<argname2>" : <argval2>,...},}\' '
-            + "modes are: embedding, linear:int8, linear:int4, linear:a8w4dq, precision."
+            'Quantization options, passed in as a json file or string. See torchchat/quant_config for examples. ' 
+            + "Modes are: embedding, linear:int8, linear:int4, linear:a8w4dq, precision."
         ),
     )
     model_config_parser.add_argument(
@@ -203,7 +203,7 @@ def _add_export_args(parser) -> None:
         "--max-seq-length",
         type=int,
         default=None,
-        help="Set maximum length sequence when before calling torch.export",
+        help="Set maximum length sequence when creating the model",
     )
 
 
