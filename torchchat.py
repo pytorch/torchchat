@@ -37,6 +37,7 @@ if __name__ == "__main__":
         "chat": "Chat interactively with a model via the CLI",
         "generate": "Generate responses from a model given a prompt",
         "browser": "Chat interactively with a model in a locally hosted browser",
+        "quantize": "Quantize a model and save to a file",
         "export": "Export a model artifact to AOT Inductor or ExecuTorch",
         "download": "Download model artifacts",
         "list": "List all supported models",
@@ -81,6 +82,11 @@ if __name__ == "__main__":
         from torchchat.generate import main as generate_main
 
         generate_main(args)
+    elif args.command == "quantize":
+        check_args(args, "quantize")
+        from torchchat.utils.quantize import main as quantize_main
+
+        quantize_main(args)
     elif args.command == "eval":
         from torchchat.usages.eval import main as eval_main
 

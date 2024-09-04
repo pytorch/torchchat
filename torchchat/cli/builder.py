@@ -518,6 +518,13 @@ def _initialize_model(
         with measure_time("Time to load model: {time:.02f} seconds"):
             model = _load_model(builder_args)
             device_sync(device=builder_args.device)
+        
+        print("Loading quantized state_dict")
+        from torchao.dtypes import AffineQuantizedTensor
+        from torchao.dtypes.affine_quantized_tensor import TensorCoreTiledAQTLayout, TensorCoreTiledLayoutType
+        from torchao.quantization.quant_primitives import ZeroPointDomain
+        torch.serialization.add_safe_globals([AffineQuantizedTensor, TensorCoreTiledAQTLayout, TensorCoreTiledLayoutType, ZeroPointDomain])
+        model.load_state_dict(torch.load("quantized_model.pt", weights_only=True), assign=True)
 
         if quantize:
             print(f"Quantizing the model with: {quantize}")

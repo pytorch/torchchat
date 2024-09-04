@@ -861,3 +861,31 @@ ao_quantizer_class_dict = {
     "linear:int4": Int4WeightOnlyQuantizer,
     "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
 }
+
+
+def main(args: Namespace):
+    from argparse import Namespace
+    from torchchat.cli.builder import (
+        _load_model,
+        _initialize_tokenizer,
+        BuilderArgs,
+        TokenizerArgs,
+    )
+    from torchchat.utils.build_utils import set_precision
+
+    builder_args: BuilderArgs = BuilderArgs.from_args(args)
+
+    print(f"Using device={builder_args.device}")
+    set_precision(builder_args.precision)
+
+    tokenizer_args: TokenizerArgs = TokenizerArgs.from_args(args)
+    tokenizer = _initialize_tokenizer(tokenizer_args)
+
+    model = _load_model(builder_args)
+    quantize_model(
+        model,
+        builder_args.device,
+        args.quantize,
+        tokenizer,
+    )
+    torch.save(model.state_dict(), "quantized_model.pt")
