@@ -21,6 +21,7 @@ from distributed.safetensor_utils import (
 from distributed.utils import Color as color
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 from torchchat.model import ModelArgs, Transformer
+from torchchat.utils.build_utils import set_precision
 
 logger = setup_logging(__name__)
 
@@ -28,6 +29,7 @@ MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
     "Transformer-2-7b-chat-hf": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
 }
+CACHE_PRECISION = torch.bfloat16
 
 
 def _init_distributed():
@@ -80,6 +82,9 @@ def main():
     hf_model_name, model_dtype = NAME_TO_HF_MODEL_ID_AND_DTYPE[MODEL_NAME]
     logger.info(f"Using HF model weights from {hf_model_name} and dtype {model_dtype}")
 
+    set_precision(CACHE_PRECISION)
+    logger.info(f"Using cache precision {CACHE_PRECISION}")
+
     hf_config = get_hf_config_file(hf_model_name)
     if hf_config is None:
         raise ValueError(f"Config file not found for model id {hf_model_name}")
@@ -114,8 +119,6 @@ def main():
         model = Transformer(config)
 
     model.setup_caches(1, 4096)
-    # TODO: refine this .to once we start using fp8 for KV cache
-    model = model.to(model_dtype)
 
     # Distribute model on TP mesh
     model.distribute(tp_mesh)
