@@ -25,9 +25,10 @@ from torchchat.utils.build_utils import set_precision
 
 logger = setup_logging(__name__)
 
-MODEL_NAME = "Transformer-2-7b-chat-hf"
+MODEL_NAME = "Meta-Llama-3-8B"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
     "Transformer-2-7b-chat-hf": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
+    "Meta-Llama-3-8B": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16),
 }
 CACHE_PRECISION = torch.bfloat16
 
@@ -76,8 +77,7 @@ def main():
 
     config = ModelArgs.from_name(MODEL_NAME).text_transformer_args
     logger.info(f"Chat Model Config: {config}")
-    # TODO - should we make this work...atm returns float32
-    # torchchat_precision = get_precision()
+    
 
     hf_model_name, model_dtype = NAME_TO_HF_MODEL_ID_AND_DTYPE[MODEL_NAME]
     logger.info(f"Using HF model weights from {hf_model_name} and dtype {model_dtype}")
