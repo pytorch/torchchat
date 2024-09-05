@@ -29,7 +29,8 @@ from torchchat.cli.cli import add_arguments_for_verb, arg_init, check_args
 from torchchat.model import Model
 from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
-
+from distributed.logging_utils import setup_logging
+logger = setup_logging(__name__)
 
 class _ChatFormatter(ABC):
     def __init__(self, tokenizer):
@@ -53,6 +54,7 @@ class Llama3ChatFormatter(_ChatFormatter):
         tokens.extend(self.tokenizer.encode(role, bos=False, eos=False))
         tokens.append(self.tokenizer.special_tokens["<|end_header_id|>"])
         tokens.extend(self.tokenizer.encode("\n\n", bos=False, eos=False))
+        logger.info(f"header: {tokens=}")
         return tokens
 
     def encode_message(self, message) -> List[int]:
@@ -61,6 +63,7 @@ class Llama3ChatFormatter(_ChatFormatter):
             self.tokenizer.encode(message["content"].strip(), bos=False, eos=False)
         )
         tokens.append(self.tokenizer.special_tokens["<|eot_id|>"])
+        logger.info(f"message: {tokens=}")
         return tokens
 
     def encode_dialog_prompt(self, dialog) -> List[int]:
@@ -70,6 +73,7 @@ class Llama3ChatFormatter(_ChatFormatter):
             tokens.extend(self.encode_message(message))
         # Add the start of an assistant message for the model to complete.
         tokens.extend(self.encode_header("assistant"))  # Pass role directly as a string
+        logger.info(f"dialog prompt: {tokens=}")
         return tokens
 
 
@@ -209,6 +213,7 @@ class Generator:
         print(
             f"Using device={self.builder_args.device} {get_device_info(self.builder_args.device)}"
         )
+        logger.info(f"setting precision to {builder_args.precision=}")
         set_precision(self.builder_args.precision)
         if builder_args.use_distributed:
             device = torch.device(f"cuda:{int(os.environ['LOCAL_RANK'])}")
@@ -228,6 +233,8 @@ class Generator:
             # fmt: on
             # raise RuntimeError("You need to use --is-chat-model to indicate model has chat support.")
         self.system_prompt = generator_args.prompt
+        logger.info(f"{self.tokenizer_args=}")
+        
         self.tokenizer = _initialize_tokenizer(self.tokenizer_args)
 
         # Right now the assumption is only llama3 uses tiktokenizer and it
@@ -244,6 +251,7 @@ class Generator:
             if self.is_llama3_model
             else Llama2ChatFormatter(self.tokenizer)
         )
+
 
         self.builder_args.setup_caches = False
         self.model = _initialize_model(self.builder_args, self.quantize, self.tokenizer)
@@ -310,19 +318,20 @@ class Generator:
         sequential_prefill=True,
         **sampling_kwargs,
     ) -> torch.Tensor:
-        # logging.debug(f"x: {x}, input_pos: {input_pos}")
+        logger.debug(f"x: {x}, input_pos: {input_pos}")
         width = x.size(1)
         assert input_pos.size(0) == width
 
         if sequential_prefill:
             for i in range(width):
                 x_sliced, ip_sliced = x[:, i].view(-1, 1), input_pos[i].view(-1)
-                # logging.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
+                logger.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
                 logits = model(x_sliced, ip_sliced)  # (x[:, i], input_pos[i])
         else:
             # input_pos: [B, S]
+            logger.debug(f"{x=}, {input_pos=}")
             logits = model(x, input_pos)
-            # print(f"logits {logits.shape}")
+            logger.debug(f"logits {logits.shape}")
 
         # print(f"x: {x},\n  input_pos: {input_pos}\n")
         return self.sample(logits, need_probs=False, **sampling_kwargs)[0]
@@ -337,6 +346,7 @@ class Generator:
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         # input_pos: [B, 1]
         assert input_pos.shape[-1] == 1
+        logger.debug(f"in decode one token {input_pos.shape=}")
         logits = model(x.view(1, -1), input_pos)
         # print(f"x: {x},\n  input_pos: {input_pos}\n")
         return self.sample(logits, need_probs=need_probs, **sampling_kwargs)
@@ -360,11 +370,13 @@ class Generator:
         **sampling_kwargs,
     ):
         new_tokens, new_probs = [], []
+        logger.info(f"in decode n tokens")
         encountered_eos = False
         for _i in range(
             num_new_tokens - 1
         ):  # -1 to save space to run an EoS if dont generate it naturally
             # Actually better for Inductor to codegen attention here
+            logger.info(f"decode n tokens....")
             with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]):
 
                 out_token = cur_token.clone()
@@ -414,6 +426,7 @@ class Generator:
         # return new_tokens, new_probs
 
     def model_forward(self, model, x, input_pos):
+        logger.info(f"model forward {x=}, {input_pos=}")
         return model(x, input_pos)
 
     def speculative_decode(
@@ -538,6 +551,7 @@ class Generator:
             sequential_prefill=sequential_prefill,
             **sampling_kwargs,
         )
+        logger.info(f"{next_token=}")
         if is_speculative:
             self.prefill(
                 draft_model,
@@ -583,6 +597,7 @@ class Generator:
                 next_token = next_tokens[-1]
         else:
             generated_tokens = []
+            logger.info(f" in generated tokens")
             for generated_token, _ in self.decode_n_tokens(
                 model,
                 next_token,
@@ -615,6 +630,7 @@ class Generator:
         tokens = self.tokenizer.encode(string)
         if bos:
             tokens = [self.tokenizer.bos_id()] + tokens
+        logger.info(f"***** encoding:  {tokens=}, {string=}")
         return torch.tensor(tokens, dtype=torch.int, device=device)
 
     def _callback(self, x, *, buffer, done_generating):
@@ -876,9 +892,12 @@ class Generator:
 
 
 def main(args):
+    logger.info(f"main args {args=}")
     builder_args = BuilderArgs.from_args(args)
+    logger.info(f"{builder_args=}")
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
+    logger.info(f"{tokenizer_args=}")
     generator_args = GeneratorArgs.from_args(args)
     gen = Generator(
         builder_args,

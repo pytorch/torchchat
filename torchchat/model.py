@@ -308,8 +308,10 @@ class Transformer(nn.Module):
 
     def forward(self, x: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
+        x.to("cuda")
         # TODO: find a better way to pass input_pos to non-0 pipeline stages
         input_pos = input_pos if input_pos is not None else self._input_pos
+        input_pos.to("cuda")
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
         if self.tok_embeddings:

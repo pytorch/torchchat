@@ -34,7 +34,8 @@ from torchchat.utils.build_utils import (
 )
 from torchchat.utils.measure_time import measure_time
 from torchchat.utils.quantize import quantize_model
-
+from distributed.logging_utils import setup_logging
+logger = setup_logging(__name__)
 
 @dataclass
 class BuilderArgs:
@@ -192,6 +193,7 @@ class TokenizerArgs:
     t: Optional[Any] = None
 
     def __post_init__(self):
+        logger.info(f"in post init for TokenizerArgs")
         try:
             from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
@@ -244,6 +246,8 @@ class TokenizerArgs:
         is_sentencepiece = False
         is_tiktoken = False
 
+        logger.info(f"in from args, tokenizer")
+
         if args.tokenizer_path:
             tokenizer_path = args.tokenizer_path
         elif args.model:  # Using a named, well-known model
@@ -263,6 +267,7 @@ class TokenizerArgs:
 
         if not tokenizer_path.is_file():
             raise RuntimeError(f"did not find tokenizer at {tokenizer_path}")
+
 
         return cls(
             tokenizer_path=tokenizer_path,
