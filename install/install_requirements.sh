@@ -78,6 +78,12 @@ REQUIREMENTS_TO_INSTALL=(
     "${REQUIREMENTS_TO_INSTALL[@]}"
 )
 
+# Install torchtune from github to get the latest feature
+(
+  set -x
+  $PIP_EXECUTABLE install git+https://github.com/pytorch/torchtune.git
+)
+
 # For torchao need to install from github since nightly build doesn't have macos build.
 # TODO: Remove this and install nightly build, once it supports macos
 (
