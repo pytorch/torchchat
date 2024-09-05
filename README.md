@@ -33,17 +33,14 @@ torchchat is a small codebase showcasing the ability to run large language model
 ## Installation
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
+*torchchat uses the latest changes from various PyTorch projects so it's highly recommended that you use a venv (by using the commands below) or CONDA.*
+
 [skip default]: begin
 ```bash
-# get the code
 git clone https://github.com/pytorch/torchchat.git
 cd torchchat
-
-# set up a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-
-# install dependencies
 ./install/install_requirements.sh
 ```
 [skip default]: end
@@ -358,7 +355,7 @@ python3 torchchat.py generate llama3.1 --device cpu --pte-path llama3.1.pte --pr
 
 
 <details>
-<summary>Deploying via a Runner</summary>
+<summary>Deploying via the c++ Runner</summary>
 
 Build the runner
 ```bash
