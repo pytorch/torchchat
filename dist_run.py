@@ -36,7 +36,8 @@ def _init_distributed():
     dist.init_process_group("nccl")
     rank = dist.get_rank()
     world_size = dist.get_world_size()
-    torch.cuda.set_device(rank)
+    # Assuming same number of GPUs per node
+    torch.cuda.set_device(rank % torch.cuda.device_count())
     return rank, world_size
 
 
