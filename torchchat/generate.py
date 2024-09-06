@@ -667,7 +667,6 @@ class Generator:
             if self.builder_args.device == "cpu":
                 if generator_args.max_autotune:
                     kwargs = {"mode": "max-autotune"}
-                    torch._inductor.config.trace.log_autotuning_results = True
                 else:
                     kwargs = {}
             else:
@@ -683,7 +682,7 @@ class Generator:
             )
 
             if generator_args.compile_prefill:
-                self.prefill = torch.compile(self.prefill, fullgraph=True, dynamic=True)
+                self.prefill = torch.compile(self.prefill, fullgraph=True, dynamic=True, **kwargs)
 
         self.system_prompt = None
         # Set up our max_seq_length
