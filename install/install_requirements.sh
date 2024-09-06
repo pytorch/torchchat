@@ -41,13 +41,17 @@ fi
 )
 
 # Since torchchat often uses main-branch features of pytorch, only the nightly
-# pip versions will have the required features. The NIGHTLY_VERSION value should
-# agree with the third-party/pytorch pinned submodule commit.
+# pip versions will have the required features. The PYTORCH_NIGHTLY_VERSION value
+# should agree with the third-party/pytorch pinned submodule commit.
 #
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
-# NIGHTLY_VERSION, you should re-run this script to install the necessary
+# PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-NIGHTLY_VERSION=dev20240814
+PYTORCH_NIGHTLY_VERSION=dev20240814
+
+# For torchao need to install specific nightly version due to unstable macos support.
+# TODO: remove the version once torchao can support macos stable.
+AO_NIGHTLY_VERSION=dev20240905
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 (
@@ -67,7 +71,8 @@ fi
 
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
-  torch=="2.5.0.${NIGHTLY_VERSION}"
+  torch=="2.5.0.${PYTORCH_NIGHTLY_VERSION}"
+  torchao=="0.5.0.${AO_NIGHTLY_VERSION}"
 )
 
 # Install the requirements. `--extra-index-url` tells pip to look for package
@@ -84,12 +89,6 @@ REQUIREMENTS_TO_INSTALL=(
   $PIP_EXECUTABLE install git+https://github.com/pytorch/torchtune.git
 )
 
-# For torchao need to install from github since nightly build doesn't have macos build.
-# TODO: Remove this and install nightly build, once it supports macos
-(
-  set -x
-  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@e11201a62669f582d81cdb33e031a07fb8dfc4f3
-)
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   (
     set -x
