@@ -4,47 +4,44 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+import os
+from pathlib import Path
+from types import SimpleNamespace
+from typing import Any, Dict
+
 # Run command:
 # torchrun --nproc-per-node 4 dist_run.py
 import torch
 import torch.distributed as dist
-
-from distributed.verification_utils import find_cpu_tensors
-from distributed.logging_utils import setup_logging
-
-# TODO - these are not distributed specific, consider moving to new package
-from distributed.safetensor_utils import (
-    get_hf_config_file,
-    get_hf_weight_map_and_path,
-    load_safetensor_weights,
-)
-from distributed.utils import Color as color
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
+
+from distributed.logging_utils import setup_logging
+# TODO - these are not distributed specific, consider moving to new package
+from distributed.safetensor_utils import (get_hf_config_file,
+                                          get_hf_weight_map_and_path,
+                                          load_safetensor_weights)
+from distributed.utils import Color as color
+from distributed.verification_utils import find_cpu_tensors
+from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
 from torchchat.model import ModelArgs, Transformer
 from torchchat.utils.build_utils import set_precision
 
-from torchchat.cli.builder import (
-    _initialize_model,
-    _initialize_tokenizer,
-    BuilderArgs,
-    TokenizerArgs,
-)
-import os
-from pathlib import Path
-from types import SimpleNamespace
-from typing import Dict, Any
-from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
-from sentencepiece import SentencePieceProcessor
-
+try:
+    from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
+except ImportError:
+    TiktokenTokenizer = None
+try:
+    from sentencepiece import SentencePieceProcessor
+except ImportError:
+    SentencePieceProcessor = None
 
 
 logger = setup_logging(__name__)
 
-MODEL_NAME = "Meta-Llama-3-8B"
+MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
     "Transformer-2-7b-chat-hf": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
     "Meta-Llama-3-8B": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16),
-    #"Meta-Llama-3-8B":("meta-llama/Meta-Llama-3-8B", torch.bfloat16)
 }
 CACHE_PRECISION = torch.bfloat16
 
@@ -53,43 +50,56 @@ def _init_distributed():
     dist.init_process_group("nccl")
     rank = dist.get_rank()
     world_size = dist.get_world_size()
-    #torch.cuda.set_device(rank % torch.cuda.device_count())
-    torch.cuda.set_device(rank)
+    # Assuming same number of GPUs per node
+    torch.cuda.set_device(rank % torch.cuda.device_count())
     return rank, world_size
 
 
 def _create_device_mesh(mesh_dimensions):
     return dist.init_device_mesh("cuda", mesh_dimensions, mesh_dim_names=("pp", "tp"))
 
+
 def dict_to_args(dictionary: Dict[str, Any]) -> SimpleNamespace:
     return SimpleNamespace(**dictionary)
 
-def _build_chat_tokenizer(model_base_name: str = "llama2") -> SentencePieceProcessor | TiktokenTokenizer:
+
+def _build_chat_tokenizer(
+    model_base_name: str = "llama3",
+) -> SentencePieceProcessor | TiktokenTokenizer:
     # Create base args for tokenizer
-    default_model_dir = Path(os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")).expanduser()
-    
+    default_model_dir = Path(
+        os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")
+    ).expanduser()
+
     tokenconfig = {
-        'model_directory': default_model_dir,
-        'model': model_base_name,
-        'tokenizer_path': None
+        "model_directory": default_model_dir,
+        "model": model_base_name,
+        "tokenizer_path": None,
     }
-    
     args = dict_to_args(tokenconfig)
     tokenizer_args = TokenizerArgs.from_args(args)
     tokenizer = _initialize_tokenizer(tokenizer_args)
     assert tokenizer is not None, f"Failed to get tokenizer using {tokenconfig=}"
-    logger.info(f"using tokenizer = {tokenizer.__class__.__module__}.{tokenizer.__class__.__name__}")
-    assert False, "check tok"
+    logger.info(
+        f"using tokenizer = {tokenizer.__class__.__module__}.{tokenizer.__class__.__name__}"
+    )
     return tokenizer
 
-def _get_hf_tokenizer(hf_model_name):
-    """Load tokenizer from HF model id.  TODO - use torchchat tokenizer?"""
-    from transformers import AutoTokenizer
-    tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
-    assert tokenizer is not None, f"Failed to load tokenizer for {hf_model_name}"
-    logger.info(f"Loaded tokenizer for {hf_model_name}")
-    tokenizer.pad_token = tokenizer.eos_token
-    return tokenizer
+def _encode_tokens(string, tokenizer, bos=True, device="cuda", dtype=torch.int64):
+        tokens = tokenizer.encode(string)
+        if bos:
+            tokens = [tokenizer.bos_id()] + tokens
+        logger.info(f"***** encoding:  {tokens=}, {string=}")
+        return torch.tensor(tokens, dtype=dtype, device=device)
+
+def _logits_to_probs(
+        logits
+    ):
+        logits = logits / max(
+            temperature, 1e-5 if logits.dtype != torch.float16 else 1e-3
+        )
+        probs = torch.nn.functional.softmax(logits, dim=-1)
+        return probs
 
 def _load_model_weights(stage_module, hf_model_name, device, model_config):
     """Load the weights from the safetensor file(s) into the model stage.
@@ -112,6 +122,11 @@ def _load_model_weights(stage_module, hf_model_name, device, model_config):
     if num_missing_weights > 0:
         raise ValueError(f"Missing {num_missing_weights} weights")
 
+def _multinomial_sample_one_no_sync(
+        probs_sort,
+    ):  # Does multinomial sampling without a cuda synchronization
+        q = torch.empty_like(probs_sort).exponential_(1)
+        return torch.argmax(probs_sort / q, dim=-1, keepdim=True).to(dtype=torch.int)
 
 def _cleanup():
     dist.barrier()
@@ -120,8 +135,6 @@ def _cleanup():
 
 def main():
     rank, world_size = _init_distributed()
-
-
 
     config = ModelArgs.from_name(MODEL_NAME).text_transformer_args
     logger.info(f"Chat Model Config: {config}")
@@ -135,8 +148,6 @@ def main():
     set_precision(CACHE_PRECISION)
     logger.info(f"Using cache precision {CACHE_PRECISION}")
 
-    #tokenizer = _get_tokenizer(hf_model_name)
-
     hf_config = get_hf_config_file(hf_model_name)
     if hf_config is None:
         raise ValueError(f"Config file not found for model id {hf_model_name}")
@@ -144,7 +155,7 @@ def main():
 
     # Assuming 2 pipeline stages, feel free to change this as long as the
     # asserts are satisfied
-    pp_degree = 1
+    pp_degree = 2
     assert world_size % pp_degree == 0
     assert config.n_layers % pp_degree == 0
 
@@ -173,11 +184,11 @@ def main():
     model.setup_caches(1, 4096)
 
     # Distribute model on TP mesh
-    #model.distribute(tp_mesh)
-    #logger.info(f"Model: {model}")
-    # 8 samples = 2 microbatches, each mb contains 4 samples.  
-    mbs = 1  # number of micro-batches 
-    mb_size = 1  # micro-batch size = number of samples in a batch. 
+    model.distribute(tp_mesh)
+    logger.info(f"Model: {model}")
+
+    mbs = 1  # number of micro-batches
+    mb_size = 1  # micro-batch size
     batch_size = mbs * mb_size  # total batch size
     seqlen = 4096  # sequence length
     dim = 4096  # embedding dimension
@@ -192,14 +203,13 @@ def main():
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
     _load_model_weights(model, hf_model_name, device=device, model_config=config)
-    
+
     # Setup input position
     # input_pos for prefill: a list of increasing integers from 0 to seqlen
     input_pos = torch.arange(seqlen, device=device)
     model.setup_input_pos(input_pos)
-    model.to("cuda")
     model.eval()
-    '''
+
     logger.info(f"Creating pipeline stage {pp_rank=}, {pp_degree=}")
     stage = PipelineStage(
         model,
@@ -226,63 +236,53 @@ def main():
     #     len(dtype_count) == 2
     # ), f"Expected 2 dtypes in model after checkpoint loading: {model_dtype} and {torch.bool}"
 
-    input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
-    logger.info(f"Input: {input_ids.dtype=}, {input_ids.shape=}, {input_ids.device=}")
-    '''
-    full_batch_prompts = (
-        "What is snow?",#  "I like to", "Can I help", "You need to",
-        #"The weather is", "I found a", "What is your", "You are so",
-    )  # full batch size = 8
-    #torch.set_printoptions(threshold=30, edgeitems=10)
-    inputs = tokenizer(full_batch_prompts,padding="max_length", max_length=4096, return_tensors="pt",).to(device)
+    #input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
+    #logger.info(f"Input: {input_ids.dtype=}, {input_ids.shape=}, {input_ids.device=}")
+
+    prompt = "what is snow?"
+    input_ids = _encode_tokens(prompt, tokenizer, device, dtype=torch.int64)
+
+    prompt_len = input_ids.size(0)
+    start_pos = 0
+    max_new_tokens = min(seqlen, seqlen - start_pos - prompt_len)
+    token_buffer_size = prompt_len + max_new_tokens
     
-    input_ids = inputs["input_ids"].to(device)
-    #logger.info(f"{input_ids=}")
-    input_ids=torch.tensor([128000, 128006, 882, 128007, 271, 12840, 374, 12056, 30, 128009, 128006, 78191, 128007, 271], device="cuda", dtype=torch.int64)
-    logger.info(f"Input: {input_ids.dtype=}, {input_ids[0:10]=}")
-    pad_token = tokenizer(tokenizer.pad_token)
-    logger.info(f"{pad_token=}")
-    padded_input = torch.full((4096,), 128009, dtype=torch.int64, device=device)
-    insert_size = len(input_ids)
-    padded_input[:insert_size] = input_ids
-    padded_input = padded_input.unsqueeze(0)
-    #logger.info(f"{padded_input.shape=}")
-    #logger.info(f"{padded_input[:20]=}")
-    
-    output = model(padded_input)
-    logger.info(f"{output=}")
-    logger.info(f"Output: {output.shape=}")
-    next_token_logits = output[:, -1, :]
-    full_batch_logits = output[:, 0:-1, :]
-    logger.info(f"{next_token_logits.shape=}")
-    next_token = torch.argmax(next_token_logits, dim=-1)
-    next_full_batch = torch.argmax(full_batch_logits, dim=-1)
-    logger.info(f"{next_token=}, {tokenizer.batch_decode(next_token, skip_special_tokens=False)}")
-    logger.info(f"{full_batch_logits=}, {(tokenizer.batch_decode(next_full_batch))}")
-    '''
+    empty = torch.empty(token_buffer_size, dtype=torch.int64, device=device)
+    empty.fill_(tokenizer.eos_id())
+    empty[:prompt_len] = input_ids
+    empty = empty.unsqueeze(0)
+    seq = empty
+    #input_pos = torch.arange(
+    #        start_pos, T + start_pos, device=device, dtype=torch.int
+    #    )
+
+
     schedule = ScheduleGPipe(stage, mbs)
     logger.info(f"Created schedule: {schedule}")
-    output=None
+
     with torch.no_grad():  # .inference_mode():
         if pp_rank == 0:
-            output=schedule.step(input_ids)
+            output=schedule.step(empty)
         else:
             output = schedule.step()
 
     if pp_rank == pp_degree - 1 and tp_rank == 0:
-        #logger.info(f"Output: {output}")
-        # Decode
-    #if output:
-        logger.info(f"Output: {output.shape=}")
+        logger.info(f"Output: {output}")
         next_token_logits = output[:, -1, :]
         full_batch_logits = output[:, 0:-1, :]
         logger.info(f"{next_token_logits.shape=}")
         next_token = torch.argmax(next_token_logits, dim=-1)
+        logger.info(f"\n{next_token=}")
         next_full_batch = torch.argmax(full_batch_logits, dim=-1)
-        logger.info(f"{next_token=}, {tokenizer.batch_decode(next_token, skip_special_tokens=True)}")
+        #logger.info(f"{next_token=}, {(tokenizer.batch_decode(next_token))}")
         #logger.info(f"{full_batch_logits=}, {(tokenizer.batch_decode(next_full_batch))}")
 
-    '''
+
+        probs = _logits_to_probs(next_token[0, -1])
+        idx_next = _multinomial_sample_one_no_sync(probs)
+        logger.info(f"\n\n{idx_next=}")
+
+
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
     )

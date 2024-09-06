@@ -329,6 +329,7 @@ class Generator:
                 logits = model(x_sliced, ip_sliced)  # (x[:, i], input_pos[i])
         else:
             # input_pos: [B, S]
+            logger.info("not in sequential, in prefill")
             logger.debug(f"{x=}, {input_pos=}")
             logits = model(x, input_pos)
             logger.debug(f"logits {logits.shape}")
