@@ -41,13 +41,19 @@ fi
 )
 
 # Since torchchat often uses main-branch features of pytorch, only the nightly
-# pip versions will have the required features. The NIGHTLY_VERSION value should
+# pip versions will have the required features. The PYTORCH_NIGHTLY_VERSION value should
 # agree with the third-party/pytorch pinned submodule commit.
 #
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
-# NIGHTLY_VERSION, you should re-run this script to install the necessary
+# PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-NIGHTLY_VERSION=dev20240814
+PYTORCH_NIGHTLY_VERSION=dev20240814
+
+# Nightly version for torchvision
+VISION_NIGHTLY_VERSION=dev20240814
+
+# Nightly version for torchao
+AO_NIGHTLY_VERSION=dev20240905
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 (
@@ -67,9 +73,9 @@ fi
 
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
-  torch=="2.5.0.${NIGHTLY_VERSION}"
-  torchvision
-  torchao
+  torch=="2.5.0.${PYTORCH_NIGHTLY_VERSION}"
+  torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
+  torchao=="0.5.0.${AO_NIGHTLY_VERSION}"
 )
 
 # Install the requirements. `--extra-index-url` tells pip to look for package
