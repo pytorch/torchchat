@@ -69,7 +69,7 @@ fi
 REQUIREMENTS_TO_INSTALL=(
   torch=="2.5.0.${NIGHTLY_VERSION}"
   torchvision
-
+  torchao
 )
 
 # Install the requirements. `--extra-index-url` tells pip to look for package
@@ -78,13 +78,6 @@ REQUIREMENTS_TO_INSTALL=(
   set -x
   $PIP_EXECUTABLE install --extra-index-url "${TORCH_NIGHTLY_URL}" \
     "${REQUIREMENTS_TO_INSTALL[@]}"
-)
-
-# For torchao need to install from github since nightly build doesn't have macos build.
-# TODO: Remove this and install nightly build, once it supports macos
-(
-  set -x
-  $PIP_EXECUTABLE install --pre torchao --index-url "${TORCH_NIGHTLY_URL}"
 )
 
 # Install torchtune from github to get the latest feature

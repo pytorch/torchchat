@@ -248,14 +248,21 @@ class Model(nn.Module):
         
         return recipe.fusion_class(**modules)
 
-    def forward(self, idx: Optional[Tensor] = None, input_pos: Optional[Tensor] = None, batch: Optional[dict] = None) -> Tensor:
+    def forward(self, 
+                tokens: Optional[Tensor] = None,
+                input_pos: Optional[Tensor] = None, 
+                encoder_input: Optional[Dict[str, Tensor]] = None, 
+                encoder_mask: Optional[Tensor] = None) -> Tensor:
+
         if self.config.model_type == ModelType.TextOnly:
-            return self.text_transformer(idx, input_pos)
+            return self.text_transformer(tokens, input_pos)
         else:
             assert self.config.model_type == ModelType.Flamingo
-            if imgs is None:
-                return self.model(idx, input_pos = input_pos)
-            return self.model(idx, encoder_input={"images": imgs, "aspect_ratio": aspect_ratio}, input_pos = input_pos)
+            if input_pos:
+                warnings.warn("input_pos is not used for Flamingo model. Ignoring it.")
+            if encoder_input is None:
+                return self.model(tokens, encoder_mask = encoder_mask)
+            return self.model(tokens, encoder_input=encoder_input, encoder_mask = encoder_mask)
 
     def setup_caches(self, max_batch_size, max_seq_length=None, dtype=None):
         if self.config.model_type == ModelType.TextOnly:
