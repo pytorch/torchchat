@@ -248,7 +248,7 @@ class Model(nn.Module):
         
         return recipe.fusion_class(**modules)
 
-    def forward(self, idx: Tensor, imgs: Optional[Tensor] = None, aspect_ratio: Optional[Tensor] = None, input_pos: Optional[Tensor] = None) -> Tensor:
+    def forward(self, idx: Optional[Tensor] = None, input_pos: Optional[Tensor] = None, batch: Optional[dict] = None) -> Tensor:
         if self.config.model_type == ModelType.TextOnly:
             return self.text_transformer(idx, input_pos)
         else:

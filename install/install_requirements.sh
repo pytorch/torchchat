@@ -68,6 +68,8 @@ fi
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
   torch=="2.5.0.${NIGHTLY_VERSION}"
+  torchvision
+
 )
 
 # Install the requirements. `--extra-index-url` tells pip to look for package
@@ -78,18 +80,19 @@ REQUIREMENTS_TO_INSTALL=(
     "${REQUIREMENTS_TO_INSTALL[@]}"
 )
 
+# For torchao need to install from github since nightly build doesn't have macos build.
+# TODO: Remove this and install nightly build, once it supports macos
+(
+  set -x
+  $PIP_EXECUTABLE install --pre torchao --index-url "${TORCH_NIGHTLY_URL}"
+)
+
 # Install torchtune from github to get the latest feature
 (
   set -x
   $PIP_EXECUTABLE install git+https://github.com/pytorch/torchtune.git
 )
 
-# For torchao need to install from github since nightly build doesn't have macos build.
-# TODO: Remove this and install nightly build, once it supports macos
-(
-  set -x
-  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@e11201a62669f582d81cdb33e031a07fb8dfc4f3
-)
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   (
     set -x
