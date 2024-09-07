@@ -38,7 +38,7 @@ except ImportError:
 
 logger = setup_logging(__name__)
 
-MODEL_NAME = "Transformer-2-7b-chat-hf"
+
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
     "Transformer-2-7b-chat-hf": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
     "Meta-Llama-3-8B": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16),
@@ -93,7 +93,8 @@ def _encode_tokens(string, tokenizer, bos=True, device="cuda", dtype=torch.int64
         return torch.tensor(tokens, dtype=dtype, device=device)
 
 def _logits_to_probs(
-        logits
+        logits,
+        temperature=1.0,
     ):
         logits = logits / max(
             temperature, 1e-5 if logits.dtype != torch.float16 else 1e-3
@@ -132,18 +133,34 @@ def _cleanup():
     dist.barrier()
     dist.destroy_process_group()
 
+def _get_hf_tokenizer(hf_model_name):
+    """Load tokenizer from HF model id.  TODO - use torchchat tokenizer?"""
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
+    assert tokenizer is not None, f"Failed to load tokenizer for {hf_model_name}"
+    logger.info(f"Loaded tokenizer for {hf_model_name}")
+    tokenizer.pad_token = tokenizer.eos_token
+    return tokenizer
+
 
 def main():
     rank, world_size = _init_distributed()
 
+
+    MODEL_NAME = "Meta-Llama-3-8B" # "Transformer-2-7b-chat-hf"
+
     config = ModelArgs.from_name(MODEL_NAME).text_transformer_args
     logger.info(f"Chat Model Config: {config}")
+    
 
     tokenizer = _build_chat_tokenizer()
     logger.info(f"built tokenizer {tokenizer=}")
 
     hf_model_name, model_dtype = NAME_TO_HF_MODEL_ID_AND_DTYPE[MODEL_NAME]
     logger.info(f"Using HF model weights from {hf_model_name} and dtype {model_dtype}")
+
+
+    hf_tokenizer = _get_hf_tokenizer(hf_model_name)
 
     set_precision(CACHE_PRECISION)
     logger.info(f"Using cache precision {CACHE_PRECISION}")
@@ -243,6 +260,7 @@ def main():
     input_ids = _encode_tokens(prompt, tokenizer, device, dtype=torch.int64)
 
     prompt_len = input_ids.size(0)
+    logger.info(f"{prompt_len=}")
     start_pos = 0
     max_new_tokens = min(seqlen, seqlen - start_pos - prompt_len)
     token_buffer_size = prompt_len + max_new_tokens
@@ -262,25 +280,24 @@ def main():
 
     with torch.no_grad():  # .inference_mode():
         if pp_rank == 0:
-            output=schedule.step(empty)
+            schedule.step(empty)
         else:
             output = schedule.step()
 
+# Decoding
     if pp_rank == pp_degree - 1 and tp_rank == 0:
-        logger.info(f"Output: {output}")
-        next_token_logits = output[:, -1, :]
-        full_batch_logits = output[:, 0:-1, :]
+        
+        next_token_logits = output[:,prompt_len-1, :]
+
+        logger.info(f"{next_token_logits=}")
         logger.info(f"{next_token_logits.shape=}")
+        
         next_token = torch.argmax(next_token_logits, dim=-1)
-        logger.info(f"\n{next_token=}")
-        next_full_batch = torch.argmax(full_batch_logits, dim=-1)
-        #logger.info(f"{next_token=}, {(tokenizer.batch_decode(next_token))}")
-        #logger.info(f"{full_batch_logits=}, {(tokenizer.batch_decode(next_full_batch))}")
 
+        # self.tokenizer.decode([period_id] + x.tolist())[1:]
+        next_token_decoded = tokenizer.decode((next_token.tolist()))
 
-        probs = _logits_to_probs(next_token[0, -1])
-        idx_next = _multinomial_sample_one_no_sync(probs)
-        logger.info(f"\n\n{idx_next=}")
+        logger.info(f"\n\n{color.green}====>>>> {color.blue} {next_token_decoded=}, {next_token}\n{color.reset}")
 
 
     logger.info(

@@ -305,6 +305,9 @@ class Generator:
         if temperature == 0 and not need_probs:
             _, idx_next = torch.topk(logits[0, -1], k=1, dim=-1)
             return (idx_next, None)
+        logger.info(f"{logits=}")
+        logger.info(f"{logits.shape=}")
+        logger.info(f"{logits[0,-1]=}")
         probs = self.logits_to_probs(logits[0, -1], temperature, top_k)
         idx_next = self.multinomial_sample_one_no_sync(probs)
         return idx_next, probs
