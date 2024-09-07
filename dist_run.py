@@ -20,7 +20,7 @@ from distributed.logging_utils import setup_logging
 from distributed.safetensor_utils import (get_hf_config_file,
                                           get_hf_weight_map_and_path,
                                           load_safetensor_weights)
-from distributed.utils import Color as color, get_stage_size, build_gpu_memory_monitor
+from distributed.utils import Color as color, get_stage_size, build_gpu_memory_monitor, TrackTime, get_num_params
 from distributed.verification_utils import find_cpu_tensors
 from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
 from torchchat.model import ModelArgs, Transformer
@@ -222,12 +222,14 @@ def main():
     example_args = mb_ids if pp_rank == 0 else activation
 
     # Load weights
-    with track_time() as elapsed_seconds:
+    with TrackTime() as timer:
         logger.info(f"Loading weights for {pp_rank=} on {device=}")
         _load_model_weights(model, hf_model_name, device=device, model_config=config)
+    logger.info(f"{color.green}Total weight loading time: {timer.get_time()} for {rank}{color.reset}")
 
-        stage_size, stage_size_formatted = get_stage_size(model)
-        logger.info(f"Stage for rank {rank} is size: {color.blue}{stage_size_formatted}{color.reset}\n")
+    stage_size, stage_size_formatted = get_stage_size(model)     
+    stage_num_params = get_num_params(stage)
+    logger.info(f"Stage rank {rank} has {color.blue}{stage_num_params} params{color.reset}, Size: {color.blue}{stage_size_formatted}{color.reset}\n")
 
     import time
     time.sleep(5)

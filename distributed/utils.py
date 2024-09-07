@@ -14,7 +14,7 @@ import torch
 from distributed.logging_utils import SingletonLogger
 import time
 from contextlib import contextmanager
-from typing import Optional, Union
+from typing import Optional, Union, Generator
 
 logger = SingletonLogger.get_logger()
 
@@ -149,21 +149,30 @@ def format_model_params(params):
     else:
         return f"{params:,}"
 
+import time
+from typing import Optional
 
-@contextmanager
-def track_time(use_ms: bool = False, round_to: Optional[int] = 4) -> Union[float, None]:
-    """ Context manager timer for easy perf timing.  Returns elapsed time in ms or seconds """
-    start_time = time.perf_counter()
-    try:
-        yield
-    finally:
+class TrackTime:
+    def __init__(self, use_ms: bool = False, round_to: Optional[int] = 4):
+        self.use_ms = use_ms
+        self.round_to = round_to
+        self.start_time = 0.0
+        self.elapsed_time = 0.0
+        self.unit="seconds" if not use_ms else "milliseconds"
+
+    def __enter__(self):
+        self.start_time = time.perf_counter()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
         end_time = time.perf_counter()
-        elapsed_time = end_time - start_time
+        self.elapsed_time = end_time - self.start_time
         
-        if use_ms:
-            elapsed_time *= 1000  # milliseconds
+        if self.use_ms:
+            self.elapsed_time *= 1000  # Convert to milliseconds
         
-        if round_to is not None:
-            elapsed_time = round(elapsed_time, round_to)
-    
-        return elapsed_time
+        if self.round_to is not None:
+            self.elapsed_time = round(self.elapsed_time, self.round_to)
+
+    def get_time(self) -> float:
+        return self.elapsed_time
