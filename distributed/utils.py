@@ -59,7 +59,8 @@ def get_stage_size(stage):
                 for p in itertools.chain(stage.parameters(), stage.buffers())
             ]
         )
-    return model_size
+    readable_model_size = format_model_params(model_size)
+    return model_size, readable_model_size
 
 @dataclass(frozen=True)
 class Color:
@@ -135,3 +136,12 @@ def build_gpu_memory_monitor():
     )
 
     return gpu_memory_monitor, device_info
+
+def format_model_params(params):
+    """ turn the num_params into a readable formatted number """
+    if params >= 1_000_000_000:
+        return f"{params / 1_000_000_000:.2f}B"
+    elif params >= 1_000_000:
+        return f"{params / 1_000_000:.2f}M"
+    else:
+        return f"{params:,}"
