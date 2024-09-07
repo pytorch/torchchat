@@ -53,7 +53,8 @@ def get_num_params(model: torch.nn.Module, exclude_embedding: bool = False) -> i
     num_params = sum(p.numel() for p in model.parameters())
     if exclude_embedding:
         num_params -= model.tok_embeddings.weight.numel()
-    return num_params
+    readable_num_params = format_model_params(num_params)
+    return readable_num_params
 
 def get_stage_size(stage):
     model_size = sum(
@@ -62,7 +63,7 @@ def get_stage_size(stage):
                 for p in itertools.chain(stage.parameters(), stage.buffers())
             ]
         )
-    readable_model_size = format_model_params(model_size)
+    readable_model_size = bytes_to_readable(model_size)
     return model_size, readable_model_size
 
 @dataclass(frozen=True)
@@ -176,3 +177,21 @@ class TrackTime:
 
     def get_time(self) -> float:
         return self.elapsed_time
+
+
+def bytes_to_readable(bytes_value: int) -> str:
+    """ formatting function to make reading model (stage) sizes easy """
+    GiB = 1024 ** 3  # 1 GiB in bytes
+    MiB = 1024 ** 2  # 1 MiB in bytes
+    
+    if bytes_value >= GiB:
+        value = bytes_value / GiB
+        unit = "GiB"
+    else:
+        value = bytes_value / MiB
+        unit = "MiB"
+    
+    # Round to 2 decimal places
+    rounded_value = round(value, 2)
+    
+    return f"{rounded_value} {unit}"

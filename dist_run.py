@@ -225,10 +225,11 @@ def main():
     with TrackTime() as timer:
         logger.info(f"Loading weights for {pp_rank=} on {device=}")
         _load_model_weights(model, hf_model_name, device=device, model_config=config)
-    logger.info(f"{color.green}Total weight loading time: {timer.get_time()} for {rank}{color.reset}")
+    logger.info(f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for {rank}{color.reset}")
 
+    # info on stage size and params
     stage_size, stage_size_formatted = get_stage_size(model)     
-    stage_num_params = get_num_params(stage)
+    stage_num_params = get_num_params(model)
     logger.info(f"Stage rank {rank} has {color.blue}{stage_num_params} params{color.reset}, Size: {color.blue}{stage_size_formatted}{color.reset}\n")
 
     import time
