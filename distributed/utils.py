@@ -11,9 +11,12 @@ import itertools
 
 import torch
 
-from distributed.logging_utils import setup_logging
+from distributed.logging_utils import SingletonLogger
+import time
+from contextlib import contextmanager
+from typing import Optional, Union
 
-logger = setup_logging(__name__)
+logger = SingletonLogger.get_logger()
 
 def _warn_overwrite_env(env, val):
     if env in os.environ:
@@ -145,3 +148,22 @@ def format_model_params(params):
         return f"{params / 1_000_000:.2f}M"
     else:
         return f"{params:,}"
+
+
+@contextmanager
+def track_time(use_ms: bool = False, round_to: Optional[int] = 4) -> Union[float, None]:
+    """ Context manager timer for easy perf timing.  Returns elapsed time in ms or seconds """
+    start_time = time.perf_counter()
+    try:
+        yield
+    finally:
+        end_time = time.perf_counter()
+        elapsed_time = end_time - start_time
+        
+        if use_ms:
+            elapsed_time *= 1000  # milliseconds
+        
+        if round_to is not None:
+            elapsed_time = round(elapsed_time, round_to)
+    
+        return elapsed_time

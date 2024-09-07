@@ -222,11 +222,17 @@ def main():
     example_args = mb_ids if pp_rank == 0 else activation
 
     # Load weights
-    logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    _load_model_weights(model, hf_model_name, device=device, model_config=config)
-    stage_size = get_stage_size(model)
-    logger.info(f"Stage for rank {rank} is size: {color.yellow}{stage_size}{color.reset}")
+    with track_time() as elapsed_seconds:
+        logger.info(f"Loading weights for {pp_rank=} on {device=}")
+        _load_model_weights(model, hf_model_name, device=device, model_config=config)
 
+        stage_size, stage_size_formatted = get_stage_size(model)
+        logger.info(f"Stage for rank {rank} is size: {color.blue}{stage_size_formatted}{color.reset}\n")
+
+    import time
+    time.sleep(5)
+
+    assert False, "check time"
     # Setup input position
     # input_pos for prefill: a list of increasing integers from 0 to seqlen
     input_pos = torch.arange(seqlen, device=device)
