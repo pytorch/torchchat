@@ -20,7 +20,7 @@ from distributed.logging_utils import setup_logging
 from distributed.safetensor_utils import (get_hf_config_file,
                                           get_hf_weight_map_and_path,
                                           load_safetensor_weights)
-from distributed.utils import Color as color
+from distributed.utils import Color as color, get_stage_size, build_gpu_memory_monitor
 from distributed.verification_utils import find_cpu_tensors
 from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
 from torchchat.model import ModelArgs, Transformer
@@ -36,7 +36,9 @@ except ImportError:
     SentencePieceProcessor = None
 
 
-logger = setup_logging(__name__)
+# logger = setup_logging(__name__)
+from distributed.logging_utils import SingletonLogger
+logger = SingletonLogger.get_logger(__name__)
 
 
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
@@ -134,7 +136,7 @@ def _cleanup():
     dist.destroy_process_group()
 
 def _get_hf_tokenizer(hf_model_name):
-    """Load tokenizer from HF model id.  TODO - use torchchat tokenizer?"""
+    """Load tokenizer from HF model id. note - use torchchat tokenizer as default"""
     from transformers import AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
     assert tokenizer is not None, f"Failed to load tokenizer for {hf_model_name}"
@@ -145,6 +147,8 @@ def _get_hf_tokenizer(hf_model_name):
 
 def main():
     rank, world_size = _init_distributed()
+    gpu_memory_monitor, device_info = build_gpu_memory_monitor()
+    logger.info(f"{color.yellow} {device_info}{color.reset}")
 
 
     MODEL_NAME = "Meta-Llama-3-8B" # "Transformer-2-7b-chat-hf"
@@ -172,7 +176,7 @@ def main():
 
     # Assuming 2 pipeline stages, feel free to change this as long as the
     # asserts are satisfied
-    pp_degree = 2
+    pp_degree = 4
     assert world_size % pp_degree == 0
     assert config.n_layers % pp_degree == 0
 
@@ -220,6 +224,8 @@ def main():
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
     _load_model_weights(model, hf_model_name, device=device, model_config=config)
+    stage_size = get_stage_size(model)
+    logger.info(f"Stage for rank {rank} is size: {color.yellow}{stage_size}{color.reset}")
 
     # Setup input position
     # input_pos for prefill: a list of increasing integers from 0 to seqlen
@@ -291,13 +297,15 @@ def main():
 
         logger.info(f"{next_token_logits=}")
         logger.info(f"{next_token_logits.shape=}")
-        
+
         next_token = torch.argmax(next_token_logits, dim=-1)
 
         # self.tokenizer.decode([period_id] + x.tolist())[1:]
         next_token_decoded = tokenizer.decode((next_token.tolist()))
 
         logger.info(f"\n\n{color.green}====>>>> {color.blue} {next_token_decoded=}, {next_token}\n{color.reset}")
+        res_mem_gib, res_mem_pct = gpu_memory_monitor.get_peak_stats()
+        logger.info(f"{color.blue} Memory used: {color.green}{res_mem_pct:.3f} %, {color.magenta}{res_mem_gib:.3f} GB{color.reset}")
 
 
     logger.info(
