@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Dict, Optional, Union
+from abc import ABC, abstractmethod
 
 import torch
 import torch.nn as nn
@@ -250,16 +251,12 @@ class KVCache(nn.Module):
         return k_out, v_out
 
 
-class Model(nn.Module):
+class Model(ABC, nn.Module):
     def __init__(self, config: ModelArgs) -> None:
         super().__init__()
         self.config = config
-        # TODO: unify the model init logic
-        if config.model_type == ModelType.TextOnly:
-            self.text_transformer = self.build_model()
-        else:
-            self.model = self.build_model()
-    
+        self.model = self.build_model()
+
     def build_model(self):
         recipe = ModelRecipe.get_recipe(self.config.model_type)
         modules = {}
@@ -270,57 +267,77 @@ class Model(nn.Module):
                 modules[name] = module_class(self.config.transformer_args[name])
 
         return recipe.fusion_class(**modules)
-
-    def forward(self, 
-                tokens: Optional[Tensor] = None,
-                input_pos: Optional[Tensor] = None, 
-                encoder_input: Optional[Dict[str, Tensor]] = None, 
-                encoder_mask: Optional[Tensor] = None) -> Tensor:
-
-        if self.config.model_type == ModelType.TextOnly:
-            return self.text_transformer(tokens, input_pos)
-        else:
-            assert self.config.model_type == ModelType.Flamingo
-            if input_pos:
-                warnings.warn("input_pos is not used for Flamingo model. Ignoring it.")
-            if encoder_input is None:
-                return self.model(tokens, encoder_mask = encoder_mask)
-            return self.model(tokens, encoder_input=encoder_input, encoder_mask = encoder_mask)
-
-    def setup_caches(self, max_batch_size, max_seq_length=None, dtype=None):
-        if self.config.model_type == ModelType.TextOnly:
-            self.text_transformer.setup_caches(max_batch_size, max_seq_length)
-        else:
-            assert self.config.model_type == ModelType.Flamingo
-            if max_seq_length is not None:
-                warnings.warn("max_seq_length is not used for Flamingo model. Ignoring it.")
-            self.model.setup_caches(max_batch_size, dtype=dtype)
     
-    def reset_caches(self):
-        assert self.config.model_type == ModelType.Flamingo
-        self.model.reset_caches()
+    @abstractmethod
+    def forward(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def setup_caches(self, *args, **kwargs):
+        pass
+    
+    def _load_state_dict_hook(self, state_dict, prefix, *args, **kwargs):
+        """Apply extra prefix to the state_dict keys.
+
+        Args:
+            state_dict (dict): The state dictionary where the model parameters are stored.
+            prefix (str): The prefix to add to each key in the state_dict.
+        """
+        new_state_dict = {}
+        for key in state_dict.keys():
+            new_key = f"{prefix}{key}"
+            new_state_dict[new_key] = state_dict[key]
+        return new_state_dict
+
+    @classmethod
+    def _get_model_instance(cls, config: ModelArgs):
+        model_class = MODEL_TYPE_TO_CLASS.get(config.model_type)
+        if model_class is None:
+            raise ValueError("Unsupported model type")
+        return model_class(config)
 
     @classmethod
     def from_name(cls, name: str):
-        return cls(ModelArgs.from_name(name))
+        return cls._get_model_instance(ModelArgs.from_name(name))
 
     @classmethod
     def from_table(cls, name: str):
-        return cls(ModelArgs.from_table(name))
+        return cls._get_model_instance(ModelArgs.from_table(name))
 
     @classmethod
     def from_params(cls, params_path: str):
-        return cls(ModelArgs.from_params(params_path))
+        return cls._get_model_instance(ModelArgs.from_params(name))
 
     @classmethod
     def from_gguf(cls, gguf_path: str, **kwargs):
-        from torchchat.utils.gguf_loader import load_model_and_state_dict
+        return cls._get_model_instance(ModelArgs.from_gguf(name))
 
-        model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
-        if state_dict != {}:
-            model.load_state_dict(state_dict, assign=True)
-        return model
 
+class TextOnlyModel(Model):
+    def forward(self, tokens: Optional[Tensor] = None, input_pos: Optional[Tensor] = None) -> Tensor:
+        return self.model(tokens, input_pos)
+
+    def setup_caches(self, max_batch_size, max_seq_length):
+        self.model.setup_caches(max_batch_size, max_seq_length)
+
+
+class FlamingoModel(Model):
+    def forward(self, tokens: Optional[Tensor] = None, encoder_input: Optional[Dict[str, Tensor]] = None, encoder_mask: Optional[Tensor] = None) -> Tensor:
+        if encoder_input is None:
+            return self.model(tokens, encoder_mask=encoder_mask)
+        return self.model(tokens, encoder_input=encoder_input, encoder_mask=encoder_mask)
+
+    def setup_caches(self, max_batch_size, dtype=None):
+        self.model.setup_caches(max_batch_size, dtype=dtype)
+
+    def reset_caches(self):
+        self.model.reset_caches()
+
+
+MODEL_TYPE_TO_CLASS = {
+    ModelType.TextOnly: TextOnlyModel,
+    ModelType.Flamingo: FlamingoModel,
+}
 
 class Transformer(nn.Module):
     def __init__(self, config: TransformerArgs) -> None:

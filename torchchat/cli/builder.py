@@ -364,7 +364,7 @@ def _load_model_default(builder_args, only_config=False):
     if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
         checkpoint = checkpoint["model"]
     
-    checkpoint = {"text_transformer." + k: v for k, v in checkpoint.items()}
+    checkpoint = {"model." + k: v for k, v in checkpoint.items()}
 
     model.load_state_dict(checkpoint, assign=True, strict=True)
     return model
