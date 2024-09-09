@@ -20,8 +20,13 @@ from torch.nn import functional as F
 
 from torchchat.utils.build_utils import find_multiple, get_precision
 
-from torchtune.models.flamingo import flamingo_decoder, flamingo_vision_encoder
-from torchtune.modules.model_fusion import DeepFusionModel 
+# bypass the import issue, if any
+# TODO: remove this once the torchao is ready on macos
+try:
+    from torchtune.models.flamingo import flamingo_decoder, flamingo_vision_encoder
+    from torchtune.modules.model_fusion import DeepFusionModel 
+except:
+    pass
 
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
 
