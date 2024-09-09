@@ -25,6 +25,11 @@ from torchtune.modules.model_fusion import DeepFusionModel
 
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
 
+def identity(**kwargs):
+    if len(kwargs) != 1:
+        raise ValueError("Only one argument is expected")
+    return list(kwargs.values())[0]
+
 class ModelType(Enum):
     TextOnly = "text_only"
     Flamingo = "flamingo"
@@ -40,8 +45,8 @@ class ModelRecipe:
     def text_only(cls):
         return cls(
             model_type=ModelType.TextOnly,
-            modules={'text_transformer': Transformer},
-            fusion_class=nn.Identity,
+            modules={'text': Transformer},
+            fusion_class=identity,
         )
     @classmethod
     def flamingo(cls):
@@ -152,7 +157,6 @@ class ModelArgs:
             # now only support flamingo model
             assert model_type == ModelType.Flamingo
             transformer_args = {k: v for k, v in loaded_params.items() if k != "model_type"}
-
         return cls(transformer_args, model_type)
 
     @classmethod
@@ -236,7 +240,7 @@ class Model(nn.Module):
         self.config = config
         # TODO: unify the model init logic
         if config.model_type == ModelType.TextOnly:
-            self.text_transformer = Transformer(config.transformer_args["text"])
+            self.text_transformer = self.build_model()
         else:
             self.model = self.build_model()
     
@@ -244,8 +248,11 @@ class Model(nn.Module):
         recipe = ModelRecipe.get_recipe(self.config.model_type)
         modules = {}
         for name, module_class in recipe.modules.items():
-            modules[name] = module_class(**self.config.transformer_args[name])
-        
+            if isinstance(self.config.transformer_args[name], dict):
+                modules[name] = module_class(**self.config.transformer_args[name])
+            else:
+                modules[name] = module_class(self.config.transformer_args[name])
+
         return recipe.fusion_class(**modules)
 
     def forward(self, 
