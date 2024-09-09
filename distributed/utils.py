@@ -4,6 +4,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
+import itertools
 import os
 from dataclasses import dataclass
 from datetime import timedelta
@@ -14,12 +15,14 @@ from distributed.logging_utils import setup_logging
 
 logger = setup_logging(__name__)
 
+
 def _warn_overwrite_env(env, val):
     if env in os.environ:
         logger.warning(
             f"ENV[{env}] = {os.environ[env]} will be overridden to {val} based on job config"
         )
     os.environ[env] = val
+
 
 TRACE_BUFFER_SIZE = "TORCH_NCCL_TRACE_BUFFER_SIZE"
 TRACE_FILE = "TORCH_NCCL_DEBUG_INFO_TEMP_FILE"
@@ -49,7 +52,47 @@ def get_num_params(model: torch.nn.Module, exclude_embedding: bool = False) -> i
     num_params = sum(p.numel() for p in model.parameters())
     if exclude_embedding:
         num_params -= model.tok_embeddings.weight.numel()
-    return num_params
+    readable_num_params = format_model_params(num_params)
+    return readable_num_params
+
+
+def get_stage_size(stage):
+    model_size = sum(
+        [
+            p.numel() * p.dtype.itemsize
+            for p in itertools.chain(stage.parameters(), stage.buffers())
+        ]
+    )
+    readable_model_size = bytes_to_readable(model_size)
+    return model_size, readable_model_size
+
+
+def format_model_params(params):
+    """turn the num_params into a readable formatted number"""
+    if params >= 1_000_000_000:
+        return f"{params / 1_000_000_000:.2f}B"
+    elif params >= 1_000_000:
+        return f"{params / 1_000_000:.2f}M"
+    else:
+        return f"{params:,}"
+
+
+def bytes_to_readable(bytes_value: int, round_to: int = 2) -> str:
+    """formatting function to make reading model (stage) sizes easy"""
+    GiB = 1024**3  # 1 GiB in bytes
+    MiB = 1024**2  # 1 MiB in bytes
+
+    if bytes_value >= GiB:
+        value = bytes_value / GiB
+        unit = "GiB"
+    else:
+        value = bytes_value / MiB
+        unit = "MiB"
+
+    # Round to 2 decimal places
+    rounded_value = round(value, round_to)
+
+    return f"{rounded_value} {unit}"
 
 
 @dataclass(frozen=True)
