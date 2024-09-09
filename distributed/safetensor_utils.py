@@ -107,9 +107,9 @@ def remap_weight_keys(dictionary):
         "v_proj": "wv",
         "q_proj": "wq",
         "post_attention_layernorm.weight": "ffn_norm.weight",
-        "down_proj": "w1",
-        "gate_proj": "w3",
-        "up_proj": "w2",
+        "down_proj": "w2",
+        "gate_proj": "w1",
+        "up_proj": "w3",
         "lm_head.weight": "output.weight",
         "mlp": "feed_forward",
     }
@@ -138,6 +138,7 @@ def load_safetensor_weights(
     device: torch.device = "cuda",
     purge_model_prefix: bool = True,
     ignore_cache_layers: bool = True,
+    model_config: Optional[Dict] = None,
 ) -> Tuple[int, int]:
     """
     Load safetensor weights into a stage module.
@@ -150,6 +151,7 @@ def load_safetensor_weights(
         device (torch.device): The device to load tensors onto.
         purge_model_prefix (bool): Whether to remove 'model.' prefix from keys.
         ignore_cache_layers (bool): Whether to ignore cache layers when reporting missing keys.
+        model_config (Optional[Dict]): Model configuration.
 
     Returns:
         Tuple[int, int]: Number of updated weights and number of missing weights.
@@ -174,6 +176,7 @@ def load_safetensor_weights(
                 file,
                 updated_states,
                 device,
+                model_config,
             )
         except FileNotFoundError:
             logger.error(f"File not found: {full_path}")
@@ -239,6 +242,16 @@ def load_checkpoint(full_path: str, device: torch.device) -> Dict[str, torch.Ten
     return tensors
 
 
+def permute_weight_to_attn_heads(w, n_heads, head_dim, model_dim):
+    """Permute the weight tensor to match the attention heads."""
+    # TODO - this is borrowed from chat/convert_hf...we should expose this as a direct function
+    return (
+        w.view(n_heads, 2, head_dim // 2, model_dim)
+        .transpose(1, 2)
+        .reshape(head_dim * n_heads, model_dim)
+    )
+
+
 def update_state_dict(
     state_dict: Dict[str, torch.Tensor],
     checkpoint: Dict[str, torch.Tensor],
@@ -247,8 +260,15 @@ def update_state_dict(
     file: str,
     updated_states: Set[str],
     device: torch.device,
+    model_config: Optional[Dict] = None,
 ):
     count_dtensors_loaded = 0
+    # for handling attn head permuting
+    num_heads = model_config.n_heads
+    dim = model_config.dim
+    num_local_heads = model_config.n_local_heads
+    head_dim = model_config.head_dim
+
     for param, file_with_param in weight_map.items():
         if file_with_param == file and param in state_dict:
             model_param = (
@@ -263,17 +283,22 @@ def update_state_dict(
             checkpoint_tensor = checkpoint[old_param]
             stage_tensor = state_dict[param]
 
-            # stage_is_dtensor = is_dtensor(stage_tensor)
-            # logger.info(f"cme DType Check: {param=}, {stage_is_dtensor=}, {checkpoint_tensor.dtype=}, {stage_tensor.dtype=}")
+            stage_is_dtensor = is_dtensor(stage_tensor)
 
-            checkpoint_tensor = compare_and_reverse(stage_tensor, checkpoint_tensor)
+            if "wq" in param:
+                checkpoint_tensor = permute_weight_to_attn_heads(
+                    checkpoint_tensor, num_heads, head_dim, dim
+                )
+            elif "wk" in param:
+                checkpoint_tensor = permute_weight_to_attn_heads(
+                    checkpoint_tensor, num_local_heads, head_dim, dim
+                )
 
             # here we need to check if the tensor is a DTensor and if so, adjust the
             # shape and placement to match the model DTensor.
-            if is_dtensor(stage_tensor):
+            if stage_is_dtensor:
                 model_tensor = load_into_dtensor(checkpoint_tensor, stage_tensor)
                 # logger.info(f"DTensor: Loaded {param} into {model_tensor=}")
-
                 state_dict[param] = model_tensor
                 count_dtensors_loaded += 1
 

@@ -265,7 +265,7 @@ def main(args) -> None:
         model_forward = torch.compile(
             model_forward, mode="reduce-overhead", dynamic=True, fullgraph=True
         )
-        torch._inductor.config.coordinate_descent_tuning = True
+        torch._inductor.config.coordinate_descent_tuning = False if device == "cpu" else True
 
     with measure_time("Time to run eval: {time:.02f}s."):
         result = eval(
