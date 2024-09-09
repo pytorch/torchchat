@@ -7,6 +7,9 @@
 import os
 from dataclasses import dataclass
 from datetime import timedelta
+import time
+from typing import Optional
+
 
 import torch
 
@@ -14,12 +17,14 @@ from distributed.logging_utils import setup_logging
 
 logger = setup_logging(__name__)
 
+
 def _warn_overwrite_env(env, val):
     if env in os.environ:
         logger.warning(
             f"ENV[{env}] = {os.environ[env]} will be overridden to {val} based on job config"
         )
     os.environ[env] = val
+
 
 TRACE_BUFFER_SIZE = "TORCH_NCCL_TRACE_BUFFER_SIZE"
 TRACE_FILE = "TORCH_NCCL_DEBUG_INFO_TEMP_FILE"
@@ -76,3 +81,31 @@ class NoColor:
     cyan = ""
     white = ""
     reset = ""
+
+
+class TrackTime:
+    """integrated class for perf timing via perf_counter"""
+
+    def __init__(self, use_ms: bool = False, round_to: Optional[int] = 4):
+        self.use_ms = use_ms
+        self.round_to = round_to
+        self.start_time = 0.0
+        self.elapsed_time = 0.0
+        self.unit = "seconds" if not use_ms else "milliseconds"
+
+    def __enter__(self):
+        self.start_time = time.perf_counter()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        end_time = time.perf_counter()
+        self.elapsed_time = end_time - self.start_time
+
+        if self.use_ms:
+            self.elapsed_time *= 1000  # Convert to milliseconds
+
+        if self.round_to is not None:
+            self.elapsed_time = round(self.elapsed_time, self.round_to)
+
+    def get_time(self) -> float:
+        return self.elapsed_time

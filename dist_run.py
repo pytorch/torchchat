@@ -16,11 +16,14 @@ import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 
 from distributed.logging_utils import setup_logging
+
 # TODO - these are not distributed specific, consider moving to new package
-from distributed.safetensor_utils import (get_hf_config_file,
-                                          get_hf_weight_map_and_path,
-                                          load_safetensor_weights)
-from distributed.utils import Color as color
+from distributed.safetensor_utils import (
+    get_hf_config_file,
+    get_hf_weight_map_and_path,
+    load_safetensor_weights,
+)
+from distributed.utils import Color as color, TrackTime
 from distributed.verification_utils import find_cpu_tensors
 from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
 from torchchat.model import ModelArgs, Transformer
@@ -182,7 +185,12 @@ def main():
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    _load_model_weights(model, hf_model_name, device=device, model_config=config)
+    with TrackTime() as timer:
+        _load_model_weights(model, hf_model_name, device=device, model_config=config)
+
+    logger.info(
+        f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for stage {rank}{color.reset}"
+    )
 
     # Setup input position
     # input_pos for prefill: a list of increasing integers from 0 to seqlen
