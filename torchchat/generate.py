@@ -834,6 +834,8 @@ class Generator:
                 generator_args.compile or generator_args.compile_prefill
             )
             compilation_time = time.perf_counter() - t0
+            device_sync(device=self.builder_args.device)
+            t = time.perf_counter() - t0
             if hasattr(prof, "export_chrome_trace"):
                 if self.builder_args.device == "cpu":
                     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
@@ -843,8 +845,6 @@ class Generator:
                     prof.export_chrome_trace(f"{self.profile}_rank_{self.rank}.json")
                 else:
                     prof.export_chrome_trace(f"{self.profile}.json")
-            device_sync(device=self.builder_args.device)
-            t = time.perf_counter() - t0
 
             if start_pos >= max_seq_length:
                 print(
