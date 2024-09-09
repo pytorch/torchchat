@@ -58,7 +58,7 @@ def export_for_server(
 
         seq = Dim("seq", min=1, max=model.config.transformer_args["text"].max_seq_length)
         # Specify that the first dimension of each input is that batch size
-        dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
+        dynamic_shapes = {"tokens": {1: seq}, "input_pos": {0: seq}}
     else:
         input = (
             torch.tensor([[1]], dtype=torch.int, device=device),
