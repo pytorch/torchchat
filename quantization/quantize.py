@@ -22,7 +22,11 @@
 #
 from __future__ import annotations
 
+# torchao_experimental
+import importlib.util
+
 import json
+import sys
 
 # from functools import reduce
 # from math import gcd
@@ -44,6 +48,22 @@ from torchao.quantization.quant_api import (
     quantize_,
 )
 from torchao.utils import unwrap_tensor_subclass
+
+torchao_experimental_spec = importlib.util.spec_from_file_location(
+    "torchao_experimental",
+    "/Users/scroy/fbsource/fbcode/pytorch/ao/torchao/experimental/kernels/cpu/linear/examples/torch_custom_op/torch_custom_op.py",
+)
+torchao_experimental = importlib.util.module_from_spec(torchao_experimental_spec)
+sys.modules["torchao_experimental"] = torchao_experimental
+torchao_experimental_spec.loader.exec_module(torchao_experimental)
+
+import glob
+
+libs = glob.glob("/tmp/cmake-out/torchao/libtorch_custom_op.*")
+libs = list(filter(lambda l: (l.endswith("so") or l.endswith("dylib")), libs))
+torch.ops.load_library(libs[0])
+
+from torchao_experimental import Int8DynActLowbitWeightQuantizer
 
 
 #########################################################################
@@ -92,9 +112,20 @@ def quantize_model(
 
             try:
                 # Easier to ask forgiveness than permission
-                quant_handler = ao_quantizer_class_dict[quantizer](
-                    groupsize=q_kwargs["groupsize"], device=device, precision=precision
-                )
+                if quantizer == "linear:a8wlow":
+                    quant_handler = ao_quantizer_class_dict[quantizer](
+                        device=device,
+                        precision=precision,
+                        bitwidth=q_kwargs.get("bitwidth", 4),
+                        groupsize=q_kwargs.get("groupsize", 128),
+                        has_weight_zeros=q_kwargs.get("has_weight_zeros", False),
+                    )
+                else:
+                    quant_handler = ao_quantizer_class_dict[quantizer](
+                        groupsize=q_kwargs["groupsize"],
+                        device=device,
+                        precision=precision,
+                    )
             except TypeError as e:
                 if "unexpected keyword argument 'device'" in str(e):
                     quant_handler = ao_quantizer_class_dict[quantizer](
@@ -564,33 +595,75 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
         return self.quantize(self.model_)
 
 
-class CustomHandler(QuantHandler):
-    def __init__(self, model: nn.Module, device="cpu", tokenizer=None):
-        self.model_ = model
-        self.device = device
-        self.tokenizer = tokenizer
+# class A8WLowHandler(QuantHandler):
+#     def __init__(
+#         self,
+#         model: nn.Module,
+#         device="cpu",
+#         tokenizer=None,
+#         *,
+#         bitwidth: Optional[int] = None,
+#         groupsize: Optional[int] = None,
+#         has_weight_zeros: Optional[bool] = None,
+#     ):
+#         self.model_ = model
+#         self.device = device
+#         self.tokenizer = tokenizer
 
-    def create_quantized_state_dict(self) -> Dict:  # "StateDict"
-        pass
+#         if bitwidth is None:
+#             self.bitwidth = 4
+#             print(f"Warning: bitwidth not specified, defaulting to {self.bitwidth}.")
+#         else:
+#             self.bitwidth = bitwidth
 
-    def convert_for_runtime(self) -> nn.Module:
-        pass
+#         if groupsize is None:
+#             self.groupsize = 256
+#             print(f"Warning: groupsize not specified, defaulting to {self.groupsize}.")
+#         else:
+#             self.groupsize = groupsize
 
-    def quantized_model(self) -> nn.Module:
-        self.model_ = self.model_.to("cpu")
+#         if has_weight_zeros is None:
+#             self.has_weight_zeros = False
+#             print(f"Warning: has_weight_zeros not specified, defaulting to {self.has_weight_zeros}.")
+#         else:
+#             self.has_weight_zeros = has_weight_zeros
 
-        import importlib.util
-        import sys
-        spec = importlib.util.spec_from_file_location(
-            "torch_custom_op",
-            "/Users/scroy/fbsource/fbcode/pytorch/ao/torchao/experimental/kernels/cpu/linear/examples/torch_custom_op/torch_custom_op.py"
-        )
-        torch_custom_op = importlib.util.module_from_spec(spec)
-        sys.modules["torch_custom_op"] = torch_custom_op
-        spec.loader.exec_module(torch_custom_op)
+#         print("Quantizing with:")
+#         print(f"\tbitwidth: {self.bitwidth}")
+#         print(f"\tgroupsize: {self.groupsize}")
+#         print(f"\thas_weight_zeros: {self.has_weight_zeros}")
 
-        torch_custom_op.replace_linear_with_quantized_linear(self.model_, kwargs={"group_size": 256, "nbit": 4, "squeeze_unsqueeze_dim0": True})
-        return self.model_
+#     def create_quantized_state_dict(self) -> Dict:  # "StateDict"
+#         pass
+
+#     def convert_for_runtime(self) -> nn.Module:
+#         pass
+
+#     def quantized_model(self) -> nn.Module:
+#         self.model_ = self.model_.to("cpu")
+
+#         import importlib.util
+#         import sys
+
+#         spec = importlib.util.spec_from_file_location(
+#             "torch_custom_op",
+#             "/Users/scroy/fbsource/fbcode/pytorch/ao/torchao/experimental/kernels/cpu/linear/examples/torch_custom_op/torch_custom_op.py",
+#         )
+#         torch_custom_op = importlib.util.module_from_spec(spec)
+#         sys.modules["torch_custom_op"] = torch_custom_op
+#         spec.loader.exec_module(torch_custom_op)
+
+#         torch_custom_op.replace_linear_with_quantized_linear(
+#             self.model_,
+#             kwargs={
+#                 "group_size": self.groupsize,
+#                 "nbit": self.bitwidth,
+#                 "has_weight_zeros": self.has_weight_zeros,
+#                 "squeeze_unsqueeze_dim0": True,
+#             },
+#         )
+#         return self.model_
+
 
 ##########################################################################
 ###                       quantization dictionary                      ###
@@ -603,10 +676,10 @@ quantizer_class_dict = {
     "linear:int8": WeightOnlyInt8QuantHandler,
     "precision": PrecisionHandler,
     "executor": ExecutorHandler,
-    "_custom": CustomHandler,
 }
 
 ao_quantizer_class_dict = {
     "linear:int4": Int4WeightOnlyQuantizer,
     "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
+    "linear:a8wlow": Int8DynActLowbitWeightQuantizer,
 }

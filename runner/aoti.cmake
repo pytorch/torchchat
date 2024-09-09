@@ -28,3 +28,6 @@ if(Torch_FOUND)
     target_link_libraries(aoti_run "${TORCH_LIBRARIES}" m)
     set_property(TARGET aoti_run PROPERTY CXX_STANDARD 17)
 endif()
+
+
+target_link_libraries(aoti_run "/tmp/cmake-out/torchao/libtorch_custom_op.dylib")
