@@ -21,3 +21,6 @@ runner-aoti/cmake-out/*
 
 # debug / logging files
 system_info.txt
+
+# intermediate system file
+.DS_Store
