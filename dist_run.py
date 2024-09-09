@@ -4,36 +4,54 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+import os
+from pathlib import Path
+from types import SimpleNamespace
+from typing import Any, Dict
+
 # Run command:
 # torchrun --nproc-per-node 4 dist_run.py
 import torch
 import torch.distributed as dist
-from distributed.dtensor_utils import find_cpu_tensors, record_module_dtypes
-from distributed.logging_utils import setup_logging
-
-# TODO - these are not distributed specific, consider moving to new package
-from distributed.safetensor_utils import (
-    get_hf_config_file,
-    get_hf_weight_map_and_path,
-    load_safetensor_weights,
-)
-from distributed.utils import Color as color
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
-from torchchat.model import ModelArgs, TransformerArgs
-from torchchat.model_dist import TransformerStage
-from torchchat.utils.build_utils import get_precision
+
+from distributed.logging_utils import setup_logging
+# TODO - these are not distributed specific, consider moving to new package
+from distributed.safetensor_utils import (get_hf_config_file,
+                                          get_hf_weight_map_and_path,
+                                          load_safetensor_weights)
+from distributed.utils import Color as color
+from distributed.verification_utils import find_cpu_tensors
+from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
+from torchchat.model import ModelArgs, Transformer
+from torchchat.utils.build_utils import set_precision
+
+try:
+    from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
+except ImportError:
+    TiktokenTokenizer = None
+try:
+    from sentencepiece import SentencePieceProcessor
+except ImportError:
+    SentencePieceProcessor = None
+
+
+logger = setup_logging(__name__)
 
 MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
     "Transformer-2-7b-chat-hf": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
+    "Meta-Llama-3-8B": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16),
 }
+CACHE_PRECISION = torch.bfloat16
 
 
 def _init_distributed():
     dist.init_process_group("nccl")
     rank = dist.get_rank()
     world_size = dist.get_world_size()
-    torch.cuda.set_device(rank)
+    # Assuming same number of GPUs per node
+    torch.cuda.set_device(rank % torch.cuda.device_count())
     return rank, world_size
 
 
@@ -41,10 +59,47 @@ def _create_device_mesh(mesh_dimensions):
     return dist.init_device_mesh("cuda", mesh_dimensions, mesh_dim_names=("pp", "tp"))
 
 
-def _load_model_weights(stage_module, hf_model_name, device, logger):
+def dict_to_args(dictionary: Dict[str, Any]) -> SimpleNamespace:
+    return SimpleNamespace(**dictionary)
+
+
+def _build_chat_tokenizer(
+    model_base_name: str = "llama3",
+) -> SentencePieceProcessor | TiktokenTokenizer:
+    # Create base args for tokenizer
+    default_model_dir = Path(
+        os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")
+    ).expanduser()
+
+    tokenconfig = {
+        "model_directory": default_model_dir,
+        "model": model_base_name,
+        "tokenizer_path": None,
+    }
+    args = dict_to_args(tokenconfig)
+    tokenizer_args = TokenizerArgs.from_args(args)
+    tokenizer = _initialize_tokenizer(tokenizer_args)
+    assert tokenizer is not None, f"Failed to get tokenizer using {tokenconfig=}"
+    logger.info(
+        f"using tokenizer = {tokenizer.__class__.__module__}.{tokenizer.__class__.__name__}"
+    )
+    return tokenizer
+
+
+def _load_model_weights(stage_module, hf_model_name, device, model_config):
+    """Load the weights from the safetensor file(s) into the model stage.
+    Model config is needed b/c we permute wq and wk weights based on attn heads.
+    """
+
     weight_map, weight_path, key_map = get_hf_weight_map_and_path(hf_model_name)
+
     num_loaded_weights, num_missing_weights = load_safetensor_weights(
-        stage_module, weight_map, weight_path, key_map, device
+        stage_module,
+        weight_map,
+        weight_path,
+        key_map,
+        device,
+        model_config=model_config,
     )
     logger.info(
         f"Success - Loaded {num_loaded_weights} weights, {num_missing_weights} missing weights"
@@ -60,36 +115,56 @@ def _cleanup():
 
 def main():
     rank, world_size = _init_distributed()
-    logger = setup_logging(__name__)
 
     config = ModelArgs.from_name(MODEL_NAME).transformer_args['text']
     logger.info(f"Chat Model Config: {config}")
-    # TODO - should we make this work...atm returns float32
-    # torchchat_precision = get_precision()
+
+    tokenizer = _build_chat_tokenizer()
+    logger.info(f"built tokenizer {tokenizer=}")
 
     hf_model_name, model_dtype = NAME_TO_HF_MODEL_ID_AND_DTYPE[MODEL_NAME]
     logger.info(f"Using HF model weights from {hf_model_name} and dtype {model_dtype}")
+
+    set_precision(CACHE_PRECISION)
+    logger.info(f"Using cache precision {CACHE_PRECISION}")
 
     hf_config = get_hf_config_file(hf_model_name)
     if hf_config is None:
         raise ValueError(f"Config file not found for model id {hf_model_name}")
     logger.info(f"Using HF model weights from {hf_model_name}")
 
-    mesh_dimensions = (2, 2)
-    device_mesh = _create_device_mesh(mesh_dimensions)
+    # Assuming 2 pipeline stages, feel free to change this as long as the
+    # asserts are satisfied
+    pp_degree = 2
+    assert world_size % pp_degree == 0
+    assert config.n_layers % pp_degree == 0
 
+    # Sequence parallel is enabled in this program
+    # Sequence parallel = Tensor parallel + dividing sequence by tp_degree at layer boundary
+    sp_degree = world_size // pp_degree
+
+    # Create device mesh
+    mesh_dimensions = (pp_degree, sp_degree)
+    device_mesh = _create_device_mesh(mesh_dimensions)
     tp_mesh = device_mesh["tp"]
     pp_mesh = device_mesh["pp"]
+    tp_rank = tp_mesh.get_local_rank()
     pp_rank = pp_mesh.get_local_rank()
-    nstages = pp_mesh.size()
-    device = torch.device(f"cuda:{rank}")
+
+    # Assuming same number of GPUs per node
+    device = torch.device(f"cuda:{rank % torch.cuda.device_count()}")
+
+    # Fill in PP configs
+    config.stage_idx = pp_rank
+    config.n_stages = pp_degree
 
     with device:
-        with tp_mesh:
-            model = TransformerStage(config, pp_rank, nstages)
-            model.setup_caches(1, 4096)
-            # TODO: refine this .to once we start using fp8 for KV cache
-            model = model.to(model_dtype)
+        model = Transformer(config)
+
+    model.setup_caches(1, 4096)
+
+    # Distribute model on TP mesh
+    model.distribute(tp_mesh)
     logger.info(f"Model: {model}")
 
     mbs = 2  # number of micro-batches
@@ -97,22 +172,29 @@ def main():
     batch_size = mbs * mb_size  # total batch size
     seqlen = 4096  # sequence length
     dim = 4096  # embedding dimension
+    assert seqlen % sp_degree == 0
 
     mb_ids = torch.randint(0, config.vocab_size, (mb_size, seqlen), device=device)
-    activation = torch.rand(mb_size, seqlen, dim, device=device, dtype=model_dtype)
+    activation = torch.rand(
+        mb_size, seqlen // sp_degree, dim, device=device, dtype=model_dtype
+    )
     example_args = mb_ids if pp_rank == 0 else activation
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    _load_model_weights(model, hf_model_name, device=device, logger=logger)
+    _load_model_weights(model, hf_model_name, device=device, model_config=config)
 
+    # Setup input position
+    # input_pos for prefill: a list of increasing integers from 0 to seqlen
+    input_pos = torch.arange(seqlen, device=device)
+    model.setup_input_pos(input_pos)
     model.eval()
 
-    logger.info(f"Creating pipeline stage {pp_rank=}, {nstages=}")
+    logger.info(f"Creating pipeline stage {pp_rank=}, {pp_degree=}")
     stage = PipelineStage(
         model,
         pp_rank,
-        nstages,
+        pp_degree,
         device,
         input_args=(example_args,),
         group=pp_mesh.get_group(),
@@ -145,7 +227,9 @@ def main():
             schedule.step(input_ids)
         else:
             output = schedule.step()
-            logger.info(f"Output: {output}")
+
+    if pp_rank == pp_degree - 1 and tp_rank == 0:
+        logger.info(f"Output: {output}")
 
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
