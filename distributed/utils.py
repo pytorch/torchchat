@@ -112,11 +112,23 @@ class TrackTime:
 
 
 class CUDATrackTime:
-    """integrated class for perf timing via cuda events"""
+    """integrated class for perf timing via cuda events.
+    Note - this uses a default stream synchronize, and defaults to current device."""
 
-    def __init__(self, use_ms: bool = False, round_to: Optional[int] = 4):
-        self.start_event = torch.cuda.Event(enable_timing=True)
-        self.end_event = torch.cuda.Event(enable_timing=True)
+    def __init__(self, device=None, use_ms: bool = False, round_to: Optional[int] = 4):
+        if device is None:
+            device = torch.cuda.current_device()
+        elif isinstance(device, str):
+            device = torch.device(device)
+        elif isinstance(device, int):
+            device = torch.device(f"cuda:{device}")
+
+        self.device = device
+        # Create events on the specified device
+        with torch.cuda.device(self.device):
+            self.start_event = torch.cuda.Event(enable_timing=True)
+            self.end_event = torch.cuda.Event(enable_timing=True)
+
         self.active = False
         self.round_to = round_to
         self.elapsed_time = 0.0
@@ -139,7 +151,7 @@ class CUDATrackTime:
         if self.active:
             raise RuntimeError("Timer is still running. Use .stop() to stop it")
 
-        torch.cuda.synchronize()  # Wait for all GPU operations to finish
+        torch.cuda.synchronize(self.device)  # Synchronize all streams on the device
         total_time = self.start_event.elapsed_time(self.end_event)
 
         if not self.use_ms:
