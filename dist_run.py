@@ -15,6 +15,7 @@ import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 
+
 from distributed.logging_utils import SingletonLogger
 
 # TODO - these are not distributed specific, consider moving to new package
@@ -23,7 +24,9 @@ from distributed.safetensor_utils import (
     get_hf_weight_map_and_path,
     load_safetensor_weights,
 )
-from distributed.utils import Color as color
+
+from distributed.utils import Color as color, GPUMemoryMonitor
+
 from distributed.verification_utils import find_cpu_tensors
 from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
 from torchchat.model import ModelArgs, Transformer
@@ -118,6 +121,9 @@ def _cleanup():
 
 def main():
     rank, world_size = _init_distributed()
+
+    gpu_memory_monitor = GPUMemoryMonitor("cuda")
+    logger.info(f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}")
 
     config = ModelArgs.from_name(MODEL_NAME).text_transformer_args
     logger.info(f"Chat Model Config: {config}")
@@ -233,6 +239,12 @@ def main():
 
     if pp_rank == pp_degree - 1 and tp_rank == 0:
         logger.info(f"Output: {output}")
+
+    # show peak memory stats for this stage
+    res_mem_gib, res_mem_pct = gpu_memory_monitor.get_peak_stats()
+    logger.info(
+        f"{color.blue} Memory used: {color.green}{res_mem_pct:.3f} %, {color.magenta}{res_mem_gib:.3f} GB{color.reset}"
+    )
 
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
