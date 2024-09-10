@@ -112,8 +112,11 @@ class TrackTime:
 
 
 class CUDATrackTime:
-    """integrated class for perf timing via cuda events.
-    Note - this uses a default stream synchronize, and defaults to current device."""
+    """
+    Integrated class for perf timing via cuda events.
+    Note - this uses the default stream to synchronize, and defaults to current device.
+    The event.record() will create a context on the CUDA device matching the device used at init.
+    """
 
     def __init__(self, device=None, use_ms: bool = False, round_to: Optional[int] = 4):
         if device is None:

@@ -185,13 +185,13 @@ def main():
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    with CUDATrackTime("cuda") as timer:
+    with TrackTime("cuda") as timer:
         _load_model_weights(model, hf_model_name, device=device, model_config=config)
 
     logger.info(
         f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for stage {rank}{color.reset}"
     )
-    assert False, "check time"
+    
     
     # Setup input position
     # input_pos for prefill: a list of increasing integers from 0 to seqlen
