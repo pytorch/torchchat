@@ -200,6 +200,7 @@ class Generator:
         self.quantize = quantize
         self.draft_quantize = draft_quantize
         self.is_torchtune_model = generator_args.is_torchtune_model
+        self.dtype = builder_args.precision
 
         # global print
         #    from tp import maybe_init_dist
@@ -524,7 +525,7 @@ class Generator:
             model = model.to(device=device)
             with torch.device(device):
                 if self.is_torchtune_model:
-                    model.setup_caches(max_batch_size=1, dtype=model.dtype)
+                    model.setup_caches(max_batch_size=1, dtype=self.dtype)
                 else:
                     model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
                 if is_speculative and draft_model is not model:
