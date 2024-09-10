@@ -23,7 +23,7 @@ from distributed.safetensor_utils import (
     get_hf_weight_map_and_path,
     load_safetensor_weights,
 )
-from distributed.utils import Color as color, build_gpu_memory_monitor
+from distributed.utils import Color as color, GPUMemoryMonitor
 from distributed.verification_utils import find_cpu_tensors
 from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
 from torchchat.model import ModelArgs, Transformer
@@ -119,8 +119,8 @@ def _cleanup():
 def main():
     rank, world_size = _init_distributed()
 
-    gpu_memory_monitor, device_info = build_gpu_memory_monitor()
-    logger.info(f"{color.yellow} {device_info}{color.reset}")
+    gpu_memory_monitor = GPUMemoryMonitor("cuda")
+    logger.info(f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}")
 
     config = ModelArgs.from_name(MODEL_NAME).text_transformer_args
     logger.info(f"Chat Model Config: {config}")

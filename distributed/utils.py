@@ -81,10 +81,10 @@ class NoColor:
 
 
 class GPUMemoryMonitor:
-    def __init__(self, device: str = "cuda:0"):
+    def __init__(self, device: str):
         self.device = torch.device(device)  # device object
         self.device_name = torch.cuda.get_device_name(self.device)
-        self.device_index = torch.cuda.current_device()
+        self.device_index = self.device.index
         self.device_capacity = torch.cuda.get_device_properties(
             self.device
         ).total_memory
@@ -105,10 +105,6 @@ class GPUMemoryMonitor:
     def get_peak_stats(self):
         cuda_info = torch.cuda.memory_stats(self.device)
 
-        # max_active = cuda_info["active_bytes.all.peak"]
-        # max_active_gib = self._to_gib(max_active)
-        # max_active_pct = self._to_pct(max_active)
-
         max_reserved = cuda_info["reserved_bytes.all.peak"]
         max_reserved_gib = self._to_gib(max_reserved)
         max_reserved_pct = self._to_pct(max_reserved)
@@ -118,12 +114,12 @@ class GPUMemoryMonitor:
     def reset_peak_stats(self):
         torch.cuda.reset_peak_memory_stats()
 
-
-def build_gpu_memory_monitor():
-    gpu_memory_monitor = GPUMemoryMonitor("cuda")
-    device_info = (
-        f"GPU capacity: {gpu_memory_monitor.device_name} ({gpu_memory_monitor.device_index}) "
-        f"with {gpu_memory_monitor.device_capacity_gib:.2f}GiB memory"
-    )
-
-    return gpu_memory_monitor, device_info
+    def get_device_info(
+        self,
+    ) -> str:
+        """provides a single formatted string detailing device name, index and total memory"""
+        device_info = (
+            f"GPU capacity: {self.device_name} ({self.device_index}) "
+            f"with {self.device_capacity_gib:.2f}GiB memory"
+        )
+        return device_info
