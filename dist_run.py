@@ -23,7 +23,7 @@ from distributed.safetensor_utils import (
     get_hf_weight_map_and_path,
     load_safetensor_weights,
 )
-from distributed.utils import Color as color, TrackTime
+from distributed.utils import Color as color, TrackTime, CUDATrackTime
 from distributed.verification_utils import find_cpu_tensors
 from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
 from torchchat.model import ModelArgs, Transformer
@@ -191,7 +191,7 @@ def main():
     logger.info(
         f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for stage {rank}{color.reset}"
     )
-
+    
     # Setup input position
     # input_pos for prefill: a list of increasing integers from 0 to seqlen
     input_pos = torch.arange(seqlen, device=device)

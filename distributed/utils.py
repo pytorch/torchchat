@@ -109,3 +109,52 @@ class TrackTime:
 
     def get_time(self) -> float:
         return self.elapsed_time
+
+
+class CUDATrackTime:
+    """integrated class for perf timing via cuda events"""
+
+    def __init__(self, use_ms: bool = False, round_to: Optional[int] = 4):
+        self.start_event = torch.cuda.Event(enable_timing=True)
+        self.end_event = torch.cuda.Event(enable_timing=True)
+        self.active = False
+        self.round_to = round_to
+        self.elapsed_time = 0.0
+        self.use_ms = use_ms
+        self.unit = "seconds" if not use_ms else "milliseconds"
+
+    def start(self):
+        if self.active:
+            raise RuntimeError("Timer is already running. Use .stop() to stop it")
+        self.start_event.record()
+        self.active = True
+
+    def stop(self):
+        if not self.active:
+            raise RuntimeError("Timer is not running. Use .start() to start it")
+        self.end_event.record()
+        self.active = False
+
+    def get_time(self):
+        if self.active:
+            raise RuntimeError("Timer is still running. Use .stop() to stop it")
+
+        torch.cuda.synchronize() # Wait for all GPU operations to finish
+        total_time = self.start_event.elapsed_time(self.end_event)
+
+        if not self.use_ms:
+            total_time = total_time / 1000.0  # to seconds
+
+        if self.round_to:
+            total_time = round(total_time, self.round_to)
+
+        self.elapsed_time = total_time
+
+        return self.elapsed_time
+
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
