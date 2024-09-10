@@ -303,7 +303,7 @@ class Model(ABC, nn.Module):
 
     @classmethod
     def from_params(cls, params_path: str):
-        return cls._get_model_instance(ModelArgs.from_params(name))
+        return cls._get_model_instance(ModelArgs.from_params(params_path))
 
     @classmethod
     def from_gguf(cls, gguf_path: str, **kwargs):

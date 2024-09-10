@@ -506,10 +506,7 @@ class Generator:
             torch.manual_seed(seed)
 
         is_speculative = draft_model is not None
-        device, dtype = prompt.device, prompt.dtype
-
-        print(f"Generating {max_new_tokens} tokens on device {device} with dtype {dtype}")
-        
+        device, dtype = prompt.device, prompt.dtype        
 
         # create an empty tensor of the expected final shape and
         # fill in the current tokens

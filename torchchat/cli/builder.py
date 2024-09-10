@@ -35,6 +35,9 @@ from torchchat.utils.build_utils import (
 from torchchat.utils.measure_time import measure_time
 from torchchat.utils.quantize import quantize_model
 
+from torchtune.training import set_default_dtype
+
+
 
 @dataclass
 class BuilderArgs:
@@ -372,6 +375,7 @@ def _load_model_default(builder_args, only_config=False):
     tune_checkpoint = {"model." + k: v for k, v in tune_checkpoint.items()}
 
     model.load_state_dict(tune_checkpoint, assign=True, strict=True)
+
     return model
 
 
