@@ -119,3 +119,48 @@ class NoColor:
     cyan = ""
     white = ""
     reset = ""
+
+
+class GPUMemoryMonitor:
+    def __init__(self, device: str):
+        self.device = torch.device(device)  # device object
+        self.device_name = torch.cuda.get_device_name(self.device)
+        self.device_index = self.device.index
+        self.device_capacity = torch.cuda.get_device_properties(
+            self.device
+        ).total_memory
+        self.device_capacity_gib = self._to_gib(self.device_capacity)
+
+        torch.cuda.reset_peak_memory_stats()
+        torch.cuda.empty_cache()
+
+    def _to_gib(self, memory_in_bytes):
+        # NOTE: GiB (gibibyte) is 1024, vs GB is 1000
+        _gib_in_bytes = 1024 * 1024 * 1024
+        memory_in_gib = memory_in_bytes / _gib_in_bytes
+        return memory_in_gib
+
+    def _to_pct(self, memory):
+        return 100 * memory / self.device_capacity
+
+    def get_peak_stats(self):
+        cuda_info = torch.cuda.memory_stats(self.device)
+
+        max_reserved = cuda_info["reserved_bytes.all.peak"]
+        max_reserved_gib = self._to_gib(max_reserved)
+        max_reserved_pct = self._to_pct(max_reserved)
+
+        return max_reserved_gib, max_reserved_pct
+
+    def reset_peak_stats(self):
+        torch.cuda.reset_peak_memory_stats()
+
+    def get_device_info(
+        self,
+    ) -> str:
+        """provides a single formatted string detailing device name, index and total memory"""
+        device_info = (
+            f"GPU capacity: {self.device_name} ({self.device_index}) "
+            f"with {self.device_capacity_gib:.2f}GiB memory"
+        )
+        return device_info
