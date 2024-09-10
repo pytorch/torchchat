@@ -15,7 +15,7 @@ import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 
-from distributed.logging_utils import setup_logging
+from distributed.logging_utils import SingletonLogger
 # TODO - these are not distributed specific, consider moving to new package
 from distributed.safetensor_utils import (get_hf_config_file,
                                           get_hf_weight_map_and_path,
@@ -36,7 +36,7 @@ except ImportError:
     SentencePieceProcessor = None
 
 
-logger = setup_logging(__name__)
+logger = SingletonLogger.get_logger()
 
 MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {

@@ -12,9 +12,9 @@ from typing import Tuple
 
 import torch
 
-from distributed.logging_utils import setup_logging
+from distributed.logging_utils import SingletonLogger
+logger = SingletonLogger.get_logger()
 
-logger = setup_logging(__name__)
 
 try:
     import tomllib
