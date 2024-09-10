@@ -56,15 +56,14 @@ def get_num_params(model: torch.nn.Module, exclude_embedding: bool = False) -> i
     return readable_num_params
 
 
-def get_stage_size(stage):
+def get_module_size(stage):
     model_size = sum(
         [
             p.numel() * p.dtype.itemsize
             for p in itertools.chain(stage.parameters(), stage.buffers())
         ]
     )
-    readable_model_size = bytes_to_readable(model_size)
-    return model_size, readable_model_size
+    return model_size
 
 
 def format_model_params(params):

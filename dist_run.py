@@ -23,7 +23,7 @@ from distributed.safetensor_utils import (
     get_hf_weight_map_and_path,
     load_safetensor_weights,
 )
-from distributed.utils import Color as color, get_stage_size, get_num_params
+from distributed.utils import Color as color, get_module_size, get_num_params, bytes_to_readable
 from distributed.verification_utils import find_cpu_tensors
 from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
 from torchchat.model import ModelArgs, Transformer
@@ -188,12 +188,13 @@ def main():
     _load_model_weights(model, hf_model_name, device=device, model_config=config)
 
     # info on stage size and params
-    stage_size, stage_size_formatted = get_stage_size(model)
+    stage_size = get_module_size(model)
+    stage_size_formatted = bytes_to_readable(stage_size)
     stage_num_params = get_num_params(model)
     logger.info(
         f"Stage {rank} has {color.blue}{stage_num_params} params{color.reset}, Size: {color.blue}{stage_size_formatted}{color.reset}\n"
     )
-
+    assert False, "check formatted"
     # Setup input position
     # input_pos for prefill: a list of increasing integers from 0 to seqlen
     input_pos = torch.arange(seqlen, device=device)
