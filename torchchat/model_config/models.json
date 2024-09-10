@@ -57,6 +57,18 @@
         "distribution_path": "meta-llama/Meta-Llama-3.1-70B-Instruct",
         "transformer_params_key": "Meta-Llama-3.1-70B"
     },
+    "meta-llama/Meta-Llama-3.1-8B-Instruct-Tune": {
+        "aliases": ["llama3.1-tune", "llama3.1-chat-tune", "llama3.1-instruct-tune"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+        "transformer_params_key": "Meta-Llama-3.1-8B-Tune"
+    },
+    "meta-llama/Meta-Llama-3.1-70B-Instruct-Tune": {
+        "aliases": ["llama3.1-70b-tune"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+        "transformer_params_key": "Meta-Llama-3.1-70B-Tune"
+    },
     "meta-llama/CodeLlama-7b-Python-hf": {
         "aliases": ["codellama", "codellama-7b"],
         "distribution_channel": "HuggingFaceSnapshot",

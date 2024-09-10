@@ -116,6 +116,7 @@ class GeneratorArgs:
     speculate_k: int = 5
     sequential_prefill: bool = False
     max_autotune: bool = False
+    is_torchtune_model: bool = False
 
     def __post_init__(self):
         if self.compile_prefill and self.sequential_prefill:
@@ -161,6 +162,7 @@ class GeneratorArgs:
             speculate_k=args.speculate_k,
             sequential_prefill=sequential_prefill,
             max_autotune=args.max_autotune,
+            is_torchtune_model=args.model.endswith("tune"),
         )
 
 
@@ -197,6 +199,7 @@ class Generator:
         self.profile = profile
         self.quantize = quantize
         self.draft_quantize = draft_quantize
+        self.is_torchtune_model = generator_args.is_torchtune_model
 
         # global print
         #    from tp import maybe_init_dist
@@ -517,8 +520,10 @@ class Generator:
         if start_pos == 0:
             model = model.to(device=device)
             with torch.device(device):
-                # model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
-                model.setup_caches(max_batch_size=1, dtype=torch.bfloat16)
+                if self.is_torchtune_model:
+                    model.setup_caches(max_batch_size=1, dtype=model.dtype)
+                else:
+                    model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
                 if is_speculative and draft_model is not model:
                     draft_model.setup_caches(
                         max_batch_size=1, max_seq_length=max_seq_length
@@ -687,7 +692,12 @@ class Generator:
 
         self.system_prompt = None
         # Set up our max_seq_length
-        if generator_args.chat_mode:
+
+        # This is a hack to get around the fact that different models have different ways to record their max_seq_length and might be wrong
+        # TODO: unify the max_seq_length config representation.
+        if generator_args.is_torchtune_model:
+            max_seq_length = self.model.config.transformer_args["text"]["max_seq_len"]
+        elif generator_args.chat_mode:
             max_seq_length = self.model.config.transformer_args["text"].max_seq_length
             print(
                 f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye"
@@ -699,11 +709,11 @@ class Generator:
                 self.system_prompt = input("What is your system prompt? \n")
 
         else:
-            # max_seq_length = min(
-            #     encoded.size(0) + generator_args.max_new_tokens,
-            # )
-            max_seq_length = self.model.config.transformer_args["text"]["max_seq_len"]
-            # max_seq_length = 4096
+            max_seq_length = min(
+                encoded.size(0) + generator_args.max_new_tokens,
+                self.model.config.transformer_args["text"].block_size,
+            )
+
 
         max_seq_length = (
             max_seq_length + self.speculative_builder_args.speculate_k + 1

@@ -36,6 +36,7 @@ from torchchat.utils.measure_time import measure_time
 from torchchat.utils.quantize import quantize_model
 
 from torchtune.training import set_default_dtype
+from torchtune.models.convert_weights import meta_to_tune
 
 
 
@@ -333,48 +334,48 @@ def _load_model_default(builder_args, only_config=False):
     hf_checkpoint = torch.load(
         str(builder_args.checkpoint_path), mmap=True, weights_only=True
     )
-    from torchtune.models.convert_weights import meta_to_tune
 
-    tune_checkpoint = meta_to_tune(hf_checkpoint)
+    cps = []
+    if builder_args.params_table.endswith("Tune"):
+        print("Loading Tune checkpoint")
+        checkpoint = meta_to_tune(hf_checkpoint)
+    elif builder_args.checkpoint_dir is not None:
+        # Load multiple checkpoint; ignore the single path.
+        builder_args.checkpoint_path = None
+        for i in range(4):
+            cp_name = f"consolidated.{i}.pth"
+            print(f"Loading {cp_name}")
+            cps.append(
+                torch.load(
+                    os.path.join(builder_args.checkpoint_dir, cp_name),
+                    map_location=builder_args.device,
+                    mmap=True,
+                )
+            )
+        checkpoint = {}
+        for key in cps[0].keys():
+            if not torch.allclose(cps[0][key], cps[1][key]):
+                values = (cps[0][key], cps[1][key], cps[2][key], cps[3][key])
+                if key.endswith("wo.weight") or key.endswith("w2.weight"):
+                    checkpoint[key] = torch.cat(values, dim=1)
+                else:
+                    checkpoint[key] = torch.cat(values, dim=0)
+            else:
+                checkpoint[key] = cps[0][key]
+    else:
+        checkpoint = torch.load(
+            str(builder_args.checkpoint_path),
+            map_location=builder_args.device,
+            mmap=True,
+            weights_only=True,
+        )
 
-    # cps = []
-    # if builder_args.checkpoint_dir is not None:
-    #     # Load multiple checkpoint; ignore the single path.
-    #     builder_args.checkpoint_path = None
-    #     for i in range(4):
-    #         cp_name = f"consolidated.{i}.pth"
-    #         print(f"Loading {cp_name}")
-    #         cps.append(
-    #             torch.load(
-    #                 os.path.join(builder_args.checkpoint_dir, cp_name),
-    #                 map_location=builder_args.device,
-    #                 mmap=True,
-    #             )
-    #         )
-    #     checkpoint = {}
-    #     for key in cps[0].keys():
-    #         if not torch.allclose(cps[0][key], cps[1][key]):
-    #             values = (cps[0][key], cps[1][key], cps[2][key], cps[3][key])
-    #             if key.endswith("wo.weight") or key.endswith("w2.weight"):
-    #                 checkpoint[key] = torch.cat(values, dim=1)
-    #             else:
-    #                 checkpoint[key] = torch.cat(values, dim=0)
-    #         else:
-    #             checkpoint[key] = cps[0][key]
-    # else:
-    #     checkpoint = torch.load(
-    #         str(builder_args.checkpoint_path),
-    #         map_location=builder_args.device,
-    #         mmap=True,
-    #         weights_only=True,
-    #     )
+    if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
+        checkpoint = checkpoint["model"]
 
-    # if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
-    #     checkpoint = checkpoint["model"]
 
-    tune_checkpoint = {"model." + k: v for k, v in tune_checkpoint.items()}
-
-    model.load_state_dict(tune_checkpoint, assign=True, strict=True)
+    checkpoint = {"model." + k: v for k, v in checkpoint.items()}
+    model.load_state_dict(checkpoint, assign=True, strict=True)
 
     return model
 
