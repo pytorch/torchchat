@@ -11,12 +11,21 @@ from typing import Optional
 
 
 def millisecond_timestamp(include_year: bool = False) -> str:
-    format_string = '%Y-%m-%d %H:%M:%S.%f' if include_year else '%m-%d %H:%M:%S.%f'
+    format_string = "%Y-%m-%d %H:%M:%S.%f" if include_year else "%m-%d %H:%M:%S.%f"
     return datetime.now().strftime(format_string)[:-3]
 
+
 class CompactFormatter(logging.Formatter):
-    def __init__(self, fmt: Optional[str] = None, datefmt: Optional[str] = None, style: str = '%',
-                 validate: bool = True, *, defaults: Optional[dict] = None, show_lower_levels: bool = True):
+    def __init__(
+        self,
+        fmt: Optional[str] = None,
+        datefmt: Optional[str] = None,
+        style: str = "%",
+        validate: bool = True,
+        *,
+        defaults: Optional[dict] = None,
+        show_lower_levels: bool = True,
+    ):
         super().__init__(fmt, datefmt, style, validate, defaults=defaults)
         self.show_lower_levels = show_lower_levels
         self.original_fmt = fmt
@@ -24,28 +33,35 @@ class CompactFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         # Remove .py extension from filename
         record.filename = os.path.splitext(record.filename)[0]
-        
+
         if self.show_lower_levels or record.levelno > logging.INFO:
             return super().format(record)
         else:
             # Create a copy of the record and modify it
             new_record = logging.makeLogRecord(record.__dict__)
-            new_record.levelname = ''
+            new_record.levelname = ""
             # Temporarily change the format string
-            temp_fmt = self.original_fmt.replace(' - %(levelname)s', '')
+            temp_fmt = self.original_fmt.replace(" - %(levelname)s", "")
             self._style._fmt = temp_fmt
             formatted_message = super().format(new_record)
             # Restore the original format string
             self._style._fmt = self.original_fmt
             return formatted_message
 
+
 class SingletonLogger:
     """Singleton (global) logger to avoid logging duplication"""
+
     _instance = None
 
     @classmethod
-    def get_logger(cls, name: str = 'global_logger', level: int = logging.INFO,
-                   include_year: bool = False, show_lower_levels: bool = False) -> logging.Logger:
+    def get_logger(
+        cls,
+        name: str = "global_logger",
+        level: int = logging.INFO,
+        include_year: bool = False,
+        show_lower_levels: bool = False,
+    ) -> logging.Logger:
         """
         Get or create a singleton logger instance.
 
@@ -56,53 +72,38 @@ class SingletonLogger:
         :return: Logger instance
         """
         if cls._instance is None:
-            cls._instance = cls._setup_logger(name, level, include_year, show_lower_levels)
+            cls._instance = cls._setup_logger(
+                name, level, include_year, show_lower_levels
+            )
         return cls._instance
 
     @staticmethod
-    def _setup_logger(name: str, level: int, include_year: bool = False, show_lower_levels: bool = False) -> logging.Logger:
+    def _setup_logger(
+        name: str,
+        level: int,
+        include_year: bool = False,
+        show_lower_levels: bool = False,
+    ) -> logging.Logger:
         logger = logging.getLogger(name)
-        
+
         if not logger.handlers:
             logger.setLevel(level)
-            
+
             console_handler = logging.StreamHandler()
             console_handler.setLevel(level)
-            
+
             formatter = CompactFormatter(
-                '%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s',
-                show_lower_levels=show_lower_levels
+                "%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s",
+                show_lower_levels=show_lower_levels,
             )
-            formatter.formatTime = lambda record, datefmt=None: millisecond_timestamp(include_year)
+            formatter.formatTime = lambda record, datefmt=None: millisecond_timestamp(
+                include_year
+            )
             console_handler.setFormatter(formatter)
             logger.addHandler(console_handler)
-            
+
             # Suppress verbose torch.profiler logging
             os.environ["KINETO_LOG_LEVEL"] = "5"
-        
+
         logger.propagate = False
         return logger
-
-'''
-def millisecond_timestamp(*args):
-    return datetime.now().strftime('%m-%d %H:%M:%S.%f')[:-3]
-
-def setup_logging(name=None, log_level=logging.INFO):
-    logger = logging.getLogger(name)
-    logger.setLevel(log_level)
-
-    if not logger.handlers:
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(log_level)
-
-        formatter = logging.Formatter('%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(message)s')
-        formatter.formatTime = millisecond_timestamp
-
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
-
-        # suppress verbose torch.profiler logging
-        os.environ["KINETO_LOG_LEVEL"] = "5"
-
-    return logger
-'''

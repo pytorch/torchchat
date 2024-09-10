@@ -16,10 +16,13 @@ import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 
 from distributed.logging_utils import SingletonLogger
+
 # TODO - these are not distributed specific, consider moving to new package
-from distributed.safetensor_utils import (get_hf_config_file,
-                                          get_hf_weight_map_and_path,
-                                          load_safetensor_weights)
+from distributed.safetensor_utils import (
+    get_hf_config_file,
+    get_hf_weight_map_and_path,
+    load_safetensor_weights,
+)
 from distributed.utils import Color as color
 from distributed.verification_utils import find_cpu_tensors
 from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
