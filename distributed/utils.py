@@ -56,7 +56,8 @@ def get_num_params(model: torch.nn.Module, exclude_embedding: bool = False) -> i
     return readable_num_params
 
 
-def get_module_size(stage):
+def get_module_size(stage: torch.nn.Module) -> int:
+    """get module (stage) size in bytes"""
     model_size = sum(
         [
             p.numel() * p.dtype.itemsize
