@@ -34,6 +34,7 @@ from torchchat.utils.build_utils import find_multiple, get_precision
 try:
     from torchtune.models.flamingo import flamingo_decoder, flamingo_vision_encoder
     from torchtune.modules.model_fusion import DeepFusionModel 
+    from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
 except:
     pass
 
@@ -46,6 +47,7 @@ def identity(**kwargs):
 
 class ModelType(Enum):
     TextOnly = "text_only"
+    Llama3_1 = "llama3_1"
     Flamingo = "flamingo"
 
 
@@ -62,6 +64,15 @@ class ModelRecipe:
             modules={'text': Transformer},
             fusion_class=identity,
         )
+    
+    @classmethod
+    def llama3_1(cls):
+        return cls(
+            model_type=ModelType.Llama3_1,
+            modules={'text': llama3_1_builder},
+            fusion_class=identity,
+        )
+
     @classmethod
     def flamingo(cls):
         return cls(
@@ -79,6 +90,8 @@ class ModelRecipe:
             return cls.text_only()
         elif model_type == ModelType.Flamingo:
             return cls.flamingo()
+        elif model_type == ModelType.Llama3_1:
+            return cls.llama3_1()
         else:
             raise ValueError(f"Can not find the model recipe for {model_type}")
 
@@ -170,9 +183,6 @@ class ModelArgs:
         except TypeError:
             # try to interpret as a dict of transformer configs
             model_type = ModelType(loaded_params["model_type"])
-
-            # now only support flamingo model
-            assert model_type == ModelType.Flamingo
             transformer_args = {k: v for k, v in loaded_params.items() if k != "model_type"}
         return cls(transformer_args, model_type)
 
@@ -280,7 +290,7 @@ class Model(ABC, nn.Module):
     def _get_model_instance(cls, config: ModelArgs):
         model_class = MODEL_TYPE_TO_CLASS.get(config.model_type)
         if model_class is None:
-            raise ValueError("Unsupported model type")
+            raise ValueError("Unsupported model type:", str(config.model_type))
         return model_class(config)
 
     @classmethod
@@ -301,20 +311,31 @@ class Model(ABC, nn.Module):
 
 
 class TextOnlyModel(Model):
-    def forward(self, tokens: Optional[Tensor] = None, input_pos: Optional[Tensor] = None) -> Tensor:
+    def forward(self, tokens: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         return self.model(tokens, input_pos)
 
     def setup_caches(self, max_batch_size, max_seq_length):
         self.model.setup_caches(max_batch_size, max_seq_length)
 
 
+class Llama31Model(Model):
+    def forward(self, tokens: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
+        return self.model(tokens=tokens, input_pos=input_pos)
+
+    def setup_caches(self, max_batch_size, dtype):
+        self.model.setup_caches(max_batch_size, dtype=dtype)
+
+    def reset_caches(self):
+        self.model.reset_caches()
+
+
 class FlamingoModel(Model):
-    def forward(self, tokens: Optional[Tensor] = None, encoder_input: Optional[Dict[str, Tensor]] = None, encoder_mask: Optional[Tensor] = None) -> Tensor:
+    def forward(self, tokens: Tensor, encoder_input: Optional[Dict[str, Tensor]] = None, encoder_mask: Optional[Tensor] = None) -> Tensor:
         if encoder_input is None:
             return self.model(tokens, encoder_mask=encoder_mask)
         return self.model(tokens, encoder_input=encoder_input, encoder_mask=encoder_mask)
 
-    def setup_caches(self, max_batch_size, dtype=None):
+    def setup_caches(self, max_batch_size, dtype):
         self.model.setup_caches(max_batch_size, dtype=dtype)
 
     def reset_caches(self):
@@ -324,6 +345,7 @@ class FlamingoModel(Model):
 MODEL_TYPE_TO_CLASS = {
     ModelType.TextOnly: TextOnlyModel,
     ModelType.Flamingo: FlamingoModel,
+    ModelType.Llama3_1: Llama31Model,
 }
 
 class Transformer(nn.Module):

@@ -263,7 +263,7 @@ class Generator:
         else:
             self.draft_model = None
 
-        self.tokenizer_args.validate_model(self.model)
+        # self.tokenizer_args.validate_model(self.model)
         self.tokenizer_args.validate_model(self.draft_model, "draft model")
         generator_args.validate_build(self.builder_args)
         generator_args.validate_build(self.speculative_builder_args, "draft model")
@@ -508,6 +508,9 @@ class Generator:
         is_speculative = draft_model is not None
         device, dtype = prompt.device, prompt.dtype
 
+        print(f"Generating {max_new_tokens} tokens on device {device} with dtype {dtype}")
+        
+
         # create an empty tensor of the expected final shape and
         # fill in the current tokens
         T = prompt.size(0)
@@ -517,7 +520,8 @@ class Generator:
         if start_pos == 0:
             model = model.to(device=device)
             with torch.device(device):
-                model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+                # model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+                model.setup_caches(max_batch_size=1, dtype=torch.bfloat16)
                 if is_speculative and draft_model is not model:
                     draft_model.setup_caches(
                         max_batch_size=1, max_seq_length=max_seq_length
@@ -698,10 +702,11 @@ class Generator:
                 self.system_prompt = input("What is your system prompt? \n")
 
         else:
-            max_seq_length = min(
-                encoded.size(0) + generator_args.max_new_tokens,
-                self.model.config.transformer_args["text"].block_size,
-            )
+            # max_seq_length = min(
+            #     encoded.size(0) + generator_args.max_new_tokens,
+            # )
+            max_seq_length = self.model.config.transformer_args["text"]["max_seq_len"]
+            # max_seq_length = 4096
 
         max_seq_length = (
             max_seq_length + self.speculative_builder_args.speculate_k + 1

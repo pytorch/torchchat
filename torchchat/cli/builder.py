@@ -139,7 +139,6 @@ class BuilderArgs:
                     if "chat" in path_basename or "instruct" in path_basename:
                         is_chat_model = True
 
-
         output_pte_path = getattr(args, "output_pte_path", None)
         output_dso_path = getattr(args, "output_dso_path", None)
         if output_pte_path and args.dtype.startswith("fast"):
@@ -328,45 +327,51 @@ def _load_model_default(builder_args, only_config=False):
     assert not builder_args.gguf_path
 
     model = _init_model_on_meta_device(builder_args)
-    # checkpoint = torch.load(str(builder_args.checkpoint_path), mmap=True, weights_only=True)
-    cps = []
-    if builder_args.checkpoint_dir is not None:
-        # Load multiple checkpoint; ignore the single path.
-        builder_args.checkpoint_path = None
-        for i in range(4):
-            cp_name = f"consolidated.{i}.pth"
-            print(f"Loading {cp_name}")
-            cps.append(
-                torch.load(
-                    os.path.join(builder_args.checkpoint_dir, cp_name),
-                    map_location=builder_args.device,
-                    mmap=True,
-                )
-            )
-        checkpoint = {}
-        for key in cps[0].keys():
-            if not torch.allclose(cps[0][key], cps[1][key]):
-                values = (cps[0][key], cps[1][key], cps[2][key], cps[3][key])
-                if key.endswith("wo.weight") or key.endswith("w2.weight"):
-                    checkpoint[key] = torch.cat(values, dim=1)
-                else:
-                    checkpoint[key] = torch.cat(values, dim=0)
-            else:
-                checkpoint[key] = cps[0][key]
-    else:
-        checkpoint = torch.load(
-            str(builder_args.checkpoint_path),
-            map_location=builder_args.device,
-            mmap=True,
-            weights_only=True,
-        )
+    hf_checkpoint = torch.load(
+        str(builder_args.checkpoint_path), mmap=True, weights_only=True
+    )
+    from torchtune.models.convert_weights import meta_to_tune
 
-    if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
-        checkpoint = checkpoint["model"]
-    
-    checkpoint = {"model." + k: v for k, v in checkpoint.items()}
+    tune_checkpoint = meta_to_tune(hf_checkpoint)
 
-    model.load_state_dict(checkpoint, assign=True, strict=True)
+    # cps = []
+    # if builder_args.checkpoint_dir is not None:
+    #     # Load multiple checkpoint; ignore the single path.
+    #     builder_args.checkpoint_path = None
+    #     for i in range(4):
+    #         cp_name = f"consolidated.{i}.pth"
+    #         print(f"Loading {cp_name}")
+    #         cps.append(
+    #             torch.load(
+    #                 os.path.join(builder_args.checkpoint_dir, cp_name),
+    #                 map_location=builder_args.device,
+    #                 mmap=True,
+    #             )
+    #         )
+    #     checkpoint = {}
+    #     for key in cps[0].keys():
+    #         if not torch.allclose(cps[0][key], cps[1][key]):
+    #             values = (cps[0][key], cps[1][key], cps[2][key], cps[3][key])
+    #             if key.endswith("wo.weight") or key.endswith("w2.weight"):
+    #                 checkpoint[key] = torch.cat(values, dim=1)
+    #             else:
+    #                 checkpoint[key] = torch.cat(values, dim=0)
+    #         else:
+    #             checkpoint[key] = cps[0][key]
+    # else:
+    #     checkpoint = torch.load(
+    #         str(builder_args.checkpoint_path),
+    #         map_location=builder_args.device,
+    #         mmap=True,
+    #         weights_only=True,
+    #     )
+
+    # if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
+    #     checkpoint = checkpoint["model"]
+
+    tune_checkpoint = {"model." + k: v for k, v in tune_checkpoint.items()}
+
+    model.load_state_dict(tune_checkpoint, assign=True, strict=True)
     return model
 
 
@@ -534,7 +539,9 @@ def _initialize_model(
         if builder_args.setup_caches:
             with torch.device(builder_args.device):
                 model.setup_caches(
-                    max_batch_size=1, max_seq_length=max_seq_length or model.config.transformer_args["text"].max_seq_length
+                    max_batch_size=1,
+                    max_seq_length=max_seq_length
+                    or model.config.transformer_args["text"].max_seq_length,
                 )
 
         model.to(dtype=builder_args.precision)
