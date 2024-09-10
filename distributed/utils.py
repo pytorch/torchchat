@@ -139,7 +139,7 @@ class CUDATrackTime:
         if self.active:
             raise RuntimeError("Timer is still running. Use .stop() to stop it")
 
-        torch.cuda.synchronize() # Wait for all GPU operations to finish
+        torch.cuda.synchronize()  # Wait for all GPU operations to finish
         total_time = self.start_event.elapsed_time(self.end_event)
 
         if not self.use_ms:
