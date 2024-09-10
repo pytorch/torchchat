@@ -617,7 +617,7 @@ class Generator:
         tokens = self.tokenizer.encode(string)
         if bos:
             tokens = [self.tokenizer.bos_id()] + tokens
-        print("size after encode_tokens:", len(tokens))
+        logging.debug(f"Size after encode_tokens: {len(tokens)}")
         return torch.tensor(tokens, dtype=torch.int, device=device)
 
     def _callback(self, x, *, buffer, done_generating):
@@ -667,7 +667,6 @@ class Generator:
             if self.builder_args.device == "cpu":
                 if generator_args.max_autotune:
                     kwargs = {"mode": "max-autotune"}
-                    torch._inductor.config.trace.log_autotuning_results = True
                 else:
                     kwargs = {}
             else:
@@ -683,7 +682,7 @@ class Generator:
             )
 
             if generator_args.compile_prefill:
-                self.prefill = torch.compile(self.prefill, fullgraph=True, dynamic=True)
+                self.prefill = torch.compile(self.prefill, fullgraph=True, dynamic=True, **kwargs)
 
         self.system_prompt = None
         # Set up our max_seq_length
@@ -835,6 +834,8 @@ class Generator:
                 generator_args.compile or generator_args.compile_prefill
             )
             compilation_time = time.perf_counter() - t0
+            device_sync(device=self.builder_args.device)
+            t = time.perf_counter() - t0
             if hasattr(prof, "export_chrome_trace"):
                 if self.builder_args.device == "cpu":
                     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
@@ -844,8 +845,6 @@ class Generator:
                     prof.export_chrome_trace(f"{self.profile}_rank_{self.rank}.json")
                 else:
                     prof.export_chrome_trace(f"{self.profile}.json")
-            device_sync(device=self.builder_args.device)
-            t = time.perf_counter() - t0
 
             if start_pos >= max_seq_length:
                 print(
@@ -854,8 +853,10 @@ class Generator:
                 print("---------------------------------------------------")
 
             tokens_sec = (num_tokens_generated + 1) / t
-            first_token_sec = 1 / aggregate_metrics.get('time_to_first_token', 0)
-            next_tokens_sec = num_tokens_generated / (t - aggregate_metrics.get('time_to_first_token', 0))
+            first_token_sec = 1 / aggregate_metrics.get("time_to_first_token", 0)
+            next_tokens_sec = num_tokens_generated / (
+                t - aggregate_metrics.get("time_to_first_token", 0)
+            )
 
             if jit_compile:
                 print(
@@ -870,22 +871,24 @@ class Generator:
                 aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
 
             logging.info(
-                f"\nTime for inference {i + 1}: {t:.04f} sec total, \n\
-                    time to first token {aggregate_metrics.get('time_to_first_token', 0):.04f} sec \n\
-                    with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill,\n\
-                    generate {num_tokens_generated} tokens, \n\
-                    total throughput, {tokens_sec:.04f} tokens/sec, {1 / tokens_sec:.04f} s/token \n\
-                    first token throughput, {first_token_sec:.04f} tokens/sec, {1 / first_token_sec:.04f} s/token \n\
-                    next token throughput, {next_tokens_sec:.04f} tokens/sec, {1 / next_tokens_sec:.04f} s/token \n\
+                f"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\
+                \nGenerated {num_tokens_generated} tokens \
+                \nTime for inference {i + 1}: {t:.04f} sec total \
+                \nTime to first token: {aggregate_metrics.get('time_to_first_token', 0):.04f} sec \
+with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill.\
+                \n\n      Total throughput: {tokens_sec:.04f} tokens/sec, {1 / tokens_sec:.04f} s/token \
+                \nFirst token throughput: {first_token_sec:.04f} tokens/sec, {1 / first_token_sec:.04f} s/token \
+                \n Next token throughput: {next_tokens_sec:.04f} tokens/sec, {1 / next_tokens_sec:.04f} s/token \
                     "
             )
             logging.info(
-                f"Bandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s"
+                f"\nBandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s"
             )
             if i == 0:
                 logging.info(
                     f"*** This first iteration will include cold start effects for dynamic import, hardware caches{', JIT compilation' if jit_compile else ''}. ***"
                 )
+            print("\n========================================\n")
             if start_pos >= max_seq_length:
                 if generator_args.chat_mode:
                     break
@@ -893,7 +896,6 @@ class Generator:
             if not generator_args.chat_mode:
                 start_pos = 0
 
-        print("\n========================================\n")
         if self.is_speculative:
             counts_aggregated = [
                 sum(i) for i in zip(*aggregate_metrics["accept_counts"])
@@ -905,9 +907,9 @@ class Generator:
             )
 
         print(
-            f"\nAverage tokens/sec (total): {torch.mean(torch.tensor(aggregate_metrics['tokens_per_sec'])).item():.2f} \n\
-                Average tokens/sec (first token): {torch.mean(torch.tensor(aggregate_metrics['first_token_per_sec'])).item():.2f} \n\
-                Average tokens/sec (next tokens): {torch.mean(torch.tensor(aggregate_metrics['next_tokens_per_sec'])).item():.2f} \n\
+            f"\n      Average tokens/sec (total): {torch.mean(torch.tensor(aggregate_metrics['tokens_per_sec'])).item():.2f} \
+                \nAverage tokens/sec (first token): {torch.mean(torch.tensor(aggregate_metrics['first_token_per_sec'])).item():.2f} \
+                \nAverage tokens/sec (next tokens): {torch.mean(torch.tensor(aggregate_metrics['next_tokens_per_sec'])).item():.2f} \n\
                 "
         )
         print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
