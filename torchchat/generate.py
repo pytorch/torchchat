@@ -266,7 +266,10 @@ class Generator:
         else:
             self.draft_model = None
 
-        # self.tokenizer_args.validate_model(self.model)
+        # torchtune model does not contain essential info for validation
+        # TODO: refactor model config to be more generic
+        if not self.is_torchtune_model:
+            self.tokenizer_args.validate_model(self.model)
         self.tokenizer_args.validate_model(self.draft_model, "draft model")
         generator_args.validate_build(self.builder_args)
         generator_args.validate_build(self.speculative_builder_args, "draft model")
