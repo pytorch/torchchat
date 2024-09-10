@@ -275,19 +275,6 @@ class Model(ABC, nn.Module):
     @abstractmethod
     def setup_caches(self, *args, **kwargs):
         pass
-    
-    def _load_state_dict_hook(self, state_dict, prefix, *args, **kwargs):
-        """Apply extra prefix to the state_dict keys.
-
-        Args:
-            state_dict (dict): The state dictionary where the model parameters are stored.
-            prefix (str): The prefix to add to each key in the state_dict.
-        """
-        new_state_dict = {}
-        for key in state_dict.keys():
-            new_key = f"{prefix}{key}"
-            new_state_dict[new_key] = state_dict[key]
-        return new_state_dict
 
     @classmethod
     def _get_model_instance(cls, config: ModelArgs):
