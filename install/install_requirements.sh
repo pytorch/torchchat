@@ -95,6 +95,11 @@ LINUX_REQUIREMENTS_TO_INSTALL=(
 )
 
 PLATFORM=$(uname -s)
+
+# Install torchtune and torchao requirements for Linux systems using nightly.
+# For non-Linux systems (e.g., macOS), install torchao from GitHub since nightly
+# build doesn't have macOS build.
+# TODO: Remove this and install nightly build, once it supports macOS
 if [ "$PLATFORM" == "Linux" ];
 then
   (
