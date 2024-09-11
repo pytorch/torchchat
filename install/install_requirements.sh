@@ -41,13 +41,23 @@ fi
 )
 
 # Since torchchat often uses main-branch features of pytorch, only the nightly
-# pip versions will have the required features. The NIGHTLY_VERSION value should
+# pip versions will have the required features. The PYTORCH_NIGHTLY_VERSION value should
 # agree with the third-party/pytorch pinned submodule commit.
 #
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
-# NIGHTLY_VERSION, you should re-run this script to install the necessary
+# PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-NIGHTLY_VERSION=dev20240814
+PYTORCH_NIGHTLY_VERSION=dev20240814
+
+# Nightly version for torchvision
+VISION_NIGHTLY_VERSION=dev20240814
+
+# Nightly version for torchao
+AO_NIGHTLY_VERSION=dev20240905
+
+# Nightly version for torchtune
+TUNE_NIGHTLY_VERSION=dev20240910
+
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 (
@@ -67,10 +77,16 @@ fi
 
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
-  torch=="2.5.0.${NIGHTLY_VERSION}"
+  torch=="2.5.0.${PYTORCH_NIGHTLY_VERSION}"
+  torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
 )
 
-# Install the requirements. `--extra-index-url` tells pip to look for package
+LINUX_REQUIREMENTS_TO_INSTALL=(
+  torchao=="0.5.0.${AO_NIGHTLY_VERSION}"
+  torchtune=="0.3.0.${TUNE_NIGHTLY_VERSION}"
+)
+
+# Install the requirements. --extra-index-url tells pip to look for package
 # versions on the provided URL if they aren't available on the default URL.
 (
   set -x
@@ -78,12 +94,28 @@ REQUIREMENTS_TO_INSTALL=(
     "${REQUIREMENTS_TO_INSTALL[@]}"
 )
 
-# For torchao need to install from github since nightly build doesn't have macos build.
-# TODO: Remove this and install nightly build, once it supports macos
-(
-  set -x
-  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@e11201a62669f582d81cdb33e031a07fb8dfc4f3
-)
+PLATFORM=$(uname -s)
+
+# Install torchtune and torchao requirements for Linux systems using nightly.
+# For non-Linux systems (e.g., macOS), install torchao from GitHub since nightly
+# build doesn't have macOS build.
+# TODO: Remove this and install nightly build, once it supports macOS
+if [ "$PLATFORM" == "Linux" ];
+then
+  (
+    set -x
+    $PIP_EXECUTABLE install --pre --extra-index-url "${TORCH_NIGHTLY_URL}" --no-cache-dir \
+      "${LINUX_REQUIREMENTS_TO_INSTALL[@]}"
+  )
+else
+  # For torchao need to install from github since nightly build doesn't have macos build.
+  # TODO: Remove this and install nightly build, once it supports macos
+  (
+    set -x
+    $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@e11201a62669f582d81cdb33e031a07fb8dfc4f3
+  )
+fi
+
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   (
     set -x
