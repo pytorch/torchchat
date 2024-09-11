@@ -513,7 +513,7 @@ class Generator:
             torch.manual_seed(seed)
 
         is_speculative = draft_model is not None
-        device, dtype = prompt.device, prompt.dtype        
+        device, dtype = prompt.device, prompt.dtype 
 
         # create an empty tensor of the expected final shape and
         # fill in the current tokens
@@ -717,7 +717,6 @@ class Generator:
                 encoded.size(0) + generator_args.max_new_tokens,
                 self.model.config.transformer_args["text"].block_size,
             )
-
 
         max_seq_length = (
             max_seq_length + self.speculative_builder_args.speculate_k + 1
