@@ -122,14 +122,14 @@ def _load_model_weights(stage_module, hf_model_name, device, model_config):
     if num_missing_weights > 0:
         raise ValueError(f"Missing {num_missing_weights} weights")
 
-def _encode_string(string, tokenizer, bos=True, device="cuda", dtype=torch.int64)-> torch.Tensor:
+def _encode_string(string: str, tokenizer, bos: bool =True, device: str ="cuda", dtype=torch.int64)-> torch.Tensor:
     """Encode a prompt string into a tensor of token ids."""
     tokens = tokenizer.encode(string)
     if bos:
         tokens = [tokenizer.bos_id()] + tokens
     return torch.tensor(tokens, dtype=dtype, device=device)
 
-def _create_padded_prompt(input_ids, tokenizer, seqlen, start_pos, device) -> Tuple[torch.Tensor, int]:
+def _create_padded_prompt(input_ids: torch.Tensor, tokenizer, seqlen: int, start_pos: int, device: str) -> Tuple[torch.Tensor, int]:
     """Create a padded tensor for the encoded input prompt. Returns the padded tensor and the prompt length."""
     prompt_len = input_ids.size(0)
     max_new_tokens = min(seqlen, seqlen - start_pos - prompt_len)
@@ -251,7 +251,7 @@ def main():
     if len(cpu_tensors) > 0:
         raise ValueError("Found cpu tensors in stage")
 
-    prompt = "What is snow?"
+    prompt = "What is the capital of France?"
     start_pos = 0
 
     # encode the prompt
