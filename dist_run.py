@@ -31,7 +31,7 @@ from distributed.utils import (
     get_module_size,
     get_num_params,
     bytes_to_readable,
-    TrackTime, 
+    TrackTime,
     CUDATrackTime,
 )
 
@@ -122,21 +122,30 @@ def _load_model_weights(stage_module, hf_model_name, device, model_config):
     if num_missing_weights > 0:
         raise ValueError(f"Missing {num_missing_weights} weights")
 
-def _encode_string(string: str, tokenizer, bos: bool =True, device: str ="cuda", dtype=torch.int64)-> torch.Tensor:
+
+def _encode_string(
+    string: str, tokenizer, bos: bool = True, device: str = "cuda", dtype=torch.int64
+) -> torch.Tensor:
     """Encode a prompt string into a tensor of token ids."""
     tokens = tokenizer.encode(string)
     if bos:
         tokens = [tokenizer.bos_id()] + tokens
     return torch.tensor(tokens, dtype=dtype, device=device)
 
-def _create_padded_prompt(input_ids: torch.Tensor, tokenizer, seqlen: int, start_pos: int, device: str) -> Tuple[torch.Tensor, int]:
+
+def _create_padded_prompt(
+    input_ids: torch.Tensor, tokenizer, seqlen: int, start_pos: int, device: str
+) -> Tuple[torch.Tensor, int]:
     """Create a padded tensor for the encoded input prompt. Returns the padded tensor and the prompt length."""
     prompt_len = input_ids.size(0)
     max_new_tokens = min(seqlen, seqlen - start_pos - prompt_len)
     token_buffer_size = prompt_len + max_new_tokens
-    seq = torch.full((1, token_buffer_size), tokenizer.eos_id(), dtype=torch.int64, device=device)
+    seq = torch.full(
+        (1, token_buffer_size), tokenizer.eos_id(), dtype=torch.int64, device=device
+    )
     seq[0, :prompt_len] = input_ids
     return seq, prompt_len
+
 
 def _cleanup():
     dist.barrier()
@@ -149,7 +158,7 @@ def main():
     gpu_memory_monitor = GPUMemoryMonitor("cuda")
     logger.info(f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}")
 
-    config = ModelArgs.from_name(MODEL_NAME).transformer_args['text']
+    config = ModelArgs.from_name(MODEL_NAME).transformer_args["text"]
     logger.info(f"Chat Model Name: {MODEL_NAME}\nModel Config: {config}")
 
     tokenizer = _build_chat_tokenizer()
@@ -229,7 +238,7 @@ def main():
     logger.info(
         f"Stage {rank} has {color.blue}{stage_num_params} params{color.reset}, Size: {color.blue}{stage_size_formatted}{color.reset}\n"
     )
-    
+
     # Setup input position
     input_pos = torch.arange(seqlen, device=device)
     model.setup_input_pos(input_pos)
@@ -255,14 +264,18 @@ def main():
     start_pos = 0
 
     # encode the prompt
-    input_ids = _encode_string(prompt, tokenizer, bos=True, device=device, dtype=torch.int64)
+    input_ids = _encode_string(
+        prompt, tokenizer, bos=True, device=device, dtype=torch.int64
+    )
     logger.info(f"{input_ids[0:8]=}")
-    
+
     # create a padded tensor for the input prompt
-    padded_sequence, prompt_len = _create_padded_prompt(input_ids, tokenizer, seqlen, start_pos, device)
+    padded_sequence, prompt_len = _create_padded_prompt(
+        input_ids, tokenizer, seqlen, start_pos, device
+    )
     logger.info(f"{prompt_len=}")
     logger.info(f"{padded_sequence[0, :prompt_len+1]=}")
-    
+
     schedule = ScheduleGPipe(stage, mbs)
     logger.info(f"Created schedule: {schedule}")
 
@@ -274,12 +287,13 @@ def main():
 
     # Decoding
     if pp_rank == pp_degree - 1 and tp_rank == 0:
-        next_token_logits = output[:,prompt_len-1, :]
+        next_token_logits = output[:, prompt_len - 1, :]
         next_token = torch.argmax(next_token_logits, dim=-1)
         next_token_decoded = tokenizer.decode((next_token.tolist()))
 
-        logger.info(f"\n\n{color.green} Prefill response ====>>>> {color.blue} {next_token_decoded=}, {next_token}\n{color.reset}")
-        
+        logger.info(
+            f"\n\n{color.green} Prefill response ====>>>> {color.blue} {next_token_decoded=}, {next_token}\n{color.reset}"
+        )
 
     # show peak memory stats for this stage
     res_mem_gib, res_mem_pct = gpu_memory_monitor.get_peak_stats()
