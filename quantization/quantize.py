@@ -22,11 +22,7 @@
 #
 from __future__ import annotations
 
-# torchao_experimental
-import importlib.util
-
 import json
-import sys
 
 # from functools import reduce
 # from math import gcd
@@ -48,6 +44,7 @@ from torchao.quantization.quant_api import (
     quantize_,
 )
 from torchao.utils import unwrap_tensor_subclass
+
 
 #########################################################################
 ###                  torchchat quantization API                       ###
@@ -578,6 +575,7 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
     def quantized_model(self) -> nn.Module:
         return self.quantize(self.model_)
 
+
 ##########################################################################
 ###                       quantization dictionary                      ###
 
@@ -597,6 +595,8 @@ ao_quantizer_class_dict = {
 }
 
 try:
+    import importlib.util
+    import sys
     import os
     torchao_build_path = f"{os.getcwd()}/torchao-build"
 

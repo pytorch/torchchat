@@ -106,7 +106,6 @@ if(executorch_FOUND)
 
   target_link_libraries(et_run PRIVATE
   "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libcustom_ops.a>")
-
   # This one is needed for cpuinfo where it uses android specific log lib
   if(ANDROID)
     target_link_libraries(et_run PRIVATE log)
