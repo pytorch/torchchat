@@ -30,4 +30,4 @@ if(Torch_FOUND)
 endif()
 
 
-target_link_libraries(aoti_run "/tmp/cmake-out/torchao/libtorch_custom_op.dylib")
+target_link_libraries(aoti_run "${TORCHCHAT_ROOT}/torchao-build/cmake-out/liblowbit_op_aten${CMAKE_SHARED_LIBRARY_SUFFIX}")

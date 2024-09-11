@@ -106,6 +106,7 @@ if(executorch_FOUND)
 
   target_link_libraries(et_run PRIVATE
   "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libcustom_ops.a>")
+
   # This one is needed for cpuinfo where it uses android specific log lib
   if(ANDROID)
     target_link_libraries(et_run PRIVATE log)
@@ -129,3 +130,5 @@ if(executorch_FOUND)
 else()
   MESSAGE(WARNING "ExecuTorch package not found")
 endif()
+
+target_link_libraries(et_run PRIVATE "${TORCHCHAT_ROOT}/torchao-build/cmake-out/liblowbit_op_executorch${CMAKE_SHARED_LIBRARY_SUFFIX}")

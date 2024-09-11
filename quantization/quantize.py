@@ -49,23 +49,6 @@ from torchao.quantization.quant_api import (
 )
 from torchao.utils import unwrap_tensor_subclass
 
-torchao_experimental_spec = importlib.util.spec_from_file_location(
-    "torchao_experimental",
-    "/Users/scroy/fbsource/fbcode/pytorch/ao/torchao/experimental/kernels/cpu/linear/examples/torch_custom_op/torch_custom_op.py",
-)
-torchao_experimental = importlib.util.module_from_spec(torchao_experimental_spec)
-sys.modules["torchao_experimental"] = torchao_experimental
-torchao_experimental_spec.loader.exec_module(torchao_experimental)
-
-import glob
-
-libs = glob.glob("/tmp/cmake-out/torchao/libtorch_custom_op.*")
-libs = list(filter(lambda l: (l.endswith("so") or l.endswith("dylib")), libs))
-torch.ops.load_library(libs[0])
-
-from torchao_experimental import Int8DynActLowbitWeightQuantizer
-
-
 #########################################################################
 ###                  torchchat quantization API                       ###
 
@@ -119,6 +102,7 @@ def quantize_model(
                         bitwidth=q_kwargs.get("bitwidth", 4),
                         groupsize=q_kwargs.get("groupsize", 128),
                         has_weight_zeros=q_kwargs.get("has_weight_zeros", False),
+                        squeeze_unsqueeze_dim0=True,
                     )
                 else:
                     quant_handler = ao_quantizer_class_dict[quantizer](
@@ -610,5 +594,32 @@ quantizer_class_dict = {
 ao_quantizer_class_dict = {
     "linear:int4": Int4WeightOnlyQuantizer,
     "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
-    "linear:a8wlow": Int8DynActLowbitWeightQuantizer,
 }
+
+try:
+    import os
+    torchao_build_path = f"{os.getcwd()}/torchao-build"
+
+    # Load quantizer
+    torchao_experimental_spec = importlib.util.spec_from_file_location(
+        "torchao_experimental",
+        f"{torchao_build_path}/src/ao/torchao/experimental/kernels/cpu/linear/examples/torch_custom_op/torch_custom_op.py",
+    )
+    torchao_experimental = importlib.util.module_from_spec(torchao_experimental_spec)
+    sys.modules["torchao_experimental"] = torchao_experimental
+    torchao_experimental_spec.loader.exec_module(torchao_experimental)
+    from torchao_experimental import Int8DynActLowbitWeightQuantizer
+    ao_quantizer_class_dict["linear:a8wlow"] = Int8DynActLowbitWeightQuantizer
+
+    # Try loading custom op
+    try:
+        import glob
+        libs = glob.glob(f"{torchao_build_path}/cmake-out/liblowbit_op_aten.*")
+        libs = list(filter(lambda l: (l.endswith("so") or l.endswith("dylib")), libs))
+        torch.ops.load_library(libs[0])
+    except Exception as e:
+        print("Failed to load custom ops : ", e)
+        print("Slow fallback kernels will be used.")
+
+except Exception as e:
+    print(f"Failed to use torchao_experimental kernels: {e}")

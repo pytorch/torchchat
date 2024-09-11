@@ -60,6 +60,10 @@ if [ -z "${ET_BUILD_DIR}" ]; then
     ET_BUILD_DIR="et-build"
 fi
 
+if [ -z "${TORCHAO_BUILD_DIR}" ]; then
+    TORCHAO_BUILD_DIR="torchao-build"
+fi
+
 source "$TORCHCHAT_ROOT/scripts/install_utils.sh"
 
 pushd ${TORCHCHAT_ROOT}
@@ -70,6 +74,10 @@ if [[ "$TARGET" == "et" ]]; then
     install_pip_dependencies
     clone_executorch
     install_executorch_libs false
+
+    EXECUTORCH_INCLUDE_DIRS=${TORCHCHAT_ROOT}/et-build/src
+    EXECUTORCH_LIBRARIES=${TORCHCHAT_ROOT}/et-build/install/lib/libexecutorch_no_prim_ops.a
+    install_torchao_custom_executorch_ops
 fi
 popd
 
