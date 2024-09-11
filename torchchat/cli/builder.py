@@ -335,17 +335,15 @@ def _load_model_default(builder_args, only_config=False):
     assert not builder_args.gguf_path
 
     model = _init_model_on_meta_device(builder_args)
+    checkpoint = torch.load(str(builder_args.checkpoint_path), mmap=True, weights_only=True)
 
-    cps = []
     if builder_args.params_table and builder_args.params_table.endswith("Tune"):
         print("Loading Tune checkpoint")
-        meta_checkpoint = torch.load(
-            str(builder_args.checkpoint_path), mmap=True, weights_only=True
-        )
-        checkpoint = meta_to_tune(meta_checkpoint)
+        checkpoint = meta_to_tune(checkpoint)
     elif builder_args.checkpoint_dir is not None:
         # Load multiple checkpoint; ignore the single path.
         builder_args.checkpoint_path = None
+        cps = []
         for i in range(4):
             cp_name = f"consolidated.{i}.pth"
             print(f"Loading {cp_name}")
