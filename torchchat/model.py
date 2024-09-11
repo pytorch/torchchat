@@ -337,7 +337,12 @@ class Model(nn.Module):
 
     @classmethod
     def from_gguf(cls, gguf_path: str, **kwargs):
-        return cls._get_model_instance(ModelArgs.from_gguf(name))
+        from torchchat.utils.gguf_loader import load_model_and_state_dict
+
+        model, state_dict = load_model_and_state_dict(gguf_path, **kwargs)
+        if state_dict != {}:
+            model.load_state_dict(state_dict, assign=True)
+        return model
 
 
 class TextOnlyModel(Model):
