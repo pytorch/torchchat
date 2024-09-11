@@ -35,6 +35,13 @@ from torchchat.utils.build_utils import (
 from torchchat.utils.measure_time import measure_time
 from torchchat.utils.quantize import quantize_model
 
+# bypass the import issue before torchao is ready on macos
+try:
+    from torchtune.models.convert_weights import meta_to_tune
+except:
+    pass
+
+
 
 @dataclass
 class BuilderArgs:
@@ -230,7 +237,7 @@ class TokenizerArgs:
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
-        use_tiktoken = model.config.text_transformer_args.use_tiktoken
+        use_tiktoken = model.config.transformer_args["text"].use_tiktoken
 
         if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
             raise RuntimeError(
@@ -328,11 +335,15 @@ def _load_model_default(builder_args, only_config=False):
     assert not builder_args.gguf_path
 
     model = _init_model_on_meta_device(builder_args)
-    # checkpoint = torch.load(str(builder_args.checkpoint_path), mmap=True, weights_only=True)
-    cps = []
-    if builder_args.checkpoint_dir is not None:
+
+    if builder_args.params_table and builder_args.params_table.endswith("Tune"):
+        print("Loading Tune checkpoint")
+        meta_checkpoint = torch.load(str(builder_args.checkpoint_path), mmap=True, weights_only=True)
+        checkpoint = meta_to_tune(meta_checkpoint)
+    elif builder_args.checkpoint_dir is not None:
         # Load multiple checkpoint; ignore the single path.
         builder_args.checkpoint_path = None
+        cps = []
         for i in range(4):
             cp_name = f"consolidated.{i}.pth"
             print(f"Loading {cp_name}")
@@ -363,10 +374,10 @@ def _load_model_default(builder_args, only_config=False):
 
     if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
         checkpoint = checkpoint["model"]
-    
-    checkpoint = {"text_transformer." + k: v for k, v in checkpoint.items()}
 
+    checkpoint = {"model." + k: v for k, v in checkpoint.items()}
     model.load_state_dict(checkpoint, assign=True, strict=True)
+
     return model
 
 
@@ -534,7 +545,9 @@ def _initialize_model(
         if builder_args.setup_caches:
             with torch.device(builder_args.device):
                 model.setup_caches(
-                    max_batch_size=1, max_seq_length=max_seq_length or model.config.text_transformer_args.max_seq_length
+                    max_batch_size=1,
+                    max_seq_length=max_seq_length
+                    or model.config.transformer_args["text"].max_seq_length,
                 )
 
         model.to(dtype=builder_args.precision)

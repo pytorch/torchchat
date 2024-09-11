@@ -25,7 +25,7 @@ from distributed.safetensor_utils import (
     load_safetensor_weights,
 )
 
-from distributed.utils import Color as color, GPUMemoryMonitor
+from distributed.utils import Color as color, TrackTime, CUDATrackTime, GPUMemoryMonitor
 
 from distributed.verification_utils import find_cpu_tensors
 from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
@@ -125,7 +125,7 @@ def main():
     gpu_memory_monitor = GPUMemoryMonitor("cuda")
     logger.info(f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}")
 
-    config = ModelArgs.from_name(MODEL_NAME).text_transformer_args
+    config = ModelArgs.from_name(MODEL_NAME).transformer_args['text']
     logger.info(f"Chat Model Config: {config}")
 
     tokenizer = _build_chat_tokenizer()
@@ -191,8 +191,14 @@ def main():
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    _load_model_weights(model, hf_model_name, device=device, model_config=config)
+    with TrackTime("cuda") as timer:
+        _load_model_weights(model, hf_model_name, device=device, model_config=config)
 
+    logger.info(
+        f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for stage {rank}{color.reset}"
+    )
+    
+    
     # Setup input position
     # input_pos for prefill: a list of increasing integers from 0 to seqlen
     input_pos = torch.arange(seqlen, device=device)
