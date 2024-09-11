@@ -162,7 +162,7 @@ class GeneratorArgs:
             speculate_k=args.speculate_k,
             sequential_prefill=sequential_prefill,
             max_autotune=args.max_autotune,
-            is_torchtune_model=args.model.endswith("tune"),
+            is_torchtune_model=args.model and args.model.endswith("tune"),
         )
 
 
