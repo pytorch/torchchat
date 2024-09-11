@@ -37,7 +37,6 @@ from torchchat.utils.quantize import quantize_model
 
 # bypass the import issue before torchao is ready on macos
 try:
-    from torchtune.training import set_default_dtype
     from torchtune.models.convert_weights import meta_to_tune
 except:
     pass

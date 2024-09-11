@@ -281,7 +281,7 @@ class KVCache(nn.Module):
         return k_out, v_out
 
 
-class Model(nn.Module):
+class Model(ABC, nn.Module):
     """
     The entrance for model construction in torchchat.
     """
@@ -301,10 +301,10 @@ class Model(nn.Module):
         recipe = ModelRecipe.get_recipe(self.config.model_type)
         modules = {}
         for name, module_class in recipe.modules.items():
-            if isinstance(self.config.transformer_args[name], dict):
-                modules[name] = module_class(**self.config.transformer_args[name])
+            if isinstance(config_args := self.config.transformer_args[name], dict):
+                modules[name] = module_class(**config_args)
             else:
-                modules[name] = module_class(self.config.transformer_args[name])
+                modules[name] = module_class(config_args)
 
         return recipe.fusion_class(**modules)
     
@@ -369,7 +369,12 @@ class Llama31Model(Model):
 
 
 class FlamingoModel(Model):
-    def forward(self, tokens: Tensor, encoder_input: Optional[Dict[str, Tensor]] = None, encoder_mask: Optional[Tensor] = None) -> Tensor:
+    def forward(
+        self,
+        tokens: Tensor,
+        encoder_input: Optional[Dict[str, Tensor]] = None,
+        encoder_mask: Optional[Tensor] = None,
+    ) -> Tensor:
         if encoder_input is None:
             return self.model(tokens, encoder_mask=encoder_mask)
         return self.model(tokens, encoder_input=encoder_input, encoder_mask=encoder_mask)
