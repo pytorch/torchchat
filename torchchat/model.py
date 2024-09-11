@@ -10,7 +10,7 @@ import warnings
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Callable, Dict, Optional, Union
 
 import torch
 import torch.nn as nn
