@@ -52,7 +52,7 @@ except ImportError:
 
 logger = SingletonLogger.get_logger()
 
-MODEL_NAME = "Transformer-2-7b-chat-hf"
+MODEL_NAME = "Meta-Llama-3-8B"
 
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
     "Transformer-2-7b-chat-hf": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
@@ -216,7 +216,7 @@ def main():
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    with TrackTime("cuda") as timer:
+    with TrackTime() as timer:
         _load_model_weights(model, hf_model_name, device=device, model_config=config)
     logger.info(
         f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for stage {rank}{color.reset}"
@@ -261,7 +261,8 @@ def main():
     # create a padded tensor for the input prompt
     padded_sequence, prompt_len = _create_padded_prompt(input_ids, tokenizer, seqlen, start_pos, device)
     logger.info(f"{prompt_len=}")
-
+    logger.info(f"{padded_sequence[0, :prompt_len+1]=}")
+    
     schedule = ScheduleGPipe(stage, mbs)
     logger.info(f"Created schedule: {schedule}")
 
