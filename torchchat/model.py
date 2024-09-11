@@ -10,7 +10,7 @@ import warnings
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Callable, Dict, Optional, Union
 from abc import ABC, abstractmethod
 
 import torch
@@ -56,10 +56,10 @@ ModuleLike = Union[nn.Module, Callable[..., nn.Module]]
 @dataclass
 class ModelRecipe:
     """
-    A class in TorchChat that describes and contains all supported model structures in TorchChat.
+    The class describes and contains all supported model structures in torchchat.
     
     ModelRecipe represents a model as a collection of Transformer modules and a fusion module,
-    providing a standardized and centralized way to define and build models in TorchChat.
+    providing a standardized and centralized way to define and build models in torchchat.
     Attributes:
         model_type (ModelType):
             The type of the model.
@@ -283,7 +283,7 @@ class KVCache(nn.Module):
 
 class Model(nn.Module):
     """
-    The entrance for model construction in tochchat.
+    The entrance for model construction in torchchat.
     """
     def __init__(self, config: ModelArgs) -> None:
         super().__init__()
