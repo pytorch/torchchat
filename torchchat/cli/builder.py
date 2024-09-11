@@ -147,6 +147,7 @@ class BuilderArgs:
                     if "chat" in path_basename or "instruct" in path_basename:
                         is_chat_model = True
 
+
         output_pte_path = getattr(args, "output_pte_path", None)
         output_dso_path = getattr(args, "output_dso_path", None)
         if output_pte_path and args.dtype.startswith("fast"):
@@ -335,11 +336,11 @@ def _load_model_default(builder_args, only_config=False):
     assert not builder_args.gguf_path
 
     model = _init_model_on_meta_device(builder_args)
-    checkpoint = torch.load(str(builder_args.checkpoint_path), mmap=True, weights_only=True)
 
     if builder_args.params_table and builder_args.params_table.endswith("Tune"):
         print("Loading Tune checkpoint")
-        checkpoint = meta_to_tune(checkpoint)
+        meta_checkpoint = torch.load(str(builder_args.checkpoint_path), mmap=True, weights_only=True)
+        checkpoint = meta_to_tune(meta_checkpoint)
     elif builder_args.checkpoint_dir is not None:
         # Load multiple checkpoint; ignore the single path.
         builder_args.checkpoint_path = None

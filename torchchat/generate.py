@@ -302,7 +302,8 @@ class Generator:
         need_probs: bool,
         temperature: float = 1.0,
         top_k: Optional[int] = None,
-    ):
+    ):  
+        print(f"logits {logits}")
         if temperature == 0 and not need_probs:
             _, idx_next = torch.topk(logits[0, -1], k=1, dim=-1)
             return (idx_next, None)
@@ -513,7 +514,7 @@ class Generator:
             torch.manual_seed(seed)
 
         is_speculative = draft_model is not None
-        device, dtype = prompt.device, prompt.dtype 
+        device, dtype = prompt.device, prompt.dtype
 
         # create an empty tensor of the expected final shape and
         # fill in the current tokens
