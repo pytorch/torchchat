@@ -59,7 +59,7 @@ def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
     T = prompt.size(0)
     T_new = T + max_new_tokens
     if max_seq_length is None:
-        max_seq_length = min(T_new, model.config.text_transformer_args.block_size)
+        max_seq_length = min(T_new, model.config.transformer_args["text"].block_size)
 
     device, dtype = prompt.device, prompt.dtype
     # create an empty tensor of the expected final shape and
