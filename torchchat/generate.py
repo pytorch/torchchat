@@ -324,15 +324,20 @@ class Generator:
         width = x.size(1)
         assert input_pos.size(0) == width
         print("x: ", x, "input_pos: ", input_pos, "width: ", width)
+        print("sequential_prefill: ", sequential_prefill)
 
         if sequential_prefill:
             for i in range(width):
+                print("i: ", i)
                 x_sliced, ip_sliced = x[:, i].view(-1, 1), input_pos[i].view(-1)
+                print("x_sliced: ", x_sliced, "ip_sliced: ", ip_sliced)
                 # logging.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
                 logits = model(x_sliced, ip_sliced)  # (x[:, i], input_pos[i])
+                print("logits: ", logits)
         else:
             # input_pos: [B, S]
             logits = model(x, input_pos)
+            print("logits: ", logits)
             # print(f"logits {logits.shape}")
 
         # print(f"x: {x},\n  input_pos: {input_pos}\n")
