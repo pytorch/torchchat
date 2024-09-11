@@ -50,15 +50,34 @@ class ModelType(Enum):
     Llama3_1 = "llama3_1"
     Flamingo = "flamingo"
 
+# Type for objects that can generate nn.Module instance
+ModuleLike = Union[nn.Module, Callable[..., nn.Module]]
 
 @dataclass
 class ModelRecipe:
+    """
+    A class in TorchChat that describes and contains all supported model structures in TorchChat.
+    
+    ModelRecipe represents a model as a collection of Transformer modules and a fusion module,
+    providing a standardized and centralized way to define and build models in TorchChat.
+    Attributes:
+        model_type (ModelType):
+            The type of the model.
+        modules (Dict[str, ModuleLike]):
+            A dictionary of ModuleLike modules, where each key is the module name and each 
+            value is a ModuleLike object that generates the transformer.
+            The names of the Transformer modules should match the corresponding names in the
+            fusion class and the JSON file holding model hyperparameters.
+        fusion_class (ModuleLike):
+            A ModuleLike object that generates a fusion module by taking the constructed modules above.
+    """
+
     model_type: ModelType
-    modules: dict
-    fusion_class: torch.nn.Module
+    modules: Dict[str, ModuleLike]
+    fusion_class: ModuleLike
 
     @classmethod
-    def text_only(cls):
+    def _text_only(cls):
         return cls(
             model_type=ModelType.TextOnly,
             modules={'text': Transformer},
@@ -66,7 +85,7 @@ class ModelRecipe:
         )
     
     @classmethod
-    def llama3_1(cls):
+    def _llama3_1(cls):
         return cls(
             model_type=ModelType.Llama3_1,
             modules={'text': llama3_1_builder},
@@ -74,7 +93,7 @@ class ModelRecipe:
         )
 
     @classmethod
-    def flamingo(cls):
+    def _flamingo(cls):
         return cls(
             model_type=ModelType.Flamingo,
             modules={
@@ -87,11 +106,11 @@ class ModelRecipe:
     @classmethod
     def get_recipe(cls, model_type):
         if model_type == ModelType.TextOnly:
-            return cls.text_only()
+            return cls._text_only()
         elif model_type == ModelType.Flamingo:
-            return cls.flamingo()
+            return cls._flamingo()
         elif model_type == ModelType.Llama3_1:
-            return cls.llama3_1()
+            return cls._llama3_1()
         else:
             raise ValueError(f"Can not find the model recipe for {model_type}")
 
@@ -158,6 +177,7 @@ class ModelArgs:
         
         self.model_type = model_type
         if isinstance(transformer_args, TransformerArgs):
+            assert model_type == ModelType.TextOnly
             self.transformer_args = {"text": transformer_args}
         else:
             self.transformer_args = transformer_args
@@ -261,13 +281,23 @@ class KVCache(nn.Module):
         return k_out, v_out
 
 
-class Model(ABC, nn.Module):
+class Model(nn.Module):
+    """
+    The entrance for model construction in tochchat.
+    """
     def __init__(self, config: ModelArgs) -> None:
         super().__init__()
         self.config = config
         self.model = self.build_model()
-
-    def build_model(self):
+    
+    def build_model(self) -> nn.Module:
+        """
+        Builds a model based on the provided configuration.
+        This method retrieves a ModelRecipe instance corresponding to the specified model type,
+        constructs the required Transformer modules, and combines them using the fusion class.
+        Returns:
+            The constructed model instance.
+        """
         recipe = ModelRecipe.get_recipe(self.config.model_type)
         modules = {}
         for name, module_class in recipe.modules.items():
