@@ -116,6 +116,7 @@ class GeneratorArgs:
     speculate_k: int = 5
     sequential_prefill: bool = False
     max_autotune: bool = False
+    is_torchtune_model: bool = False
 
     def __post_init__(self):
         if self.compile_prefill and self.sequential_prefill:
@@ -161,6 +162,7 @@ class GeneratorArgs:
             speculate_k=args.speculate_k,
             sequential_prefill=sequential_prefill,
             max_autotune=args.max_autotune,
+            is_torchtune_model=args.model and args.model.endswith("tune"),
         )
 
 
@@ -197,6 +199,8 @@ class Generator:
         self.profile = profile
         self.quantize = quantize
         self.draft_quantize = draft_quantize
+        self.is_torchtune_model = generator_args.is_torchtune_model
+        self.dtype = builder_args.precision
 
         # global print
         #    from tp import maybe_init_dist
@@ -263,7 +267,10 @@ class Generator:
         else:
             self.draft_model = None
 
-        self.tokenizer_args.validate_model(self.model)
+        # torchtune model does not contain essential info for validation
+        # TODO: refactor model config to be more generic
+        if not self.is_torchtune_model:
+            self.tokenizer_args.validate_model(self.model)
         self.tokenizer_args.validate_model(self.draft_model, "draft model")
         generator_args.validate_build(self.builder_args)
         generator_args.validate_build(self.speculative_builder_args, "draft model")
@@ -295,7 +302,7 @@ class Generator:
         need_probs: bool,
         temperature: float = 1.0,
         top_k: Optional[int] = None,
-    ):
+    ):  
         if temperature == 0 and not need_probs:
             _, idx_next = torch.topk(logits[0, -1], k=1, dim=-1)
             return (idx_next, None)
@@ -517,7 +524,10 @@ class Generator:
         if start_pos == 0:
             model = model.to(device=device)
             with torch.device(device):
-                model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+                if self.is_torchtune_model:
+                    model.setup_caches(max_batch_size=1, dtype=self.dtype)
+                else:
+                    model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
                 if is_speculative and draft_model is not model:
                     draft_model.setup_caches(
                         max_batch_size=1, max_seq_length=max_seq_length
@@ -686,7 +696,12 @@ class Generator:
 
         self.system_prompt = None
         # Set up our max_seq_length
-        if generator_args.chat_mode:
+
+        # This is a hack to get around the fact that different models have different ways to record their max_seq_length and might be wrong
+        # TODO: unify the max_seq_length config representation.
+        if generator_args.is_torchtune_model:
+            max_seq_length = self.model.config.transformer_args["text"]["max_seq_len"]
+        elif generator_args.chat_mode:
             max_seq_length = self.model.config.transformer_args["text"].max_seq_length
             print(
                 f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye"
