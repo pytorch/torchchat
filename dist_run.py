@@ -122,7 +122,7 @@ def main():
     gpu_memory_monitor = GPUMemoryMonitor("cuda")
     logger.info(f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}")
 
-    config = ModelArgs.from_name(MODEL_NAME).text_transformer_args
+    config = ModelArgs.from_name(MODEL_NAME).transformer_args['text']
     logger.info(f"Chat Model Config: {config}")
 
     tokenizer = _build_chat_tokenizer()
