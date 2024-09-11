@@ -15,26 +15,12 @@ import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 
-
-from distributed.logging_utils import SingletonLogger
-
+from distributed.logging_utils import setup_logging
 # TODO - these are not distributed specific, consider moving to new package
-from distributed.safetensor_utils import (
-    get_hf_config_file,
-    get_hf_weight_map_and_path,
-    load_safetensor_weights,
-)
-
-from distributed.utils import (
-    Color as color,
-    GPUMemoryMonitor,
-    get_module_size,
-    get_num_params,
-    bytes_to_readable,
-    TrackTime, 
-    CUDATrackTime,
-)
-
+from distributed.safetensor_utils import (get_hf_config_file,
+                                          get_hf_weight_map_and_path,
+                                          load_safetensor_weights)
+from distributed.utils import Color as color, get_stage_size, build_gpu_memory_monitor, TrackTime, get_num_params
 from distributed.verification_utils import find_cpu_tensors
 from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
 from torchchat.model import ModelArgs, Transformer
@@ -50,9 +36,10 @@ except ImportError:
     SentencePieceProcessor = None
 
 
-logger = SingletonLogger.get_logger()
+# logger = setup_logging(__name__)
+from distributed.logging_utils import SingletonLogger
+logger = SingletonLogger.get_logger(__name__)
 
-MODEL_NAME = "Transformer-2-7b-chat-hf"
 
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
     "Transformer-2-7b-chat-hf": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
@@ -100,6 +87,22 @@ def _build_chat_tokenizer(
     )
     return tokenizer
 
+def _encode_string(string, tokenizer, bos=True, device="cuda", dtype=torch.int64):
+        tokens = tokenizer.encode(string)
+        if bos:
+            tokens = [tokenizer.bos_id()] + tokens
+        logger.info(f"***** encoding:  {tokens=}, {string=}")
+        return torch.tensor(tokens, dtype=dtype, device=device)
+
+def _logits_to_probs(
+        logits,
+        temperature=1.0,
+    ):
+        logits = logits / max(
+            temperature, 1e-5 if logits.dtype != torch.float16 else 1e-3
+        )
+        probs = torch.nn.functional.softmax(logits, dim=-1)
+        return probs
 
 def _load_model_weights(stage_module, hf_model_name, device, model_config):
     """Load the weights from the safetensor file(s) into the model stage.
@@ -122,41 +125,46 @@ def _load_model_weights(stage_module, hf_model_name, device, model_config):
     if num_missing_weights > 0:
         raise ValueError(f"Missing {num_missing_weights} weights")
 
-def _encode_string(string, tokenizer, bos=True, device="cuda", dtype=torch.int64)-> torch.Tensor:
-    """Encode a prompt string into a tensor of token ids."""
-        tokens = tokenizer.encode(string)
-        if bos:
-            tokens = [tokenizer.bos_id()] + tokens
-        return torch.tensor(tokens, dtype=dtype, device=device)
-
-def _create_padded_prompt(input_ids, seqlen, start_pos, device) -> torch.Tensor:
-    """Create a padded tensor for the encoded input prompt."""
-        prompt_len = input_ids.size(0)
-        max_new_tokens = min(seqlen, seqlen - start_pos - prompt_len)
-        token_buffer_size = prompt_len + max_new_tokens
-        seq = torch.full((1, token_buffer_size), tokenizer.eos_id(), dtype=torch.int64, device=device)
-        seq[0, :prompt_len] = input_ids
-        return seq
+def _multinomial_sample_one_no_sync(
+        probs_sort,
+    ):  # Does multinomial sampling without a cuda synchronization
+        q = torch.empty_like(probs_sort).exponential_(1)
+        return torch.argmax(probs_sort / q, dim=-1, keepdim=True).to(dtype=torch.int)
 
 def _cleanup():
     dist.barrier()
     dist.destroy_process_group()
 
+def _get_hf_tokenizer(hf_model_name):
+    """Load tokenizer from HF model id. note - use torchchat tokenizer as default"""
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
+    assert tokenizer is not None, f"Failed to load tokenizer for {hf_model_name}"
+    logger.info(f"Loaded tokenizer for {hf_model_name}")
+    tokenizer.pad_token = tokenizer.eos_token
+    return tokenizer
+
 
 def main():
     rank, world_size = _init_distributed()
+    gpu_memory_monitor, device_info = build_gpu_memory_monitor()
+    logger.info(f"{color.yellow} {device_info}{color.reset}")
 
-    gpu_memory_monitor = GPUMemoryMonitor("cuda")
-    logger.info(f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}")
 
-    config = ModelArgs.from_name(MODEL_NAME).transformer_args['text']
-    logger.info(f"Chat Model Name: {MODEL_NAME}\nModel Config: {config}")
+    MODEL_NAME = "Meta-Llama-3-8B" # "Transformer-2-7b-chat-hf"
+
+    config = ModelArgs.from_name(MODEL_NAME).text_transformer_args
+    logger.info(f"Chat Model Config: {config}")
+    
 
     tokenizer = _build_chat_tokenizer()
     logger.info(f"built tokenizer {tokenizer=}")
 
     hf_model_name, model_dtype = NAME_TO_HF_MODEL_ID_AND_DTYPE[MODEL_NAME]
     logger.info(f"Using HF model weights from {hf_model_name} and dtype {model_dtype}")
+
+
+    hf_tokenizer = _get_hf_tokenizer(hf_model_name)
 
     set_precision(CACHE_PRECISION)
     logger.info(f"Using cache precision {CACHE_PRECISION}")
@@ -168,7 +176,7 @@ def main():
 
     # Assuming 2 pipeline stages, feel free to change this as long as the
     # asserts are satisfied
-    pp_degree = 2
+    pp_degree = 4
     assert world_size % pp_degree == 0
     assert config.n_layers % pp_degree == 0
 
@@ -198,12 +206,11 @@ def main():
 
     # Distribute model on TP mesh
     model.distribute(tp_mesh)
-    # logger.info(f"Model: {model}")
+    logger.info(f"Model: {model}")
 
-    mbs = 1  # number of micro-batches TODO: move to multibatch
+    mbs = 1  # number of micro-batches
     mb_size = 1  # micro-batch size
     batch_size = mbs * mb_size  # total batch size
-
     seqlen = 4096  # sequence length
     dim = 4096  # embedding dimension
     assert seqlen % sp_degree == 0
@@ -215,22 +222,18 @@ def main():
     example_args = mb_ids if pp_rank == 0 else activation
 
     # Load weights
-    logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    with TrackTime("cuda") as timer:
+    with TrackTime() as timer:
+        logger.info(f"Loading weights for {pp_rank=} on {device=}")
         _load_model_weights(model, hf_model_name, device=device, model_config=config)
-    logger.info(
-        f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for stage {rank}{color.reset}"
-    )
+    logger.info(f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for {rank}{color.reset}")
 
     # info on stage size and params
-    stage_size = get_module_size(model)
-    stage_size_formatted = bytes_to_readable(stage_size)
+    stage_size, stage_size_formatted = get_stage_size(model)     
     stage_num_params = get_num_params(model)
-    logger.info(
-        f"Stage {rank} has {color.blue}{stage_num_params} params{color.reset}, Size: {color.blue}{stage_size_formatted}{color.reset}\n"
-    )
-    
+    logger.info(f"Stage rank {rank} has {color.blue}{stage_num_params} params{color.reset}, Size: {color.blue}{stage_size_formatted}{color.reset}\n")
+
     # Setup input position
+    # input_pos for prefill: a list of increasing integers from 0 to seqlen
     input_pos = torch.arange(seqlen, device=device)
     model.setup_input_pos(input_pos)
     model.eval()
@@ -251,17 +254,33 @@ def main():
     if len(cpu_tensors) > 0:
         raise ValueError("Found cpu tensors in stage")
 
-    
-    prompt = "What is the capital of France?"
+    # TODO: this can likely be removed after we prove out a few more models
+    # verify dtypes for model - expect all to be model_dtype except for bool causal_mask atm.
+    # dtype_count, dtype_locations, fp32_locations = record_module_dtypes(stage.submod)
+    # logger.info(
+    #     f"Stage Dtypes - Found {len(dtype_count)} dtypes: {dtype_count.items()}"
+    # )
+    # assert (
+    #     len(dtype_count) == 2
+    # ), f"Expected 2 dtypes in model after checkpoint loading: {model_dtype} and {torch.bool}"
+
+    #input_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
+    #logger.info(f"Input: {input_ids.dtype=}, {input_ids.shape=}, {input_ids.device=}")
+
+    prompt = "what is snow?"
+    input_ids = _encode_string(prompt, tokenizer, device, dtype=torch.int64)
+
+    prompt_len = input_ids.size(0)
     start_pos = 0
 
-    # encode the prompt
-    input_ids = _encode_string(prompt, tokenizer, bos=True, device=device, dtype=torch.int64)
-
     # create a padded tensor for the input prompt
-    seq = _create_padded_prompt(input_ids, seqlen, start_pos, device)
+    max_new_tokens = min(seqlen, seqlen - start_pos - prompt_len)
+    token_buffer_size = prompt_len + max_new_tokens
     
-
+    seq = torch.full((1, token_buffer_size), tokenizer.eos_id(), dtype=torch.int64, device=device)
+    seq[0, :prompt_len] = input_ids
+    
+    
     schedule = ScheduleGPipe(stage, mbs)
     logger.info(f"Created schedule: {schedule}")
 
@@ -271,22 +290,75 @@ def main():
         else:
             output = schedule.step()
 
-    # Decoding
+# Decoding
     if pp_rank == pp_degree - 1 and tp_rank == 0:
         
         next_token_logits = output[:,prompt_len-1, :]
+
+        logger.info(f"{next_token_logits=}")
+        logger.info(f"{next_token_logits.shape=}")
+
         next_token = torch.argmax(next_token_logits, dim=-1)
 
+        # self.tokenizer.decode([period_id] + x.tolist())[1:]
         next_token_decoded = tokenizer.decode((next_token.tolist()))
 
-        logger.info(f"\n\n{color.green} Prefill response ====>>>> {color.blue} {next_token_decoded=}, {next_token}\n{color.reset}")
-        
+        logger.info(f"\n\n{color.green}====>>>> {color.blue} {next_token_decoded=}, {next_token}\n{color.reset}")
+        res_mem_gib, res_mem_pct = gpu_memory_monitor.get_peak_stats()
+        logger.info(f"{color.blue} Memory used: {color.green}{res_mem_pct:.3f} %, {color.magenta}{res_mem_gib:.3f} GB{color.reset}")
 
-    # show peak memory stats for this stage
-    res_mem_gib, res_mem_pct = gpu_memory_monitor.get_peak_stats()
-    logger.info(
-        f"{color.blue} Memory used: {color.green}{res_mem_pct:.3f} %, {color.magenta}{res_mem_gib:.3f} GB{color.reset}"
-    )
+    
+
+    if pp_rank == pp_degree - 1 and tp_rank == 0:
+        response = []
+        response.append(next_token_decoded)
+
+    token_array = [19435, 374, 16054]   
+    for i in range(len(token_array)):
+        prompt_len += 1
+        newest_token = token_array[i]
+        next_token_tensor = torch.tensor([newest_token], dtype=torch.int64, device=device)
+        seq[0, prompt_len] = next_token_tensor
+        if pp_rank == pp_degree - 1 and tp_rank == 0:
+            next_token_decoded = tokenizer.decode(next_token_tensor.tolist())
+            response.append(next_token_decoded)
+
+    pretend_next_token = token_array[0]
+    if pretend_next_token != tokenizer.eos_id():
+
+        for i in range(1):
+            logger.info(f"running loop decoding, iter {i}")
+            prompt_len += 1
+            newest_token = token_array[i]
+            next_token_tensor = torch.tensor(newest_token, dtype=torch.int64, device=device)
+            seq[0, prompt_len] = next_token_tensor
+            
+            with torch.no_grad():  # .inference_mode():
+                if pp_rank == 0:
+                    schedule.step(seq)
+                else:
+                    output = schedule.step()
+
+            if pp_rank == pp_degree - 1 and tp_rank == 0:
+                next_token_logits = output[:,prompt_len-1, :]
+
+                logger.info(f"{next_token_logits=}")
+                logger.info(f"{next_token_logits.shape=}")
+                next_token = torch.argmax(next_token_logits, dim=-1)
+
+                # self.tokenizer.decode([period_id] + x.tolist())[1:]
+                next_token_decoded = tokenizer.decode((next_token.tolist()))
+                logger.info(f"\n\n{color.green}====>>>> {color.blue} {next_token_decoded=}, {next_token}\n{color.reset}")
+
+                seq[0, prompt_len] = next_token
+                logger.info(f"{seq= }")
+                response.append(next_token_decoded)
+        
+                logger.info(f"\n\n{color.green} After {i=} iters ====>>>> {color.blue} {response}\n{color.reset}")
+
+
+
+        
 
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
