@@ -682,7 +682,9 @@ class RMSNorm(nn.Module):
 
 def apply_scaling(freqs: torch.Tensor, rope_scaling: Dict[str, Any]):
     # Check for the presence of the required keys
-    assert set(rope_scaling.keys()) >= {"factor", "low_freq_factor", "high_freq_factor", "original_max_position_embeddings"}
+    required_keys = {"factor", "low_freq_factor", "high_freq_factor", "original_max_position_embeddings"}
+    if not required_keys.issubset(rope_scaling.keys()):
+        raise ValueError(f"Missing required keys in apply_scaling. Expected: {required_keys}")
 
     scale_factor = rope_scaling["factor"]
     low_freq_factor = rope_scaling["low_freq_factor"]
