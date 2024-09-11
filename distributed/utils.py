@@ -4,15 +4,19 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
+import itertools
 import os
 from dataclasses import dataclass
 from datetime import timedelta
+import time
+from typing import Optional
+
 
 import torch
 
-from distributed.logging_utils import setup_logging
 
-logger = setup_logging(__name__)
+from distributed.logging_utils import SingletonLogger
+logger = SingletonLogger.get_logger()
 
 
 def _warn_overwrite_env(env, val):
@@ -51,7 +55,47 @@ def get_num_params(model: torch.nn.Module, exclude_embedding: bool = False) -> i
     num_params = sum(p.numel() for p in model.parameters())
     if exclude_embedding:
         num_params -= model.tok_embeddings.weight.numel()
-    return num_params
+    readable_num_params = format_model_params(num_params)
+    return readable_num_params
+
+
+def get_module_size(stage: torch.nn.Module) -> int:
+    """get module (stage) size in bytes"""
+    model_size = sum(
+        [
+            p.numel() * p.dtype.itemsize
+            for p in itertools.chain(stage.parameters(), stage.buffers())
+        ]
+    )
+    return model_size
+
+
+def format_model_params(params):
+    """turn the num_params into a readable formatted number"""
+    if params >= 1_000_000_000:
+        return f"{params / 1_000_000_000:.2f}B"
+    elif params >= 1_000_000:
+        return f"{params / 1_000_000:.2f}M"
+    else:
+        return f"{params:,}"
+
+
+def bytes_to_readable(bytes_value: int, round_to: int = 2) -> str:
+    """formatting function to make reading model (stage) sizes easy"""
+    GiB = 1024**3  # 1 GiB in bytes
+    MiB = 1024**2  # 1 MiB in bytes
+
+    if bytes_value >= GiB:
+        value = bytes_value / GiB
+        unit = "GiB"
+    else:
+        value = bytes_value / MiB
+        unit = "MiB"
+
+    # Round to 2 decimal places
+    rounded_value = round(value, round_to)
+
+    return f"{rounded_value} {unit}"
 
 
 @dataclass(frozen=True)
@@ -79,6 +123,96 @@ class NoColor:
     white = ""
     reset = ""
 
+class TrackTime:
+    """integrated class for perf timing via perf_counter"""
+
+    def __init__(self, use_ms: bool = False, round_to: Optional[int] = 4):
+        self.use_ms = use_ms
+        self.round_to = round_to
+        self.start_time = 0.0
+        self.elapsed_time = 0.0
+        self.unit = "seconds" if not use_ms else "milliseconds"
+
+    def __enter__(self):
+        self.start_time = time.perf_counter()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        end_time = time.perf_counter()
+        self.elapsed_time = end_time - self.start_time
+
+        if self.use_ms:
+            self.elapsed_time *= 1000  # Convert to milliseconds
+
+        if self.round_to is not None:
+            self.elapsed_time = round(self.elapsed_time, self.round_to)
+
+    def get_time(self) -> float:
+        return self.elapsed_time
+
+
+class CUDATrackTime:
+    """
+    Integrated class for perf timing via cuda events.
+    Note - this uses the default stream to synchronize, and defaults to current device.
+    The event.record() will create a context on the CUDA device matching the device used at init.
+    """
+
+    def __init__(self, device=None, use_ms: bool = False, round_to: Optional[int] = 4):
+        if device is None:
+            device = torch.cuda.current_device()
+        elif isinstance(device, str):
+            device = torch.device(device)
+        elif isinstance(device, int):
+            device = torch.device(f"cuda:{device}")
+
+        self.device = device
+        # Create events on the specified device
+        with torch.cuda.device(self.device):
+            self.start_event = torch.cuda.Event(enable_timing=True)
+            self.end_event = torch.cuda.Event(enable_timing=True)
+
+        self.active = False
+        self.round_to = round_to
+        self.elapsed_time = 0.0
+        self.use_ms = use_ms
+        self.unit = "seconds" if not use_ms else "milliseconds"
+
+    def start(self):
+        if self.active:
+            raise RuntimeError("Timer is already running. Use .stop() to stop it")
+        self.start_event.record()
+        self.active = True
+
+    def stop(self):
+        if not self.active:
+            raise RuntimeError("Timer is not running. Use .start() to start it")
+        self.end_event.record()
+        self.active = False
+
+    def get_time(self):
+        if self.active:
+            raise RuntimeError("Timer is still running. Use .stop() to stop it")
+
+        torch.cuda.synchronize(self.device)  # Synchronize all streams on the device
+        total_time = self.start_event.elapsed_time(self.end_event)
+
+        if not self.use_ms:
+            total_time = total_time / 1000.0  # to seconds
+
+        if self.round_to:
+            total_time = round(total_time, self.round_to)
+
+        self.elapsed_time = total_time
+
+        return self.elapsed_time
+
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
 
 class GPUMemoryMonitor:
     def __init__(self, device: str):
