@@ -13,14 +13,17 @@ import json
 from torch.nn import Module
 from typing import Dict, Tuple, Set, Optional
 
-from distributed.logging_utils import setup_logging
+
 from distributed.dtensor_utils import is_dtensor, load_into_dtensor
 
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
 _CONFIG_NAME = "config.json"
 
-logger = setup_logging(__name__)
+
+from distributed.logging_utils import SingletonLogger
+logger = SingletonLogger.get_logger()
+
 
 
 def compare_and_reverse(tensor1: torch.Tensor, tensor2: torch.Tensor) -> torch.Tensor:

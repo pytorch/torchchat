@@ -15,7 +15,8 @@ import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 
-from distributed.logging_utils import setup_logging
+
+from distributed.logging_utils import SingletonLogger
 
 # TODO - these are not distributed specific, consider moving to new package
 from distributed.safetensor_utils import (
@@ -24,7 +25,15 @@ from distributed.safetensor_utils import (
     load_safetensor_weights,
 )
 
-from distributed.utils import Color as color, TrackTime, CUDATrackTime, GPUMemoryMonitor
+from distributed.utils import (
+    Color as color,
+    GPUMemoryMonitor,
+    get_module_size,
+    get_num_params,
+    bytes_to_readable,
+    TrackTime, 
+    CUDATrackTime,
+)
 
 from distributed.verification_utils import find_cpu_tensors
 from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
@@ -41,7 +50,7 @@ except ImportError:
     SentencePieceProcessor = None
 
 
-logger = setup_logging(__name__)
+logger = SingletonLogger.get_logger()
 
 MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
@@ -192,11 +201,17 @@ def main():
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
     with TrackTime("cuda") as timer:
         _load_model_weights(model, hf_model_name, device=device, model_config=config)
-
     logger.info(
         f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for stage {rank}{color.reset}"
     )
-    
+
+    # info on stage size and params
+    stage_size = get_module_size(model)
+    stage_size_formatted = bytes_to_readable(stage_size)
+    stage_num_params = get_num_params(model)
+    logger.info(
+        f"Stage {rank} has {color.blue}{stage_num_params} params{color.reset}, Size: {color.blue}{stage_size_formatted}{color.reset}\n"
+    )
     
     # Setup input position
     # input_pos for prefill: a list of increasing integers from 0 to seqlen

@@ -6,9 +6,10 @@ from torch._subclasses import FakeTensor
 import numpy as np
 from distributed.dtensor_utils import is_dtensor
 from typing import Dict, List, Tuple
-from distributed.logging_utils import setup_logging
 
-logger = setup_logging(__name__)
+from distributed.logging_utils import SingletonLogger
+logger = SingletonLogger.get_logger()
+
 
 
 def record_module_dtypes(module):
