@@ -558,7 +558,7 @@ def load_model(gguf_file: str) -> torch.nn.Module:
     # metadata.get(f"{arch}.rope.dimension_count", None)
 
     with torch.device("meta"):
-        model = Model(model_args)
+        model = Model.from_model_args(model_args)
     return model
 
 

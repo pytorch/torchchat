@@ -310,11 +310,11 @@ class Model(nn.Module):
     
     @abstractmethod
     def forward(self, *args, **kwargs):
-        pass
+        raise NotImplementedError("forward method is not implemented")
 
     @abstractmethod
     def setup_caches(self, *args, **kwargs):
-        pass
+        raise NotImplementedError("setup_caches method is not implemented")
 
     @classmethod
     def _get_model_instance(cls, config: ModelArgs):
@@ -322,6 +322,10 @@ class Model(nn.Module):
         if model_class is None:
             raise ValueError("Unsupported model type:", str(config.model_type))
         return model_class(config)
+
+    @classmethod
+    def from_model_args(cls, config: ModelArgs):
+        return cls._get_model_instance(config)
 
     @classmethod
     def from_name(cls, name: str):
