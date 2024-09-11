@@ -47,7 +47,7 @@ def _convert_gguf_tensor_name_to_llama_nn(gguf_name: str) -> str:
     result = copy.deepcopy(gguf_name)
     for gguf_string, replacement in _name_replacements:
         result = result.replace(gguf_string, replacement)
-    result = "text_transformer." + result
+    result = "model." + result
     return result
 
 
@@ -558,7 +558,7 @@ def load_model(gguf_file: str) -> torch.nn.Module:
     # metadata.get(f"{arch}.rope.dimension_count", None)
 
     with torch.device("meta"):
-        model = Model(model_args)
+        model = Model.from_model_args(model_args)
     return model
 
 

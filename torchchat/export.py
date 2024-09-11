@@ -4,7 +4,6 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-import argparse
 import os
 from typing import Optional
 
@@ -21,7 +20,6 @@ from torchchat.cli.builder import (
     BuilderArgs,
     TokenizerArgs,
 )
-from torchchat.cli.cli import add_arguments_for_verb, arg_init, check_args
 
 from torchchat.utils.build_utils import set_backend, set_precision
 
@@ -56,9 +54,9 @@ def export_for_server(
             torch.tensor([0, 1, 2, 3, 4], dtype=torch.int, device=device),
         )
 
-        seq = Dim("seq", min=1, max=model.config.text_transformer_args.max_seq_length)
+        seq = Dim("seq", min=1, max=model.config.transformer_args["text"].max_seq_length)
         # Specify that the first dimension of each input is that batch size
-        dynamic_shapes = {"idx": {1: seq}, "input_pos": {0: seq}}
+        dynamic_shapes = {"tokens": {1: seq}, "input_pos": {0: seq}}
     else:
         input = (
             torch.tensor([[1]], dtype=torch.int, device=device),
@@ -258,7 +256,7 @@ try:
             core_aten_ep, edge_constant_methods, edge_compile_config, verbose=verbose
         )
 
-    def export_for_et(model, device, output_path, args=None) -> str:  # noqa: C901
+    def export_for_et(model, device, output_path) -> str:
 
         input = (
             torch.tensor([[1]], dtype=torch.long, device=device),
@@ -405,9 +403,7 @@ def main(args):
             output_pte_path = str(os.path.abspath(output_pte_path))
             if executorch_export_available:
                 print(f"Exporting model using ExecuTorch to {output_pte_path}")
-                export_for_et(
-                    model_to_pte, builder_args.device, args.output_pte_path, args
-                )
+                export_for_et(model_to_pte, builder_args.device, args.output_pte_path)
             else:
                 print(
                     "Export with executorch requested but ExecuTorch could not be loaded"

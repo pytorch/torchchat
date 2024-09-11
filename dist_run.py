@@ -15,7 +15,8 @@ import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 
-from distributed.logging_utils import setup_logging
+
+from distributed.logging_utils import SingletonLogger
 
 # TODO - these are not distributed specific, consider moving to new package
 from distributed.safetensor_utils import (
@@ -30,6 +31,8 @@ from distributed.utils import (
     get_module_size,
     get_num_params,
     bytes_to_readable,
+    TrackTime, 
+    CUDATrackTime,
 )
 
 from distributed.verification_utils import find_cpu_tensors
@@ -47,7 +50,7 @@ except ImportError:
     SentencePieceProcessor = None
 
 
-logger = setup_logging(__name__)
+logger = SingletonLogger.get_logger()
 
 MODEL_NAME = "Transformer-2-7b-chat-hf"
 NAME_TO_HF_MODEL_ID_AND_DTYPE = {
@@ -130,7 +133,7 @@ def main():
     gpu_memory_monitor = GPUMemoryMonitor("cuda")
     logger.info(f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}")
 
-    config = ModelArgs.from_name(MODEL_NAME).text_transformer_args
+    config = ModelArgs.from_name(MODEL_NAME).transformer_args['text']
     logger.info(f"Chat Model Config: {config}")
 
     tokenizer = _build_chat_tokenizer()
@@ -196,7 +199,11 @@ def main():
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    _load_model_weights(model, hf_model_name, device=device, model_config=config)
+    with TrackTime("cuda") as timer:
+        _load_model_weights(model, hf_model_name, device=device, model_config=config)
+    logger.info(
+        f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for stage {rank}{color.reset}"
+    )
 
     # info on stage size and params
     stage_size = get_module_size(model)
@@ -205,7 +212,7 @@ def main():
     logger.info(
         f"Stage {rank} has {color.blue}{stage_num_params} params{color.reset}, Size: {color.blue}{stage_size_formatted}{color.reset}\n"
     )
-
+    
     # Setup input position
     # input_pos for prefill: a list of increasing integers from 0 to seqlen
     input_pos = torch.arange(seqlen, device=device)

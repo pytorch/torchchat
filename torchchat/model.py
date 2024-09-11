@@ -5,10 +5,13 @@
 # LICENSE file in the root directory of this source tree.
 import json
 import os
+import warnings
 
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Callable, Dict, Optional, Union
+from abc import ABC, abstractmethod
 
 import torch
 import torch.nn as nn
@@ -26,8 +29,90 @@ from torch.nn import functional as F
 
 from torchchat.utils.build_utils import find_multiple, get_precision
 
+# bypass the import issue, if any
+# TODO: remove this once the torchao is ready on macos
+try:
+    from torchtune.models.flamingo import flamingo_decoder, flamingo_vision_encoder
+    from torchtune.modules.model_fusion import DeepFusionModel 
+    from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
+except:
+    pass
+
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
 
+def identity(**kwargs):
+    if len(kwargs) != 1:
+        raise ValueError("Only one argument is expected")
+    return list(kwargs.values())[0]
+
+class ModelType(Enum):
+    TextOnly = "text_only"
+    Llama3_1 = "llama3_1"
+    Flamingo = "flamingo"
+
+# Type for objects that can generate nn.Module instance
+ModuleLike = Union[nn.Module, Callable[..., nn.Module]]
+
+@dataclass
+class ModelRecipe:
+    """
+    The class describes and contains all supported model structures in torchchat.
+    
+    ModelRecipe represents a model as a collection of Transformer modules and a fusion module,
+    providing a standardized and centralized way to define and build models in torchchat.
+    Attributes:
+        model_type (ModelType):
+            The type of the model.
+        modules (Dict[str, ModuleLike]):
+            A dictionary of ModuleLike modules, where each key is the module name and each 
+            value is a ModuleLike object that generates the transformer.
+            The names of the Transformer modules should match the corresponding names in the
+            fusion class and the JSON file holding model hyperparameters.
+        fusion_class (ModuleLike):
+            A ModuleLike object that generates a fusion module by taking the constructed modules above.
+    """
+
+    model_type: ModelType
+    modules: Dict[str, ModuleLike]
+    fusion_class: ModuleLike
+
+    @classmethod
+    def _text_only(cls):
+        return cls(
+            model_type=ModelType.TextOnly,
+            modules={'text': Transformer},
+            fusion_class=identity,
+        )
+    
+    @classmethod
+    def _llama3_1(cls):
+        return cls(
+            model_type=ModelType.Llama3_1,
+            modules={'text': llama3_1_builder},
+            fusion_class=identity,
+        )
+
+    @classmethod
+    def _flamingo(cls):
+        return cls(
+            model_type=ModelType.Flamingo,
+            modules={
+                'encoder': flamingo_vision_encoder,
+                'decoder': flamingo_decoder
+            },
+            fusion_class=DeepFusionModel,
+        )
+    
+    @classmethod
+    def get_recipe(cls, model_type):
+        if model_type == ModelType.TextOnly:
+            return cls._text_only()
+        elif model_type == ModelType.Flamingo:
+            return cls._flamingo()
+        elif model_type == ModelType.Llama3_1:
+            return cls._llama3_1()
+        else:
+            raise ValueError(f"Can not find the model recipe for {model_type}")
 
 @dataclass
 class TransformerArgs:
@@ -77,13 +162,33 @@ class TransformerArgs:
                 params[_to] = params.pop(_from)
         return cls(**params)
 
+
 @dataclass
 class ModelArgs:
-    text_transformer_args: TransformerArgs
+    model_type: ModelType
+    transformer_args: Dict[str, Union[Dict, TransformerArgs]]
 
-    def __post_init__(self):
-        assert self.text_transformer_args is not None
-        assert type(self.text_transformer_args) == TransformerArgs
+    def __init__(
+        self,
+        transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
+        model_type: ModelType = ModelType.TextOnly,
+    ) -> None:
+        self._sanity_check(transformer_args, model_type)
+        
+        self.model_type = model_type
+        if isinstance(transformer_args, TransformerArgs):
+            assert model_type == ModelType.TextOnly
+            self.transformer_args = {"text": transformer_args}
+        else:
+            self.transformer_args = transformer_args
+    
+    def _sanity_check(
+        self,
+        transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
+        model_type: ModelType,
+    ) -> None:
+        assert isinstance(model_type, ModelType)
+        assert isinstance(transformer_args, (TransformerArgs, dict))
 
     @classmethod
     def from_params(cls, params_path):
@@ -92,18 +197,14 @@ class ModelArgs:
 
         try:
             # try to interpret as a single transformer config
-            text_transformer_args = TransformerArgs.from_params(
-                loaded_params
-            )
+            transformer_args: Dict[str, TransformerArgs] = {}
+            transformer_args["text"] = TransformerArgs.from_params(loaded_params)
+            model_type = ModelType.TextOnly
         except TypeError:
             # try to interpret as a dict of transformer configs
-            for name, params in loaded_params.items():
-                if name == "text":
-                    text_transformer_args = TransformerArgs.from_params(params)
-                else:
-                    raise ValueError(f"Unknown transformer name {name}")
-
-        return cls(text_transformer_args)
+            model_type = ModelType(loaded_params["model_type"])
+            transformer_args = {k: v for k, v in loaded_params.items() if k != "model_type"}
+        return cls(transformer_args, model_type)
 
     @classmethod
     def from_table(cls, name: str):
@@ -180,29 +281,63 @@ class KVCache(nn.Module):
         return k_out, v_out
 
 
-class Model(nn.Module):
+class Model(ABC, nn.Module):
+    """
+    The entrance for model construction in torchchat.
+    """
     def __init__(self, config: ModelArgs) -> None:
         super().__init__()
         self.config = config
-        self.text_transformer = Transformer(config.text_transformer_args)
-
-    def forward(self, idx: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
-        return self.text_transformer(idx, input_pos)
+        self.model = self.build_model()
     
-    def setup_caches(self, max_batch_size, max_seq_length):
-        self.text_transformer.setup_caches(max_batch_size, max_seq_length)
+    def build_model(self) -> nn.Module:
+        """
+        Builds a model based on the provided configuration.
+        This method retrieves a ModelRecipe instance corresponding to the specified model type,
+        constructs the required Transformer modules, and combines them using the fusion class.
+        Returns:
+            The constructed model instance.
+        """
+        recipe = ModelRecipe.get_recipe(self.config.model_type)
+        modules = {}
+        for name, module_class in recipe.modules.items():
+            if isinstance(config_args := self.config.transformer_args[name], dict):
+                modules[name] = module_class(**config_args)
+            else:
+                modules[name] = module_class(config_args)
+
+        return recipe.fusion_class(**modules)
+    
+    @abstractmethod
+    def forward(self, *args, **kwargs):
+        raise NotImplementedError("forward method is not implemented")
+
+    @abstractmethod
+    def setup_caches(self, *args, **kwargs):
+        raise NotImplementedError("setup_caches method is not implemented")
+
+    @classmethod
+    def _get_model_instance(cls, config: ModelArgs):
+        model_class = MODEL_TYPE_TO_CLASS.get(config.model_type)
+        if model_class is None:
+            raise ValueError("Unsupported model type:", str(config.model_type))
+        return model_class(config)
+
+    @classmethod
+    def from_model_args(cls, config: ModelArgs):
+        return cls._get_model_instance(config)
 
     @classmethod
     def from_name(cls, name: str):
-        return cls(ModelArgs.from_name(name))
+        return cls._get_model_instance(ModelArgs.from_name(name))
 
     @classmethod
     def from_table(cls, name: str):
-        return cls(ModelArgs.from_table(name))
+        return cls._get_model_instance(ModelArgs.from_table(name))
 
     @classmethod
     def from_params(cls, params_path: str):
-        return cls(ModelArgs.from_params(params_path))
+        return cls._get_model_instance(ModelArgs.from_params(params_path))
 
     @classmethod
     def from_gguf(cls, gguf_path: str, **kwargs):
@@ -213,6 +348,49 @@ class Model(nn.Module):
             model.load_state_dict(state_dict, assign=True)
         return model
 
+
+class TextOnlyModel(Model):
+    def forward(self, tokens: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
+        return self.model(tokens, input_pos)
+
+    def setup_caches(self, max_batch_size, max_seq_length):
+        self.model.setup_caches(max_batch_size, max_seq_length)
+
+
+class Llama31Model(Model):
+    def forward(self, tokens: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
+        return self.model(tokens=tokens, input_pos=input_pos)
+
+    def setup_caches(self, max_batch_size, dtype):
+        self.model.setup_caches(max_batch_size, dtype=dtype)
+
+    def reset_caches(self):
+        self.model.reset_caches()
+
+
+class FlamingoModel(Model):
+    def forward(
+        self,
+        tokens: Tensor,
+        encoder_input: Optional[Dict[str, Tensor]] = None,
+        encoder_mask: Optional[Tensor] = None,
+    ) -> Tensor:
+        if encoder_input is None:
+            return self.model(tokens, encoder_mask=encoder_mask)
+        return self.model(tokens, encoder_input=encoder_input, encoder_mask=encoder_mask)
+
+    def setup_caches(self, max_batch_size, dtype):
+        self.model.setup_caches(max_batch_size, dtype=dtype)
+
+    def reset_caches(self):
+        self.model.reset_caches()
+
+
+MODEL_TYPE_TO_CLASS = {
+    ModelType.TextOnly: TextOnlyModel,
+    ModelType.Flamingo: FlamingoModel,
+    ModelType.Llama3_1: Llama31Model,
+}
 
 class Transformer(nn.Module):
     def __init__(self, config: TransformerArgs) -> None:
@@ -564,11 +742,11 @@ def apply_rotary_emb(x: Tensor, freqs_cis: Tensor) -> Tensor:
 # ExecuTorch model components
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-try: 
+try:
     from executorch.extension.pybindings import portable_lib as exec_lib
-
+    
     # ET changed the way it's loading the custom ops so it's not included in portable_lib but has to be loaded separately.
-    from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache # no-qa
+    from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache  # no-qa
 
     class PTEModel(nn.Module):
         def __init__(self, config, path) -> None:
@@ -589,5 +767,6 @@ try:
 
         def setup_caches(self, max_batch_size, max_seq_length):
             pass
+
 except:
     pass

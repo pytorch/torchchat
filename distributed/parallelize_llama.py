@@ -10,10 +10,11 @@ from torch.distributed.tensor.parallel import (ColwiseParallel,
                                                RowwiseParallel,
                                                parallelize_module)
 
-from distributed.logging_utils import setup_logging
+
 from distributed.parallel_config import ParallelDims
 
-logger = setup_logging(__name__)
+from distributed.logging_utils import SingletonLogger
+logger = SingletonLogger.get_logger()
 
 
 def apply_tp(
@@ -61,7 +62,7 @@ def apply_tp(
     # after we apply TP to the model. Because we don't want to change model code 
     # when applying TP. We need to have change to ensure KVCache has the correct
     # size as k and v.
-    model.config.text_transformer_args.n_local_heads = model.config.text_transformer_args.n_local_heads // tp_mesh.size()
+    model.config.transformer_args["text"].n_local_heads = model.config.transformer_args["text"].n_local_heads // tp_mesh.size()
 
     # Apply tensor parallelism to every transformer block
     for transformer_block in model.layers:
