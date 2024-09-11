@@ -323,6 +323,7 @@ class Generator:
         # logging.debug(f"x: {x}, input_pos: {input_pos}")
         width = x.size(1)
         assert input_pos.size(0) == width
+        print("x: ", x, "input_pos: ", input_pos, "width: ", width)
 
         if sequential_prefill:
             for i in range(width):
