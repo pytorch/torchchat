@@ -340,7 +340,7 @@ def _load_model_default(builder_args, only_config=False):
     )
 
     cps = []
-    if builder_args.params_table.endswith("Tune"):
+    if builder_args.params_table and builder_args.params_table.endswith("Tune"):
         print("Loading Tune checkpoint")
         checkpoint = meta_to_tune(hf_checkpoint)
     elif builder_args.checkpoint_dir is not None:
