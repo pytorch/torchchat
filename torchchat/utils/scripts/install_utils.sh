@@ -7,6 +7,11 @@
 
 set -ex pipefail
 
+if [ -z "$TORCHCHAT_ROOT" ]; then
+  echo "Defaulting TORCHCHAT_ROOT to $PWD since it is unset."
+  TORCHCHAT_ROOT=$PWD
+fi
+
 install_pip_dependencies() {
   echo "Intalling common pip packages"
   pip3 install wheel "cmake>=3.19" ninja zstd
@@ -20,19 +25,52 @@ function find_cmake_prefix_path() {
   MY_CMAKE_PREFIX_PATH=$path
 }
 
-clone_executorch() {
-  echo "Cloning executorch to ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src"
-  rm -rf ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}
+clone_executorch_internal() {
+  rm -rf ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
+
   mkdir -p ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
   pushd ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
   git clone https://github.com/pytorch/executorch.git
   cd executorch
   git checkout $(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt)
-  echo "Install executorch: submodule update"
+  echo "Install ExecuTorch: submodule update"
   git submodule sync
   git submodule update --init
 
   popd
+}
+
+clone_executorch() {
+  echo "Cloning ExecuTorch to ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src"
+
+  # Check if executorch is already cloned and has the correct version
+  if [ -d "${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch" ]; then
+    pushd ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch
+
+    # Check if the repo is clean
+    git_status=$(git status --porcelain)
+    if [ -n "$git_status" ]; then
+      echo "ExecuTorch repo is not clean. Removing and recloning."
+      popd
+      clone_executorch_internal
+      return
+    fi
+
+    # Check if the version is the same
+    current_version=$(git rev-parse HEAD)
+    desired_version=$(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt)
+
+    if [ "$current_version" == "$desired_version" ]; then
+      echo "ExecuTorch is already cloned with the correct version. Skipping clone."
+      popd
+      return
+    fi
+
+    echo "ExecuTorch is already cloned but has the wrong version. Removing and recloning."
+    popd
+  fi
+
+  clone_executorch_internal
 }
 
 install_executorch_python_libs() {
