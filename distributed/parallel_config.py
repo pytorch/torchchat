@@ -8,8 +8,8 @@ from dataclasses import dataclass
 
 from torch.distributed.device_mesh import init_device_mesh
 
-from distributed.logging_utils import setup_logging
-logger = setup_logging(__name__)
+from distributed.logging_utils import SingletonLogger
+logger = SingletonLogger.get_logger()
 
 @dataclass
 class ParallelDims:

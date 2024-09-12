@@ -927,7 +927,8 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
                 \nAverage tokens/sec (next tokens): {torch.mean(torch.tensor(aggregate_metrics['next_tokens_per_sec'])).item():.2f} \n\
                 "
         )
-        print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
+        if torch.cuda.is_available():
+            print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
 
 def main(args):
