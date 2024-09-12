@@ -88,7 +88,8 @@ REQUIREMENTS_TO_INSTALL=(
 )
 
 (
-  set -x $PIP_EXECUTABLE install torchao=="0.5.0"
+  set -x
+  $PIP_EXECUTABLE install torchao=="0.5.0"
 )
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
