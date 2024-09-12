@@ -10,7 +10,8 @@ import warnings
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Callable, Dict, Optional, Union
+
+from typing import Any, Callable, Dict, Optional, Union
 from abc import ABC, abstractmethod
 
 import torch
@@ -127,7 +128,7 @@ class TransformerArgs:
     ffn_dim_multiplier: Optional[int] = None
     use_tiktoken: bool = False
     max_seq_length: int = 8192
-    use_scaled_rope: bool = False
+    rope_scaling: Optional[Dict[str, Any]] = None
     # For pipeline parallel
     n_stages: int = 1
     stage_idx: int = 0
@@ -413,8 +414,6 @@ class Transformer(nn.Module):
             self.norm = None
             self.output = None
 
-        # self.freqs_cis: Optional[Tensor] = None
-        # self.mask_cache: Optional[Tensor] = None
         self.max_batch_size = -1
         self.max_seq_length = -1
         # For supporting sequence parallel (default is off, thus value of 1)
@@ -439,7 +438,7 @@ class Transformer(nn.Module):
             self.config.dim // self.config.n_heads,
             self.config.block_size * 2,
             self.config.rope_base,
-            use_scaled=self.config.use_scaled_rope,
+            rope_scaling=self.config.rope_scaling,
         )
         self.register_buffer("freqs_cis", freqs_cis, persistent=True)
         causal_mask = torch.tril(
@@ -676,12 +675,16 @@ class RMSNorm(nn.Module):
         return output * self.weight
 
 
-def apply_scaling(freqs: torch.Tensor):
-    # Values obtained from grid search
-    scale_factor = 8
-    low_freq_factor = 1
-    high_freq_factor = 4
-    old_context_len = 8192  # original llama3 length
+def apply_scaling(freqs: torch.Tensor, rope_scaling: Dict[str, Any]):
+    # Check for the presence of the required keys
+    required_keys = {"factor", "low_freq_factor", "high_freq_factor", "original_max_position_embeddings"}
+    if not required_keys.issubset(rope_scaling.keys()):
+        raise ValueError(f"Missing required keys in apply_scaling. Expected: {required_keys}")
+
+    scale_factor = rope_scaling["factor"]
+    low_freq_factor = rope_scaling["low_freq_factor"]
+    high_freq_factor = rope_scaling["high_freq_factor"]
+    old_context_len = rope_scaling["original_max_position_embeddings"]
 
     low_freq_wavelen = old_context_len / low_freq_factor
     high_freq_wavelen = old_context_len / high_freq_factor
@@ -702,7 +705,7 @@ def apply_scaling(freqs: torch.Tensor):
 
 
 def precompute_freqs_cis(
-    n_elem: int, seq_len: int, base: int = 10000, dtype=None, use_scaled: bool = False
+    n_elem: int, seq_len: int, base: int = 10000, dtype=None, rope_scaling: Optional[Dict[str, Any]] = None
 ) -> Tensor:
     if not dtype:
         dtype = get_precision()
@@ -710,8 +713,8 @@ def precompute_freqs_cis(
         base ** (torch.arange(0, n_elem, 2)[: (n_elem // 2)].float() / n_elem)
     )
     t = torch.arange(seq_len, device=freqs.device)
-    if use_scaled:
-        freqs = apply_scaling(freqs)
+    if rope_scaling is not None:
+        freqs = apply_scaling(freqs, rope_scaling)
     freqs = torch.outer(t, freqs)
     freqs_cis = torch.polar(torch.ones_like(freqs), freqs)
     cache = torch.stack([freqs_cis.real, freqs_cis.imag], dim=-1)
