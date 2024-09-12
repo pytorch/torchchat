@@ -10,7 +10,7 @@ torchchat is a small codebase showcasing the ability to run large language model
   - [Run chat in the Browser](#browser)
 - [Run models on desktop/server without python](#desktopserver-execution)
   - [Use AOT Inductor for faster execution](#aoti-aot-inductor)
-  - [Running in c++ using the runner](#running-native-using-our-c-runner)
+  - [Running in c++ using the runner](#run-using-our-c-runner)
 - [Run models on mobile](#mobile-execution)
   - [Deploy and run on iOS](#deploy-and-run-on-ios)
   - [Deploy and run on Android](#deploy-and-run-on-android)
@@ -33,7 +33,8 @@ torchchat is a small codebase showcasing the ability to run large language model
 ## Installation
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
-*torchchat uses the latest changes from various PyTorch projects so it's highly recommended that you use a venv (by using the commands below) or CONDA.*
+> [!TIP]
+> torchchat uses the latest changes from various PyTorch projects so it's highly recommended that you use a venv (by using the commands below) or CONDA.
 
 [skip default]: begin
 ```bash
@@ -127,13 +128,13 @@ python3 torchchat.py download llama3.1
 <summary>Additional Model Inventory Management Commands</summary>
 
 ### List
-This subcommands shows the available models
+This subcommand shows the available models
 ```bash
 python3 torchchat.py list
 ```
 
 ### Where
-This subcommands shows location of a particular model.
+This subcommand shows location of a particular model.
 ```bash
 python3 torchchat.py where llama3.1
 ```
@@ -141,7 +142,7 @@ This is useful in scripts when you do not want to hard-code paths
 
 
 ### Remove
-This subcommands removes the specified model
+This subcommand removes the specified model
 ```bash
 python3 torchchat.py remove llama3.1
 ```
@@ -181,18 +182,10 @@ python3 torchchat.py generate llama3.1 --prompt "write me a story about a boy an
 [skip default]: end
 
 ### Server
-**Note: This feature is still a work in progress and not all endpoints are working**
-
-
-<details>
-<summary>This mode gives a REST API that matches the OpenAI API spec for interacting with a model</summary>
-
+This mode exposes a REST API for interacting with a model. 
 The server follows the [OpenAI API specification](https://platform.openai.com/docs/api-reference/chat) for chat completions.
-Since this feature is under active development, not every parameter is consumed. See api/api.py for details on
-which request parameters are implemented. If you encounter any issues, please comment on the [tracking Github issue](https://github.com/pytorch/torchchat/issues/973).
 
 To test out the REST API, **you'll need 2 terminals**: one to host the server, and one to send the request.
-
 In one terminal, start the server
 
 [skip default]: begin
@@ -204,8 +197,14 @@ python3 torchchat.py server llama3.1
 
 In another terminal, query the server using `curl`. Depending on the model configuration, this query might take a few minutes to respond.
 
-Setting `stream` to "true" in the request emits a response in chunks. If `stream` is unset or not "true", then the client will await the full response from the server.
+> [!NOTE]
+> Since this feature is under active development, not every parameter is consumed. See api/api.py for details on
+> which request parameters are implemented. If you encounter any issues, please comment on the [tracking Github issue](https://github.com/pytorch/torchchat/issues/973).
 
+<details>
+<summary>Example Query</summary>
+
+Setting `stream` to "true" in the request emits a response in chunks. If `stream` is unset or not "true", then the client will await the full response from the server.
 
 **Example Input + Output**
 
@@ -348,7 +347,7 @@ Specifically there are 2 ways of doing so: Pure Python and via a Runner
 
 ```
 # Execute
-python3 torchchat.py generate llama3.1 --device cpu --pte-path llama3.1.pte --prompt "Hello my name is"
+python3 torchchat.py generate llama3.1 --pte-path llama3.1.pte --prompt "Hello my name is"
 ```
 
 </details>
