@@ -7,7 +7,7 @@
 import os
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 # Run command:
 # torchrun --nproc-per-node 4 dist_run.py
@@ -15,26 +15,15 @@ import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 
-
 from distributed.logging_utils import SingletonLogger
-
 # TODO - these are not distributed specific, consider moving to new package
-from distributed.safetensor_utils import (
-    get_hf_config_file,
-    get_hf_weight_map_and_path,
-    load_safetensor_weights,
-)
-
-from distributed.utils import (
-    Color as color,
-    GPUMemoryMonitor,
-    get_module_size,
-    get_num_params,
-    bytes_to_readable,
-    TrackTime,
-    CUDATrackTime,
-)
-
+from distributed.safetensor_utils import (get_hf_config_file,
+                                          get_hf_weight_map_and_path,
+                                          load_safetensor_weights)
+from distributed.utils import Color as color
+from distributed.utils import (GPUMemoryMonitor, TrackTime,
+                               bytes_to_readable, get_module_size,
+                               get_num_params)
 from distributed.verification_utils import find_cpu_tensors
 from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
 from torchchat.model import ModelArgs, Transformer
@@ -123,28 +112,86 @@ def _load_model_weights(stage_module, hf_model_name, device, model_config):
         raise ValueError(f"Missing {num_missing_weights} weights")
 
 
-def _encode_string(
-    string: str, tokenizer, bos: bool = True, device: str = "cuda", dtype=torch.int64
-) -> torch.Tensor:
-    """Encode a prompt string into a tensor of token ids."""
-    tokens = tokenizer.encode(string)
-    if bos:
-        tokens = [tokenizer.bos_id()] + tokens
-    return torch.tensor(tokens, dtype=dtype, device=device)
+def _encode_strings(
+    strings: List[str],
+    tokenizer,
+    bos: bool = True,
+    device: str = "cuda",
+    dtype=torch.int64,
+) -> List[torch.Tensor]:
+    """Encode a list of prompt strings into a list of tensor token ids."""
+    encoded_list = []
+    for string in strings:
+        tokens = tokenizer.encode(string)
+        if bos:
+            tokens = [tokenizer.bos_id()] + tokens
+        encoded_list.append(torch.tensor(tokens, dtype=dtype, device=device))
+    return encoded_list
 
 
-def _create_padded_prompt(
-    input_ids: torch.Tensor, tokenizer, seqlen: int, start_pos: int, device: str
-) -> Tuple[torch.Tensor, int]:
-    """Create a padded tensor for the encoded input prompt. Returns the padded tensor and the prompt length."""
-    prompt_len = input_ids.size(0)
-    max_new_tokens = min(seqlen, seqlen - start_pos - prompt_len)
-    token_buffer_size = prompt_len + max_new_tokens
-    seq = torch.full(
-        (1, token_buffer_size), tokenizer.eos_id(), dtype=torch.int64, device=device
+def _create_padded_prompts(
+    input_ids_list: List[torch.Tensor],
+    tokenizer,
+    seqlen: int,
+    start_pos: int,
+    device: str,
+    pad_token_id: Optional[int] = None,
+) -> Tuple[torch.Tensor, List[int]]:
+    """
+    Create a padded tensor for multiple encoded input prompts.
+
+    Returns:
+        Tuple[torch.Tensor, List[int]]: A tuple containing the padded tensor and a list of prompt lengths.
+    """
+    pad_token_id = pad_token_id if pad_token_id is not None else tokenizer.eos_id()
+
+    # Find the maximum prompt length
+    max_prompt_len = max(ids.size(0) for ids in input_ids_list)
+
+    # Calculate the buffer size
+    max_new_tokens = max(0, min(seqlen - start_pos, seqlen - max_prompt_len))
+    token_buffer_size = max_prompt_len + max_new_tokens
+
+    # Create the padded batch tensor
+    batch_size = len(input_ids_list)
+    batch_seq = torch.full(
+        (batch_size, token_buffer_size), pad_token_id, dtype=torch.int64, device=device
     )
-    seq[0, :prompt_len] = input_ids
-    return seq, prompt_len
+
+    prompt_lengths = []
+    for i, input_ids in enumerate(input_ids_list):
+        prompt_len = input_ids.size(0)
+        batch_seq[i, :prompt_len] = input_ids
+        prompt_lengths.append(prompt_len)
+
+    return batch_seq, prompt_lengths
+
+
+def _batch_decode_next_tokens(
+    output: torch.Tensor,
+    prompt_lengths: List[int],
+    tokenizer,
+) -> List[Tuple[int, str]]:
+    """
+    Decode the next token for each prompt in the batch.
+
+    Returns:
+        List[Tuple[int, str]]: List of tuples containing the next token id and its
+        decoded string for each prompt in the batch.
+    """
+    batch_size = output.shape[0]
+    results = []
+
+    for i in range(batch_size):
+        next_token_logits = output[i, prompt_lengths[i] - 1, :]
+
+        # Argmax (deterministic) TODO: add temperature
+        next_token = torch.argmax(next_token_logits, dim=-1)
+
+        next_token_decoded = tokenizer.decode([next_token.item()])
+        results.append((next_token.item(), next_token_decoded))
+
+    return results
 
 
 def _cleanup():
@@ -209,7 +256,7 @@ def main():
     model.distribute(tp_mesh)
     # logger.info(f"Model: {model}")
 
-    mbs = 1  # number of micro-batches TODO: move to multibatch
+    mbs = 4  # number of micro-batches
     mb_size = 1  # micro-batch size
     batch_size = mbs * mb_size  # total batch size
 
@@ -260,21 +307,28 @@ def main():
     if len(cpu_tensors) > 0:
         raise ValueError("Found cpu tensors in stage")
 
-    prompt = "What is the capital of France?"
+    prompt = [
+        "What is the capital of France?",
+        "What is snow?",
+        "What is your name?",
+        "What is the capital of Japan?",
+    ]
     start_pos = 0
 
     # encode the prompt
-    input_ids = _encode_string(
+    input_ids = _encode_strings(
         prompt, tokenizer, bos=True, device=device, dtype=torch.int64
     )
     logger.info(f"{input_ids[0:8]=}")
 
     # create a padded tensor for the input prompt
-    padded_sequence, prompt_len = _create_padded_prompt(
+    padded_sequence, prompt_lengths = _create_padded_prompts(
         input_ids, tokenizer, seqlen, start_pos, device
     )
-    logger.info(f"{prompt_len=}")
-    logger.info(f"{padded_sequence[0, :prompt_len+1]=}")
+    logger.info(f"{prompt_lengths=}")
+    logger.info(f"first prompt {padded_sequence[0, :prompt_lengths[0]+1]=}")
+    if len(prompt_lengths) > 1:
+        logger.info(f"second prompt {padded_sequence[1, :prompt_lengths[1]+1]=}")
 
     schedule = ScheduleGPipe(stage, mbs)
     logger.info(f"Created schedule: {schedule}")
@@ -287,12 +341,12 @@ def main():
 
     # Decoding
     if pp_rank == pp_degree - 1 and tp_rank == 0:
-        next_token_logits = output[:, prompt_len - 1, :]
-        next_token = torch.argmax(next_token_logits, dim=-1)
-        next_token_decoded = tokenizer.decode((next_token.tolist()))
+        decode_results = _batch_decode_next_tokens(
+            output=output, prompt_lengths=prompt_lengths, tokenizer=tokenizer
+        )
 
         logger.info(
-            f"\n\n{color.green} Prefill response ====>>>> {color.blue} {next_token_decoded=}, {next_token}\n{color.reset}"
+            f"\n\n{color.green} Prefill responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
         )
 
     # show peak memory stats for this stage
