@@ -162,3 +162,48 @@ install_executorch_libs() {
 
   install_executorch_python_libs $1
 }
+
+clone_torchao() {
+  echo "Cloning torchao to ${TORCHCHAT_ROOT}/torchao-build/src"
+  rm -rf ${TORCHCHAT_ROOT}/torchao-build/src
+  mkdir -p ${TORCHCHAT_ROOT}/torchao-build/src
+  pushd ${TORCHCHAT_ROOT}/torchao-build/src
+  echo $pwd
+
+  cp -R /Users/scroy/fbsource/fbcode/pytorch/ao .
+  # git clone https://github.com/pytorch/ao.git
+  # cd ao
+  # git checkout $(cat ${TORCHCHAT_ROOT}/intstall/.pins/torchao-experimental-pin.txt)
+
+  popd
+}
+
+install_torchao_custom_aten_ops() {
+  echo "Building torchao custom ops for ATen"
+  pushd ${TORCHCHAT_ROOT}/torchao-build/src/ao/torchao/experimental/kernels/cpu/linear/examples/torch_custom_op
+  export TORCHAO_INCLUDE_DIRS=${TORCHCHAT_ROOT}/torchao-build/src/ao
+
+  CMAKE_OUT_DIR=${TORCHCHAT_ROOT}/torchao-build/cmake-out
+  cmake -DTORCHAO_INCLUDE_DIRS=${TORCHAO_INCLUDE_DIRS} \
+    -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
+    -DPLATFORM="ATEN" \
+    -S . \
+    -B ${CMAKE_OUT_DIR} -G Ninja
+  cmake --build  ${CMAKE_OUT_DIR}
+}
+
+install_torchao_custom_executorch_ops() {
+  echo "Building torchao custom ops for ExecuTorch"
+  pushd ${TORCHCHAT_ROOT}/torchao-build/src/ao/torchao/experimental/kernels/cpu/linear/examples/torch_custom_op
+  export TORCHAO_INCLUDE_DIRS=${TORCHCHAT_ROOT}/torchao-build/src/ao
+
+  CMAKE_OUT_DIR="${TORCHCHAT_ROOT}/torchao-build/cmake-out"
+  cmake -DTORCHAO_INCLUDE_DIRS=${TORCHAO_INCLUDE_DIRS} \
+    -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
+    -DEXECUTORCH_INCLUDE_DIRS=${EXECUTORCH_INCLUDE_DIRS} \
+    -DEXECUTORCH_LIBRARIES=${EXECUTORCH_LIBRARIES} \
+    -DPLATFORM="EXECUTORCH" \
+    -S . \
+    -B ${CMAKE_OUT_DIR} -G Ninja
+  cmake --build  ${CMAKE_OUT_DIR}
+}
