@@ -13,19 +13,27 @@ from typing import Any, Dict, List, Optional, Tuple
 # torchrun --nproc-per-node 4 dist_run.py
 import torch
 import torch.distributed as dist
-from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 
 from distributed.logging_utils import SingletonLogger
+
 # TODO - these are not distributed specific, consider moving to new package
-from distributed.safetensor_utils import (get_hf_config_file,
-                                          get_hf_weight_map_and_path,
-                                          load_safetensor_weights)
-from distributed.utils import Color as color
-from distributed.utils import (GPUMemoryMonitor, TrackTime, CUDATrackTime,
-                               bytes_to_readable, get_module_size,
-                               get_num_params)
+from distributed.safetensor_utils import (
+    get_hf_config_file,
+    get_hf_weight_map_and_path,
+    load_safetensor_weights,
+)
+from distributed.utils import (
+    bytes_to_readable,
+    Color as color,
+    CUDATrackTime,
+    get_module_size,
+    get_num_params,
+    GPUMemoryMonitor,
+    TrackTime,
+)
 from distributed.verification_utils import find_cpu_tensors
-from torchchat.cli.builder import TokenizerArgs, _initialize_tokenizer
+from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
+from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
 from torchchat.model import ModelArgs, Transformer
 from torchchat.utils.build_utils import set_precision
 
@@ -239,6 +247,17 @@ def main():
     pp_mesh = device_mesh["pp"]
     tp_rank = tp_mesh.get_local_rank()
     pp_rank = pp_mesh.get_local_rank()
+    tp_group = tp_mesh.get_group()
+    pp_group = pp_mesh.get_group()
+
+    logger.info(f"review: {pp_group=}, {tp_group= }")
+
+    logger.info(f"Created device mesh: {device_mesh}\n {tp_mesh=}, {pp_mesh=}\n")
+    # TODO - this assumes 1D mesh, need to update for 2D+ mesh
+    pp_group_size = pp_mesh.size()
+    tp_group_size = tp_mesh.size()
+
+    logger.info(f"pp_group_size: {pp_group_size}, tp_group_size: {tp_group_size}")
 
     # Assuming same number of GPUs per node
     device = torch.device(f"cuda:{rank % torch.cuda.device_count()}")
@@ -311,7 +330,7 @@ def main():
         "What is snow?",
     ]
 
-    '''
+    """
     "What is the capital of France?",
         "What is your name?",
         "What is the capital of Japan?",
@@ -328,7 +347,7 @@ def main():
         "What is the capital of Argentina?",
         "What is the capital of Canada?",
     ]
-    '''
+    """
 
     start_pos = 0
 
@@ -351,57 +370,102 @@ def main():
     logger.info(f"Created schedule: {schedule}")
 
     # with CUDATrackTime() as timer:
-    first_pp_rank = 0
-    last_pp_rank = pp_degree - 1
+    first_pp_group = 0
+    last_pp_group = pp_group_size - 1
 
-    x = torch.tensor([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,], device=device)
-    x_recv = torch.zeros_like(x)
+    x = torch.tensor(
+        [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+        ],
+        device=device,
+    )
+    x_recv = torch.zeros_like(padded_sequence)
+    logger.info(f"{x_recv.shape=}")
 
     last_global_rank = world_size - 1
 
+    # if pp_rank == pp_group_size - 1:
+    #    dst = dist.get_global_rank(pp_group, 0)
+    #    dist.send(tensor, dst, pp_group)
+
     with torch.no_grad():  # .inference_mode():
         # for _ in range(1):
-            # first
+        # first
         if pp_rank == 0:
             schedule.step(padded_sequence)
-            if rank == 0:
-                dist.recv(padded_sequence, src=last_global_rank, ) 
-                logger.info(f"RECEIVING from {last_global_rank=}")
-            # elif rank == 1:
-            #    dist.recv(x_recv, src=last_global_rank-1, ) 
-            #    logger.info(f"RECEIVING from {last_global_rank=}")
-            #    logger.info(f"Received x_recv: {x_recv=}")
-                
-            # elif tp_rank == 1:
-            #    dist.recv(padded_sequence, src=last_global_rank-1, )
+            src = dist.get_global_rank(pp_group, pp_group_size - 1)
+            dist.recv(
+                x_recv,
+                src,
+                group=pp_group,
+            )
+
         # last
-        elif pp_rank == last_pp_rank:
+        elif pp_rank == last_pp_group:
             output = schedule.step()
-            logger.info(f"SENDING back...from {pp_rank=}")
-            #if tp_rank == 0:
-            if rank == world_size-1:
-                dist.send(output, dst=0, )
-                #dist.send(x, dst=1, )
-            
+            # need to decode the output
+            decode_results = _batch_decode_next_tokens(
+                output=output, prompt_lengths=prompt_lengths, tokenizer=tokenizer
+            )
+
+            logger.info(
+                f"\n\n{color.green} Prefill responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
+            )
+
+            dst = dist.get_global_rank(pp_group, 0)
+            logger.info(f"SENDING back...from {rank=} to {dst=}")
+            logger.info(f"{decode_results.shape=}, {decode_results[0, 4:8]=}")
+
+            dist.send(
+                decode_results,
+                dst,
+                pp_group,
+            )
+            # dist.send(x, dst=1, )
+
             # dist.send(x,dst = 1,)
-            #elif tp_rank==1:
+            # elif tp_rank==1:
             #    dist.send(output, dst=1, )
             # elif tp_rank == 1:
             #    dist.send(output, dst=1, )
         # middle pp ranks
-        else:  
+        else:
             schedule.step()
 
-        if rank==0:
-            logger.info(f"{color.red} Success! Received output from {last_global_rank} {color.reset}")
-            logger.info(f"out of loop - Received output: {padded_sequence[4:8]=}") #  {padded_sequence[0, :prompt_lengths[0]+1]=}")
-        if rank ==1:
-            logger.info(f"{color.red} Success! Received output from {last_global_rank} {color.reset}")
-            logger.info(f"out of loop Received output: {x_recv=}") #  {padded_sequence[0, :prompt_lengths[0]+1]=}")
-    
-    #logger.info(f"{color.green}Total prefill time: {timer.get_time()} {timer.unit}{color.reset}")
-    '''
+        if rank == 0:
+            logger.info(
+                f"{color.red} Success! Rank {rank} - Received output from {src} {color.reset}"
+            )
+            logger.info(
+                f"out of loop - Received output: {x_recv[0, 4:8]=}"
+            )  # {padded_sequence[4:8]=}"
+            #  {padded_sequence[0, :prompt_lengths[0]+1]=}")
+        if rank == 1:
+            logger.info(
+                f"{color.red} Success! Received {rank} output from {src} {color.reset}"
+            )
+            logger.info(
+                f"out of loop Received output: {x_recv[0, 4:8]=}"
+            )  #  {padded_sequence[0, :prompt_lengths[0]+1]=}")
+
+    # logger.info(f"{color.green}Total prefill time: {timer.get_time()} {timer.unit}{color.reset}")
+
     # Decoding
+    """
     if pp_rank == pp_degree - 1 and tp_rank == 0:
         decode_results = _batch_decode_next_tokens(
             output=output, prompt_lengths=prompt_lengths, tokenizer=tokenizer
@@ -410,7 +474,8 @@ def main():
         logger.info(
             f"\n\n{color.green} Prefill responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
         )
-
+    """
+    """
     # show peak memory stats for this stage
     res_mem_gib, res_mem_pct = gpu_memory_monitor.get_peak_stats()
     logger.info(
@@ -420,8 +485,10 @@ def main():
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
     )
-    '''
-    logger.info(f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}")
+    """
+    logger.info(
+        f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
+    )
     _cleanup()
 
 
