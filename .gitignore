@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 
+.vscode
 .model-artifacts/
 .venv
 .torchchat
@@ -15,6 +16,7 @@ build/android/*
 et-build/*
 runner-et/cmake-out/*
 runner-aoti/cmake-out/*
+cmake-out/
 
 # pte files
 *.pte
@@ -24,3 +26,7 @@ system_info.txt
 
 # intermediate system file
 .DS_Store
+
+# build artifacts
+checkpoints/
+exportedModels/
