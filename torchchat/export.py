@@ -194,7 +194,7 @@ try:
             return self.wo(output)
 
     def replace_attention_with_custom_sdpa_attention(module: nn.Module):
-        from executorch.examples.models.llama2.custom_ops import (  # noqa
+        from executorch.extension.llm.custom_ops import (  # noqa
             sdpa_with_kv_cache,
         )
 
