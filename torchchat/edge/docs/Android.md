@@ -37,10 +37,10 @@ In your app working directory (for example executorch/examples/demo-apps/android
 copy the AAR to your app libs:
 ```bash
 mkdir -p app/libs
-cp ${TORCHCHAT_ROOT}/android/torchchat/app/libs/executorch.aar ${YOUR_APP_ROOT}/app/libs/executorch.jar
+cp ${TORCHCHAT_ROOT}/android/torchchat/app/libs/executorch.aar ${YOUR_APP_ROOT}/app/libs/executorch.aar
 ```
 
-In your Java app, add the jar file path to your gradle build rule.
+In your Java app, add the aar file path to your gradle build rule.
 ```
 # app/build.grardle.kts
 dependencies {
