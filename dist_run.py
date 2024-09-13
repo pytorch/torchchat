@@ -21,7 +21,7 @@ from distributed.safetensor_utils import (get_hf_config_file,
                                           get_hf_weight_map_and_path,
                                           load_safetensor_weights)
 from distributed.utils import Color as color
-from distributed.utils import (GPUMemoryMonitor, TrackTime,
+from distributed.utils import (GPUMemoryMonitor, TrackTime, CUDATrackTime,
                                bytes_to_readable, get_module_size,
                                get_num_params)
 from distributed.verification_utils import find_cpu_tensors
@@ -256,7 +256,7 @@ def main():
     model.distribute(tp_mesh)
     # logger.info(f"Model: {model}")
 
-    mbs = 4  # number of micro-batches
+    mbs = 1  # number of micro-batches
     mb_size = 1  # micro-batch size
     batch_size = mbs * mb_size  # total batch size
 
@@ -308,11 +308,28 @@ def main():
         raise ValueError("Found cpu tensors in stage")
 
     prompt = [
-        "What is the capital of France?",
         "What is snow?",
+    ]
+
+    '''
+    "What is the capital of France?",
         "What is your name?",
         "What is the capital of Japan?",
+        "When is Christmas?",
+        "Where does Santa Claus live?",
+        "What is the capital of the United States?",
+        "What is the capital of China?",
+        "What is the capital of Russia?",
+        "What is PyTorch?",
+        "What is the capital of India?",
+        "What is an LLM?",
+        "What is the capital of Brazil?",
+        "What is the capital of Mexico?",
+        "What is the capital of Argentina?",
+        "What is the capital of Canada?",
     ]
+    '''
+
     start_pos = 0
 
     # encode the prompt
@@ -333,12 +350,57 @@ def main():
     schedule = ScheduleGPipe(stage, mbs)
     logger.info(f"Created schedule: {schedule}")
 
+    # with CUDATrackTime() as timer:
+    first_pp_rank = 0
+    last_pp_rank = pp_degree - 1
+
+    x = torch.tensor([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,], device=device)
+    x_recv = torch.zeros_like(x)
+
+    last_global_rank = world_size - 1
+
     with torch.no_grad():  # .inference_mode():
+        # for _ in range(1):
+            # first
         if pp_rank == 0:
             schedule.step(padded_sequence)
-        else:
+            if rank == 0:
+                dist.recv(padded_sequence, src=last_global_rank, ) 
+                logger.info(f"RECEIVING from {last_global_rank=}")
+            # elif rank == 1:
+            #    dist.recv(x_recv, src=last_global_rank-1, ) 
+            #    logger.info(f"RECEIVING from {last_global_rank=}")
+            #    logger.info(f"Received x_recv: {x_recv=}")
+                
+            # elif tp_rank == 1:
+            #    dist.recv(padded_sequence, src=last_global_rank-1, )
+        # last
+        elif pp_rank == last_pp_rank:
             output = schedule.step()
+            logger.info(f"SENDING back...from {pp_rank=}")
+            #if tp_rank == 0:
+            if rank == world_size-1:
+                dist.send(output, dst=0, )
+                #dist.send(x, dst=1, )
+            
+            # dist.send(x,dst = 1,)
+            #elif tp_rank==1:
+            #    dist.send(output, dst=1, )
+            # elif tp_rank == 1:
+            #    dist.send(output, dst=1, )
+        # middle pp ranks
+        else:  
+            schedule.step()
 
+        if rank==0:
+            logger.info(f"{color.red} Success! Received output from {last_global_rank} {color.reset}")
+            logger.info(f"out of loop - Received output: {padded_sequence[4:8]=}") #  {padded_sequence[0, :prompt_lengths[0]+1]=}")
+        if rank ==1:
+            logger.info(f"{color.red} Success! Received output from {last_global_rank} {color.reset}")
+            logger.info(f"out of loop Received output: {x_recv=}") #  {padded_sequence[0, :prompt_lengths[0]+1]=}")
+    
+    #logger.info(f"{color.green}Total prefill time: {timer.get_time()} {timer.unit}{color.reset}")
+    '''
     # Decoding
     if pp_rank == pp_degree - 1 and tp_rank == 0:
         decode_results = _batch_decode_next_tokens(
@@ -358,7 +420,8 @@ def main():
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
     )
-
+    '''
+    logger.info(f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}")
     _cleanup()
 
 
