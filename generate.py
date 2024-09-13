@@ -50,6 +50,10 @@ class Llama3ChatFormatter(_ChatFormatter):
     def encode_header(self, role) -> List[int]:
         tokens = []
         tokens.append(self.tokenizer.special_tokens["<|start_header_id|>"])
+            
+        if not isinstance(role, str):		# Ensure `role` is a string
+            role = str(role)  			# Convert to string if possible
+
         tokens.extend(self.tokenizer.encode(role, bos=False, eos=False))
         tokens.append(self.tokenizer.special_tokens["<|end_header_id|>"])
         tokens.extend(self.tokenizer.encode("\n\n", bos=False, eos=False))
