@@ -304,7 +304,6 @@ try:
         edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
         export_program = edge_manager.to_executorch(
             ExecutorchBackendConfig(
-                extract_constant_segment=True,
                 extract_delegate_segments=True,
                 passes=[
                     QuantFusionPass(),
