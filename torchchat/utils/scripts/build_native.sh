@@ -54,6 +54,7 @@ if [ -z "${TORCHCHAT_ROOT}" ]; then
     SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
     # Get the absolute path of the parent directory
     TORCHCHAT_ROOT="$(dirname "$(dirname "$(dirname "$SCRIPT_PATH")")")"
+fi
 
 source "$TORCHCHAT_ROOT/torchchat/utils/scripts/install_utils.sh"
 
