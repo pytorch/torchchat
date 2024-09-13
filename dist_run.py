@@ -393,7 +393,7 @@ def main():
         ],
         device=device,
     )
-    x_recv = torch.zeros_like(padded_sequence)
+    x_recv = torch.zeros(1, device=device, dtype=torch.int64)
     logger.info(f"{x_recv.shape=}")
 
     last_global_rank = world_size - 1
@@ -425,13 +425,13 @@ def main():
             logger.info(
                 f"\n\n{color.green} Prefill responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
             )
-
+            next_token = torch.tensor([decode_results[0][0]], device=device)
             dst = dist.get_global_rank(pp_group, 0)
             logger.info(f"SENDING back...from {rank=} to {dst=}")
-            logger.info(f"{decode_results.shape=}, {decode_results[0, 4:8]=}")
+            logger.info(f"SENDING data {next_token.shape=}, {next_token=}")
 
             dist.send(
-                decode_results,
+                next_token,
                 dst,
                 pp_group,
             )
@@ -451,7 +451,7 @@ def main():
                 f"{color.red} Success! Rank {rank} - Received output from {src} {color.reset}"
             )
             logger.info(
-                f"out of loop - Received output: {x_recv[0, 4:8]=}"
+                f"out of loop - Received output: {x_recv=}, {x_recv.shape=}, {x_recv.dtype=}"
             )  # {padded_sequence[4:8]=}"
             #  {padded_sequence[0, :prompt_lengths[0]+1]=}")
         if rank == 1:
@@ -459,7 +459,7 @@ def main():
                 f"{color.red} Success! Received {rank} output from {src} {color.reset}"
             )
             logger.info(
-                f"out of loop Received output: {x_recv[0, 4:8]=}"
+                f"out of loop Received output: {x_recv=}"
             )  #  {padded_sequence[0, :prompt_lengths[0]+1]=}")
 
     # logger.info(f"{color.green}Total prefill time: {timer.get_time()} {timer.unit}{color.reset}")
