@@ -25,6 +25,8 @@ if [ $# -eq 0 ]; then
     show_help
     exit 1
 fi
+
+LINK_TORCHAO=OFF
 while (( "$#" )); do
   case "$1" in
     -h|--help)
@@ -39,6 +41,11 @@ while (( "$#" )); do
     et)
       echo "Building et native runner..."
       TARGET="et"
+      shift
+      ;;
+    link_torchao)
+      echo "Linking with torchao custom ops..."
+      LINK_TORCHAO=ON
       shift
       ;;
     *)
@@ -72,14 +79,20 @@ if [[ "$TARGET" == "et" ]]; then
     install_pip_dependencies
     clone_executorch
     install_executorch_libs false
+
+    if [[ "$LINK_TORCHAO" == "ON" ]]; then
+      EXECUTORCH_INCLUDE_DIRS="${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src"
+      EXECUTORCH_LIBRARIES="${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libexecutorch_no_prim_ops.a"
+      install_torchao_custom_executorch_ops
+    fi
 fi
 popd
 
 # CMake commands
 if [[ "$TARGET" == "et" ]]; then
-    cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=1" -G Ninja
+    cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` -DLINK_TORCHAO_CUSTOM_OPS="${LINK_TORCHAO}" -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=1" -G Ninja
 else
-    cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" -G Ninja
+    cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` -DLINK_TORCHAO_CUSTOM_OPS="${LINK_TORCHAO}" -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" -G Ninja
 fi
 cmake --build ./cmake-out --target "${TARGET}"_run
 
