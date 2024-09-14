@@ -202,6 +202,17 @@ def _batch_decode_next_tokens(
     return results
 
 
+def _update_padded_sequence(
+    padded_sequence: torch.Tensor,
+    x_recv: torch.Tensor,
+    res,
+    prompt_lengths: List[int],
+) -> None:
+    for i in range(len(prompt_lengths)):
+        prompt_lengths[i] += 1
+        padded_sequence[i, prompt_lengths[i] - 1] = x_recv
+
+
 def _cleanup():
     dist.barrier()
     dist.destroy_process_group()
@@ -378,120 +389,101 @@ def main():
 
     last_global_rank = world_size - 1
     res = []
+    dst = None
+    src = None
 
-    # if pp_rank == pp_group_size - 1:
-    #    dst = dist.get_global_rank(pp_group, 0)
-    #    dist.send(tensor, dst, pp_group)
+    if pp_rank == last_pp_group:
+        dst = dist.get_global_rank(pp_group, 0)
+    elif pp_rank == 0:
+        src = dist.get_global_rank(pp_group, last_pp_group)
 
-    with torch.no_grad():  # .inference_mode():
-        # for _ in range(1):
-        # first
-        if pp_rank == 0:
-            schedule.step(padded_sequence)
-            src = dist.get_global_rank(pp_group, pp_group_size - 1)
-            dist.recv(
-                x_recv,
-                src,
-                group=pp_group,
-            )
-
-        # last
-        elif pp_rank == last_pp_group:
-            output = schedule.step()
-            # need to decode the output
-            decode_results = _batch_decode_next_tokens(
-                output=output, prompt_lengths=prompt_lengths, tokenizer=tokenizer
-            )
-
-            logger.info(
-                f"\n\n{color.green} Prefill responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
-            )
-            next_token = torch.tensor([decode_results[0][0]], device=device)
-            res.append(decode_results[0][1])
-            dst = dist.get_global_rank(pp_group, 0)
-            logger.info(f"SENDING back...from {rank=} to {dst=}")
-            logger.info(f"SENDING data {next_token.shape=}, {next_token=}")
-
-            dist.send(
-                next_token,
-                dst,
-                pp_group,
-            )
-
-        # middle pp ranks
-        else:
-            schedule.step()
-
-    def _update_padded_sequence(
-        padded_sequence: torch.Tensor,
-        x_recv: torch.Tensor,
-        res,
-        prompt_lengths: List[int],
-    ) -> None:
-        for i in range(len(prompt_lengths)):
-            prompt_lengths[i] += 1
-            padded_sequence[i, prompt_lengths[i] - 1] = x_recv
-
-        logger.info(f"REVIEW {padded_sequence[0,:15]=}")
-
-    # logger.info(f"{color.green}Total prefill time: {timer.get_time()} {timer.unit}{color.reset}")
-
-    # decoding loop
-    # append first token to the prompt from prefill
-    logger.info(f"\npre update {padded_sequence[0,0:9]=}")
-    _update_padded_sequence(padded_sequence, x_recv, res, prompt_lengths)
-    logger.info(f"{prompt_lengths=}, {padded_sequence[0, prompt_lengths[0]-1]=}")
-    logger.info(f"\n post update {padded_sequence[0,0:9]=}")
-
-    num_tokens = 5
+    # Decoding
+    num_tokens = 10
+    """
     with torch.no_grad():
-        for step in range(num_tokens):
+        for step in range(num_tokens + 1):  # +1 to include the initial prefill step
             if pp_rank == 0:
-                logger.info(
-                    f"about to send...{prompt_lengths=}, {padded_sequence[0, :prompt_lengths[0]+1]=}"
-                )
                 schedule.step(padded_sequence)
-
-                src = dist.get_global_rank(pp_group, pp_group_size - 1)
-                dist.recv(
-                    x_recv,
-                    src,
-                    group=pp_group,
-                )
+                dist.recv(x_recv, src, group=pp_group)
                 logger.info(f"RECEIVED {x_recv=}")
                 assert x_recv != 128006, f"next_token is header id={x_recv}"
                 _update_padded_sequence(padded_sequence, x_recv, res, prompt_lengths)
                 logger.info(
-                    f"about to send...{prompt_lengths=}, {padded_sequence[:, prompt_lengths[0]-1]=}"
+                    f"Updated padded seq start: {prompt_lengths=}, {padded_sequence[:, prompt_lengths[0]-1]=}"
                 )
-                schedule.step(padded_sequence)
 
             elif pp_rank == last_pp_group:
                 output = schedule.step()
-                # need to decode the output
-
                 decode_results = _batch_decode_next_tokens(
-                    output=output, prompt_lengths=prompt_lengths, tokenizer=tokenizer
+                    output, prompt_lengths, tokenizer
+                )
+                logger.info(
+                    f"\n\n{color.green} {'Prefill' if step == 0 else '* Decode *'} responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
                 )
 
+                next_token = torch.tensor([decode_results[0][0]], device=device)
+                res.append(decode_results[0][1])
+
+                # increment prompt lengths for next token
                 for i in range(len(prompt_lengths)):
                     prompt_lengths[i] += 1
                     logger.info(
                         f"output review {prompt_lengths[i]=}, {padded_sequence[i, prompt_lengths[i]-1]=}"
                     )
 
+                if step < num_tokens - 1:
+                    dist.send(next_token, dst, pp_group)
                 logger.info(
-                    f"\n\n{color.green} * Decode * responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
-                )
-                res.append(decode_results[0][1])
-                next_token = torch.tensor([decode_results[0][0]], device=device)
-                dst = dist.get_global_rank(pp_group, 0)
-                logger.info(
-                    f"SENDING back...from {rank=} to {dst=}, data {next_token.shape=}, {next_token=}"
+                    f"SENDING back...from rank={pp_rank} to dst={dst}, data {next_token.shape=}, {next_token=}"
                 )
                 assert next_token != 128006, f"next_token is header id={next_token}"
 
+            else:  # middle pp ranks
+                schedule.step()
+    """
+    with torch.no_grad():
+        for step in range(num_tokens):
+            # first
+            if pp_rank == 0:
+                schedule.step(padded_sequence)
+                # only receive if not last step
                 if step < num_tokens - 1:
+
+                    dist.recv(
+                        x_recv,
+                        src,
+                        group=pp_group,
+                    )
+                    _update_padded_sequence(
+                        padded_sequence, x_recv, res, prompt_lengths
+                    )
+
+            # last
+            elif pp_rank == last_pp_group:
+                output = schedule.step()
+                # need to decode the output
+                decode_results = _batch_decode_next_tokens(
+                    output=output, prompt_lengths=prompt_lengths, tokenizer=tokenizer
+                )
+                logger.info(
+                    f"\n\n{color.green} {'Prefill' if step == 0 else '* Decode *'} responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
+                )
+
+                next_token = torch.tensor([decode_results[0][0]], device=device)
+                res.append(decode_results[0][1])
+
+                # increment prompt lengths for next token
+                for i in range(len(prompt_lengths)):
+                    prompt_lengths[i] += 1
+                    logger.info(
+                        f"output review {prompt_lengths[i]=}, {padded_sequence[i, prompt_lengths[i]-1]=}"
+                    )
+
+                # logger.info(f"SENDING back...from {rank=} to {dst=}")
+                # logger.info(f"SENDING data {next_token.shape=}, {next_token=}")
+
+                # only send if not last step
+                if step < (num_tokens - 1):
                     dist.send(
                         next_token,
                         dst,
@@ -501,6 +493,10 @@ def main():
             # middle pp ranks
             else:
                 schedule.step()
+
+        # logger.info(f"REVIEW {padded_sequence[0,:15]=}")
+
+    # logger.info(f"{color.green}Total prefill time: {timer.get_time()} {timer.unit}{color.reset}")
 
     # Decoding
     """
