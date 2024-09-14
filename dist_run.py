@@ -373,30 +373,11 @@ def main():
     first_pp_group = 0
     last_pp_group = pp_group_size - 1
 
-    x = torch.tensor(
-        [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-        ],
-        device=device,
-    )
     x_recv = torch.zeros(1, device=device, dtype=torch.int64)
     logger.info(f"{x_recv.shape=}")
 
     last_global_rank = world_size - 1
+    res = []
 
     # if pp_rank == pp_group_size - 1:
     #    dst = dist.get_global_rank(pp_group, 0)
@@ -435,34 +416,76 @@ def main():
                 dst,
                 pp_group,
             )
-            # dist.send(x, dst=1, )
 
-            # dist.send(x,dst = 1,)
-            # elif tp_rank==1:
-            #    dist.send(output, dst=1, )
-            # elif tp_rank == 1:
-            #    dist.send(output, dst=1, )
         # middle pp ranks
         else:
             schedule.step()
 
-        if rank == 0:
-            logger.info(
-                f"{color.red} Success! Rank {rank} - Received output from {src} {color.reset}"
-            )
-            logger.info(
-                f"out of loop - Received output: {x_recv=}, {x_recv.shape=}, {x_recv.dtype=}"
-            )  # {padded_sequence[4:8]=}"
-            #  {padded_sequence[0, :prompt_lengths[0]+1]=}")
-        if rank == 1:
-            logger.info(
-                f"{color.red} Success! Received {rank} output from {src} {color.reset}"
-            )
-            logger.info(
-                f"out of loop Received output: {x_recv=}"
-            )  #  {padded_sequence[0, :prompt_lengths[0]+1]=}")
+    def _update_padded_sequence(
+        padded_sequence: torch.Tensor,
+        x_recv: torch.Tensor,
+        res,
+        prompt_lengths: List[int],
+    ) -> None:
+        for i in range(len(prompt_lengths)):
+            prompt_lengths[i] += 1
+            padded_sequence[i, prompt_lengths[i] - 1] = x_recv
+
+        logger.info(f"REVIEW {padded_sequence[0,4:9]=}")
 
     # logger.info(f"{color.green}Total prefill time: {timer.get_time()} {timer.unit}{color.reset}")
+
+    # decoding loop
+    # append first token to the prompt from prefill
+    logger.info(f"{prompt_lengths=}")
+    logger.info(f"{prompt_lengths=}, {padded_sequence[:, prompt_lengths[0]-1]=}")
+    prompt_lengths[0] += 1
+    padded_sequence[0, prompt_lengths[0] - 1] = x_recv
+    logger.info(f"{padded_sequence[0, prompt_lengths[0]+1]=}")
+
+    num_tokens = 4
+    with torch.no_grad():
+        for _ in range(num_tokens):
+            if pp_rank == 0:
+                schedule.step(padded_sequence)
+                src = dist.get_global_rank(pp_group, pp_group_size - 1)
+                dist.recv(
+                    x_recv,
+                    src,
+                    group=pp_group,
+                )
+                logger.info(f"RECEIVED {x_recv=}")
+                _update_padded_sequence(padded_sequence, x_recv, res, prompt_lengths)
+                logger.info(
+                    f"{prompt_lengths=}, {padded_sequence[:, prompt_lengths[0]-1]=}"
+                )
+                schedule.step(padded_sequence)
+
+            elif pp_rank == last_pp_group:
+                output = schedule.step()
+                # need to decode the output
+                decode_results = _batch_decode_next_tokens(
+                    output=output, prompt_lengths=prompt_lengths, tokenizer=tokenizer
+                )
+
+                logger.info(
+                    f"\n\n{color.green} * Decode * responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
+                )
+                res.append(decode_results[0][1])
+                next_token = torch.tensor([decode_results[0][0]], device=device)
+                dst = dist.get_global_rank(pp_group, 0)
+                logger.info(f"SENDING back...from {rank=} to {dst=}")
+                logger.info(f"SENDING data {next_token.shape=}, {next_token=}")
+
+                dist.send(
+                    next_token,
+                    dst,
+                    pp_group,
+                )
+
+            # middle pp ranks
+            else:
+                schedule.step()
 
     # Decoding
     """
@@ -486,6 +509,7 @@ def main():
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
     )
     """
+    logger.info(f"$$$$$$ {color.red}{res=}{color.reset}  $$$$$")
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
     )
