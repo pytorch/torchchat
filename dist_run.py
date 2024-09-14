@@ -407,6 +407,7 @@ def main():
                 f"\n\n{color.green} Prefill responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
             )
             next_token = torch.tensor([decode_results[0][0]], device=device)
+            res.append(decode_results[0][1])
             dst = dist.get_global_rank(pp_group, 0)
             logger.info(f"SENDING back...from {rank=} to {dst=}")
             logger.info(f"SENDING data {next_token.shape=}, {next_token=}")
@@ -431,23 +432,26 @@ def main():
             prompt_lengths[i] += 1
             padded_sequence[i, prompt_lengths[i] - 1] = x_recv
 
-        logger.info(f"REVIEW {padded_sequence[0,4:9]=}")
+        logger.info(f"REVIEW {padded_sequence[0,:15]=}")
 
     # logger.info(f"{color.green}Total prefill time: {timer.get_time()} {timer.unit}{color.reset}")
 
     # decoding loop
     # append first token to the prompt from prefill
-    logger.info(f"{prompt_lengths=}")
-    logger.info(f"{prompt_lengths=}, {padded_sequence[:, prompt_lengths[0]-1]=}")
-    prompt_lengths[0] += 1
-    padded_sequence[0, prompt_lengths[0] - 1] = x_recv
-    logger.info(f"{padded_sequence[0, prompt_lengths[0]+1]=}")
+    logger.info(f"\npre update {padded_sequence[0,0:9]=}")
+    _update_padded_sequence(padded_sequence, x_recv, res, prompt_lengths)
+    logger.info(f"{prompt_lengths=}, {padded_sequence[0, prompt_lengths[0]-1]=}")
+    logger.info(f"\n post update {padded_sequence[0,0:9]=}")
 
-    num_tokens = 4
+    num_tokens = 5
     with torch.no_grad():
-        for _ in range(num_tokens):
+        for step in range(num_tokens):
             if pp_rank == 0:
+                logger.info(
+                    f"about to send...{prompt_lengths=}, {padded_sequence[0, :prompt_lengths[0]+1]=}"
+                )
                 schedule.step(padded_sequence)
+
                 src = dist.get_global_rank(pp_group, pp_group_size - 1)
                 dist.recv(
                     x_recv,
@@ -455,18 +459,26 @@ def main():
                     group=pp_group,
                 )
                 logger.info(f"RECEIVED {x_recv=}")
+                assert x_recv != 128006, f"next_token is header id={x_recv}"
                 _update_padded_sequence(padded_sequence, x_recv, res, prompt_lengths)
                 logger.info(
-                    f"{prompt_lengths=}, {padded_sequence[:, prompt_lengths[0]-1]=}"
+                    f"about to send...{prompt_lengths=}, {padded_sequence[:, prompt_lengths[0]-1]=}"
                 )
                 schedule.step(padded_sequence)
 
             elif pp_rank == last_pp_group:
                 output = schedule.step()
                 # need to decode the output
+
                 decode_results = _batch_decode_next_tokens(
                     output=output, prompt_lengths=prompt_lengths, tokenizer=tokenizer
                 )
+
+                for i in range(len(prompt_lengths)):
+                    prompt_lengths[i] += 1
+                    logger.info(
+                        f"output review {prompt_lengths[i]=}, {padded_sequence[i, prompt_lengths[i]-1]=}"
+                    )
 
                 logger.info(
                     f"\n\n{color.green} * Decode * responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
@@ -474,14 +486,17 @@ def main():
                 res.append(decode_results[0][1])
                 next_token = torch.tensor([decode_results[0][0]], device=device)
                 dst = dist.get_global_rank(pp_group, 0)
-                logger.info(f"SENDING back...from {rank=} to {dst=}")
-                logger.info(f"SENDING data {next_token.shape=}, {next_token=}")
-
-                dist.send(
-                    next_token,
-                    dst,
-                    pp_group,
+                logger.info(
+                    f"SENDING back...from {rank=} to {dst=}, data {next_token.shape=}, {next_token=}"
                 )
+                assert next_token != 128006, f"next_token is header id={next_token}"
+
+                if step < num_tokens - 1:
+                    dist.send(
+                        next_token,
+                        dst,
+                        pp_group,
+                    )
 
             # middle pp ranks
             else:
