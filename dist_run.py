@@ -231,8 +231,9 @@ def main():
     logger.info(f"built tokenizer {tokenizer=}")
 
     eos_token_id = tokenizer.eos_id()
-    logger.info(f"eos_token_id: {eos_token_id}")
-
+    eot_token_id = tokenizer.encode("<|endoftext|>")
+    logger.info(f"eos_token_id: {eos_token_id}, eot_token_id: {eot_token_id}")
+    assert False, "check eot"
     hf_model_name, model_dtype = NAME_TO_HF_MODEL_ID_AND_DTYPE[MODEL_NAME]
     logger.info(f"Using HF model weights from {hf_model_name} and dtype {model_dtype}")
 
@@ -340,11 +341,10 @@ def main():
     if len(cpu_tensors) > 0:
         raise ValueError("Found cpu tensors in stage")
 
-    prompt = [
-        "What is snow?",
-    ]
+    prompt = ["What is PyTorch?"]  # "Write a poem about snow.",
 
     """
+    What is snow?
     "What is the capital of France?",
         "What is your name?",
         "What is the capital of Japan?",
@@ -401,7 +401,7 @@ def main():
         src = dist.get_global_rank(pp_group, last_pp_group)
 
     # Decoding
-    max_tokens = 180
+    max_tokens = 490
 
     """
     with torch.no_grad():
@@ -528,18 +528,22 @@ def main():
             f"\n\n{color.green} Prefill responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
         )
     """
+
     """
+    logger.info(
+        f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
+    )
+    """
+    if pp_rank == last_pp_group and tp_rank == 0:
+        logger.info(f"Prompt:{color.green} {prompt[0]} {color.reset}")
+        formatted_response = "".join(res)
+        logger.info(f"$$$$$$ {color.blue}{formatted_response}{color.reset}  $$$$$")
+
     # show peak memory stats for this stage
     res_mem_gib, res_mem_pct = gpu_memory_monitor.get_peak_stats()
     logger.info(
         f"{color.blue} Memory used: {color.green}{res_mem_pct:.3f} %, {color.magenta}{res_mem_gib:.3f} GB{color.reset}"
     )
-
-    logger.info(
-        f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
-    )
-    """
-    logger.info(f"$$$$$$ {color.red}{res=}{color.reset}  $$$$$")
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
     )
