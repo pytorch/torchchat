@@ -494,32 +494,12 @@ def main():
             else:
                 schedule.step()
 
-        # logger.info(f"REVIEW {padded_sequence[0,:15]=}")
+    # output formatted response via last pp group and tp rank 0
+    if pp_rank == last_pp_group and tp_rank == 0:
+        logger.info(f"Prompt:{color.green} {prompt[0]} {color.reset}")
+        formatted_response = "".join(res)
+        logger.info(f"$$$$$$ {color.blue}{formatted_response}{color.reset}  $$$$$")
 
-    # logger.info(f"{color.green}Total prefill time: {timer.get_time()} {timer.unit}{color.reset}")
-
-    # Decoding
-    """
-    if pp_rank == pp_degree - 1 and tp_rank == 0:
-        decode_results = _batch_decode_next_tokens(
-            output=output, prompt_lengths=prompt_lengths, tokenizer=tokenizer
-        )
-
-        logger.info(
-            f"\n\n{color.green} Prefill responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
-        )
-    """
-    """
-    # show peak memory stats for this stage
-    res_mem_gib, res_mem_pct = gpu_memory_monitor.get_peak_stats()
-    logger.info(
-        f"{color.blue} Memory used: {color.green}{res_mem_pct:.3f} %, {color.magenta}{res_mem_gib:.3f} GB{color.reset}"
-    )
-
-    logger.info(
-        f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
-    )
-    """
     logger.info(f"$$$$$$ {color.red}{res=}{color.reset}  $$$$$")
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
