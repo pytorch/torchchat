@@ -230,6 +230,9 @@ def main():
     tokenizer = _build_chat_tokenizer()
     logger.info(f"built tokenizer {tokenizer=}")
 
+    eos_token_id = tokenizer.eos_id()
+    logger.info(f"eos_token_id: {eos_token_id}")
+
     hf_model_name, model_dtype = NAME_TO_HF_MODEL_ID_AND_DTYPE[MODEL_NAME]
     logger.info(f"Using HF model weights from {hf_model_name} and dtype {model_dtype}")
 
@@ -398,7 +401,8 @@ def main():
         src = dist.get_global_rank(pp_group, last_pp_group)
 
     # Decoding
-    num_tokens = 10
+    max_tokens = 180
+
     """
     with torch.no_grad():
         for step in range(num_tokens + 1):  # +1 to include the initial prefill step
@@ -441,13 +445,14 @@ def main():
             else:  # middle pp ranks
                 schedule.step()
     """
+    # next_token.item() == eos_token_id
     with torch.no_grad():
-        for step in range(num_tokens):
+        for step in range(max_tokens):
             # first
             if pp_rank == 0:
                 schedule.step(padded_sequence)
                 # only receive if not last step
-                if step < num_tokens - 1:
+                if step < max_tokens - 1:
 
                     dist.recv(
                         x_recv,
@@ -457,6 +462,9 @@ def main():
                     _update_padded_sequence(
                         padded_sequence, x_recv, res, prompt_lengths
                     )
+                if x_recv.item() == eos_token_id:
+                    logger.info(f"Received EOS {x_recv=}")
+                    break
 
             # last
             elif pp_rank == last_pp_group:
@@ -483,18 +491,29 @@ def main():
                 # logger.info(f"SENDING data {next_token.shape=}, {next_token=}")
 
                 # only send if not last step
-                if step < (num_tokens - 1):
+                # we send the eos token to the first pp rank
+                if step < (max_tokens - 1):
                     dist.send(
                         next_token,
                         dst,
                         pp_group,
                     )
 
+                if next_token.item() == eos_token_id:
+                    logger.item(f"Generated EOS {next_token=}")
+                    break
+
             # middle pp ranks
             else:
                 schedule.step()
 
-        # logger.info(f"REVIEW {padded_sequence[0,:15]=}")
+    # logger.info(f"REVIEW {padded_sequence[0,:15]=}")
+
+    # logger.info(f"{color.green}Total prefill time: {timer.get_time()} {timer.unit}{color.reset}")
+
+    # Decoding
+
+    # logger.info(f"REVIEW {padded_sequence[0,:15]=}")
 
     # logger.info(f"{color.green}Total prefill time: {timer.get_time()} {timer.unit}{color.reset}")
 
