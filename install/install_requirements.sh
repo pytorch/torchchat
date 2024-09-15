@@ -52,9 +52,6 @@ PYTORCH_NIGHTLY_VERSION=dev20240814
 # Nightly version for torchvision
 VISION_NIGHTLY_VERSION=dev20240814
 
-# Nightly version for torchao
-AO_NIGHTLY_VERSION=dev20240905
-
 # Nightly version for torchtune
 TUNE_NIGHTLY_VERSION=dev20240910
 
@@ -79,10 +76,6 @@ fi
 REQUIREMENTS_TO_INSTALL=(
   torch=="2.5.0.${PYTORCH_NIGHTLY_VERSION}"
   torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
-)
-
-LINUX_REQUIREMENTS_TO_INSTALL=(
-  torchao=="0.5.0.${AO_NIGHTLY_VERSION}"
   torchtune=="0.3.0.${TUNE_NIGHTLY_VERSION}"
 )
 
@@ -94,27 +87,10 @@ LINUX_REQUIREMENTS_TO_INSTALL=(
     "${REQUIREMENTS_TO_INSTALL[@]}"
 )
 
-PLATFORM=$(uname -s)
-
-# Install torchtune and torchao requirements for Linux systems using nightly.
-# For non-Linux systems (e.g., macOS), install torchao from GitHub since nightly
-# build doesn't have macOS build.
-# TODO: Remove this and install nightly build, once it supports macOS
-if [ "$PLATFORM" == "Linux" ];
-then
-  (
-    set -x
-    $PIP_EXECUTABLE install --pre --extra-index-url "${TORCH_NIGHTLY_URL}" --no-cache-dir \
-      "${LINUX_REQUIREMENTS_TO_INSTALL[@]}"
-  )
-else
-  # For torchao need to install from github since nightly build doesn't have macos build.
-  # TODO: Remove this and install nightly build, once it supports macos
-  (
-    set -x
-    $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@e11201a62669f582d81cdb33e031a07fb8dfc4f3
-  )
-fi
+(
+  set -x
+  $PIP_EXECUTABLE install torchao=="0.5.0"
+)
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   (

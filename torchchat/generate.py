@@ -739,7 +739,7 @@ class Generator:
         )
         for i in range(num_samples):
             device_sync(device=self.builder_args.device)
-            if i >= 0 and generator_args.chat_mode:
+            if generator_args.chat_mode:
                 prompt = input("User: ")
                 if prompt == "/bye":
                     print("Exiting Chat.\n")
@@ -784,7 +784,6 @@ class Generator:
                     )
                     break
 
-            if generator_args.chat_mode and i >= 0:
                 print("Model: ", end="")
 
                 buffer = []
@@ -927,7 +926,8 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
                 \nAverage tokens/sec (next tokens): {torch.mean(torch.tensor(aggregate_metrics['next_tokens_per_sec'])).item():.2f} \n\
                 "
         )
-        print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
+        if torch.cuda.is_available():
+            print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
 
 def main(args):
