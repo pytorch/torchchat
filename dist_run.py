@@ -433,9 +433,9 @@ def main():
                 # increment prompt lengths for next token
                 for i in range(len(prompt_lengths)):
                     prompt_lengths[i] += 1
-                    logger.info(
-                        f"output review {prompt_lengths[i]=}, {padded_sequence[i, prompt_lengths[i]-1]=}"
-                    )
+                    # logger.info(
+                    #     f"output review {prompt_lengths[i]=}, {padded_sequence[i, prompt_lengths[i]-1]=}"
+                    # )
 
                 # only send if not last step
                 if step < (num_tokens - 1):
