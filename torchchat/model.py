@@ -41,10 +41,41 @@ def identity(**kwargs):
         raise ValueError("Only one argument is expected")
     return list(kwargs.values())[0]
 
+
+class ConcateFusion(nn.Module):
+    def __init__(self, encoder: nn.Module, decoder: nn.Module):
+        super().__init__()
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def forward(self, 
+        tokens: Tensor,
+        *,
+        post_tokens: Optional[Tensor] = None,
+        mask: Optional[torch.Tensor] = None,
+        encoder_input: Optional[Tensor] = None,
+        encoder_mask: Optional[torch.Tensor] = None,
+        input_pos: Optional[torch.Tensor] = None,) -> Tensor:
+        # split prompt from img tag into before img and after img
+        # concate before img, image result and after img into a large prompt
+        # forward that to text transformer
+        # resturn result
+
+        if encoder_input:
+            encoder_output = self.encoder(
+                encoder_input,
+            )
+        
+        
+
+
+
+
 class ModelType(Enum):
     TextOnly = "text_only"
     Llama3_1 = "llama3_1"
     Flamingo = "flamingo"
+    Llava = "llava"
 
 # Type for objects that can generate nn.Module instance
 ModuleLike = Union[nn.Module, Callable[..., nn.Module]]
@@ -100,6 +131,17 @@ class ModelRecipe:
         )
     
     @classmethod
+    def _llava(cls):
+        return cls(
+            model_type=ModelType.Llava,
+            modules={
+                'te': flamingo_vision_encoder,
+                'decoder': llama3_1_builder
+            },
+            fusion_class=DeepFusionModel,
+        )
+    
+    @classmethod
     def get_recipe(cls, model_type):
         if model_type == ModelType.TextOnly:
             return cls._text_only()
@@ -107,6 +149,8 @@ class ModelRecipe:
             return cls._flamingo()
         elif model_type == ModelType.Llama3_1:
             return cls._llama3_1()
+        elif model_type == ModelType.Llava:
+            return cls._llava()
         else:
             raise ValueError(f"Can not find the model recipe for {model_type}")
 
