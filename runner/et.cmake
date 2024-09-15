@@ -112,7 +112,7 @@ if(executorch_FOUND)
   endif()
 
   if(LINK_TORCHAO_CUSTOM_OPS)
-    target_link_libraries(et_run PRIVATE "${TORCHCHAT_ROOT}/torchao-build/cmake-out/liblowbit_op_executorch${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    target_link_libraries(et_run PRIVATE "${TORCHCHAT_ROOT}/torchao-build/cmake-out/ops/linear/linear_a8wxdq_op/liblinear_a8wxdq_aten${CMAKE_SHARED_LIBRARY_SUFFIX}")
   endif()
 
   # Adding target_link_options_shared_lib as commented out below leads to this:
