@@ -65,8 +65,13 @@ class ConcateFusion(nn.Module):
             encoder_output = self.encoder(
                 encoder_input,
             )
+
+    def _gen_mm_embedding(self, tokens: Tensor, *, encoder_input: Optional[Tensor], post_tokens: Optional[Tensor]):
+        assert bool(encoder_input) == bool(post_tokens), "encoder_input and post_tokens must be both None or not None"
+        if encoder_input is None:
+            return tokens
         
-        
+
 
 
 
