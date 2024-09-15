@@ -456,7 +456,12 @@ def main(args):
     if pp_rank == last_pp_rank and tp_rank == 0:
         for i in range(len(prompt_lengths)):
             logger.info(f"\nPrompt:{color.green} {prompt[i]} {color.reset}")
-            formatted_response = "".join(res[i])
+
+            # TODO: resolve issue with llama2-7b-chat model and "".join
+            if model_name != "llama2-7b-chat":
+                formatted_response = "".join(res[i])
+            else:
+                formatted_response = " ".join(res[i])
             logger.info(f"$$ {color.red}{formatted_response} {color.reset}  $$\n")
 
     # Cleanup
