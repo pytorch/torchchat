@@ -29,7 +29,6 @@ from distributed.utils import (
     get_module_size,
     get_num_params,
     GPUMemoryMonitor,
-    TrackTime,
 )
 from distributed.verification_utils import find_cpu_tensors
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
@@ -124,7 +123,7 @@ def _encode_strings(
     strings: List[str],
     tokenizer,
     bos: bool = True,
-    device: str = "cuda",
+    device: torch.device = "cuda:0",
     dtype=torch.int64,
 ) -> List[torch.Tensor]:
     """Encode a list of prompt strings into a list of tensor token ids."""
@@ -142,7 +141,7 @@ def _create_padded_prompts(
     tokenizer,
     seqlen: int,
     start_pos: int,
-    device: str,
+    device: torch.device,
     pad_token_id: Optional[int] = None,
 ) -> Tuple[torch.Tensor, List[int]]:
     """
@@ -284,7 +283,7 @@ def main():
 
     # Distribute model on TP mesh
     model.distribute(tp_mesh)
-    # logger.info(f"Model: {model}")
+    logger.info(f"Model: {model}")
 
     mbs = 1  # number of micro-batches
     mb_size = 1  # micro-batch size
@@ -302,7 +301,7 @@ def main():
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    with TrackTime() as timer:
+    with CUDATrackTime() as timer:
         _load_model_weights(model, hf_model_name, device=device, model_config=config)
     logger.info(
         f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for stage {rank}{color.reset}"
@@ -316,7 +315,7 @@ def main():
         f"Stage {rank} has {color.blue}{stage_num_params} params{color.reset}, Size: {color.blue}{stage_size_formatted}{color.reset}\n"
     )
 
-    # Setup input position
+    # Setup input position (input_pos) for prefill: a list of increasing integers from 0 to seqlen
     input_pos = torch.arange(seqlen, device=device)
     model.setup_input_pos(input_pos)
     model.eval()
@@ -398,49 +397,8 @@ def main():
         src = dist.get_global_rank(pp_group, last_pp_group)
 
     # Decoding
-    num_tokens = 10
-    """
-    with torch.no_grad():
-        for step in range(num_tokens + 1):  # +1 to include the initial prefill step
-            if pp_rank == 0:
-                schedule.step(padded_sequence)
-                dist.recv(x_recv, src, group=pp_group)
-                logger.info(f"RECEIVED {x_recv=}")
-                assert x_recv != 128006, f"next_token is header id={x_recv}"
-                _update_padded_sequence(padded_sequence, x_recv, res, prompt_lengths)
-                logger.info(
-                    f"Updated padded seq start: {prompt_lengths=}, {padded_sequence[:, prompt_lengths[0]-1]=}"
-                )
+    num_tokens = 40
 
-            elif pp_rank == last_pp_group:
-                output = schedule.step()
-                decode_results = _batch_decode_next_tokens(
-                    output, prompt_lengths, tokenizer
-                )
-                logger.info(
-                    f"\n\n{color.green} {'Prefill' if step == 0 else '* Decode *'} responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
-                )
-
-                next_token = torch.tensor([decode_results[0][0]], device=device)
-                res.append(decode_results[0][1])
-
-                # increment prompt lengths for next token
-                for i in range(len(prompt_lengths)):
-                    prompt_lengths[i] += 1
-                    logger.info(
-                        f"output review {prompt_lengths[i]=}, {padded_sequence[i, prompt_lengths[i]-1]=}"
-                    )
-
-                if step < num_tokens - 1:
-                    dist.send(next_token, dst, pp_group)
-                logger.info(
-                    f"SENDING back...from rank={pp_rank} to dst={dst}, data {next_token.shape=}, {next_token=}"
-                )
-                assert next_token != 128006, f"next_token is header id={next_token}"
-
-            else:  # middle pp ranks
-                schedule.step()
-    """
     with torch.no_grad():
         for step in range(num_tokens):
             # first
@@ -448,7 +406,6 @@ def main():
                 schedule.step(padded_sequence)
                 # only receive if not last step
                 if step < num_tokens - 1:
-
                     dist.recv(
                         x_recv,
                         src,
@@ -465,9 +422,10 @@ def main():
                 decode_results = _batch_decode_next_tokens(
                     output=output, prompt_lengths=prompt_lengths, tokenizer=tokenizer
                 )
-                logger.info(
-                    f"\n\n{color.green} {'Prefill' if step == 0 else '* Decode *'} responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
-                )
+                if tp_rank == 0:
+                    logger.info(
+                        f"\n\n{color.green} {'Prefill' if step == 0 else '* Decode *'} responses ====>>>> {color.blue} {decode_results=} \n{color.reset}"
+                    )
 
                 next_token = torch.tensor([decode_results[0][0]], device=device)
                 res.append(decode_results[0][1])
@@ -478,9 +436,6 @@ def main():
                     logger.info(
                         f"output review {prompt_lengths[i]=}, {padded_sequence[i, prompt_lengths[i]-1]=}"
                     )
-
-                # logger.info(f"SENDING back...from {rank=} to {dst=}")
-                # logger.info(f"SENDING data {next_token.shape=}, {next_token=}")
 
                 # only send if not last step
                 if step < (num_tokens - 1):
@@ -496,11 +451,10 @@ def main():
 
     # output formatted response via last pp group and tp rank 0
     if pp_rank == last_pp_group and tp_rank == 0:
-        logger.info(f"Prompt:{color.green} {prompt[0]} {color.reset}")
+        logger.info(f"\nPrompt:{color.green} {prompt[0]} {color.reset}")
         formatted_response = "".join(res)
-        logger.info(f"$$$$$$ {color.blue}{formatted_response}{color.reset}  $$$$$")
+        logger.info(f"$$$$$$ {color.blue}{formatted_response}\n{color.reset}  $$$$$")
 
-    logger.info(f"$$$$$$ {color.red}{res=}{color.reset}  $$$$$")
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
     )
