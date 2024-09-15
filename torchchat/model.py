@@ -6,19 +6,19 @@
 import json
 import os
 import warnings
+from abc import ABC, abstractmethod
 
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
 from typing import Any, Callable, Dict, Optional, Union
-from abc import ABC, abstractmethod
 
 import torch
 import torch.nn as nn
 
 from torch import Tensor
-from torch.distributed._tensor import Replicate, Shard, DTensor
+from torch.distributed._tensor import DTensor, Replicate, Shard
 from torch.distributed.device_mesh import DeviceMesh
 from torch.distributed.tensor.parallel import (
     ColwiseParallel,
@@ -28,39 +28,43 @@ from torch.distributed.tensor.parallel import (
 )
 from torch.nn import functional as F
 
+from torchtune.models.flamingo import flamingo_decoder, flamingo_vision_encoder
+from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
+from torchtune.modules.model_fusion import DeepFusionModel
+
 from torchchat.utils.build_utils import find_multiple, get_precision
 
-from torchtune.models.flamingo import flamingo_decoder, flamingo_vision_encoder
-from torchtune.modules.model_fusion import DeepFusionModel 
-from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
-
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
+
 
 def identity(**kwargs):
     if len(kwargs) != 1:
         raise ValueError("Only one argument is expected")
     return list(kwargs.values())[0]
 
+
 class ModelType(Enum):
     TextOnly = "text_only"
     Llama3_1 = "llama3_1"
     Flamingo = "flamingo"
 
+
 # Type for objects that can generate nn.Module instance
 ModuleLike = Union[nn.Module, Callable[..., nn.Module]]
+
 
 @dataclass
 class ModelRecipe:
     """
     The class describes and contains all supported model structures in torchchat.
-    
+
     ModelRecipe represents a model as a collection of Transformer modules and a fusion module,
     providing a standardized and centralized way to define and build models in torchchat.
     Attributes:
         model_type (ModelType):
             The type of the model.
         modules (Dict[str, ModuleLike]):
-            A dictionary of ModuleLike modules, where each key is the module name and each 
+            A dictionary of ModuleLike modules, where each key is the module name and each
             value is a ModuleLike object that generates the transformer.
             The names of the Transformer modules should match the corresponding names in the
             fusion class and the JSON file holding model hyperparameters.
@@ -76,15 +80,15 @@ class ModelRecipe:
     def _text_only(cls):
         return cls(
             model_type=ModelType.TextOnly,
-            modules={'text': Transformer},
+            modules={"text": Transformer},
             fusion_class=identity,
         )
-    
+
     @classmethod
     def _llama3_1(cls):
         return cls(
             model_type=ModelType.Llama3_1,
-            modules={'text': llama3_1_builder},
+            modules={"text": llama3_1_builder},
             fusion_class=identity,
         )
 
@@ -92,13 +96,10 @@ class ModelRecipe:
     def _flamingo(cls):
         return cls(
             model_type=ModelType.Flamingo,
-            modules={
-                'encoder': flamingo_vision_encoder,
-                'decoder': flamingo_decoder
-            },
+            modules={"encoder": flamingo_vision_encoder, "decoder": flamingo_decoder},
             fusion_class=DeepFusionModel,
         )
-    
+
     @classmethod
     def get_recipe(cls, model_type):
         if model_type == ModelType.TextOnly:
@@ -109,6 +110,7 @@ class ModelRecipe:
             return cls._llama3_1()
         else:
             raise ValueError(f"Can not find the model recipe for {model_type}")
+
 
 @dataclass
 class TransformerArgs:
@@ -170,14 +172,14 @@ class ModelArgs:
         model_type: ModelType = ModelType.TextOnly,
     ) -> None:
         self._sanity_check(transformer_args, model_type)
-        
+
         self.model_type = model_type
         if isinstance(transformer_args, TransformerArgs):
             assert model_type == ModelType.TextOnly
             self.transformer_args = {"text": transformer_args}
         else:
             self.transformer_args = transformer_args
-    
+
     def _sanity_check(
         self,
         transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
@@ -195,11 +197,15 @@ class ModelArgs:
             # try to interpret as a single transformer config
             transformer_args: Dict[str, TransformerArgs] = {}
             transformer_args["text"] = TransformerArgs.from_params(loaded_params)
-            model_type = ModelType.TextOnly
+            if (model_type := loaded_params.get("model_type", None)) is None:
+                model_type = ModelType.TextOnly
+
         except TypeError:
             # try to interpret as a dict of transformer configs
             model_type = ModelType(loaded_params["model_type"])
-            transformer_args = {k: v for k, v in loaded_params.items() if k != "model_type"}
+            transformer_args = {
+                k: v for k, v in loaded_params.items() if k != "model_type"
+            }
         return cls(transformer_args, model_type)
 
     @classmethod
@@ -281,11 +287,12 @@ class Model(ABC, nn.Module):
     """
     The entrance for model construction in torchchat.
     """
+
     def __init__(self, config: ModelArgs) -> None:
         super().__init__()
         self.config = config
         self.model = self.build_model()
-    
+
     def build_model(self) -> nn.Module:
         """
         Builds a model based on the provided configuration.
@@ -303,7 +310,7 @@ class Model(ABC, nn.Module):
                 modules[name] = module_class(config_args)
 
         return recipe.fusion_class(**modules)
-    
+
     @abstractmethod
     def forward(self, *args, **kwargs):
         raise NotImplementedError("forward method is not implemented")
@@ -373,7 +380,9 @@ class FlamingoModel(Model):
     ) -> Tensor:
         if encoder_input is None:
             return self.model(tokens, encoder_mask=encoder_mask)
-        return self.model(tokens, encoder_input=encoder_input, encoder_mask=encoder_mask)
+        return self.model(
+            tokens, encoder_input=encoder_input, encoder_mask=encoder_mask
+        )
 
     def setup_caches(self, max_batch_size, dtype):
         self.model.setup_caches(max_batch_size, dtype=dtype)
@@ -388,6 +397,7 @@ MODEL_TYPE_TO_CLASS = {
     ModelType.Llama3_1: Llama31Model,
 }
 
+
 class Transformer(nn.Module):
     def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
@@ -396,14 +406,16 @@ class Transformer(nn.Module):
 
         self.tok_embeddings = (
             nn.Embedding(config.vocab_size, config.dim)
-            if config.stage_idx == 0 else None
+            if config.stage_idx == 0
+            else None
         )
 
         # Use ModuleDict so that each layer can be assigned its layer ID in the original model
         self.layers = nn.ModuleDict()
 
         for layer_id in range(
-            layers_per_stage * config.stage_idx, layers_per_stage * (config.stage_idx + 1)
+            layers_per_stage * config.stage_idx,
+            layers_per_stage * (config.stage_idx + 1),
         ):
             self.layers[str(layer_id)] = TransformerBlock(config)
 
@@ -449,7 +461,8 @@ class Transformer(nn.Module):
     def distribute(self, device_mesh: DeviceMesh):
         if self.tok_embeddings:
             parallelize_module(
-                self.tok_embeddings, device_mesh,
+                self.tok_embeddings,
+                device_mesh,
                 RowwiseParallel(
                     input_layouts=Replicate(),
                     output_layouts=Shard(1),
@@ -464,7 +477,8 @@ class Transformer(nn.Module):
 
         if self.output:
             parallelize_module(
-                self.output, device_mesh,
+                self.output,
+                device_mesh,
                 ColwiseParallel(
                     input_layouts=Shard(1),
                     output_layouts=Replicate(),
@@ -588,7 +602,9 @@ class Attention(nn.Module):
         parallelize_module(self.wq, device_mesh, ColwiseParallel())
         parallelize_module(self.wk, device_mesh, ColwiseParallel())
         parallelize_module(self.wv, device_mesh, ColwiseParallel())
-        parallelize_module(self.wo, device_mesh, RowwiseParallel(output_layouts=Shard(1)))
+        parallelize_module(
+            self.wo, device_mesh, RowwiseParallel(output_layouts=Shard(1))
+        )
         # TODO: enable kv cache in distributed case
         self.kv_cache = None
 
@@ -650,7 +666,9 @@ class FeedForward(nn.Module):
     def distribute(self, device_mesh: DeviceMesh):
         self.device_mesh = device_mesh
         parallelize_module(self.w1, device_mesh, ColwiseParallel())
-        parallelize_module(self.w2, device_mesh, RowwiseParallel(output_layouts=Shard(1)))
+        parallelize_module(
+            self.w2, device_mesh, RowwiseParallel(output_layouts=Shard(1))
+        )
         parallelize_module(self.w3, device_mesh, ColwiseParallel())
 
     def forward(self, x: Tensor) -> Tensor:
@@ -677,9 +695,16 @@ class RMSNorm(nn.Module):
 
 def apply_scaling(freqs: torch.Tensor, rope_scaling: Dict[str, Any]):
     # Check for the presence of the required keys
-    required_keys = {"factor", "low_freq_factor", "high_freq_factor", "original_max_position_embeddings"}
+    required_keys = {
+        "factor",
+        "low_freq_factor",
+        "high_freq_factor",
+        "original_max_position_embeddings",
+    }
     if not required_keys.issubset(rope_scaling.keys()):
-        raise ValueError(f"Missing required keys in apply_scaling. Expected: {required_keys}")
+        raise ValueError(
+            f"Missing required keys in apply_scaling. Expected: {required_keys}"
+        )
 
     scale_factor = rope_scaling["factor"]
     low_freq_factor = rope_scaling["low_freq_factor"]
@@ -705,7 +730,11 @@ def apply_scaling(freqs: torch.Tensor, rope_scaling: Dict[str, Any]):
 
 
 def precompute_freqs_cis(
-    n_elem: int, seq_len: int, base: int = 10000, dtype=None, rope_scaling: Optional[Dict[str, Any]] = None
+    n_elem: int,
+    seq_len: int,
+    base: int = 10000,
+    dtype=None,
+    rope_scaling: Optional[Dict[str, Any]] = None,
 ) -> Tensor:
     if not dtype:
         dtype = get_precision()
@@ -742,7 +771,7 @@ def apply_rotary_emb(x: Tensor, freqs_cis: Tensor) -> Tensor:
 
 try:
     from executorch.extension.pybindings import portable_lib as exec_lib
-    
+
     # ET changed the way it's loading the custom ops so it's not included in portable_lib but has to be loaded separately.
     from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache  # no-qa
 

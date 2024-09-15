@@ -15,15 +15,26 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 import torch.nn as nn
+
+try:
+    from _torchchat_test_script import flamingo_meta_to_tune
+except ImportError:
+    pass
+
 from distributed import (
     init_distributed,
     launch_distributed,
     ParallelDims,
     parallelize_llama,
 )
+
 from torch.distributed.device_mesh import DeviceMesh
 
-from torchchat.model import Model
+from torchtune.models.convert_weights import meta_to_tune
+
+from torchtune.training import set_default_dtype
+
+from torchchat.model import Model, ModelType
 
 from torchchat.model_config.model_config import resolve_model_config
 from torchchat.utils.build_utils import (
@@ -34,10 +45,6 @@ from torchchat.utils.build_utils import (
 )
 from torchchat.utils.measure_time import measure_time
 from torchchat.utils.quantize import quantize_model
-
-from torchtune.models.convert_weights import meta_to_tune
-
-
 
 
 @dataclass
@@ -143,7 +150,6 @@ class BuilderArgs:
                     if "chat" in path_basename or "instruct" in path_basename:
                         is_chat_model = True
 
-
         output_pte_path = getattr(args, "output_pte_path", None)
         output_dso_path = getattr(args, "output_dso_path", None)
         if output_pte_path and args.dtype.startswith("fast"):
@@ -234,7 +240,12 @@ class TokenizerArgs:
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
-        use_tiktoken = model.config.transformer_args["text"].use_tiktoken
+        text_args = model.config.transformer_args.get("text")
+        if text_args is None:
+            # TODO: Will be refactored: Currently, the only model that doesn't have text in transfomer_args is Flamingo
+            use_tiktoken = model.config.model_type == ModelType.Flamingo
+        else:
+            use_tiktoken = text_args.use_tiktoken
 
         if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
             raise RuntimeError(
@@ -266,7 +277,9 @@ class TokenizerArgs:
             raise RuntimeError("cannot find tokenizer model")
 
         if not tokenizer_path.is_file():
-            raise RuntimeError(f"did not find tokenizer at {tokenizer_path}")
+            raise RuntimeError(
+                f"did not find tokenizer at {os.path.abspath(tokenizer_path)}"
+            )
 
         return cls(
             tokenizer_path=tokenizer_path,
@@ -335,7 +348,9 @@ def _load_model_default(builder_args, only_config=False):
 
     if builder_args.params_table and builder_args.params_table.endswith("Tune"):
         print("Loading Tune checkpoint")
-        meta_checkpoint = torch.load(str(builder_args.checkpoint_path), mmap=True, weights_only=True)
+        meta_checkpoint = torch.load(
+            str(builder_args.checkpoint_path), mmap=True, weights_only=True
+        )
         checkpoint = meta_to_tune(meta_checkpoint)
     elif builder_args.checkpoint_dir is not None:
         # Load multiple checkpoint; ignore the single path.
@@ -372,8 +387,17 @@ def _load_model_default(builder_args, only_config=False):
     if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
         checkpoint = checkpoint["model"]
 
-    checkpoint = {"model." + k: v for k, v in checkpoint.items()}
-    model.load_state_dict(checkpoint, assign=True, strict=True)
+    if model.config.model_type == ModelType.Flamingo:
+        # TODO: Refactor this. For now, overwrite the model with model loaded from params_path
+        with set_default_dtype(builder_args.precision), torch.device(
+            builder_args.device
+        ):
+            model = Model.from_params(builder_args.params_path)
+        state_dict = flamingo_meta_to_tune(checkpoint)
+        model.model.load_state_dict(state_dict)
+    else:
+        checkpoint = {"model." + k: v for k, v in checkpoint.items()}
+        model.load_state_dict(checkpoint, assign=True, strict=True)
 
     return model
 
