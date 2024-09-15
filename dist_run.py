@@ -219,7 +219,7 @@ def _update_padded_sequence(
     prompt_lengths: List[int],
 ) -> None:
     for i in range(len(prompt_lengths)):
-        padded_sequence[i, prompt_lengths[i] - 1] = new_token[i, 0]
+        padded_sequence[i, prompt_lengths[i]] = new_token[i, 0]
         # logger.info(f"updated prompt {i} with new token {new_token[i, 0]}")
 
 
@@ -441,13 +441,13 @@ def main(args):
                     group=pp_group,
                 )
 
-            # increment prompt lengths for next token
-            for i in range(len(prompt_lengths)):
-                prompt_lengths[i] += 1
-
             # Update input sequence with new token
             if pp_rank == first_pp_rank:
                 _update_padded_sequence(padded_sequence, new_token, prompt_lengths)
+
+            # increment prompt lengths for next token
+            for i in range(len(prompt_lengths)):
+                prompt_lengths[i] += 1
 
     # Display the decoding results
 
