@@ -180,30 +180,31 @@ clone_torchao() {
 
 install_torchao_custom_aten_ops() {
   echo "Building torchao custom ops for ATen"
-  pushd ${TORCHCHAT_ROOT}/torchao-build/src/ao/torchao/experimental/kernels/cpu/linear/examples/torch_custom_op
-  export TORCHAO_INCLUDE_DIRS=${TORCHCHAT_ROOT}/torchao-build/src/ao
+  pushd ${TORCHCHAT_ROOT}/torchao-build/src/ao/torchao/experimental
 
   CMAKE_OUT_DIR=${TORCHCHAT_ROOT}/torchao-build/cmake-out
-  cmake -DTORCHAO_INCLUDE_DIRS=${TORCHAO_INCLUDE_DIRS} \
-    -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
-    -DPLATFORM="ATEN" \
+  cmake -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
+    -DTORCHAO_OP_TARGET="ATEN" \
     -S . \
     -B ${CMAKE_OUT_DIR} -G Ninja
   cmake --build  ${CMAKE_OUT_DIR}
+
+  popd
 }
 
 install_torchao_custom_executorch_ops() {
   echo "Building torchao custom ops for ExecuTorch"
-  pushd ${TORCHCHAT_ROOT}/torchao-build/src/ao/torchao/experimental/kernels/cpu/linear/examples/torch_custom_op
+  pushd ${TORCHCHAT_ROOT}/torchao-build/src/ao/torchao/experimental
   export TORCHAO_INCLUDE_DIRS=${TORCHCHAT_ROOT}/torchao-build/src/ao
 
   CMAKE_OUT_DIR="${TORCHCHAT_ROOT}/torchao-build/cmake-out"
-  cmake -DTORCHAO_INCLUDE_DIRS=${TORCHAO_INCLUDE_DIRS} \
-    -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
+  cmake -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
     -DEXECUTORCH_INCLUDE_DIRS=${EXECUTORCH_INCLUDE_DIRS} \
     -DEXECUTORCH_LIBRARIES=${EXECUTORCH_LIBRARIES} \
-    -DPLATFORM="EXECUTORCH" \
+    -DTORCHAO_OP_TARGET="EXECUTORCH" \
     -S . \
     -B ${CMAKE_OUT_DIR} -G Ninja
   cmake --build  ${CMAKE_OUT_DIR}
+
+  popd
 }

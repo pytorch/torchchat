@@ -891,7 +891,7 @@ try:
     # Try loading custom op
     try:
         import glob
-        libs = glob.glob(f"{torchao_build_path}/cmake-out/liblowbit_op_aten.*")
+        libs = glob.glob(f"{torchao_build_path}/cmake-out/ops/linear/linear_a8wxdq_op/liblinear_a8wxdq_aten.*")
         libs = list(filter(lambda l: (l.endswith("so") or l.endswith("dylib")), libs))
         torch.ops.load_library(libs[0])
     except Exception as e:
