@@ -31,7 +31,6 @@ from distributed.utils import (
     get_num_params,
     GPUMemoryMonitor,
 )
-from distributed.verification_utils import find_cpu_tensors
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
 from torchchat.model import ModelArgs, Transformer
@@ -219,7 +218,6 @@ def _update_padded_sequence(
     new_token: torch.Tensor,
     prompt_lengths: List[int],
 ) -> None:
-
     for i in range(len(prompt_lengths)):
         prompt_lengths[i] += 1
         padded_sequence[i, prompt_lengths[i] - 1] = new_token[i, 0]
