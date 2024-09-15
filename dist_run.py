@@ -223,7 +223,7 @@ def _update_padded_sequence(
     for i in range(len(prompt_lengths)):
         prompt_lengths[i] += 1
         padded_sequence[i, prompt_lengths[i] - 1] = new_token[i, 0]
-        logger.info(f"updated prompt {i} with new token {new_token[i, 0]}")
+        # logger.info(f"updated prompt {i} with new token {new_token[i, 0]}")
 
 
 def _cleanup():
@@ -296,7 +296,7 @@ def main(args):
         logger.info(f"Model: {model}")
 
     mbs = 1  # number of micro-batches
-    mb_size = 2  # micro-batch size
+    mb_size = 5  # micro-batch size
     batch_size = mbs * mb_size  # total batch size
 
     seqlen = 4096  # sequence length
@@ -345,6 +345,9 @@ def main(args):
     prompt = [
         "What is snow?",
         "Where does Santa Claus live?",
+        "What is PyTorch?",
+        "Write a poem about the beauty of the night sky.",
+        "What is the capital of France, Germany and Switzerland?",
     ]
 
     """
@@ -379,13 +382,11 @@ def main(args):
     input_ids = _encode_strings(
         prompt, tokenizer, bos=True, device=device, dtype=torch.int64
     )
-    logger.info(f"{input_ids[0][0:8]=}")
 
     # create a padded tensor for the input prompt
     padded_sequence, prompt_lengths = _create_padded_prompts(
         input_ids, tokenizer, seqlen, start_pos, device
     )
-    logger.info(f"length of each prompt in the batch: {prompt_lengths=}")
 
     # create schedule
     schedule = ScheduleGPipe(stage, mbs)
@@ -397,7 +398,7 @@ def main(args):
     # need a new token dimension (row) for each prompt in the batch
     new_token = torch.zeros(total_prompts, 1, device=device, dtype=torch.int64)
     res = [[] for _ in range(total_prompts)]
-    num_tokens = 20
+    num_tokens = 40
 
     # Decoding
     with torch.no_grad():
@@ -449,18 +450,17 @@ def main(args):
             # Update input sequence with new token
             if pp_rank == first_pp_rank:
                 _update_padded_sequence(padded_sequence, new_token, prompt_lengths)
-                for i in range(len(prompt_lengths)):
-                    logger.info(
-                        f"next submission: {padded_sequence[i, prompt_lengths[i]-4:prompt_lengths[i]+4]}"
-                    )
+
+    # Display the decoding results
 
     # output formatted response via last pp group and tp rank 0
     if pp_rank == last_pp_rank and tp_rank == 0:
         for i in range(len(prompt_lengths)):
-            logger.info(f"Prompt:{color.green} {prompt[i]} {color.reset}")
+            logger.info(f"\nPrompt:{color.green} {prompt[i]} {color.reset}")
             formatted_response = "".join(res[i])
-            logger.info(f"$$ {color.red}{formatted_response} {color.reset}  $$")
+            logger.info(f"$$ {color.red}{formatted_response} {color.reset}  $$\n")
 
+    # Cleanup
     logger.info(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
     )
