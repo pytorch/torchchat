@@ -42,37 +42,61 @@ def identity(**kwargs):
     return list(kwargs.values())[0]
 
 
+class MultiModalProjector(nn.Module):
+    def __init__(self, args: ProjectorArgs):
+        super().__init__()
+
+        self.linear_1 = nn.Linear(args.in_channels, args.out_channels, bias=True)
+        self.act = args.activation
+        self.linear_2 = nn.Linear(args.out_channels, args.out_channels, bias=True)
+
+    def forward(self, image_features):
+        hidden_states = self.linear_1(image_features)
+        hidden_states = self.act(hidden_states)
+        hidden_states = self.linear_2(hidden_states)
+        return hidden_states
+
 class ConcateFusion(nn.Module):
-    def __init__(self, encoder: nn.Module, decoder: nn.Module):
+    def __init__(self, encoder: nn.Module, decoder: nn.Module, token_embedding_name="tok_embeddings", mm_proj_in_channels=1024, mm_proj_out_channels=4096, mm_proj_activation=nn.GELU):
         super().__init__()
         self.encoder = encoder
         self.decoder = decoder
+
+        # esclate the embedding layer outside decoder llava model need to fuse
+        # the text and image embedding together before passing to decoder.
+        self.tok_embeddings = getattr(self.decoder, token_embedding_name)
+
+        # set the embedding layer in decoder to None to jump the embedding layer over in decoder
+        self.decoder.__setattr__(token_embedding_name) = None
+
+        self.mm_projector = MultiModalProjector(ProjectorArgs(in_channels=mm_proj_in_channels, out_channels=mm_proj_out_channels, activation=mm_proj_activation))
 
     def forward(self, 
         tokens: Tensor,
         *,
         post_tokens: Optional[Tensor] = None,
-        mask: Optional[torch.Tensor] = None,
         encoder_input: Optional[Tensor] = None,
         encoder_mask: Optional[torch.Tensor] = None,
         input_pos: Optional[torch.Tensor] = None,) -> Tensor:
-        # split prompt from img tag into before img and after img
-        # concate before img, image result and after img into a large prompt
-        # forward that to text transformer
-        # resturn result
-
         if encoder_input:
             encoder_output = self.encoder(
                 encoder_input,
             )
+        else:
+            encoder_output = None
+        
+        decoder_input = self._get_decoder_input(tokens, encoder_input=encoder_input, post_tokens=post_tokens)
+        return self.decoder(decoder_input)
 
-    def _gen_mm_embedding(self, tokens: Tensor, *, encoder_input: Optional[Tensor], post_tokens: Optional[Tensor]):
+    def _get_decoder_input(self, tokens: Tensor, *, encoder_input: Optional[Tensor], post_tokens: Optional[Tensor]):
         assert bool(encoder_input) == bool(post_tokens), "encoder_input and post_tokens must be both None or not None"
         if encoder_input is None:
-            return tokens
+            return self.tok_embeddings(tokens)
+        else:
+            pre_img_embed = self.tok_embeddings(tokens)
+            post_img_embed = self.tok_embeddings(post_tokens)
+            return torch.cat((pre_img_embed, image_embeds, post_img_embed), dim=1)
         
-
-
 
 
 
