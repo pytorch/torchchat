@@ -244,6 +244,12 @@ def main(args):
     logger.info(f"Chat Model Config: {config}")
 
     tokenizer = _build_chat_tokenizer(model_name)
+    if model_name == "llama3":
+        eos_token_id = tokenizer.special_tokens["<|eot_id|>"]
+        logger.info(f"Using eos_token_id {eos_token_id}")
+        # eos_token_id = torch.tensor([11410], dtype=torch.int64, device="cuda")
+    else:
+        eos_token_id = tokenizer.eos_id()
 
     set_precision(CACHE_PRECISION)
     logger.info(f"Using cache precision {CACHE_PRECISION}")
@@ -293,7 +299,7 @@ def main(args):
         logger.info(f"Model: {model}")
 
     mbs = 1  # number of micro-batches
-    mb_size = 5  # micro-batch size
+    mb_size = 2  # micro-batch size
     batch_size = mbs * mb_size  # total batch size
 
     seqlen = 4096  # sequence length
@@ -340,14 +346,17 @@ def main(args):
     )
 
     prompt = [
-        "What is snow?",
-        "Where does Santa Claus live?",
-        "What is PyTorch?",
-        "Write a poem about the beauty of the night sky.",
-        "What is the capital of France, Germany and Switzerland?",
+        "Write a 4 line poem about snow.",
+        "Write a 5 line poem about the beauty of the night sky.",
     ]
 
     """
+    Prompt gallery:
+    "What is snow?",
+    "Where does Santa Claus live?",
+    "What is PyTorch?",
+     "Write a poem about the beauty of the night sky.",
+    "What is the capital of France, Germany and Switzerland?",
     "What is the capital of France?",
         "What is your name?",
         "What is the capital of Japan?",
@@ -401,7 +410,15 @@ def main(args):
     # need a new token dimension (row) for each prompt in the batch
     new_token = torch.zeros(total_prompts, 1, device=device, dtype=torch.int64)
     res = [[] for _ in range(total_prompts)]
-    num_tokens = 40
+    num_tokens = 4000
+
+    # monitor all prompts for eot_id to stop all decoding
+    eos_tracker = [False for _ in range(total_prompts)]
+
+    decode_num_tokens = 5
+    num_sets = num_tokens // decode_num_tokens
+    num_remainder = num_tokens % decode_num_tokens
+    switch_to_single_decode = num_sets * decode_num_tokens
 
     # Decoding
     with torch.no_grad():
@@ -426,10 +443,13 @@ def main(args):
                     )
                 # decode results returns both token_id (int) and token_str (readable), hence [0] and [1]
                 for i in range(len(decode_results)):
-                    res[i].append(decode_results[i][1])
                     new_token[i, 0] = torch.tensor(
                         [decode_results[i][0]], device=device
                     )  # decode_results[i][0]
+                    if decode_results[i][0] == eos_token_id:
+                        eos_tracker[i] = True
+                    else:
+                        res[i].append(decode_results[i][1])
 
             # sendrecv between last and first ranks, only if:
             # first_pp_rank != last_pp_rank.
@@ -439,12 +459,28 @@ def main(args):
                     dst=first_pp_rank_global_id,
                     group=pp_group,
                 )
+                # monitor for eos_id
+                if all(eos_tracker):
+                    logger.info(
+                        f"{color.green}Received EOS token for all prompts{color.reset}"
+                    )
+                    break
+
             elif pp_rank == first_pp_rank and pp_rank != last_pp_rank:
                 dist.recv(
                     new_token,
                     src=last_pp_rank_global_id,
                     group=pp_group,
                 )
+                for i in range(len(prompt_lengths)):
+                    if new_token[i, 0] == eos_token_id:
+                        logger.info(f"{color.green}Received EOS token{color.reset}")
+
+                if all(eos_tracker):
+                    logger.info(
+                        f"{color.green}Received EOS token for all prompts{color.reset}"
+                    )
+                    break
 
             # Update input sequence with new token
             if pp_rank == first_pp_rank:
