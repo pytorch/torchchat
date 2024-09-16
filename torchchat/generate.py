@@ -27,12 +27,6 @@ except ImportError:
 
 from PIL import Image
 
-# torchtune model definition dependencies
-from torchtune.data import Message
-from torchtune.generation._generation import sample as tune_sample
-from torchtune.models.llama3 import llama3_tokenizer
-from torchtune.training import set_default_dtype
-
 from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
@@ -42,6 +36,12 @@ from torchchat.cli.builder import (
 from torchchat.model import Model, ModelType
 from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
+
+# torchtune model definition dependencies
+from torchtune.data import Message
+from torchtune.generation._generation import sample as tune_sample
+from torchtune.models.llama3 import llama3_tokenizer
+from torchtune.training import set_default_dtype
 
 
 class _ChatFormatter(ABC):
@@ -790,16 +790,12 @@ class Generator:
 
         # This is a hack to get around the fact that different models have different ways to record their max_seq_length and might be wrong
         # TODO: unify the max_seq_length config representation.
-        if generator_args.is_torchtune_model:
-            max_seq_length = self.model.config.transformer_args.get("text", {}).get(
-                "max_seq_len", 2048
-            )
-        elif generator_args.chat_mode:
-            if (
-                max_seq_length := self.model.config.transformer_args.get("text", None)
-                is None
-            ):
-                max_seq_length = 2048
+        text_transformer_args = getattr(self.model.model, "config", None)
+        max_seq_length = (
+            text_transformer_args.max_seq_length if text_transformer_args else 2048
+        )
+
+        if generator_args.chat_mode:
             print(
                 f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye"
             )
@@ -809,15 +805,9 @@ class Generator:
             if get_system_prompt == "y" or get_system_prompt == "Y":
                 self.system_prompt = input("What is your system prompt? \n")
 
-        else:
-            text_transformer_args = self.model.config.transformer_args.get("text", None)
+        elif not generator_args.is_torchtune_model:
             max_seq_length = min(
-                encoded.size(0) + generator_args.max_new_tokens,
-                (
-                    text_transformer_args.block_size
-                    if text_transformer_args is not None
-                    else 2048
-                ),
+                encoded.size(0) + generator_args.max_new_tokens, max_seq_length
             )
 
         max_seq_length = (
