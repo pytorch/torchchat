@@ -6,8 +6,12 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
+from PIL import Image
+import requests
+import torchvision
 
 from typing import Any, Callable, Dict, Optional, Union
+from collections.abc import Hashable
 
 import torch
 import torch.nn as nn
@@ -46,6 +50,13 @@ def identity(**kwargs):
     if len(kwargs) != 1:
         raise ValueError("Only one argument is expected")
     return list(kwargs.values())[0]
+
+
+@dataclass
+class ProjectorArgs:
+    in_channels: int = 1024
+    out_channels: int = 4096
+    activation: nn.Module = nn.GELU()
 
 
 class MultiModalProjector(nn.Module):
@@ -105,13 +116,22 @@ class ConcateFusion(nn.Module):
             encoder_output = self.encoder(
                 encoder_input,
             )
+            encoder_output = self._encoder_feature_select(encoder_output)
         else:
             encoder_output = None
 
         decoder_input = self._get_decoder_input(
             tokens, encoder_output=encoder_output, post_tokens=post_tokens
         )
-        return self.decoder(decoder_input)
+        return self.decoder(decoder_input, input_pos=input_pos)
+    
+    def _encoder_feature_select(self, encoder_output):
+        selected_image_feature = encoder_output[1][0].view(
+            *encoder_output[1][0].shape[2:]
+        )
+
+        selected_image_feature = selected_image_feature[:, 1:]
+        return selected_image_feature
 
     def _get_decoder_input(
         self,
@@ -197,8 +217,8 @@ class ModelRecipe:
         return cls(
             model_type=ModelType.Llava,
             modules={
-                'te': flamingo_vision_encoder,
-                'decoder': llama3_1_builder
+                'encoder': clip_vision_encoder,
+                'decoder': Transformer
             },
             fusion_class=DeepFusionModel,
         )
@@ -414,7 +434,7 @@ class Model(ABC, nn.Module):
     def _replace_know_params(self, params):
         patterns = {"QuickGELUActivation()": QuickGELUActivation(), "False": False, "True": True}
         for key, value in params.items():
-            if value in patterns:
+            if isinstance(value, Hashable) and value in patterns:
                 params[key] = patterns[value]
         return params
     
@@ -496,10 +516,26 @@ class FlamingoModel(Model):
         self.model.reset_caches()
 
 
+class LlavaModel(Model):
+    def forward(
+        self,
+        tokens: Tensor,
+        *,
+        encoder_input: Optional[Dict[str, Tensor]] = None,
+        post_tokens: Optional[Tensor] = None,
+        input_pos: Optional[Tensor] = None,
+    ) -> Tensor:
+        return self.model(tokens, encoder_input=encoder_input, post_tokens=post_tokens, input_pos=input_pos)
+
+    def setup_caches(self, max_batch_size, max_seq_length):
+        self.model.setup_caches(max_batch_size, max_seq_length)
+
+
 MODEL_TYPE_TO_CLASS = {
     ModelType.TextOnly: TextOnlyModel,
     ModelType.Flamingo: FlamingoModel,
     ModelType.Llama3_1: Llama31Model,
+    ModelType.Llava: LlavaModel,
 }
 
 class Transformer(nn.Module):
@@ -882,3 +918,46 @@ try:
 
 except:
     pass
+
+
+if __name__ == "__main__":
+    def prepare_image(target_h: int, target_w: int) -> torch.Tensor:
+        """Read image into a tensor and resize the image so that it fits in
+        a target_h x target_w canvas.
+
+        Args:
+            image (Image): An Image object.
+            target_h (int): Target height.
+            target_w (int): Target width.
+
+        Returns:
+            torch.Tensor: resized image tensor.
+        """
+        image = Image.open(
+            requests.get(
+                "https://llava-vl.github.io/static/images/view.jpg", stream=True
+            ).raw)
+
+        img = torchvision.transforms.functional.pil_to_tensor(image)
+        # height ratio
+        ratio_h = img.shape[1] / target_h
+        # width ratio
+        ratio_w = img.shape[2] / target_w
+        # resize the image so that it fits in a target_h x target_w canvas
+        ratio = max(ratio_h, ratio_w)
+        output_size = (int(img.shape[1] / ratio), int(img.shape[2] / ratio))
+        img = torchvision.transforms.Resize(size=output_size)(img)
+        return img
+
+    pre_tokens = torch.tensor([[    1,   319, 13563,  1546,   263, 12758,  5199,   322,   385, 23116,
+         21082, 20255, 29889,   450, 20255,  4076,  8444, 29892, 13173, 29892,
+           322,  1248,   568,  6089,   304,   278,  5199, 29915, 29879,  5155,
+         29889,  3148,  1001, 29901, 29871]])
+    img = prepare_image(336, 336)
+    post_tokens = torch.tensor([[29871,    13,   462,  9651,  1724,   526,   278,  2712,   306,   881,
+           367,   274,  1300,  2738,  1048,   746,   306,  6493,  1244, 29973,
+           319,  1799,  9047, 13566, 29901]])
+    
+    llava_model = Model.from_params("/home/gasoonjia/torchchat/torchchat/model_params/llava-1.5.json")
+
+    llava_model(tokens=pre_tokens, encoder_input=img, post_tokens=post_tokens)
