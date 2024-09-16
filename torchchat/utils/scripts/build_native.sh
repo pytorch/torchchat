@@ -77,7 +77,7 @@ git submodule sync
 if [[ "$TARGET" == "et" ]]; then
     find_cmake_prefix_path
     install_pip_dependencies
-    clone_executorch
+    # clone_executorch
     install_executorch_libs false
 
     if [[ "$LINK_TORCHAO" == "ON" ]]; then
@@ -90,7 +90,7 @@ popd
 
 # CMake commands
 if [[ "$TARGET" == "et" ]]; then
-    cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` -DLINK_TORCHAO_CUSTOM_OPS="${LINK_TORCHAO}" -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=1" -G Ninja
+    cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` -DLINK_TORCHAO_CUSTOM_OPS="${LINK_TORCHAO}" -DET_USE_ADAPTIVE_THREADS=ON -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=1" -G Ninja
 else
     cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` -DLINK_TORCHAO_CUSTOM_OPS="${LINK_TORCHAO}" -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" -G Ninja
 fi
