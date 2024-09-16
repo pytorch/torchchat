@@ -1,24 +1,19 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# All rights reserved.
-
-# This source code is licensed under the license found in the
-# LICENSE file in the root directory of this source tree.
 import json
 import os
 import warnings
+from abc import ABC, abstractmethod
 
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
 from typing import Any, Callable, Dict, Optional, Union
-from abc import ABC, abstractmethod
 
 import torch
 import torch.nn as nn
 
 from torch import Tensor
-from torch.distributed._tensor import Replicate, Shard, DTensor
+from torch.distributed._tensor import DTensor, Replicate, Shard
 from torch.distributed.device_mesh import DeviceMesh
 from torch.distributed.tensor.parallel import (
     ColwiseParallel,
@@ -31,10 +26,11 @@ from torch.nn import functional as F
 from torchchat.utils.build_utils import find_multiple, get_precision
 
 from torchtune.models.flamingo import flamingo_decoder, flamingo_vision_encoder
-from torchtune.modules.model_fusion import DeepFusionModel 
 from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
+from torchtune.modules.model_fusion import DeepFusionModel
 
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
+
 
 def identity(**kwargs):
     if len(kwargs) != 1:
@@ -56,8 +52,17 @@ class MultiModalProjector(nn.Module):
         hidden_states = self.linear_2(hidden_states)
         return hidden_states
 
+
 class ConcateFusion(nn.Module):
-    def __init__(self, encoder: nn.Module, decoder: nn.Module, token_embedding_name="tok_embeddings", mm_proj_in_channels=1024, mm_proj_out_channels=4096, mm_proj_activation=nn.GELU):
+    def __init__(
+        self,
+        encoder: nn.Module,
+        decoder: nn.Module,
+        token_embedding_name="tok_embeddings",
+        mm_proj_in_channels=1024,
+        mm_proj_out_channels=4096,
+        mm_proj_activation=nn.GELU,
+    ):
         super().__init__()
         self.encoder = encoder
         self.decoder = decoder
@@ -67,36 +72,53 @@ class ConcateFusion(nn.Module):
         self.tok_embeddings = getattr(self.decoder, token_embedding_name)
 
         # set the embedding layer in decoder to None to jump the embedding layer over in decoder
-        self.decoder.__setattr__(token_embedding_name) = None
+        self.decoder.__setattr__(token_embedding_name, None)
 
-        self.mm_projector = MultiModalProjector(ProjectorArgs(in_channels=mm_proj_in_channels, out_channels=mm_proj_out_channels, activation=mm_proj_activation))
+        self.mm_projector = MultiModalProjector(
+            ProjectorArgs(
+                in_channels=mm_proj_in_channels,
+                out_channels=mm_proj_out_channels,
+                activation=mm_proj_activation,
+            )
+        )
 
-    def forward(self, 
+    def forward(
+        self,
         tokens: Tensor,
         *,
         post_tokens: Optional[Tensor] = None,
         encoder_input: Optional[Tensor] = None,
         encoder_mask: Optional[torch.Tensor] = None,
-        input_pos: Optional[torch.Tensor] = None,) -> Tensor:
+        input_pos: Optional[torch.Tensor] = None,
+    ) -> Tensor:
         if encoder_input:
             encoder_output = self.encoder(
                 encoder_input,
             )
         else:
             encoder_output = None
-        
-        decoder_input = self._get_decoder_input(tokens, encoder_input=encoder_input, post_tokens=post_tokens)
+
+        decoder_input = self._get_decoder_input(
+            tokens, encoder_input=encoder_input, post_tokens=post_tokens
+        )
         return self.decoder(decoder_input)
 
-    def _get_decoder_input(self, tokens: Tensor, *, encoder_input: Optional[Tensor], post_tokens: Optional[Tensor]):
-        assert bool(encoder_input) == bool(post_tokens), "encoder_input and post_tokens must be both None or not None"
+    def _get_decoder_input(
+        self,
+        tokens: Tensor,
+        *,
+        encoder_input: Optional[Tensor],
+        post_tokens: Optional[Tensor],
+    ):
+        assert bool(encoder_input) == bool(
+            post_tokens
+        ), "encoder_input and post_tokens must be both None or not None"
         if encoder_input is None:
             return self.tok_embeddings(tokens)
         else:
             pre_img_embed = self.tok_embeddings(tokens)
             post_img_embed = self.tok_embeddings(post_tokens)
             return torch.cat((pre_img_embed, image_embeds, post_img_embed), dim=1)
-        
 
 
 
