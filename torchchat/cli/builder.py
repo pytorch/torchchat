@@ -563,7 +563,7 @@ def _initialize_model(
                 model.setup_caches(
                     max_batch_size=1,
                     max_seq_length=max_seq_length
-                    or model.config.transformer_args["text"].max_seq_length,
+                    or model.model.config.max_seq_length,
                 )
 
         model.to(dtype=builder_args.precision)
