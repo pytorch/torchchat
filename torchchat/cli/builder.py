@@ -240,12 +240,7 @@ class TokenizerArgs:
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
-        text_args = model.config.transformer_args.get("text")
-        if text_args is None:
-            # TODO: Will be refactored: Currently, the only model that doesn't have text in transfomer_args is Flamingo
-            use_tiktoken = model.config.model_type == ModelType.Flamingo
-        else:
-            use_tiktoken = text_args.use_tiktoken
+        use_tiktoken = model.config.use_tiktoken
 
         if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
             raise RuntimeError(

@@ -164,49 +164,49 @@ class TransformerArgs:
 @dataclass
 class ModelArgs:
     model_type: ModelType
-    transformer_args: Dict[str, Union[Dict, TransformerArgs]]
+    transformer_args: Dict[str, Dict[str, Any]]
+    use_tiktoken: bool
 
     def __init__(
         self,
-        transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
+        transformer_args: Dict[str, Dict[str, Any]],
         model_type: ModelType = ModelType.TextOnly,
+        use_tiktoken: bool = False,
     ) -> None:
         self._sanity_check(transformer_args, model_type)
 
         self.model_type = model_type
-        if isinstance(transformer_args, TransformerArgs):
-            assert model_type == ModelType.TextOnly
-            self.transformer_args = {"text": transformer_args}
-        else:
-            self.transformer_args = transformer_args
+        self.transformer_args = transformer_args
+
+        # Model-level attributes
+        self.use_tiktoken = use_tiktoken
 
     def _sanity_check(
         self,
-        transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
+        transformer_args: Dict[str, Dict[str, Any]],
         model_type: ModelType,
     ) -> None:
-        assert isinstance(model_type, ModelType)
-        assert isinstance(transformer_args, (TransformerArgs, dict))
+        assert isinstance(model_type, ModelType), model_type
+        assert isinstance(transformer_args, dict)
 
     @classmethod
     def from_params(cls, params_path):
         with open(params_path, "r") as f:
             loaded_params = json.loads(f.read())
-
-        try:
-            # try to interpret as a single transformer config
-            transformer_args: Dict[str, TransformerArgs] = {}
-            transformer_args["text"] = TransformerArgs.from_params(loaded_params)
-            if (model_type := loaded_params.get("model_type", None)) is None:
-                model_type = ModelType.TextOnly
-
-        except TypeError:
-            # try to interpret as a dict of transformer configs
-            model_type = ModelType(loaded_params["model_type"])
+        
+        if (model_type_name := loaded_params.get("model_type", None)) is None:
+            # The model params is in the transformer_args format
+            # set the model_type to TextOnly and reformat the params
+            model_type = ModelType.TextOnly
+            transformer_args = {"text": {"config": loaded_params}}
+        else:
+            model_type = ModelType(model_type_name)
             transformer_args = {
                 k: v for k, v in loaded_params.items() if k != "model_type"
             }
-        return cls(transformer_args, model_type)
+
+        use_tiktoken = loaded_params.get("use_tiktoken", False)
+        return cls(transformer_args, model_type, use_tiktoken)
 
     @classmethod
     def from_table(cls, name: str):
@@ -304,10 +304,8 @@ class Model(ABC, nn.Module):
         recipe = ModelRecipe.get_recipe(self.config.model_type)
         modules = {}
         for name, module_class in recipe.modules.items():
-            if isinstance(config_args := self.config.transformer_args[name], dict):
-                modules[name] = module_class(**config_args)
-            else:
-                modules[name] = module_class(config_args)
+            config_args = self.config.transformer_args[name]
+            modules[name] = module_class(**config_args)
 
         return recipe.fusion_class(**modules)
 
@@ -399,8 +397,9 @@ MODEL_TYPE_TO_CLASS = {
 
 
 class Transformer(nn.Module):
-    def __init__(self, config: TransformerArgs) -> None:
+    def __init__(self, config: Dict[str, Any]) -> None:
         super().__init__()
+        config = TransformerArgs.from_params(config)
         self.config = config
         layers_per_stage = config.n_layers // config.n_stages
 
