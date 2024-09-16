@@ -9,10 +9,10 @@
         "out_indices": [
             23
         ],
-        "output_cls_projection": False,
+        "output_cls_projection": "False",
         "max_num_tiles": 1,
         "in_channels": 3,
-        "intermediate_act": QuickGELUActivation()
+        "intermediate_act": "QuickGELUActivation()"
     },
     "decoder": {
         "n_layers": 32,
