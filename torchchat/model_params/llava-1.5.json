@@ -1,23 +1,24 @@
-@dataclass
-class VisionArgs:
-    tile_size: int = 336
-    patch_size: int = 14
-    embed_dim: int = 1024
-    num_layers: int = 24
-    num_heads: int = 16
-    out_indices: List[int] = field(default_factory=list)
-    output_cls_projection: bool = False
-    max_num_tiles: int = 1
-    in_channels: int = 3
-    intermediate_act: nn.Module = QuickGELUActivation()
-
-    def __post_init__(self):
-        if not self.out_indices:
-            self.out_indices = [self.num_layers - 1]
-
-
-@dataclass
-class ProjectorArgs:
-    in_channels: int = 1024
-    out_channels: int = 4096
-    activation: nn.Module = nn.GELU()
+{
+    "model_type": "llava",
+    "encoder": {
+        "tile_size": 336,
+        "patch_size": 14,
+        "embed_dim": 1024,
+        "num_layers": 24,
+        "num_heads": 16,
+        "out_indices": [
+            23
+        ],
+        "output_cls_projection": False,
+        "max_num_tiles": 1,
+        "in_channels": 3,
+        "intermediate_act": QuickGELUActivation()
+    },
+    "decoder": {
+        "n_layers": 32,
+        "n_heads": 32,
+        "dim": 4096,
+        "vocab_size": 32064,
+        "max_seq_length": 768
+    }
+}

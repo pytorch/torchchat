@@ -28,8 +28,18 @@ from torchchat.utils.build_utils import find_multiple, get_precision
 from torchtune.models.flamingo import flamingo_decoder, flamingo_vision_encoder
 from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
 from torchtune.modules.model_fusion import DeepFusionModel
+from torchtune.models.clip import clip_vision_encoder
 
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
+
+
+class QuickGELUActivation(nn.Module):
+    """
+    Applies GELU approximation that is fast but somewhat inaccurate. See: https://github.com/hendrycks/GELUs
+    """
+
+    def forward(self, input):
+        return input * torch.sigmoid(1.702 * input)
 
 
 def identity(**kwargs):
@@ -99,7 +109,7 @@ class ConcateFusion(nn.Module):
             encoder_output = None
 
         decoder_input = self._get_decoder_input(
-            tokens, encoder_input=encoder_input, post_tokens=post_tokens
+            tokens, encoder_output=encoder_output, post_tokens=post_tokens
         )
         return self.decoder(decoder_input)
 
@@ -107,16 +117,17 @@ class ConcateFusion(nn.Module):
         self,
         tokens: Tensor,
         *,
-        encoder_input: Optional[Tensor],
+        encoder_output: Optional[Tensor],
         post_tokens: Optional[Tensor],
     ):
-        assert bool(encoder_input) == bool(
+        assert bool(encoder_output) == bool(
             post_tokens
         ), "encoder_input and post_tokens must be both None or not None"
-        if encoder_input is None:
+        if encoder_output is None:
             return self.tok_embeddings(tokens)
         else:
             pre_img_embed = self.tok_embeddings(tokens)
+            image_embeds = self.mm_projector(encoder_output)
             post_img_embed = self.tok_embeddings(post_tokens)
             return torch.cat((pre_img_embed, image_embeds, post_img_embed), dim=1)
 
@@ -261,7 +272,7 @@ class ModelArgs:
 
     def __init__(
         self,
-        transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
+        transformer_args: Union[TransformerArgs, Dict[str, Dict[str, Any]]],
         model_type: ModelType = ModelType.TextOnly,
     ) -> None:
         self._sanity_check(transformer_args, model_type)
@@ -275,7 +286,7 @@ class ModelArgs:
     
     def _sanity_check(
         self,
-        transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
+        transformer_args: Union[TransformerArgs, Dict[str, Dict[str, Any]]],
         model_type: ModelType,
     ) -> None:
         assert isinstance(model_type, ModelType)
@@ -393,11 +404,19 @@ class Model(ABC, nn.Module):
         modules = {}
         for name, module_class in recipe.modules.items():
             if isinstance(config_args := self.config.transformer_args[name], dict):
+                config_args = self._replace_know_params(config_args)
                 modules[name] = module_class(**config_args)
             else:
                 modules[name] = module_class(config_args)
 
         return recipe.fusion_class(**modules)
+    
+    def _replace_know_params(self, params):
+        patterns = {"QuickGELUActivation()": QuickGELUActivation(), "False": False, "True": True}
+        for key, value in params.items():
+            if value in patterns:
+                params[key] = patterns[value]
+        return params
     
     @abstractmethod
     def forward(self, *args, **kwargs):
