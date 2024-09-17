@@ -86,7 +86,7 @@ class ConcateFusion(nn.Module):
         token_embedding_name="tok_embeddings",
         mm_proj_in_channels=1024,
         mm_proj_out_channels=4096,
-        mm_proj_activation=nn.GELU,
+        mm_proj_activation=nn.GELU(),
     ):
         super().__init__()
         self.encoder = encoder
@@ -130,6 +130,9 @@ class ConcateFusion(nn.Module):
         )
         return self.decoder(decoder_input, input_pos=input_pos)
     
+    def setup_caches(self, batch_size, max_seq_len):
+        self.decoder.setup_caches(batch_size, max_seq_len)
+    
     def _encoder_feature_select(self, encoder_output):
         selected_image_feature = encoder_output[1][0].view(
             *encoder_output[1][0].shape[2:]
@@ -145,17 +148,17 @@ class ConcateFusion(nn.Module):
         encoder_output: Optional[Tensor],
         post_tokens: Optional[Tensor],
     ):
-        assert bool(encoder_output) == bool(
-            post_tokens
-        ), "encoder_input and post_tokens must be both None or not None"
         if encoder_output is None:
+            assert post_tokens is None
             return self.tok_embeddings(tokens)
         else:
             pre_img_embed = self.tok_embeddings(tokens)
             image_embeds = self.mm_projector(encoder_output)
+            if post_tokens is None:
+                return torch.cat((pre_img_embed, image_embeds), dim=1)
+            
             post_img_embed = self.tok_embeddings(post_tokens)
             return torch.cat((pre_img_embed, image_embeds, post_img_embed), dim=1)
-
 
 
 class ModelType(Enum):
@@ -969,3 +972,98 @@ try:
         
 except:
     pass
+
+
+if __name__ == "__main__":
+    def prepare_image(target_h: int, target_w: int) -> torch.Tensor:
+        """Read image into a tensor and resize the image so that it fits in
+        a target_h x target_w canvas.
+
+        Args:
+            image (Image): An Image object.
+            target_h (int): Target height.
+            target_w (int): Target width.
+
+        Returns:
+            torch.Tensor: resized image tensor.
+        """
+        image = Image.open(
+            requests.get(
+                "https://llava-vl.github.io/static/images/view.jpg", stream=True
+            ).raw)
+
+        img = torchvision.transforms.functional.pil_to_tensor(image)
+        # height ratio
+        ratio_h = img.shape[1] / target_h
+        # width ratio
+        ratio_w = img.shape[2] / target_w
+        # resize the image so that it fits in a target_h x target_w canvas
+        ratio = max(ratio_h, ratio_w)
+        output_size = (int(img.shape[1] / ratio), int(img.shape[2] / ratio))
+        img = torchvision.transforms.Resize(size=output_size)(img)
+        return img
+    
+
+    def image_preprocess(img: torch.Tensor, target_h: int, target_w: int, rescale_factor, image_mean, image_std) -> torch.Tensor:
+        # pad the image with median rgb value, to make a square
+        l_pad = (target_w - img.shape[2]) // 2
+        t_pad = (target_h - img.shape[1]) // 2
+        # ceil division
+        r_pad = -((target_w - img.shape[2]) // -2)
+        b_pad = -((target_h - img.shape[1]) // -2)
+
+        torch._check(l_pad >= 0)
+        torch._check(t_pad >= 0)
+        torch._check(r_pad >= 0)
+        torch._check(b_pad >= 0)
+
+        # This is different from the original implementation, due to export limitations.
+        resized = torch.nn.functional.pad(
+            img,
+            (l_pad, r_pad, t_pad, b_pad),
+        )
+        # originally:
+        # resized = F.pad(
+        #     img,
+        #     padding=(l_pad, t_pad, r_pad, b_pad),
+        #     fill=tuple(int(x * 255) for x in self.image_mean),
+        # )
+
+        # TODO: implement _upsample_bicubic_aa.out in portable kernel library.
+        # here padded shape should be max(h, w) x max(h, w)
+        # skipping resize for now due to missing _upsample_bicubic_aa kernel in portable
+        # resized = resize(
+        #     padded,
+        #     size=[
+        #         self.image_processor.crop_size["height"],
+        #         self.image_processor.crop_size["width"],
+        #     ],
+        #     interpolation="bicubic",
+        # )
+        # torch._check(resized.size(1) == self.config.crop_size["height"])
+        # torch._check(resized.size(2) == self.config.crop_size["width"])
+        # print(resized.shape)
+        # cropped = F.center_crop(img, output_size=[w, w])
+        # print(cropped.shape)
+        scaled = resized * rescale_factor
+        # print(scaled)
+        from torchvision.transforms.v2 import functional as tvF
+        normed = tvF.normalize(
+            scaled, image_mean, image_std
+        )
+        # print(normed)
+        return normed.unsqueeze(0)
+
+    pre_tokens = torch.tensor([[    1,   319, 13563,  1546,   263, 12758,  5199,   322,   385, 23116,
+         21082, 20255, 29889,   450, 20255,  4076,  8444, 29892, 13173, 29892,
+           322,  1248,   568,  6089,   304,   278,  5199, 29915, 29879,  5155,
+         29889,  3148,  1001, 29901, 29871]])
+    img = prepare_image(336, 336)
+    post_tokens = torch.tensor([[29871,    13,   462,  9651,  1724,   526,   278,  2712,   306,   881,
+           367,   274,  1300,  2738,  1048,   746,   306,  6493,  1244, 29973,
+           319,  1799,  9047, 13566, 29901]])
+    
+    llava_model = Model.from_params("/home/gasoonjia/torchchat/torchchat/model_params/llava-1.5.json")
+    llava_model.setup_caches(1, 2048)
+    img = image_preprocess(img=img, target_h=336, target_w=336, image_mean=[0.48145466, 0.4578275, 0.40821073], image_std=[0.26862954, 0.26130258, 0.27577711], rescale_factor=0.00392156862745098)
+    llava_model(tokens=pre_tokens, encoder_input=img, post_tokens=post_tokens)
