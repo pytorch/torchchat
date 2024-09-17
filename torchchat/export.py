@@ -5,7 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import os
-from typing import Optional
+from typing import Dict, Optional
 
 import torch
 import torch.nn as nn
@@ -39,6 +39,7 @@ def export_for_server(
     output_path: str = "model.pt2",
     dynamic_shapes: bool = False,
     package: bool = True,
+    metadata: Optional[Dict[str, str]] = None,
 ) -> str:
     """
     Export the model using AOT Compile to get a .dso for server use cases.
@@ -67,7 +68,7 @@ def export_for_server(
         dynamic_shapes = None
 
     with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]):
-        metadata = {}  # TODO: put more metadata here
+        metadata = metadata or {}
         options = {"aot_inductor.package": package, "aot_inductor.metadata": metadata}
         if not package:
             options = {"aot_inductor.output_path": output_path}
@@ -373,6 +374,7 @@ def main(args):
 
     # TODO: clean this up
     # This mess is because ET does not support _weight_int4pack_mm right now
+    tokenizer_args = None
     if not builder_args.gguf_path:
         # tokenizer needed for quantization so get that here,
         try:
@@ -443,6 +445,12 @@ def main(args):
 
         if output_aoti_package_path:
             output_aoti_package_path = str(os.path.abspath(output_aoti_package_path))
+
+            tokenizer_type = "0"
+            if tokenizer_args is not None:
+                tokenizer_type = "2" if tokenizer_args.is_sentencepiece else "3"
+
+            metadata = {"tokenizer_type": tokenizer_type}
             print(f"Exporting model using AOT Inductor to {output_aoti_package_path}")
             export_for_server(
                 model_to_aoti_package,
@@ -450,4 +458,5 @@ def main(args):
                 output_aoti_package_path,
                 builder_args.dynamic_shapes,
                 package=True,
+                metadata=metadata,
             )
