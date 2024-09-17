@@ -364,6 +364,8 @@ class Generator:
                 x_sliced, ip_sliced = x[:, i].view(-1, 1), input_pos[i].view(-1)
                 # logging.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
                 logits = model(x_sliced, ip_sliced)  # (x[:, i], input_pos[i])
+        elif self.model.config.model_type == ModelType.Flamingo:
+            logits = model(x)
         else:
             # input_pos: [B, S]
             logits = model(x, input_pos)
@@ -383,11 +385,14 @@ class Generator:
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         # input_pos: [B, 1]
         assert input_pos.shape[-1] == 1
-        if model.config.model_type == ModelType.Flamingo and batch is not None:
-            x = x.view(1, -1)
-            logits = model(x, encoder_mask=batch["encoder_mask"][:, -1:])
+        x = x.view(1, -1)
+        if model.config.model_type == ModelType.Flamingo:
+            if batch is not None:
+                logits = model(x, encoder_mask=batch["encoder_mask"][:, -1:])
+            else:
+                logits = model(x)
         else:
-            logits = model(x.view(1, -1), input_pos)
+            logits = model(x, input_pos)
         # print(f"x: {x},\n  input_pos: {input_pos}\n")
         return self.sample(logits, need_probs=need_probs, **sampling_kwargs)
 
@@ -790,7 +795,7 @@ class Generator:
 
         # This is a hack to get around the fact that different models have different ways to record their max_seq_length and might be wrong
         # TODO: unify the max_seq_length config representation.
-        text_transformer_args = getattr(self.model.model, "config", None)
+        text_transformer_args = self.model.text_transformer_args
         max_seq_length = (
             text_transformer_args.max_seq_length if text_transformer_args else 2048
         )

@@ -291,6 +291,18 @@ class TransformerArgs:
 
 @dataclass
 class ModelArgs:
+    """
+    A data class to describe the structure of a model.
+    Attributes:
+        model_type (ModelType): The type of the model. This attribute is used to categorize the model into different classes.
+        transformer_args (Dict[str, Dict[str, Any]]): A dictionary containing the parameters for each transformer in the model.
+            The outer dictionary has transformer names as keys and inner dictionaries as values. Each inner dictionary contains
+            the parameter names and their corresponding values for the respective transformer.
+        use_tiktoken (bool): A flag indicating whether to use TikToken as the tokenizer for the model.
+    Note:
+        It is recommended to use factory functions to create instances of this class instead of directly using the constructor.
+    """
+
     model_type: ModelType
     transformer_args: Dict[str, Dict[str, Any]]
     use_tiktoken: bool
@@ -326,7 +338,7 @@ class ModelArgs:
             # The model params is in the transformer_args format
             # set the model_type to TextOnly and reformat the params
             model_type = ModelType.TextOnly
-            transformer_args = {"text": {"config": loaded_params}}
+            transformer_args = {"text": loaded_params}
         else:
             model_type = ModelType(model_type_name)
             transformer_args = {
@@ -420,6 +432,7 @@ class Model(ABC, nn.Module):
         super().__init__()
         self.config = config
         self.model = self.build_model()
+        self.text_transformer_args = None
 
     def build_model(self) -> nn.Module:
         """
@@ -433,7 +446,10 @@ class Model(ABC, nn.Module):
         modules = {}
         for name, module_class in recipe.modules.items():
             config_args = self.config.transformer_args[name]
-            modules[name] = module_class(**config_args)
+            if module_class == Transformer:
+                modules[name] = module_class(TransformerArgs.from_params(config_args))
+            else:
+                modules[name] = module_class(**config_args)
 
         return recipe.fusion_class(**modules)
     
@@ -486,6 +502,10 @@ class Model(ABC, nn.Module):
 
 
 class TextOnlyModel(Model):
+    def __init__(self, config: ModelArgs) -> None:
+        super().__init__(config)
+        self.text_transformer_args = self.model.config
+
     def forward(self, tokens: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         return self.model(tokens, input_pos)
 
@@ -548,9 +568,8 @@ MODEL_TYPE_TO_CLASS = {
 
 
 class Transformer(nn.Module):
-    def __init__(self, config: Dict[str, Any]) -> None:
+    def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
-        config = TransformerArgs.from_params(config)
         self.config = config
         layers_per_stage = config.n_layers // config.n_stages
 
@@ -930,11 +949,9 @@ try:
             super().__init__()
             self.config = config
             self.model_ = exec_lib._load_for_executorch(str(path))
-            
-            # A hacky way to get the model config from the self.model, making it consistent with Model class
-            # TODO: remove the hacky way once get rid of model.model
-            self.model = type('model', (), {'config': self.config})
 
+            self.text_transformer_args = TransformerArgs.from_params(self.config.transformer_args["text"])
+            
         def forward(self, x, input_pos):
             # model_.forward expects inputs to be wrapped in a tuple
             forward_inputs = (x.to(torch.long), input_pos.to(torch.long))
@@ -948,7 +965,7 @@ try:
 
         def setup_caches(self, max_batch_size, max_seq_length):
             pass
-
+        
 except:
     pass
 
