@@ -163,6 +163,18 @@ class TransformerArgs:
 
 @dataclass
 class ModelArgs:
+    """
+    A data class to describe the structure of a model.
+    Attributes:
+        model_type (ModelType): The type of the model. This attribute is used to categorize the model into different classes.
+        transformer_args (Dict[str, Dict[str, Any]]): A dictionary containing the parameters for each transformer in the model.
+            The outer dictionary has transformer names as keys and inner dictionaries as values. Each inner dictionary contains
+            the parameter names and their corresponding values for the respective transformer.
+        use_tiktoken (bool): A flag indicating whether to use TikToken as the tokenizer for the model.
+    Note:
+        It is recommended to use factory functions to create instances of this class instead of directly using the constructor.
+    """
+
     model_type: ModelType
     transformer_args: Dict[str, Dict[str, Any]]
     use_tiktoken: bool
@@ -316,6 +328,10 @@ class Model(ABC, nn.Module):
     @abstractmethod
     def setup_caches(self, *args, **kwargs):
         raise NotImplementedError("setup_caches method is not implemented")
+    
+    @abstractmethod
+    def get_text_transformer_args(self):
+        raise NotImplementedError("get_text_transformer_args method is not implemented")
 
     @classmethod
     def _get_model_instance(cls, config: ModelArgs):
@@ -356,6 +372,9 @@ class TextOnlyModel(Model):
 
     def setup_caches(self, max_batch_size, max_seq_length):
         self.model.setup_caches(max_batch_size, max_seq_length)
+    
+    def get_text_transformer_args(self):
+        return self.model.model.config
 
 
 class Llama31Model(Model):
@@ -367,6 +386,10 @@ class Llama31Model(Model):
 
     def reset_caches(self):
         self.model.reset_caches()
+    
+    def get_text_transformer_args(self):
+        # TODO: add support for llama3_1
+        return None
 
 
 class FlamingoModel(Model):
@@ -387,6 +410,10 @@ class FlamingoModel(Model):
 
     def reset_caches(self):
         self.model.reset_caches()
+    
+    def get_text_transformer_args(self):
+        # TODO: add support for flamingo
+        return None
 
 
 MODEL_TYPE_TO_CLASS = {
@@ -778,16 +805,8 @@ try:
         def __init__(self, config, path) -> None:
             super().__init__()
             self.config = config
-            self.model_ = exec_lib._load_for_executorch(str(path))
+            self.model_ = exec_lib._load_for_executorch(str(path))            
             
-            # A hacky way to get the model config from the self.model, making it consistent with Model class
-            # TODO: remove the hacky way once get rid of model.model
-            try:
-                text_transformer_config = TransformerArgs.from_params(self.config.transformer_args["text"])
-            except:
-                text_transformer_config = None
-            self.model = type('model', (), {'config': text_transformer_config})
-
         def forward(self, x, input_pos):
             # model_.forward expects inputs to be wrapped in a tuple
             forward_inputs = (x.to(torch.long), input_pos.to(torch.long))
@@ -801,6 +820,15 @@ try:
 
         def setup_caches(self, max_batch_size, max_seq_length):
             pass
+        
+        def get_text_transformer_args(self):
+            # A hacky way to get the model config from the self.model, making it consistent with Model class
+            # TODO: remove the hacky way once get rid of model.model
+            try:
+                text_transformer_config = TransformerArgs.from_params(self.config.transformer_args["text"])
+            except:
+                text_transformer_config = None
+            return text_transformer_config
 
 except:
     pass
