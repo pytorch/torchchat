@@ -795,7 +795,7 @@ class Generator:
 
         # This is a hack to get around the fact that different models have different ways to record their max_seq_length and might be wrong
         # TODO: unify the max_seq_length config representation.
-        text_transformer_args = getattr(self.model.model, "config", None)
+        text_transformer_args = self.model.text_transformer_args
         max_seq_length = (
             text_transformer_args.max_seq_length if text_transformer_args else 2048
         )
