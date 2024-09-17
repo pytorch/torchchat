@@ -437,13 +437,15 @@ class Transformer(nn.Module):
             and self.max_batch_size >= max_batch_size
         ):
             return
-        head_dim = self.config.dim // self.config.n_heads
         max_seq_length = find_multiple(max_seq_length, 8)
         self.max_seq_length = max_seq_length
         self.max_batch_size = max_batch_size
         for b in self.layers.values():
-            b.attention.kv_cache = KVCache(
-                max_batch_size, max_seq_length, self.config.n_local_heads, head_dim
+            # Lower the setup_cache call to the attention module because tensor
+            # parallelism may have been applied there and the `n_local_heads``
+            # value being adjusted.
+            b.attention.setup_cache(
+                max_batch_size, max_seq_length,
             )
 
         freqs_cis = precompute_freqs_cis(
@@ -559,6 +561,16 @@ class Attention(nn.Module):
         self.dim = config.dim
         self._register_load_state_dict_pre_hook(self.load_hook)
 
+    def setup_cache(self, max_batch_size, max_seq_length):
+        n_local_heads = self.n_local_heads
+        # If TP is enabled, the heads would be divided and assigned to different ranks
+        if hasattr(self, "tp_degree"):
+            n_local_heads = self.n_local_heads // self.tp_degree
+
+        self.kv_cache = KVCache(
+            max_batch_size, max_seq_length, n_local_heads, self.head_dim
+        )
+
     def load_hook(self, state_dict, prefix, *args):
         # if prefix + "wq.weight" in state_dict:
         #     wq = state_dict.pop(prefix + "wq.weight")
@@ -599,14 +611,13 @@ class Attention(nn.Module):
 
     def distribute(self, device_mesh: DeviceMesh):
         self.device_mesh = device_mesh
+        self.tp_degree = device_mesh.size()
         parallelize_module(self.wq, device_mesh, ColwiseParallel())
         parallelize_module(self.wk, device_mesh, ColwiseParallel())
         parallelize_module(self.wv, device_mesh, ColwiseParallel())
         parallelize_module(
             self.wo, device_mesh, RowwiseParallel(output_layouts=Shard(1))
         )
-        # TODO: enable kv cache in distributed case
-        self.kv_cache = None
 
     def forward(
         self,
