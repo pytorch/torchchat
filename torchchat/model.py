@@ -782,7 +782,11 @@ try:
             
             # A hacky way to get the model config from the self.model, making it consistent with Model class
             # TODO: remove the hacky way once get rid of model.model
-            self.model = type('model', (), {'config': self.config})
+            try:
+                text_transformer_config = TransformerArgs.from_params(self.config.transformer_args["text"])
+            else:
+                text_transformer_config = None
+            self.model = type('model', (), {'config': text_transformer_config})
 
         def forward(self, x, input_pos):
             # model_.forward expects inputs to be wrapped in a tuple
