@@ -125,5 +125,4 @@ def initialize_generator(args) -> OpenAiApiGenerator:
 
 def main(args):
     app = create_app(args)
-    # app.run(host="::", port=8085)
     app.run()

@@ -17,7 +17,11 @@ from typing import Any, Dict, List, Optional, Union
 
 import torch
 
-from _torchchat_test_script import flamingo_transform, padded_collate
+try:
+    from _torchchat_test_script import flamingo_transform, padded_collate
+except ImportError:
+    pass
+
 from PIL import Image
 from torchtune.data import Message
 
@@ -292,7 +296,9 @@ class OpenAiApiGenerator(Generator):
             f"{self.builder_args.device}_{self.builder_args.precision}"
         )
 
-    def _openai_messages_to_torchtune(self, messages: List[_AbstractMessage]):
+    def _openai_messages_to_torchtune(
+        self, messages: List[_AbstractMessage]
+    ) -> List[Message]:
         """Convert a list of OpenAI API messages to a list of TorchTune messages.
 
         Args:
