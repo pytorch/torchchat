@@ -55,7 +55,6 @@ NAME_TO_DISTRIBUTION_AND_DTYPE = {
     "llama2-7b-chat": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
     "llama3": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16),
 }
-CACHE_PRECISION = torch.bfloat16
 
 
 def _init_distributed():
@@ -245,8 +244,8 @@ def main(args):
 
     tokenizer = _build_chat_tokenizer(model_name)
 
-    set_precision(CACHE_PRECISION)
-    logger.info(f"Using cache precision {CACHE_PRECISION}")
+    set_precision(model_dtype)
+    logger.info(f"Using cache precision {model_dtype}")
 
     hf_config = get_hf_config_file(distribution)
     if hf_config is None:
@@ -285,8 +284,6 @@ def main(args):
     with device:
         model = Transformer(config)
 
-    model.setup_caches(1, 4096)
-
     # Distribute model on TP mesh
     model.distribute(tp_mesh)
     if rank == 0:
@@ -299,6 +296,12 @@ def main(args):
     seqlen = 4096  # sequence length
     dim = 4096  # embedding dimension
     assert seqlen % sp_degree == 0
+
+    # Setup KV caches (after model distribution)
+    # TODO: the setting below only works for 1 micro-batch case. To support
+    # multiple micro-batches, we need the KV cache in the model to be aware of
+    # the number of micro-batches and the current micro-batch index.
+    model.setup_caches(mb_size, seqlen)
 
     mb_ids = torch.randint(0, config.vocab_size, (mb_size, seqlen), device=device)
     activation = torch.rand(
