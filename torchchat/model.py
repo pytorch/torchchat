@@ -210,7 +210,7 @@ class ModelArgs:
             # The model params is in the transformer_args format
             # set the model_type to TextOnly and reformat the params
             model_type = ModelType.TextOnly
-            transformer_args = {"text": {"config": loaded_params}}
+            transformer_args = {"text": loaded_params}
         else:
             model_type = ModelType(model_type_name)
             transformer_args = {
@@ -317,7 +317,10 @@ class Model(ABC, nn.Module):
         modules = {}
         for name, module_class in recipe.modules.items():
             config_args = self.config.transformer_args[name]
-            modules[name] = module_class(**config_args)
+            if module_class == Transformer:
+                modules[name] = module_class(TransformerArgs.from_params(config_args))
+            else:
+                modules[name] = module_class(**config_args)
 
         return recipe.fusion_class(**modules)
 
@@ -424,9 +427,8 @@ MODEL_TYPE_TO_CLASS = {
 
 
 class Transformer(nn.Module):
-    def __init__(self, config: Dict[str, Any]) -> None:
+    def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
-        config = TransformerArgs.from_params(config)
         self.config = config
         layers_per_stage = config.n_layers // config.n_stages
 
