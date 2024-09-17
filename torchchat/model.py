@@ -779,6 +779,10 @@ try:
             super().__init__()
             self.config = config
             self.model_ = exec_lib._load_for_executorch(str(path))
+            
+            # A hacky way to get the model config from the self.model, making it consistent with Model class
+            # TODO: remove the hacky way once get rid of model.model
+            self.model = type('model', (), {'config': self.config})
 
         def forward(self, x, input_pos):
             # model_.forward expects inputs to be wrapped in a tuple
