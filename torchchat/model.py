@@ -61,9 +61,9 @@ class MultiModalProjector(nn.Module):
     def __init__(self, in_channels: int, out_channels: int, act: nn.Module):
         super().__init__()
 
-        self.linear_1 = nn.Linear(args.in_channels, args.out_channels, bias=True)
+        self.linear_1 = nn.Linear(in_channels, out_channels, bias=True)
         self.act = act
-        self.linear_2 = nn.Linear(args.out_channels, args.out_channels, bias=True)
+        self.linear_2 = nn.Linear(out_channels, out_channels, bias=True)
 
     def forward(self, image_features):
         hidden_states = self.linear_1(image_features)
