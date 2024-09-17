@@ -727,11 +727,13 @@ class Generator:
         if generator_args.image_prompts is not None:
             print("Image prompts", generator_args.image_prompts)
 
+            # Support for just the first image prompt for now
+            images = [Image.open(generator_args.image_prompts[0])]
             messages = [
                 Message(
                     role="user",
                     content=[
-                        {"type": "image"},
+                        {"type": "image", "content": images[0]},
                         {"type": "text", "content": generator_args.prompt},
                     ],
                     eot=True,
@@ -739,10 +741,8 @@ class Generator:
                 Message(role="assistant", content=""),
             ]
 
-            images = [Image.open(generator_args.image_prompts[0])]
             transform = flamingo_transform(str(self.tokenizer_args.tokenizer_path))
-
-            data = transform({"images": images, "messages": messages}, inference=True)
+            data = transform({"messages": messages}, inference=True)
             batch = padded_collate([data], self.builder_args.device)
             batch.pop("mask")
             encoded = batch["tokens"]
