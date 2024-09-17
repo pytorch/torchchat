@@ -332,9 +332,10 @@ class Model(ABC, nn.Module):
     def setup_caches(self, *args, **kwargs):
         raise NotImplementedError("setup_caches method is not implemented")
     
+    @property
     @abstractmethod
-    def get_text_transformer_args(self):
-        raise NotImplementedError("get_text_transformer_args method is not implemented")
+    def text_transformer_args(self):
+        raise NotImplementedError("no text_transformer_args is created")
 
     @classmethod
     def _get_model_instance(cls, config: ModelArgs):
@@ -376,7 +377,8 @@ class TextOnlyModel(Model):
     def setup_caches(self, max_batch_size, max_seq_length):
         self.model.setup_caches(max_batch_size, max_seq_length)
     
-    def get_text_transformer_args(self):
+    @property
+    def text_transformer_args(self):
         return self.model.model.config
 
 
@@ -390,7 +392,8 @@ class Llama31Model(Model):
     def reset_caches(self):
         self.model.reset_caches()
     
-    def get_text_transformer_args(self):
+    @property
+    def text_transformer_args(self):
         # TODO: add support for llama3_1
         return None
 
@@ -414,7 +417,8 @@ class FlamingoModel(Model):
     def reset_caches(self):
         self.model.reset_caches()
     
-    def get_text_transformer_args(self):
+    @property
+    def text_transformer_args(self):
         # TODO: add support for flamingo
         return None
 
@@ -807,7 +811,9 @@ try:
         def __init__(self, config, path) -> None:
             super().__init__()
             self.config = config
-            self.model_ = exec_lib._load_for_executorch(str(path))            
+            self.model_ = exec_lib._load_for_executorch(str(path))
+
+            self.text_transformer_config = TransformerArgs.from_params(self.config.transformer_args["text"])
             
         def forward(self, x, input_pos):
             # model_.forward expects inputs to be wrapped in a tuple
@@ -823,14 +829,5 @@ try:
         def setup_caches(self, max_batch_size, max_seq_length):
             pass
         
-        def get_text_transformer_args(self):
-            # A hacky way to get the model config from the self.model, making it consistent with Model class
-            # TODO: remove the hacky way once get rid of model.model
-            try:
-                text_transformer_config = TransformerArgs.from_params(self.config.transformer_args["text"])
-            except:
-                text_transformer_config = None
-            return text_transformer_config
-
 except:
     pass

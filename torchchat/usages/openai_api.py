@@ -284,11 +284,11 @@ class OpenAiApiGenerator(Generator):
         super().__init__(*args, **kwargs)
         try:
             self.max_seq_length = (
-                self.model.get_text_transformer_args.max_seq_length
+                self.model.text_transformer_args.max_seq_length
                 + self.speculative_builder_args.speculate_k
                 + 1
                 if self.draft_model is not None
-                else self.model.get_text_transformer_args.max_seq_length
+                else self.model.text_transformer_args.max_seq_length
             )
         except:
             # can not find max_seq_length in model config, use default value
