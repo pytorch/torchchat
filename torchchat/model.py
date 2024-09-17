@@ -784,7 +784,7 @@ try:
             # TODO: remove the hacky way once get rid of model.model
             try:
                 text_transformer_config = TransformerArgs.from_params(self.config.transformer_args["text"])
-            else:
+            except:
                 text_transformer_config = None
             self.model = type('model', (), {'config': text_transformer_config})
 
