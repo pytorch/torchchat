@@ -282,15 +282,17 @@ class OpenAiApiGenerator(Generator):
         """
 
         super().__init__(*args, **kwargs)
-        self.max_seq_length = 128
-        if self.model.config.transformer_args.get("text", None):
-            self.max_seq_len = (
-                self.model.config.transformer_args["text"].max_seq_length
+        try:
+            self.max_seq_length = (
+                self.model.text_transformer_args.max_seq_length
                 + self.speculative_builder_args.speculate_k
                 + 1
                 if self.draft_model is not None
-                else self.model.config.transformer_args["text"].max_seq_length
+                else self.model.text_transformer_args.max_seq_length
             )
+        except:
+            # can not find max_seq_length in model config, use default value
+            self.max_seq_length = 128
         # The System fingerprint is a unique identifier for the model and its configuration.
         self.system_fingerprint = (
             f"{self.builder_args.device}_{self.builder_args.precision}"

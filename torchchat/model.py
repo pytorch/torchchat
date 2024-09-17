@@ -163,50 +163,64 @@ class TransformerArgs:
 
 @dataclass
 class ModelArgs:
+    """
+    A data class to describe the structure of a model.
+    Attributes:
+        model_type (ModelType): The type of the model. This attribute is used to categorize the model into different classes.
+        transformer_args (Dict[str, Dict[str, Any]]): A dictionary containing the parameters for each transformer in the model.
+            The outer dictionary has transformer names as keys and inner dictionaries as values. Each inner dictionary contains
+            the parameter names and their corresponding values for the respective transformer.
+            TODO: econcile Dict[str, Any] into tranformer-arg-family classes in future PRs.
+
+        use_tiktoken (bool): A flag indicating whether to use TikToken as the tokenizer for the model.
+    Note:
+        It is recommended to use factory functions to create instances of this class instead of directly using the constructor.
+    """
+
     model_type: ModelType
-    transformer_args: Dict[str, Union[Dict, TransformerArgs]]
+    transformer_args: Dict[str, Dict[str, Any]]
+    use_tiktoken: bool
 
     def __init__(
         self,
-        transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
+        transformer_args: Dict[str, Dict[str, Any]],
         model_type: ModelType = ModelType.TextOnly,
+        use_tiktoken: bool = False,
     ) -> None:
         self._sanity_check(transformer_args, model_type)
 
         self.model_type = model_type
-        if isinstance(transformer_args, TransformerArgs):
-            assert model_type == ModelType.TextOnly
-            self.transformer_args = {"text": transformer_args}
-        else:
-            self.transformer_args = transformer_args
+        self.transformer_args = transformer_args
+
+        # Model-level attributes
+        self.use_tiktoken = use_tiktoken
 
     def _sanity_check(
         self,
-        transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
+        transformer_args: Dict[str, Dict[str, Any]],
         model_type: ModelType,
     ) -> None:
-        assert isinstance(model_type, ModelType)
-        assert isinstance(transformer_args, (TransformerArgs, dict))
+        assert isinstance(model_type, ModelType), model_type
+        assert isinstance(transformer_args, dict)
 
     @classmethod
     def from_params(cls, params_path):
         with open(params_path, "r") as f:
             loaded_params = json.loads(f.read())
-
-        try:
-            # try to interpret as a single transformer config
-            transformer_args: Dict[str, TransformerArgs] = {}
-            transformer_args["text"] = TransformerArgs.from_params(loaded_params)
-            if (model_type := loaded_params.get("model_type", None)) is None:
-                model_type = ModelType.TextOnly
-
-        except TypeError:
-            # try to interpret as a dict of transformer configs
-            model_type = ModelType(loaded_params["model_type"])
+        
+        if (model_type_name := loaded_params.get("model_type", None)) is None:
+            # The model params is in the transformer_args format
+            # set the model_type to TextOnly and reformat the params
+            model_type = ModelType.TextOnly
+            transformer_args = {"text": loaded_params}
+        else:
+            model_type = ModelType(model_type_name)
             transformer_args = {
                 k: v for k, v in loaded_params.items() if k != "model_type"
             }
-        return cls(transformer_args, model_type)
+
+        use_tiktoken = loaded_params.get("use_tiktoken", False)
+        return cls(transformer_args, model_type, use_tiktoken)
 
     @classmethod
     def from_table(cls, name: str):
@@ -293,6 +307,10 @@ class Model(ABC, nn.Module):
         self.config = config
         self.model = self.build_model()
 
+        # text_transformer_args represents the args for the text transformer in the model.
+        # It should be assigned in the actual model implementation, if any.
+        self.text_transformer_args = None
+
     def build_model(self) -> nn.Module:
         """
         Builds a model based on the provided configuration.
@@ -304,10 +322,11 @@ class Model(ABC, nn.Module):
         recipe = ModelRecipe.get_recipe(self.config.model_type)
         modules = {}
         for name, module_class in recipe.modules.items():
-            if isinstance(config_args := self.config.transformer_args[name], dict):
-                modules[name] = module_class(**config_args)
+            config_args = self.config.transformer_args[name]
+            if module_class == Transformer:
+                modules[name] = module_class(TransformerArgs.from_params(config_args))
             else:
-                modules[name] = module_class(config_args)
+                modules[name] = module_class(**config_args)
 
         return recipe.fusion_class(**modules)
 
@@ -353,6 +372,10 @@ class Model(ABC, nn.Module):
 
 
 class TextOnlyModel(Model):
+    def __init__(self, config: ModelArgs) -> None:
+        super().__init__(config)
+        self.text_transformer_args = self.model.config
+
     def forward(self, tokens: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         return self.model(tokens, input_pos)
 
@@ -389,6 +412,7 @@ class FlamingoModel(Model):
 
     def reset_caches(self):
         self.model.reset_caches()
+
 
 
 MODEL_TYPE_TO_CLASS = {
@@ -792,6 +816,8 @@ try:
             self.config = config
             self.model_ = exec_lib._load_for_executorch(str(path))
 
+            self.text_transformer_args = TransformerArgs.from_params(self.config.transformer_args["text"])
+            
         def forward(self, x, input_pos):
             # model_.forward expects inputs to be wrapped in a tuple
             forward_inputs = (x.to(torch.long), input_pos.to(torch.long))
@@ -805,6 +831,6 @@ try:
 
         def setup_caches(self, max_batch_size, max_seq_length):
             pass
-
+        
 except:
     pass
