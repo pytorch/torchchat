@@ -30,5 +30,5 @@ if(Torch_FOUND)
 endif()
 
 if (LINK_TORCHAO_CUSTOM_OPS)
-    target_link_libraries(aoti_run "${TORCHCHAT_ROOT}/torchao-build/cmake-out/ops/linear/linear_a8wxdq_op/liblinear_a8wxdq_aten${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    target_link_libraries(aoti_run "${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/liblinear_a8wxdq_ATEN${CMAKE_SHARED_LIBRARY_SUFFIX}")
 endif()
