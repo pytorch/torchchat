@@ -812,7 +812,12 @@ class Generator:
 
         elif not generator_args.is_torchtune_model:
             max_seq_length = min(
-                encoded.size(0) + generator_args.max_new_tokens, max_seq_length
+                encoded.size(0) + generator_args.max_new_tokens,
+                (
+                    text_transformer_args.block_size
+                    if text_transformer_args is not None
+                    else 2048
+                ),
             )
 
         max_seq_length = (

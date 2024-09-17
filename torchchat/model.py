@@ -170,6 +170,8 @@ class ModelArgs:
         transformer_args (Dict[str, Dict[str, Any]]): A dictionary containing the parameters for each transformer in the model.
             The outer dictionary has transformer names as keys and inner dictionaries as values. Each inner dictionary contains
             the parameter names and their corresponding values for the respective transformer.
+            TODO: econcile Dict[str, Any] into tranformer-arg-family classes in future PRs.
+
         use_tiktoken (bool): A flag indicating whether to use TikToken as the tokenizer for the model.
     Note:
         It is recommended to use factory functions to create instances of this class instead of directly using the constructor.
@@ -304,6 +306,9 @@ class Model(ABC, nn.Module):
         super().__init__()
         self.config = config
         self.model = self.build_model()
+
+        # text_transformer_args represents the args for the text transformer in the model.
+        # It should be assigned in the actual model implementation, if any.
         self.text_transformer_args = None
 
     def build_model(self) -> nn.Module:
