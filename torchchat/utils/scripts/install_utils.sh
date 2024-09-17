@@ -184,10 +184,11 @@ install_torchao_custom_aten_ops() {
 
   CMAKE_OUT_DIR=${TORCHCHAT_ROOT}/torchao-build/cmake-out
   cmake -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_OUT_DIR} \
     -DTORCHAO_OP_TARGET="ATEN" \
     -S . \
     -B ${CMAKE_OUT_DIR} -G Ninja
-  cmake --build  ${CMAKE_OUT_DIR}
+  cmake --build  ${CMAKE_OUT_DIR} --target install --config Release
 
   popd
 }
@@ -198,12 +199,13 @@ install_torchao_custom_executorch_ops() {
 
   CMAKE_OUT_DIR="${TORCHCHAT_ROOT}/torchao-build/cmake-out"
   cmake -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_OUT_DIR} \
     -DEXECUTORCH_INCLUDE_DIRS="${EXECUTORCH_INCLUDE_DIRS}" \
     -DEXECUTORCH_LIBRARIES="${EXECUTORCH_LIBRARIES}" \
     -DTORCHAO_OP_TARGET="EXECUTORCH" \
     -S . \
     -B ${CMAKE_OUT_DIR} -G Ninja
-  cmake --build  ${CMAKE_OUT_DIR}
+  cmake --build  ${CMAKE_OUT_DIR} --target install --config Release
 
   popd
 }
