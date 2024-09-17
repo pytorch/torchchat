@@ -11,8 +11,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from PIL import Image
-import requests
+
 import torchvision
 
 from typing import Any, Callable, Dict, Optional, Union
@@ -35,13 +34,9 @@ from torch.nn import functional as F
 from torchtune.models.flamingo import flamingo_decoder, flamingo_vision_encoder
 from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
 from torchtune.modules.model_fusion import DeepFusionModel
+from torchtune.models.clip import clip_vision_encoder
 
 from torchchat.utils.build_utils import find_multiple, get_precision
-
-from torchtune.models.flamingo import flamingo_decoder, flamingo_vision_encoder
-from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
-from torchtune.modules.model_fusion import DeepFusionModel
-from torchtune.models.clip import clip_vision_encoder
 
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
 
@@ -61,19 +56,13 @@ def identity(**kwargs):
     return list(kwargs.values())[0]
 
 
-@dataclass
-class ProjectorArgs:
-    in_channels: int = 1024
-    out_channels: int = 4096
-    activation: nn.Module = nn.GELU()
-
 
 class MultiModalProjector(nn.Module):
-    def __init__(self, args: ProjectorArgs):
+    def __init__(self, in_channels: int, out_channels: int, act: nn.Module):
         super().__init__()
 
         self.linear_1 = nn.Linear(args.in_channels, args.out_channels, bias=True)
-        self.act = args.activation
+        self.act = act
         self.linear_2 = nn.Linear(args.out_channels, args.out_channels, bias=True)
 
     def forward(self, image_features):
@@ -105,11 +94,9 @@ class ConcateFusion(nn.Module):
         self.decoder.__setattr__(token_embedding_name, None)
 
         self.mm_projector = MultiModalProjector(
-            ProjectorArgs(
                 in_channels=mm_proj_in_channels,
                 out_channels=mm_proj_out_channels,
-                activation=mm_proj_activation,
-            )
+                act=mm_proj_activation,
         )
 
     def forward(
@@ -123,9 +110,7 @@ class ConcateFusion(nn.Module):
     ) -> Tensor:
         if encoder_input is not None:
             encoder_input = encoder_input.view(1, 1, *encoder_input.shape)
-            encoder_output = self.encoder(
-                encoder_input,
-            )
+            encoder_output = self.encoder(encoder_input)
             encoder_output = self._encoder_feature_select(encoder_output)
         else:
             encoder_output = None
@@ -143,10 +128,10 @@ class ConcateFusion(nn.Module):
 
         return self.decoder(decoder_input, input_pos=input_pos)
     
-    def setup_caches(self, batch_size, max_seq_len):
+    def setup_caches(self, batch_size, max_seq_len) -> None:
         self.decoder.setup_caches(batch_size, max_seq_len)
     
-    def _encoder_feature_select(self, encoder_output):
+    def _encoder_feature_select(self, encoder_output) -> Tensor:
         selected_image_feature = encoder_output[1][0].view(
             *encoder_output[1][0].shape[2:]
         )
@@ -160,7 +145,7 @@ class ConcateFusion(nn.Module):
         *,
         encoder_output: Optional[Tensor],
         post_tokens: Optional[Tensor],
-    ):
+    ) -> Tensor:
         if encoder_output is None:
             assert post_tokens is None
             return self.tok_embeddings(tokens)
@@ -245,16 +230,17 @@ class ModelRecipe:
     
     @classmethod
     def get_recipe(cls, model_type):
-        if model_type == ModelType.TextOnly:
-            return cls._text_only()
-        elif model_type == ModelType.Flamingo:
-            return cls._flamingo()
-        elif model_type == ModelType.Llama3_1:
-            return cls._llama3_1()
-        elif model_type == ModelType.Llava:
-            return cls._llava()
-        else:
-            raise ValueError(f"Can not find the model recipe for {model_type}")
+        match model_type:
+            case ModelType.TextOnly:
+                return cls._text_only()
+            case ModelType.Flamingo:
+                return cls._flamingo()
+            case ModelType.Llama3_1:
+                return cls._llama3_1()
+            case ModelType.Llava:
+                return cls._llava()
+            case _:
+                raise ValueError(f"Can not find the model recipe for {model_type}")
 
 
 @dataclass
@@ -475,7 +461,7 @@ class Model(ABC, nn.Module):
 
         return recipe.fusion_class(**modules)
     
-    def _replace_know_params(self, params):
+    def _replace_known_params(self, params):
         patterns = {"QuickGELUActivation()": QuickGELUActivation()}
         for key, value in params.items():
             if isinstance(value, Hashable) and value in patterns:
