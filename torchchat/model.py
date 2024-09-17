@@ -116,7 +116,8 @@ class ConcateFusion(nn.Module):
         encoder_mask: Optional[torch.Tensor] = None,
         input_pos: Optional[torch.Tensor] = None,
     ) -> Tensor:
-        if encoder_input:
+        if encoder_input is not None:
+            encoder_input = encoder_input.view(1, 1, *encoder_input.shape)
             encoder_output = self.encoder(
                 encoder_input,
             )
@@ -223,7 +224,7 @@ class ModelRecipe:
                 'encoder': clip_vision_encoder,
                 'decoder': Transformer
             },
-            fusion_class=DeepFusionModel,
+            fusion_class=ConcateFusion,
         )
     
     @classmethod
@@ -968,46 +969,3 @@ try:
         
 except:
     pass
-
-
-if __name__ == "__main__":
-    def prepare_image(target_h: int, target_w: int) -> torch.Tensor:
-        """Read image into a tensor and resize the image so that it fits in
-        a target_h x target_w canvas.
-
-        Args:
-            image (Image): An Image object.
-            target_h (int): Target height.
-            target_w (int): Target width.
-
-        Returns:
-            torch.Tensor: resized image tensor.
-        """
-        image = Image.open(
-            requests.get(
-                "https://llava-vl.github.io/static/images/view.jpg", stream=True
-            ).raw)
-
-        img = torchvision.transforms.functional.pil_to_tensor(image)
-        # height ratio
-        ratio_h = img.shape[1] / target_h
-        # width ratio
-        ratio_w = img.shape[2] / target_w
-        # resize the image so that it fits in a target_h x target_w canvas
-        ratio = max(ratio_h, ratio_w)
-        output_size = (int(img.shape[1] / ratio), int(img.shape[2] / ratio))
-        img = torchvision.transforms.Resize(size=output_size)(img)
-        return img
-
-    pre_tokens = torch.tensor([[    1,   319, 13563,  1546,   263, 12758,  5199,   322,   385, 23116,
-         21082, 20255, 29889,   450, 20255,  4076,  8444, 29892, 13173, 29892,
-           322,  1248,   568,  6089,   304,   278,  5199, 29915, 29879,  5155,
-         29889,  3148,  1001, 29901, 29871]])
-    img = prepare_image(336, 336)
-    post_tokens = torch.tensor([[29871,    13,   462,  9651,  1724,   526,   278,  2712,   306,   881,
-           367,   274,  1300,  2738,  1048,   746,   306,  6493,  1244, 29973,
-           319,  1799,  9047, 13566, 29901]])
-    
-    llava_model = Model.from_params("/home/gasoonjia/torchchat/torchchat/model_params/llava-1.5.json")
-
-    llava_model(tokens=pre_tokens, encoder_input=img, post_tokens=post_tokens)
