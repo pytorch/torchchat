@@ -1,5 +1,6 @@
 {
     "model_type": "llava",
+    "use_tiktoken": true,
     "encoder": {
         "tile_size": 336,
         "patch_size": 14,
@@ -9,7 +10,7 @@
         "out_indices": [
             23
         ],
-        "output_cls_projection": "False",
+        "output_cls_projection": false,
         "max_num_tiles": 1,
         "in_channels": 3,
         "intermediate_act": "QuickGELUActivation()"

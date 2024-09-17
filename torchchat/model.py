@@ -438,7 +438,7 @@ class Model(ABC, nn.Module):
         return recipe.fusion_class(**modules)
     
     def _replace_know_params(self, params):
-        patterns = {"QuickGELUActivation()": QuickGELUActivation(), "False": False, "True": True}
+        patterns = {"QuickGELUActivation()": QuickGELUActivation()}
         for key, value in params.items():
             if isinstance(value, Hashable) and value in patterns:
                 params[key] = patterns[value]
