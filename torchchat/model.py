@@ -304,6 +304,7 @@ class Model(ABC, nn.Module):
         super().__init__()
         self.config = config
         self.model = self.build_model()
+        self.text_transformer_args = None
 
     def build_model(self) -> nn.Module:
         """
@@ -331,11 +332,6 @@ class Model(ABC, nn.Module):
     @abstractmethod
     def setup_caches(self, *args, **kwargs):
         raise NotImplementedError("setup_caches method is not implemented")
-    
-    @property
-    @abstractmethod
-    def text_transformer_args(self):
-        raise NotImplementedError("no text_transformer_args is created")
 
     @classmethod
     def _get_model_instance(cls, config: ModelArgs):
@@ -371,15 +367,15 @@ class Model(ABC, nn.Module):
 
 
 class TextOnlyModel(Model):
+    def __init__(self, config: ModelArgs) -> None:
+        super().__init__(config)
+        self.text_transformer_args = self.model.config
+
     def forward(self, tokens: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         return self.model(tokens, input_pos)
 
     def setup_caches(self, max_batch_size, max_seq_length):
         self.model.setup_caches(max_batch_size, max_seq_length)
-    
-    @property
-    def text_transformer_args(self):
-        return self.model.model.config
 
 
 class Llama31Model(Model):
@@ -391,11 +387,6 @@ class Llama31Model(Model):
 
     def reset_caches(self):
         self.model.reset_caches()
-    
-    @property
-    def text_transformer_args(self):
-        # TODO: add support for llama3_1
-        return None
 
 
 class FlamingoModel(Model):
@@ -416,11 +407,7 @@ class FlamingoModel(Model):
 
     def reset_caches(self):
         self.model.reset_caches()
-    
-    @property
-    def text_transformer_args(self):
-        # TODO: add support for flamingo
-        return None
+
 
 
 MODEL_TYPE_TO_CLASS = {
@@ -813,7 +800,7 @@ try:
             self.config = config
             self.model_ = exec_lib._load_for_executorch(str(path))
 
-            self.text_transformer_config = TransformerArgs.from_params(self.config.transformer_args["text"])
+            self.text_transformer_args = TransformerArgs.from_params(self.config.transformer_args["text"])
             
         def forward(self, x, input_pos):
             # model_.forward expects inputs to be wrapped in a tuple
