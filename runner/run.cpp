@@ -213,11 +213,11 @@ float* forward(Transformer* transformer, int token, int pos) {
                              .to(torch::kCPU);
   auto logits = result[0].data_ptr();
 #else // __ET_MODEL__
-  TensorPtr pos_managed = make_tensor_ptr(ScalarType::Long, {1}, pos_buffer); //(pos_buffer, {1}, ScalarType::Long);
-  TensorPtr tokens_managed = make_tensor_ptr(ScalarType::Long, {1, 1}, token_buffer); //(token_buffer, {1, 1}, ScalarType::Long);
+  TensorPtr pos_managed = make_tensor_ptr(ScalarType::Long, {1}, pos_buffer);
+  TensorPtr tokens_managed = make_tensor_ptr(ScalarType::Long, {1, 1}, token_buffer);
   std::vector<EValue> inputs;
-  auto tmp1 = EValue(tokens_managed); //.get_aliasing_tensor());
-  auto tmp2 = EValue(pos_managed); //.get_aliasing_tensor());
+  auto tmp1 = EValue(tokens_managed);
+  auto tmp2 = EValue(pos_managed);
 
   inputs.push_back(tmp1);
   inputs.push_back(tmp2);
