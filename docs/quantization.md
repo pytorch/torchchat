@@ -178,7 +178,6 @@ python torchchat.py export llama3 --device cpu --dtype float32 --quantize '{"lin
 ```
 
 Note: only the ExecuTorch C++ runner in torchchat when built using the instructions in the setup can run the exported *.pte file.
-Also note that the ExecuTorch op that wraps the new torchao kernel is currently single threaded.
 
 ## Quantization Profiles
 
