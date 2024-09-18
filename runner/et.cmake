@@ -62,7 +62,6 @@ if(executorch_FOUND)
 
     set(EXECUTORCH_SRC_ROOT ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch)
     set(XNNPACK_ROOT ${EXECUTORCH_SRC_ROOT}/backends/xnnpack)
-    list(APPEND _srcs ${XNNPACK_ROOT}/threadpool/cpuinfo_utils.cpp)
     list(APPEND _common_include_directories
          ${XNNPACK_ROOT}/third-party/cpuinfo/include)
 
@@ -80,7 +79,9 @@ if(executorch_FOUND)
     et_run PRIVATE
     executorch
     extension_module
+    extension_tensor
     extension_data_loader
+    extension_threadpool
     optimized_kernels
     quantized_kernels
     portable_kernels
@@ -112,7 +113,11 @@ if(executorch_FOUND)
   endif()
 
   if(LINK_TORCHAO_CUSTOM_OPS)
-    target_link_libraries(et_run PRIVATE "${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/liblinear_a8wxdq_EXECUTORCH${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    target_link_libraries(et_run PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/liblinear_a8wxdq_EXECUTORCH.a>")
+    target_link_libraries(et_run PRIVATE
+      "${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/libtorchao_ops_linear_EXECUTORCH.a"
+      "${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/libtorchao_kernels_aarch64.a"
+    )
   endif()
 
   # Adding target_link_options_shared_lib as commented out below leads to this:
