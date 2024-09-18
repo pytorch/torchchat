@@ -33,7 +33,7 @@ def convert_hf_checkpoint(
         model_name = model_dir.name
 
     config = ModelArgs.from_name(model_name).transformer_args['text']
-    print(f"Model config {config.__dict__}")
+    print(f"Model config {config}")
 
     # Load the json file containing weight mapping
     model_map_json = model_dir / "pytorch_model.bin.index.json"
