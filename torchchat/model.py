@@ -260,7 +260,7 @@ class TransformerArgs:
     multiple_of: int = 256
     ffn_dim_multiplier: Optional[int] = None
     use_tiktoken: bool = False
-    max_seq_length: int = 8192
+    max_seq_length: int = 1024
     rope_scaling: Optional[Dict[str, Any]] = None
     # For pipeline parallel
     n_stages: int = 1
