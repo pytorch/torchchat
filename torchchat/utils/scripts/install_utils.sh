@@ -170,7 +170,7 @@ clone_torchao() {
   pushd ${TORCHCHAT_ROOT}/torchao-build/src
   echo $pwd
 
-  cp -R /Users/scroy/fbsource/fbcode/pytorch/ao .
+  cp -R ${HOME}/fbsource/fbcode/pytorch/ao .
   # git clone https://github.com/pytorch/ao.git
   # cd ao
   # git checkout $(cat ${TORCHCHAT_ROOT}/intstall/.pins/torchao-experimental-pin.txt)
