@@ -113,6 +113,7 @@ if(executorch_FOUND)
   endif()
 
   if(LINK_TORCHAO_CUSTOM_OPS)
+    # target_link_libraries(et_run PRIVATE "${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/liblinear_a8wxdq_EXECUTORCH${CMAKE_SHARED_LIBRARY_SUFFIX}")
     target_link_libraries(et_run PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/liblinear_a8wxdq_EXECUTORCH.a>")
     target_link_libraries(et_run PRIVATE
       "${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/libtorchao_ops_linear_EXECUTORCH.a"
