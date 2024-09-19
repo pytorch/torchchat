@@ -27,6 +27,7 @@ if [ $# -eq 0 ]; then
 fi
 
 LINK_TORCHAO=OFF
+SKIP_ET_INSTALL=OFF
 while (( "$#" )); do
   case "$1" in
     -h|--help)
@@ -46,6 +47,11 @@ while (( "$#" )); do
     link_torchao)
       echo "Linking with torchao custom ops..."
       LINK_TORCHAO=ON
+      shift
+      ;;
+    skip_et_install)
+      echo "Skipping ET install..."
+      SKIP_ET_INSTALL=ON
       shift
       ;;
     *)
@@ -68,9 +74,11 @@ git submodule update --init
 git submodule sync
 if [[ "$TARGET" == "et" ]]; then
     find_cmake_prefix_path
-    install_pip_dependencies
-    clone_executorch
-    install_executorch_libs false
+    if [[ "$SKIP_ET_INSTALL" == "OFF" ]]; then
+      install_pip_dependencies
+      clone_executorch
+      install_executorch_libs false
+    fi
 
     if [[ "$LINK_TORCHAO" == "ON" ]]; then
       EXECUTORCH_INCLUDE_DIRS="${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/include;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src"
