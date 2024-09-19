@@ -916,6 +916,11 @@ jobs:
         run: |
           echo "Installing ExecuTorch"
           bash torchchat/utils/scripts/build_native.sh et
+      - name: Install ExecuTorch python
+        run: |
+          echo "Install ExecuTorch python"
+          source "torchchat/utils/scripts/install_utils.sh"
+          install_executorch_python_libs
       - name: Install runner
         run: |
           echo "Installing runner"
