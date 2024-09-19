@@ -918,7 +918,8 @@ jobs:
           bash torchchat/utils/scripts/build_native.sh et
       - name: Install runner
         run: |
-          bash torchchat/utils/scripts/build_native.sh et
+          echo "Installing runner"
+          bash torchchat/utils/scripts/build_native.sh et skip_et_install
       - name: Run inference
         run: |
           python torchchat.py download stories15M
@@ -1074,7 +1075,8 @@ jobs:
           bash torchchat/utils/scripts/build_native.sh et link_torchao
       - name: Install runner
         run: |
-          bash torchchat/utils/scripts/build_native.sh et link_torchao
+          echo "Installing runner"
+          bash torchchat/utils/scripts/build_native.sh et skip_et_install link_torchao
       - name: Install runner AOTI
         id: install-runner-aoti
         run: |
