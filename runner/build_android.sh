@@ -22,6 +22,7 @@ fi
 export ET_BUILD_DIR="et-build-android"
 export CMAKE_OUT_DIR="cmake-out-android"
 export EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT="OFF"
+export EXECUTORCH_BUILD_EXTENSION_TENSOR="ON"
 export EXECUTORCH_BUILD_KERNELS_CUSTOM="ON"
 export CMAKE_OUT_DIR="cmake-out-android"
 # export DCMAKE_INSTALL_PREFIX=cmake-out-android
