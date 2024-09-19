@@ -8,7 +8,9 @@
 set -ex pipefail
 
 if [ -z "$TORCHCHAT_ROOT" ]; then
-  TORCHCHAT_ROOT="$(dirname "${BASH_SOURCE[0]}")/../../.."
+  # Get the absolute path of the current script
+  SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+  TORCHCHAT_ROOT="$(dirname "$SCRIPT_PATH")/../../.."
   echo "Defaulting TORCHCHAT_ROOT to $TORCHCHAT_ROOT since it is unset."
 fi
 
