@@ -921,7 +921,9 @@ jobs:
         run: |
           echo "Install ExecuTorch python"
           pushd et-build/src/executorch
-          sh ./install_requirements.sh
+          chmod +x ./install_requirements.sh
+          chmod +x ./install_requirements.py
+          ./install_requirements.sh
           popd
       - name: Install runner
         run: |
