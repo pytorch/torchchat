@@ -112,30 +112,6 @@ if(executorch_FOUND)
     target_link_libraries(et_run PRIVATE log)
   endif()
 
-  if(LINK_TORCHAO_CUSTOM_OPS)
-    # target_link_libraries(et_run PRIVATE "${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/liblinear_a8wxdq_EXECUTORCH${CMAKE_SHARED_LIBRARY_SUFFIX}")
-    target_link_libraries(et_run PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/liblinear_a8wxdq_EXECUTORCH.a>")
-    target_link_libraries(et_run PRIVATE
-      "${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/libtorchao_ops_linear_EXECUTORCH.a"
-      "${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/libtorchao_kernels_aarch64.a"
-    )
-  endif()
-
-  # Adding target_link_options_shared_lib as commented out below leads to this:
-  #
-  # CMake Error at Utils.cmake:22 (target_link_options):
-  #   Cannot specify link options for target
-  #   "/Users/scroy/etorch/torchchat/et-build/src/executorch/${CMAKE_OUT_DIR}/examples/models/llama2/custom_ops/libcustom_ops_lib.a"
-  #   which is not built by this project.
-  # Call Stack (most recent call first):
-  #   Utils.cmake:30 (macos_kernel_link_options)
-  #   CMakeLists.txt:41 (target_link_options_shared_lib)
-  #
-  #target_link_options_shared_lib("${TORCHCHAT_ROOT}/et-build/src/executorch/${CMAKE_OUT_DIR}/examples/models/llama2/custom_ops/libcustom_ops_lib.a") # This one does not get installed by ExecuTorch
-
-  # This works on mac, but appears to run into issues on linux
-  # It is needed to solve:
-  # E 00:00:00.055965 executorch:method.cpp:536] Missing operator: [8] llama::sdpa_with_kv_cache.out
 else()
   MESSAGE(WARNING "ExecuTorch package not found")
 endif()
