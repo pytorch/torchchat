@@ -452,6 +452,7 @@ jobs:
           echo "Intalling pip3 packages"
           ./install/install_requirements.sh
 
+          export TORCHCHAT_ROOT=$PWD
           ./torchchat/utils/scripts/install_et.sh
 
           pip3 list
