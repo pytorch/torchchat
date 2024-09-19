@@ -10,7 +10,7 @@ set -ex pipefail
 if [ -z "$TORCHCHAT_ROOT" ]; then
   # Get the absolute path of the current script
   SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-  TORCHCHAT_ROOT="$(dirname "$SCRIPT_PATH")/../../.."
+  TORCHCHAT_ROOT="$SCRIPT_PATH/../../.."
   echo "Defaulting TORCHCHAT_ROOT to $TORCHCHAT_ROOT since it is unset."
 fi
 
