@@ -961,7 +961,7 @@ try:
     from executorch.extension.pybindings import portable_lib as exec_lib
 
     # ET changed the way it's loading the custom ops so it's not included in portable_lib but has to be loaded separately.
-    from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache  # no-qa
+    from executorch.extension.llm.custom_ops import sdpa_with_kv_cache  # no-qa
 
     class PTEModel(nn.Module):
         def __init__(self, config, path) -> None:
