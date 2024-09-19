@@ -624,8 +624,8 @@ jobs:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
       runner: macos-m1-stable  # neeps MPS, was macos-m1-stable
-      python-version: '3.10'
       script: |
+        export PYTHON_VERSION="3.10"
         set -x
         # NS/MC: Remove previous installation of torch and torchao first
         # as this script does not install anything into conda env but rather as system dep
@@ -737,8 +737,8 @@ jobs:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
       runner: macos-m1-stable  # needs MPS, was macos-m1-stable
-      python-version: '3.10'
       script: |
+        export PYTHON_VERSION="3.10"
         set -x
         # NS/MC: Remove previous installation of torch and torchao first
         # as this script does not install anything into conda env but rather as system dep
@@ -878,7 +878,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.10
+          python-version: 3.10.11
       - name: Setup Xcode
         if: runner.os == 'macOS'
         uses: maxim-lobanov/setup-xcode@v1
