@@ -104,7 +104,8 @@ COMMON_CMAKE_ARGS="\
     -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON \
     -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON \
     -DEXECUTORCH_BUILD_KERNELS_QUANTIZED=ON \
-    -DEXECUTORCH_BUILD_XNNPACK=ON"
+    -DEXECUTORCH_BUILD_XNNPACK=ON \
+    -DEXECUTORCH_BUILD_EXTENSION_TENSOR=ON"
 
 install_executorch() {
   # AOT lib has to be build for model export
@@ -155,13 +156,7 @@ install_executorch() {
 }
 
 install_executorch_libs() {
-  # Install executorch python and C++ libs
-  export CMAKE_ARGS="\
-    ${COMMON_CMAKE_ARGS} \
-    -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
-    -DCMAKE_INSTALL_PREFIX=${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install"
-  export CMAKE_BUILD_ARGS="--target install"
-
+  install_executorch
   install_executorch_python_libs $1
 }
 
