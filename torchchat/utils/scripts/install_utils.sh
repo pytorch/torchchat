@@ -107,7 +107,7 @@ COMMON_CMAKE_ARGS="\
     -DEXECUTORCH_BUILD_XNNPACK=ON \
     -DEXECUTORCH_BUILD_EXTENSION_TENSOR=ON"
 
-install_executorch() {
+install_executorch_cpp_libs() {
   # AOT lib has to be build for model export
   # So by default it is built, and you can explicitly opt-out
   EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT_VAR=OFF
@@ -156,7 +156,7 @@ install_executorch() {
 }
 
 install_executorch_libs() {
-  install_executorch
+  install_executorch_cpp_libs
   install_executorch_python_libs $1
 }
 

@@ -915,16 +915,17 @@ jobs:
         continue-on-error: true
         run: |
           echo "Installing ExecuTorch"
-          bash torchchat/utils/scripts/build_native.sh et
+          bash torchchat/utils/scripts/install_et.sh
       - name: Install ExecuTorch python
         run: |
           echo "Install ExecuTorch python"
+          export TORCHCHAT_ROOT=$PWD
           source "torchchat/utils/scripts/install_utils.sh"
           install_executorch_python_libs
       - name: Install runner
         run: |
           echo "Installing runner"
-          bash torchchat/utils/scripts/build_native.sh et skip_et_install
+          bash torchchat/utils/scripts/build_native.sh et
       - name: Run inference
         run: |
           python torchchat.py download stories15M
@@ -1077,11 +1078,11 @@ jobs:
         continue-on-error: true
         run: |
           echo "Installing ExecuTorch"
-          bash torchchat/utils/scripts/build_native.sh et link_torchao
+          bash torchchat/utils/scripts/install_et.sh
       - name: Install runner
         run: |
           echo "Installing runner"
-          bash torchchat/utils/scripts/build_native.sh et skip_et_install link_torchao
+          bash torchchat/utils/scripts/build_native.sh et link_torchao
       - name: Install runner AOTI
         id: install-runner-aoti
         run: |
