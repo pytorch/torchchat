@@ -920,9 +920,9 @@ jobs:
       - name: Install ExecuTorch python
         run: |
           echo "Install ExecuTorch python"
-          export TORCHCHAT_ROOT=$PWD
-          source "torchchat/utils/scripts/install_utils.sh"
-          install_executorch_python_libs
+          pushd et-build/src/executorch
+          sh ./install_requirements.sh
+          popd
       - name: Install runner
         run: |
           echo "Installing runner"
