@@ -118,7 +118,6 @@ python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "gr
 python3 torchchat.py generate llama3 --pte-path llama3.pte  --prompt "Hello my name is"
 ```
 
-
 ## Quantization Profiles
 
 Four [sample profiles](https://github.com/pytorch/torchchat/tree/main/torchchat/quant_config/) are included with the torchchat distribution: `cuda.json`, `desktop.json`, `mobile.json`, `pi5.json`
