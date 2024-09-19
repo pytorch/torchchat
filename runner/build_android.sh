@@ -41,5 +41,5 @@ install_executorch_python_libs $ENABLE_ET_PYBIND
 export CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake
 export ANDROID_ABI=arm64-v8a
 export ANDROID_PLATFORM=android-23
-install_executorch
+install_executorch_cpp_libs
 build_runner_et

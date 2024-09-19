@@ -27,7 +27,6 @@ if [ $# -eq 0 ]; then
 fi
 
 LINK_TORCHAO=OFF
-SKIP_ET_INSTALL=OFF
 while (( "$#" )); do
   case "$1" in
     -h|--help)
@@ -49,11 +48,6 @@ while (( "$#" )); do
       LINK_TORCHAO=ON
       shift
       ;;
-    skip_et_install)
-      echo "Skipping ET install..."
-      SKIP_ET_INSTALL=ON
-      shift
-      ;;
     *)
       echo "Invalid option: $1"
       show_help
@@ -73,18 +67,23 @@ pushd ${TORCHCHAT_ROOT}
 git submodule update --init
 git submodule sync
 if [[ "$TARGET" == "et" ]]; then
-    find_cmake_prefix_path
-    if [[ "$SKIP_ET_INSTALL" == "OFF" ]]; then
-      install_pip_dependencies
-      clone_executorch
-      install_executorch_libs false
-    fi
+  if [ ! -d "${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install" ]; then
+    echo "Directory ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install does not exist."
+    echo "Make sure you run install_executorch_libs"
+    exit 1
+  fi
 
-    if [[ "$LINK_TORCHAO" == "ON" ]]; then
-      EXECUTORCH_INCLUDE_DIRS="${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/include;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src"
-      EXECUTORCH_LIBRARIES="${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libexecutorch_no_prim_ops.a;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libextension_threadpool.a;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libcpuinfo.a;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libpthreadpool.a"
-      install_torchao_custom_executorch_ops
+  if [[ "$LINK_TORCHAO" == "ON" ]]; then
+    if [ ! -d "${TORCHCHAT_ROOT}/torchao-build" ]; then
+      echo "Directory ${TORCHCHAT_ROOT}/torchao-build does not exist."
+      echo "Make sure you run clone_torchao"
+      exit 1
     fi
+    find_cmake_prefix_path
+    EXECUTORCH_INCLUDE_DIRS="${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/include;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src"
+    EXECUTORCH_LIBRARIES="${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libexecutorch_no_prim_ops.a;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libextension_threadpool.a;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libcpuinfo.a;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libpthreadpool.a"
+    install_torchao_custom_executorch_ops
+  fi
 fi
 popd
 
