@@ -8,8 +8,8 @@
 set -ex pipefail
 
 if [ -z "$TORCHCHAT_ROOT" ]; then
-  echo "Defaulting TORCHCHAT_ROOT to $PWD since it is unset."
-  TORCHCHAT_ROOT=$PWD
+  TORCHCHAT_ROOT="$(dirname "${BASH_SOURCE[0]}")/../../.."
+  echo "Defaulting TORCHCHAT_ROOT to $TORCHCHAT_ROOT since it is unset."
 fi
 
 install_pip_dependencies() {
