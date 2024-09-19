@@ -75,6 +75,7 @@ clone_executorch() {
   clone_executorch_internal
 }
 
+
 install_executorch_python_libs() {
   if [ ! -d "${TORCHCHAT_ROOT}/${ET_BUILD_DIR}" ]; then
     echo "Directory ${TORCHCHAT_ROOT}/${ET_BUILD_DIR} does not exist."
