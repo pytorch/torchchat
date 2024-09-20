@@ -62,6 +62,7 @@ if(executorch_FOUND)
 
     set(EXECUTORCH_SRC_ROOT ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch)
     set(XNNPACK_ROOT ${EXECUTORCH_SRC_ROOT}/backends/xnnpack)
+    list(APPEND _srcs ${XNNPACK_ROOT}/threadpool/cpuinfo_utils.cpp)
     list(APPEND _common_include_directories
          ${XNNPACK_ROOT}/third-party/cpuinfo/include)
 
