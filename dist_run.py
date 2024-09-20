@@ -258,12 +258,11 @@ def main(args):
     assert world_size % pp_degree == 0
     assert config.n_layers % pp_degree == 0
 
-    # Sequence parallel is enabled in this program
-    # Sequence parallel = Tensor parallel + dividing sequence by tp_degree at layer boundary
-    sp_degree = world_size // pp_degree
+    # Tensor parallel is enabled in this program
+    tp_degree = world_size // pp_degree
 
     # Create device mesh
-    mesh_dimensions = (pp_degree, sp_degree)
+    mesh_dimensions = (pp_degree, tp_degree)
     device_mesh = _create_device_mesh(mesh_dimensions)
     tp_mesh = device_mesh["tp"]
     pp_mesh = device_mesh["pp"]
@@ -299,7 +298,6 @@ def main(args):
 
     seqlen = 4096  # sequence length
     dim = 4096  # embedding dimension
-    assert seqlen % sp_degree == 0
 
     # Setup KV caches (after model distribution)
     # TODO: the setting below only works for 1 micro-batch case. To support
@@ -309,7 +307,7 @@ def main(args):
 
     mb_ids = torch.randint(0, config.vocab_size, (mb_size, seqlen), device=device)
     activation = torch.rand(
-        mb_size, seqlen // sp_degree, dim, device=device, dtype=model_dtype
+        mb_size, seqlen, dim, device=device, dtype=model_dtype
     )
     example_args = mb_ids if pp_rank == 0 else activation
 
