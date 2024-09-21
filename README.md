@@ -15,7 +15,7 @@ torchchat is a small codebase showcasing the ability to run large language model
   - [Deploy and run on iOS](#deploy-and-run-on-ios)
   - [Deploy and run on Android](#deploy-and-run-on-android)
 - [Evaluate a model](#eval)
-
+ 
 
 ## Highlights
 - Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
