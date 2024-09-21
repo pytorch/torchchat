@@ -309,8 +309,8 @@ def main(args):
     # When decoding is done for certain micro-batches, we can reuse the KV cache
     # lanes.
     # TODO: bump up the lane count
-    cache_lanes = 1
-    model.setup_caches(batch_size, seqlen_prefill, cache_lanes=cache_lanes)
+    pipeline_lanes = 1
+    model.setup_caches(batch_size, seqlen_prefill, cache_lanes=pipeline_lanes)
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
