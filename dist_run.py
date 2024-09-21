@@ -273,13 +273,11 @@ def main(args):
     pp_rank = pp_mesh.get_local_rank()
     tp_group = tp_mesh.get_group()
     pp_group = pp_mesh.get_group()
-    pp_group_size = pp_group.size()
-    tp_group_size = tp_group.size()
-    logger.info(f"{pp_group_size=}, {tp_group_size=}")
+    logger.info(f"{pp_degree=}, {tp_degree=}")
 
     # Convenience variables
     first_pp_rank = 0
-    last_pp_rank = pp_group_size - 1
+    last_pp_rank = pp_degree - 1
 
     # Assuming same number of GPUs per node
     device = torch.device(f"cuda:{rank % torch.cuda.device_count()}")
@@ -297,18 +295,22 @@ def main(args):
     if rank == 0:
         logger.info(f"Model: {model}")
 
-    mbs = 1  # number of micro-batches
-    mb_size = 4  # micro-batch size
-    batch_size = mbs * mb_size  # total batch size
-
+    # Batch size. Since we push batches dynamically through the pipeline rather
+    # than chunking them, this is effectively micro-batch size in pipeline
+    # sense. Thus it is interchangeable with micro-batch size below.
+    batch_size = 4
     seqlen_prefill = 1024  # sequence length
     dim = 4096  # embedding dimension
 
     # Setup KV caches (after model distribution)
-    # TODO: the setting below only works for 1 micro-batch case. To support
-    # multiple micro-batches, we need the KV cache in the model to be aware of
-    # the number of micro-batches and the current micro-batch index.
-    model.setup_caches(mb_size, seqlen_prefill)
+    # The number of cache lanes is the same as the maximum number of
+    # micro-batches that can be "in flight" in parallel -- imagine each
+    # micro-batch takes 1 "pipeline lane," they need distinct KV cache spaces.
+    # When decoding is done for certain micro-batches, we can reuse the KV cache
+    # lanes.
+    # TODO: bump up the lane count
+    cache_lanes = 1
+    model.setup_caches(batch_size, seqlen_prefill, cache_lanes=cache_lanes)
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
@@ -317,7 +319,7 @@ def main(args):
         model.to(device)
 
     logger.info(
-        f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for stage {rank}{color.reset}"
+        f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
     )
 
     # info on stage size and params
@@ -335,12 +337,12 @@ def main(args):
 
     # Helper function to get example inputs and outputs for the stages.
     def get_example_ins_outs(seqlen: int) -> Tuple[torch.Tensor, torch.Tensor]:
-        mb_ids = torch.randint(0, config.vocab_size, (mb_size, seqlen), device=device)
+        mb_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
         activation = torch.rand(
-            mb_size, seqlen, dim, device=device, dtype=model_dtype
+            batch_size, seqlen, dim, device=device, dtype=model_dtype
         )
         logits = torch.rand(
-            mb_size, seqlen, config.vocab_size, device=device, dtype=model_dtype
+            batch_size, seqlen, config.vocab_size, device=device, dtype=model_dtype
         )
         example_inputs = (mb_ids if pp_rank == first_pp_rank else activation,)
         example_outputs = (logits if pp_rank == last_pp_rank else activation,)
@@ -358,8 +360,13 @@ def main(args):
         output_args=example_outputs,
         group=pp_group,
     )
+    # Number of micro-batches for the schedule is 1, because each step() call we
+    # only push 1 micro-batch into the pipeline. But we can continuously push
+    # new micro-batches into the pipeline as they arrive, achieving same
+    # pipelining effect.
+    mbs = 1
     # create schedule
-    prefill_schedule = ScheduleGPipe(prefill_stage, mbs)
+    prefiller = ScheduleGPipe(prefill_stage, mbs)
 
     prompt = [
         "What is a computer?",
@@ -401,14 +408,15 @@ def main(args):
     num_tokens = 40
 
     # Prefill phase
-    # Run context input through pipeline, in 1 step
+    # Run context input through pipeline
+    # TODO: we need to pass `input_pos` and `cache_lane` to each stage.
     with torch.no_grad():
         if pp_rank == first_pp_rank:
-            output = prefill_schedule.step(padded_sequence)
+            output = prefiller.step(padded_sequence)
         elif pp_rank == last_pp_rank:
-            output = prefill_schedule.step()
+            output = prefiller.step()
         else:  # middle pp ranks
-            prefill_schedule.step()
+            prefiller.step()
 
     # Decode the output -- first generated token
     if pp_rank == last_pp_rank:
@@ -445,7 +453,7 @@ def main(args):
         group=pp_group,
     )
     # create schedule
-    decode_schedule = ScheduleGPipe(decode_stage, mbs)
+    decorder = ScheduleGPipe(decode_stage, mbs)
 
     # Decoding
     with torch.no_grad():
@@ -467,11 +475,11 @@ def main(args):
 
             # Run data through pipeline
             if pp_rank == first_pp_rank:
-                output = decode_schedule.step(new_token)
+                output = decorder.step(new_token)
             elif pp_rank == last_pp_rank:
-                output = decode_schedule.step()
+                output = decorder.step()
             else:  # middle pp ranks
-                decode_schedule.step()
+                decorder.step()
 
             # Decode the output
             if pp_rank == last_pp_rank:
