@@ -332,7 +332,6 @@ def main(args):
 
     # Setup input position (input_pos) for prefill: a list of increasing integers from 0 to seqlen
     input_pos = torch.arange(seqlen_prefill, device=device)
-    model.setup_input_pos(input_pos)
     model.eval()
 
     # Helper function to get example inputs and outputs for the stages.
@@ -410,13 +409,15 @@ def main(args):
     # Prefill phase
     # Run context input through pipeline
     # TODO: we need to pass `input_pos` and `cache_lane` to each stage.
+    lane = 0
+    kwargs = {"input_pos": input_pos, "cache_lane": lane}
     with torch.no_grad():
         if pp_rank == first_pp_rank:
-            output = prefiller.step(padded_sequence)
+            output = prefiller.step(padded_sequence, **kwargs)
         elif pp_rank == last_pp_rank:
-            output = prefiller.step()
+            output = prefiller.step(**kwargs)
         else:  # middle pp ranks
-            prefiller.step()
+            prefiller.step(**kwargs)
 
     # Decode the output -- first generated token
     if pp_rank == last_pp_rank:
@@ -438,7 +439,6 @@ def main(args):
     # seqlen = 1 now
     seqlen_decode = 1
     input_pos = torch.tensor([prompt_lengths[0]], device=device)
-    model.setup_input_pos(input_pos)
 
     # Create decode stage
     logger.info(f"Creating pipeline stage for decode {pp_rank=}, {pp_degree=}")
@@ -458,6 +458,7 @@ def main(args):
     # Decoding
     with torch.no_grad():
         for step in range(num_tokens - 1):
+            kwargs = {"input_pos": input_pos, "cache_lane": lane}
             # sendrecv between last and first ranks, only if:
             # first_pp_rank != last_pp_rank.
             if pp_rank == last_pp_rank and pp_rank != first_pp_rank:
@@ -475,11 +476,11 @@ def main(args):
 
             # Run data through pipeline
             if pp_rank == first_pp_rank:
-                output = decorder.step(new_token)
+                output = decorder.step(new_token, **kwargs)
             elif pp_rank == last_pp_rank:
-                output = decorder.step()
+                output = decorder.step(**kwargs)
             else:  # middle pp ranks
-                decorder.step()
+                decorder.step(**kwargs)
 
             # Decode the output
             if pp_rank == last_pp_rank:
@@ -499,7 +500,6 @@ def main(args):
                     )  # decode_results[i][0]
 
             input_pos += 1
-            model.setup_input_pos(input_pos)
 
     # Display the decoding results
 

@@ -653,15 +653,8 @@ class Transformer(nn.Module):
                 ColwiseParallel(output_layouts=Replicate()),
             )
 
-    # This is a temporary solution to pass input_pos to non-0 pipeline stages
-    # TODO: make `step()` function of dist.pipelining accept args for non-0 stages
-    def setup_input_pos(self, input_pos: Tensor) -> None:
-        self._input_pos = input_pos
-
     def forward(self, x: Tensor, input_pos: Optional[Tensor] = None, cache_lane: int = 1) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
-        # TODO: find a better way to pass input_pos to non-0 pipeline stages
-        input_pos = input_pos if input_pos is not None else self._input_pos
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
         if self.tok_embeddings:
