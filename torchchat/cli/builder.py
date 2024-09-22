@@ -532,7 +532,7 @@ def _initialize_model(
         # ), "quantize not valid for exported PTE model. Specify quantization during export."
 
         with measure_time("Time to load model: {time:.02f} seconds"):
-            model = _load_model(builder_args, only_config=True)
+            model = _load_model(builder_args)
             device_sync(device=builder_args.device)
 
         try:
