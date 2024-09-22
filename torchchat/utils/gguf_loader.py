@@ -47,7 +47,6 @@ def _convert_gguf_tensor_name_to_llama_nn(gguf_name: str) -> str:
     result = copy.deepcopy(gguf_name)
     for gguf_string, replacement in _name_replacements:
         result = result.replace(gguf_string, replacement)
-    result = "model." + result
     return result
 
 
