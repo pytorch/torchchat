@@ -495,7 +495,8 @@ class Model(ABC, nn.Module):
         :return: The attribute value if found, otherwise raise AttributeError.
         """
         try:
-            return super().__getattribute__(name)
+            if name in self.__dict__:
+                return self.__dict__[name]
         except AttributeError:
             pass
 
