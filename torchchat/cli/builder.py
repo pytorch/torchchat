@@ -388,11 +388,9 @@ def _load_model_default(builder_args, only_config=False):
             builder_args.device
         ):
             model = Model.from_params(builder_args.params_path)
-        state_dict = flamingo_meta_to_tune(checkpoint)
-        model.model.load_state_dict(state_dict)
-    else:
-        checkpoint = {"model." + k: v for k, v in checkpoint.items()}
-        model.load_state_dict(checkpoint, assign=True, strict=True)
+        checkpoint = flamingo_meta_to_tune(checkpoint)
+
+    model.load_state_dict(checkpoint, assign=True, strict=True)
 
     return model
 

@@ -442,6 +442,8 @@ class Model(ABC, nn.Module):
         # It should be assigned in the actual model implementation, if any.
         self.text_transformer_args = None
 
+        self._register_load_state_dict_pre_hook(self._load_model_state_dict)
+
     def build_model(self) -> nn.Module:
         """
         Builds a model based on the provided configuration.
@@ -467,6 +469,13 @@ class Model(ABC, nn.Module):
             if isinstance(value, Hashable) and value in patterns:
                 params[key] = patterns[value]
         return params
+    
+    def _load_model_state_dict(self, state_dict, prefix, local_metadata, strict, missing_keys, unexpected_keys, error_msgs):
+        # 修改 state dict 中的键值
+        for key in list(state_dict.keys()):
+            new_key = 'model.' + key
+            state_dict[new_key] = state_dict.pop(key)
+        return state_dict
     
     @abstractmethod
     def forward(self, *args, **kwargs):
