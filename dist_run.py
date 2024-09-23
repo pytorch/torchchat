@@ -394,7 +394,6 @@ def main(args):
     s = set(prompt_lengths)
     assert len(s) == 1, f"prompt_lengths should be the same, got {s}"
 
-    # with CUDATrackTime() as timer:
     # Need these global ids due to the API definition of dist.send and recv
     first_pp_rank_global_id = dist.get_global_rank(pp_group, first_pp_rank)
     last_pp_rank_global_id = dist.get_global_rank(pp_group, last_pp_rank)
@@ -411,13 +410,17 @@ def main(args):
     # TODO: we need to pass `input_pos` and `cache_lane` to each stage.
     lane = 0
     kwargs = {"input_pos": input_pos, "cache_lane": lane}
-    with torch.no_grad():
+    with torch.no_grad(), CUDATrackTime() as timer:
         if pp_rank == first_pp_rank:
             output = prefiller.step(padded_sequence, **kwargs)
         elif pp_rank == last_pp_rank:
             output = prefiller.step(**kwargs)
         else:  # middle pp ranks
             prefiller.step(**kwargs)
+
+    logger.info(
+        f"{color.green}Prefilling time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
+    )
 
     # Decode the output -- first generated token
     if pp_rank == last_pp_rank:
@@ -456,7 +459,7 @@ def main(args):
     decorder = ScheduleGPipe(decode_stage, mbs)
 
     # Decoding
-    with torch.no_grad():
+    with torch.no_grad(), CUDATrackTime() as timer:
         for step in range(num_tokens - 1):
             kwargs = {"input_pos": input_pos, "cache_lane": lane}
             # sendrecv between last and first ranks, only if:
@@ -500,6 +503,10 @@ def main(args):
                     )  # decode_results[i][0]
 
             input_pos += 1
+
+    logger.info(
+        f"{color.green}Decoding time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
+    )
 
     # Display the decoding results
 
