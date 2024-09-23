@@ -164,7 +164,7 @@ install_executorch_libs() {
 
 clone_torchao() {
   echo "Cloning torchao to ${TORCHCHAT_ROOT}/torchao-build/src"
-  rm -rf ${TORCHCHAT_ROOT}/torchao-build/src
+  rm -rf ${TORCHCHAT_ROOT}/torchao-build
   mkdir -p ${TORCHCHAT_ROOT}/torchao-build/src
   pushd ${TORCHCHAT_ROOT}/torchao-build/src
   echo $pwd
@@ -172,7 +172,7 @@ clone_torchao() {
   cp -R ${HOME}/fbsource/fbcode/pytorch/ao .
   # git clone https://github.com/pytorch/ao.git
   # cd ao
-  # git checkout $(cat ${TORCHCHAT_ROOT}/intstall/.pins/torchao-experimental-pin.txt)
+  # git checkout $(cat ${TORCHCHAT_ROOT}/intstall/.pins/torchao-pin.txt)
 
   popd
 }
