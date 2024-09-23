@@ -778,7 +778,7 @@ class Generator:
 
                 batch = {
                     "tokens": input_ids[:index].unsqueeze(0),
-                    "encoder_input": llava_image_preprocess(images[0], device=self.builder_args.device),
+                    "encoder_input": llava_image_preprocess(images[0], device=self.builder_args.device, dtype=self.builder_args.precision),
                     "post_tokens": input_ids[index + len(image_token_indices) :].unsqueeze(0),
                 }
                 print("BATTTTTTTCHCHHHHHHHHH")
