@@ -1,4 +1,10 @@
 {
+    "llava-hf/llava-1.5-7b-hf": {
+        "aliases": ["llava-1.5"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "llava-hf/llava-1.5-7b-hf",
+        "transformer_params_key": "llava-1.5"
+    },
     "meta-llama/Llama-2-7b-hf": {
         "aliases": ["llama2-base", "llama2-7b"],
         "distribution_channel": "HuggingFaceSnapshot",

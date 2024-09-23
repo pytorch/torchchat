@@ -723,6 +723,13 @@ class Generator:
     ):
         if generator_args.chat_mode:
             print("Starting Interactive Chat")
+        
+        print("Generator Args:")
+        print(generator_args)
+        print("Builder Args:")
+        print(self.builder_args)
+
+        exit(0)
 
         if generator_args.image_prompts is not None:
             print("Image prompts", generator_args.image_prompts)

@@ -28,13 +28,34 @@ def _download_hf_snapshot(
     # Download and store the HF model artifacts.
     print(f"Downloading {model_config.name} from HuggingFace...", file=sys.stderr)
     try:
-        snapshot_download(
-            model_config.distribution_path,
-            local_dir=artifact_dir,
-            local_dir_use_symlinks=False,
-            token=hf_token,
-            ignore_patterns="*safetensors*",
+
+        import huggingface_hub
+        # 定义模型名称和版本
+        model_name = "llava-hf/llava-1.5-7b-hf"
+        # 下载模型checkpoint
+        repo_id = model_name
+        revision = "main"  # 默认分支
+        # 强制重新下载
+        snapshot_dir = huggingface_hub.snapshot_download(
+            repo_id=repo_id,
+            revision=revision,
+            cache_dir=artifact_dir,
+            force_download=True,
         )
+        print(f"模型下载完成，保存在 {snapshot_dir} 目录下")
+
+
+        # snapshot_download(
+        #     model_config.distribution_path,
+        #     cache_dir=artifact_dir,
+        #     local_dir_use_symlinks=False,
+        #     token=hf_token,
+        #     ignore_patterns="*safetensors*",
+        # )
+        print("*****************")
+        print(os.listdir(artifact_dir))
+        shutil.copytree(artifact_dir, "/home/gasoonjia/download/hahaha")
+        exit(0)
     except HTTPError as e:
         if e.response.status_code == 401:  # Missing HuggingFace CLI login.
             print(
@@ -78,10 +99,16 @@ def download_and_convert(
     # location once the download and conversion is complete. This
     # allows recovery in the event that the download or conversion
     # fails unexpectedly.
-    temp_dir = models_dir / "downloads" / model_config.name
+    # temp_dir = models_dir / "downloads" / model_config.name
+    temp_dir = Path("/home/gasoonjia") / "downloads" / model_config.name
+
     if os.path.isdir(temp_dir):
         shutil.rmtree(temp_dir)
     os.makedirs(temp_dir, exist_ok=True)
+
+    print("**************************************************")
+    print("**************************************************")
+    print("temp dir: ", temp_dir)
 
     try:
         if (

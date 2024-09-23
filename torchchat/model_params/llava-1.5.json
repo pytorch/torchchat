@@ -20,6 +20,7 @@
         "n_heads": 32,
         "dim": 4096,
         "vocab_size": 32064,
-        "max_seq_length": 768
+        "max_seq_length": 768,
+        "use_hf_rope": true
     }
 }
