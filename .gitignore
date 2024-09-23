@@ -14,6 +14,7 @@ __pycache__/
 # Build directories
 build/android/*
 et-build/*
+torchao-build/*
 runner-et/cmake-out/*
 runner-aoti/cmake-out/*
 cmake-out/

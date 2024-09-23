@@ -116,6 +116,13 @@ if(executorch_FOUND)
     target_link_libraries(et_run PRIVATE log)
   endif()
 
+  if(LINK_TORCHAO_OPS)
+    target_link_libraries(et_run PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/libtorchao_ops_executorch.a>")
+    target_link_libraries(et_run PRIVATE
+      "${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/libtorchao_kernels_aarch64.a"
+    )
+  endif()
+
 else()
   MESSAGE(WARNING "ExecuTorch package not found")
 endif()
