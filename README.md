@@ -440,7 +440,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 1. Download the AAR file, which contains the Java library and corresponding JNI library, to build and run the app.
 
-   - [executorch-240911.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-240911.aar) (SHASUM: 58d0f3501cc2112c0e7aad5f3d5c17fe6074a4e9)
+   - [executorch-240919.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-240919.aar) (SHASUM: c8a5d38ead03bfa28ee8469f6355840ad0d182ba)
 
 2. Rename the downloaded AAR file to `executorch.aar` and move the file to `android/torchchat/app/libs/`. You may need to create directory `android/torchchat/app/libs/` if it does not exist.
 
