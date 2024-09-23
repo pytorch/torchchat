@@ -501,7 +501,8 @@ def main(args):
         res_list = res.tolist()
         response = tokenizer.decode(res_list)
         for i in range(len(response)):
-            logger.info(f"$$ {color.red}{response[i]} {color.reset}  $$\n")
+            logger.info(f"Prompt: {color.green}{prompt[i]} {color.reset}")
+            logger.info(f"Response: {color.red}{response[i]} {color.reset}")
 
     # Cleanup
     _cleanup()
