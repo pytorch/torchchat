@@ -542,15 +542,17 @@ def load_model(gguf_file: str) -> torch.nn.Module:
     assert arch == "llama", "Only LLaMa models are supported by this converter."
 
     model_args = ModelArgs(
-        TransformerArgs(
-            dim=metadata[f"{arch}.embedding_length"],
-            n_layers=metadata[f"{arch}.block_count"],
-            n_heads=metadata[f"{arch}.attention.head_count"],
-            n_local_heads=metadata[f"{arch}.attention.head_count_kv"],
-            vocab_size=len(metadata["tokenizer.ggml.tokens"]),
-            norm_eps=metadata[f"{arch}.attention.layer_norm_rms_epsilon"],
-            hidden_dim=metadata[f"{arch}.feed_forward_length"],
-        )
+        {
+            "text": {
+                "dim": metadata[f"{arch}.embedding_length"],
+                "n_layers": metadata[f"{arch}.block_count"],
+                "n_heads": metadata[f"{arch}.attention.head_count"],
+                "n_local_heads": metadata[f"{arch}.attention.head_count_kv"],
+                "vocab_size": len(metadata["tokenizer.ggml.tokens"]),
+                "norm_eps": metadata[f"{arch}.attention.layer_norm_rms_epsilon"],
+                "hidden_dim": metadata[f"{arch}.feed_forward_length"],
+            }
+        }
     )
 
     # TODO: what to do with rope args like

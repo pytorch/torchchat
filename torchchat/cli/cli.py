@@ -46,7 +46,7 @@ def check_args(args, verb: str) -> None:
     # different semantics.
     if (
         verb not in INVENTORY_VERBS
-        and args.model
+        and getattr(args, "model", None)
         and not is_model_downloaded(args.model, args.model_directory)
     ):
         download_and_convert(args.model, args.model_directory, args.hf_token)
@@ -86,7 +86,6 @@ def add_arguments_for_verb(parser, verb: str) -> None:
 
     # WIP Features (suppressed from --help)
     _add_distributed_args(parser)
-    _add_custom_model_args(parser)
     _add_speculative_execution_args(parser)
 
 
@@ -94,7 +93,7 @@ def add_arguments_for_verb(parser, verb: str) -> None:
 def _add_model_specification_args(parser) -> None:
     model_specification_parser = parser.add_argument_group(
         "Model Specification",
-        "(REQUIRED) Specify the base model. Args are mutually exclusive.",
+        "A base model is required: `model` XOR `checkpoint-path`",
     )
     exclusive_parser = model_specification_parser.add_mutually_exclusive_group(
         required=True
@@ -112,7 +111,8 @@ def _add_model_specification_args(parser) -> None:
         default="not_specified",
         help="Use the specified model checkpoint path",
     )
-    # See _add_custom_model_args() for more details
+
+    _add_custom_model_args(model_specification_parser)
     exclusive_parser.add_argument(
         "--gguf-path",
         type=Path,
@@ -321,6 +321,13 @@ def _add_generation_args(parser, verb: str) -> None:
         )
 
     generator_parser.add_argument(
+        "--image-prompts",
+        nargs="+",
+        type=str,
+        default=None,
+        help="Paths to image files used as image prompts for multimodal models. Currently, 1 image input is supported.",
+    )
+    generator_parser.add_argument(
         "--chat",
         action="store_true",
         # help="Whether to start an interactive chat session",
@@ -404,8 +411,7 @@ def _add_distributed_args(parser) -> None:
     )
 
 
-# Add CLI Args related to custom model inputs (e.g. GGUF)
-# This feature is currently a [WIP] and hidden from --help
+# Add CLI Args related to custom model inputs
 def _add_custom_model_args(parser) -> None:
     parser.add_argument(
         "--params-table",
@@ -419,15 +425,13 @@ def _add_custom_model_args(parser) -> None:
         "--params-path",
         type=Path,
         default=None,
-        help=argparse.SUPPRESS,
-        # "Use the specified parameter file",
+        help= "Use the specified parameter file, instead of one specified under torchchat.model_params",
     )
     parser.add_argument(
         "--tokenizer-path",
         type=Path,
         default=None,
-        help=argparse.SUPPRESS,
-        # "Use the specified model tokenizer file",
+        help= "Use the specified model tokenizer file, instead of the one downloaded from HuggingFace",
     )
 
 

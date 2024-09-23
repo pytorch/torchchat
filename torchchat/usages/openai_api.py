@@ -4,16 +4,26 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+import base64
 import os
 import time
 import uuid
 
 from abc import ABC
 from dataclasses import dataclass
+from io import BytesIO
 from pwd import getpwuid
 from typing import Any, Dict, List, Optional, Union
 
 import torch
+
+try:
+    from _torchchat_test_script import flamingo_transform, padded_collate
+except ImportError:
+    pass
+
+from PIL import Image
+from torchtune.data import Message
 
 from torchchat.cli.download import is_model_downloaded, load_model_configs
 from torchchat.generate import Generator, GeneratorArgs
@@ -32,6 +42,46 @@ OPENAI_API_DEFAULT_MAX_TOKENS = 16
 
 
 @dataclass
+class _ContentPart(ABC):
+    """A single part of a message content field.
+
+    See the "Assistants >>> Messages >>> Create Message >>> Request body >>> content >>> Show possible types" section of the OpenAI API docs for more details.
+    """
+
+    type: str
+
+
+@dataclass
+class ImageFile:
+    file_id: str
+    detail: Optional[str]
+
+
+@dataclass
+class ImageFileContentPart(_ContentPart):
+    type: str = "image_file"
+    image_file: Optional[ImageFile] = None
+
+
+@dataclass
+class ImageUrl:
+    url: str
+    detail: Optional[str]
+
+
+@dataclass
+class ImageUrlContentPart(_ContentPart):
+    type: str = "image_url"
+    image_url: Optional[ImageUrl] = None
+
+
+@dataclass
+class TextContentPart(_ContentPart):
+    text: str = ""
+    type: str = "text"
+
+
+@dataclass
 class _AbstractMessage(ABC):
     """Base class with common parameters for message types.
 
@@ -42,7 +92,7 @@ class _AbstractMessage(ABC):
     """
 
     role: str
-    content: Optional[str] = None
+    content: Optional[Union[List[_ContentPart], str]] = None
 
 
 @dataclass
@@ -185,7 +235,7 @@ class ChunkDelta:
 
     tool_calls: Optional[List[ToolCall]]
     role: Optional[str]
-    content: Optional[str]
+    content: Optional[Union[List[_ContentPart], str]] = None
 
 
 @dataclass
@@ -232,17 +282,58 @@ class OpenAiApiGenerator(Generator):
         """
 
         super().__init__(*args, **kwargs)
-        self.max_seq_length = (
-            self.model.config.transformer_args["text"].max_seq_length
-            + self.speculative_builder_args.speculate_k
-            + 1
-            if self.draft_model is not None
-            else self.model.config.transformer_args["text"].max_seq_length
-        )
+        try:
+            self.max_seq_length = (
+                self.model.text_transformer_args.max_seq_length
+                + self.speculative_builder_args.speculate_k
+                + 1
+                if self.draft_model is not None
+                else self.model.text_transformer_args.max_seq_length
+            )
+        except:
+            # can not find max_seq_length in model config, use default value
+            self.max_seq_length = 128
         # The System fingerprint is a unique identifier for the model and its configuration.
         self.system_fingerprint = (
             f"{self.builder_args.device}_{self.builder_args.precision}"
         )
+
+    def _openai_messages_to_torchtune(
+        self, messages: List[_AbstractMessage]
+    ) -> List[Message]:
+        """Convert a list of OpenAI API messages to a list of TorchTune messages.
+
+        Args:
+            messages: A list of OpenAI API messages.
+
+        Returns:
+            A list of Torchtune Messages.
+        """
+        torchtune_messages = []
+        for message in messages:
+            torchtune_contents = []
+            if isinstance(message["content"], list):
+                for content in message["content"]:
+                    if isinstance(content, dict):
+                        if content["type"] == "image_url":
+                            torchtune_contents.append({"type": "image"})
+                        elif content["type"] == "image_file":
+                            torchtune_contents.append({"type": "image"})
+                        elif content["type"] == "text":
+                            torchtune_contents.append(
+                                {"type": "text", "content": content["text"]}
+                            )
+                    elif isinstance(content, str):
+                        torchtune_contents.append({"type": "text", "text": content})
+            else:
+                torchtune_contents.append(
+                    {"type": "text", "content": message["content"]}
+                )
+            torchtune_messages.append(
+                Message(role=message["role"], content=torchtune_contents, eot=False)
+            )
+        torchtune_messages.append(Message(role="assistant", content="", eot=False))
+        return torchtune_messages
 
     def chunked_completion(self, completion_request: CompletionRequest):
         """Handle a chat completion request and yield a chunked response.
@@ -271,15 +362,42 @@ class OpenAiApiGenerator(Generator):
         id = str(uuid.uuid4())
 
         idx = 0
-        tokens = self.chat_formatter.encode_dialog_prompt(
-            dialog=[
-                {"role": message["role"], "content": message["content"]}
-                for message in completion_request.messages
-            ]
-        )
+        images = []
 
-        encoded = torch.tensor(tokens, dtype=torch.int, device=self.builder_args.device)
-        print(self.tokenizer.decode(tokens))
+        device_sync(device=self.builder_args.device)
+        for message in completion_request.messages:
+            contents = message["content"]
+            if isinstance(contents, list):
+                for content in message["content"]:
+                    if content["type"] == "image_url":
+                        base64_decoded = base64.b64decode(
+                            content["image_url"].split(";base64,")[1]
+                        )
+                        images.append(Image.open(BytesIO(base64_decoded)))
+        print("images:", len(images), flush=True)
+        if len(images) > 0:
+            transform = flamingo_transform(str(self.tokenizer_args.tokenizer_path))
+            torchtune_messages = self._openai_messages_to_torchtune(
+                completion_request.messages
+            )
+            data = transform(
+                {"images": images, "messages": torchtune_messages}, inference=True
+            )
+            batch = padded_collate([data], self.builder_args.device)
+            batch.pop("mask")
+            encoded = batch["tokens"]
+        else:
+            tokens = self.chat_formatter.encode_dialog_prompt(
+                dialog=[
+                    {"role": message["role"], "content": message["content"]}
+                    for message in completion_request.messages
+                ]
+            )
+            print("tokens:", self.tokenizer.decode(tokens), flush=True)
+            encoded = torch.tensor(
+                tokens, dtype=torch.int, device=self.builder_args.device
+            )
+            batch = None
 
         start_pos = 0
 
@@ -293,7 +411,7 @@ class OpenAiApiGenerator(Generator):
             encoded_prompt=encoded,
             temperature=float(completion_request.temperature),
             chat_mode=False,
-            sequential_prefill=True,
+            sequential_prefill=False,
         )
 
         def callback(x, *, done_generating=False):
@@ -313,6 +431,7 @@ class OpenAiApiGenerator(Generator):
             draft_model=self.draft_model,
             speculate_k=generator_args.speculate_k,
             chat_mode=generator_args.chat_mode,
+            batch=batch,
             callback=callback,
             temperature=generator_args.temperature,
             top_k=generator_args.top_k,
@@ -323,10 +442,12 @@ class OpenAiApiGenerator(Generator):
         ):
             if y is None:
                 continue
+
             elif y.item() == self.tokenizer.eos_id:
                 # Stop generation if the EOS token is generated.
                 break
 
+            y = y.view(-1)
             # Decode the torch.Tensor token to a string and append to the buffer. Separate the sequences with a period token.
             content = "".join(
                 self.tokenizer.decode([self.tokenizer.encode(".")[0]] + y.tolist())[1:]

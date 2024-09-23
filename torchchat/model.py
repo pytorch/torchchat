@@ -6,19 +6,22 @@
 import json
 import os
 import warnings
+from abc import ABC, abstractmethod
 
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
+import torchvision
+
 from typing import Any, Callable, Dict, Optional, Union
-from abc import ABC, abstractmethod
+from collections.abc import Hashable
 
 import torch
 import torch.nn as nn
 
 from torch import Tensor
-from torch.distributed._tensor import Replicate, Shard, DTensor
+from torch.distributed._tensor import DTensor, Replicate
 from torch.distributed.device_mesh import DeviceMesh
 from torch.distributed.tensor.parallel import (
     ColwiseParallel,
@@ -28,39 +31,157 @@ from torch.distributed.tensor.parallel import (
 )
 from torch.nn import functional as F
 
+from torchtune.models.flamingo import flamingo_decoder, flamingo_vision_encoder
+from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
+from torchtune.modules.model_fusion import DeepFusionModel
+from torchtune.models.clip import clip_vision_encoder
+
 from torchchat.utils.build_utils import find_multiple, get_precision
 
-from torchtune.models.flamingo import flamingo_decoder, flamingo_vision_encoder
-from torchtune.modules.model_fusion import DeepFusionModel 
-from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
-
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
+
+
+class QuickGELUActivation(nn.Module):
+    """
+    Applies GELU approximation that is fast but somewhat inaccurate. See: https://github.com/hendrycks/GELUs
+    """
+
+    def forward(self, input):
+        return input * torch.sigmoid(1.702 * input)
+
 
 def identity(**kwargs):
     if len(kwargs) != 1:
         raise ValueError("Only one argument is expected")
     return list(kwargs.values())[0]
 
+
+
+class MultiModalProjector(nn.Module):
+    def __init__(self, in_channels: int, out_channels: int, act: nn.Module):
+        super().__init__()
+
+        self.linear_1 = nn.Linear(in_channels, out_channels, bias=True)
+        self.act = act
+        self.linear_2 = nn.Linear(out_channels, out_channels, bias=True)
+
+    def forward(self, image_features):
+        hidden_states = self.linear_1(image_features)
+        hidden_states = self.act(hidden_states)
+        hidden_states = self.linear_2(hidden_states)
+        return hidden_states
+
+
+class ConcateFusion(nn.Module):
+    def __init__(
+        self,
+        encoder: nn.Module,
+        decoder: nn.Module,
+        token_embedding_name="tok_embeddings",
+        mm_proj_in_channels=1024,
+        mm_proj_out_channels=4096,
+        mm_proj_activation=nn.GELU(),
+    ):
+        super().__init__()
+        self.encoder = encoder
+        self.decoder = decoder
+
+        # esclate the embedding layer outside decoder llava model need to fuse
+        # the text and image embedding together before passing to decoder.
+        self.tok_embeddings = getattr(self.decoder, token_embedding_name)
+
+        # set the embedding layer in decoder to None to jump the embedding layer over in decoder
+        self.decoder.__setattr__(token_embedding_name, None)
+
+        self.mm_projector = MultiModalProjector(
+                in_channels=mm_proj_in_channels,
+                out_channels=mm_proj_out_channels,
+                act=mm_proj_activation,
+        )
+
+    def forward(
+        self,
+        tokens: Tensor,
+        *,
+        post_tokens: Optional[Tensor] = None,
+        encoder_input: Optional[Tensor] = None,
+        encoder_mask: Optional[torch.Tensor] = None,
+        input_pos: Optional[torch.Tensor] = None,
+    ) -> Tensor:
+        if encoder_input is not None:
+            encoder_input = encoder_input.view(1, 1, *encoder_input.shape)
+            encoder_output = self.encoder(encoder_input)
+            encoder_output = self._encoder_feature_select(encoder_output)
+        else:
+            encoder_output = None
+
+        decoder_input = self._get_decoder_input(
+            tokens, encoder_output=encoder_output, post_tokens=post_tokens
+        )
+
+        if input_pos is None:
+            input_pos = torch.arange(
+                decoder_input.shape[1],
+                device=decoder_input.device,
+                dtype=torch.int,
+            )
+
+        return self.decoder(decoder_input, input_pos=input_pos)
+    
+    def setup_caches(self, batch_size, max_seq_len) -> None:
+        self.decoder.setup_caches(batch_size, max_seq_len)
+    
+    def _encoder_feature_select(self, encoder_output) -> Tensor:
+        selected_image_feature = encoder_output[1][0].view(
+            *encoder_output[1][0].shape[2:]
+        )
+
+        selected_image_feature = selected_image_feature[:, 1:]
+        return selected_image_feature
+
+    def _get_decoder_input(
+        self,
+        tokens: Tensor,
+        *,
+        encoder_output: Optional[Tensor],
+        post_tokens: Optional[Tensor],
+    ) -> Tensor:
+        if encoder_output is None:
+            assert post_tokens is None
+            return self.tok_embeddings(tokens)
+        else:
+            pre_img_embed = self.tok_embeddings(tokens)
+            image_embeds = self.mm_projector(encoder_output)
+            if post_tokens is None:
+                return torch.cat((pre_img_embed, image_embeds), dim=1)
+            
+            post_img_embed = self.tok_embeddings(post_tokens)
+            return torch.cat((pre_img_embed, image_embeds, post_img_embed), dim=1)
+
+
 class ModelType(Enum):
     TextOnly = "text_only"
     Llama3_1 = "llama3_1"
     Flamingo = "flamingo"
+    Llava = "llava"
+
 
 # Type for objects that can generate nn.Module instance
 ModuleLike = Union[nn.Module, Callable[..., nn.Module]]
+
 
 @dataclass
 class ModelRecipe:
     """
     The class describes and contains all supported model structures in torchchat.
-    
+
     ModelRecipe represents a model as a collection of Transformer modules and a fusion module,
     providing a standardized and centralized way to define and build models in torchchat.
     Attributes:
         model_type (ModelType):
             The type of the model.
         modules (Dict[str, ModuleLike]):
-            A dictionary of ModuleLike modules, where each key is the module name and each 
+            A dictionary of ModuleLike modules, where each key is the module name and each
             value is a ModuleLike object that generates the transformer.
             The names of the Transformer modules should match the corresponding names in the
             fusion class and the JSON file holding model hyperparameters.
@@ -76,15 +197,15 @@ class ModelRecipe:
     def _text_only(cls):
         return cls(
             model_type=ModelType.TextOnly,
-            modules={'text': Transformer},
+            modules={"text": Transformer},
             fusion_class=identity,
         )
-    
+
     @classmethod
     def _llama3_1(cls):
         return cls(
             model_type=ModelType.Llama3_1,
-            modules={'text': llama3_1_builder},
+            modules={"text": llama3_1_builder},
             fusion_class=identity,
         )
 
@@ -92,23 +213,35 @@ class ModelRecipe:
     def _flamingo(cls):
         return cls(
             model_type=ModelType.Flamingo,
-            modules={
-                'encoder': flamingo_vision_encoder,
-                'decoder': flamingo_decoder
-            },
+            modules={"encoder": flamingo_vision_encoder, "decoder": flamingo_decoder},
             fusion_class=DeepFusionModel,
+        )
+
+    @classmethod
+    def _llava(cls):
+        return cls(
+            model_type=ModelType.Llava,
+            modules={
+                'encoder': clip_vision_encoder,
+                'decoder': Transformer
+            },
+            fusion_class=ConcateFusion,
         )
     
     @classmethod
     def get_recipe(cls, model_type):
-        if model_type == ModelType.TextOnly:
-            return cls._text_only()
-        elif model_type == ModelType.Flamingo:
-            return cls._flamingo()
-        elif model_type == ModelType.Llama3_1:
-            return cls._llama3_1()
-        else:
-            raise ValueError(f"Can not find the model recipe for {model_type}")
+        match model_type:
+            case ModelType.TextOnly:
+                return cls._text_only()
+            case ModelType.Flamingo:
+                return cls._flamingo()
+            case ModelType.Llama3_1:
+                return cls._llama3_1()
+            case ModelType.Llava:
+                return cls._llava()
+            case _:
+                raise ValueError(f"Can not find the model recipe for {model_type}")
+
 
 @dataclass
 class TransformerArgs:
@@ -161,46 +294,64 @@ class TransformerArgs:
 
 @dataclass
 class ModelArgs:
+    """
+    A data class to describe the structure of a model.
+    Attributes:
+        model_type (ModelType): The type of the model. This attribute is used to categorize the model into different classes.
+        transformer_args (Dict[str, Dict[str, Any]]): A dictionary containing the parameters for each transformer in the model.
+            The outer dictionary has transformer names as keys and inner dictionaries as values. Each inner dictionary contains
+            the parameter names and their corresponding values for the respective transformer.
+            TODO: econcile Dict[str, Any] into tranformer-arg-family classes in future PRs.
+
+        use_tiktoken (bool): A flag indicating whether to use TikToken as the tokenizer for the model.
+    Note:
+        It is recommended to use factory functions to create instances of this class instead of directly using the constructor.
+    """
+
     model_type: ModelType
-    transformer_args: Dict[str, Union[Dict, TransformerArgs]]
+    transformer_args: Dict[str, Dict[str, Any]]
+    use_tiktoken: bool
 
     def __init__(
         self,
-        transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
+        transformer_args: Dict[str, Dict[str, Any]],
         model_type: ModelType = ModelType.TextOnly,
+        use_tiktoken: bool = False,
     ) -> None:
         self._sanity_check(transformer_args, model_type)
-        
+
         self.model_type = model_type
-        if isinstance(transformer_args, TransformerArgs):
-            assert model_type == ModelType.TextOnly
-            self.transformer_args = {"text": transformer_args}
-        else:
-            self.transformer_args = transformer_args
-    
+        self.transformer_args = transformer_args
+
+        # Model-level attributes
+        self.use_tiktoken = use_tiktoken
+
     def _sanity_check(
         self,
-        transformer_args: Union[TransformerArgs, Dict[str, TransformerArgs]],
+        transformer_args: Dict[str, Dict[str, Any]],
         model_type: ModelType,
     ) -> None:
-        assert isinstance(model_type, ModelType)
-        assert isinstance(transformer_args, (TransformerArgs, dict))
+        assert isinstance(model_type, ModelType), model_type
+        assert isinstance(transformer_args, dict)
 
     @classmethod
     def from_params(cls, params_path):
         with open(params_path, "r") as f:
             loaded_params = json.loads(f.read())
-
-        try:
-            # try to interpret as a single transformer config
-            transformer_args: Dict[str, TransformerArgs] = {}
-            transformer_args["text"] = TransformerArgs.from_params(loaded_params)
+        
+        if (model_type_name := loaded_params.get("model_type", None)) is None:
+            # The model params is in the transformer_args format
+            # set the model_type to TextOnly and reformat the params
             model_type = ModelType.TextOnly
-        except TypeError:
-            # try to interpret as a dict of transformer configs
-            model_type = ModelType(loaded_params["model_type"])
-            transformer_args = {k: v for k, v in loaded_params.items() if k != "model_type"}
-        return cls(transformer_args, model_type)
+            transformer_args = {"text": loaded_params}
+        else:
+            model_type = ModelType(model_type_name)
+            transformer_args = {
+                k: v for k, v in loaded_params.items() if k != "model_type"
+            }
+
+        use_tiktoken = loaded_params.get("use_tiktoken", False)
+        return cls(transformer_args, model_type, use_tiktoken)
 
     @classmethod
     def from_table(cls, name: str):
@@ -281,11 +432,16 @@ class Model(ABC, nn.Module):
     """
     The entrance for model construction in torchchat.
     """
+
     def __init__(self, config: ModelArgs) -> None:
         super().__init__()
         self.config = config
         self.model = self.build_model()
-    
+
+        # text_transformer_args represents the args for the text transformer in the model.
+        # It should be assigned in the actual model implementation, if any.
+        self.text_transformer_args = None
+
     def build_model(self) -> nn.Module:
         """
         Builds a model based on the provided configuration.
@@ -297,12 +453,20 @@ class Model(ABC, nn.Module):
         recipe = ModelRecipe.get_recipe(self.config.model_type)
         modules = {}
         for name, module_class in recipe.modules.items():
-            if isinstance(config_args := self.config.transformer_args[name], dict):
-                modules[name] = module_class(**config_args)
+            config_args = self.config.transformer_args[name]
+            if module_class == Transformer:
+                modules[name] = module_class(TransformerArgs.from_params(config_args))
             else:
-                modules[name] = module_class(config_args)
+                modules[name] = module_class(**config_args)
 
         return recipe.fusion_class(**modules)
+    
+    def _replace_known_params(self, params):
+        patterns = {"QuickGELUActivation()": QuickGELUActivation()}
+        for key, value in params.items():
+            if isinstance(value, Hashable) and value in patterns:
+                params[key] = patterns[value]
+        return params
     
     @abstractmethod
     def forward(self, *args, **kwargs):
@@ -346,6 +510,10 @@ class Model(ABC, nn.Module):
 
 
 class TextOnlyModel(Model):
+    def __init__(self, config: ModelArgs) -> None:
+        super().__init__(config)
+        self.text_transformer_args = self.model.config
+
     def forward(self, tokens: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
         return self.model(tokens, input_pos)
 
@@ -373,7 +541,9 @@ class FlamingoModel(Model):
     ) -> Tensor:
         if encoder_input is None:
             return self.model(tokens, encoder_mask=encoder_mask)
-        return self.model(tokens, encoder_input=encoder_input, encoder_mask=encoder_mask)
+        return self.model(
+            tokens, encoder_input=encoder_input, encoder_mask=encoder_mask
+        )
 
     def setup_caches(self, max_batch_size, dtype):
         self.model.setup_caches(max_batch_size, dtype=dtype)
@@ -382,11 +552,28 @@ class FlamingoModel(Model):
         self.model.reset_caches()
 
 
+class LlavaModel(Model):
+    def forward(
+        self,
+        tokens: Tensor,
+        *,
+        encoder_input: Optional[Dict[str, Tensor]] = None,
+        post_tokens: Optional[Tensor] = None,
+        input_pos: Optional[Tensor] = None,
+    ) -> Tensor:
+        return self.model(tokens, encoder_input=encoder_input, post_tokens=post_tokens, input_pos=input_pos)
+
+    def setup_caches(self, max_batch_size, max_seq_length):
+        self.model.setup_caches(max_batch_size, max_seq_length)
+
+
 MODEL_TYPE_TO_CLASS = {
     ModelType.TextOnly: TextOnlyModel,
     ModelType.Flamingo: FlamingoModel,
     ModelType.Llama3_1: Llama31Model,
+    ModelType.Llava: LlavaModel,
 }
+
 
 class Transformer(nn.Module):
     def __init__(self, config: TransformerArgs) -> None:
@@ -396,14 +583,16 @@ class Transformer(nn.Module):
 
         self.tok_embeddings = (
             nn.Embedding(config.vocab_size, config.dim)
-            if config.stage_idx == 0 else None
+            if config.stage_idx == 0
+            else None
         )
 
         # Use ModuleDict so that each layer can be assigned its layer ID in the original model
         self.layers = nn.ModuleDict()
 
         for layer_id in range(
-            layers_per_stage * config.stage_idx, layers_per_stage * (config.stage_idx + 1)
+            layers_per_stage * config.stage_idx,
+            layers_per_stage * (config.stage_idx + 1),
         ):
             self.layers[str(layer_id)] = TransformerBlock(config)
 
@@ -416,8 +605,6 @@ class Transformer(nn.Module):
 
         self.max_batch_size = -1
         self.max_seq_length = -1
-        # For supporting sequence parallel (default is off, thus value of 1)
-        self.seq_parallel_degree = 1
 
     def setup_caches(self, max_batch_size, max_seq_length):
         if (
@@ -425,13 +612,15 @@ class Transformer(nn.Module):
             and self.max_batch_size >= max_batch_size
         ):
             return
-        head_dim = self.config.dim // self.config.n_heads
         max_seq_length = find_multiple(max_seq_length, 8)
         self.max_seq_length = max_seq_length
         self.max_batch_size = max_batch_size
         for b in self.layers.values():
-            b.attention.kv_cache = KVCache(
-                max_batch_size, max_seq_length, self.config.n_local_heads, head_dim
+            # Lower the setup_cache call to the attention module because tensor
+            # parallelism may have been applied there and the `n_local_heads``
+            # value being adjusted.
+            b.attention.setup_cache(
+                max_batch_size, max_seq_length,
             )
 
         freqs_cis = precompute_freqs_cis(
@@ -449,29 +638,20 @@ class Transformer(nn.Module):
     def distribute(self, device_mesh: DeviceMesh):
         if self.tok_embeddings:
             parallelize_module(
-                self.tok_embeddings, device_mesh,
-                RowwiseParallel(
-                    input_layouts=Replicate(),
-                    output_layouts=Shard(1),
-                ),
+                self.tok_embeddings,
+                device_mesh,
+                RowwiseParallel(input_layouts=Replicate()),
             )
 
         for layer in self.layers.values():
             layer.distribute(device_mesh)
 
-        if self.norm:
-            parallelize_module(self.norm, device_mesh, SequenceParallel())
-
         if self.output:
             parallelize_module(
-                self.output, device_mesh,
-                ColwiseParallel(
-                    input_layouts=Shard(1),
-                    output_layouts=Replicate(),
-                ),
+                self.output,
+                device_mesh,
+                ColwiseParallel(output_layouts=Replicate()),
             )
-
-        self.seq_parallel_degree = device_mesh.size()
 
     # This is a temporary solution to pass input_pos to non-0 pipeline stages
     # TODO: make `step()` function of dist.pipelining accept args for non-0 stages
@@ -509,8 +689,6 @@ class TransformerBlock(nn.Module):
     def distribute(self, device_mesh: DeviceMesh):
         self.attention.distribute(device_mesh)
         self.feed_forward.distribute(device_mesh)
-        parallelize_module(self.ffn_norm, device_mesh, SequenceParallel())
-        parallelize_module(self.attention_norm, device_mesh, SequenceParallel())
 
     def forward(
         self, x: Tensor, input_pos: Tensor, freqs_cis: Tensor, mask: Tensor
@@ -544,6 +722,16 @@ class Attention(nn.Module):
         self.n_local_heads = config.n_local_heads
         self.dim = config.dim
         self._register_load_state_dict_pre_hook(self.load_hook)
+
+    def setup_cache(self, max_batch_size, max_seq_length):
+        n_local_heads = self.n_local_heads
+        # If TP is enabled, the heads would be divided and assigned to different ranks
+        if hasattr(self, "tp_degree"):
+            n_local_heads = self.n_local_heads // self.tp_degree
+
+        self.kv_cache = KVCache(
+            max_batch_size, max_seq_length, n_local_heads, self.head_dim
+        )
 
     def load_hook(self, state_dict, prefix, *args):
         # if prefix + "wq.weight" in state_dict:
@@ -584,13 +772,11 @@ class Attention(nn.Module):
         _unfuse_wqkv_state_dict(state_dict, self.dim)
 
     def distribute(self, device_mesh: DeviceMesh):
-        self.device_mesh = device_mesh
+        self.tp_degree = device_mesh.size()
         parallelize_module(self.wq, device_mesh, ColwiseParallel())
         parallelize_module(self.wk, device_mesh, ColwiseParallel())
         parallelize_module(self.wv, device_mesh, ColwiseParallel())
-        parallelize_module(self.wo, device_mesh, RowwiseParallel(output_layouts=Shard(1)))
-        # TODO: enable kv cache in distributed case
-        self.kv_cache = None
+        parallelize_module(self.wo, device_mesh, RowwiseParallel())
 
     def forward(
         self,
@@ -599,10 +785,6 @@ class Attention(nn.Module):
         mask: Tensor,
         input_pos: Optional[Tensor] = None,
     ) -> Tensor:
-        # Gather sequence back in case of sequence parallelism before attention
-        if isinstance(x, DTensor):
-            x = x.redistribute(self.device_mesh, [Replicate()])
-
         bsz, seqlen, _ = x.shape
 
         q = self.wq(x)
@@ -648,16 +830,11 @@ class FeedForward(nn.Module):
         self.w3 = nn.Linear(config.dim, config.hidden_dim, bias=False)
 
     def distribute(self, device_mesh: DeviceMesh):
-        self.device_mesh = device_mesh
         parallelize_module(self.w1, device_mesh, ColwiseParallel())
-        parallelize_module(self.w2, device_mesh, RowwiseParallel(output_layouts=Shard(1)))
+        parallelize_module(self.w2, device_mesh, RowwiseParallel())
         parallelize_module(self.w3, device_mesh, ColwiseParallel())
 
     def forward(self, x: Tensor) -> Tensor:
-        # Gather sequence back in case of sequence parallelism
-        if isinstance(x, DTensor):
-            x = x.redistribute(self.device_mesh, [Replicate()])
-
         return self.w2(F.silu(self.w1(x)) * self.w3(x))
 
 
@@ -677,9 +854,16 @@ class RMSNorm(nn.Module):
 
 def apply_scaling(freqs: torch.Tensor, rope_scaling: Dict[str, Any]):
     # Check for the presence of the required keys
-    required_keys = {"factor", "low_freq_factor", "high_freq_factor", "original_max_position_embeddings"}
+    required_keys = {
+        "factor",
+        "low_freq_factor",
+        "high_freq_factor",
+        "original_max_position_embeddings",
+    }
     if not required_keys.issubset(rope_scaling.keys()):
-        raise ValueError(f"Missing required keys in apply_scaling. Expected: {required_keys}")
+        raise ValueError(
+            f"Missing required keys in apply_scaling. Expected: {required_keys}"
+        )
 
     scale_factor = rope_scaling["factor"]
     low_freq_factor = rope_scaling["low_freq_factor"]
@@ -705,7 +889,11 @@ def apply_scaling(freqs: torch.Tensor, rope_scaling: Dict[str, Any]):
 
 
 def precompute_freqs_cis(
-    n_elem: int, seq_len: int, base: int = 10000, dtype=None, rope_scaling: Optional[Dict[str, Any]] = None
+    n_elem: int,
+    seq_len: int,
+    base: int = 10000,
+    dtype=None,
+    rope_scaling: Optional[Dict[str, Any]] = None,
 ) -> Tensor:
     if not dtype:
         dtype = get_precision()
@@ -742,9 +930,12 @@ def apply_rotary_emb(x: Tensor, freqs_cis: Tensor) -> Tensor:
 
 try:
     from executorch.extension.pybindings import portable_lib as exec_lib
-    
+
     # ET changed the way it's loading the custom ops so it's not included in portable_lib but has to be loaded separately.
-    from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache  # no-qa
+    # For quantized_decomposed ops
+    from executorch.kernels import quantized  # no-qa
+    # For llama::sdpa_with_kv_cache.out, preprocess ops
+    from executorch.extension.llm.custom_ops import sdpa_with_kv_cache  # no-qa
 
     class PTEModel(nn.Module):
         def __init__(self, config, path) -> None:
@@ -752,6 +943,8 @@ try:
             self.config = config
             self.model_ = exec_lib._load_for_executorch(str(path))
 
+            self.text_transformer_args = TransformerArgs.from_params(self.config.transformer_args["text"])
+            
         def forward(self, x, input_pos):
             # model_.forward expects inputs to be wrapped in a tuple
             forward_inputs = (x.to(torch.long), input_pos.to(torch.long))
@@ -761,10 +954,15 @@ try:
             # the first element to get the tensor
             assert len(logits) == 1
             logits = logits[0]
+
+            # Add a batch dimension, if it's missing (e.g. some pte's
+            # exported from the ExecuTorch repo)
+            if logits.dim() == 2:
+                logits = logits.unsqueeze(0)
             return logits
 
         def setup_caches(self, max_batch_size, max_seq_length):
             pass
-
+        
 except:
     pass
