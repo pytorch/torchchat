@@ -3,6 +3,7 @@
 
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+import glob
 import json
 import os
 import re
@@ -41,7 +42,12 @@ def convert_hf_checkpoint(
     print(f"Model config {config.__dict__}")
 
     # Load the json file containing weight mapping
-    model_map_json = model_dir / "pytorch_model.bin.index.json"
+    model_map_json_matches = [Path(m) for m in glob.glob(str(model_dir / "*.index.json"))]
+    assert len(model_map_json_matches) <= 1, "Found multiple weight mapping files"
+    if len(model_map_json_matches):
+        model_map_json = model_map_json_matches[0]
+    else:
+        model_map_json = model_dir / "pytorch_model.bin.index.json"
 
     # If there is no weight mapping, check for a consolidated model and
     # tokenizer we can move. Llama 2 and Mistral have weight mappings, while
