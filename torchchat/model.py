@@ -480,7 +480,20 @@ class Model(ABC, nn.Module):
         unexpected_keys,
         error_msgs,
     ):
-        # update key names to match the new model
+        """
+        Updates the loaded internal model state dictionary to match the Model class structure.
+        Note that this is a temporary solution and will be removed once the model structure is finalized.
+        Args:
+            state_dict (dict): The state dictionary to load.
+            prefix (str): The prefix of the model.
+            local_metadata (dict): Local metadata.
+            strict (bool): Whether to strictly enforce that the keys in the state dictionary match the keys in the model.
+            missing_keys (list): List of missing keys.
+            unexpected_keys (list): List of unexpected keys.
+            error_msgs (list): List of error messages.
+        Returns:
+            dict: The updated state dictionary.            
+        """
         for key in list(state_dict.keys()):
             new_key = "model." + key
             state_dict[new_key] = state_dict.pop(key)
