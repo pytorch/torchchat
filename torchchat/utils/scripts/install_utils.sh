@@ -8,8 +8,10 @@
 set -ex pipefail
 
 if [ -z "$TORCHCHAT_ROOT" ]; then
-  echo "Defaulting TORCHCHAT_ROOT to $PWD since it is unset."
-  TORCHCHAT_ROOT=$PWD
+  # Get the absolute path of the current script
+  SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+  TORCHCHAT_ROOT="$SCRIPT_PATH/../../.."
+  echo "Defaulting TORCHCHAT_ROOT to $TORCHCHAT_ROOT since it is unset."
 fi
 
 install_pip_dependencies() {
@@ -73,6 +75,7 @@ clone_executorch() {
   clone_executorch_internal
 }
 
+
 install_executorch_python_libs() {
   if [ ! -d "${TORCHCHAT_ROOT}/${ET_BUILD_DIR}" ]; then
     echo "Directory ${TORCHCHAT_ROOT}/${ET_BUILD_DIR} does not exist."
@@ -102,9 +105,10 @@ COMMON_CMAKE_ARGS="\
     -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON \
     -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON \
     -DEXECUTORCH_BUILD_KERNELS_QUANTIZED=ON \
-    -DEXECUTORCH_BUILD_XNNPACK=ON"
+    -DEXECUTORCH_BUILD_XNNPACK=ON \
+    -DEXECUTORCH_BUILD_EXTENSION_TENSOR=ON"
 
-install_executorch() {
+install_executorch_cpp_libs() {
   # AOT lib has to be build for model export
   # So by default it is built, and you can explicitly opt-out
   EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT_VAR=OFF
@@ -144,7 +148,6 @@ install_executorch() {
         -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
         -DEXECUTORCH_BUILD_KERNELS_CUSTOM_AOT=${EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT_VAR} \
         -DEXECUTORCH_BUILD_KERNELS_CUSTOM=${EXECUTORCH_BUILD_KERNELS_CUSTOM_VAR} \
-        -DEXECUTORCH_BUILD_XNNPACK=ON \
         ${CROSS_COMPILE_ARGS} \
         -S . -B ${CMAKE_OUT_DIR} -G Ninja
   cmake --build ${CMAKE_OUT_DIR} -j16
@@ -153,12 +156,8 @@ install_executorch() {
 }
 
 install_executorch_libs() {
-  # Install executorch python and C++ libs
-  export CMAKE_ARGS="\
-    ${COMMON_CMAKE_ARGS} \
-    -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
-    -DCMAKE_INSTALL_PREFIX=${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install"
-  export CMAKE_BUILD_ARGS="--target install"
-
+  EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT_VAR=OFF
+  EXECUTORCH_BUILD_KERNELS_CUSTOM_VAR=OFF
+  install_executorch_cpp_libs
   install_executorch_python_libs $1
 }

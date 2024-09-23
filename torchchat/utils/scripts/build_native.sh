@@ -25,6 +25,7 @@ if [ $# -eq 0 ]; then
     show_help
     exit 1
 fi
+
 while (( "$#" )); do
   case "$1" in
     -h|--help)
@@ -49,15 +50,7 @@ while (( "$#" )); do
   esac
 done
 
-if [ -z "${TORCHCHAT_ROOT}" ]; then
-    # Get the absolute path of the current script
-    SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-    # Get the absolute path of the parent directory
-    TORCHCHAT_ROOT="$(dirname "$SCRIPT_PATH")"
-    source "$TORCHCHAT_ROOT/scripts/install_utils.sh"
-else
-    source "$TORCHCHAT_ROOT/torchchat/utils/scripts/install_utils.sh"
-fi
+source "$(dirname "${BASH_SOURCE[0]}")/install_utils.sh"
 
 if [ -z "${ET_BUILD_DIR}" ]; then
     ET_BUILD_DIR="et-build"
@@ -68,16 +61,17 @@ pushd ${TORCHCHAT_ROOT}
 git submodule update --init
 git submodule sync
 if [[ "$TARGET" == "et" ]]; then
-    find_cmake_prefix_path
-    install_pip_dependencies
-    clone_executorch
-    install_executorch_libs false
+  if [ ! -d "${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install" ]; then
+    echo "Directory ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install does not exist."
+    echo "Make sure you run install_executorch_libs"
+    exit 1
+  fi
 fi
 popd
 
 # CMake commands
 if [[ "$TARGET" == "et" ]]; then
-    cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=1" -G Ninja
+    cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` -DET_USE_ADAPTIVE_THREADS=ON -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=1" -G Ninja
 else
     cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" -G Ninja
 fi
