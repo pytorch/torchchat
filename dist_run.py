@@ -399,10 +399,9 @@ def main(args):
     last_pp_rank_global_id = dist.get_global_rank(pp_group, last_pp_rank)
 
     # New token generated each iteration
-    total_prompts = len(prompt_lengths)
-    # need a new token dimension (row) for each prompt in the batch
-    new_token = torch.zeros(total_prompts, 1, device=device, dtype=torch.int64)
-    res = [[] for _ in range(total_prompts)]
+    # need a row dimension for each prompt in the batch
+    new_token = torch.zeros(batch_size, 1, device=device, dtype=torch.int64)
+    res = [[] for _ in range(batch_size)]
     num_tokens = 40
 
     # Prefill phase
