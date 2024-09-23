@@ -152,9 +152,9 @@ try:
             self.wo = attention.wo
 
             max_batch_size, n_heads, max_seq_length, head_dim = (
-                attention.kv_cache.k_cache.shape
+                attention.kv_cache[0].k_cache.shape
             )
-            cache_dtype = attention.kv_cache.k_cache.dtype
+            cache_dtype = attention.kv_cache[0].k_cache.dtype
             self.kv_cache = CustomKVCache(
                 max_batch_size, max_seq_length, n_heads, head_dim, cache_dtype
             )
