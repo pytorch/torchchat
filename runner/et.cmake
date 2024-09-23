@@ -69,6 +69,8 @@ if(executorch_FOUND)
     list(APPEND _common_include_directories
          ${XNNPACK_ROOT}/third-party/pthreadpool/include)
   endif()
+  add_library(custom_ops STATIC IMPORTED)
+  set_property(TARGET custom_ops PROPERTY IMPORTED_LOCATION ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libcustom_ops.a)
 
   target_include_directories(executorch INTERFACE ${_common_include_directories}) # Ideally ExecuTorch installation process would do this
   add_executable(et_run ${_srcs})
@@ -109,6 +111,8 @@ if(executorch_FOUND)
     target_link_options_shared_lib(executorch)
   endif()
 
+  # target_link_libraries(et_run PRIVATE
+  # "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libcustom_ops.a>")
   # This one is needed for cpuinfo where it uses android specific log lib
   if(ANDROID)
     target_link_libraries(et_run PRIVATE log)
