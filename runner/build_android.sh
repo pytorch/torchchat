@@ -24,8 +24,6 @@ export CMAKE_OUT_DIR="cmake-out-android"
 export EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT="OFF"
 export EXECUTORCH_BUILD_KERNELS_CUSTOM="ON"
 export CMAKE_OUT_DIR="cmake-out-android"
-# export DCMAKE_INSTALL_PREFIX=cmake-out-android
-#
 
 build_runner_et() {
   rm -rf cmake-out-android
@@ -43,5 +41,5 @@ install_executorch_python_libs $ENABLE_ET_PYBIND
 export CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake
 export ANDROID_ABI=arm64-v8a
 export ANDROID_PLATFORM=android-23
-install_executorch
+install_executorch_cpp_libs
 build_runner_et
