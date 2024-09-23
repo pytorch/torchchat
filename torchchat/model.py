@@ -606,7 +606,7 @@ class Transformer(nn.Module):
         self.max_batch_size = -1
         self.max_seq_length = -1
 
-    def setup_caches(self, max_batch_size, max_seq_length):
+    def setup_caches(self, max_batch_size, max_seq_length, cache_lanes: int = 1):
         if (
             self.max_seq_length >= max_seq_length
             and self.max_batch_size >= max_batch_size
@@ -620,7 +620,7 @@ class Transformer(nn.Module):
             # parallelism may have been applied there and the `n_local_heads``
             # value being adjusted.
             b.attention.setup_cache(
-                max_batch_size, max_seq_length,
+                max_batch_size, max_seq_length, cache_lanes=cache_lanes
             )
 
         freqs_cis = precompute_freqs_cis(
@@ -653,22 +653,15 @@ class Transformer(nn.Module):
                 ColwiseParallel(output_layouts=Replicate()),
             )
 
-    # This is a temporary solution to pass input_pos to non-0 pipeline stages
-    # TODO: make `step()` function of dist.pipelining accept args for non-0 stages
-    def setup_input_pos(self, input_pos: Tensor) -> None:
-        self._input_pos = input_pos
-
-    def forward(self, x: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
+    def forward(self, x: Tensor, input_pos: Optional[Tensor] = None, cache_lane: int = 1) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
-        # TODO: find a better way to pass input_pos to non-0 pipeline stages
-        input_pos = input_pos if input_pos is not None else self._input_pos
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
         if self.tok_embeddings:
             x = self.tok_embeddings(x)
 
         for _, layer in self.layers.items():
-            x = layer(x, input_pos, freqs_cis, mask)
+            x = layer(x, input_pos, freqs_cis, mask, cache_lane=cache_lane)
 
         if self.norm:
             x = self.norm(x)
@@ -691,7 +684,7 @@ class TransformerBlock(nn.Module):
         self.feed_forward.distribute(device_mesh)
 
     def forward(
-        self, x: Tensor, input_pos: Tensor, freqs_cis: Tensor, mask: Tensor
+        self, x: Tensor, input_pos: Tensor, freqs_cis: Tensor, mask: Tensor, cache_lane: int = 0
     ) -> Tensor:
         h = x + self.attention(self.attention_norm(x), freqs_cis, mask, input_pos)
         out = h + self.feed_forward(self.ffn_norm(h))
@@ -723,15 +716,16 @@ class Attention(nn.Module):
         self.dim = config.dim
         self._register_load_state_dict_pre_hook(self.load_hook)
 
-    def setup_cache(self, max_batch_size, max_seq_length):
+    def setup_cache(self, max_batch_size, max_seq_length, cache_lanes: int = 1):
         n_local_heads = self.n_local_heads
         # If TP is enabled, the heads would be divided and assigned to different ranks
         if hasattr(self, "tp_degree"):
             n_local_heads = self.n_local_heads // self.tp_degree
 
-        self.kv_cache = KVCache(
-            max_batch_size, max_seq_length, n_local_heads, self.head_dim
-        )
+        self.kv_cache = nn.ModuleList([
+            KVCache(max_batch_size, max_seq_length, n_local_heads, self.head_dim)
+            for _ in range(cache_lanes)
+        ])
 
     def load_hook(self, state_dict, prefix, *args):
         # if prefix + "wq.weight" in state_dict:
@@ -784,6 +778,7 @@ class Attention(nn.Module):
         freqs_cis: Tensor,
         mask: Tensor,
         input_pos: Optional[Tensor] = None,
+        cache_lane: int = 0,
     ) -> Tensor:
         bsz, seqlen, _ = x.shape
 
@@ -809,7 +804,7 @@ class Attention(nn.Module):
         q, k, v = (x.transpose(1, 2) for x in (q, k, v))
 
         if self.kv_cache is not None:
-            k, v = self.kv_cache.update(input_pos, k, v)
+            k, v = self.kv_cache[cache_lane].update(input_pos, k, v)
 
         k = k.repeat_interleave(self.n_heads // self.n_local_heads, dim=1)
         v = v.repeat_interleave(self.n_heads // self.n_local_heads, dim=1)
