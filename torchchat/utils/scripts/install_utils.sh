@@ -148,7 +148,6 @@ install_executorch_cpp_libs() {
         -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
         -DEXECUTORCH_BUILD_KERNELS_CUSTOM_AOT=${EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT_VAR} \
         -DEXECUTORCH_BUILD_KERNELS_CUSTOM=${EXECUTORCH_BUILD_KERNELS_CUSTOM_VAR} \
-        -DEXECUTORCH_BUILD_XNNPACK=ON \
         ${CROSS_COMPILE_ARGS} \
         -S . -B ${CMAKE_OUT_DIR} -G Ninja
   cmake --build ${CMAKE_OUT_DIR}
@@ -157,6 +156,8 @@ install_executorch_cpp_libs() {
 }
 
 install_executorch_libs() {
+  EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT_VAR=OFF
+  EXECUTORCH_BUILD_KERNELS_CUSTOM_VAR=OFF
   install_executorch_cpp_libs
   install_executorch_python_libs $1
 }
