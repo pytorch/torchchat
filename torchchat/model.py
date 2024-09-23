@@ -14,7 +14,7 @@ from pathlib import Path
 
 import torchvision
 
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 from collections.abc import Hashable
 
 import torch
@@ -55,52 +55,6 @@ def identity(**kwargs):
         raise ValueError("Only one argument is expected")
     return list(kwargs.values())[0]
 
-
-# Based on https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py#L77
-def hf_precompute_freqs_cis(dim: int, end: int, theta: float, **kwargs):
-    freqs = 1.0 / (
-        theta
-        ** (torch.arange(0, dim, 2, dtype=torch.int64).float() / dim)
-    )
-    # pyre-ignore Undefined attribute [16]: `float` has no attribute `device`.
-    t = torch.arange(end, device=freqs.device, dtype=torch.int64).type_as(
-        freqs  # pyre-ignore
-    )
-    freqs = torch.outer(t, freqs).float()  # pyre-ignore
-    emb = torch.cat((freqs, freqs), dim=-1)
-    freqs_cos = torch.cos(emb)
-    freqs_sin = torch.sin(emb)
-    return torch.stack((freqs_cos, freqs_sin), dim=-1)
-
-# Based on https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py#L135
-def rotate_half(x):
-    """Rotates half the hidden dims of the input."""
-    x1 = x[..., : x.shape[-1] // 2]
-    x2 = x[..., x.shape[-1] // 2 :]
-    return torch.cat((-x2, x1), dim=-1)
-
-
-def hf_apply_rotary_emb(x, freq_cis, unsqueeze_dim=1, **kwargs):
-    """Applies Rotary Position Embedding to the query and key tensors.
-
-    Args:
-        q (`torch.Tensor`): The query tensor.
-        k (`torch.Tensor`): The key tensor.
-        cos (`torch.Tensor`): The cosine part of the rotary embedding.
-        sin (`torch.Tensor`): The sine part of the rotary embedding.
-        unsqueeze_dim (`int`, *optional*, defaults to 1):
-            The 'unsqueeze_dim' argument specifies the dimension along which to unsqueeze cos[position_ids] and
-            sin[position_ids] so that they can be properly broadcasted to the dimensions of q and k. For example, note
-            that cos[position_ids] and sin[position_ids] have the shape [batch_size, seq_len, head_dim]. Then, if q and
-            k have the shape [batch_size, heads, seq_len, head_dim], then setting unsqueeze_dim=1 makes
-            cos[position_ids] and sin[position_ids] broadcastable to the shapes of q and k. Similarly, if q and k have
-            the shape [batch_size, seq_len, heads, head_dim], then set unsqueeze_dim=2.
-    Returns:
-        `tuple(torch.Tensor)` comprising of the query and key tensors rotated using the Rotary Position Embedding.
-    """
-    cos = freq_cis[..., 0].unsqueeze(unsqueeze_dim)
-    sin = freq_cis[..., 1].unsqueeze(unsqueeze_dim)
-    return (x * cos) + (rotate_half(x) * sin)
 
 class MultiModalProjector(nn.Module):
     def __init__(self, in_channels: int, out_channels: int, act: nn.Module):
@@ -204,6 +158,10 @@ class ConcateFusion(nn.Module):
                 return torch.cat((pre_img_embed, image_embeds), dim=1)
             
             post_img_embed = self.tok_embeddings(post_tokens)
+            print("embeddings sizes:")
+            print(pre_img_embed.shape)
+            print(image_embeds.shape)
+            print(post_img_embed.shape)
             return torch.cat((pre_img_embed, image_embeds, post_img_embed), dim=1)
 
 
@@ -462,7 +420,6 @@ class KVCache(nn.Module):
         # print(f"dtype on entry {dtype}")
         if not dtype:
             dtype = get_precision()
-        # print(f"dtype on get_prec {dtype}")
         cache_shape = (max_batch_size, n_heads, max_seq_length, head_dim)
         self.register_buffer("k_cache", torch.zeros(cache_shape, dtype=dtype))
         self.register_buffer("v_cache", torch.zeros(cache_shape, dtype=dtype))
@@ -731,10 +688,16 @@ class Transformer(nn.Module):
         input_pos = input_pos if input_pos is not None else self._input_pos
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
+
+        print("before tok_embedding", x.dtype)
+
         if self.tok_embeddings:
             x = self.tok_embeddings(x)
+        
+        print("after tok_embedding", x.dtype)
 
-        for _, layer in self.layers.items():
+        for idx, (_, layer) in enumerate(self.layers.items()):
+            print(f"before entering layer {idx} tok_embedding", x.dtype)
             x = layer(x, input_pos, freqs_cis, mask)
 
         if self.norm:
@@ -1011,6 +974,58 @@ def apply_rotary_emb(x: Tensor, freqs_cis: Tensor) -> Tensor:
     return x_out2.type_as(x)
 
 
+
+# Based on https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py#L77
+def hf_precompute_freqs_cis(dim: int, end: int, theta: float, dtype=None, **kwargs):
+    if not dtype:
+        dtype = get_precision()
+
+    freqs = 1.0 / (
+        theta
+        ** (torch.arange(0, dim, 2, dtype=torch.int64).float() / dim)
+    )
+    # pyre-ignore Undefined attribute [16]: `float` has no attribute `device`.
+    t = torch.arange(end, device=freqs.device, dtype=torch.int64).type_as(
+        freqs  # pyre-ignore
+    )
+    freqs = torch.outer(t, freqs).float()  # pyre-ignore
+    emb = torch.cat((freqs, freqs), dim=-1)
+    freqs_cos = torch.cos(emb)
+    freqs_sin = torch.sin(emb)
+    return torch.stack((freqs_cos, freqs_sin), dim=-1).to(dtype=dtype)
+
+# Based on https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py#L135
+def rotate_half(x):
+    """Rotates half the hidden dims of the input."""
+    x1 = x[..., : x.shape[-1] // 2]
+    x2 = x[..., x.shape[-1] // 2 :]
+    return torch.cat((-x2, x1), dim=-1)
+
+
+def hf_apply_rotary_emb(x, freq_cis, unsqueeze_dim=1, **kwargs):
+    """Applies Rotary Position Embedding to the query and key tensors.
+
+    Args:
+        q (`torch.Tensor`): The query tensor.
+        k (`torch.Tensor`): The key tensor.
+        cos (`torch.Tensor`): The cosine part of the rotary embedding.
+        sin (`torch.Tensor`): The sine part of the rotary embedding.
+        unsqueeze_dim (`int`, *optional*, defaults to 1):
+            The 'unsqueeze_dim' argument specifies the dimension along which to unsqueeze cos[position_ids] and
+            sin[position_ids] so that they can be properly broadcasted to the dimensions of q and k. For example, note
+            that cos[position_ids] and sin[position_ids] have the shape [batch_size, seq_len, head_dim]. Then, if q and
+            k have the shape [batch_size, heads, seq_len, head_dim], then setting unsqueeze_dim=1 makes
+            cos[position_ids] and sin[position_ids] broadcastable to the shapes of q and k. Similarly, if q and k have
+            the shape [batch_size, seq_len, heads, head_dim], then set unsqueeze_dim=2.
+    Returns:
+        `tuple(torch.Tensor)` comprising of the query and key tensors rotated using the Rotary Position Embedding.
+    """
+    cos = freq_cis[..., 0].unsqueeze(unsqueeze_dim)
+    sin = freq_cis[..., 1].unsqueeze(unsqueeze_dim)
+    x_out = (x * cos) + (rotate_half(x) * sin)
+    return x_out.type_as(x)
+
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ExecuTorch model components
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1045,6 +1060,90 @@ try:
         
 except:
     pass
+
+
+from torchvision import transforms as tvT
+
+def llava_image_preprocess(
+        # img_address: str,
+        target_h: int,
+        target_w: int,
+        rescale_factor: float, 
+        image_mean: List[float], 
+        image_std: List[float],
+    ) -> torch.Tensor:
+    """
+    Preprocess an image by resizing it to fit a target height and width, 
+    padding with median RGB value to make a square, scaling, and normalizing.
+
+    Args:
+        img_address (str): Address of the local image file will be forwarded to the model.
+        target_h (int): Target height.
+        target_w (int): Target width.
+        rescale_factor (float): Rescaling factor.
+        image_mean (list): Mean values for normalization.
+        image_std (list): Standard deviation values for normalization.
+
+    Returns:
+        torch.Tensor: Preprocessed image tensor.
+
+    Raises:
+        FileNotFoundError: If the image file does not exist.
+        ValueError: If the target height or width is not positive.
+    """
+
+    # # Check if the image file exists
+    # if not os.path.exists(img_address):
+    #     raise FileNotFoundError("Image file not found")
+
+    # Check if the target height and width are positive
+    if target_h <= 0 or target_w <= 0:
+        raise ValueError("Target height and width must be positive")
+
+    # Load the image from the given address
+    image = Image.open(
+            requests.get(
+                "https://llava-vl.github.io/static/images/view.jpg", stream=True
+            ).raw)
+    # Convert the image to a tensor
+    img = tvT.functional.pil_to_tensor(image)
+
+    # Calculate the height and width ratios
+    ratio_h = img.shape[1] / target_h
+    ratio_w = img.shape[2] / target_w
+
+    # Resize the image to fit in a target_h x target_w canvas
+    ratio = max(ratio_h, ratio_w)
+    output_size = (int(img.shape[1] / ratio), int(img.shape[2] / ratio))
+    img = tvT.Resize(size=output_size)(img)
+
+    # Pad the image with median RGB value to make a square
+    l_pad = (target_w - img.shape[2]) // 2
+    t_pad = (target_h - img.shape[1]) // 2
+    r_pad = -((target_w - img.shape[2]) // -2)
+    b_pad = -((target_h - img.shape[1]) // -2)
+
+    torch._check(l_pad >= 0)
+    torch._check(t_pad >= 0)
+    torch._check(r_pad >= 0)
+    torch._check(b_pad >= 0)
+
+    # Pad the image
+    resized = torch.nn.functional.pad(
+        img,
+        (l_pad, r_pad, t_pad, b_pad),
+    )
+
+    # Scale the image
+    scaled = resized * rescale_factor
+
+    # Normalize the image
+    normed = tvT.Normalize(image_mean, image_std)(scaled)
+
+    return normed.unsqueeze(0)
+
+
+
 
 
 if __name__ == "__main__":
@@ -1381,11 +1480,12 @@ if __name__ == "__main__":
             21082, 20255, 29889,   450, 20255,  4076,  8444, 29892, 13173, 29892,
             322,  1248,   568,  6089,   304,   278,  5199, 29915, 29879,  5155,
             29889,  3148,  1001, 29901, 29871]])
-        img = prepare_image(336, 336)
+        # img = prepare_image(336, 336)
         post_tokens = torch.tensor([[29871,    13,   462,  9651,  1724,   526,   278,  2712,   306,   881,
             367,   274,  1300,  2738,  1048,   746,   306,  6493,  1244, 29973,
             319,  1799,  9047, 13566, 29901]])
-        img = image_preprocess(img=img, target_h=336, target_w=336, image_mean=[0.48145466, 0.4578275, 0.40821073], image_std=[0.26862954, 0.26130258, 0.27577711], rescale_factor=0.00392156862745098)
+        img = llava_image_preprocess(target_h=336, target_w=336, image_mean=[0.48145466, 0.4578275, 0.40821073], image_std=[0.26862954, 0.26130258, 0.27577711], rescale_factor=0.00392156862745098)
+        print(img)
         
         print("Done, Now creating model...")
         llava_model = Model.from_params("/home/gasoonjia/torchchat/torchchat/model_params/llava-1.5.json")
