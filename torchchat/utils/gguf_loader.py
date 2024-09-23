@@ -47,7 +47,6 @@ def _convert_gguf_tensor_name_to_llama_nn(gguf_name: str) -> str:
     result = copy.deepcopy(gguf_name)
     for gguf_string, replacement in _name_replacements:
         result = result.replace(gguf_string, replacement)
-    result = "model." + result
     return result
 
 
@@ -55,6 +54,10 @@ def _fqn_lookup(fqn: str, module: torch.nn.Module) -> Any:
     if fqn == "":
         return module
     atoms = fqn.split(".")
+    # Expose the root module to users.
+    # Note this is temporary, and will be removed once we removed Model.model
+    if isinstance(module, Model):
+        module = module.model
     curr = module
     for a in atoms:
         curr = getattr(curr, a)

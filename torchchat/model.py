@@ -442,6 +442,8 @@ class Model(ABC, nn.Module):
         # It should be assigned in the actual model implementation, if any.
         self.text_transformer_args = None
 
+        self._register_load_state_dict_pre_hook(self._load_model_state_dict)
+
     def build_model(self) -> nn.Module:
         """
         Builds a model based on the provided configuration.
@@ -468,6 +470,35 @@ class Model(ABC, nn.Module):
                 params[key] = patterns[value]
         return params
     
+    def _load_model_state_dict(
+        self,
+        state_dict,
+        prefix,
+        local_metadata,
+        strict,
+        missing_keys,
+        unexpected_keys,
+        error_msgs,
+    ):
+        """
+        Updates the loaded internal model state dictionary to match the Model class structure.
+        Note that this is a temporary solution and will be removed once the model structure is finalized.
+        Args:
+            state_dict (dict): The state dictionary to load.
+            prefix (str): The prefix of the model.
+            local_metadata (dict): Local metadata.
+            strict (bool): Whether to strictly enforce that the keys in the state dictionary match the keys in the model.
+            missing_keys (list): List of missing keys.
+            unexpected_keys (list): List of unexpected keys.
+            error_msgs (list): List of error messages.
+        Returns:
+            dict: The updated state dictionary.            
+        """
+        for key in list(state_dict.keys()):
+            new_key = "model." + key
+            state_dict[new_key] = state_dict.pop(key)
+        return state_dict
+
     @abstractmethod
     def forward(self, *args, **kwargs):
         raise NotImplementedError("forward method is not implemented")
