@@ -359,13 +359,13 @@ def main(args):
         output_args=example_outputs,
         group=pp_group,
     )
+
+    # Create schedule
     # Number of micro-batches for the schedule is 1, because each step() call we
     # only push 1 micro-batch into the pipeline. But we can continuously push
     # new micro-batches into the pipeline as they arrive, achieving same
     # pipelining effect.
-    mbs = 1
-    # create schedule
-    prefiller = ScheduleGPipe(prefill_stage, mbs)
+    prefiller = ScheduleGPipe(prefill_stage, 1)
 
     prompt = [
         "What is a computer?",
@@ -456,7 +456,7 @@ def main(args):
         group=pp_group,
     )
     # create schedule
-    decorder = ScheduleGPipe(decode_stage, mbs)
+    decorder = ScheduleGPipe(decode_stage, 1)
 
     # Decoding
     with torch.no_grad(), CUDATrackTime() as timer:
