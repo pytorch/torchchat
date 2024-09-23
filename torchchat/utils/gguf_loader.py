@@ -54,6 +54,10 @@ def _fqn_lookup(fqn: str, module: torch.nn.Module) -> Any:
     if fqn == "":
         return module
     atoms = fqn.split(".")
+    # Expose the root module to users.
+    # Note this is temporary, and will be removed once we removed Model.model
+    if isinstance(module, Model):
+        module = module.model
     curr = module
     for a in atoms:
         curr = getattr(curr, a)

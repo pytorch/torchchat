@@ -486,27 +486,6 @@ class Model(ABC, nn.Module):
             state_dict[new_key] = state_dict.pop(key)
         return state_dict
 
-    def __getattr__(self, name):
-        """
-        Rewrite __getattr__ to search attribute in Model and its model attribute.
-        Note that this is a temporary solution to expose internal model attributes to the user.
-
-        :param name: The name of the attribute to get.
-        :return: The attribute value if found, otherwise raise AttributeError.
-        """
-        try:
-            if name in self.__dict__:
-                return self.__dict__[name]
-        except AttributeError:
-            pass
-
-        try:
-            return getattr(self.model, name)
-        except AttributeError:
-            raise AttributeError(
-                f"'{type(self).__name__}' object has no attribute '{name}'"
-            )
-            
     @abstractmethod
     def forward(self, *args, **kwargs):
         raise NotImplementedError("forward method is not implemented")
