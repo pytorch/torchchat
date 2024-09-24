@@ -80,15 +80,9 @@ def download_and_convert(
     # allows recovery in the event that the download or conversion
     # fails unexpectedly.
     temp_dir = models_dir / "downloads" / model_config.name
-    # temp_dir = Path("/home/gasoonjia") / "downloads" / model_config.name
-
     if os.path.isdir(temp_dir):
         shutil.rmtree(temp_dir)
     os.makedirs(temp_dir, exist_ok=True)
-
-    print("**************************************************")
-    print("**************************************************")
-    print("temp dir: ", temp_dir)
 
     try:
         if (

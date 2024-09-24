@@ -309,8 +309,6 @@ def convert_hf_checkpoint(
     model_name: Optional[str] = None,
     remove_bin_files: bool = False,
 ):
-    print(model_name)
-    print("***********************")
     if "llava" in model_name:
         convert_llava_checkpoint(model_dir=model_dir)
     else:
