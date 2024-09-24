@@ -21,7 +21,7 @@ import torch
 import torch.nn as nn
 
 from torch import Tensor
-from torch.distributed._tensor import DTensor, Replicate, Shard
+from torch.distributed._tensor import DTensor, Replicate
 from torch.distributed.device_mesh import DeviceMesh
 from torch.distributed.tensor.parallel import (
     ColwiseParallel,
@@ -619,7 +619,7 @@ class Transformer(nn.Module):
             self.precompute_freqs_cis = precompute_freqs_cis
         
 
-    def setup_caches(self, max_batch_size, max_seq_length):
+    def setup_caches(self, max_batch_size, max_seq_length, cache_lanes: int = 1):
         if (
             self.max_seq_length >= max_seq_length
             and self.max_batch_size >= max_batch_size
@@ -633,7 +633,7 @@ class Transformer(nn.Module):
             # parallelism may have been applied there and the `n_local_heads``
             # value being adjusted.
             b.attention.setup_cache(
-                max_batch_size, max_seq_length,
+                max_batch_size, max_seq_length, cache_lanes=cache_lanes
             )
 
         freqs_cis = self.precompute_freqs_cis(
@@ -653,39 +653,21 @@ class Transformer(nn.Module):
             parallelize_module(
                 self.tok_embeddings,
                 device_mesh,
-                RowwiseParallel(
-                    input_layouts=Replicate(),
-                    output_layouts=Shard(1),
-                ),
+                RowwiseParallel(input_layouts=Replicate()),
             )
 
         for layer in self.layers.values():
             layer.distribute(device_mesh)
 
-        if self.norm:
-            parallelize_module(self.norm, device_mesh, SequenceParallel())
-
         if self.output:
             parallelize_module(
                 self.output,
                 device_mesh,
-                ColwiseParallel(
-                    input_layouts=Shard(1),
-                    output_layouts=Replicate(),
-                ),
+                ColwiseParallel(output_layouts=Replicate()),
             )
 
-        self.seq_parallel_degree = device_mesh.size()
-
-    # This is a temporary solution to pass input_pos to non-0 pipeline stages
-    # TODO: make `step()` function of dist.pipelining accept args for non-0 stages
-    def setup_input_pos(self, input_pos: Tensor) -> None:
-        self._input_pos = input_pos
-
-    def forward(self, x: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
+    def forward(self, x: Tensor, input_pos: Optional[Tensor] = None, cache_lane: int = 1) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
-        # TODO: find a better way to pass input_pos to non-0 pipeline stages
-        input_pos = input_pos if input_pos is not None else self._input_pos
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
 
@@ -693,8 +675,8 @@ class Transformer(nn.Module):
             x = self.tok_embeddings(x)
         
 
-        for idx, (_, layer) in enumerate(self.layers.items()):
-            x = layer(x, input_pos, freqs_cis, mask)
+        for _, layer in self.layers.items():
+            x = layer(x, input_pos, freqs_cis, mask, cache_lane=cache_lane)
 
         if self.norm:
             x = self.norm(x)
@@ -715,11 +697,9 @@ class TransformerBlock(nn.Module):
     def distribute(self, device_mesh: DeviceMesh):
         self.attention.distribute(device_mesh)
         self.feed_forward.distribute(device_mesh)
-        parallelize_module(self.ffn_norm, device_mesh, SequenceParallel())
-        parallelize_module(self.attention_norm, device_mesh, SequenceParallel())
 
     def forward(
-        self, x: Tensor, input_pos: Tensor, freqs_cis: Tensor, mask: Tensor
+        self, x: Tensor, input_pos: Tensor, freqs_cis: Tensor, mask: Tensor, cache_lane: int = 0
     ) -> Tensor:
         h = x + self.attention(self.attention_norm(x), freqs_cis, mask, input_pos)
         out = h + self.feed_forward(self.ffn_norm(h))
@@ -755,15 +735,16 @@ class Attention(nn.Module):
         else:
             self.apply_rotary_emb = apply_rotary_emb
 
-    def setup_cache(self, max_batch_size, max_seq_length):
+    def setup_cache(self, max_batch_size, max_seq_length, cache_lanes: int = 1):
         n_local_heads = self.n_local_heads
         # If TP is enabled, the heads would be divided and assigned to different ranks
         if hasattr(self, "tp_degree"):
             n_local_heads = self.n_local_heads // self.tp_degree
 
-        self.kv_cache = KVCache(
-            max_batch_size, max_seq_length, n_local_heads, self.head_dim
-        )
+        self.kv_cache = nn.ModuleList([
+            KVCache(max_batch_size, max_seq_length, n_local_heads, self.head_dim)
+            for _ in range(cache_lanes)
+        ])
 
     def load_hook(self, state_dict, prefix, *args):
         # if prefix + "wq.weight" in state_dict:
@@ -804,14 +785,11 @@ class Attention(nn.Module):
         _unfuse_wqkv_state_dict(state_dict, self.dim)
 
     def distribute(self, device_mesh: DeviceMesh):
-        self.device_mesh = device_mesh
         self.tp_degree = device_mesh.size()
         parallelize_module(self.wq, device_mesh, ColwiseParallel())
         parallelize_module(self.wk, device_mesh, ColwiseParallel())
         parallelize_module(self.wv, device_mesh, ColwiseParallel())
-        parallelize_module(
-            self.wo, device_mesh, RowwiseParallel(output_layouts=Shard(1))
-        )
+        parallelize_module(self.wo, device_mesh, RowwiseParallel())
 
     def forward(
         self,
@@ -819,11 +797,8 @@ class Attention(nn.Module):
         freqs_cis: Tensor,
         mask: Tensor,
         input_pos: Optional[Tensor] = None,
+        cache_lane: int = 0,
     ) -> Tensor:
-        # Gather sequence back in case of sequence parallelism before attention
-        if isinstance(x, DTensor):
-            x = x.redistribute(self.device_mesh, [Replicate()])
-
         bsz, seqlen, _ = x.shape
 
         q = self.wq(x)
@@ -848,7 +823,7 @@ class Attention(nn.Module):
         q, k, v = (x.transpose(1, 2) for x in (q, k, v))
 
         if self.kv_cache is not None:
-            k, v = self.kv_cache.update(input_pos, k, v)
+            k, v = self.kv_cache[cache_lane].update(input_pos, k, v)
 
         k = k.repeat_interleave(self.n_heads // self.n_local_heads, dim=1)
         v = v.repeat_interleave(self.n_heads // self.n_local_heads, dim=1)
@@ -869,18 +844,11 @@ class FeedForward(nn.Module):
         self.w3 = nn.Linear(config.dim, config.hidden_dim, bias=False)
 
     def distribute(self, device_mesh: DeviceMesh):
-        self.device_mesh = device_mesh
         parallelize_module(self.w1, device_mesh, ColwiseParallel())
-        parallelize_module(
-            self.w2, device_mesh, RowwiseParallel(output_layouts=Shard(1))
-        )
+        parallelize_module(self.w2, device_mesh, RowwiseParallel())
         parallelize_module(self.w3, device_mesh, ColwiseParallel())
 
     def forward(self, x: Tensor) -> Tensor:
-        # Gather sequence back in case of sequence parallelism
-        if isinstance(x, DTensor):
-            x = x.redistribute(self.device_mesh, [Replicate()])
-
         return self.w2(F.silu(self.w1(x)) * self.w3(x))
 
 
@@ -1030,7 +998,10 @@ try:
     from executorch.extension.pybindings import portable_lib as exec_lib
 
     # ET changed the way it's loading the custom ops so it's not included in portable_lib but has to be loaded separately.
-    from executorch.examples.models.llama2.custom_ops import sdpa_with_kv_cache  # no-qa
+    # For quantized_decomposed ops
+    from executorch.kernels import quantized  # no-qa
+    # For llama::sdpa_with_kv_cache.out, preprocess ops
+    from executorch.extension.llm.custom_ops import sdpa_with_kv_cache  # no-qa
 
     class PTEModel(nn.Module):
         def __init__(self, config, path) -> None:
@@ -1049,6 +1020,11 @@ try:
             # the first element to get the tensor
             assert len(logits) == 1
             logits = logits[0]
+
+            # Add a batch dimension, if it's missing (e.g. some pte's
+            # exported from the ExecuTorch repo)
+            if logits.dim() == 2:
+                logits = logits.unsqueeze(0)
             return logits
 
         def setup_caches(self, max_batch_size, max_seq_length):

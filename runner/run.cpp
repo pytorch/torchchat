@@ -39,19 +39,20 @@ torch::Device aoti_device(torch::kCPU);
 
 #else // __ET_MODEL__
 #include <executorch/extension/module/module.h>
-#include <executorch/extension/runner_util/managed_tensor.h>
+#include <executorch/extension/tensor/tensor_ptr.h>
 #include <executorch/runtime/core/evalue.h>
 #include <executorch/runtime/core/exec_aten/exec_aten.h>
 #include <executorch/runtime/core/exec_aten/util/scalar_type_util.h>
 
 #if defined(ET_USE_ADAPTIVE_THREADS)
-#include <executorch/backends/xnnpack/threadpool/cpuinfo_utils.h>
-#include <executorch/backends/xnnpack/threadpool/threadpool.h>
+#include <executorch/extension/threadpool/cpuinfo_utils.h>
+#include <executorch/extension/threadpool/threadpool.h>
 #endif
 
 using exec_aten::ScalarType;
 using torch::executor::EValue;
-using torch::executor::ManagedTensor;
+using executorch::extension::TensorPtr;
+using executorch::extension::make_tensor_ptr;
 using torch::executor::Module;
 using torch::executor::Result;
 #endif
@@ -212,11 +213,11 @@ float* forward(Transformer* transformer, int token, int pos) {
                              .to(torch::kCPU);
   auto logits = result[0].data_ptr();
 #else // __ET_MODEL__
-  ManagedTensor pos_managed(pos_buffer, {1}, ScalarType::Long);
-  ManagedTensor tokens_managed(token_buffer, {1, 1}, ScalarType::Long);
+  TensorPtr pos_managed = make_tensor_ptr({1}, pos_buffer, ScalarType::Long);
+  TensorPtr tokens_managed = make_tensor_ptr({1, 1}, token_buffer, ScalarType::Long);
   std::vector<EValue> inputs;
-  auto tmp1 = EValue(tokens_managed.get_aliasing_tensor());
-  auto tmp2 = EValue(pos_managed.get_aliasing_tensor());
+  auto tmp1 = EValue(tokens_managed);
+  auto tmp2 = EValue(pos_managed);
 
   inputs.push_back(tmp1);
   inputs.push_back(tmp2);

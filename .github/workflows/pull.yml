@@ -434,7 +434,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.10.11
+          python-version: '3.10.11'
       - name: Setup Xcode
         if: runner.os == 'macOS'
         uses: maxim-lobanov/setup-xcode@v1
@@ -577,7 +577,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.10.11
+          python-version: '3.10.11'
       - name: Print machine info
         run: |
           uname -a
@@ -625,6 +625,7 @@ jobs:
     with:
       runner: macos-m1-stable  # neeps MPS, was macos-m1-stable
       script: |
+        export PYTHON_VERSION="3.10"
         set -x
         # NS/MC: Remove previous installation of torch and torchao first
         # as this script does not install anything into conda env but rather as system dep
@@ -737,6 +738,7 @@ jobs:
     with:
       runner: macos-m1-stable  # needs MPS, was macos-m1-stable
       script: |
+        export PYTHON_VERSION="3.10"
         set -x
         # NS/MC: Remove previous installation of torch and torchao first
         # as this script does not install anything into conda env but rather as system dep
@@ -914,31 +916,19 @@ jobs:
         continue-on-error: true
         run: |
           echo "Installing ExecuTorch"
-          bash torchchat/utils/scripts/build_native.sh et
-      - name: Install ET pip
+          bash torchchat/utils/scripts/install_et.sh
+      - name: Install ExecuTorch python
         run: |
-          echo "ET build directory"
-          ls et-build | cat
-
+          echo "Install ExecuTorch python"
           pushd et-build/src/executorch
-          if [ $(git rev-parse HEAD) != ${{env.et-git-hash}} ]; then
-            echo "Mismatched hash.  Make sure branch install_et.sh matches branch from Github cache."
-            echo "On commit $(git rev-parse HEAD)"
-            echo "Expected commit ${{env.et-git-hash}}"
-            exit 1
-          fi
-          pip install .
+          chmod +x ./install_requirements.sh
+          chmod +x ./install_requirements.py
+          ./install_requirements.sh
           popd
       - name: Install runner
         run: |
-          # Pull submodules (re2, abseil) for Tiktoken
-          git submodule sync
-          git submodule update --init
-
-          export TORCHCHAT_ROOT=${PWD}
-          cmake -S . -B ./cmake-out -G Ninja
-          cmake --build ./cmake-out --target et_run
-
+          echo "Installing runner"
+          bash torchchat/utils/scripts/build_native.sh et
       - name: Run inference
         run: |
           python torchchat.py download stories15M

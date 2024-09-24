@@ -33,7 +33,7 @@ from distributed.utils import (
 )
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
-from torchchat.model import ModelArgs, Transformer
+from torchchat.model import ModelArgs, Transformer, TransformerArgs
 from torchchat.utils.build_utils import set_precision
 
 try:
@@ -187,8 +187,8 @@ def _create_padded_prompts(
 
 def _batch_decode_next_tokens(
     output: torch.Tensor,
-    prompt_lengths: List[int],
     tokenizer,
+    prompt_lengths: Optional[List[int]] = None,
 ) -> List[Tuple[int, str]]:
     """
     Decode the next token for each prompt in the batch.
@@ -201,7 +201,8 @@ def _batch_decode_next_tokens(
     results = []
 
     for i in range(batch_size):
-        next_token_logits = output[i, prompt_lengths[i] - 1, :]
+        pos = prompt_lengths[i] - 1 if prompt_lengths is not None else 0
+        next_token_logits = output[i, pos, :]
 
         # Argmax (deterministic) TODO: add temperature
         next_token = torch.argmax(next_token_logits, dim=-1)
@@ -239,8 +240,11 @@ def main(args):
     distribution, model_dtype = NAME_TO_DISTRIBUTION_AND_DTYPE[model_name]
     logger.info(f"Using HF model weights from {distribution} and dtype {model_dtype}")
 
-    config = ModelArgs.from_name(distribution).transformer_args["text"]
-    logger.info(f"Chat Model Config: {config}")
+    # Model-level config
+    model_config = ModelArgs.from_name(distribution)
+    # Transformer-level config
+    config = TransformerArgs.from_params(model_config.transformer_args["text"])
+    logger.info(f"Transformer Config: {config}")
 
     tokenizer = _build_chat_tokenizer(model_name)
 
@@ -255,12 +259,11 @@ def main(args):
     assert world_size % pp_degree == 0
     assert config.n_layers % pp_degree == 0
 
-    # Sequence parallel is enabled in this program
-    # Sequence parallel = Tensor parallel + dividing sequence by tp_degree at layer boundary
-    sp_degree = world_size // pp_degree
+    # Tensor parallel is enabled in this program
+    tp_degree = world_size // pp_degree
 
     # Create device mesh
-    mesh_dimensions = (pp_degree, sp_degree)
+    mesh_dimensions = (pp_degree, tp_degree)
     device_mesh = _create_device_mesh(mesh_dimensions)
     tp_mesh = device_mesh["tp"]
     pp_mesh = device_mesh["pp"]
@@ -270,9 +273,11 @@ def main(args):
     pp_rank = pp_mesh.get_local_rank()
     tp_group = tp_mesh.get_group()
     pp_group = pp_mesh.get_group()
-    pp_group_size = pp_group.size()
-    tp_group_size = tp_group.size()
-    logger.info(f"{pp_group_size=}, {tp_group_size=}")
+    logger.info(f"{pp_degree=}, {tp_degree=}")
+
+    # Convenience variables
+    first_pp_rank = 0
+    last_pp_rank = pp_degree - 1
 
     # Assuming same number of GPUs per node
     device = torch.device(f"cuda:{rank % torch.cuda.device_count()}")
@@ -282,6 +287,7 @@ def main(args):
     config.n_stages = pp_degree
 
     with device:
+        # TODO: we should create model instead of Transformer
         model = Transformer(config)
 
     # Distribute model on TP mesh
@@ -289,34 +295,31 @@ def main(args):
     if rank == 0:
         logger.info(f"Model: {model}")
 
-    mbs = 1  # number of micro-batches
-    mb_size = 5  # micro-batch size
-    batch_size = mbs * mb_size  # total batch size
-
-    seqlen = 4096  # sequence length
+    # Batch size. Since we push batches dynamically through the pipeline rather
+    # than chunking them, this is effectively micro-batch size in pipeline
+    # sense. Thus it is interchangeable with micro-batch size below.
+    batch_size = 4
+    seqlen_prefill = 1024  # sequence length
     dim = 4096  # embedding dimension
-    assert seqlen % sp_degree == 0
 
     # Setup KV caches (after model distribution)
-    # TODO: the setting below only works for 1 micro-batch case. To support
-    # multiple micro-batches, we need the KV cache in the model to be aware of
-    # the number of micro-batches and the current micro-batch index.
-    model.setup_caches(mb_size, seqlen)
-
-    mb_ids = torch.randint(0, config.vocab_size, (mb_size, seqlen), device=device)
-    activation = torch.rand(
-        mb_size, seqlen // sp_degree, dim, device=device, dtype=model_dtype
-    )
-    example_args = mb_ids if pp_rank == 0 else activation
+    # The number of cache lanes is the same as the maximum number of
+    # micro-batches that can be "in flight" in parallel -- imagine each
+    # micro-batch takes 1 "pipeline lane," they need distinct KV cache spaces.
+    # When decoding is done for certain micro-batches, we can reuse the KV cache
+    # lanes.
+    # TODO: bump up the lane count
+    pipeline_lanes = 1
+    model.setup_caches(batch_size, seqlen_prefill, cache_lanes=pipeline_lanes)
 
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
-
     with CUDATrackTime() as timer:
         _load_model_weights(model, distribution, device=device, model_config=config)
+        model.to(device)
 
     logger.info(
-        f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for stage {rank}{color.reset}"
+        f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
     )
 
     # info on stage size and params
@@ -328,52 +331,50 @@ def main(args):
     )
 
     # Setup input position (input_pos) for prefill: a list of increasing integers from 0 to seqlen
-    input_pos = torch.arange(seqlen, device=device)
-    model.setup_input_pos(input_pos)
+    input_pos = torch.arange(seqlen_prefill, device=device)
     model.eval()
 
-    logger.info(f"Creating pipeline stage {pp_rank=}, {pp_degree=}")
-    stage = PipelineStage(
+    # Helper function to get example inputs and outputs for the stages.
+    def get_example_ins_outs(seqlen: int) -> Tuple[torch.Tensor, torch.Tensor]:
+        mb_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
+        activation = torch.rand(
+            batch_size, seqlen, dim, device=device, dtype=model_dtype
+        )
+        logits = torch.rand(
+            batch_size, seqlen, config.vocab_size, device=device, dtype=model_dtype
+        )
+        example_inputs = (mb_ids if pp_rank == first_pp_rank else activation,)
+        example_outputs = (logits if pp_rank == last_pp_rank else activation,)
+        return example_inputs, example_outputs
+
+    # Create prefill stage
+    logger.info(f"Creating pipeline stage for prefill {pp_rank=}, {pp_degree=}")
+    example_inputs, example_outputs = get_example_ins_outs(seqlen_prefill)
+    prefill_stage = PipelineStage(
         model,
         pp_rank,
         pp_degree,
         device,
-        input_args=(example_args,),
+        input_args=example_inputs,
+        output_args=example_outputs,
         group=pp_group,
     )
 
-    prompt = [
-        "What is snow?",
-        "Where does Santa Claus live?",
-        "What is PyTorch?",
-        "Write a poem about the beauty of the night sky.",
-        "What is the capital of France, Germany and Switzerland?",
-    ]
+    # Create schedule
+    # Number of micro-batches for the schedule is 1, because each step() call we
+    # only push 1 micro-batch into the pipeline. But we can continuously push
+    # new micro-batches into the pipeline as they arrive, achieving same
+    # pipelining effect.
+    prefiller = ScheduleGPipe(prefill_stage, 1)
 
-    """
-    "What is the capital of France?",
-        "What is your name?",
-        "What is the capital of Japan?",
-        "When is Christmas?",
-        "Where does Santa Claus live?",
-        "What is the capital of the United States?",
-        "What is the capital of China?",
-        "What is the capital of Russia?",
-        "What is PyTorch?",
-        "What is the capital of India?",
-        "What is an LLM?",
-        "What is the capital of Brazil?",
-        "What is the capital of Mexico?",
-        "What is the capital of Argentina?",
-        "What is the capital of Canada?",
+    prompt = [
+        "What is a computer?",
+        "Where does Santa live?",
+        "Who is Abraham Lincoln?",
+        "How are models trained?",
     ]
-    """
 
     start_pos = 0
-
-    # pipeline comms setup
-    first_pp_rank = 0
-    last_pp_rank = pp_group_size - 1
 
     # Need these global ids due to the API definition of dist.send and recv
     first_pp_rank_global_id = dist.get_global_rank(pp_group, first_pp_rank)
@@ -386,15 +387,13 @@ def main(args):
 
     # create a padded tensor for the input prompt
     padded_sequence, prompt_lengths = _create_padded_prompts(
-        input_ids, tokenizer, seqlen, start_pos, device
+        input_ids, tokenizer, seqlen_prefill, start_pos, device
     )
+    # TODO: figure out how to set input_pos for each prompt in the batch then we
+    # can remove this limitation.
+    s = set(prompt_lengths)
+    assert len(s) == 1, f"prompt_lengths should be the same, got {s}"
 
-    # create schedule
-    schedule = ScheduleGPipe(stage, mbs)
-
-    # with CUDATrackTime() as timer:
-    first_pp_rank = 0
-    last_pp_rank = pp_group_size - 1
     # Need these global ids due to the API definition of dist.send and recv
     first_pp_rank_global_id = dist.get_global_rank(pp_group, first_pp_rank)
     last_pp_rank_global_id = dist.get_global_rank(pp_group, last_pp_rank)
@@ -406,34 +405,63 @@ def main(args):
     res = [[] for _ in range(total_prompts)]
     num_tokens = 40
 
+    # Prefill phase
+    # Run context input through pipeline
+    # TODO: we need to pass `input_pos` and `cache_lane` to each stage.
+    lane = 0
+    kwargs = {"input_pos": input_pos, "cache_lane": lane}
+    with torch.no_grad(), CUDATrackTime() as timer:
+        if pp_rank == first_pp_rank:
+            output = prefiller.step(padded_sequence, **kwargs)
+        elif pp_rank == last_pp_rank:
+            output = prefiller.step(**kwargs)
+        else:  # middle pp ranks
+            prefiller.step(**kwargs)
+
+    logger.info(
+        f"{color.green}Prefilling time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
+    )
+
+    # Decode the output -- first generated token
+    if pp_rank == last_pp_rank:
+        decode_results = _batch_decode_next_tokens(
+            output=output,
+            tokenizer=tokenizer,
+            prompt_lengths=prompt_lengths,
+        )
+        for i in range(len(decode_results)):
+            new_token[i, 0] = torch.tensor(
+                [decode_results[i][0]], device=device
+            )  # token_id in int form
+        if tp_rank == 0:
+            logger.info(
+                f"{color.green} {'* Prefill *'} "
+                f"responses ====>>>> {color.blue} {decode_results=}{color.reset}"
+            )
+
+    # seqlen = 1 now
+    seqlen_decode = 1
+    input_pos = torch.tensor([prompt_lengths[0]], device=device)
+
+    # Create decode stage
+    logger.info(f"Creating pipeline stage for decode {pp_rank=}, {pp_degree=}")
+    example_inputs, example_outputs = get_example_ins_outs(seqlen_decode)
+    decode_stage = PipelineStage(
+        model,
+        pp_rank,
+        pp_degree,
+        device,
+        input_args=example_inputs,
+        output_args=example_outputs,
+        group=pp_group,
+    )
+    # create schedule
+    decorder = ScheduleGPipe(decode_stage, 1)
+
     # Decoding
-    with torch.no_grad():
-        for step in range(num_tokens):
-            # Run data through pipeline
-            if pp_rank == first_pp_rank:
-                output = schedule.step(padded_sequence)
-            elif pp_rank == last_pp_rank:
-                output = schedule.step()
-            else:  # middle pp ranks
-                schedule.step()
-
-            # Decode the output
-            if pp_rank == last_pp_rank:
-                decode_results = _batch_decode_next_tokens(
-                    output=output, prompt_lengths=prompt_lengths, tokenizer=tokenizer
-                )
-                if tp_rank == 0:
-                    logger.info(
-                        f"{color.green} {'Prefill' if step == 0 else '* Decode *'} "
-                        f"responses ====>>>> {color.blue} {decode_results=}{color.reset}"
-                    )
-                # decode results returns both token_id (int) and token_str (readable), hence [0] and [1]
-                for i in range(len(decode_results)):
-                    res[i].append(decode_results[i][1])
-                    new_token[i, 0] = torch.tensor(
-                        [decode_results[i][0]], device=device
-                    )  # decode_results[i][0]
-
+    with torch.no_grad(), CUDATrackTime() as timer:
+        for step in range(num_tokens - 1):
+            kwargs = {"input_pos": input_pos, "cache_lane": lane}
             # sendrecv between last and first ranks, only if:
             # first_pp_rank != last_pp_rank.
             if pp_rank == last_pp_rank and pp_rank != first_pp_rank:
@@ -449,13 +477,36 @@ def main(args):
                     group=pp_group,
                 )
 
-            # Update input sequence with new token
+            # Run data through pipeline
             if pp_rank == first_pp_rank:
-                _update_padded_sequence(padded_sequence, new_token, prompt_lengths)
+                output = decorder.step(new_token, **kwargs)
+            elif pp_rank == last_pp_rank:
+                output = decorder.step(**kwargs)
+            else:  # middle pp ranks
+                decorder.step(**kwargs)
 
-            # increment prompt lengths for next token
-            for i in range(len(prompt_lengths)):
-                prompt_lengths[i] += 1
+            # Decode the output
+            if pp_rank == last_pp_rank:
+                decode_results = _batch_decode_next_tokens(
+                    output=output, tokenizer=tokenizer
+                )
+                if tp_rank == 0:
+                    logger.info(
+                        f"{color.green} {'* Decode *'} "
+                        f"responses ====>>>> {color.blue} {decode_results=}{color.reset}"
+                    )
+                # decode results returns both token_id (int) and token_str (readable), hence [0] and [1]
+                for i in range(len(decode_results)):
+                    res[i].append(decode_results[i][1])
+                    new_token[i, 0] = torch.tensor(
+                        [decode_results[i][0]], device=device
+                    )  # decode_results[i][0]
+
+            input_pos += 1
+
+    logger.info(
+        f"{color.green}Decoding time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
+    )
 
     # Display the decoding results
 

@@ -152,9 +152,9 @@ try:
             self.wo = attention.wo
 
             max_batch_size, n_heads, max_seq_length, head_dim = (
-                attention.kv_cache.k_cache.shape
+                attention.kv_cache[0].k_cache.shape
             )
-            cache_dtype = attention.kv_cache.k_cache.dtype
+            cache_dtype = attention.kv_cache[0].k_cache.dtype
             self.kv_cache = CustomKVCache(
                 max_batch_size, max_seq_length, n_heads, head_dim, cache_dtype
             )
@@ -194,7 +194,7 @@ try:
             return self.wo(output)
 
     def replace_attention_with_custom_sdpa_attention(module: nn.Module):
-        from executorch.examples.models.llama2.custom_ops import (  # noqa
+        from executorch.extension.llm.custom_ops import (  # noqa
             sdpa_with_kv_cache,
         )
 
@@ -304,7 +304,6 @@ try:
         edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
         export_program = edge_manager.to_executorch(
             ExecutorchBackendConfig(
-                extract_constant_segment=True,
                 extract_delegate_segments=True,
                 passes=[
                     QuantFusionPass(),

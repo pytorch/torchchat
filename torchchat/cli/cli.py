@@ -86,7 +86,6 @@ def add_arguments_for_verb(parser, verb: str) -> None:
 
     # WIP Features (suppressed from --help)
     _add_distributed_args(parser)
-    _add_custom_model_args(parser)
     _add_speculative_execution_args(parser)
 
 
@@ -94,7 +93,7 @@ def add_arguments_for_verb(parser, verb: str) -> None:
 def _add_model_specification_args(parser) -> None:
     model_specification_parser = parser.add_argument_group(
         "Model Specification",
-        "(REQUIRED) Specify the base model. Args are mutually exclusive.",
+        "A base model is required: `model` XOR `checkpoint-path`",
     )
     exclusive_parser = model_specification_parser.add_mutually_exclusive_group(
         required=True
@@ -112,7 +111,8 @@ def _add_model_specification_args(parser) -> None:
         default="not_specified",
         help="Use the specified model checkpoint path",
     )
-    # See _add_custom_model_args() for more details
+
+    _add_custom_model_args(model_specification_parser)
     exclusive_parser.add_argument(
         "--gguf-path",
         type=Path,
@@ -411,8 +411,7 @@ def _add_distributed_args(parser) -> None:
     )
 
 
-# Add CLI Args related to custom model inputs (e.g. GGUF)
-# This feature is currently a [WIP] and hidden from --help
+# Add CLI Args related to custom model inputs
 def _add_custom_model_args(parser) -> None:
     parser.add_argument(
         "--params-table",
@@ -426,15 +425,13 @@ def _add_custom_model_args(parser) -> None:
         "--params-path",
         type=Path,
         default=None,
-        help=argparse.SUPPRESS,
-        # "Use the specified parameter file",
+        help= "Use the specified parameter file, instead of one specified under torchchat.model_params",
     )
     parser.add_argument(
         "--tokenizer-path",
         type=Path,
         default=None,
-        help=argparse.SUPPRESS,
-        # "Use the specified model tokenizer file",
+        help= "Use the specified model tokenizer file, instead of the one downloaded from HuggingFace",
     )
 
 

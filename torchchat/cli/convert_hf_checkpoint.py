@@ -15,6 +15,8 @@ import torch
 import safetensors.torch
 import shutil
 
+from torchchat.model import TransformerArgs
+
 # support running without installing as a package
 wd = Path(__file__).parent.parent
 sys.path.append(str(wd.resolve()))
@@ -202,7 +204,8 @@ def convert_text_only_hf_checkpoint(
     if model_name is None:
         model_name = model_dir.name
 
-    config = ModelArgs.from_name(model_name).transformer_args['text']
+    config_args = ModelArgs.from_name(model_name).transformer_args['text']
+    config = TransformerArgs.from_params(config_args)
     print(f"Model config {config.__dict__}")
 
     # Load the json file containing weight mapping
