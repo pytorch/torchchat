@@ -182,7 +182,7 @@ python3 torchchat.py generate llama3.1 --prompt "write me a story about a boy an
 [skip default]: end
 
 ### Server
-This mode exposes a REST API for interacting with a model. 
+This mode exposes a REST API for interacting with a model.
 The server follows the [OpenAI API specification](https://platform.openai.com/docs/api-reference/chat) for chat completions.
 
 To test out the REST API, **you'll need 2 terminals**: one to host the server, and one to send the request.
@@ -440,7 +440,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 1. Download the AAR file, which contains the Java library and corresponding JNI library, to build and run the app.
 
-   - [executorch-llama-tiktoken-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc3-0719.aar) (SHASUM: c3e5d2a97708f033c2b1839a89f12f737e3bbbef)
+   - [executorch-240919.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-240919.aar) (SHASUM: c8a5d38ead03bfa28ee8469f6355840ad0d182ba)
 
 2. Rename the downloaded AAR file to `executorch.aar` and move the file to `android/torchchat/app/libs/`. You may need to create directory `android/torchchat/app/libs/` if it does not exist.
 
@@ -460,9 +460,8 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 6. Follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem. Then issue a prompt.
 
-**Note:** The AAR file listed in Step 1 has the tiktoken tokenizer, which is used for Llama 3. To tweak or use a custom tokenizer and runtime, modify the ExecuTorch code
-and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library. For convenience, we also provide an AAR
-for sentencepiece tokenizer (e.g. Llama 2): [executorch-llama-bpe-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar) (SHASUM: d5fe81d9a4700c36b50ae322e6bf34882134edb0)
+**Note:** The AAR file listed in Step 1 has the tiktoken and sentensepiece tokenizer. To tweak or use a custom tokenizer and runtime, modify the ExecuTorch code
+and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library.
 
 <p align="center">
     <img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
