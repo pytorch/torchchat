@@ -30,3 +30,6 @@ system_info.txt
 # build artifacts
 checkpoints/
 exportedModels/
+
+# test script
+_torchchat_test_script.py
