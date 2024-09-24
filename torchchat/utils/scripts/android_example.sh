@@ -30,13 +30,8 @@ else
   exit -1
 fi
 
-if [ "${USE_TIKTOKEN:-OFF}" == "ON" ]; then
-  LLAMA_AAR_URL="https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc3-0719.aar"
-  LLAMA_AAR_SHASUM="c3e5d2a97708f033c2b1839a89f12f737e3bbbef"
-else
-  LLAMA_AAR_URL="https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar"
-  LLAMA_AAR_SHASUM="d5fe81d9a4700c36b50ae322e6bf34882134edb0"
-fi
+LLAMA_AAR_URL="https://ossci-android.s3.amazonaws.com/executorch/main/executorch-240919.aar"
+LLAMA_AAR_SHASUM="c8a5d38ead03bfa28ee8469f6355840ad0d182ba"
 
 mkdir -p ${TORCHCHAT_ROOT}/build/android
 
