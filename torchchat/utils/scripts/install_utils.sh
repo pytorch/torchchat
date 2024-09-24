@@ -150,7 +150,7 @@ install_executorch_cpp_libs() {
         -DEXECUTORCH_BUILD_KERNELS_CUSTOM=${EXECUTORCH_BUILD_KERNELS_CUSTOM_VAR} \
         ${CROSS_COMPILE_ARGS} \
         -S . -B ${CMAKE_OUT_DIR} -G Ninja
-  cmake --build ${CMAKE_OUT_DIR}
+  cmake --build ${CMAKE_OUT_DIR} -j16
   cmake --install ${CMAKE_OUT_DIR} --prefix ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install
   popd
 }
