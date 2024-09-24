@@ -14,7 +14,7 @@ from pathlib import Path
 
 import torchvision
 
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 from collections.abc import Hashable
 
 import torch
@@ -54,7 +54,6 @@ def identity(**kwargs):
     if len(kwargs) != 1:
         raise ValueError("Only one argument is expected")
     return list(kwargs.values())[0]
-
 
 
 class MultiModalProjector(nn.Module):
@@ -126,7 +125,10 @@ class ConcateFusion(nn.Module):
                 dtype=torch.int,
             )
 
-        return self.decoder(decoder_input, input_pos=input_pos)
+            return decoder_input.shape[1], self.decoder(decoder_input, input_pos=input_pos)
+        else:
+            return self.decoder(decoder_input, input_pos=input_pos)
+
     
     def setup_caches(self, batch_size, max_seq_len) -> None:
         self.decoder.setup_caches(batch_size, max_seq_len)
@@ -262,6 +264,7 @@ class TransformerArgs:
     use_tiktoken: bool = False
     max_seq_length: int = 8192
     rope_scaling: Optional[Dict[str, Any]] = None
+    use_hf_rope: bool = False
     # For pipeline parallel
     n_stages: int = 1
     stage_idx: int = 0
@@ -413,7 +416,6 @@ class KVCache(nn.Module):
         # print(f"dtype on entry {dtype}")
         if not dtype:
             dtype = get_precision()
-        # print(f"dtype on get_prec {dtype}")
         cache_shape = (max_batch_size, n_heads, max_seq_length, head_dim)
         self.register_buffer("k_cache", torch.zeros(cache_shape, dtype=dtype))
         self.register_buffer("v_cache", torch.zeros(cache_shape, dtype=dtype))
@@ -553,13 +555,16 @@ class FlamingoModel(Model):
 
 
 class LlavaModel(Model):
+    def __init__(self, config: ModelArgs) -> None:
+        super().__init__(config)
+        self.text_transformer_args = self.model.decoder.config
+
     def forward(
         self,
         tokens: Tensor,
-        *,
+        input_pos: Optional[Tensor] = None,
         encoder_input: Optional[Dict[str, Tensor]] = None,
         post_tokens: Optional[Tensor] = None,
-        input_pos: Optional[Tensor] = None,
     ) -> Tensor:
         return self.model(tokens, encoder_input=encoder_input, post_tokens=post_tokens, input_pos=input_pos)
 
@@ -605,6 +610,13 @@ class Transformer(nn.Module):
 
         self.max_batch_size = -1
         self.max_seq_length = -1
+        # For supporting sequence parallel (default is off, thus value of 1)
+        self.seq_parallel_degree = 1
+        if config.use_hf_rope:
+            self.precompute_freqs_cis = hf_precompute_freqs_cis
+        else:
+            self.precompute_freqs_cis = precompute_freqs_cis
+        
 
     def setup_caches(self, max_batch_size, max_seq_length, cache_lanes: int = 1):
         if (
@@ -623,7 +635,7 @@ class Transformer(nn.Module):
                 max_batch_size, max_seq_length, cache_lanes=cache_lanes
             )
 
-        freqs_cis = precompute_freqs_cis(
+        freqs_cis = self.precompute_freqs_cis(
             self.config.dim // self.config.n_heads,
             self.config.block_size * 2,
             self.config.rope_base,
@@ -657,8 +669,10 @@ class Transformer(nn.Module):
         assert self.freqs_cis is not None, "Caches must be initialized first"
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
+
         if self.tok_embeddings:
             x = self.tok_embeddings(x)
+        
 
         for _, layer in self.layers.items():
             x = layer(x, input_pos, freqs_cis, mask, cache_lane=cache_lane)
@@ -715,6 +729,10 @@ class Attention(nn.Module):
         self.n_local_heads = config.n_local_heads
         self.dim = config.dim
         self._register_load_state_dict_pre_hook(self.load_hook)
+        if config.use_hf_rope:
+            self.apply_rotary_emb = hf_apply_rotary_emb
+        else:
+            self.apply_rotary_emb = apply_rotary_emb
 
     def setup_cache(self, max_batch_size, max_seq_length, cache_lanes: int = 1):
         n_local_heads = self.n_local_heads
@@ -798,8 +816,8 @@ class Attention(nn.Module):
         # -1 = self.n_local_heads
         v = v.view(bsz, seqlen, -1, self.head_dim)
 
-        q = apply_rotary_emb(q, freqs_cis)
-        k = apply_rotary_emb(k, freqs_cis)
+        q = self.apply_rotary_emb(q, freqs_cis)
+        k = self.apply_rotary_emb(k, freqs_cis)
 
         q, k, v = (x.transpose(1, 2) for x in (q, k, v))
 
@@ -917,6 +935,58 @@ def apply_rotary_emb(x: Tensor, freqs_cis: Tensor) -> Tensor:
 
     x_out2 = x_out2.flatten(3)
     return x_out2.type_as(x)
+
+
+
+# Based on https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py#L77
+def hf_precompute_freqs_cis(dim: int, end: int, theta: float, dtype=None, **kwargs):
+    if not dtype:
+        dtype = get_precision()
+
+    freqs = 1.0 / (
+        theta
+        ** (torch.arange(0, dim, 2, dtype=torch.int64).float() / dim)
+    )
+    # pyre-ignore Undefined attribute [16]: `float` has no attribute `device`.
+    t = torch.arange(end, device=freqs.device, dtype=torch.int64).type_as(
+        freqs  # pyre-ignore
+    )
+    freqs = torch.outer(t, freqs).float()  # pyre-ignore
+    emb = torch.cat((freqs, freqs), dim=-1)
+    freqs_cos = torch.cos(emb)
+    freqs_sin = torch.sin(emb)
+    return torch.stack((freqs_cos, freqs_sin), dim=-1).to(dtype=dtype)
+
+# Based on https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py#L135
+def rotate_half(x):
+    """Rotates half the hidden dims of the input."""
+    x1 = x[..., : x.shape[-1] // 2]
+    x2 = x[..., x.shape[-1] // 2 :]
+    return torch.cat((-x2, x1), dim=-1)
+
+
+def hf_apply_rotary_emb(x, freq_cis, unsqueeze_dim=1, **kwargs):
+    """Applies Rotary Position Embedding to the query and key tensors.
+
+    Args:
+        q (`torch.Tensor`): The query tensor.
+        k (`torch.Tensor`): The key tensor.
+        cos (`torch.Tensor`): The cosine part of the rotary embedding.
+        sin (`torch.Tensor`): The sine part of the rotary embedding.
+        unsqueeze_dim (`int`, *optional*, defaults to 1):
+            The 'unsqueeze_dim' argument specifies the dimension along which to unsqueeze cos[position_ids] and
+            sin[position_ids] so that they can be properly broadcasted to the dimensions of q and k. For example, note
+            that cos[position_ids] and sin[position_ids] have the shape [batch_size, seq_len, head_dim]. Then, if q and
+            k have the shape [batch_size, heads, seq_len, head_dim], then setting unsqueeze_dim=1 makes
+            cos[position_ids] and sin[position_ids] broadcastable to the shapes of q and k. Similarly, if q and k have
+            the shape [batch_size, seq_len, heads, head_dim], then set unsqueeze_dim=2.
+    Returns:
+        `tuple(torch.Tensor)` comprising of the query and key tensors rotated using the Rotary Position Embedding.
+    """
+    cos = freq_cis[..., 0].unsqueeze(unsqueeze_dim)
+    sin = freq_cis[..., 1].unsqueeze(unsqueeze_dim)
+    x_out = (x * cos) + (rotate_half(x) * sin)
+    return x_out.type_as(x)
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

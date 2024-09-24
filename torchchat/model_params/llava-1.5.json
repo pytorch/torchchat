@@ -1,6 +1,5 @@
 {
     "model_type": "llava",
-    "use_tiktoken": true,
     "encoder": {
         "tile_size": 336,
         "patch_size": 14,
@@ -20,6 +19,7 @@
         "n_heads": 32,
         "dim": 4096,
         "vocab_size": 32064,
-        "max_seq_length": 768
+        "max_seq_length": 768,
+        "use_hf_rope": true
     }
 }

@@ -86,6 +86,6 @@ def resolve_model_config(model: str) -> ModelConfig:
         model = model_aliases[model]
 
     if model not in model_configs:
-        raise ValueError(f"Unknown model '{model}'.")
+        raise ValueError(f"Unknown model '{model}'. Supported models: {model_configs.keys()}")
 
     return model_configs[model]

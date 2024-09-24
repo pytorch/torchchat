@@ -33,8 +33,9 @@ def _download_hf_snapshot(
             local_dir=artifact_dir,
             local_dir_use_symlinks=False,
             token=hf_token,
-            ignore_patterns="*safetensors*",
+            ignore_patterns=None if "llava" in model_config.name else "*safetensors*",
         )
+
     except HTTPError as e:
         if e.response.status_code == 401:  # Missing HuggingFace CLI login.
             print(

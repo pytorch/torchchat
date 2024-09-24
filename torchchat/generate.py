@@ -36,6 +36,7 @@ from torchchat.cli.builder import (
 from torchchat.model import Model, ModelType
 from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
+from torchchat.utils.preprocessors import llava_image_preprocess
 
 # torchtune model definition dependencies
 from torchtune.data import Message
@@ -357,8 +358,13 @@ class Generator:
 
         if batch is not None:
             # TODO: Verify sequential prefill works with multimodal models
-            logits = model(**batch)[:, -1]
-            return tune_sample(logits, 0, 500)
+            logits = model(**batch)
+            if model.config.model_type == ModelType.Llava:
+                context_len, logits = logits[0], logits[1][:, -1]
+                return context_len, tune_sample(logits, 0, 500)
+            else:
+                logits = logits[:, -1]
+                return tune_sample(logits, 0, 500)
         elif sequential_prefill:
             for i in range(width):
                 x_sliced, ip_sliced = x[:, i].view(-1, 1), input_pos[i].view(-1)
@@ -622,6 +628,13 @@ class Generator:
             sequential_prefill=sequential_prefill,
             **sampling_kwargs,
         )
+
+        # For llava with image input, we need to extract next pos id from prefill result
+        if batch and self.model.config.model_type == ModelType.Llava:
+            context_len, next_token = next_token
+        else:
+            context_len, next_token = T, next_token
+
         if is_speculative:
             self.prefill(
                 draft_model,
@@ -636,7 +649,7 @@ class Generator:
         # max_new_tokens <= 2 means we are effectively not calling decode_n_tokens().
         callback(next_token.clone().view(-1), done_generating=max_new_tokens <= 2)
 
-        input_pos = torch.tensor([start_pos + T], device=device, dtype=torch.int)
+        input_pos = torch.tensor([start_pos + context_len], device=device, dtype=torch.int)
         accept_counts = [0] * (
             speculate_k + 1
         )  # creates array of [0, 0, 0, ...] that is speculate_k + 1 long
@@ -726,27 +739,56 @@ class Generator:
 
         if generator_args.image_prompts is not None:
             print("Image prompts", generator_args.image_prompts)
-
             # Support for just the first image prompt for now
             images = [Image.open(generator_args.image_prompts[0])]
-            messages = [
-                Message(
-                    role="user",
-                    content=[
-                        {"type": "image", "content": images[0]},
-                        {"type": "text", "content": generator_args.prompt},
-                    ],
-                    eot=True,
-                ),
-                Message(role="assistant", content=""),
-            ]
 
-            transform = flamingo_transform(str(self.tokenizer_args.tokenizer_path))
-            data = transform({"messages": messages}, inference=True)
-            batch = padded_collate([data], self.builder_args.device)
-            batch.pop("mask")
-            encoded = batch["tokens"]
+            assert len(images) == 1, "Only one image prompt is supported for now"
 
+            #TODO: updated encoded variable for multi-modality models to include image tokens.
+            if self.model.config.model_type == ModelType.Flamingo:
+                messages = [
+                    Message(
+                        role="user",
+                        content=[
+                            {"type": "image", "content": images[0]},
+                            {"type": "text", "content": generator_args.prompt},
+                        ],
+                        eot=True,
+                    ),
+                    Message(role="assistant", content=""),
+                ]
+
+                transform = flamingo_transform(str(self.tokenizer_args.tokenizer_path))
+                data = transform({"messages": messages}, inference=True)
+                batch = padded_collate([data], self.builder_args.device)
+                batch.pop("mask")
+                encoded = batch["tokens"]
+            elif self.model.config.model_type == ModelType.Llava:
+                #TODO: double check the tokenizer.
+                def find_subtensor(tensor, target):
+                    target_len = len(target)
+                    for i in range(len(tensor) - target_len + 1):
+                        if torch.all(tensor[i:i+target_len] == target):
+                            return i
+                    return -1
+
+                input_ids = self.encode_tokens(generator_args.prompt, bos=True, device=self.builder_args.device)
+                image_token_indices = self.encode_tokens("<image>", device=self.builder_args.device)[1:]
+                index = find_subtensor(input_ids, image_token_indices)
+
+                if index == -1:
+                    raise ValueError("Image token not found in prompt")
+
+                batch = {
+                    "tokens": input_ids[:index].unsqueeze(0),
+                    "encoder_input": llava_image_preprocess(images[0], device=self.builder_args.device, dtype=self.builder_args.precision),
+                    "post_tokens": input_ids[index + len(image_token_indices) :].unsqueeze(0),
+                }
+
+                # can not get actual encoded image feature before model inference; pseudo one
+                pseudo_vision_encoded = torch.zeros(1, 624).to(device=self.builder_args.device, dtype=self.builder_args.precision)
+                encoded = torch.cat([batch["tokens"].view(1, -1), pseudo_vision_encoded, batch["post_tokens"].view(1, -1)], dim=-1).view(-1)
+                
         else:
             encoded = self.encode_tokens(
                 generator_args.prompt, bos=True, device=self.builder_args.device
