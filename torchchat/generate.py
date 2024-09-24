@@ -818,6 +818,7 @@ class Generator:
                     if text_transformer_args is not None
                     else 2048
                 ),
+                max_seq_length
             )
 
         max_seq_length = (
