@@ -941,7 +941,7 @@ jobs:
           python torchchat.py export stories15M --output-pte-path ./model.pte
           ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
 
-          for dtype in fp32 fp16; do   # bf16 needs to be supported
+          for dtype in fp32 fp16 bf16; do
             echo "Testing export + runner with dtype=$dtype"
             python torchchat.py export stories15M --dtype $dtype --output-pte-path ./model.pte
             ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
