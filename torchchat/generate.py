@@ -358,8 +358,13 @@ class Generator:
 
         if batch is not None:
             # TODO: Verify sequential prefill works with multimodal models
-            logits = model(**batch)[:, -1]
-            return tune_sample(logits, 0, 500)
+            logits = model(**batch)
+            if model.config.model_type == ModelType.Llava:
+                context_len, logits = logits[0], logits[1][:, -1]
+                return context_len, tune_sample(logits, 0, 500)
+            else:
+                logits = logits[:, -1]
+                return tune_sample(logits, 0, 500)
         elif sequential_prefill:
             for i in range(width):
                 x_sliced, ip_sliced = x[:, i].view(-1, 1), input_pos[i].view(-1)
@@ -369,7 +374,7 @@ class Generator:
             logits = model(x)
         else:
             # input_pos: [B, S]
-            logits = model(x, input_pos)
+            logits = model(x, input_pos=input_pos)
             # print(f"logits {logits.shape}")
 
         # print(f"x: {x},\n  input_pos: {input_pos}\n")
@@ -393,7 +398,7 @@ class Generator:
             else:
                 logits = model(x)
         else:
-            logits = model(x, input_pos)
+            logits = model(x, input_pos=input_pos)
         # print(f"x: {x},\n  input_pos: {input_pos}\n")
         return self.sample(logits, need_probs=need_probs, **sampling_kwargs)
 
@@ -624,11 +629,11 @@ class Generator:
             **sampling_kwargs,
         )
 
-        # For llava, we need to extract next pos id from prefill result
-        if self.model.config.model_type == ModelType.Llava:
-            next_token, context_len = next_token
+        # For llava with image input, we need to extract next pos id from prefill result
+        if batch and self.model.config.model_type == ModelType.Llava:
+            context_len, next_token = next_token
         else:
-            next_token, context_len = next_token, T
+            context_len, next_token = T, next_token
 
         if is_speculative:
             self.prefill(
@@ -731,11 +736,6 @@ class Generator:
     ):
         if generator_args.chat_mode:
             print("Starting Interactive Chat")
-        
-        print("Generator Args:")
-        print(generator_args)
-        print("Builder Args:")
-        print(self.builder_args)
 
         if generator_args.image_prompts is not None:
             print("Image prompts", generator_args.image_prompts)
@@ -776,14 +776,18 @@ class Generator:
                 image_token_indices = self.encode_tokens("<image>", device=self.builder_args.device)[1:]
                 index = find_subtensor(input_ids, image_token_indices)
 
+                if index == -1:
+                    raise ValueError("Image token not found in prompt")
+
                 batch = {
                     "tokens": input_ids[:index].unsqueeze(0),
                     "encoder_input": llava_image_preprocess(images[0], device=self.builder_args.device, dtype=self.builder_args.precision),
                     "post_tokens": input_ids[index + len(image_token_indices) :].unsqueeze(0),
                 }
-                print("BATTTTTTTCHCHHHHHHHHH")
-                print(batch)
-                encoded = torch.cat([batch["tokens"].view(1, -1), batch["post_tokens"].view(1, -1)], dim=-1).view(-1)
+
+                # can not get actual encoded image feature before model inference; pseudo one
+                pseudo_vision_encoded = torch.zeros(1, 624).to(device=self.builder_args.device, dtype=self.builder_args.precision)
+                encoded = torch.cat([batch["tokens"].view(1, -1), pseudo_vision_encoded, batch["post_tokens"].view(1, -1)], dim=-1).view(-1)
                 
         else:
             encoded = self.encode_tokens(

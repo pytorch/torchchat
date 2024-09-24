@@ -150,7 +150,7 @@ class ConcateFusion(nn.Module):
     ) -> Tensor:
         if encoder_output is None:
             assert post_tokens is None
-            return self.tok_embeddings(tokens).unsqueeze(0)
+            return self.tok_embeddings(tokens)
         else:
             pre_img_embed = self.tok_embeddings(tokens)
             image_embeds = self.mm_projector(encoder_output)
@@ -158,10 +158,6 @@ class ConcateFusion(nn.Module):
                 return torch.cat((pre_img_embed, image_embeds), dim=1)
             
             post_img_embed = self.tok_embeddings(post_tokens)
-            print("embeddings sizes:")
-            print(pre_img_embed.shape)
-            print(image_embeds.shape)
-            print(post_img_embed.shape)
             return torch.cat((pre_img_embed, image_embeds, post_img_embed), dim=1)
 
 
@@ -559,6 +555,10 @@ class FlamingoModel(Model):
 
 
 class LlavaModel(Model):
+    def __init__(self, config: ModelArgs) -> None:
+        super().__init__(config)
+        self.text_transformer_args = self.model.decoder.config
+
     def forward(
         self,
         tokens: Tensor,
@@ -689,15 +689,11 @@ class Transformer(nn.Module):
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
 
-        print("before tok_embedding", x.dtype)
-
         if self.tok_embeddings:
             x = self.tok_embeddings(x)
         
-        print("after tok_embedding", x.dtype)
 
         for idx, (_, layer) in enumerate(self.layers.items()):
-            print(f"before entering layer {idx} tok_embedding", x.dtype)
             x = layer(x, input_pos, freqs_cis, mask)
 
         if self.norm:
