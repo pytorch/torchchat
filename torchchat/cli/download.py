@@ -30,7 +30,7 @@ def _download_hf_snapshot(
     try:
         snapshot_download(
             model_config.distribution_path,
-            cache_dir=artifact_dir,
+            local_dir=artifact_dir,
             local_dir_use_symlinks=False,
             token=hf_token,
             ignore_patterns=None if "llava" in model_config.name else "*safetensors*",

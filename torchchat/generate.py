@@ -374,7 +374,7 @@ class Generator:
             logits = model(x)
         else:
             # input_pos: [B, S]
-            logits = model(x, input_pos=input_pos)
+            logits = model(x, input_pos)
             # print(f"logits {logits.shape}")
 
         # print(f"x: {x},\n  input_pos: {input_pos}\n")
@@ -398,7 +398,7 @@ class Generator:
             else:
                 logits = model(x)
         else:
-            logits = model(x, input_pos=input_pos)
+            logits = model(x, input_pos)
         # print(f"x: {x},\n  input_pos: {input_pos}\n")
         return self.sample(logits, need_probs=need_probs, **sampling_kwargs)
 
