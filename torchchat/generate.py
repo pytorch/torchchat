@@ -359,16 +359,16 @@ class Generator:
         if batch is not None:
             # TODO: Verify sequential prefill works with multimodal models
             tokens = batch["tokens"]
-            if 'encoder_input' in tokens:
-                encoder_input = tokens['encoder_input']
+            if 'encoder_input' in batch:
+                encoder_input = batch['encoder_input']
             else:
                 encoder_input = None
-            
-            mask = batch["causal_mask"][None, :seq_len]
-            input_pos = batch["input_pos"][None, :seq_len]
-            encoder_mask = batch["encoder_mask"]
 
-            logits = model(tokens=tokens, mask=mask, encoder_input=encoder_input, input_pos=input_post, encoder_mask=encoder_mask)[:, -1]
+            seq_len = tokens.size(1)
+            mask = batch["causal_mask"][None, :seq_len]
+            encoder_mask = batch["encoder_mask"]
+            input_pos = input_pos.view(1, -1)
+            logits = model(tokens=tokens, mask=mask, encoder_input=encoder_input, input_pos=input_pos, encoder_mask=encoder_mask)[:, -1]
             return tune_sample(logits, temperature=0, top_k=500)
         elif sequential_prefill:
             for i in range(width):
@@ -604,7 +604,7 @@ class Generator:
                     self.is_torchtune_model
                     or self.model.config.model_type == ModelType.Flamingo
                 ):
-                    model.setup_caches(batch_size=1, dtype=self.dtype, encoder_max_seq_len=6404, decoder_max_seq_len=T_new)
+                    model.setup_caches(batch_size=1, dtype=self.dtype, encoder_max_seq_len=6404, decoder_max_seq_len=max_seq_length-1)
                 else:
                     model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
                 if is_speculative and draft_model is not model:
@@ -753,18 +753,19 @@ class Generator:
             ]
 
             transform = flamingo_transform(str(self.tokenizer_args.tokenizer_path))
-            data = transform({"messages": messages}, inference=True)
-            batch = padded_collate_tiled_images_and_mask([data], pad_direction="left", pad_max_images=1)
-            seq_len = len(data["tokens"])
-            total_response_length = seq_len + generator_args.max_new_tokens
-            batch["causal_mask"] = torch.tril(
-                                        torch.ones(
-                                            size=(total_response_length, total_response_length),
-                                            dtype=torch.bool,
+
+            with torch.device(device=self.builder_args.device):
+                data = transform({"messages": messages}, inference=True)
+                batch = padded_collate_tiled_images_and_mask([data], pad_direction="left", pad_max_images=1)
+                seq_len = len(data["tokens"])
+                batch["causal_mask"] = torch.tril(
+                                            torch.ones(
+                                                size=(generator_args.max_new_tokens, generator_args.max_new_tokens),
+                                                dtype=torch.bool,
+                                            )
                                         )
-                                    )
-            batch["encoder_mask"] = batch["encoder_mask"][:, :seq_len]
-            encoded = batch["tokens"]
+                batch["encoder_mask"] = batch["encoder_mask"][:, :seq_len]
+                encoded = batch["tokens"]
 
         else:
             encoded = self.encode_tokens(
