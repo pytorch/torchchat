@@ -653,7 +653,7 @@ class Transformer(nn.Module):
                 ColwiseParallel(output_layouts=Replicate()),
             )
 
-    def forward(self, x: Tensor, input_pos: Optional[Tensor] = None, cache_lane: int = 1) -> Tensor:
+    def forward(self, x: Tensor, input_pos: Optional[Tensor] = None, cache_lane: int = 0) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
@@ -686,7 +686,9 @@ class TransformerBlock(nn.Module):
     def forward(
         self, x: Tensor, input_pos: Tensor, freqs_cis: Tensor, mask: Tensor, cache_lane: int = 0
     ) -> Tensor:
-        h = x + self.attention(self.attention_norm(x), freqs_cis, mask, input_pos)
+        h = x + self.attention(
+            self.attention_norm(x), freqs_cis, mask, input_pos, cache_lane=cache_lane
+        )
         out = h + self.feed_forward(self.ffn_norm(h))
         return out
 

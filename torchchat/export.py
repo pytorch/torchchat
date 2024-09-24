@@ -158,16 +158,21 @@ try:
                 attention.kv_cache[0].k_cache.shape
             )
             cache_dtype = attention.kv_cache[0].k_cache.dtype
-            self.kv_cache = CustomKVCache(
-                max_batch_size, max_seq_length, n_heads, head_dim, cache_dtype
-            )
+            # The `Attention` module being replaced can have multiple KV caches
+            # (denoted by `cache_lanes`).  Thus we follow the same setup format
+            # as in `Attention.setup_cache`.
+            cache_lanes = len(attention.kv_cache)
+            self.kv_cache = nn.ModuleList([
+                CustomKVCache(max_batch_size, max_seq_length, n_heads, head_dim, cache_dtype)
+                for _ in range(cache_lanes)
+            ])
 
             self.n_heads = attention.n_heads
             self.head_dim = attention.head_dim
             self.n_local_heads = attention.n_local_heads
             self.dim = attention.dim
 
-        def forward(self, x, freqs_cis, mask, input_pos=None):
+        def forward(self, x, freqs_cis, mask, input_pos=None, cache_lane: int = 0):
             bsz, seqlen, _ = x.shape
 
             q = self.wq(x)
@@ -184,12 +189,13 @@ try:
 
             # KV cache should always be enabled
             assert self.kv_cache is not None
+            kv_cache = self.kv_cache[cache_lane]
             output = torch.ops.llama.sdpa_with_kv_cache(
                 q,
                 k,
                 v,
-                self.kv_cache.k_cache,
-                self.kv_cache.v_cache,
+                kv_cache.k_cache,
+                kv_cache.v_cache,
                 input_pos[-1].item(),
                 seqlen,
             )
