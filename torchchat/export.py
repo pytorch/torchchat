@@ -199,7 +199,7 @@ try:
                 input_pos[-1].item(),
                 seqlen,
             )
-            output = output.view(bsz, seqlen, self.dim).to(dtype=q.dtype)
+            output = output.view(bsz, seqlen, self.dim).to(dtype=x.dtype)
             return self.wo(output)
 
     def replace_attention_with_custom_sdpa_attention(module: nn.Module):
@@ -291,11 +291,7 @@ try:
             model = model.to(dtype=target_precision)
             state_dict_dtype = target_precision
 
-        # Custom SDPA does not work with bfloat16 on CPU currently. (The op doesn't
-        # support anything but bfloat32, and our attempt to use it anyway by converting
-        # to and from float causes other errors.)
-        if target_precision != torch.bfloat16:
-            replace_attention_with_custom_sdpa_attention(model)
+        replace_attention_with_custom_sdpa_attention(model)
 
         with torch.nn.attention.sdpa_kernel(
             [torch.nn.attention.SDPBackend.MATH]
