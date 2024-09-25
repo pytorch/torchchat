@@ -31,7 +31,6 @@ from torchtune.training import set_default_dtype
 
 from torchchat.model import Model, ModelArgs, ModelType
 
-from torchtune.modules.position_embeddings import RotaryPositionalEmbeddings
 from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
 
 from torchchat.model_config.model_config import resolve_model_config
