@@ -348,6 +348,7 @@ class Generator:
         x: torch.Tensor,
         input_pos: torch.Tensor,
         batch: Optional[Dict[str, Any]] = None,  # Inputs for multimodal models
+        causal_mask: Optional[torch.Tensor] = None,
         *,
         sequential_prefill=True,
         **sampling_kwargs,
@@ -365,7 +366,7 @@ class Generator:
                 encoder_input = None
 
             seq_len = tokens.size(1)
-            mask = batch["causal_mask"][None, :seq_len]
+            mask = batch["casual_mask"][None, :seq_len]
             encoder_mask = batch["encoder_mask"]
             input_pos = input_pos.view(1, -1)
             logits = model(tokens=tokens, mask=mask, encoder_input=encoder_input, input_pos=input_pos, encoder_mask=encoder_mask)[:, -1]
@@ -375,8 +376,9 @@ class Generator:
                 x_sliced, ip_sliced = x[:, i].view(-1, 1), input_pos[i].view(-1)
                 # logging.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
                 logits = model(x_sliced, ip_sliced)  # (x[:, i], input_pos[i])
-        elif self.model.config.model_type == ModelType.Flamingo:
-            assert False, "Flamingo requires batch"
+        elif self.is_torchtune_model:
+            mask = causal_mask[None, :width]
+            logits = model(x, input_pos, mask=mask)
         else:
             # input_pos: [B, S]
             logits = model(x, input_pos)
@@ -392,6 +394,7 @@ class Generator:
         input_pos: torch.Tensor,
         need_probs: bool,
         batch: Optional[Dict[str, Any]] = None,  # Inputs for multimodal models
+        casual_mask: Optional[torch.Tensor] = None,
         **sampling_kwargs,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         # input_pos: [B, 1]
@@ -399,9 +402,12 @@ class Generator:
         x = x.view(1, -1)
         if model.config.model_type == ModelType.Flamingo:
             assert batch is not None, "Flamingo requires batch"
-            mask = batch["causal_mask"][None, input_pos.item(), None, :]
+            mask = batch["casual_mask"][None, input_pos.item(), None, :]
             encoder_mask = batch["encoder_mask"][:, -1:]
             logits = model(x, encoder_mask=encoder_mask, mask=mask, input_pos=input_pos)[:, -1:]
+        elif self.is_torchtune_model:
+            mask = casual_mask[None, input_pos.item(), None, :]
+            logits = model(x, input_pos, mask=mask)
         else:
             logits = model(x, input_pos)
         # print(f"x: {x},\n  input_pos: {input_pos}\n")
@@ -424,6 +430,7 @@ class Generator:
         callback=lambda _: _,
         eos_token_id: int = 2,
         eot_id: Optional[int] = None,
+        casual_mask: Optional[torch.Tensor] = None,
         **sampling_kwargs,
     ):
         new_tokens, new_probs = [], []
@@ -441,6 +448,7 @@ class Generator:
                     input_pos,
                     batch=batch,
                     need_probs=need_probs,
+                    casual_mask=casual_mask,
                     **sampling_kwargs,
                 )
                 input_pos += 1
@@ -464,6 +472,7 @@ class Generator:
                         input_pos,
                         need_probs,
                         batch=batch,
+                        casual_mask=casual_mask,
                         **sampling_kwargs,
                     )
                     input_pos += 1
@@ -482,6 +491,7 @@ class Generator:
                 input_pos,
                 need_probs,
                 batch=batch,
+                casual_mask=casual_mask,
                 **sampling_kwargs,
             )
             input_pos += 1
@@ -600,12 +610,11 @@ class Generator:
         if start_pos == 0:
             model = model.to(device=device)
             with torch.device(device):
-                if (
-                    self.is_torchtune_model
-                    or self.model.config.model_type == ModelType.Flamingo
-                ):
+                if self.model.config.model_type == ModelType.Flamingo:
                     # 6404 is one-gpu affordable max_seq_length for single image input
                     model.setup_caches(batch_size=1, dtype=self.dtype, encoder_max_seq_len=6404, decoder_max_seq_len=T_new)
+                elif self.is_torchtune_model:
+                    model.setup_caches(max_batch_size=1, dtype=self.dtype)
                 else:
                     model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
                 if is_speculative and draft_model is not model:
@@ -625,12 +634,18 @@ class Generator:
             start_pos, T + start_pos, device=device, dtype=torch.int
         )
 
+        casual_mask = torch.tril(
+            torch.ones(T_new, T_new, dtype=torch.bool, device=device)
+        )
+
+
         prefill_t0 = time.perf_counter()
         next_token = self.prefill(
             model,
             prompt.view(1, -1),
             input_pos,
             batch=batch,
+            causal_mask=casual_mask,
             sequential_prefill=sequential_prefill,
             **sampling_kwargs,
         )
@@ -693,6 +708,7 @@ class Generator:
                     if self.is_llama3_model
                     else None
                 ),
+                casual_mask=casual_mask,
                 **sampling_kwargs,
             ):
                 generated_tokens.append(generated_token.view(-1))
@@ -762,7 +778,7 @@ class Generator:
                 batch["encoder_input"]["images"] = batch["encoder_input"]["images"].to(self.dtype)
                 seq_len = len(data["tokens"])
                 total_response_length = seq_len + generator_args.max_new_tokens
-                batch["causal_mask"] = torch.tril(
+                batch["casual_mask"] = torch.tril(
                                             torch.ones(
                                                 size=(total_response_length, total_response_length),
                                                 dtype=torch.bool,

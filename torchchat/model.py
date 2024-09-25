@@ -529,8 +529,8 @@ class TextOnlyModel(Model):
 
 
 class Llama31Model(Model):
-    def forward(self, tokens: Tensor, input_pos: Optional[Tensor] = None) -> Tensor:
-        return self.model(tokens=tokens, input_pos=input_pos)
+    def forward(self, tokens: Tensor, input_pos: Optional[Tensor] = None, mask: Optional[Tensor] = None) -> Tensor:
+        return self.model(tokens=tokens, input_pos=input_pos, mask=mask)
 
     def setup_caches(self, max_batch_size, dtype):
         self.model.setup_caches(max_batch_size, dtype=dtype)
@@ -647,10 +647,10 @@ class Transformer(nn.Module):
             rope_scaling=self.config.rope_scaling,
         )
         self.register_buffer("freqs_cis", freqs_cis, persistent=True)
-        causal_mask = torch.tril(
+        casual_mask = torch.tril(
             torch.ones(self.max_seq_length, self.max_seq_length, dtype=torch.bool)
         )
-        self.register_buffer("causal_mask", causal_mask, persistent=True)
+        self.register_buffer("casual_mask", casual_mask, persistent=True)
 
     def distribute(self, device_mesh: DeviceMesh):
         if self.tok_embeddings:
@@ -672,7 +672,7 @@ class Transformer(nn.Module):
 
     def forward(self, x: Tensor, input_pos: Optional[Tensor] = None, cache_lane: int = 0) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
-        mask = self.causal_mask[None, None, input_pos]
+        mask = self.casual_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
         if self.tok_embeddings:
             x = self.tok_embeddings(x)

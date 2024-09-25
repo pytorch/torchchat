@@ -330,7 +330,7 @@ def clean_cache_keys(input_set: Set[str]) -> Set[str]:
     return {
         item
         for item in input_set
-        if not (item.endswith("cache") or item in ["freqs_cis", "causal_mask"])
+        if not (item.endswith("cache") or item in ["freqs_cis", "casual_mask"])
     }
 
 

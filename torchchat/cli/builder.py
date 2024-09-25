@@ -384,7 +384,7 @@ def _load_model_default(builder_args: BuilderArgs) -> Model:
     if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
         checkpoint = checkpoint["model"]
 
-    if model.config.model_type == ModelType.Flamingo:
+    if model.config.model_type == ModelType.Flamingo or model.config.model_type == ModelType.Llama3_1:
         # TODO: Refactor this. For now, overwrite the model with model loaded from params_path
         with set_default_dtype(builder_args.precision), torch.device(
             builder_args.device
@@ -397,14 +397,17 @@ def _load_model_default(builder_args: BuilderArgs) -> Model:
             # does not host any actual values, need to reinitialize them in the actual
             # device. Only do those buffer initialization, without initializing the entire
             # model.
-            decoder_config = model.config.transformer_args['decoder']
+            if  model.config.model_type == ModelType.Flamingo:
+                decoder_config = model.config.transformer_args['decoder']
+            else: # Llama3_1
+                decoder_config = model.config.transformer_args['text']
             head_dim = decoder_config['embed_dim'] // decoder_config['num_heads']
             max_seq_len = decoder_config['max_seq_len']
             rope_base = decoder_config['rope_base']
             for submodule in model.modules():
                 if isinstance(submodule, Llama3ScaledRoPE):
                     submodule.__init__(head_dim, max_seq_len, rope_base)
-        state_dict = flamingo_meta_to_tune(checkpoint)
+        state_dict = flamingo_meta_to_tune(checkpoint) if model.config.model_type == ModelType.Flamingo else checkpoint
         model.model.load_state_dict(state_dict, assign=True, strict=False)
     else:
         checkpoint = {"model." + k: v for k, v in checkpoint.items()}
