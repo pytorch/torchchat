@@ -458,6 +458,13 @@ class Model(ABC, nn.Module):
                 modules[name] = module_class(TransformerArgs.from_params(config_args))
             else:
                 modules[name] = module_class(**config_args)
+        
+        # Temporary add extra params to the DeepFusionModel.
+        # TODO: Remove it once we can make fusion model configurable in model_param.
+        if recipe.fusion_class == DeepFusionModel:
+            modules["encoder_trainable"] = False
+            modules["decoder_trainable"] = False
+            modules["fusion_trainable"] = False
 
         return recipe.fusion_class(**modules)
 
