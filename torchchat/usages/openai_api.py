@@ -17,11 +17,10 @@ from typing import Any, Dict, List, Optional, Union
 
 import torch
 
-from torchtune.models.llama3_2_vision._convert_weights import padded_collate
-from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform 
-
 from PIL import Image
-from torchtune.data import Message
+
+from torchtune.data import Message, padded_collate
+from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
 
 from torchchat.cli.download import is_model_downloaded, load_model_configs
 from torchchat.generate import Generator, GeneratorArgs
@@ -374,7 +373,9 @@ class OpenAiApiGenerator(Generator):
                         images.append(Image.open(BytesIO(base64_decoded)))
         print("images:", len(images), flush=True)
         if len(images) > 0:
-            transform = llama3_2_vision_transform(str(self.tokenizer_args.tokenizer_path))
+            transform = llama3_2_vision_transform(
+                str(self.tokenizer_args.tokenizer_path)
+            )
             torchtune_messages = self._openai_messages_to_torchtune(
                 completion_request.messages
             )
