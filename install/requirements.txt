@@ -14,7 +14,6 @@ snakeviz
 sentencepiece
 numpy < 2.0
 gguf
-lm-eval==0.4.2
 blobfile
 tomli >= 1.1.0 ; python_version < "3.11"
 openai
