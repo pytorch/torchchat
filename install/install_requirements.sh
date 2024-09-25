@@ -99,3 +99,9 @@ if [[ -x "$(command -v nvidia-smi)" ]]; then
     $PYTHON_EXECUTABLE torchchat/utils/scripts/patch_triton.py
   )
 fi
+
+
+(
+  set -x
+  $PIP_EXECUTABLE install lm-eval=="0.4.2"
+)
