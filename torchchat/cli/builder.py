@@ -21,7 +21,7 @@ try:
 except ImportError:
     pass
 
-from distributed import launch_distributed, ParallelDims, parallelize_llama
+from torchchat.distributed import launch_distributed, ParallelDims, parallelize_llama
 
 from torch.distributed.device_mesh import DeviceMesh
 

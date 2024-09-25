@@ -9,14 +9,13 @@ from typing import Optional, Tuple
 
 from torch.distributed.device_mesh import DeviceMesh
 
-
-from distributed.parallel_config import ParallelDims
-from distributed.utils import init_distributed
+from torchchat.distributed.parallel_config import ParallelDims
+from torchchat.distributed.utils import init_distributed
+from torchchat.distributed.logging_utils import SingletonLogger
 
 from .config_manager import InferenceConfig
 
 
-from distributed.logging_utils import SingletonLogger
 logger = SingletonLogger.get_logger()
 
 

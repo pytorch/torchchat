@@ -14,14 +14,14 @@ from torch.nn import Module
 from typing import Dict, Tuple, Set, Optional
 
 
-from distributed.dtensor_utils import is_dtensor, load_into_dtensor
+from torchchat.distributed.dtensor_utils import is_dtensor, load_into_dtensor
 
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
 _CONFIG_NAME = "config.json"
 
 
-from distributed.logging_utils import SingletonLogger
+from torchchat.distributed.logging_utils import SingletonLogger
 logger = SingletonLogger.get_logger()
 
 
