@@ -758,6 +758,8 @@ class Generator:
             with torch.device(device=self.builder_args.device), set_default_dtype(self.dtype):
                 data = transform({"messages": messages}, inference=True)
                 batch = padded_collate_tiled_images_and_mask([data], pad_direction="left", pad_max_images=1)
+                # set_default_dtype can not handle the dtype of the image tensor inside the batch; need to manually cast it
+                batch["encoder_input"]["images"] = batch["encoder_input"]["images"].to(self.dtype)
                 seq_len = len(data["tokens"])
                 total_response_length = seq_len + generator_args.max_new_tokens
                 batch["causal_mask"] = torch.tril(
