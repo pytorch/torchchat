@@ -212,6 +212,7 @@ float* forward(Transformer* transformer, int token, int pos) {
                              .to(torch::dtype(torch::kFloat32))
                              .to(torch::kCPU);
   auto logits = result[0].data_ptr();
+  memcpy(s->logits, logits, p->vocab_size * sizeof(float));
 #else // __ET_MODEL__
   TensorPtr pos_managed = make_tensor_ptr({1}, pos_buffer, ScalarType::Long);
   TensorPtr tokens_managed = make_tensor_ptr({1, 1}, token_buffer, ScalarType::Long);
@@ -228,10 +229,23 @@ float* forward(Transformer* transformer, int token, int pos) {
     exit(EXIT_FAILURE);
   }
   std::vector<EValue> result = outputs_res.get();
-  auto logits = result[0].toTensor().const_data_ptr();
+  // HACK: the rest of this runner assumes that logits must be float,
+  // so we simply convert them rather than plumbing
+  // templating/switch-on-type through the rest of this file.
+  const auto& result_tensor = result[0].toTensor();
+  ET_SWITCH_REALHBBF16_TYPES(
+      result_tensor.scalar_type(),
+      unused,
+      "forward",
+      CTYPE,
+      [&]() {
+        const CTYPE* logits = result_tensor.const_data_ptr<CTYPE>();
+        std::transform(logits, logits + p->vocab_size, s->logits, [](auto x) {
+          return static_cast<float>(x);
+        });
+      });
 #endif
 
-  memcpy(s->logits, logits, p->vocab_size * sizeof(float));
   return s->logits;
 }
 
