@@ -4,26 +4,28 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+# Example run command:
+# torchrun --nproc-per-node 4 dist_run.py llama2-7b-chat --pp 2
+# torchrun --nproc-per-node 4 dist_run.py llama3 --pp 2
+
 import argparse
 import os
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional, Tuple
 
-# Run command:
-# torchrun --nproc-per-node 4 dist_run.py
 import torch
 import torch.distributed as dist
 
-from distributed.logging_utils import SingletonLogger
+from torchchat.distributed.logging_utils import SingletonLogger
 
 # TODO - these are not distributed specific, consider moving to new package
-from distributed.safetensor_utils import (
+from torchchat.distributed.safetensor_utils import (
     get_hf_config_file,
     get_hf_weight_map_and_path,
     load_safetensor_weights,
 )
-from distributed.utils import (
+from torchchat.distributed.utils import (
     bytes_to_readable,
     Color as color,
     CUDATrackTime,

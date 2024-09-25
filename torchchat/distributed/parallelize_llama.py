@@ -11,9 +11,9 @@ from torch.distributed.tensor.parallel import (ColwiseParallel,
                                                parallelize_module)
 
 
-from distributed.parallel_config import ParallelDims
+from torchchat.distributed.parallel_config import ParallelDims
 
-from distributed.logging_utils import SingletonLogger
+from torchchat.distributed.logging_utils import SingletonLogger
 logger = SingletonLogger.get_logger()
 
 
