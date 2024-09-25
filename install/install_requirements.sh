@@ -90,7 +90,7 @@ REQUIREMENTS_TO_INSTALL=(
 # Rely on the latest tochtune for flamingo support
 (
   set -x
-  $PIP_EXECUTABLE install git+https://github.com/pytorch/torchtune.git@d002d45e3ec700fa770d9dcc61b02c59e2507bf6
+  $PIP_EXECUTABLE install -I git+https://github.com/pytorch/torchtune.git@d002d45e3ec700fa770d9dcc61b02c59e2507bf6
 )
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
