@@ -755,7 +755,7 @@ class Generator:
 
             transform = flamingo_transform(str(self.tokenizer_args.tokenizer_path))
 
-            with torch.device(device=self.builder_args.device):
+            with torch.device(device=self.builder_args.device), set_default_dtype(self.dtype):
                 data = transform({"messages": messages}, inference=True)
                 batch = padded_collate_tiled_images_and_mask([data], pad_direction="left", pad_max_images=1)
                 seq_len = len(data["tokens"])
