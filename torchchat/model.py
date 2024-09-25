@@ -458,6 +458,13 @@ class Model(ABC, nn.Module):
                 modules[name] = module_class(TransformerArgs.from_params(config_args))
             else:
                 modules[name] = module_class(**config_args)
+        
+        # Temporary add extra params to the DeepFusionModel.
+        # TODO: Remove it once we can make fusion model configurable in model_param.
+        if recipe.fusion_class == DeepFusionModel:
+            modules["encoder_trainable"] = False
+            modules["decoder_trainable"] = False
+            modules["fusion_trainable"] = False
 
         return recipe.fusion_class(**modules)
 
@@ -535,18 +542,28 @@ class Llama31Model(Model):
 class FlamingoModel(Model):
     def forward(
         self,
-        tokens: Tensor,
-        encoder_input: Optional[Dict[str, Tensor]] = None,
-        encoder_mask: Optional[Tensor] = None,
+        tokens: torch.Tensor,
+        *,
+        mask: Optional[torch.Tensor] = None,
+        encoder_input: Optional[Dict] = None,
+        encoder_mask: Optional[torch.Tensor] = None,
+        input_pos: Optional[torch.Tensor] = None,
     ) -> Tensor:
-        if encoder_input is None:
-            return self.model(tokens, encoder_mask=encoder_mask)
         return self.model(
-            tokens, encoder_input=encoder_input, encoder_mask=encoder_mask
+            tokens,
+            mask=mask,
+            encoder_input=encoder_input,
+            encoder_mask=encoder_mask,
+            input_pos=input_pos,
         )
 
-    def setup_caches(self, max_batch_size, dtype):
-        self.model.setup_caches(max_batch_size, dtype=dtype)
+    def setup_caches(self, batch_size, dtype, encoder_max_seq_len, decoder_max_seq_len):
+        self.model.setup_caches(
+            batch_size=batch_size,
+            dtype=dtype,
+            encoder_max_seq_len=encoder_max_seq_len,
+            decoder_max_seq_len=decoder_max_seq_len,
+        )
 
     def reset_caches(self):
         self.model.reset_caches()
