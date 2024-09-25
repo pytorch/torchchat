@@ -69,6 +69,44 @@
         "distribution_path": "meta-llama/Meta-Llama-3.1-70B-Instruct",
         "transformer_params_key": "Meta-Llama-3.1-70B-Tune"
     },
+    "meta-llama/Meta-Llama-3.2-1B": {
+        "aliases": ["llama3.2-1b-base"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/Llama-3.2-1B"
+    },
+    "meta-llama/Meta-Llama-3.2-1B-Instruct": {
+        "aliases": ["llama3.2-1b", "llama3.2-1b-chat", "llama3.2-1b-instruct"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/Llama-3.2-1B-Instruct",
+        "transformer_params_key": "Meta-Llama-3.2-1B"
+    },
+    "meta-llama/Llama-Guard-3-1B": {
+        "aliases": ["llama3-1b-guard", "llama3.2-1b-guard"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/Llama-Guard-3-1B"
+    },
+    "meta-llama/Meta-Llama-3.2-3B": {
+        "aliases": ["llama3.2-3b-base"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/Llama-3.2-3B"
+    },
+    "meta-llama/Meta-Llama-3.2-3B-Instruct": {
+        "aliases": ["llama3.2-3b", "llama3.2-3b-chat", "llama3.2-3b-instruct"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/Llama-3.2-3B-Instruct",
+        "transformer_params_key": "Meta-Llama-3.2-3B"
+    },
+    "meta-llama/Llama-3.2-11B-Vision": {
+        "aliases": ["llama3.2-11B-base", "Llama-3.2-11B-Vision-base"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/Llama-3.2-11B-Vision"
+    },
+    "meta-llama/Llama-3.2-11B-Vision-Instruct": {
+        "aliases": ["llama3.2-11B", "Llama-3.2-11B-Vision", "Llama-3.2-mm"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/Llama-3.2-11B-Vision-Instruct",
+        "transformer_params_key": "Llama-3.2-11B-Vision"
+    },
     "meta-llama/CodeLlama-7b-Python-hf": {
         "aliases": ["codellama", "codellama-7b"],
         "distribution_channel": "HuggingFaceSnapshot",

@@ -20,10 +20,7 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 
-try:
-    from _torchchat_test_script import flamingo_transform
-except ImportError:
-    pass
+from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
 
 from PIL import Image
 
@@ -753,7 +750,7 @@ class Generator:
                 Message(role="assistant", content=""),
             ]
 
-            transform = flamingo_transform(str(self.tokenizer_args.tokenizer_path))
+            transform = llama3_2_vision_transform(str(self.tokenizer_args.tokenizer_path))
 
             with torch.device(device=self.builder_args.device), set_default_dtype(self.dtype):
                 data = transform({"messages": messages}, inference=True)

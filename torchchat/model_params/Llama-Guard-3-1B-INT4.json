@@ -1,0 +1,20 @@
+{
+    "block_size": 131072,
+    "dim": 2048,
+    "hidden_dim": 6400,
+    "n_layers": 12,
+    "n_heads": 32,
+    "n_kv_heads": 8,
+    "vocab_size": 128256,
+    "ffn_dim_multiplier": 1.5,
+    "multiple_of": 256,
+    "norm_eps": 1e-05,
+    "rope_theta": 500000.0,
+    "rope_scaling": {
+        "factor": 32.0,
+        "low_freq_factor": 1.0,
+        "high_freq_factor": 4.0,
+        "original_max_position_embeddings": 8192
+    },
+    "use_tiktoken": true
+}

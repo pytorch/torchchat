@@ -16,10 +16,7 @@ import torch._dynamo.config
 import torch._inductor.config
 import torch.nn as nn
 
-try:
-    from _torchchat_test_script import flamingo_meta_to_tune
-except ImportError:
-    pass
+from torchtune.models.llama3_2_vision._convert_weights import llama3_vision_meta_to_tune
 
 from distributed import launch_distributed, ParallelDims, parallelize_llama
 
@@ -404,7 +401,7 @@ def _load_model_default(builder_args: BuilderArgs) -> Model:
             for submodule in model.modules():
                 if isinstance(submodule, Llama3ScaledRoPE):
                     submodule.__init__(head_dim, max_seq_len, rope_base)
-        state_dict = flamingo_meta_to_tune(checkpoint)
+        state_dict = llama3_vision_meta_to_tune(checkpoint)
         model.model.load_state_dict(state_dict, assign=True, strict=False)
     else:
         checkpoint = {"model." + k: v for k, v in checkpoint.items()}
