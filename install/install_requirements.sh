@@ -52,10 +52,6 @@ PYTORCH_NIGHTLY_VERSION=dev20240901
 # Nightly version for torchvision
 VISION_NIGHTLY_VERSION=dev20240901
 
-# Nightly version for torchtune
-TUNE_NIGHTLY_VERSION=dev20240916
-
-
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 (
   set -x
@@ -76,7 +72,6 @@ fi
 REQUIREMENTS_TO_INSTALL=(
   torch=="2.5.0.${PYTORCH_NIGHTLY_VERSION}"
   torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
-  torchtune=="0.3.0.${TUNE_NIGHTLY_VERSION}"
 )
 
 # Install the requirements. --extra-index-url tells pip to look for package
@@ -90,6 +85,12 @@ REQUIREMENTS_TO_INSTALL=(
 (
   set -x
   $PIP_EXECUTABLE install torchao=="0.5.0"
+)
+
+# Rely on the latest tochtune for flamingo support
+(
+  set -x
+  $PIP_EXECUTABLE install git+https://github.com/pytorch/torchtune.git@18efc81dda1c537bb7c25058ff059b4623ccff58
 )
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
