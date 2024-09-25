@@ -4,14 +4,16 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+# Example run command:
+# torchrun --nproc-per-node 4 dist_run.py llama2-7b-chat --pp 2
+# torchrun --nproc-per-node 4 dist_run.py llama3 --pp 2
+
 import argparse
 import os
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional, Tuple
 
-# Run command:
-# torchrun --nproc-per-node 4 dist_run.py
 import torch
 import torch.distributed as dist
 
