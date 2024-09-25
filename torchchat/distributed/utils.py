@@ -15,7 +15,7 @@ from typing import Optional
 import torch
 
 
-from distributed.logging_utils import SingletonLogger
+from torchchat.distributed.logging_utils import SingletonLogger
 logger = SingletonLogger.get_logger()
 
 

@@ -90,7 +90,7 @@ REQUIREMENTS_TO_INSTALL=(
 # Rely on the latest tochtune for flamingo support
 (
   set -x
-  $PIP_EXECUTABLE install git+https://github.com/pytorch/torchtune.git@18efc81dda1c537bb7c25058ff059b4623ccff58
+  $PIP_EXECUTABLE install -I git+https://github.com/pytorch/torchtune.git@d002d45e3ec700fa770d9dcc61b02c59e2507bf6
 )
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
@@ -99,3 +99,9 @@ if [[ -x "$(command -v nvidia-smi)" ]]; then
     $PYTHON_EXECUTABLE torchchat/utils/scripts/patch_triton.py
   )
 fi
+
+
+(
+  set -x
+  $PIP_EXECUTABLE install lm-eval=="0.4.2"
+)

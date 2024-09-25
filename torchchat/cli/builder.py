@@ -18,7 +18,7 @@ import torch.nn as nn
 
 from torchtune.models.llama3_2_vision._convert_weights import llama3_vision_meta_to_tune
 
-from distributed import launch_distributed, ParallelDims, parallelize_llama
+from torchchat.distributed import launch_distributed, ParallelDims, parallelize_llama
 
 from torch.distributed.device_mesh import DeviceMesh
 

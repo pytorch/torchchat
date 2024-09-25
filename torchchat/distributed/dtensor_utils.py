@@ -4,7 +4,7 @@ from torch.distributed._tensor import DTensor, Shard, Replicate
 
 from collections import defaultdict
 
-from distributed.logging_utils import SingletonLogger
+from torchchat.distributed.logging_utils import SingletonLogger
 logger = SingletonLogger.get_logger()
 
 
