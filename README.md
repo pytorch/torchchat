@@ -2,6 +2,12 @@
 
 torchchat is a small codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
 
+> [!IMPORTANT]
+> Update September 25, 2024: torchchat has multimodal support for **Llama3.2 11B**!!
+>
+> To try it out, finish the [Installation](#Installation) section below, then hop
+> over to our [multimodal guide](docs/multimodal.md) to learn more.
+
 
 ## What can you do with torchchat?
 - [Run models via PyTorch / Python](#running-via-pytorch--python)
@@ -18,6 +24,7 @@ torchchat is a small codebase showcasing the ability to run large language model
 
 
 ## Highlights
+
 - Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
 - PyTorch-native execution with performance
 - Supports popular hardware and OS
@@ -514,6 +521,13 @@ aliases.
 
 | Model | Mobile Friendly | Notes |
 |------------------|---|---------------------|
+|[meta-llama/Meta-Llama-3.2-3B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct)|✅|Tuned for `chat` . Alias to `llama3.2-3b`.|
+|[meta-llama/Meta-Llama-3.2-3B](https://huggingface.co/meta-llama/Llama-3.2-3B)|✅|Best for `generate`. Alias to `llama3.2-3b-base`.|
+|[meta-llama/Llama-Guard-3-1B](https://huggingface.co/meta-llama/Llama-Guard-3-1B)|✅|Tuned for classification . Alias to `llama3-1b-guard`.|
+|[meta-llama/Meta-Llama-3.2-1B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-1B-Instruct)|✅|Tuned for `chat` . Alias to `llama3.2-1b`.|
+|[meta-llama/Meta-Llama-3.2-1B](https://huggingface.co/meta-llama/Llama-3.2-1B)|✅|Best for `generate`. Alias to `llama3.2-1b-base`.|
+|[meta-llama/Llama-3.2-11B-Vision-Instruct](https://huggingface.co/meta-llama/Llama-3.2-11B-Vision-Instruct)||Multimodal (Image + Text). Tuned for `chat` . Alias to `llama3.2-11B`.|
+|[meta-llama/Llama-3.2-11B-Vision](https://huggingface.co/meta-llama/Llama-3.2-11B-Vision)||Multimodal (Image + Text). Tuned for `generate` . Alias to `llama3.2-11B-base`.|
 |[meta-llama/Meta-Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3.1`.|
 |[meta-llama/Meta-Llama-3.1-8B](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B)|✅|Best for `generate`. Alias to `llama3.1-base`.|
 |[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3`.|

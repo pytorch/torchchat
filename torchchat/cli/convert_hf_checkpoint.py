@@ -34,6 +34,8 @@ def convert_hf_checkpoint(
     if model_name is None:
         model_name = model_dir.name
 
+    # TODO: This is an incongruent way of resolving config_args
+    # See https://github.com/pytorch/torchchat/issues/1179
     config_args = ModelArgs.from_name(model_name).transformer_args['text']
     config = TransformerArgs.from_params(config_args)
     print(f"Model config {config.__dict__}")
@@ -130,6 +132,26 @@ def convert_hf_checkpoint(
     if remove_bin_files:
         for file in bin_files:
             os.remove(file)
+
+
+@torch.inference_mode()
+def convert_hf_checkpoint_to_tune(
+    *,
+    model_dir: Optional[Path] = None,
+    model_name: str,
+) -> None:
+    assert model_dir is not None
+
+    consolidated_pth = model_dir / "original" / "consolidated.pth"
+    tokenizer_pth = model_dir / "original" / "tokenizer.model"
+    if consolidated_pth.is_file() and tokenizer_pth.is_file():
+        print(f"Moving checkpoint to {model_dir / 'model.pth'}.")
+        os.rename(consolidated_pth, model_dir / "model.pth")
+        print(f"Moving tokenizer to {model_dir / 'tokenizer.model'}.")
+        os.rename(tokenizer_pth, model_dir / "tokenizer.model")
+        print("Done.")
+    else:
+        raise RuntimeError(f"Could not find {consolidated_pth}")
 
 
 if __name__ == "__main__":
