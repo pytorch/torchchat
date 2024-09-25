@@ -81,10 +81,17 @@ def convert_hf_checkpoint(
         "model.layers.{}.self_attn.k_proj.weight": "layers.{}.attention.wk.weight",
         "model.layers.{}.self_attn.v_proj.weight": "layers.{}.attention.wv.weight",
         "model.layers.{}.self_attn.o_proj.weight": "layers.{}.attention.wo.weight",
+        "model.layers.{}.self_attn.q_proj.bias": "layers.{}.attention.wq.bias",
+        "model.layers.{}.self_attn.k_proj.bias": "layers.{}.attention.wk.bias",
+        "model.layers.{}.self_attn.v_proj.bias": "layers.{}.attention.wv.bias",
+        "model.layers.{}.self_attn.o_proj.bias": "layers.{}.attention.wo.bias",
         "model.layers.{}.self_attn.rotary_emb.inv_freq": None,
         "model.layers.{}.mlp.gate_proj.weight": "layers.{}.feed_forward.w1.weight",
         "model.layers.{}.mlp.up_proj.weight": "layers.{}.feed_forward.w3.weight",
         "model.layers.{}.mlp.down_proj.weight": "layers.{}.feed_forward.w2.weight",
+        "model.layers.{}.mlp.gate_proj.bias": "layers.{}.feed_forward.w1.bias",
+        "model.layers.{}.mlp.up_proj.bias": "layers.{}.feed_forward.w3.bias",
+        "model.layers.{}.mlp.down_proj.bias": "layers.{}.feed_forward.w2.bias",
         "model.layers.{}.input_layernorm.weight": "layers.{}.attention_norm.weight",
         "model.layers.{}.post_attention_layernorm.weight": "layers.{}.ffn_norm.weight",
         "model.norm.weight": "norm.weight",
@@ -135,17 +142,15 @@ def convert_hf_checkpoint(
         if "layers" in key:
             abstract_key = re.sub(r"(\d+)", "{}", key)
             layer_num = re.search(r"\d+", key).group(0)
-            new_key = weight_map[abstract_key]
-            if new_key is None:
-                continue
+            new_key = weight_map.get(abstract_key, abstract_key)
             new_key = new_key.format(layer_num)
         else:
-            new_key = weight_map[key]
+            new_key = weight_map.get(key, key)
 
         final_result[new_key] = value
 
     for key in tuple(final_result.keys()):
-        if "wq" in key:
+        if "wq.weight" in key:
             q = final_result[key]
             k = final_result[key.replace("wq", "wk")]
             v = final_result[key.replace("wq", "wv")]
