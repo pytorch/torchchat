@@ -289,7 +289,7 @@ class OpenAiApiGenerator(Generator):
             )
         except:
             # can not find max_seq_length in model config, use default value
-            self.max_seq_length = 128
+            self.max_seq_length = 2048
         # The System fingerprint is a unique identifier for the model and its configuration.
         self.system_fingerprint = (
             f"{self.builder_args.device}_{self.builder_args.precision}"
