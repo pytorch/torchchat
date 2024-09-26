@@ -164,7 +164,6 @@ jobs:
           bash .ci/scripts/validate.sh "./checkpoints/${REPO_NAME}/model.pth" "cpu" "eval_sanity_check-float16"
 
   test-cpu-eval-sanity-check-float32:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     name: test-cpu-eval-sanity-check-float32 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-cpu
     strategy:
