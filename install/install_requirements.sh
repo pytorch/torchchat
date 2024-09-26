@@ -103,5 +103,5 @@ fi
 
 (
   set -x
-  $PIP_EXECUTABLE install lm-eval=="0.4.2"
+  $PIP_EXECUTABLE install lm-eval=="0.4.2" psutil=="6.0.0"
 )
