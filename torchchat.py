@@ -8,7 +8,6 @@ import argparse
 import logging
 import subprocess
 import sys
-import lm_eval  # noqa
 
 from torchchat.cli.cli import (
     add_arguments_for_verb,
