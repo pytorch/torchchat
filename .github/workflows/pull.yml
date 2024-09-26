@@ -905,13 +905,11 @@ jobs:
       - name: Load or install ET
         id: install-et
         uses: actions/cache@v4
-        env:
-          cache-key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}-${{ hashFiles('torchchat/utils/scripts/install_et.sh') }}
         with:
-          path: ./et-build
-          key: ${{env.cache-key}}
-          restore-keys: |
-            ${{env.cache-key}}
+          path: |
+            ./et-build
+            ./torchchat/utils/scripts
+          key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}-${{ hashFiles('**/install_et.sh') }}
       - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
         continue-on-error: true
         run: |
