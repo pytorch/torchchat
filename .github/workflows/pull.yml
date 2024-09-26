@@ -904,9 +904,9 @@ jobs:
           echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt)" >> "$GITHUB_ENV"
       - name: Load or install ET
         id: install-et
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
-          cache-key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}
+          cache-key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}-${{ hashFiles('torchchat/utils/scripts/install_et.sh') }}
         with:
           path: ./et-build
           key: ${{env.cache-key}}
