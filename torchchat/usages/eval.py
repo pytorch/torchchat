@@ -10,8 +10,6 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 
-import lm_eval  # noqa
-
 from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
@@ -29,6 +27,8 @@ torch._inductor.config.triton.unique_kernel_names = True
 torch._inductor.config.epilogue_fusion = False
 torch._inductor.config.triton.cudagraphs = True
 torch._dynamo.config.cache_size_limit = 100000
+
+import lm_eval
 
 from lm_eval.evaluator import evaluate
 from lm_eval.models.huggingface import HFLM as eval_wrapper

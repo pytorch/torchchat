@@ -31,6 +31,7 @@ from torch.distributed.tensor.parallel import (
 )
 from torch.nn import functional as F
 
+import lm_eval  # noqa
 from torchtune.models.clip import clip_vision_encoder
 from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
 from torchtune.models.llama3_2_vision._component_builders import (
