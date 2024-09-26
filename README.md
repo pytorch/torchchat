@@ -449,7 +449,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
    - [executorch-240919.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-240919.aar) (SHASUM: c8a5d38ead03bfa28ee8469f6355840ad0d182ba)
 
-2. Rename the downloaded AAR file to `executorch.aar` and move the file to `android/torchchat/app/libs/`. You may need to create directory `android/torchchat/app/libs/` if it does not exist.
+2. Rename the downloaded AAR file to `executorch.aar` and move the file to `torchchat/edge/android/torchchat/app/libs/`. You may need to create directory `torchchat/edge/android/torchchat/app/libs/` if it does not exist.
 
 3. Push the model and tokenizer file to your device. You can find the model file called `llama3.1.pte` in the current `torchchat` directory and the tokenizer file at `$(python3 torchchat.py where llama3.1)/tokenizer.model` path.
     ```
@@ -484,7 +484,6 @@ Alternatively, you can run `torchchat/utils/scripts/android_example.sh` which se
 
 ```
 export TORCHCHAT_ROOT=$(pwd)
-export USE_TIKTOKEN=ON # Set this only for tiktoken tokenizer
 sh torchchat/utils/scripts/android_example.sh
 ```
 
