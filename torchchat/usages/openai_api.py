@@ -289,8 +289,8 @@ class OpenAiApiGenerator(Generator):
                 else self.model.text_transformer_args.max_seq_length
             )
         except:
-            # can not find max_seq_length in model config, use default value
-            self.max_seq_length = 128
+            self.max_seq_length = 2048
+            print(f"can not find max_seq_length in model config, use default value: {self.max_seq_length}")
         # The System fingerprint is a unique identifier for the model and its configuration.
         self.system_fingerprint = (
             f"{self.builder_args.device}_{self.builder_args.precision}"
@@ -321,10 +321,11 @@ class OpenAiApiGenerator(Generator):
                         base64_decoded = base64.b64decode(
                                     content_dict["image_url"].split(";base64,")[1]
                                 )
+                        image = Image.open(BytesIO(base64_decoded))
                         converted_content.append(
                             {
                                 "type": "image",
-                                "content": Image.open(BytesIO(base64_decoded)),
+                                "content": image,
                             }
                         )
                     torchtune_messages.append( 
