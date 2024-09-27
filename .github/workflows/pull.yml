@@ -737,63 +737,68 @@ jobs:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
       runner: macos-m1-stable  # needs MPS, was macos-m1-stable
-      script: |
-        export PYTHON_VERSION="3.10"
-        set -x
-        # NS/MC: Remove previous installation of torch and torchao first
-        # as this script does not install anything into conda env but rather as system dep
-        pip3 uninstall -y torch || true
-        set -eou pipefail
+      steps:
+        - name: Setup Python
+          uses: actions/setup-python@v2
+          with:
+            python-version: 3.10.11
+        - name: Run test
+          run: |
+            export PYTHON_VERSION="3.10"
+            set -x
+            # NS/MC: Remove previous installation of torch and torchao first
+            # as this script does not install anything into conda env but rather as system dep
+            pip3 uninstall -y torch || true
+            set -eou pipefail
 
-        pip3 uninstall -y torchao || true
-        set -eou pipefail
+            pip3 uninstall -y torchao || true
+            set -eou pipefail
 
-        echo "::group::Print machine info"
-        uname -a
-        sysctl machdep.cpu.brand_string
-        sysctl machdep.cpu.core_count
-        echo "::endgroup::"
+            echo "::group::Print machine info"
+            uname -a
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+            echo "::endgroup::"
 
-        echo "::group::Install requirements"
-        # Install requirements
-        ./install/install_requirements.sh
-        ls -la
-        pwd
-        pip3 list
-        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
-        echo "::endgroup::"
+            echo "::group::Install requirements"
+            # Install requirements
+            ./install/install_requirements.sh
+            ls -la
+            pwd
+            pip3 list
+            python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+            echo "::endgroup::"
 
-        echo "::group::Download checkpoints"
-        (
-          mkdir -p checkpoints/stories15M
-          pushd checkpoints/stories15M
-          curl -fsSL -O https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
-          curl -fsSL -O https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
-          popd
-        )
-        echo "::endgroup::"
+            echo "::group::Download checkpoints"
+            (
+              mkdir -p checkpoints/stories15M
+              pushd checkpoints/stories15M
+              curl -fsSL -O https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+              curl -fsSL -O https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+              popd
+            )
+            echo "::endgroup::"
 
-        echo "::group::Run inference"
-        export MODEL_PATH=checkpoints/stories15M/stories15M.pt
-        export MODEL_NAME=stories15M
-        export MODEL_DIR=/tmp
-        for DTYPE in float16 float32; do
-          # if [ $(uname -s) == Darwin ]; then
-          #   export DTYPE=float16
-          # fi
+            echo "::group::Run inference"
+            export MODEL_PATH=checkpoints/stories15M/stories15M.pt
+            export MODEL_NAME=stories15M
+            export MODEL_DIR=/tmp
+            for DTYPE in float16 float32; do
+              # if [ $(uname -s) == Darwin ]; then
+              #   export DTYPE=float16
+              # fi
 
-          python3 torchchat.py generate --dtype ${DTYPE} --device mps --checkpoint-path ${MODEL_PATH} --temperature 0
+              python3 torchchat.py generate --dtype ${DTYPE} --device mps --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+              python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+              python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+              python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+              python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          PYTORCH_ENABLE_MPS_FALLBACK=1 python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0
-        done
+              PYTORCH_ENABLE_MPS_FALLBACK=1 python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0
   compile-gguf:
     strategy:
       matrix:
@@ -919,6 +924,7 @@ jobs:
         run: |
           echo "Install ExecuTorch python"
           export TORCHCHAT_ROOT=$PWD
+          export ET_BUILD_DIR="et-build"
           ENABLE_ET_PYBIND="${1:-true}"
           source "torchchat/utils/scripts/install_utils.sh"
           install_executorch_python_libs $ENABLE_ET_PYBIND
@@ -1067,14 +1073,12 @@ jobs:
           echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt)" >> "$GITHUB_ENV"
       - name: Load or install ET
         id: install-et
-        uses: actions/cache@v3
-        env:
-          cache-key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}
+        uses: actions/cache@v4
         with:
-          path: ./et-build
-          key: ${{env.cache-key}}
-          restore-keys: |
-            ${{env.cache-key}}
+          path: |
+            ./et-build
+            ./torchchat/utils/scripts
+          key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}-${{ hashFiles('**/install_et.sh') }}
       - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
         continue-on-error: true
         run: |
@@ -1084,6 +1088,7 @@ jobs:
         run: |
           echo "Install ExecuTorch python"
           export TORCHCHAT_ROOT=$PWD
+          export ET_BUILD_DIR="et-build"
           ENABLE_ET_PYBIND="${1:-true}"
           source "torchchat/utils/scripts/install_utils.sh"
           install_executorch_python_libs $ENABLE_ET_PYBIND
