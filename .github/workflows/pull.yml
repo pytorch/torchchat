@@ -809,6 +809,7 @@ jobs:
             python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
             PYTORCH_ENABLE_MPS_FALLBACK=1 python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+          end
   compile-gguf:
     strategy:
       matrix:
