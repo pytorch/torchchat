@@ -316,7 +316,6 @@ class OpenAiApiGenerator(Generator):
             torchtune_contents = []
             if isinstance(message["content"], list):
                 for content_dict in message["content"]:
-                    converted_content = []
                     if content_dict["type"] == "text":
                         assert (
                             prompt is None
