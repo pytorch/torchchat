@@ -93,6 +93,13 @@ install_executorch_python_libs() {
       echo "Installing pybind"
       bash ./install_requirements.sh --pybind xnnpack
   fi
+
+  # TODO: figure out the root cause of 'AttributeError: module 'evaluate'
+  # has no attribute 'utils'' error from evaluate CI jobs and remove
+  # `import lm_eval` from torchchat.py since it requires a specific version
+  # of numpy.
+  pip install numpy=='1.26.4'
+
   pip3 list
   popd
 }
@@ -169,10 +176,9 @@ clone_torchao() {
   pushd ${TORCHCHAT_ROOT}/torchao-build/src
   echo $pwd
 
-  cp -R $HOME/fbsource/fbcode/pytorch/ao .
-  # git clone https://github.com/pytorch/ao.git
-  # cd ao
-  # git checkout $(cat ${TORCHCHAT_ROOT}/intstall/.pins/torchao-pin.txt)
+  git clone https://github.com/pytorch/ao.git
+  cd ao
+  git checkout $(cat ${TORCHCHAT_ROOT}/install/.pins/torchao-pin.txt)
 
   popd
 }
