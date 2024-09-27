@@ -621,71 +621,87 @@ jobs:
           python torchchat.py remove stories15m
 
   test-mps:
-    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
-    with:
-      runner: macos-m1-stable  # neeps MPS, was macos-m1-stable
-      script: |
-        export PYTHON_VERSION="3.10"
-        set -x
-        # NS/MC: Remove previous installation of torch and torchao first
-        # as this script does not install anything into conda env but rather as system dep
-        pip3 uninstall -y torch || true
-        set -eou pipefail
+    strategy:
+      matrix:
+        runner: [macos-m1-stable ]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Run test
+        run: |
+          export PYTHON_VERSION="3.10"
+          set -x
+          # NS/MC: Remove previous installation of torch and torchao first
+          # as this script does not install anything into conda env but rather as system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
 
-        pip3 uninstall -y torchao || true
-        set -eou pipefail
+          pip3 uninstall -y torchao || true
+          set -eou pipefail
 
-        echo "::group::Print machine info"
-        uname -a
-        sysctl machdep.cpu.brand_string
-        sysctl machdep.cpu.core_count
-        echo "::endgroup::"
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+          echo "::endgroup::"
 
-        echo "::group::Install requirements"
-        # Install requirements
-        ./install/install_requirements.sh
-        ls -la
-        pwd
-        pip3 list
-        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
-        echo "::endgroup::"
+          echo "::group::Install requirements"
+          # Install requirements
+          ./install/install_requirements.sh
+          ls -la
+          pwd
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          echo "::endgroup::"
 
-        echo "::group::Download checkpoints"
-        (
-          mkdir -p checkpoints/stories15M
-          pushd checkpoints/stories15M
-          curl -fsSL -O https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
-          curl -fsSL -O https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
-          popd
-        )
-        echo "::endgroup::"
+          echo "::group::Download checkpoints"
+          (
+            mkdir -p checkpoints/stories15M
+            pushd checkpoints/stories15M
+            curl -fsSL -O https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+            curl -fsSL -O https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+            popd
+          )
+          echo "::endgroup::"
 
-        echo "::group::Run inference"
-        export MODEL_PATH=checkpoints/stories15M/stories15M.pt
-        export MODEL_NAME=stories15M
-        export MODEL_DIR=/tmp
+          echo "::group::Run inference"
+          export MODEL_PATH=checkpoints/stories15M/stories15M.pt
+          export MODEL_NAME=stories15M
+          export MODEL_DIR=/tmp
 
-        python3 torchchat.py generate --device mps --checkpoint-path ${MODEL_PATH} --temperature 0
+          python3 torchchat.py generate --device mps --checkpoint-path ${MODEL_PATH} --temperature 0
 
-        echo "************************************************************"
-        echo "*** embedding"
-        echo "************************************************************"
+          echo "************************************************************"
+          echo "*** embedding"
+          echo "************************************************************"
 
-        python3 torchchat.py generate --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
-        python3 torchchat.py generate --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+          python3 torchchat.py generate --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+          python3 torchchat.py generate --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-        echo "************************************************************"
-        echo "*** linear int8"
-        echo "************************************************************"
+          echo "************************************************************"
+          echo "*** linear int8"
+          echo "************************************************************"
 
-        python3 torchchat.py generate --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
-        python3 torchchat.py generate --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+          python3 torchchat.py generate --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+          python3 torchchat.py generate --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-        echo "************************************************************"
-        echo "*** linear int4"
-        echo "************************************************************"
+          echo "************************************************************"
+          echo "*** linear int4"
+          echo "************************************************************"
 
-        PYTORCH_ENABLE_MPS_FALLBACK=1 python3 torchchat.py generate --device mps --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+          PYTORCH_ENABLE_MPS_FALLBACK=1 python3 torchchat.py generate --device mps --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0
   test-gguf-util:
     strategy:
       matrix:
@@ -939,7 +955,6 @@ jobs:
           ENABLE_ET_PYBIND="${1:-true}"
           source "torchchat/utils/scripts/install_utils.sh"
           install_executorch_python_libs $ENABLE_ET_PYBIND
-          popd
       - name: Install runner
         run: |
           echo "Installing runner"
@@ -1103,7 +1118,6 @@ jobs:
           ENABLE_ET_PYBIND="${1:-true}"
           source "torchchat/utils/scripts/install_utils.sh"
           install_executorch_python_libs $ENABLE_ET_PYBIND
-          popd
       - name: Install runner
         run: |
           echo "Installing runner"
