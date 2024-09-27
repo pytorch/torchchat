@@ -19,10 +19,4 @@ pushd ${TORCHCHAT_ROOT}
 find_cmake_prefix_path
 clone_executorch
 install_executorch_libs $ENABLE_ET_PYBIND
-install_executorch_python_libs $ENABLE_ET_PYBIND
-# TODO: figure out the root cause of 'AttributeError: module 'evaluate'
-# has no attribute 'utils'' error from evaluate CI jobs and remove
-# `import lm_eval` from torchchat.py since it requires a specific version
-# of numpy.
-pip install numpy=='1.26.4'
 popd

@@ -918,10 +918,10 @@ jobs:
       - name: Install ExecuTorch python
         run: |
           echo "Install ExecuTorch python"
-          pushd et-build/src/executorch
-          chmod +x ./install_requirements.sh
-          chmod +x ./install_requirements.py
-          ./install_requirements.sh
+          export TORCHCHAT_ROOT=$PWD
+          ENABLE_ET_PYBIND="${1:-true}"
+          source "torchchat/utils/scripts/install_utils.sh"
+          install_executorch_python_libs $ENABLE_ET_PYBIND
           popd
       - name: Install runner
         run: |
@@ -1083,10 +1083,10 @@ jobs:
       - name: Install ExecuTorch python
         run: |
           echo "Install ExecuTorch python"
-          pushd et-build/src/executorch
-          chmod +x ./install_requirements.sh
-          chmod +x ./install_requirements.py
-          ./install_requirements.sh
+          export TORCHCHAT_ROOT=$PWD
+          ENABLE_ET_PYBIND="${1:-true}"
+          source "torchchat/utils/scripts/install_utils.sh"
+          install_executorch_python_libs $ENABLE_ET_PYBIND
           popd
       - name: Install runner
         run: |
