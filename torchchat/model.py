@@ -30,9 +30,6 @@ from torch.distributed.tensor.parallel import (
     SequenceParallel,
 )
 from torch.nn import functional as F
-# TODO: remove this after we figure out where in torchtune an `evaluate` module
-# is being imported, which is being confused with huggingface's `evaluate``.
-import lm_eval  # noqa 
 from torchtune.models.clip import clip_vision_encoder
 from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
 from torchtune.models.llama3_2_vision._component_builders import (
@@ -466,7 +463,7 @@ class Model(ABC, nn.Module):
                 modules[name] = module_class(TransformerArgs.from_params(config_args))
             else:
                 modules[name] = module_class(**config_args)
-        
+
         # Temporary add extra params to the DeepFusionModel.
         # TODO: Remove it once we can make fusion model configurable in model_param.
         if recipe.fusion_class == DeepFusionModel:
