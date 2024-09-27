@@ -334,7 +334,7 @@ class OpenAiApiGenerator(Generator):
 
         assert prompt is not None, "Text prompt must be specified in the request"
 
-        return self._gen_model_inputs(prompt, images, completed_request.max_tokens)
+        return self._gen_model_input(prompt, images, completion_request.max_tokens)
 
     def chunked_completion(self, completion_request: CompletionRequest):
         """Handle a chat completion request and yield a chunked response.
@@ -365,7 +365,7 @@ class OpenAiApiGenerator(Generator):
         device_sync(device=self.builder_args.device)
 
         encoded, batch = self._gen_model_inputs_from_openai_completion_request(
-            completed_request
+            completion_request
         )
 
         idx = 0
