@@ -734,9 +734,10 @@ jobs:
 
           echo "Tests complete."
   test-mps-dtype:
-    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
-    with:
-      runner: macos-m1-stable  # needs MPS, was macos-m1-stable
+    strategy:
+      matrix:
+        runner: [macos-m1-stable ]
+    runs-on: ${{matrix.runner}}
       steps:
         - name: Setup Python
           uses: actions/setup-python@v2
