@@ -204,6 +204,7 @@ class TokenizerArgs:
     tokenizer_path: Optional[Union[Path, str]] = None
     is_sentencepiece: bool = False
     is_tiktoken: bool = False
+    is_tokenizers: bool = False
     t: Optional[Any] = None
 
     def __post_init__(self):
@@ -213,6 +214,7 @@ class TokenizerArgs:
             self.t = TiktokenTokenizer(model_path=str(self.tokenizer_path))
             self.is_tiktoken = True
             self.is_sentencepiece = False
+            self.is_tokenizers = False
             return
         except:
             pass
@@ -223,12 +225,25 @@ class TokenizerArgs:
             self.t = SentencePieceProcessor(model_file=str(self.tokenizer_path))
             self.is_tiktoken = False
             self.is_sentencepiece = True
+            self.is_tokenizers = False
+            return
+        except:
+            pass
+
+        try:
+            from tokenizer.tokenizers import TokenizersTokenizer
+
+            self.t = TokenizersTokenizer(str(self.tokenizer_path))
+            self.is_tiktoken = False
+            self.is_sentencepiece = False
+            self.is_tokenizers = True
             return
         except:
             pass
 
         self.is_tiktoken = False
         self.is_sentencepiece = False
+        self.is_tokenizers = False
         self.t = None
         return
 
@@ -240,16 +255,27 @@ class TokenizerArgs:
         if model is None:
             return
 
-        if self.is_tiktoken == self.is_sentencepiece:
+        if len(list(filter(lambda x: x, [self.is_tiktoken, self.is_tokenizers, self.is_sentencepiece]))) != 1:
             raise RuntimeError(f"no tokenizer was found at {self.tokenizer_path}")
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
+        is_tokenizers = self.is_tokenizers
         use_tiktoken = model.config.use_tiktoken
+        use_tokenizers = model.config.use_tokenizers
+        use_sentencepiece = not (use_tiktoken or use_tokenizers)
 
-        if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
+        if (
+            (is_tiktoken and not use_tiktoken) or
+            (is_tokenizers and not use_tokenizers) or
+            (is_sentencepiece and not use_sentencepiece)
+        ):
             raise RuntimeError(
-                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)}) does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}) for {model_description}"
+                "model-specified tokenizer ({}) does not match provided tokenizer ({}) for {}".format(
+                    tokenizer_setting_to_name(use_tiktoken, use_tokenizers),
+                    tokenizer_setting_to_name(is_tiktoken, is_tokenizers),
+                    model_description,
+                )
             )
 
         return
@@ -605,5 +631,9 @@ def _initialize_model(
     return model
 
 
-def tokenizer_setting_to_name(tiktoken: bool = False) -> str:
-    return "TikToken" if tiktoken else "SentencePiece"
+def tokenizer_setting_to_name(tiktoken: bool, tokenizers: bool) -> str:
+    if tiktoken:
+        return "TikToken"
+    if tokenizers:
+        return "Tokenizers"
+    return "SentencePiece"
