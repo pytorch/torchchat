@@ -16,6 +16,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import torch
 import torch.distributed as dist
+from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
+from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
 
 from torchchat.distributed.logging_utils import SingletonLogger
 
@@ -33,8 +35,6 @@ from torchchat.distributed.utils import (
     get_num_params,
     GPUMemoryMonitor,
 )
-from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
-from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
 from torchchat.model import ModelArgs, Transformer, TransformerArgs
 from torchchat.utils.build_utils import set_precision
 
@@ -188,8 +188,7 @@ def _create_padded_prompts(
 
 
 def _batch_decode_next_tokens(
-    output: torch.Tensor,
-    pos: int,
+    output: torch.Tensor, pos: int, step: int = -1
 ) -> torch.Tensor:
     """
     Decode the next token for each prompt in the batch.
@@ -201,11 +200,21 @@ def _batch_decode_next_tokens(
         Decoded token ids.
     """
     # Take the next token logits for each prompt
-    next_token_logits = output[:, pos, :]
-    # Argmax (deterministic) TODO: add temperature
-    next_token = torch.argmax(next_token_logits, dim=-1)
+    res = []
+    logger.info(f"{color.green}output shape = {output.shape}{color.reset}")
+    logger.info(f"{color.green}pos = {pos}{color.reset}")
+    for i in range(output.shape[0]):
+        token_pos = 0 if step != -1 else pos[i] - 1
+        next_token_logits = output[i, token_pos, :]
+
+        # Argmax (deterministic) TODO: add temperature
+        next_token = torch.argmax(next_token_logits, dim=-1)
+        logger.info(f"{color.blue}next_token = {next_token}{color.reset}")
+        res.append(next_token)
     # Token ids in int tensor form
-    return next_token
+    res = torch.stack(res, dim=0)
+    logger.info(f"{color.green}next_token = {res}{color.reset}")
+    return res  # next_token
 
 
 def _update_padded_sequence(
@@ -293,7 +302,7 @@ def main(args):
     # Batch size. Since we push batches dynamically through the pipeline rather
     # than chunking them, this is effectively micro-batch size in pipeline
     # sense. Thus it is interchangeable with micro-batch size below.
-    batch_size = 4
+    batch_size = 2
     seqlen_prefill = 1024  # sequence length
     dim = 4096  # embedding dimension
 
@@ -331,7 +340,9 @@ def main(args):
 
     # Helper function to get example inputs and outputs for the stages.
     def get_example_ins_outs(seqlen: int) -> Tuple[torch.Tensor, torch.Tensor]:
-        mb_ids = torch.randint(0, config.vocab_size, (batch_size, seqlen), device=device)
+        mb_ids = torch.randint(
+            0, config.vocab_size, (batch_size, seqlen), device=device
+        )
         activation = torch.rand(
             batch_size, seqlen, dim, device=device, dtype=model_dtype
         )
@@ -363,10 +374,11 @@ def main(args):
     prefiller = ScheduleGPipe(prefill_stage, 1)
 
     prompt = [
-        "What is a computer?",
-        "Where does Santa live?",
-        "Who is Abraham Lincoln?",
-        "How are models trained?",
+        "What is Snow?",
+        "What is Fire?",
+        # "Where does Santa live?",
+        # "Who is Abraham Lincoln?",
+        # "How are models trained?",
     ]
 
     start_pos = 0
@@ -386,8 +398,9 @@ def main(args):
     )
     # TODO: figure out how to set input_pos for each prompt in the batch then we
     # can remove this limitation.
-    s = set(prompt_lengths)
-    assert len(s) == 1, f"prompt_lengths should be the same, got {s}"
+    # s = set(prompt_lengths)
+    logger.info(f"prompt_lengths = {prompt_lengths=}")
+    # assert len(s) == 1, f"prompt_lengths should be the same, got {s}"
 
     # Need these global ids due to the API definition of dist.send and recv
     first_pp_rank_global_id = dist.get_global_rank(pp_group, first_pp_rank)
@@ -396,6 +409,7 @@ def main(args):
     # New token generated each iteration
     # need a row dimension for each prompt in the batch
     new_token = torch.zeros(batch_size, 1, device=device, dtype=torch.int64)
+    logger.info(f"{color.green}{new_token.shape=}, {new_token=}{color.reset}")
     # Store the generated tokens
     res = []
 
@@ -403,6 +417,7 @@ def main(args):
     # Run context input through pipeline
     # TODO: we need to pass `input_pos` and `cache_lane` to each stage.
     lane = 0
+    logger.info(f"{color.green}Prefilling...{input_pos=}{color.reset}")
     kwargs = {"input_pos": input_pos, "cache_lane": lane}
     with torch.no_grad(), CUDATrackTime() as timer:
         if pp_rank == first_pp_rank:
@@ -415,12 +430,26 @@ def main(args):
     logger.info(
         f"{color.green}Prefilling time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
     )
+    logger.info(
+        f"{color.green}{input_pos=}, Prefill output: {type(output)=}{color.reset}"
+    )
 
     # Decode token id into string and print it
     def decode_in_flight(token):
         # Make a 2D tensor with ids on row dimension
-        unsqueezed = torch.unsqueeze(token, 1)
-        token_str = tokenizer.decode(unsqueezed.tolist())
+        # unsqueezed = torch.unsqueeze(token, 1)
+        # token_str = tokenizer.decode(unsqueezed.tolist())
+        # tiktoken does not accept tensor inputs
+        decoding_list = token.tolist()
+        logger.info(
+            f"{color.red} decoding token {token=}{type(token)=}, {decoding_list=} {color.reset}"
+        )
+        token_str = tokenizer.decode(decoding_list)
+        logger.info(
+            f"{color.green} prefile response ===>>>> token_str = {token_str}{color.reset}"
+        )
+        tp_rank = dist.get_rank()
+        # print the token string on tp rank 0
         if tp_rank == 0:
             logger.info(
                 f"{color.green} responses ====>>>> "
@@ -429,7 +458,8 @@ def main(args):
 
     # Decode the output -- first generated token
     if pp_rank == last_pp_rank:
-        new_token = _batch_decode_next_tokens(output, prompt_lengths[0] - 1)
+        logger.info(f"{color.green}Decoding...{prompt_lengths=}{color.reset}")
+        new_token = _batch_decode_next_tokens(output, prompt_lengths)
         res.append(new_token)
         if not args.disable_in_flight_decode:
             decode_in_flight(new_token)
@@ -482,7 +512,8 @@ def main(args):
 
             # Decode the output
             if pp_rank == last_pp_rank:
-                new_token = _batch_decode_next_tokens(output, 0)
+                logger.info(f"{color.red}Decoding...{output.shape=}{color.reset}")
+                new_token = _batch_decode_next_tokens(output, prompt_lengths, step)
                 res.append(new_token)
                 if not args.disable_in_flight_decode:
                     decode_in_flight(new_token)
@@ -500,8 +531,15 @@ def main(args):
     if pp_rank == last_pp_rank and tp_rank == 0:
         # `res` is a list of tensors, each being a batch of generated token ids
         res = torch.stack(res, dim=1)
+        logger.info(f"{color.green}res shape = {res.shape}{color.reset}")
         res_list = res.tolist()
-        response = tokenizer.decode(res_list)
+        logger.info(f"{color.green}res_list = {res_list}{color.reset}")
+        # Decode the output
+        response = [[] for i in range(len(res_list))]
+        for i in range(len(res_list)):
+            response[i].append(tokenizer.decode(res_list[i]))
+            # logger.info(f"Response: {color.red}{res_list[i]} {color.reset}")
+        # response = tokenizer.decode(res_list)
         for i in range(len(response)):
             logger.info(f"Prompt: {color.green}{prompt[i]} {color.reset}")
             logger.info(f"Response: {color.red}{response[i]} {color.reset}")
