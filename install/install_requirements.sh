@@ -50,7 +50,7 @@ fi
 PYTORCH_NIGHTLY_VERSION=dev20240925
 
 # Nightly version for torchvision
-VISION_NIGHTLY_VERSION=dev20240901
+VISION_NIGHTLY_VERSION=dev20240925
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 (
