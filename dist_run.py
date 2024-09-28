@@ -328,14 +328,25 @@ def main(args):
     config.stage_idx = pp_rank
     config.n_stages = pp_degree
 
-    with device:
+    with torch.device("meta"):
         # TODO: we should create model instead of Transformer
         model = Transformer(config)
 
     # Distribute model on TP mesh
+    # (Surprisingly, this works even though model is on meta device and mesh is of
+    # cuda devices)
     model.distribute(tp_mesh)
     if rank == 0:
         logger.info(f"Model: {model}")
+
+    # Load weights
+    logger.info(f"Loading weights for {pp_rank=} on {device=}")
+    with CUDATrackTime() as timer:
+        _load_model_weights(model, distribution, device=device, model_config=config)
+
+    logger.info(
+        f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
+    )
 
     # Batch size. Since we push batches dynamically through the pipeline rather
     # than chunking them, this is effectively micro-batch size in pipeline
@@ -352,17 +363,8 @@ def main(args):
     # lanes.
     # TODO: bump up the lane count
     pipeline_lanes = 1
-    model.setup_caches(batch_size, seqlen_prefill, cache_lanes=pipeline_lanes)
-
-    # Load weights
-    logger.info(f"Loading weights for {pp_rank=} on {device=}")
-    with CUDATrackTime() as timer:
-        _load_model_weights(model, distribution, device=device, model_config=config)
-        model.to(device)
-
-    logger.info(
-        f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
-    )
+    with device:
+        model.setup_caches(batch_size, seqlen_prefill, cache_lanes=pipeline_lanes)
 
     # info on stage size and params
     stage_size = get_module_size(model)
