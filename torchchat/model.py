@@ -30,8 +30,6 @@ from torch.distributed.tensor.parallel import (
     SequenceParallel,
 )
 from torch.nn import functional as F
-# TODO: remove this after we figure out where in torchtune an `evaluate` module
-# is being imported, which is being confused with huggingface's `evaluate``.
 from torchtune.models.clip import clip_vision_encoder
 from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
 from torchtune.models.llama3_2_vision._component_builders import (
