@@ -47,7 +47,7 @@ fi
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-PYTORCH_NIGHTLY_VERSION=dev20240901
+PYTORCH_NIGHTLY_VERSION=dev20240925
 
 # Nightly version for torchvision
 VISION_NIGHTLY_VERSION=dev20240901
@@ -70,7 +70,7 @@ fi
 
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
-  torch=="2.5.0.${PYTORCH_NIGHTLY_VERSION}"
+  torch=="2.6.0.${PYTORCH_NIGHTLY_VERSION}"
   torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
 )
 
