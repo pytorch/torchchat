@@ -18,6 +18,10 @@ blobfile
 tomli >= 1.1.0 ; python_version < "3.11"
 openai
 
+# For Evaluation
+evaluate==0.4.2
+lm-eval==0.4.2
+
 # Build tools
 wheel
 cmake>=3.24
