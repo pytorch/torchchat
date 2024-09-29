@@ -188,43 +188,6 @@ def _create_padded_prompts(
     return batch_seq, prompt_lengths
 
 
-def _batch_decode_next_tokens_new(
-    output: torch.Tensor, pos: torch.Tensor, step: int = -1, temperature: float = 1.0
-) -> torch.Tensor:
-    """
-    Decode the next token for each prompt in the batch.
-
-    Args:
-        output (torch.Tensor): The output tensor to decode. Shape: (batch_size, seq_len, vocab_size)
-        pos (torch.Tensor): The current position for each sequence in the batch. Shape: (batch_size,)
-        step (int): If not -1, use this fixed position for all sequences. Default: -1
-        temperature (float): Sampling temperature. Higher values increase randomness. Default: 1.0
-
-    Returns:
-        torch.Tensor: Decoded token ids. Shape: (batch_size,)
-    """
-    batch_size, seq_len, vocab_size = output.shape
-
-    # Determine the token position to use for each sequence
-    token_pos = torch.full_like(pos, step) if step != -1 else pos - 1
-
-    # Extract the relevant logits for each sequence
-    next_token_logits = output[torch.arange(batch_size), token_pos]
-
-    if temperature != 1.0:
-        next_token_logits = next_token_logits / temperature
-
-    # Sample from the distribution (or use argmax if temperature is very low)
-    if temperature < 1e-5:
-        next_tokens = torch.argmax(next_token_logits, dim=-1)
-    else:
-        next_tokens = torch.multinomial(
-            F.softmax(next_token_logits, dim=-1), num_samples=1
-        ).squeeze(-1)
-
-    return next_tokens
-
-
 def _batch_decode_next_tokens(
     output: torch.Tensor, pos: List[int], step: int = -1, temperature: float = 1.0
 ) -> torch.Tensor:
@@ -297,6 +260,15 @@ def _cleanup():
     dist.destroy_process_group()
 
 
+prompt = [
+    "What is Snow?",
+    "Who is Santa Claus?",
+    "Where does Santa live?",
+    # "Who is Abraham Lincoln?",
+    # "How are models trained?",
+]
+
+
 def main(args):
     model_name = args.model_name
     pp_degree = args.pp
@@ -367,7 +339,7 @@ def main(args):
     # Batch size. Since we push batches dynamically through the pipeline rather
     # than chunking them, this is effectively micro-batch size in pipeline
     # sense. Thus it is interchangeable with micro-batch size below.
-    batch_size = 3
+    batch_size = len(prompt)
     seqlen_prefill = 1024  # sequence length
     dim = 4096  # embedding dimension
 
@@ -437,14 +409,6 @@ def main(args):
     # new micro-batches into the pipeline as they arrive, achieving same
     # pipelining effect.
     prefiller = ScheduleGPipe(prefill_stage, 1)
-
-    prompt = [
-        "What is Snow?",
-        "Who is Santa Claus?",
-        "Where does Santa live?",
-        # "Who is Abraham Lincoln?",
-        # "How are models trained?",
-    ]
 
     start_pos = 0
 
