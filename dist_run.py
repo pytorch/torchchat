@@ -189,43 +189,50 @@ def _create_padded_prompts(
 
 
 def _batch_decode_next_tokens(
-    output: torch.Tensor, pos: List[int], step: int = -1, temperature: float = 1.0
+    output: torch.Tensor,
+    pos: List[int],
+    step: int = -1,
+    temperature: float = 1.0,
+    topk: int = 10,
 ) -> torch.Tensor:
     """
-    Decode the next token for each prompt in the batch.
+    Decode the next token for each prompt in the batch. Adds temperature option for non-deterministic decoding.
+
     Args:
         output (torch.Tensor): The output tensor to decode.
-        pos: the position of the `output` to decode in the sequence length dimension.
+        pos (List[int]): The positions of the `output` to decode in the sequence length dimension.
+        step (int): Step indicator. If -1, use positions from `pos`. Otherwise, use the first token.
+        temperature (float): Sampling temperature for non-deterministic decoding.
 
     Returns:
-        Decoded token ids.
+        torch.Tensor: Decoded token ids.
     """
-    # Take the next token logits for each prompt
-    res = []
-    # logger.info(f"{color.green}output shape = {output.shape}{color.reset}")
-    # logger.info(f"{color.green}pos = {pos}{color.reset}")
     batch_size, seq_len, vocab_size = output.shape
 
     if step != -1:
         next_token_logits = output[:, 0, :]
-        next_token = torch.argmax(next_token_logits, dim=-1)
-        res.append(next_token)
-        res = torch.stack(res, dim=0)
-        res = res.squeeze(0)
     else:
-        for i in range(batch_size):
-            token_pos = pos[i] - 1
-            next_token_logits = output[i, token_pos, :]
+        # get the logits for each prompt at the specified positions
+        next_token_logits = output[torch.arange(batch_size), torch.tensor(pos) - 1]
 
-            # Argmax (deterministic) TODO: add temperature
-            next_token = torch.argmax(next_token_logits, dim=-1)
-            # logger.info(f"{color.blue}next_token = {next_token}{color.reset}")
-            res.append(next_token)
-        # Token ids in int tensor form
-        res = torch.stack(res, dim=0)
+    if temperature != 1.0:
+        next_token_logits = next_token_logits / temperature
 
-    logger.info(f"{color.yellow}next_token = {res}{color.reset}")
-    return res  # next_token
+    # Uses top-k sampling if temperature is not 1.0, otherwise use argmax
+    if temperature != 1.0:
+        top_k = min(topk, vocab_size)
+        top_k_logits, top_k_indices = torch.topk(next_token_logits, k=top_k, dim=-1)
+        probs = torch.softmax(top_k_logits, dim=-1)
+        next_token_indices = torch.multinomial(probs, num_samples=1).squeeze(-1)
+        next_tokens = top_k_indices.gather(
+            -1, next_token_indices.unsqueeze(-1)
+        ).squeeze(-1)
+    else:
+        # Argmax (deterministic)
+        next_tokens = torch.argmax(next_token_logits, dim=-1)
+
+    logger.info(f"{color.yellow}Next tokens: {color.blue}{next_tokens}{color.reset}")
+    return next_tokens
 
 
 def _update_padded_sequence(
