@@ -375,7 +375,7 @@ def main(args):
 
     prompt = [
         "What is Snow?",
-        "What is Fire?",
+        "Who is Santa Claus?",
         # "Where does Santa live?",
         # "Who is Abraham Lincoln?",
         # "How are models trained?",
