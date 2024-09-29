@@ -51,6 +51,9 @@ from torchchat.utils.build_utils import (
 )
 
 
+# Flag for whether the a8wxdq quantizer is available.
+a8wxdq_loaded = False
+
 #########################################################################
 ###                  torchchat quantization API                       ###
 
@@ -97,6 +100,9 @@ def quantize_model(
 
             try:
                 if quantizer == "linear:a8wxdq":
+                    if not a8wxdq_loaded:
+                        raise Exception(f"Note: Failed to load torchao experimental a8wxdq quantizer with error: {e}")
+
                     quant_handler = ao_quantizer_class_dict[quantizer](
                         device=device,
                         precision=precision,
@@ -898,5 +904,8 @@ try:
         print("Failed to torchao ops library with error: ", e)
         print("Slow fallback kernels will be used.")
 
+    # Mark the Quant option as available
+    a8wxdq_loaded = True
+
 except Exception as e:
-    print(f"Failed to load torchao experimental a8wxdq quantizer with error: {e}")
+    pass
