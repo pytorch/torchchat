@@ -226,7 +226,7 @@ def _batch_decode_next_tokens_new(
 
 
 def _batch_decode_next_tokens(
-    output: torch.Tensor, pos: int, step: int = -1
+    output: torch.Tensor, pos: List[int], step: int = -1, temperature: float = 1.0
 ) -> torch.Tensor:
     """
     Decode the next token for each prompt in the batch.
@@ -239,19 +239,29 @@ def _batch_decode_next_tokens(
     """
     # Take the next token logits for each prompt
     res = []
-    logger.info(f"{color.green}output shape = {output.shape}{color.reset}")
-    logger.info(f"{color.green}pos = {pos}{color.reset}")
-    for i in range(output.shape[0]):
-        token_pos = 0 if step != -1 else pos[i] - 1
-        next_token_logits = output[i, token_pos, :]
+    # logger.info(f"{color.green}output shape = {output.shape}{color.reset}")
+    # logger.info(f"{color.green}pos = {pos}{color.reset}")
+    batch_size, seq_len, vocab_size = output.shape
 
-        # Argmax (deterministic) TODO: add temperature
+    if step != -1:
+        next_token_logits = output[:, 0, :]
         next_token = torch.argmax(next_token_logits, dim=-1)
-        logger.info(f"{color.blue}next_token = {next_token}{color.reset}")
         res.append(next_token)
-    # Token ids in int tensor form
-    res = torch.stack(res, dim=0)
-    logger.info(f"{color.green}next_token = {res}{color.reset}")
+        res = torch.stack(res, dim=0)
+        res = res.squeeze(0)
+    else:
+        for i in range(batch_size):
+            token_pos = pos[i] - 1
+            next_token_logits = output[i, token_pos, :]
+
+            # Argmax (deterministic) TODO: add temperature
+            next_token = torch.argmax(next_token_logits, dim=-1)
+            # logger.info(f"{color.blue}next_token = {next_token}{color.reset}")
+            res.append(next_token)
+        # Token ids in int tensor form
+        res = torch.stack(res, dim=0)
+
+    logger.info(f"{color.yellow}next_token = {res}{color.reset}")
     return res  # next_token
 
 
@@ -340,7 +350,7 @@ def main(args):
     # Batch size. Since we push batches dynamically through the pipeline rather
     # than chunking them, this is effectively micro-batch size in pipeline
     # sense. Thus it is interchangeable with micro-batch size below.
-    batch_size = 2
+    batch_size = 3
     seqlen_prefill = 1024  # sequence length
     dim = 4096  # embedding dimension
 
@@ -414,7 +424,7 @@ def main(args):
     prompt = [
         "What is Snow?",
         "Who is Santa Claus?",
-        # "Where does Santa live?",
+        "Where does Santa live?",
         # "Who is Abraham Lincoln?",
         # "How are models trained?",
     ]
@@ -455,7 +465,6 @@ def main(args):
     # Run context input through pipeline
     # TODO: we need to pass `input_pos` and `cache_lane` to each stage.
     lane = 0
-    logger.info(f"{color.green}Prefilling...{input_pos=}{color.reset}")
     kwargs = {"input_pos": input_pos, "cache_lane": lane}
     with torch.no_grad(), CUDATrackTime() as timer:
         if pp_rank == first_pp_rank:
