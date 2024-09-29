@@ -275,6 +275,23 @@ def _update_padded_sequence(
         # logger.info(f"updated prompt {i} with new token {new_token[i, 0]}")
 
 
+# Decode token id into string and print it
+def _decode_in_flight(token, tokenizer, tp_rank):
+    # Make a 2D tensor with ids on row dimension
+    # unsqueezed = torch.unsqueeze(token, 1)
+    # token_str = tokenizer.decode(unsqueezed.tolist())
+    # tiktoken does not accept tensor inputs
+    decoding_list = token.tolist()
+    token_str = tokenizer.decode(decoding_list)
+
+    # print the token string on tp rank 0
+    if tp_rank == 0:
+        logger.info(
+            f"{color.green} responses ====>>>> "
+            f"{color.blue} {token_str} {color.reset}"
+        )
+
+
 def _cleanup():
     dist.barrier()
     dist.destroy_process_group()
@@ -444,11 +461,6 @@ def main(args):
     padded_sequence, prompt_lengths = _create_padded_prompts(
         input_ids, tokenizer, seqlen_prefill, start_pos, device
     )
-    # TODO: figure out how to set input_pos for each prompt in the batch then we
-    # can remove this limitation.
-    # s = set(prompt_lengths)
-    logger.info(f"prompt_lengths = {prompt_lengths=}")
-    # assert len(s) == 1, f"prompt_lengths should be the same, got {s}"
 
     # Need these global ids due to the API definition of dist.send and recv
     first_pp_rank_global_id = dist.get_global_rank(pp_group, first_pp_rank)
@@ -477,31 +489,6 @@ def main(args):
     logger.info(
         f"{color.green}Prefilling time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
     )
-    logger.info(
-        f"{color.green}{input_pos=}, Prefill output: {type(output)=}{color.reset}"
-    )
-
-    # Decode token id into string and print it
-    def decode_in_flight(token):
-        # Make a 2D tensor with ids on row dimension
-        # unsqueezed = torch.unsqueeze(token, 1)
-        # token_str = tokenizer.decode(unsqueezed.tolist())
-        # tiktoken does not accept tensor inputs
-        decoding_list = token.tolist()
-        logger.info(
-            f"{color.red} decoding token {token=}{type(token)=}, {decoding_list=} {color.reset}"
-        )
-        token_str = tokenizer.decode(decoding_list)
-        logger.info(
-            f"{color.green} prefile response ===>>>> token_str = {token_str}{color.reset}"
-        )
-        tp_rank = dist.get_rank()
-        # print the token string on tp rank 0
-        if tp_rank == 0:
-            logger.info(
-                f"{color.green} responses ====>>>> "
-                f"{color.blue} {token_str} {color.reset}"
-            )
 
     # Decode the output -- first generated token
     if pp_rank == last_pp_rank:
@@ -509,7 +496,7 @@ def main(args):
         new_token = _batch_decode_next_tokens(output, prompt_lengths)
         res.append(new_token)
         if not args.disable_in_flight_decode:
-            decode_in_flight(new_token)
+            _decode_in_flight(new_token, tokenizer, tp_rank)
 
     # seqlen = 1 now
     seqlen_decode = 1
@@ -559,11 +546,11 @@ def main(args):
 
             # Decode the output
             if pp_rank == last_pp_rank:
-                logger.info(f"{color.red}Decoding...{output.shape=}{color.reset}")
+                # logger.info(f"{color.red}Decoding...{output.shape=}{color.reset}")
                 new_token = _batch_decode_next_tokens(output, prompt_lengths, step)
                 res.append(new_token)
                 if not args.disable_in_flight_decode:
-                    decode_in_flight(new_token)
+                    _decode_in_flight(new_token, tokenizer, tp_rank)
 
             # Increment input position
             input_pos += 1
