@@ -16,6 +16,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import torch
 import torch.distributed as dist
+import torch.nn.functional as F
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
 
@@ -185,6 +186,43 @@ def _create_padded_prompts(
         prompt_lengths.append(prompt_len)
 
     return batch_seq, prompt_lengths
+
+
+def _batch_decode_next_tokens_new(
+    output: torch.Tensor, pos: torch.Tensor, step: int = -1, temperature: float = 1.0
+) -> torch.Tensor:
+    """
+    Decode the next token for each prompt in the batch.
+
+    Args:
+        output (torch.Tensor): The output tensor to decode. Shape: (batch_size, seq_len, vocab_size)
+        pos (torch.Tensor): The current position for each sequence in the batch. Shape: (batch_size,)
+        step (int): If not -1, use this fixed position for all sequences. Default: -1
+        temperature (float): Sampling temperature. Higher values increase randomness. Default: 1.0
+
+    Returns:
+        torch.Tensor: Decoded token ids. Shape: (batch_size,)
+    """
+    batch_size, seq_len, vocab_size = output.shape
+
+    # Determine the token position to use for each sequence
+    token_pos = torch.full_like(pos, step) if step != -1 else pos - 1
+
+    # Extract the relevant logits for each sequence
+    next_token_logits = output[torch.arange(batch_size), token_pos]
+
+    if temperature != 1.0:
+        next_token_logits = next_token_logits / temperature
+
+    # Sample from the distribution (or use argmax if temperature is very low)
+    if temperature < 1e-5:
+        next_tokens = torch.argmax(next_token_logits, dim=-1)
+    else:
+        next_tokens = torch.multinomial(
+            F.softmax(next_token_logits, dim=-1), num_samples=1
+        ).squeeze(-1)
+
+    return next_tokens
 
 
 def _batch_decode_next_tokens(
@@ -530,19 +568,17 @@ def main(args):
     # output formatted response via last pp group and tp rank 0
     if pp_rank == last_pp_rank and tp_rank == 0:
         # `res` is a list of tensors, each being a batch of generated token ids
-        res = torch.stack(res, dim=1)
-        logger.info(f"{color.green}res shape = {res.shape}{color.reset}")
-        res_list = res.tolist()
-        logger.info(f"{color.green}res_list = {res_list}{color.reset}")
-        # Decode the output
-        response = [[] for i in range(len(res_list))]
-        for i in range(len(res_list)):
-            response[i].append(tokenizer.decode(res_list[i]))
-            # logger.info(f"Response: {color.red}{res_list[i]} {color.reset}")
-        # response = tokenizer.decode(res_list)
-        for i in range(len(response)):
-            logger.info(f"Prompt: {color.green}{prompt[i]} {color.reset}")
-            logger.info(f"Response: {color.red}{response[i]} {color.reset}")
+
+        res_stacked = torch.stack(res, dim=1)
+        res_list = res_stacked.tolist()
+
+        # Decode the output as comprehension instead of loop
+        responses = [tokenizer.decode(sequence) for sequence in res_list]
+
+        # Show prompts and responses
+        for prompt_text, response_text in zip(prompt, responses):
+            logger.info(f"Prompt: {color.green}{prompt_text} {color.reset}")
+            logger.info(f"Response: {color.red}{response_text} {color.reset}")
 
     # Cleanup
     _cleanup()
