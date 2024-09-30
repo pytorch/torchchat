@@ -16,7 +16,6 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import torch
 import torch.distributed as dist
-import torch.nn.functional as F
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
 
