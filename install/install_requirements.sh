@@ -91,12 +91,6 @@ REQUIREMENTS_TO_INSTALL=(
   $PIP_EXECUTABLE install torchao=="0.5.0"
 )
 
-# Rely on the latest tochtune for flamingo support
-(
-  set -x
-  $PIP_EXECUTABLE install -I git+https://github.com/pytorch/torchtune.git@d002d45e3ec700fa770d9dcc61b02c59e2507bf6
-)
-
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   (
     set -x
@@ -107,5 +101,5 @@ fi
 
 (
   set -x
-  $PIP_EXECUTABLE install lm-eval=="0.4.2"
+  $PIP_EXECUTABLE install evaluate=="0.4.3" lm-eval=="0.4.2" psutil=="6.0.0"
 )
