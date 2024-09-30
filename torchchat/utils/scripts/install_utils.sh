@@ -176,10 +176,9 @@ clone_torchao() {
   pushd ${TORCHCHAT_ROOT}/torchao-build/src
   echo $pwd
 
-  # git clone https://github.com/pytorch/ao.git
-  # cd ao
-  # git checkout $(cat ${TORCHCHAT_ROOT}/install/.pins/torchao-pin.txt)
-  cp -R $HOME/fbsource/fbcode/pytorch/ao .
+  git clone https://github.com/pytorch/ao.git
+  cd ao
+  git checkout $(cat ${TORCHCHAT_ROOT}/install/.pins/torchao-pin.txt)
 
   popd
 }
