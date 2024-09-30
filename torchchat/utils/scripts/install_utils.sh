@@ -178,7 +178,7 @@ clone_torchao() {
 
   git clone https://github.com/pytorch/ao.git
   cd ao
-  git checkout $(cat ${TORCHCHAT_ROOT}/intstall/.pins/torchao-pin.txt)
+  git checkout $(cat ${TORCHCHAT_ROOT}/install/.pins/torchao-pin.txt)
 
   popd
 }
