@@ -219,7 +219,7 @@ def _batch_decode_next_tokens(
 
     # Uses top-k sampling if temperature is not 1.0, otherwise use argmax
     if temperature != 1.0:
-        top_k = min(topk, vocab_size)
+        top_k = min(topk, vocab_size)  # Ensure top-k is not greater than vocab size
         top_k_logits, top_k_indices = torch.topk(next_token_logits, k=top_k, dim=-1)
         probs = torch.softmax(top_k_logits, dim=-1)
         next_token_indices = torch.multinomial(probs, num_samples=1).squeeze(-1)
