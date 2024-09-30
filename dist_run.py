@@ -246,13 +246,8 @@ def _update_padded_sequence(
 
 # Decode token id into string and print it
 def _decode_in_flight(token, tokenizer, tp_rank):
-    # Make a 2D tensor with ids on row dimension
-    # unsqueezed = torch.unsqueeze(token, 1)
-    # token_str = tokenizer.decode(unsqueezed.tolist())
-    # tiktoken does not accept tensor inputs
-    decoding_list = token.tolist()
-    token_str = tokenizer.decode(decoding_list)
-
+    """decode token ids for all prompts in the batch and log them"""
+    token_str = tokenizer.decode(token.tolist())
     # print the token string on tp rank 0
     if tp_rank == 0:
         logger.info(
