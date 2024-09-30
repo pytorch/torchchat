@@ -30,6 +30,15 @@ from torch.distributed.tensor.parallel import (
     SequenceParallel,
 )
 from torch.nn import functional as F
+
+try:
+    # TODO: remove this after we figure out where in torchtune an `evaluate` module
+    # is being imported, which is being confused with huggingface's `evaluate``.
+    import lm_eval  # noqa 
+except Exception:
+    pass
+
+from torchtune.models.clip import clip_vision_encoder
 from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
 from torchtune.models.llama3_2_vision._component_builders import (
     llama3_2_vision_decoder,
@@ -223,9 +232,6 @@ class ModelRecipe:
 
     @classmethod
     def _llava(cls):
-        # TODO: Import locally until we find where in torchtune an `evaluate` module
-        # is being imported, which is being confused with huggingface's `evaluate``.
-        from torchtune.models.clip import clip_vision_encoder
         return cls(
             model_type=ModelType.Llava,
             modules={

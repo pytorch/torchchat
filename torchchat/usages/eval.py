@@ -3,9 +3,8 @@
 
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+import argparse
 from typing import Callable, Optional
-
-import lm_eval
 
 import torch
 import torch._dynamo.config
@@ -17,6 +16,7 @@ from torchchat.cli.builder import (
     BuilderArgs,
     TokenizerArgs,
 )
+from torchchat.cli.cli import add_arguments_for_verb, arg_init
 
 from torchchat.model import Model
 from torchchat.utils.build_utils import set_precision
@@ -27,6 +27,8 @@ torch._inductor.config.triton.unique_kernel_names = True
 torch._inductor.config.epilogue_fusion = False
 torch._inductor.config.triton.cudagraphs = True
 torch._dynamo.config.cache_size_limit = 100000
+
+import lm_eval
 
 from lm_eval.evaluator import evaluate
 from lm_eval.models.huggingface import HFLM as eval_wrapper
