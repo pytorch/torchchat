@@ -1097,31 +1097,6 @@ jobs:
         run: |
           export TORCHCHAT_ROOT=${PWD}
           echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt)" >> "$GITHUB_ENV"
-      - name: Load or install ET
-        id: install-et
-        uses: actions/cache@v4
-        with:
-          path: |
-            ./et-build
-            ./torchchat/utils/scripts
-          key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}-${{ hashFiles('**/install_et.sh') }}
-      - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
-        continue-on-error: true
-        run: |
-          echo "Installing ExecuTorch"
-          bash torchchat/utils/scripts/install_et.sh
-      - name: Install ExecuTorch python
-        run: |
-          echo "Install ExecuTorch python"
-          export TORCHCHAT_ROOT=$PWD
-          export ET_BUILD_DIR="et-build"
-          ENABLE_ET_PYBIND="${1:-true}"
-          source "torchchat/utils/scripts/install_utils.sh"
-          install_executorch_python_libs $ENABLE_ET_PYBIND
-      - name: Install runner
-        run: |
-          echo "Installing runner"
-          bash torchchat/utils/scripts/build_native.sh et link_torchao_ops
       - name: Install runner AOTI
         id: install-runner-aoti
         run: |
@@ -1135,9 +1110,6 @@ jobs:
           python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"linear:a8wxdq": {"bitwidth": 4, "groupsize": 256, "has_weight_zeros": false}}'
           echo "Generate compile"
           python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"linear:a8wxdq": {"bitwidth": 4, "groupsize": 256, "has_weight_zeros": false}}' --compile
-          echo "Export and run ET (C++ runner)"
-          python torchchat.py export stories110M --output-pte-path ./model.pte --dtype float32 --quantize '{"linear:a8wxdq": {"bitwidth": 4, "groupsize": 256, "has_weight_zeros": false}}'
-          ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
           echo "Export and run AOTI (C++ runner)"
           python torchchat.py export stories110M --output-dso-path ./model.so --dtype float32 --quantize '{"linear:a8wxdq": {"bitwidth": 4, "groupsize": 256, "has_weight_zeros": false}}'
           ./cmake-out/aoti_run ./model.so -z ./tokenizer.model -t 0 -i "${PRMT}"
