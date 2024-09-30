@@ -732,24 +732,21 @@ class Generator:
             print("".join(buffer), end="", flush=True)
             buffer.clear()
         # print(, end='', flush=True)
-
-    def chat(
-        self,
-        generator_args: GeneratorArgs,
-    ):
-        if generator_args.chat_mode:
-            print("Starting Interactive Chat")
+    
+    def _gen_model_input(self, prompt: str, image_prompts: Optional[List[str | Image.Image]] = None, max_new_tokens: Optional[int] = None) -> Tuple:
+        assert image_prompts is None or len(image_prompts) == 1, "At most one image is supported at the moment"
+        if image_prompts and isinstance(image_prompts[0], str):
+            images = [Image.open(image_prompts[0])]
+        else:
+            images = image_prompts
 
         if self.model.config.model_type == ModelType.Flamingo:
+            assert max_new_tokens is not None, "max_new_tokens must be specified for Flamingo models"
 
-            is_multimodal = generator_args.image_prompts is not None
-            content = [{"type": "text", "content": generator_args.prompt}]
+            is_multimodal = images is not None
+            content = [{"type": "text", "content": prompt}]
 
             if is_multimodal:
-                print("Image prompts", generator_args.image_prompts)
-
-                # Support for just the first image prompt for now
-                images = [Image.open(generator_args.image_prompts[0])]
                 content = [{"type": "image", "content": images[0]}] + content
 
             messages = [
@@ -783,7 +780,7 @@ class Generator:
                     seq_len = encoded.size(0)
                     batch = {}
 
-                total_response_length = seq_len + generator_args.max_new_tokens
+                total_response_length = seq_len + max_new_tokens
                 batch["causal_mask"] = torch.tril(
                                             torch.ones(
                                                 size=(total_response_length, total_response_length),
@@ -792,10 +789,22 @@ class Generator:
                                         )
         else:
             encoded = self.encode_tokens(
-                generator_args.prompt, bos=True, device=self.builder_args.device
+                prompt, bos=True, device=self.builder_args.device
             )
-            logging.debug(encoded)
             batch = None
+        
+        logging.debug(encoded)
+        return encoded, batch
+
+
+    def chat(
+        self,
+        generator_args: GeneratorArgs,
+    ):
+        if generator_args.chat_mode:
+            print("Starting Interactive Chat")
+        
+        encoded, batch = self._gen_model_input(generator_args.prompt, generator_args.image_prompts, generator_args.max_new_tokens)
 
         model_size = sum(
             [
