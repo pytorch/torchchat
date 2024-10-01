@@ -316,7 +316,9 @@ class OpenAiApiGenerator(Generator):
                 {"role": message["role"], "content": message["content"]}
                 for message in completion_request.messages
             ]
-            return self._gen_model_input(prompt=prompt, max_new_tokens=completion_request.max_tokens)
+            return self._gen_model_input(
+                prompt=prompt, max_new_tokens=completion_request.max_tokens
+            )
 
         # Llama 3.2 11B
         prompt = None
