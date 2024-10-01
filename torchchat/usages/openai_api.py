@@ -310,6 +310,15 @@ class OpenAiApiGenerator(Generator):
         """
         messages = completion_request.messages
 
+        # Not Llama 3.2 11B
+        if not isinstance(self.model, FlamingoModel):
+            prompt = [
+                {"role": message["role"], "content": message["content"]}
+                for message in completion_request.messages
+            ]
+            return self._gen_model_input(prompt=prompt, max_new_tokens=completion_request.max_tokens)
+
+        # Llama 3.2 11B
         prompt = None
         images = None
 
@@ -361,27 +370,10 @@ class OpenAiApiGenerator(Generator):
 
         # Initialize counters for chunk responses and encode the prompt.
         id = str(uuid.uuid4())
-
         device_sync(device=self.builder_args.device)
-
-        # If the underlying model is LLama3.2 11B, used unified processing 
-        if isinstance(self.model, FlamingoModel): 
-            encoded, batch = self._gen_model_inputs_from_openai_completion_request(
-                completion_request
-            )
-        else:
-            # Else use the legacy formatting logic
-            tokens = self.chat_formatter.encode_dialog_prompt(
-                dialog=[
-                    {"role": message["role"], "content": message["content"]}
-                    for message in completion_request.messages
-                ]
-            )
-            print("tokens:", self.tokenizer.decode(tokens), flush=True)
-            encoded = torch.tensor(
-                tokens, dtype=torch.int, device=self.builder_args.device
-            )
-            batch = None
+        encoded, batch = self._gen_model_inputs_from_openai_completion_request(
+            completion_request
+        )
 
         idx = 0
         start_pos = 0
