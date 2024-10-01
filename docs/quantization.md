@@ -124,7 +124,7 @@ python3 torchchat.py generate llama3 --pte-path llama3.pte  --prompt "Hello my n
 The quantization scheme a8wxdq dynamically quantizes activations to 8 bits, and quantizes the weights in a groupwise manner with a specified bitwidth and groupsize.
 It takes arguments bitwidth (1, 2, 3, 4, 5, 6, 7), groupsize, and has_weight_zeros (true, false).
 The argument has_weight_zeros indicates whether the weights are quantized with scales only (has_weight_zeros: false) or with both scales and zeros (has_weight_zeros: true).
-Roughly speaking, {bitwidth: 4, groupsize: 256, has_weight_zeros: false} is similar to GGML's Q4_0 quantization scheme.
+Roughly speaking, {bitwidth: 4, groupsize: 32, has_weight_zeros: false} is similar to GGML's Q4_0 quantization scheme.
 
 You should expect high performance on ARM CPU if bitwidth is 1, 2, 3, 4, or 5 and groupsize is divisible by 16.  With other platforms and argument choices, a slow fallback kernel will be used.  You will see warnings about this during quantization.
 
