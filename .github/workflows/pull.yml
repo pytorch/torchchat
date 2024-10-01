@@ -1103,7 +1103,7 @@ jobs:
         with:
           path: |
             ./et-build
-            ./torchchat/utils/scripts
+            ./torchchat/utils/scripts/install_et.sh
           key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}-${{ hashFiles('**/install_et.sh') }}
       - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
         continue-on-error: true
