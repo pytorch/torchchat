@@ -494,7 +494,7 @@ def arg_init(args):
         )
 
     if "mps" in args.device:
-        if hasattr(args, "compile") and hasattr(args, "compile_prefill"):
+        if getattr(args, "compile", False) or getattr(args, "compile_prefill", False):
             print(
                 "Warning: compilation is not available with device MPS, ignoring option to engage compilation"
             )

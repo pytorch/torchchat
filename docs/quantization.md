@@ -122,11 +122,11 @@ python3 torchchat.py generate llama3 --pte-path llama3.pte  --prompt "Hello my n
 
 ### Use
 The quantization scheme a8wxdq dynamically quantizes activations to 8 bits, and quantizes the weights in a groupwise manner with a specified bitwidth and groupsize.
-It takes arguments bitwidth (2, 3, 4, 5, 6, 7), groupsize, and has_weight_zeros (true, false).
+It takes arguments bitwidth (1, 2, 3, 4, 5, 6, 7), groupsize, and has_weight_zeros (true, false).
 The argument has_weight_zeros indicates whether the weights are quantized with scales only (has_weight_zeros: false) or with both scales and zeros (has_weight_zeros: true).
-Roughly speaking, {bitwidth: 4, groupsize: 256, has_weight_zeros: false} is similar to GGML's Q40 quantization scheme.
+Roughly speaking, {bitwidth: 4, groupsize: 256, has_weight_zeros: false} is similar to GGML's Q4_0 quantization scheme.
 
-You should expect high performance on ARM CPU if bitwidth is 2, 3, 4, or 5 and groupsize is divisible by 16.  With other platforms and argument choices, a slow fallback kernel will be used.  You will see warnings about this during quantization.
+You should expect high performance on ARM CPU if bitwidth is 1, 2, 3, 4, or 5 and groupsize is divisible by 16.  With other platforms and argument choices, a slow fallback kernel will be used.  You will see warnings about this during quantization.
 
 ### Setup
 To use a8wxdq, you must set up the torchao experimental kernels.  These will only work on devices with ARM CPUs, for example on Mac computers with Apple Silicon.
@@ -138,7 +138,7 @@ sh torchchat/utils/scripts/build_torchao_ops.sh
 
 This should take about 10 seconds to complete.  Once finished, you can use a8wxdq in torchchat.
 
-Note: if you want to use the new kernels in the AOTI and C++ runners, you must pass the flag link_torchao when running the scripts the build the runners.
+Note: if you want to use the new kernels in the AOTI and C++ runners, you must pass the flag link_torchao_ops when running the scripts the build the runners.
 
 ```
 sh torchchat/utils/scripts/build_native.sh aoti link_torchao_ops
