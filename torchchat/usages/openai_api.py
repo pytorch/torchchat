@@ -21,6 +21,7 @@ from PIL import Image
 
 from torchchat.cli.download import is_model_downloaded, load_model_configs
 from torchchat.generate import Generator, GeneratorArgs
+from torchchat.model import FlamingoModel
 
 from torchchat.utils.build_utils import device_sync
 
@@ -363,9 +364,24 @@ class OpenAiApiGenerator(Generator):
 
         device_sync(device=self.builder_args.device)
 
-        encoded, batch = self._gen_model_inputs_from_openai_completion_request(
-            completion_request
-        )
+        # If the underlying model is LLama3.2 11B, used unified processing 
+        if isinstance(self.model, FlamingoModel): 
+            encoded, batch = self._gen_model_inputs_from_openai_completion_request(
+                completion_request
+            )
+        else:
+            # Else use the legacy formatting logic
+            tokens = self.chat_formatter.encode_dialog_prompt(
+                dialog=[
+                    {"role": message["role"], "content": message["content"]}
+                    for message in completion_request.messages
+                ]
+            )
+            print("tokens:", self.tokenizer.decode(tokens), flush=True)
+            encoded = torch.tensor(
+                tokens, dtype=torch.int, device=self.builder_args.device
+            )
+            batch = None
 
         idx = 0
         start_pos = 0
