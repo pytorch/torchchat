@@ -507,7 +507,7 @@ def main(args):
     # New token generated each iteration
     # need a row dimension for each prompt in the batch
     new_token = torch.zeros(batch_size, 1, device=device, dtype=torch.int64)
-    logger.info(f"{color.green}{new_token.shape=}, {new_token=}{color.reset}")
+    # logger.info(f"{color.green}{new_token.shape=}, {new_token=}{color.reset}")
     # Store the generated tokens
     res = []
 
