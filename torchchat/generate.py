@@ -4,6 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 import argparse
+import base64
 import itertools
 import logging
 import os
@@ -12,6 +13,7 @@ import time
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from io import BytesIO
 from os import PathLike
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
@@ -733,6 +735,9 @@ class Generator:
             buffer.clear()
         # print(, end='', flush=True)
 
+    def print_m(self, message):
+        print(message.role, [t["type"] if t["type"] != "text" else t for t in message.content ])
+
     def _gen_model_input(
         self,
         prompt: Union[str | List[Any]],
@@ -775,6 +780,7 @@ class Generator:
         assert (
             image_prompts is None or len(image_prompts) == 1
         ), "At most one image is supported at the moment"
+
         if image_prompts and isinstance(image_prompts[0], str):
             images = [Image.open(image_prompts[0])]
         else:
@@ -783,24 +789,45 @@ class Generator:
         assert (
             max_new_tokens is not None
         ), "max_new_tokens must be specified for Flamingo models"
-        assert isinstance(
-            prompt, str
-        ), "(Currently) prompt must be a str for Flamingo models"
 
-        is_multimodal = images is not None
-        content = [{"type": "text", "content": prompt}]
+        image_found = False
+        messages = []
+        for message in prompt:
+            if isinstance(message["content"], str):
+                messages.append(Message(**message))
 
-        if is_multimodal:
-            content = [{"type": "image", "content": images[0]}] + content
+            elif isinstance(message["content"], list):
+                images = None 
+                for content_dict in message["content"]:
+                    if content_dict["type"] == "text":
+                        prompt_arg = content_dict["text"]
+                    elif content_dict["type"] == "image_url":
+                        assert (
+                            images is None
+                        ), "At most one image is supported at the moment"
 
-        messages = [
-            Message(
-                role="user",
-                content=content,
-                eot=True,
-            ),
-            Message(role="assistant", content=""),
-        ]
+                        base64_decoded = base64.b64decode(
+                            content_dict["image_url"].split(";base64,")[1]
+                        )
+                        images = [Image.open(BytesIO(base64_decoded))]
+                        image_found = True
+
+                is_multimodal = images is not None
+                content = [{"type": "text", "content": prompt_arg}]
+
+                if is_multimodal:
+                    content = [{"type": "image", "content": images[0]}] + content
+
+                messages.append(
+                    Message(
+                        role="user",
+                        content=content,
+                    )
+                )
+
+        print("MESSAGE CONTENTS:")
+        messages.append(Message(role="assistant", content=""))
+        [self.print_m(m) for m in messages]
 
         transform = llama3_2_vision_transform(str(self.tokenizer_args.tokenizer_path))
 
