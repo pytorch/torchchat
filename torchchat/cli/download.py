@@ -22,18 +22,44 @@ from torchchat.model_config.model_config import (
 def _download_hf_snapshot(
     model_config: ModelConfig, artifact_dir: Path, hf_token: Optional[str]
 ):
-    from huggingface_hub import snapshot_download
+    from huggingface_hub import model_info, snapshot_download
     from requests.exceptions import HTTPError
 
     # Download and store the HF model artifacts.
     print(f"Downloading {model_config.name} from HuggingFace...", file=sys.stderr)
     try:
+        # Fetch the info about the model's repo
+        model_info = model_info(model_config.distribution_path, token=hf_token)
+        model_fnames = [f.rfilename for f in model_info.siblings]
+
+        # Check the model config for preference between safetensors and pth
+        has_pth = any(f.endswith(".pth") for f in model_fnames)
+        has_safetensors = any(f.endswith(".safetensors") for f in model_fnames)
+
+        # If told to prefer safetensors, ignore pth files
+        if model_config.prefer_safetensors:
+            if not has_safetensors:
+                print(
+                    f"Model {model_config.name} does not have safetensors files, but prefer_safetensors is set to True. Using pth files instead.",
+                    file=sys.stderr,
+                )
+                exit(1)
+            ignore_patterns = "*.pth"
+
+        # If the model has both, prefer pth files over safetensors
+        elif has_pth and has_safetensors:
+            ignore_patterns = "*safetensors*"
+
+        # Otherwise, download everything
+        else:
+            ignore_patterns = None
+
         snapshot_download(
             model_config.distribution_path,
             local_dir=artifact_dir,
             local_dir_use_symlinks=False,
             token=hf_token,
-            ignore_patterns="*safetensors*",
+            ignore_patterns=ignore_patterns,
         )
     except HTTPError as e:
         if e.response.status_code == 401:  # Missing HuggingFace CLI login.
