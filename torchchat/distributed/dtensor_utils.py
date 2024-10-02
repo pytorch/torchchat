@@ -8,24 +8,17 @@ from torchchat.distributed.logging_utils import SingletonLogger
 logger = SingletonLogger.get_logger()
 
 
-
-def is_dtensor(tensor):
-    """Check if a tensor is a DTensor by class or has a placements attribute (not sure if we want to use attr check)"""
-    return isinstance(tensor, DTensor) or hasattr(tensor, "placements")
-
-
-def load_into_dtensor(weight_tensor, model_dtensor):
+def convert_to_dtensor(weight_tensor, dtensor_template):
     """Adjust a loaded tensor to match the shape/placement of the model DTensor and copy the data into it"""
-    weight_tensor = weight_tensor.to(model_dtensor.device)
 
-    if weight_tensor.shape != model_dtensor.shape:
+    if weight_tensor.shape != dtensor_template.shape:
         raise ValueError(
             f"Shape mismatch: weight tensor shape {weight_tensor.shape} "
-            f"doesn't match DTensor shape {model_dtensor.shape}"
+            f"doesn't match DTensor shape {dtensor_template.shape}"
         )
 
-    placements = model_dtensor.placements
-    mesh = model_dtensor.device_mesh
+    placements = dtensor_template.placements
+    mesh = dtensor_template.device_mesh
     mesh_dims = mesh.ndim
 
     for placement in placements:
