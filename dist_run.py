@@ -54,7 +54,7 @@ logger = SingletonLogger.get_logger()
 # You can change it to other values listed below.
 # For details on the name-to-distribution mapping, see README.md or models.json.
 NAME_TO_DISTRIBUTION_AND_DTYPE = {
-    "llama2-7b-chat": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
+    "llama2": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
     "llama3": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16),
 }
 
@@ -228,9 +228,11 @@ def _batch_decode_next_tokens(
         ).squeeze(-1)
     else:
         # Argmax (deterministic)
-        next_tokens = torch.argmax(next_token_logits, dim=-1)
+        next_tokens = torch.argmax(next_token_logits, dim=-1, keepdim=True)
 
-    logger.info(f"{color.yellow}Next tokens: {color.blue}{next_tokens}{color.reset}")
+    # logger.info(
+    #    f"{color.yellow}Next tokens: {color.blue}{next_tokens.shape=}, {next_tokens}{color.reset}"
+    # )
     return next_tokens
 
 
@@ -247,6 +249,7 @@ def _update_padded_sequence(
 # Decode token id into string and print it
 def _decode_in_flight(token, tokenizer, tp_rank):
     """decode token ids for all prompts in the batch and log them"""
+    token = token.squeeze(1)
     token_str = tokenizer.decode(token.tolist())
     # print the token string on tp rank 0
     if tp_rank == 0:
@@ -262,11 +265,81 @@ def _cleanup():
 
 
 prompt = [
-    "What is Snow?",
+    "What is snow?",
     "Who is Santa Claus?",
     "Where does Santa live?",
-    # "Who is Abraham Lincoln?",
-    # "How are models trained?",
+    "What is PyTorch?",
+    "What is fire?",
+    "What is frost?",
+    "What is ice?",
+    "What is water?",
+    "What is ice skating?",
+    "What are stars?",
+    "Who is Abraham Lincoln?",
+    "How are models trained?",
+    "What is Facebook?",
+    "What is hail?",
+    "What is sleet?",
+    "What is a Tensor?",
+    "What is a sled?",
+    "Where is Alaska?",
+    "What is a candy cane?",
+    "What is a snowball?",
+    "What is a matrix?",
+    "What is Meta?",
+    "What is snow?",
+    "Who is Santa Claus?",
+    "Where does Santa live?",
+    "What is PyTorch?",
+    "What is fire?",
+    "What is frost?",
+    "What is ice?",
+    "What is water?",
+    "What is ice skating?",
+    "What are stars?",
+    "Who is Abraham Lincoln?",
+    "How are models trained?",
+    "What is Facebook?",
+    "What is hail?",
+    "What is sleet?",
+    "What is a Tensor?",
+    "What is a sled?",
+    "Where is Alaska?",
+    "What is a candy cane?",
+    "What is a snowball?",
+    "What is a matrix?",
+    "What is Meta?",
+    "What is snow?",
+    "Who is Santa Claus?",
+    "Where does Santa live?",
+    "What is PyTorch?",
+    "What is fire?",
+    "What is frost?",
+    "What is ice?",
+    "What is water?",
+    "What is ice skating?",
+    "What are stars?",
+    "Who is Abraham Lincoln?",
+    "How are models trained?",
+    "What is Facebook?",
+    "What is hail?",
+    "What is sleet?",
+    "What is a Tensor?",
+    "What is a sled?",
+    "Where is Alaska?",
+    "What is a candy cane?",
+    "What is a snowball?",
+    "What is a matrix?",
+    "What is Meta?",
+    "What is snow?",
+    "Who is Santa Claus?",
+    "Where does Santa live?",
+    "What is PyTorch?",
+    "What is fire?",
+    "What is frost?",
+    "What is ice?",
+    "What is water?",
+    "What is ice skating?",
 ]
 
 
@@ -520,17 +593,19 @@ def main(args):
             # Increment input position
             input_pos += 1
 
-    logger.info(
-        f"{color.green}Decoding time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
-    )
+    if pp_rank == last_pp_rank:
+        logger.info(
+            f"{color.green}Decoding time: {timer.get_time()} {timer.unit} for {len(prompt)} prompts, rank {rank}{color.reset}"
+        )
 
     # Display the decoding results
 
     # output formatted response via last pp group and tp rank 0
     if pp_rank == last_pp_rank and tp_rank == 0:
-        # `res` is a list of tensors, each being a batch of generated token ids
-
-        res_stacked = torch.stack(res, dim=1)
+        # `res` is a list of tensors, each being a batch of generated token ids.
+        # We need to concatenate them to get the full sequence of generated
+        # token ids. Thus cat'ing along dim 1.
+        res_stacked = torch.cat(res, dim=1)
         res_list = res_stacked.tolist()
 
         # Decode the output as comprehension instead of loop
@@ -560,7 +635,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--ntokens",
         type=int,
-        default=40,
+        default=100,
         help="Number of tokens to generate",
     )
     parser.add_argument(

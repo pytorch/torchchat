@@ -20,8 +20,6 @@ import torch
 import torch._dynamo.config
 import torch._inductor.config
 
-from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
-
 from PIL import Image
 
 from torchchat.cli.builder import (
@@ -39,6 +37,8 @@ from torchtune.data import Message, padded_collate_tiled_images_and_mask
 
 from torchtune.generation import sample as tune_sample
 from torchtune.models.llama3 import llama3_tokenizer
+
+from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
 from torchtune.training import set_default_dtype
 
 
@@ -358,8 +358,8 @@ class Generator:
 
             # TODO: Verify sequential prefill works with multimodal models
             is_multimodal = True
-            if 'encoder_input' in batch:
-                encoder_input = batch['encoder_input']
+            if "encoder_input" in batch:
+                encoder_input = batch["encoder_input"]
                 encoder_mask = batch["encoder_mask"]
                 is_multimodal = True
             else:
@@ -370,7 +370,13 @@ class Generator:
             seq_len = x.size(1)
             mask = batch["causal_mask"][None, :seq_len]
             input_pos = input_pos.view(1, -1)
-            logits = model(tokens=x, mask=mask, encoder_input=encoder_input, input_pos=input_pos, encoder_mask=encoder_mask)[:, -1]
+            logits = model(
+                tokens=x,
+                mask=mask,
+                encoder_input=encoder_input,
+                input_pos=input_pos,
+                encoder_mask=encoder_mask,
+            )[:, -1]
 
             if is_multimodal:
                 batch["encoder_mask"] = batch["encoder_mask"][:, -1:]
@@ -405,7 +411,9 @@ class Generator:
             assert batch is not None, "Flamingo requires batch"
             mask = batch["causal_mask"][None, input_pos.item(), None, :]
             encoder_mask = batch["encoder_mask"] if "encoder_mask" in batch else None
-            logits = model(x, encoder_mask=encoder_mask, mask=mask, input_pos=input_pos)[:, -1:]
+            logits = model(
+                x, encoder_mask=encoder_mask, mask=mask, input_pos=input_pos
+            )[:, -1:]
         else:
             logits = model(x, input_pos)
         # print(f"x: {x},\n  input_pos: {input_pos}\n")
@@ -609,7 +617,12 @@ class Generator:
                     or self.model.config.model_type == ModelType.Flamingo
                 ):
                     # 6404 is one-gpu affordable max_seq_length for single image input
-                    model.setup_caches(batch_size=1, dtype=self.dtype, encoder_max_seq_len=6404, decoder_max_seq_len=T_new)
+                    model.setup_caches(
+                        batch_size=1,
+                        dtype=self.dtype,
+                        encoder_max_seq_len=6404,
+                        decoder_max_seq_len=T_new,
+                    )
                 else:
                     model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
                 if is_speculative and draft_model is not model:
@@ -740,9 +753,9 @@ class Generator:
         max_new_tokens: Optional[int] = None,
     ) -> Tuple[torch.Tensor, Optional[Dict[str, Any]]]:
         """
-        Convert prompt and image prompts into consumable model input args. 
+        Convert prompt and image prompts into consumable model input args.
 
-        When prompt is a list, the anticipated format is OpenAI API Inspired: 
+        When prompt is a list, the anticipated format is OpenAI API Inspired:
             [ ..., {"role": message["role"], "content": message["content"]}, ...]
 
         Args:
@@ -835,15 +848,18 @@ class Generator:
         logging.debug(encoded)
         return encoded, batch
 
-
     def chat(
         self,
         generator_args: GeneratorArgs,
     ):
         if generator_args.chat_mode:
             print("Starting Interactive Chat")
-        
-        encoded, batch = self._gen_model_input(generator_args.prompt, generator_args.image_prompts, generator_args.max_new_tokens)
+
+        encoded, batch = self._gen_model_input(
+            generator_args.prompt,
+            generator_args.image_prompts,
+            generator_args.max_new_tokens,
+        )
 
         model_size = sum(
             [
@@ -909,7 +925,7 @@ class Generator:
                     if text_transformer_args is not None
                     else 2048
                 ),
-                max_seq_length
+                max_seq_length,
             )
 
         max_seq_length = (
