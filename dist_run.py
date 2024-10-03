@@ -24,8 +24,7 @@ from torchchat.distributed.logging_utils import SingletonLogger
 # TODO - these are not distributed specific, consider moving to new package
 from torchchat.distributed.safetensor_utils import (
     get_hf_config_file,
-    get_hf_weight_map_and_path,
-    load_safetensor_weights,
+    load_weights_from_hf_format,
 )
 from torchchat.distributed.utils import (
     bytes_to_readable,
@@ -57,6 +56,10 @@ NAME_TO_DISTRIBUTION_AND_DTYPE = {
     "llama2-7b-chat": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
     "llama3": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16),
 }
+
+# This format stands for: index file + multiple safetensor.
+USE_HF_CHECKPOINT_FORMAT = True
+# TODO: add support for single bin format.
 
 
 def _init_distributed():
@@ -114,22 +117,10 @@ def _load_model_weights(stage_module, distribution, device, model_config):
     """Load the weights from the safetensor file(s) into the model stage.
     Model config is needed b/c we permute wq and wk weights based on attn heads.
     """
-
-    weight_map, weight_path, key_map = get_hf_weight_map_and_path(distribution)
-
-    num_loaded_weights, num_missing_weights = load_safetensor_weights(
-        stage_module,
-        weight_map,
-        weight_path,
-        key_map,
-        device,
-        model_config=model_config,
-    )
-    logger.info(
-        f"Success - Loaded {num_loaded_weights} weights, {num_missing_weights} missing weights"
-    )
-    if num_missing_weights > 0:
-        raise ValueError(f"Missing {num_missing_weights} weights")
+    if USE_HF_CHECKPOINT_FORMAT:
+        load_weights_from_hf_format(stage_module, distribution, device, model_config)
+    else:
+        load_weights_from_torchchat_format(stage_module, distribution, device, model_config)
 
 
 def _encode_strings(

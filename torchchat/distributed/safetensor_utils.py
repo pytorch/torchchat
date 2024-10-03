@@ -366,3 +366,27 @@ def log_loading_status(missing_keys: Set[str], updated_states: Set[str]):
     else:
         logger.info("Fully updated state dict.")
     logger.info(f"Successfully loaded {len(updated_states)} weights into stage module")
+
+
+def load_weights_from_hf_format(stage_module, distribution, device, model_config):
+    """
+    Load the weights from Hugging Face format (index file + multiple safetensor
+    files), and fill into `stage_module`.  Model config is needed b/c we permute
+    wq and wk weights based on attn heads.
+    """
+
+    weight_map, weight_path, key_map = get_hf_weight_map_and_path(distribution)
+
+    num_loaded_weights, num_missing_weights = load_safetensor_weights(
+        stage_module,
+        weight_map,
+        weight_path,
+        key_map,
+        device,
+        model_config=model_config,
+    )
+    logger.info(
+        f"Success - Loaded {num_loaded_weights} weights, {num_missing_weights} missing weights"
+    )
+    if num_missing_weights > 0:
+        raise ValueError(f"Missing {num_missing_weights} weights")
