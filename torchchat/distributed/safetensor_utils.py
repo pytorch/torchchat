@@ -11,7 +11,7 @@ from transformers.utils import cached_file
 import os
 import json
 from torch.nn import Module
-from typing import Dict, Tuple, Set, Optional
+from typing import Any, Dict, Tuple, Set, Optional
 
 from torch.distributed._tensor import DTensor
 from torchchat.distributed.dtensor_utils import convert_to_dtensor
@@ -165,9 +165,10 @@ def load_safetensor_weights(
     Returns:
         Tuple[int, int]: Number of updated weights and number of missing weights.
     """
-    stage_state_dict, weight_map = prepare_state_dict(
-        stage_module, weight_map, purge_model_prefix
-    )
+    stage_state_dict = stage_module.state_dict()
+    stage_state_dict = purge_fqn_prefix(stage_state_dict, "model.")
+    weight_map = purge_fqn_prefix(weight_map, "model.")
+
     needed_files = get_needed_files(stage_state_dict, weight_map)
     updated_states: Set[str] = set()
 
@@ -175,7 +176,7 @@ def load_safetensor_weights(
         full_path = os.path.join(file_location, file)
         # logger.info(f"Loading checkpoint file: {full_path}")
         try:
-            checkpoint = load_checkpoint(full_path, "cpu")  # device)
+            checkpoint = load_safetensor_file(full_path, "cpu")  # device)
 
             update_state_dict(
                 stage_state_dict,
@@ -215,14 +216,11 @@ def load_safetensor_weights(
     return len(updated_states), len(missing_keys)
 
 
-def prepare_state_dict(
-    module: Module, weight_map: Dict[str, str], purge_model_prefix: bool
+def purge_fqn_prefix(
+    any_dict: Dict[str, Any],
+    prefix: str,
 ) -> Dict[str, torch.Tensor]:
-    state_dict = module.state_dict()
-    if purge_model_prefix:
-        state_dict = {k.removeprefix("model."): v for k, v in state_dict.items()}
-        weight_map = {k.removeprefix("model."): v for k, v in weight_map.items()}
-    return state_dict, weight_map
+    return {k.removeprefix(prefix): v for k, v in any_dict.items()}
 
 
 def get_needed_files(
@@ -242,7 +240,7 @@ def get_needed_files(
     return needed_files
 
 
-def load_checkpoint(full_path: str, device: torch.device) -> Dict[str, torch.Tensor]:
+def load_safetensor_file(full_path: str, device: torch.device) -> Dict[str, torch.Tensor]:
     tensors = {}
     with safe_open(full_path, framework="pt", device=device) as f:
         for k in f.keys():
