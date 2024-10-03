@@ -19,9 +19,6 @@ While we strongly encourage you to use the Hugging Face checkpoint (which is the
 ```
 
 ##  Generation
-
-**We are currently debugging Multimodal Inference on MPS and will have updates soon. In the meantime, when testing on Mac, please set `--device cpu`**
-
 This generates text output based on a text prompt and (optional) image prompt.
 
 ```

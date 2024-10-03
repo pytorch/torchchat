@@ -10,8 +10,22 @@ We actively welcome your pull requests.
 2. If you've added code that should be tested, add tests.
 3. If you've changed APIs, update the documentation.
 4. Ensure the test suite passes.
-5. Make sure your code lints.
+5. Make sure your code is well-formatted using the repo linter. See "Linting" for details.
 6. If you haven't already, complete the Contributor License Agreement ("CLA").
+
+
+### Linting
+Install the lintrunner dependencies from the requirements file.
+```
+pip3 install -r install/requirements-lintrunner.txt
+```
+
+After making your changes locally, run the lintrunner and apply all suggestions to your changes.
+You can do this from the top-level torchchat directory - it will apply suggestions only to files that
+you have touched.
+```
+lintrunner -a
+```
 
 ## Contributor License Agreement ("CLA")
 In order to accept your pull request, we need you to submit a CLA. You only need

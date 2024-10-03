@@ -13,8 +13,8 @@ import json
 from torch.nn import Module
 from typing import Dict, Tuple, Set, Optional
 
-
-from torchchat.distributed.dtensor_utils import is_dtensor, load_into_dtensor
+from torch.distributed._tensor import DTensor
+from torchchat.distributed.dtensor_utils import convert_to_dtensor
 
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
@@ -284,9 +284,7 @@ def update_state_dict(
                 continue
 
             checkpoint_tensor = checkpoint[old_param]
-            stage_tensor = state_dict[param]
-
-            stage_is_dtensor = is_dtensor(stage_tensor)
+            model_tensor = state_dict[param]
 
             if "wq" in param:
                 checkpoint_tensor = permute_weight_to_attn_heads(
@@ -297,17 +295,16 @@ def update_state_dict(
                     checkpoint_tensor, num_local_heads, head_dim, dim
                 )
 
+            # Move checkpoint tensor to desired device
+            checkpoint_tensor = checkpoint_tensor.to(device)
+
             # here we need to check if the tensor is a DTensor and if so, adjust the
             # shape and placement to match the model DTensor.
-            if stage_is_dtensor:
-                model_tensor = load_into_dtensor(checkpoint_tensor, stage_tensor)
-                # logger.info(f"DTensor: Loaded {param} into {model_tensor=}")
-                state_dict[param] = model_tensor
+            if isinstance(model_tensor, DTensor):
+                state_dict[param] = convert_to_dtensor(checkpoint_tensor, model_tensor)
                 count_dtensors_loaded += 1
-
             else:
                 # regular tensor, just update directly
-                checkpoint_tensor = checkpoint_tensor.to(device)
                 state_dict[param] = checkpoint_tensor
 
             # ensure matching dtypes
