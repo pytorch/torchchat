@@ -19,15 +19,15 @@ import torch
 
 from PIL import Image
 
+from torchtune.data import Message, padded_collate_tiled_images_and_mask
+
+from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
+
 from torchchat.cli.download import is_model_downloaded, load_model_configs
 from torchchat.generate import Generator, GeneratorArgs
 from torchchat.model import FlamingoModel
 
 from torchchat.utils.build_utils import device_sync
-
-from torchtune.data import Message, padded_collate_tiled_images_and_mask
-
-from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
 
 
 """Dataclasses defined around the objects used the OpenAI API Chat specification.
@@ -291,7 +291,9 @@ class OpenAiApiGenerator(Generator):
             )
         except:
             self.max_seq_length = 2048
-            print(f"can not find max_seq_length in model config, use default value: {self.max_seq_length}")
+            print(
+                f"can not find max_seq_length in model config, use default value: {self.max_seq_length}"
+            )
         # The System fingerprint is a unique identifier for the model and its configuration.
         self.system_fingerprint = (
             f"{self.builder_args.device}_{self.builder_args.precision}"
