@@ -262,7 +262,6 @@ class Generator:
                 """
             ))
             # fmt: on
-            # raise RuntimeError("You need to use --is-chat-model to indicate model has chat support.")
         self.system_prompt = generator_args.prompt
         self.tokenizer = _initialize_tokenizer(self.tokenizer_args)
 
@@ -493,7 +492,6 @@ class Generator:
                 next_prob.clone() if next_prob is not None else None
             )
 
-        # return new_tokens, new_probs
 
     def model_forward(self, model, x, input_pos):
         return model(x, input_pos)
@@ -593,8 +591,6 @@ class Generator:
         is_speculative = draft_model is not None
         device, dtype = prompt.device, prompt.dtype
 
-        # create an empty tensor of the expected final shape and
-        # fill in the current tokens
         if len(prompt.shape) > 1:
             prompt = prompt.squeeze(0)
         T = prompt.size(0)
@@ -619,11 +615,6 @@ class Generator:
                     )
             if model.config.model_type == ModelType.Flamingo:
                 model.reset_caches()
-
-        # create an empty tensor of the expected final shape and
-        # fill in the current tokens
-        empty = torch.empty(T_new, dtype=dtype, device=device)
-        empty[:T] = prompt
 
         input_pos = torch.arange(
             start_pos, T + start_pos, device=device, dtype=torch.int
