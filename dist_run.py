@@ -442,7 +442,6 @@ def main(args):
     # New token generated each iteration
     # need a row dimension for each prompt in the batch
     new_token = torch.zeros(batch_size, 1, device=device, dtype=torch.int64)
-    logger.info(f"{color.green}{new_token.shape=}, {new_token=}{color.reset}")
     # Store the generated tokens
     res = []
 
@@ -519,7 +518,6 @@ def main(args):
 
             # Decode the output
             if pp_rank == last_pp_rank:
-                # logger.info(f"{color.red}Decoding...{output.shape=}{color.reset}")
                 new_token = _batch_decode_next_tokens(output, prompt_lengths, step)
                 res.append(new_token)
                 if not args.disable_in_flight_decode:
@@ -541,7 +539,13 @@ def main(args):
         # token ids. Thus cat'ing along dim 1.
         res = torch.cat(res, dim=1)
         res_list = res.tolist()
-        responses = tokenizer.decode(res_list)
+        if isinstance(tokenizer, TiktokenTokenizer):
+            # For TiktokenTokenizer, we need to decode prompt by prompt.
+            # TODO: is there a better way to do this?
+            responses = [tokenizer.decode(sequence) for sequence in res_list]
+        else:  # SentencePieceProcessor
+            # For SentencePieceProcessor, we can decode the entire 2D list at once.
+            responses = tokenizer.decode(res_list)
         # Show prompts and responses
         for prompt_text, response_text in zip(prompt, responses):
             logger.info(f"Prompt: {color.green}{prompt_text} {color.reset}")

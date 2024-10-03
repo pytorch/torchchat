@@ -502,7 +502,6 @@ class Generator:
                 next_prob.clone() if next_prob is not None else None
             )
 
-
     def model_forward(self, model, x, input_pos):
         return model(x, input_pos)
 
