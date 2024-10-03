@@ -88,6 +88,9 @@ def get_hf_weight_map_and_path(
         raise FileNotFoundError(
             f"Weight index file for {model_id} does not exist in HF cache."
         )
+    logger.info(
+        f"Loading weight map from: {index_file}"
+    )
     weight_map = read_weights_from_json(index_file)
     if weight_map is None:
         raise ValueError(f"Weight map not found in config file {index_file}")
@@ -95,6 +98,9 @@ def get_hf_weight_map_and_path(
     weight_path = os.path.dirname(index_file)
     if not os.path.exists(weight_path):
         raise FileNotFoundError(f"Weight path {weight_path} does not exist")
+    logger.info(
+        f"Loading weights from: {weight_path}"
+    )
     return weight_map, weight_path, new_to_old_keymap
 
 
