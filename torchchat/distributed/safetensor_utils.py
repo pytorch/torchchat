@@ -166,8 +166,9 @@ def load_safetensor_weights(
         Tuple[int, int]: Number of updated weights and number of missing weights.
     """
     stage_state_dict = stage_module.state_dict()
-    stage_state_dict = purge_fqn_prefix(stage_state_dict, "model.")
-    weight_map = purge_fqn_prefix(weight_map, "model.")
+    if purge_model_prefix:
+        stage_state_dict = purge_fqn_prefix(stage_state_dict, "model.")
+        weight_map = purge_fqn_prefix(weight_map, "model.")
 
     needed_files = get_needed_files(stage_state_dict, weight_map)
     updated_states: Set[str] = set()
@@ -181,9 +182,7 @@ def load_safetensor_weights(
             update_state_dict(
                 stage_state_dict,
                 checkpoint,
-                weight_map,
                 new_to_old_keymap,
-                file,
                 updated_states,
                 device,
                 model_config,
@@ -216,10 +215,13 @@ def load_safetensor_weights(
     return len(updated_states), len(missing_keys)
 
 
+# TODO: clean this up together with `purge_fqn_prefix` when we switch
+# from creating Transformer to creating model
 def purge_fqn_prefix(
     any_dict: Dict[str, Any],
     prefix: str,
-) -> Dict[str, torch.Tensor]:
+) -> Dict[str, Any]:
+    """Remove a prefix from all keys in a dictionary."""
     return {k.removeprefix(prefix): v for k, v in any_dict.items()}
 
 
@@ -262,64 +264,52 @@ def permute_weight_to_attn_heads(w, n_heads, head_dim, model_dim):
 def update_state_dict(
     state_dict: Dict[str, torch.Tensor],
     checkpoint: Dict[str, torch.Tensor],
-    weight_map: Dict[str, str],
     new_to_old_keymap: Dict[str, str],
-    file: str,
     updated_states: Set[str],
     device: torch.device,
     model_config: Optional[Dict] = None,
 ):
-    count_dtensors_loaded = 0
     # for handling attn head permuting
     num_heads = model_config.n_heads
     dim = model_config.dim
     num_local_heads = model_config.n_local_heads
     head_dim = model_config.head_dim
 
-    for param, file_with_param in weight_map.items():
-        if file_with_param == file and param in state_dict:
-            model_param = (
-                "output.weight" if param == "output.weight" else f"model.{param}"
+    for param in state_dict.keys():
+        # TODO: clean this up together with `purge_fqn_prefix` when we switch
+        # from creating Transformer to creating model
+        model_param = (
+            "output.weight" if param == "output.weight" else f"model.{param}"
+        )
+        old_param = new_to_old_keymap.get(model_param)
+
+        if old_param not in checkpoint:
+            # Maybe this param is in other files
+            continue
+
+        checkpoint_tensor = checkpoint[old_param]
+        model_tensor = state_dict[param]
+
+        if "wq" in param:
+            checkpoint_tensor = permute_weight_to_attn_heads(
+                checkpoint_tensor, num_heads, head_dim, dim
             )
-            old_param = new_to_old_keymap.get(model_param)
+        elif "wk" in param:
+            checkpoint_tensor = permute_weight_to_attn_heads(
+                checkpoint_tensor, num_local_heads, head_dim, dim
+            )
 
-            if old_param not in checkpoint:
-                logger.warning(f"Missing {old_param} in checkpoint")
-                continue
+        # Move checkpoint tensor to desired device
+        checkpoint_tensor = checkpoint_tensor.to(device)
 
-            checkpoint_tensor = checkpoint[old_param]
-            model_tensor = state_dict[param]
+        # here we need to check if the tensor is a DTensor and if so, adjust the
+        # shape and placement to match the model DTensor.
+        if isinstance(model_tensor, DTensor):
+            checkpoint_tensor = convert_to_dtensor(checkpoint_tensor, model_tensor)
 
-            if "wq" in param:
-                checkpoint_tensor = permute_weight_to_attn_heads(
-                    checkpoint_tensor, num_heads, head_dim, dim
-                )
-            elif "wk" in param:
-                checkpoint_tensor = permute_weight_to_attn_heads(
-                    checkpoint_tensor, num_local_heads, head_dim, dim
-                )
-
-            # Move checkpoint tensor to desired device
-            checkpoint_tensor = checkpoint_tensor.to(device)
-
-            # here we need to check if the tensor is a DTensor and if so, adjust the
-            # shape and placement to match the model DTensor.
-            if isinstance(model_tensor, DTensor):
-                state_dict[param] = convert_to_dtensor(checkpoint_tensor, model_tensor)
-                count_dtensors_loaded += 1
-            else:
-                # regular tensor, just update directly
-                state_dict[param] = checkpoint_tensor
-
-            # ensure matching dtypes
-            state_dict[param] = state_dict[param].to(checkpoint_tensor.dtype)
-
-            assert state_dict[param].dtype == checkpoint_tensor.dtype
-
-            # log_tensor_info(param, state_dict[param])
-            # logger.info(f"Loaded {param} from {file}")
-            updated_states.add(param)
-    # logger.info(f"Count of loaded DTensors: {count_dtensors_loaded}")
+        # Update model state dict with checkpoint tensor
+        state_dict[param] = checkpoint_tensor
+        updated_states.add(param)
 
 
 def format_tensor_info(tensor: torch.Tensor) -> str:
