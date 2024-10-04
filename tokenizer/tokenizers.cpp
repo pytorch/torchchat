@@ -5,26 +5,19 @@
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree.
  */
-#include <tokenizer.h>
+#include "tokenizer.h"
 
 // Standard
-#include <cctype>
-#include <cinttypes>
-#include <cstdint>
+#include <iostream>
+#include <filesystem>
 #include <fstream>
-#include <functional>
-#include <limits>
-#include <memory>
-#include <regex>
 #include <string>
-#include <unordered_set>
-#include <vector>
 
 // Third Party
 #include <nlohmann/json.hpp>
 
-// Local
-#include "base64.h"
+namespace fs = std::filesystem;
+using json = nlohmann::json;
 
 // // ------------------------------Util start------------------------------------
 
@@ -323,28 +316,197 @@
 //   return std::make_pair(tokens, last_piece_token_len);
 // }
 
+
 // -------------------------private method end-------------------------------
 // -------------------------public method start-------------------------------
 
 TokenizersTokenizer::TokenizersTokenizer() : Tokenizer() {}
 
 void TokenizersTokenizer::load(const std::string& path) {
+
+  // If this is a directory, look for tokenizer.json and tokenizer_config.json
+  std::string model_json = path;
+  std::string model_config_json = "";
+  if (fs::is_directory(path)) {
+    const fs::path root(path);
+    model_json = root / "tokenizer.json";
+    if (!fs::exists(model_json)) {
+      fprintf(stderr, "no tokenizer.json found in %s\n", path.c_str());
+      exit(EXIT_FAILURE);
+    }
+    const auto model_config_json_path = root / "tokenizer_config.json";
+    if (fs::exists(model_config_json_path)) {
+      model_config_json = model_config_json_path;
+    }
+  }
+
   // Load the tokenizer.json file
+  std::ifstream file(model_json);
+  if (!file) {
+    fprintf(stderr, "failed to open encoder file: %s\n", path.c_str());
+    exit(EXIT_FAILURE);
+  }
+  std::string contents(
+    (std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+  json parsed_json;
+  try {
+    parsed_json = json::parse(contents);
+  } catch (const json::exception& e) {
+    std::cout << "Error parsing json file: " << e.what() << std::endl;
+    exit(EXIT_FAILURE);
+  }
 
-  // _encoder = _load_encoder(path);
-  // _special_token_encoder = _get_special_tokens(_encoder.size());
+  // Parse the special tokens
+  try {
+    const auto& special_tokens = parsed_json.at("added_tokens");
+    for (auto it = special_tokens.begin(); it != special_tokens.end(); ++it) {
+      const std::string token = it->at("content");
+      const uint64_t token_id = it->at("id");
+      if (!_special_token_encoder.emplace(token, token_id).second) {
+        fprintf(stderr, "duplicate special token: %s\n", token.c_str());
+        exit(EXIT_FAILURE);
+      }
+      if (!_special_token_decoder.emplace(token_id, token).second) {
+        fprintf(stderr, "duplicate special token id: %llu\n", token_id);
+        exit(EXIT_FAILURE);
+      }
+    }
+  } catch (const json::out_of_range& e) {
+    fprintf(stderr, "Could not parse special tokens: %s\n", e.what());
+    exit(EXIT_FAILURE);
+  }
 
-  // _decoder = _build_decoder(_encoder);
-  // _special_token_decoder = _build_decoder(_special_token_encoder);
+  // Parse the standard tokens
+  try {
+    const auto& vocab = parsed_json.at("/model/vocab"_json_pointer);
+    for (const auto& entry : vocab.items()) {
+      const std::string token = entry.key();
+      const uint64_t token_id = entry.value();
+      // Skip adding special tokens to the standard encoder/decoder
+      if (_special_token_decoder.find(token_id) == _special_token_decoder.end()) {
+        if (!_encoder.emplace(token, token_id).second) {
+          fprintf(stderr, "duplicate token: %s\n", token.c_str());
+          exit(EXIT_FAILURE);
+        }
+        if (!_decoder.emplace(token_id, token).second) {
+          fprintf(stderr, "duplicate token id: %llu\n", token_id);
+          exit(EXIT_FAILURE);
+        }
+      }
+    }
+  } catch (const json::out_of_range& e) {
+    fprintf(stderr, "Could not parse tokens: %s\n", e.what());
+    exit(EXIT_FAILURE);
+  }
 
-  // _regex = _create_regex(_pattern);
-  // _special_token_regex = _build_special_token_regex(_special_token_encoder);
+  // Set the vocab size to include special tokens
+  vocab_size_ = _encoder.size() + _special_token_encoder.size();
 
-  // // initialize vocab_size, bos_tok, eos_tok
-  // vocab_size_ = _encoder.size() + _special_token_encoder.size();
-  // bos_tok_ = _encoder.size(); // hardcoded (see _get_special_tokens)
-  // eos_tok_ = _encoder.size() + 1; // hardcoded (see _get_special_tokens)
-  // initialized_ = true;
+  // TODO: Do we need to parse the merges?
+
+  // If a tokenizer config file is found, parse it to look up the eos/bos tokens
+  if (!model_config_json.empty()) {
+
+    // Load it and parse it as json
+    std::ifstream file(model_config_json);
+    if (!file) {
+      fprintf(stderr, "failed to open encoder file: %s\n", path.c_str());
+      exit(EXIT_FAILURE);
+    }
+    std::string contents(
+      (std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    json parsed_json;
+    try {
+      parsed_json = json::parse(contents);
+    } catch (const json::exception& e) {
+      std::cout << "Error parsing model config json json file: " << e.what() << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    // Pull out the token strings
+    try {
+      const std::string bos_token = parsed_json.at("bos_token");
+      const std::string eos_token = parsed_json.at("eos_token");
+      const auto& bos_it = _special_token_encoder.find(bos_token);
+      const auto& eos_it = _special_token_encoder.find(eos_token);
+      if (bos_it == _special_token_encoder.end()) {
+        fprintf(stderr, "BOS token %s not in special tokens\n", bos_token.c_str());
+        exit(EXIT_FAILURE);
+      }
+      if (eos_it == _special_token_encoder.end()) {
+        fprintf(stderr, "EOS token %s not in special tokens\n", eos_token.c_str());
+        exit(EXIT_FAILURE);
+      }
+      bos_tok_ = bos_it->second;
+      eos_tok_ = eos_it->second;
+    } catch (const json::out_of_range& e) {
+      fprintf(stderr, "Could not eos/bos from tokenizer config: %s\n", e.what());
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  // Otherwise, make an educated guess with the following logic:
+  // 1. Look for special tokens with "bos"/"begin" or "eos"/"end" in them
+  // 2. Sub-qualify with the word "text" if needed
+  // 3. If EOS found, but BOS is not (or vice versa), assume they are the same
+  else {
+    std::vector<std::string> bos_candidates;
+    std::vector<std::string> eos_candidates;
+    for (const auto& token : _special_token_encoder) {
+      if (
+        token.first.find("bos") != std::string::npos ||
+        token.first.find("begin") != std::string::npos
+      ) {
+        bos_candidates.push_back(token.first);
+      }
+      if (
+        token.first.find("eos") != std::string::npos ||
+        token.first.find("end") != std::string::npos
+      ) {
+        eos_candidates.push_back(token.first);
+      }
+    }
+    if (bos_candidates.size() > 1) {
+      const auto orig_candidates = bos_candidates;
+      bos_candidates.clear();
+      for (const auto& cand : orig_candidates) {
+        if (cand.find("text") != std::string::npos) {
+          bos_candidates.push_back(cand);
+        }
+      }
+    }
+    if (eos_candidates.size() > 1) {
+      const auto orig_candidates = eos_candidates;
+      eos_candidates.clear();
+      for (const auto& cand : orig_candidates) {
+        if (cand.find("text") != std::string::npos) {
+          eos_candidates.push_back(cand);
+        }
+      }
+    }
+
+    // Use if a single candidate
+    bool bos_found = false;
+    bool eos_found = false;
+    if (bos_candidates.size() == 1) {
+      bos_found = true;
+      bos_tok_ = _special_token_encoder[bos_candidates[0]];
+    }
+    if (eos_candidates.size() == 1) {
+      eos_found = true;
+      eos_tok_ = _special_token_encoder[eos_candidates[0]];
+    }
+
+    // Make them the same if only one found
+    if (bos_found && ! eos_found) {
+      eos_tok_ = bos_tok_;
+    } else if (! bos_found && eos_found) {
+      bos_tok_ = eos_tok_;
+    }
+  }
+
+  // Mark initialized once everything is done
+  initialized_ = true;
 }
 
 std::vector<uint64_t>
