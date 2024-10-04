@@ -734,13 +734,7 @@ class Generator:
         if len(buffer) == 4 or done_generating:
             print("".join(buffer), end="", flush=True)
             buffer.clear()
-        # print(, end='', flush=True)
-
-    def print_m(self, message):
-        print(
-            message.role,
-            [t["type"] if t["type"] != "text" else t for t in message.content],
-        )
+        print(, end='', flush=True)
 
     def _gen_model_input(
         self,
@@ -764,7 +758,7 @@ class Generator:
             Tuple[torch.Tensor, Optional[Dict[str, Any]]]: Encoded prompt and batch config for multimodal models.
         """
 
-        # Not Llama 3.2 11B
+        # Text-Only model
         if self.model.config.model_type != ModelType.Flamingo:
             # Single String prompt
             if isinstance(prompt, str):
@@ -819,7 +813,7 @@ class Generator:
 
                 is_multimodal = images is not None
                 content = [{"type": "text", "content": prompt_arg}]
-
+                []
                 if is_multimodal:
                     content = [{"type": "image", "content": images[0]}] + content
 
@@ -830,10 +824,6 @@ class Generator:
                     )
                 )
 
-        print("MESSAGE CONTENTS:")
-        messages.append(Message(role="assistant", content=""))
-        [self.print_m(m) for m in messages]
-
         transform = llama3_2_vision_transform(str(self.tokenizer_args.tokenizer_path))
 
         device = torch.device(device=self.builder_args.device)
@@ -841,16 +831,17 @@ class Generator:
         with device, set_default_dtype(self.dtype):
             data = transform({"messages": messages}, inference=True)
 
-            if is_multimodal:
+            if image_found:
                 batch = padded_collate_tiled_images_and_mask(
                     [data], pad_direction="left", pad_max_images=1
                 )
                 encoded = batch.pop("tokens").to(device).view(-1)
-                seq_len = encoded.size(0)
+                seq_len = encoded.size(0) 
                 batch["encoder_mask"] = batch["encoder_mask"][:, :seq_len]
                 batch["encoder_input"]["images"] = batch["encoder_input"]["images"].to(
                     self.dtype
                 )
+
             else:
                 encoded = torch.tensor(data["tokens"], device=device).view(-1)
                 seq_len = encoded.size(0)
