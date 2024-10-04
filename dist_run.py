@@ -18,6 +18,7 @@ import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
+from torchchat.distributed.base_interactor import LLMInteractor
 
 from torchchat.distributed.logging_utils import SingletonLogger
 
@@ -329,6 +330,14 @@ def main(args):
 
     # Assuming same number of GPUs per node
     device = torch.device(f"cuda:{rank % torch.cuda.device_count()}")
+
+    # Create Interactor
+    interactor = LLMInteractor(tokenizer)
+
+    for entry in prompt:
+        interactor.add_request(entry)
+
+    assert False, "check"
 
     # Fill in PP configs
     config.stage_idx = pp_rank
