@@ -3,6 +3,7 @@
 
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+import glob
 import json
 import os
 import re
@@ -41,7 +42,12 @@ def convert_hf_checkpoint(
     print(f"Model config {config.__dict__}")
 
     # Load the json file containing weight mapping
-    model_map_json = model_dir / "pytorch_model.bin.index.json"
+    model_map_json_matches = [Path(m) for m in glob.glob(str(model_dir / "*.index.json"))]
+    assert len(model_map_json_matches) <= 1, "Found multiple weight mapping files"
+    if len(model_map_json_matches):
+        model_map_json = model_map_json_matches[0]
+    else:
+        model_map_json = model_dir / "pytorch_model.bin.index.json"
 
     # If there is no weight mapping, check for a consolidated model and
     # tokenizer we can move. Llama 2 and Mistral have weight mappings, while
@@ -96,9 +102,33 @@ def convert_hf_checkpoint(
 
     merged_result = {}
     for file in sorted(bin_files):
-        state_dict = torch.load(
+
+        # The state_dict can be loaded from either a torch zip file or
+        # safetensors. We take our best guess from the name and try all
+        # possibilities
+        load_pt_mmap = lambda: torch.load(
             str(file), map_location="cpu", mmap=True, weights_only=True
         )
+        load_pt_no_mmap = lambda: torch.load(
+            str(file), map_location="cpu", mmap=False, weights_only=True
+        )
+        def load_safetensors():
+            import safetensors.torch
+            with open(file, "rb") as handle:
+                return safetensors.torch.load(handle.read())
+        if "safetensors" in str(file):
+            loaders = [load_safetensors, load_pt_mmap, load_pt_no_mmap]
+        else:
+            loaders = [load_pt_mmap, load_pt_no_mmap, load_safetensors]
+
+        state_dict = None
+        for loader in loaders:
+            try:
+                state_dict = loader()
+                break
+            except Exception:
+                continue
+        assert state_dict is not None, f"Unable to load tensors from {file}"
         merged_result.update(state_dict)
     final_result = {}
     for key, value in merged_result.items():
