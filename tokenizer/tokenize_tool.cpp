@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
   // Encode
   std::cout << "PROMPT:" << std::endl << prompt << std::endl << std::endl;
   std::cout << "Encoding..." << std::endl;
-  const auto encoded = tok_ptr->encode(prompt, 1, 1);
+  const auto encoded = tok_ptr->encode(prompt, 0, 0);
   std::cout << "[";
   for (const auto tok_id : encoded) {
     std::cout << " " << tok_id;
@@ -86,8 +86,10 @@ int main(int argc, char* argv[]) {
 
   // Decode
   std::cout << "Decoding..." << std::endl;
-  for (auto i = 1; i < encoded.size() - 1; ++i) {
-    std::cout << tok_ptr->decode(encoded[i-1], encoded[i]);
+  uint64_t prev = tok_ptr->bos_tok();
+  for (const auto& current : encoded) {
+    std::cout << tok_ptr->decode(prev, current);
+    prev = current;
   }
   std::cout << std::endl;
 
