@@ -12,33 +12,43 @@ from openai import OpenAI
 
 st.title("torchchat")
 
+
 start_state = [
     {
         "role": "system",
-        "content": "You're a helpful assistant - have fun.",
+        "content": "You're a helpful assistant - be brief and have fun.",
     },
     {"role": "assistant", "content": "How can I help you?"},
 ]
 
-st.session_state.uploader_key = 0
 
+def reset_chat():
+    st.session_state["messages"] = start_state
+    st.session_state["conversation_images"] = []
 
-def reset_per_message_state():
-    # Catch all function for anything that should be reset between each message.
-    _update_uploader_key()
+if "messages" not in st.session_state:
+    st.session_state.messages = start_state
+if "conversation_images" not in st.session_state:
+    st.session_state.conversation_images = []
 
-
-def _update_uploader_key():
-    # Increment the uploader key to reset the file uploader after each message.
-    st.session_state.uploader_key = int(time.time())
-
+def _upload_image_prompts(file_uploads):
+    for file in file_uploads:
+        st.session_state.conversation_images.append(file)
 
 with st.sidebar:
+    if st.button("Reset Chat", type="primary"):
+        reset_chat()
+
     # API Configuration
     api_base_url = st.text_input(
         label="API Base URL",
         value="http://127.0.0.1:5000/v1",
         help="The base URL for the OpenAI API to connect to",
+    )
+
+    client = OpenAI(
+        base_url=api_base_url,
+        api_key="813",  # The OpenAI API requires an API key, but since we don't consume it, this can be any non-empty string.
     )
 
     st.divider()
@@ -49,28 +59,6 @@ with st.sidebar:
     response_max_tokens = st.slider(
         "Max Response Tokens", min_value=10, max_value=1000, value=250, step=10
     )
-    if st.button("Reset Chat", type="primary"):
-        st.session_state["messages"] = start_state
-
-    image_prompts = st.file_uploader(
-        "Image Prompts",
-        type=["jpeg"],
-        accept_multiple_files=True,
-        key=st.session_state.uploader_key,
-    )
-
-    for image in image_prompts:
-        st.image(image)
-
-
-client = OpenAI(
-    base_url=api_base_url,
-    api_key="813",  # The OpenAI API requires an API key, but since we don't consume it, this can be any non-empty string.
-)
-
-if "messages" not in st.session_state:
-    st.session_state["messages"] = start_state
-
 
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
@@ -86,6 +74,7 @@ for msg in st.session_state.messages:
                     st.write(content["text"])
         elif type(msg["content"]) is dict:
             if msg["content"]["type"] == "image_url":
+                pass
                 st.image(msg["content"]["image_url"])
             else:
                 st.write(msg["content"]["text"])
@@ -98,8 +87,8 @@ for msg in st.session_state.messages:
 if prompt := st.chat_input():
     user_message = {"role": "user", "content": [{"type": "text", "text": prompt}]}
 
-    if image_prompts:
-        for image_prompt in image_prompts:
+    if len(st.session_state.conversation_images) > 0:
+        for image_prompt in st.session_state.conversation_images:
             extension = Path(image_prompt.name).suffix.strip(".")
             image_bytes = image_prompt.getvalue()
             base64_encoded = base64.b64encode(image_bytes).decode("utf-8")
@@ -113,11 +102,10 @@ if prompt := st.chat_input():
 
     with st.chat_message("user"):
         st.write(prompt)
-        for img in image_prompts:
+        for img in st.session_state.conversation_images:
             st.image(img)
-
-    image_prompts = None
-    reset_per_message_state()
+    st.session_state.conversation_images = []
+        
 
     with st.chat_message("assistant"), st.status(
         "Generating... ", expanded=True
@@ -154,3 +142,21 @@ if prompt := st.chat_input():
             print(e)
 
     st.session_state.messages.append({"role": "assistant", "content": response})
+
+# Note: This section needs to be at the end of the file to ensure that the session state is updated before the sidebar is rendered.
+with st.sidebar:
+    st.divider()
+
+    with st.form("image_uploader", clear_on_submit=True):
+        file_uploads = st.file_uploader(
+            "Upload Image Prompts",
+            type=["jpeg"],
+            accept_multiple_files=True,
+        )
+        submitted = st.form_submit_button("Attach images to chat message")
+        if submitted:
+            _upload_image_prompts(file_uploads)
+
+    st.markdown("Image Prompts")
+    for image in st.session_state.conversation_images:
+        st.image(image)

@@ -815,13 +815,13 @@ class Generator:
 
                 is_multimodal = images is not None
                 content = [{"type": "text", "content": prompt_arg}]
-                []
+                
                 if is_multimodal:
                     content = [{"type": "image", "content": images[0]}] + content
 
                 messages.append(
                     Message(
-                        role="user",
+                        role=message["role"],
                         content=content,
                     )
                 )
