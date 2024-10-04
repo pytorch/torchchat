@@ -655,7 +655,9 @@ class Generator:
         # max_new_tokens <= 2 means we are effectively not calling decode_n_tokens().
         callback(next_token.clone().view(-1), done_generating=max_new_tokens <= 2)
 
-        input_pos = torch.tensor([start_pos + prompt_length], device=device, dtype=torch.int)
+        input_pos = torch.tensor(
+            [start_pos + prompt_length], device=device, dtype=torch.int
+        )
         accept_counts = [0] * (
             speculate_k + 1
         )  # creates array of [0, 0, 0, ...] that is speculate_k + 1 long
@@ -736,12 +738,6 @@ class Generator:
             buffer.clear()
         # print(, end='', flush=True)
 
-    def print_m(self, message):
-        print(
-            message.role,
-            [t["type"] if t["type"] != "text" else t for t in message.content],
-        )
-
     def _gen_model_input(
         self,
         prompt: Union[str | List[Any]],
@@ -764,7 +760,7 @@ class Generator:
             Tuple[torch.Tensor, Optional[Dict[str, Any]]]: Encoded prompt and batch config for multimodal models.
         """
 
-        # Not Llama 3.2 11B
+        # Text-Only model
         if self.model.config.model_type != ModelType.Flamingo:
             # Single String prompt
             if isinstance(prompt, str):
@@ -819,7 +815,7 @@ class Generator:
 
                 is_multimodal = images is not None
                 content = [{"type": "text", "content": prompt_arg}]
-
+                []
                 if is_multimodal:
                     content = [{"type": "image", "content": images[0]}] + content
 
@@ -830,10 +826,6 @@ class Generator:
                     )
                 )
 
-        print("MESSAGE CONTENTS:")
-        messages.append(Message(role="assistant", content=""))
-        [self.print_m(m) for m in messages]
-
         transform = llama3_2_vision_transform(str(self.tokenizer_args.tokenizer_path))
 
         device = torch.device(device=self.builder_args.device)
@@ -841,7 +833,7 @@ class Generator:
         with device, set_default_dtype(self.dtype):
             data = transform({"messages": messages}, inference=True)
 
-            if is_multimodal:
+            if image_found:
                 batch = padded_collate_tiled_images_and_mask(
                     [data], pad_direction="left", pad_max_images=1
                 )
@@ -851,6 +843,7 @@ class Generator:
                 batch["encoder_input"]["images"] = batch["encoder_input"]["images"].to(
                     self.dtype
                 )
+
             else:
                 encoded = torch.tensor(data["tokens"], device=device).view(-1)
                 seq_len = encoded.size(0)
@@ -882,13 +875,6 @@ class Generator:
     ):
         if generator_args.chat_mode:
             print("Starting Interactive Chat")
-
-        encoded, batch = self._gen_model_input(
-            generator_args.prompt,
-            generator_args.image_prompts,
-            generator_args.max_new_tokens,
-            generator_args.max_seq_length,
-        )
 
         model_size = sum(
             [
@@ -934,6 +920,12 @@ class Generator:
         text_transformer_args = self.model.text_transformer_args
         max_seq_length = (
             text_transformer_args.max_seq_length if text_transformer_args else 2048
+        )
+        encoded, batch = self._gen_model_input(
+            generator_args.prompt,
+            generator_args.image_prompts,
+            generator_args.max_new_tokens,
+            max_seq_length,
         )
 
         if generator_args.chat_mode:
