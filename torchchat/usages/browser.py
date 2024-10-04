@@ -10,6 +10,7 @@ logger.setLevel(logging.DEBUG)
 
 from openai import OpenAI
 
+st.set_page_config(page_title="torchchat", page_icon="🤖")
 st.title("torchchat")
 
 
@@ -26,14 +27,17 @@ def reset_chat():
     st.session_state["messages"] = start_state
     st.session_state["conversation_images"] = []
 
+
 if "messages" not in st.session_state:
     st.session_state.messages = start_state
 if "conversation_images" not in st.session_state:
     st.session_state.conversation_images = []
 
+
 def _upload_image_prompts(file_uploads):
     for file in file_uploads:
         st.session_state.conversation_images.append(file)
+
 
 with st.sidebar:
     if st.button("Reset Chat", type="primary"):
@@ -105,7 +109,6 @@ if prompt := st.chat_input():
         for img in st.session_state.conversation_images:
             st.image(img)
     st.session_state.conversation_images = []
-        
 
     with st.chat_message("assistant"), st.status(
         "Generating... ", expanded=True

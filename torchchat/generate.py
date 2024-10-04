@@ -603,6 +603,7 @@ class Generator:
         if len(prompt.shape) > 1:
             prompt = prompt.squeeze(0)
         prompt_length = prompt.size(0)
+        max_new_tokens = min(max_new_tokens, max_seq_length - start_pos - prompt_length)
         # set up caches only if first inference
         if start_pos == 0:
             model = model.to(device=device)
@@ -825,6 +826,12 @@ class Generator:
                         content=content,
                     )
                 )
+        messages.append(
+            Message(
+                role="assistant",
+                content="",
+            )
+        )
 
         transform = llama3_2_vision_transform(str(self.tokenizer_args.tokenizer_path))
 
@@ -849,7 +856,7 @@ class Generator:
                 seq_len = encoded.size(0)
                 batch = {}
 
-            total_response_length = max_seq_len + max_new_tokens
+            total_response_length = seq_len + max_new_tokens
             batch["causal_mask"] = torch.nn.functional.pad(
                 torch.tril(
                     torch.ones(
