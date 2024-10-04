@@ -257,3 +257,30 @@ class GPUMemoryMonitor:
             f"with {self.device_capacity_gib:.2f}GiB memory"
         )
         return device_info
+
+class UniqueCounter:
+    """A counter that generates unique numbers (returned as str) starting from a given start value."""
+
+    def __init__(self, start: int = 0, prefix: str = "", padding: int = 0) -> None:
+        self._counter = start
+        self._prefix = prefix
+        self._padding = padding
+
+    def __next__(self) -> str:
+        value = self._format_counter()
+        self._counter += 1
+        return value
+
+    def reset(self, start: Optional[int] = None) -> None:
+        self._counter = start if start is not None else 0
+
+    def _format_counter(self) -> str:
+        return f"{self._prefix}{str(self._counter).zfill(self._padding)}"
+
+    @property
+    def current(self) -> str:
+        return self._format_counter()
+
+    def __iter__(self):
+        return self
+
