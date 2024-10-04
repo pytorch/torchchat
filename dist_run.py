@@ -283,9 +283,9 @@ def _cleanup():
 
 prompt = [
     "What is Snow?",
-    "Can you explain what is the purpose of back propagation in neural networks?",
-    # "Who is Santa Claus?",
-    # "Where does Santa live?",
+    # "Can you explain what is the purpose of back propagation in neural networks?",
+    "Who is Santa Claus?",
+    "Where does Santa live?",
     # "Who is Abraham Lincoln?",
     # "How are models trained?",
 ]
