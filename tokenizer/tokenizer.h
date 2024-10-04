@@ -145,3 +145,51 @@ class Tiktoken : public Tokenizer {
   Re2UPtr _regex;
   Re2UPtr _special_token_regex;
 };
+
+
+// ----------------------- Tokenizers -----------------------
+// Used by many Huggingface models. Adapted from a combination of the original
+// rust implementation (https://github.com/huggingface/tokenizers/tree/main)
+// and the corresponding support in llama.cpp
+// (https://github.com/ggerganov/llama.cpp)
+
+class TokenizersTokenizer : public Tokenizer {
+ public:
+  /*-- Public Interface --*/
+
+  /**
+   * Default initialize with no loaded data
+   */
+  explicit TokenizersTokenizer();
+  ~TokenizersTokenizer() {};
+
+  /**
+   * Load the model data into the
+   */
+  void load(const std::string& tokenizer_path) override;
+
+  /**
+   * Encode the input string as a list of token IDs
+   */
+  std::vector<uint64_t>
+  encode(const std::string& input, int8_t bos, int8_t eos) const override;
+
+  /**
+   * Decode the list of token IDs into a string
+   */
+  std::string decode(uint64_t prev_token, uint64_t token) const override;
+
+ private:
+  /*-- Private Methods --*/
+
+  /*-- Private Members --*/
+
+  // Sequential regex patterns to evaluate
+  std::vector<std::string> _patterns;
+
+  // Forward/backward mappings to/from (special) tokens and their IDs
+  Encoder _encoder;
+  Encoder _special_token_encoder;
+  Decoder _decoder;
+  Decoder _special_token_decoder;
+};
