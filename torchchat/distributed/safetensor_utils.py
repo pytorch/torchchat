@@ -12,9 +12,11 @@ import os
 import json
 from torch.nn import Module
 from typing import Any, Dict, Tuple, Set, Optional
+from pathlib import Path
 
 from torch.distributed._tensor import DTensor
 from torchchat.distributed.dtensor_utils import convert_to_dtensor
+from torchchat.cli.builder import BuilderArgs, _load_checkpoint
 
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
@@ -182,10 +184,10 @@ def load_safetensor_weights(
             update_state_dict(
                 stage_state_dict,
                 checkpoint,
-                new_to_old_keymap,
-                updated_states,
                 device,
-                model_config,
+                model_config=model_config,
+                new_to_old_keymap=new_to_old_keymap,
+                updated_states=updated_states,
             )
         except FileNotFoundError:
             logger.error(f"File not found: {full_path}")
@@ -264,11 +266,19 @@ def permute_weight_to_attn_heads(w, n_heads, head_dim, model_dim):
 def update_state_dict(
     state_dict: Dict[str, torch.Tensor],
     checkpoint: Dict[str, torch.Tensor],
-    new_to_old_keymap: Dict[str, str],
-    updated_states: Set[str],
     device: torch.device,
     model_config: Optional[Dict] = None,
+    new_to_old_keymap: Optional[Dict[str, str]] = None,
+    updated_states: Optional[Set[str]]= None,
 ):
+    """
+    Update the state dict with the checkpoint tensors.
+    Note:
+    - For HF format, `new_to_old_keymap` is a mapping from the new key to the old
+    key.
+    - For torchchat format, `new_to_old_keymap` is None (because FQN conversion
+    has been doen by torchchat download script).
+    """
     # for handling attn head permuting
     num_heads = model_config.n_heads
     dim = model_config.dim
@@ -276,12 +286,16 @@ def update_state_dict(
     head_dim = model_config.head_dim
 
     for param in state_dict.keys():
-        # TODO: clean this up together with `purge_fqn_prefix` when we switch
-        # from creating Transformer to creating model
-        model_param = (
-            "output.weight" if param == "output.weight" else f"model.{param}"
-        )
-        old_param = new_to_old_keymap.get(model_param)
+        if new_to_old_keymap is not None:
+            # TODO: clean the following manual prefix together with
+            # `purge_fqn_prefix` when we switch from creating Transformer to
+            # creating model
+            model_param = (
+                "output.weight" if param == "output.weight" else f"model.{param}"
+            )
+            old_param = new_to_old_keymap[model_param]
+        else:
+            old_param = param
 
         if old_param not in checkpoint:
             # Maybe this param is in other files
@@ -309,7 +323,9 @@ def update_state_dict(
 
         # Update model state dict with checkpoint tensor
         state_dict[param] = checkpoint_tensor
-        updated_states.add(param)
+
+        if updated_states is not None:
+            updated_states.add(param)
 
 
 def format_tensor_info(tensor: torch.Tensor) -> str:
@@ -378,3 +394,59 @@ def load_weights_from_hf_format(stage_module, distribution, device, model_config
     )
     if num_missing_weights > 0:
         raise ValueError(f"Missing {num_missing_weights} weights")
+
+
+# HACK: assuming single file for torchchat's converted checkpoints. We should
+# remove this after converging to torchchat's model building process.
+# In particular,
+# builder_args = BuilderArgs.from_args(args)
+# will tell us if there is a single file or a directory.
+TORCHCHCAT_SINGLE_FILE_CHECKPOINT = True
+
+def load_weights_from_torchchat_format(stage_module, distribution, device, model_config):
+    """
+    Load the weights from torchchat format (single binary file), and fill into
+    `stage_module`.  Model config is needed b/c we permute wq and wk weights
+    based on attn heads.
+    """
+    stage_state_dict = stage_module.state_dict()
+    # TODO: clean this up together with `purge_fqn_prefix` when we switch
+    stage_state_dict = purge_fqn_prefix(stage_state_dict, "model.")
+
+    # Load checkpoint from torchchat cache
+    default_cache_dir = Path(
+        os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")
+    ).expanduser()
+    # Distribution is like "meta-llama/Meta-Llama-3-8B-Instruct"
+    # Join it with the default cache dir to get the checkpoint dir
+    checkpoint_dir = default_cache_dir / distribution
+    # Provide path in single-file case, provide dir in multi-file case. See
+    # `_load_checkpoint`.
+    if TORCHCHCAT_SINGLE_FILE_CHECKPOINT:
+        checkpoint_path = checkpoint_dir / "model.pth"
+        checkpoint_dir = None
+    else:
+        checkpoint_path = None
+    # First, construct BuilderArgs
+    args_dict = {
+        "device": device,
+        "checkpoint_dir": checkpoint_dir,
+        "checkpoint_path": checkpoint_path,
+    }
+    builder_args = BuilderArgs(**args_dict)
+    # Then, load the checkpoint using torchchat util
+    checkpoint = _load_checkpoint(builder_args)
+
+    updated_states: Set[str] = set()
+    # This step converts full tensor into DTensor
+    update_state_dict(
+        stage_state_dict,
+        checkpoint,
+        device,
+        model_config=model_config,
+        updated_states=updated_states,
+    )
+
+    # Fill state dict into stage module
+    stage_module.load_state_dict(stage_state_dict, strict=False, assign=True)
+    logger.info(f"Successfully loaded {len(updated_states)} weights into stage module")

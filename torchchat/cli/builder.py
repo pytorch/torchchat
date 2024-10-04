@@ -335,11 +335,7 @@ def _load_model_gguf(builder_args: BuilderArgs) -> Model:
     return model
 
 
-def _load_model_default(builder_args: BuilderArgs) -> Model:
-    assert not builder_args.gguf_path
-
-    model: Model = _init_model_on_meta_device(builder_args)
-
+def _load_checkpoint(builder_args: BuilderArgs):
     if builder_args.params_table and builder_args.params_table.endswith("Tune"):
         print("Loading Tune checkpoint")
         meta_checkpoint = torch.load(
@@ -377,6 +373,16 @@ def _load_model_default(builder_args: BuilderArgs) -> Model:
             mmap=True,
             weights_only=True,
         )
+    return checkpoint
+
+
+def _load_model_default(builder_args: BuilderArgs) -> Model:
+    assert not builder_args.gguf_path
+
+    model: Model = _init_model_on_meta_device(builder_args)
+
+    # Load checkpoint from filesystem
+    checkpoint = _load_checkpoint(builder_args)
 
     if "model" in checkpoint and "stories" in str(builder_args.checkpoint_path):
         checkpoint = checkpoint["model"]

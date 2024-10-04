@@ -25,6 +25,7 @@ from torchchat.distributed.logging_utils import SingletonLogger
 from torchchat.distributed.safetensor_utils import (
     get_hf_config_file,
     load_weights_from_hf_format,
+    load_weights_from_torchchat_format,
 )
 from torchchat.distributed.utils import (
     bytes_to_readable,
@@ -56,10 +57,6 @@ NAME_TO_DISTRIBUTION_AND_DTYPE = {
     "llama2-7b-chat": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
     "llama3": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16),
 }
-
-# This format stands for: index file + multiple safetensor.
-USE_HF_CHECKPOINT_FORMAT = True
-# TODO: add support for single bin format.
 
 
 def _init_distributed():
@@ -113,14 +110,33 @@ def _build_chat_tokenizer(
     return tokenizer
 
 
-def _load_model_weights(stage_module, distribution, device, model_config):
+def _load_model_weights(
+    stage_module: torch.nn.Module,
+    distribution: str,
+    device: torch.device,
+    model_config: ModelArgs,
+    chpt_from: str,
+):
     """Load the weights from the safetensor file(s) into the model stage.
     Model config is needed b/c we permute wq and wk weights based on attn heads.
+
+    Args:
+        stage_module (torch.nn.Module): The model stage to load the weights into.
+        distribution (str): The distribution name, e.g. "meta-llama/Meta-Llama-3-8B-Instruct".
+        device (torch.device): The device to load the weights onto.
+        model_config (ModelArgs): The model config.
+        chpt_from (str): The checkpoint format to load the weights from, e.g. "torchchat" or "hf".
     """
-    if USE_HF_CHECKPOINT_FORMAT:
+    if chpt_from == "hf":
+        # This format stands for: index file + multiple binary files
         load_weights_from_hf_format(stage_module, distribution, device, model_config)
-    else:
+    elif chpt_from == "torchchat":
+        # This format stands for:
+        # single binary file, OR
+        # multiple binary files without index files.
         load_weights_from_torchchat_format(stage_module, distribution, device, model_config)
+    else:
+        raise ValueError(f"Unknown checkpoint format: {chpt_from}")
 
 
 def _encode_strings(
@@ -277,7 +293,7 @@ def main(args):
     logger.info(f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}")
 
     distribution, model_dtype = NAME_TO_DISTRIBUTION_AND_DTYPE[model_name]
-    logger.info(f"Using HF model weights from {distribution} and dtype {model_dtype}")
+    logger.info(f"Using model weights from {distribution} and dtype {model_dtype}")
 
     # Model-level config
     model_config = ModelArgs.from_name(distribution)
@@ -339,7 +355,7 @@ def main(args):
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
     with CUDATrackTime() as timer:
-        _load_model_weights(model, distribution, device=device, model_config=config)
+        _load_model_weights(model, distribution, device, config, args.chpt_from)
 
     logger.info(
         f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
@@ -569,6 +585,13 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="Whether to decode token into string in flight",
+    )
+    parser.add_argument(
+        "--chpt-from",
+        type=str,
+        default="hf",  # TODO: change to torchchat once we support it well
+        help="Checkpoint format to load from",
+        choices=["hf", "torchchat"],
     )
     args = parser.parse_args()
 
