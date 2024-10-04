@@ -32,9 +32,9 @@ class Tokenizer {
   virtual void load(const std::string& tokenizer_path) = 0;
 
   virtual std::vector<uint64_t>
-  encode(const std::string& input, int8_t bos, int8_t eos) = 0;
+  encode(const std::string& input, int8_t bos, int8_t eos) const = 0;
 
-  virtual std::string decode(uint64_t prev_token, uint64_t token) = 0;
+  virtual std::string decode(uint64_t prev_token, uint64_t token) const = 0;
 
   // getters
   int32_t vocab_size() const {
@@ -70,9 +70,9 @@ class SPTokenizer : public Tokenizer {
   void load(const std::string& tokenizer_path) override;
 
   std::vector<uint64_t> encode(const std::string& input, int8_t bos, int8_t eos)
-      override;
+      const override;
 
-  std::string decode(uint64_t prev_token, uint64_t token) override;
+  std::string decode(uint64_t prev_token, uint64_t token) const override;
 
  private:
   std::unique_ptr<sentencepiece::SentencePieceProcessor> _processor;
@@ -90,12 +90,12 @@ class Tiktoken : public Tokenizer {
   explicit Tiktoken();
   ~Tiktoken(){};
 
-  void load(const std::string& tokenizer_path);
+  void load(const std::string& tokenizer_path) override;
 
   std::vector<uint64_t>
-  encode(const std::string& input, int8_t bos, int8_t eos);
+  encode(const std::string& input, int8_t bos, int8_t eos) const override;
 
-  std::string decode(uint64_t prev_token, uint64_t token);
+  std::string decode(uint64_t prev_token, uint64_t token) const override;
 
  private:
   static inline const Encoder _get_special_tokens(ssize_t num_base_tokens) {
@@ -122,17 +122,17 @@ class Tiktoken : public Tokenizer {
   std::pair<std::optional<std::string>, re2::StringPiece>
   _split_with_allowed_special_token(
       re2::StringPiece& input,
-      const T& allowed_special);
+      const T& allowed_special) const;
 
   void _encode(
       re2::StringPiece& input,
       std::vector<uint64_t>& ret,
-      uint64_t& last_piece_token_len);
+      uint64_t& last_piece_token_len) const;
 
   template <typename T>
   std::pair<std::vector<uint64_t>, uint64_t> _encode_with_special_token(
       const std::string& text,
-      const T& allowed_special);
+      const T& allowed_special) const;
 
   // Removed negative lookahead \s+(?!\S) since it's not supported by RE2.
   const std::string _pattern =

@@ -246,7 +246,7 @@ template <typename T>
 std::pair<std::optional<std::string>, re2::StringPiece>
 Tiktoken::_split_with_allowed_special_token(
     re2::StringPiece& input,
-    const T& allowed_special) {
+    const T& allowed_special) const {
   if (!_special_token_regex) {
     return std::make_pair(std::nullopt, input);
   }
@@ -273,7 +273,7 @@ Tiktoken::_split_with_allowed_special_token(
 void Tiktoken::_encode(
     re2::StringPiece& input,
     std::vector<uint64_t>& ret,
-    uint64_t& last_piece_token_len) {
+    uint64_t& last_piece_token_len) const {
   std::string piece;
   assert(_regex);
   while (re2::RE2::FindAndConsume(&input, *_regex, &piece)) {
@@ -292,7 +292,7 @@ void Tiktoken::_encode(
 template <typename T>
 std::pair<std::vector<uint64_t>, uint64_t> Tiktoken::_encode_with_special_token(
     const std::string& text,
-    const T& allowed_special) {
+    const T& allowed_special) const {
   std::vector<uint64_t> tokens;
   uint64_t last_piece_token_len = 0;
   re2::StringPiece input(text);
@@ -349,7 +349,7 @@ void Tiktoken::load(const std::string& path) {
 }
 
 std::vector<uint64_t>
-Tiktoken::encode(const std::string& text, int8_t bos, int8_t eos) {
+Tiktoken::encode(const std::string& text, int8_t bos, int8_t eos) const {
   if (!initialized_) {
     exit(EXIT_FAILURE);
   }
@@ -363,7 +363,7 @@ Tiktoken::encode(const std::string& text, int8_t bos, int8_t eos) {
   return res;
 }
 
-std::string Tiktoken::decode(uint64_t prev, uint64_t cur) {
+std::string Tiktoken::decode(uint64_t prev, uint64_t cur) const {
   (void)prev;
   if (!initialized_) {
     exit(EXIT_FAILURE);
