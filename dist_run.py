@@ -22,7 +22,7 @@ from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
 from torchchat.distributed.logging_utils import SingletonLogger
 
 # TODO - these are not distributed specific, consider moving to new package
-from torchchat.distributed.safetensor_utils import (
+from torchchat.distributed.checkpoint_utils import (
     get_hf_config_file,
     load_weights_from_hf_format,
     load_weights_from_torchchat_format,
