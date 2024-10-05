@@ -5,6 +5,7 @@ import time
 import torch
 from torchchat.distributed.logging_utils import SingletonLogger
 from torchchat.distributed.request_wrapper import Request
+from torchchat.distributed.sequence_manager import SequenceManager
 from torchchat.distributed.utils import UniqueCounter
 
 logger = SingletonLogger.get_logger()
@@ -17,7 +18,7 @@ class LLMInteractor:
         self.model = None
         self.requests_counter = UniqueCounter()
         self.requests: deque[Request] = deque()
-        self.requests_manager = None
+        self.requests_manager = SequenceManager()
         self.eos_id = self.tokenizer.eos_id()
 
     def add_request(self, request):
