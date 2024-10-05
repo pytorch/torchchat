@@ -786,7 +786,7 @@ class Generator:
         if image_prompts and isinstance(image_prompts[0], str):
             images = [Image.open(image_prompts[0])]
         else:
-            images = image_prompts
+            images = None
 
         assert (
             max_new_tokens is not None
@@ -796,7 +796,19 @@ class Generator:
         messages = []
         for message in prompt:
             if isinstance(message["content"], str):
-                messages.append(Message(**message))
+                if not image_found and image_prompts:
+                    messages.append(
+                        Message(
+                            role=message["role"],
+                            content=[
+                                {"type": "image", "content": images[0]},
+                                {"type": "text", "content": message["content"]},
+                            ],
+                        )
+                    )
+                    image_found = True
+                else:
+                    messages.append(Message(**message))
 
             elif isinstance(message["content"], list):
                 images = None
@@ -816,7 +828,7 @@ class Generator:
 
                 is_multimodal = images is not None
                 content = [{"type": "text", "content": prompt_arg}]
-                
+
                 if is_multimodal:
                     content = [{"type": "image", "content": images[0]}] + content
 
@@ -826,6 +838,7 @@ class Generator:
                         content=content,
                     )
                 )
+
         messages.append(
             Message(
                 role="assistant",
@@ -929,7 +942,7 @@ class Generator:
             text_transformer_args.max_seq_length if text_transformer_args else 2048
         )
         encoded, batch = self._gen_model_input(
-            generator_args.prompt,
+            [{"role": "user", "content": generator_args.prompt}],
             generator_args.image_prompts,
             generator_args.max_new_tokens,
             max_seq_length,
@@ -945,16 +958,16 @@ class Generator:
             if get_system_prompt == "y" or get_system_prompt == "Y":
                 self.system_prompt = input("What is your system prompt? \n")
 
-        elif not generator_args.is_torchtune_model:
-            max_seq_length = min(
-                encoded.size(0) + generator_args.max_new_tokens,
-                (
-                    text_transformer_args.block_size
-                    if text_transformer_args is not None
-                    else 2048
-                ),
-                max_seq_length,
-            )
+        # elif not generator_args.is_torchtune_model:
+        #     max_seq_length = min(
+        #         encoded.size(0) + generator_args.max_new_tokens,
+        #         (
+        #             text_transformer_args.block_size
+        #             if text_transformer_args is not None
+        #             else 2048
+        #         ),
+        #         max_seq_length,
+        #     )
 
         max_seq_length = (
             max_seq_length + self.speculative_builder_args.speculate_k + 1
