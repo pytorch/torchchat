@@ -376,7 +376,7 @@ class OpenAiApiGenerator(Generator):
             encoded_prompt=encoded,
             temperature=float(completion_request.temperature),
             chat_mode=False,
-            sequential_prefill=False,
+            sequential_prefill=True,
         )
 
         def callback(x, *, done_generating=False):

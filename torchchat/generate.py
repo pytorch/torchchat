@@ -103,7 +103,11 @@ class Llama2ChatFormatter(_ChatFormatter):
         tokens = self.tokenizer.encode(f"{B_INST} ")
         first_message = True  # Bool to handle placing the B_INST token. Behavior is weird - the system prompt should have the B_INST, but not the first user message. All following user messages *should* have it. Also, if there is no system prompt, then the user message should have it.
         for message in dialog:
-            content = message["content"].strip()
+            if isinstance(message["content"], list):
+                content = message["content"][0]["text"]
+            else:
+                content = message["content"]
+            content = content.strip()
             if message["role"] == "system":
                 encoded = self.tokenizer.encode(f"{B_SYS}\n{content}\n{E_SYS}")
                 first_message = False
