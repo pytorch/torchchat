@@ -125,18 +125,39 @@ def _load_model_weights(
         distribution (str): The distribution name, e.g. "meta-llama/Meta-Llama-3-8B-Instruct".
         device (torch.device): The device to load the weights onto.
         model_config (ModelArgs): The model config.
-        chpt_from (str): The checkpoint format to load the weights from, e.g. "torchchat" or "hf".
+        chpt_from (str): The checkpoint format to load the weights from.
+
+        Valid chpt_from values: hf, tc,
+        or if you want to load from a specific dir, e.g.
+        tc:meta-llama/Meta-Llama-3-8B-Instruct-int8_wo
     """
-    if chpt_from == "hf":
+    str_lst = chpt_from.split(":")
+    assert len(str_lst) == 1 or len(str_lst) == 2, "Invalid --chpt_from format"
+    # Get the checkpoint format, e.g. "hf" or "tc"
+    chpt_format = str_lst[0]
+    # If user also specified a checkpoint, such as
+    # `meta-llama/Meta-Llama-3-8B-Instruct-int8_wo`
+    chpt_distribution = str_lst[1] if len(str_lst) == 2 else distribution
+
+    stage_state_dict = stage_module.state_dict()
+    if chpt_format == "hf":
         # This format stands for: index file + multiple binary files
-        load_weights_from_hf_format(stage_module, distribution, device, model_config)
-    elif chpt_from == "torchchat":
+        stage_state_dict = load_weights_from_hf_format(
+            stage_state_dict, chpt_distribution, device, model_config
+        )
+    elif chpt_format == "tc":
         # This format stands for:
         # single binary file, OR
         # multiple binary files without index files.
-        load_weights_from_torchchat_format(stage_module, distribution, device, model_config)
+        stage_state_dict = load_weights_from_torchchat_format(
+            stage_state_dict, chpt_distribution, device, model_config
+        )
     else:
-        raise ValueError(f"Unknown checkpoint format: {chpt_from}")
+        raise ValueError(f"Unknown checkpoint format: {chpt_format}")
+
+    # Fill state dict into stage module
+    stage_module.load_state_dict(stage_state_dict, strict=False, assign=True)
+    logger.info(f"Successfully loaded weights into stage module")
 
 
 def _encode_strings(
@@ -589,9 +610,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--chpt-from",
         type=str,
-        default="hf",  # TODO: change to torchchat once we support it well
-        help="Checkpoint format to load from",
-        choices=["hf", "torchchat"],
+        default="tc",
+        help="Checkpoint to load from, e.g. `hf` or `tc`, or "
+             "`tc:meta-llama/Meta-Llama-3-8B-Instruct-int8_wo`",
     )
     args = parser.parse_args()
 
