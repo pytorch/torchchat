@@ -46,6 +46,7 @@ class ModelConfig:
     checkpoint_file: str = field(default="model.pth")
     tokenizer_file: str = field(default="tokenizer.model")
     transformer_params_key: str = field(default=None)
+    prefer_safetensors: bool = field(default=False)
 
 
 # Keys are stored in lowercase.
