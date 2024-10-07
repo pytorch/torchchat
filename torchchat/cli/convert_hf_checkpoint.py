@@ -145,7 +145,7 @@ def convert_hf_checkpoint(
             new_key = weight_map.get(abstract_key, abstract_key)
             new_key = new_key.format(layer_num)
         else:
-            new_key = weight_map.get(key, key)
+            new_key = weight_map[key]
 
         final_result[new_key] = value
 
@@ -156,9 +156,7 @@ def convert_hf_checkpoint(
             q = final_result[key]
             k = final_result[wk_key]
             v = final_result[wv_key]
-            print(key)
             q = permute(q, config.n_heads)
-            print(wk_key)
             k = permute(k, config.n_local_heads)
             final_result[key.replace("wq", "wqkv")] = torch.cat([q, k, v])
             del final_result[key]
