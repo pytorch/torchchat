@@ -67,6 +67,9 @@ TUNE_NIGHTLY_VERSION=dev20240928
 if [[ -x "$(command -v nvidia-smi)" ]];
 then
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu121"
+elif [[ -x "$(command -v rocminfo)" ]];
+then
+  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/rocm6.1"
 else
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
 fi
