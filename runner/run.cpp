@@ -861,9 +861,9 @@ int main(int argc, char* argv[]) {
 
 #if defined(ET_USE_ADAPTIVE_THREADS)
   uint32_t num_performant_cores =
-      ::executorch::extension::cpuinfo::get_num_performant_cores();
+      torch::executorch::cpuinfo::get_num_performant_cores();
   if (num_performant_cores > 0) {
-    ::executorch::threadpool::get_threadpool()->_unsafe_reset_threadpool(
+    torch::executorch::threadpool::get_threadpool()->_unsafe_reset_threadpool(
         num_performant_cores);
   }
 #endif
