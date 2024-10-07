@@ -69,7 +69,7 @@ then
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu121"
 elif [[ -x "$(command -v rocminfo)" ]];
 then
-  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/rocm6.1"
+  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/rocm6.2"
 else
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
 fi
