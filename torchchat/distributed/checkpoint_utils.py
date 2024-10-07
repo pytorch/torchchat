@@ -11,10 +11,12 @@ from transformers.utils import cached_file
 import os
 import json
 from torch.nn import Module
-from typing import Dict, Tuple, Set, Optional
+from typing import Any, Dict, Tuple, Set, Optional
+from pathlib import Path
 
 from torch.distributed._tensor import DTensor
 from torchchat.distributed.dtensor_utils import convert_to_dtensor
+from torchchat.cli.builder import BuilderArgs, _load_checkpoint
 
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
@@ -165,9 +167,11 @@ def load_safetensor_weights(
     Returns:
         Tuple[int, int]: Number of updated weights and number of missing weights.
     """
-    stage_state_dict, weight_map = prepare_state_dict(
-        stage_module, weight_map, purge_model_prefix
-    )
+    stage_state_dict = stage_module.state_dict()
+    if purge_model_prefix:
+        stage_state_dict = purge_fqn_prefix(stage_state_dict, "model.")
+        weight_map = purge_fqn_prefix(weight_map, "model.")
+
     needed_files = get_needed_files(stage_state_dict, weight_map)
     updated_states: Set[str] = set()
 
@@ -175,17 +179,15 @@ def load_safetensor_weights(
         full_path = os.path.join(file_location, file)
         # logger.info(f"Loading checkpoint file: {full_path}")
         try:
-            checkpoint = load_checkpoint(full_path, "cpu")  # device)
+            checkpoint = load_safetensor_file(full_path, "cpu")  # device)
 
             update_state_dict(
                 stage_state_dict,
                 checkpoint,
-                weight_map,
-                new_to_old_keymap,
-                file,
-                updated_states,
                 device,
-                model_config,
+                model_config=model_config,
+                new_to_old_keymap=new_to_old_keymap,
+                updated_states=updated_states,
             )
         except FileNotFoundError:
             logger.error(f"File not found: {full_path}")
@@ -215,14 +217,14 @@ def load_safetensor_weights(
     return len(updated_states), len(missing_keys)
 
 
-def prepare_state_dict(
-    module: Module, weight_map: Dict[str, str], purge_model_prefix: bool
-) -> Dict[str, torch.Tensor]:
-    state_dict = module.state_dict()
-    if purge_model_prefix:
-        state_dict = {k.removeprefix("model."): v for k, v in state_dict.items()}
-        weight_map = {k.removeprefix("model."): v for k, v in weight_map.items()}
-    return state_dict, weight_map
+# TODO: clean this up together with `purge_fqn_prefix` when we switch
+# from creating Transformer to creating model
+def purge_fqn_prefix(
+    any_dict: Dict[str, Any],
+    prefix: str,
+) -> Dict[str, Any]:
+    """Remove a prefix from all keys in a dictionary."""
+    return {k.removeprefix(prefix): v for k, v in any_dict.items()}
 
 
 def get_needed_files(
@@ -242,7 +244,7 @@ def get_needed_files(
     return needed_files
 
 
-def load_checkpoint(full_path: str, device: torch.device) -> Dict[str, torch.Tensor]:
+def load_safetensor_file(full_path: str, device: torch.device) -> Dict[str, torch.Tensor]:
     tensors = {}
     with safe_open(full_path, framework="pt", device=device) as f:
         for k in f.keys():
@@ -264,64 +266,66 @@ def permute_weight_to_attn_heads(w, n_heads, head_dim, model_dim):
 def update_state_dict(
     state_dict: Dict[str, torch.Tensor],
     checkpoint: Dict[str, torch.Tensor],
-    weight_map: Dict[str, str],
-    new_to_old_keymap: Dict[str, str],
-    file: str,
-    updated_states: Set[str],
     device: torch.device,
     model_config: Optional[Dict] = None,
+    new_to_old_keymap: Optional[Dict[str, str]] = None,
+    updated_states: Optional[Set[str]]= None,
 ):
-    count_dtensors_loaded = 0
+    """
+    Update the state dict with the checkpoint tensors.
+    Note:
+    - For HF format, `new_to_old_keymap` is a mapping from the new key to the old
+    key.
+    - For torchchat format, `new_to_old_keymap` is None (because FQN conversion
+    has been doen by torchchat download script).
+    """
     # for handling attn head permuting
     num_heads = model_config.n_heads
     dim = model_config.dim
     num_local_heads = model_config.n_local_heads
     head_dim = model_config.head_dim
 
-    for param, file_with_param in weight_map.items():
-        if file_with_param == file and param in state_dict:
+    for param in state_dict.keys():
+        if new_to_old_keymap is not None:
+            # TODO: clean the following manual prefix together with
+            # `purge_fqn_prefix` when we switch from creating Transformer to
+            # creating model
             model_param = (
                 "output.weight" if param == "output.weight" else f"model.{param}"
             )
-            old_param = new_to_old_keymap.get(model_param)
+            old_param = new_to_old_keymap[model_param]
+        else:
+            old_param = param
 
-            if old_param not in checkpoint:
-                logger.warning(f"Missing {old_param} in checkpoint")
-                continue
+        if old_param not in checkpoint:
+            # Maybe this param is in other files
+            continue
 
-            checkpoint_tensor = checkpoint[old_param]
-            model_tensor = state_dict[param]
+        checkpoint_tensor = checkpoint[old_param]
+        model_tensor = state_dict[param]
 
-            if "wq" in param:
-                checkpoint_tensor = permute_weight_to_attn_heads(
-                    checkpoint_tensor, num_heads, head_dim, dim
-                )
-            elif "wk" in param:
-                checkpoint_tensor = permute_weight_to_attn_heads(
-                    checkpoint_tensor, num_local_heads, head_dim, dim
-                )
+        if "wq" in param:
+            checkpoint_tensor = permute_weight_to_attn_heads(
+                checkpoint_tensor, num_heads, head_dim, dim
+            )
+        elif "wk" in param:
+            checkpoint_tensor = permute_weight_to_attn_heads(
+                checkpoint_tensor, num_local_heads, head_dim, dim
+            )
 
-            # Move checkpoint tensor to desired device
-            checkpoint_tensor = checkpoint_tensor.to(device)
+        # Move checkpoint tensor to desired device
+        checkpoint_tensor = checkpoint_tensor.to(device)
 
-            # here we need to check if the tensor is a DTensor and if so, adjust the
-            # shape and placement to match the model DTensor.
-            if isinstance(model_tensor, DTensor):
-                state_dict[param] = convert_to_dtensor(checkpoint_tensor, model_tensor)
-                count_dtensors_loaded += 1
-            else:
-                # regular tensor, just update directly
-                state_dict[param] = checkpoint_tensor
+        # here we need to check if the tensor is a DTensor and if so, adjust the
+        # shape and placement to match the model DTensor.
+        if isinstance(model_tensor, DTensor):
+            checkpoint_tensor = convert_to_dtensor(checkpoint_tensor, model_tensor)
 
-            # ensure matching dtypes
-            state_dict[param] = state_dict[param].to(checkpoint_tensor.dtype)
+        # Update model state dict with checkpoint tensor
+        state_dict[param] = checkpoint_tensor
 
-            assert state_dict[param].dtype == checkpoint_tensor.dtype
-
-            # log_tensor_info(param, state_dict[param])
-            # logger.info(f"Loaded {param} from {file}")
+        if updated_states is not None:
             updated_states.add(param)
-    # logger.info(f"Count of loaded DTensors: {count_dtensors_loaded}")
 
 
 def format_tensor_info(tensor: torch.Tensor) -> str:
@@ -365,4 +369,84 @@ def log_loading_status(missing_keys: Set[str], updated_states: Set[str]):
         )
     else:
         logger.info("Fully updated state dict.")
+    logger.info(f"Successfully loaded {len(updated_states)} weights into stage module")
+
+
+def load_weights_from_hf_format(stage_module, distribution, device, model_config):
+    """
+    Load the weights from Hugging Face format (index file + multiple safetensor
+    files), and fill into `stage_module`.  Model config is needed b/c we permute
+    wq and wk weights based on attn heads.
+    """
+
+    weight_map, weight_path, key_map = get_hf_weight_map_and_path(distribution)
+
+    num_loaded_weights, num_missing_weights = load_safetensor_weights(
+        stage_module,
+        weight_map,
+        weight_path,
+        key_map,
+        device,
+        model_config=model_config,
+    )
+    logger.info(
+        f"Success - Loaded {num_loaded_weights} weights, {num_missing_weights} missing weights"
+    )
+    if num_missing_weights > 0:
+        raise ValueError(f"Missing {num_missing_weights} weights")
+
+
+# HACK: assuming single file for torchchat's converted checkpoints. We should
+# remove this after converging to torchchat's model building process.
+# In particular,
+# builder_args = BuilderArgs.from_args(args)
+# will tell us if there is a single file or a directory.
+TORCHCHCAT_SINGLE_FILE_CHECKPOINT = True
+
+def load_weights_from_torchchat_format(stage_module, distribution, device, model_config):
+    """
+    Load the weights from torchchat format (single binary file), and fill into
+    `stage_module`.  Model config is needed b/c we permute wq and wk weights
+    based on attn heads.
+    """
+    stage_state_dict = stage_module.state_dict()
+    # TODO: clean this up together with `purge_fqn_prefix` when we switch
+    stage_state_dict = purge_fqn_prefix(stage_state_dict, "model.")
+
+    # Load checkpoint from torchchat cache
+    default_cache_dir = Path(
+        os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")
+    ).expanduser()
+    # Distribution is like "meta-llama/Meta-Llama-3-8B-Instruct"
+    # Join it with the default cache dir to get the checkpoint dir
+    checkpoint_dir = default_cache_dir / distribution
+    # Provide path in single-file case, provide dir in multi-file case. See
+    # `_load_checkpoint`.
+    if TORCHCHCAT_SINGLE_FILE_CHECKPOINT:
+        checkpoint_path = checkpoint_dir / "model.pth"
+        checkpoint_dir = None
+    else:
+        checkpoint_path = None
+    # First, construct BuilderArgs
+    args_dict = {
+        "device": device,
+        "checkpoint_dir": checkpoint_dir,
+        "checkpoint_path": checkpoint_path,
+    }
+    builder_args = BuilderArgs(**args_dict)
+    # Then, load the checkpoint using torchchat util
+    checkpoint = _load_checkpoint(builder_args)
+
+    updated_states: Set[str] = set()
+    # This step converts full tensor into DTensor
+    update_state_dict(
+        stage_state_dict,
+        checkpoint,
+        device,
+        model_config=model_config,
+        updated_states=updated_states,
+    )
+
+    # Fill state dict into stage module
+    stage_module.load_state_dict(stage_state_dict, strict=False, assign=True)
     logger.info(f"Successfully loaded {len(updated_states)} weights into stage module")
