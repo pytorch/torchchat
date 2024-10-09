@@ -81,10 +81,17 @@ def convert_hf_checkpoint(
         "model.layers.{}.self_attn.k_proj.weight": "layers.{}.attention.wk.weight",
         "model.layers.{}.self_attn.v_proj.weight": "layers.{}.attention.wv.weight",
         "model.layers.{}.self_attn.o_proj.weight": "layers.{}.attention.wo.weight",
+        "model.layers.{}.self_attn.q_proj.bias": "layers.{}.attention.wq.bias",
+        "model.layers.{}.self_attn.k_proj.bias": "layers.{}.attention.wk.bias",
+        "model.layers.{}.self_attn.v_proj.bias": "layers.{}.attention.wv.bias",
+        "model.layers.{}.self_attn.o_proj.bias": "layers.{}.attention.wo.bias",
         "model.layers.{}.self_attn.rotary_emb.inv_freq": None,
         "model.layers.{}.mlp.gate_proj.weight": "layers.{}.feed_forward.w1.weight",
         "model.layers.{}.mlp.up_proj.weight": "layers.{}.feed_forward.w3.weight",
         "model.layers.{}.mlp.down_proj.weight": "layers.{}.feed_forward.w2.weight",
+        "model.layers.{}.mlp.gate_proj.bias": "layers.{}.feed_forward.w1.bias",
+        "model.layers.{}.mlp.up_proj.bias": "layers.{}.feed_forward.w3.bias",
+        "model.layers.{}.mlp.down_proj.bias": "layers.{}.feed_forward.w2.bias",
         "model.layers.{}.input_layernorm.weight": "layers.{}.attention_norm.weight",
         "model.layers.{}.post_attention_layernorm.weight": "layers.{}.ffn_norm.weight",
         "model.norm.weight": "norm.weight",
@@ -93,11 +100,10 @@ def convert_hf_checkpoint(
     bin_files = {model_dir / bin for bin in bin_index["weight_map"].values()}
 
     def permute(w, n_heads):
-        dim = config.dim
         return (
-            w.view(n_heads, 2, config.head_dim // 2, dim)
+            w.view(n_heads, 2, config.head_dim // 2, *w.shape[1:])
             .transpose(1, 2)
-            .reshape(config.head_dim * n_heads, dim)
+            .reshape(w.shape)
         )
 
     merged_result = {}
@@ -130,6 +136,7 @@ def convert_hf_checkpoint(
                 continue
         assert state_dict is not None, f"Unable to load tensors from {file}"
         merged_result.update(state_dict)
+
     final_result = {}
     for key, value in merged_result.items():
         if "layers" in key:
@@ -145,16 +152,18 @@ def convert_hf_checkpoint(
         final_result[new_key] = value
 
     for key in tuple(final_result.keys()):
-        if "wq" in key:
+        if "wq.weight" in key or "wq.bias" in key:
+            wk_key = key.replace("wq", "wk")
+            wv_key = key.replace("wq", "wv")
             q = final_result[key]
-            k = final_result[key.replace("wq", "wk")]
-            v = final_result[key.replace("wq", "wv")]
+            k = final_result[wk_key]
+            v = final_result[wv_key]
             q = permute(q, config.n_heads)
             k = permute(k, config.n_local_heads)
             final_result[key.replace("wq", "wqkv")] = torch.cat([q, k, v])
             del final_result[key]
-            del final_result[key.replace("wq", "wk")]
-            del final_result[key.replace("wq", "wv")]
+            del final_result[wk_key]
+            del final_result[wv_key]
     print(f"Saving checkpoint to {model_dir / 'model.pth'}. This may take a while.")
     torch.save(final_result, model_dir / "model.pth")
     print("Done.")

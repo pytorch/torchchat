@@ -316,38 +316,22 @@ class OpenAiApiGenerator(Generator):
         if not isinstance(self.model, FlamingoModel):
             prompt = [
                 {"role": message["role"], "content": message["content"]}
-                for message in completion_request.messages
+                for message in messages
             ]
             return self._gen_model_input(
                 prompt=prompt, max_new_tokens=completion_request.max_tokens
             )
 
         # Llama 3.2 11B
-        prompt = None
-        images = None
 
-        for message in messages:
-            torchtune_contents = []
-            if isinstance(message["content"], list):
-                for content_dict in message["content"]:
-                    if content_dict["type"] == "text":
-                        assert (
-                            prompt is None
-                        ), "At most one text prompt is supported for each request"
-                        prompt = content_dict["text"]
-                    elif content_dict["type"] == "image_url":
-                        assert (
-                            images is None
-                        ), "At most one image is supported at the moment"
+        prompt = [
+            {"role": message["role"], "content": message["content"]}
+            for message in messages
+        ]
 
-                        base64_decoded = base64.b64decode(
-                            content_dict["image_url"].split(";base64,")[1]
-                        )
-                        images = [Image.open(BytesIO(base64_decoded))]
-
-        assert prompt is not None, "Text prompt must be specified in the request"
-
-        return self._gen_model_input(prompt, images, completion_request.max_tokens)
+        return self._gen_model_input(
+            prompt=prompt, max_new_tokens=completion_request.max_tokens
+        )
 
     def chunked_completion(self, completion_request: CompletionRequest):
         """Handle a chat completion request and yield a chunked response.
@@ -392,7 +376,7 @@ class OpenAiApiGenerator(Generator):
             encoded_prompt=encoded,
             temperature=float(completion_request.temperature),
             chat_mode=False,
-            sequential_prefill=False,
+            sequential_prefill=True,
         )
 
         def callback(x, *, done_generating=False):

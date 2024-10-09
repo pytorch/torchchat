@@ -95,12 +95,9 @@ def quantize_model(
                 if not support_tensor_subclass:
                     unwrap_tensor_subclass(model)
                 continue
-            # Use dtype precision specified in user config, else fallback on global precision.
-            if "precision" in quantize_options:
-                dtype = quantize_options["precision"].get("dtype", str(get_precision()))
-                precision = name_to_dtype(dtype, device)
-            else:
-                precision = get_precision()
+            # We set global precision from quantize options if it is specified at cli.py:485 
+            # so the precision returned by get_precision() is always the authoritative precision/dtype in torchchat
+            precision = get_precision()
 
             try:
                 if quantizer == "linear:a8wxdq":

@@ -1,77 +1,69 @@
 import torch
-from torch.distributed._tensor import DTensor, Shard, Replicate
-
+from torch.distributed import DeviceMesh
+from torch.distributed._tensor import DTensor, Shard, Replicate, Placement
+from torch.distributed.tensor._utils import compute_local_shape_and_global_offset
 
 from collections import defaultdict
+from typing import Optional, Sequence
 
 from torchchat.distributed.logging_utils import SingletonLogger
 logger = SingletonLogger.get_logger()
 
 
-def convert_to_dtensor(weight_tensor, dtensor_template):
-    """Adjust a loaded tensor to match the shape/placement of the model DTensor and copy the data into it"""
-
-    if weight_tensor.shape != dtensor_template.shape:
+def convert_to_dtensor(
+    full_tensor: torch.Tensor,
+    dtensor_template: DTensor,
+) -> DTensor:
+    """
+    Converts a full tensor to a DTensor with the same placements as the given
+    DTensor template.
+    """
+    if full_tensor.shape != dtensor_template.shape:
         raise ValueError(
-            f"Shape mismatch: weight tensor shape {weight_tensor.shape} "
+            f"Shape mismatch: weight tensor shape {full_tensor.shape} "
             f"doesn't match DTensor shape {dtensor_template.shape}"
         )
 
-    placements = dtensor_template.placements
-    mesh = dtensor_template.device_mesh
-    mesh_dims = mesh.ndim
-
-    for placement in placements:
-        if isinstance(placement, Shard):
-            shard_dim = placement.dim
-
-            if shard_dim >= weight_tensor.dim():
-                raise ValueError(
-                    f"Shard dimension {shard_dim} is out of range for tensor with {weight_tensor.dim()} dimensions."
-                )
-
-            num_shards = mesh.size(
-                0
-            )  # Assuming sharding is always along the first mesh dimension
-            shard_size = weight_tensor.size(shard_dim) // num_shards
-            shard_index = mesh.get_coordinate()[0]
-
-            start_idx = shard_index * shard_size
-            end_idx = start_idx + shard_size
-
-            slice_list = [slice(None)] * weight_tensor.dim()
-            slice_list[shard_dim] = slice(start_idx, end_idx)
-            weight_tensor = weight_tensor[tuple(slice_list)]
-
-        elif isinstance(placement, Replicate):
-            continue
-        else:
-            raise ValueError(f"Unsupported placement type: {type(placement)}")
-
-    new_dtensor = DTensor.from_local(weight_tensor, mesh, placements)
-
+    new_dtensor = shard(
+        full_tensor,
+        dtensor_template.placements,
+        dtensor_template.device_mesh
+    )
     return new_dtensor
 
 
-def inspect_dtensor_sharding(dtensor):
-    """hepful debug util for inspecting DTensor sharding"""
-    if not is_dtensor(dtensor):
-        logger.info(f"This tensor {dtensor} is not a DTensor")
-        return
+def shard(
+    full_tensor: torch.Tensor,
+    placements: Sequence[Placement],
+    device_mesh: Optional[DeviceMesh] = None,
+) -> DTensor:
+    """
+    Shards a full tensor based on indicated placements, and returns a
+    DTensor containing the shard.
+    Args:
+        full_tensor (torch.Tensor): the full tensor to be sharded.
+        placements (Sequence[:class:`Placement`]): the placements that
+            describes how to place the local tensor on DeviceMesh.
+        device_mesh (:class:`DeviceMesh`, optional): DeviceMesh to place the
+            DTensor.  Must have same dimension as the number of placements.
+            If not specified, would be retrieve from current context.
+    Returns:
+        A :class:`DTensor` object with the shard as its local tensor.
+    Examples:
+        >>> # xdoctest: +SKIP("need world_size and rank")
+        >>> device_mesh = dist.init_device_mesh("cuda", (world_size,))
+        >>> full_tensor = torch.arange(world_size, device=f"cuda:{rank}")
+        >>> placements = [Shard(1)]
+        >>> dtensor = shard(full_tensor, placements, device_mesh)
+    """
+    device_mesh = device_mesh or _mesh_resources.get_current_mesh()
 
-    placements = dtensor.placements
-    logger.info(f"DTensor shape: {dtensor.shape}")
-    logger.info(f"Number of dimensions: {len(placements)}")
-
-    for dim, placement in enumerate(placements):
-        logger.info(f"Dimension {dim}:")
-        logger.info(f"  Placement type: {placement.type}")
-        if placement.type == "shard":
-            logger.info(f"  Sharding spec: {placement.sharding_spec}")
-        elif placement.type == "replicate":
-            logger.info("  Replicated across devices")
-        else:
-            logger.info(f"  Other placement type: {placement.type}")
-
-    logger.info(f"Device mesh shape: {dtensor.device_mesh.shape}")
-    logger.info(f"Device mesh devices: {dtensor.device_mesh.device_type}")
+    shape, offset = compute_local_shape_and_global_offset(
+        full_tensor.shape, device_mesh, placements
+    )
+    slices = [
+        slice(cur_offset, cur_offset + cur_shape)
+        for cur_shape, cur_offset in zip(shape, offset)
+    ]
+    local_tensor = full_tensor[slices]
+    return DTensor.from_local(local_tensor, device_mesh, placements)

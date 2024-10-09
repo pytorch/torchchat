@@ -10,6 +10,7 @@
 
 import argparse
 import os
+from enum import auto, Enum
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional, Tuple
@@ -22,10 +23,10 @@ from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
 from torchchat.distributed.logging_utils import SingletonLogger
 
 # TODO - these are not distributed specific, consider moving to new package
-from torchchat.distributed.safetensor_utils import (
+from torchchat.distributed.checkpoint_utils import (
     get_hf_config_file,
-    get_hf_weight_map_and_path,
-    load_safetensor_weights,
+    load_weights_from_hf_format,
+    load_weights_from_torchchat_format,
 )
 from torchchat.distributed.utils import (
     bytes_to_readable,
@@ -49,6 +50,7 @@ except ImportError:
 
 
 logger = SingletonLogger.get_logger()
+_tokenizer_type = None  # global variable to store the tokenizer type
 
 # Using model name to identify the model to load, for example "llama2-7b-chat".
 # You can change it to other values listed below.
@@ -57,6 +59,11 @@ NAME_TO_DISTRIBUTION_AND_DTYPE = {
     "llama2-7b-chat": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
     "llama3": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16),
 }
+
+
+class TokenizerType(Enum):
+    Tiktoken = auto()
+    SentencePiece = auto()
 
 
 def _init_distributed():
@@ -80,7 +87,10 @@ def _build_chat_tokenizer(
     model_name: str,
     model_base_name: Optional[str] = None,
 ) -> SentencePieceProcessor | TiktokenTokenizer:
-    """Builds a tokenizer for the given model name."""
+    """Builds a tokenizer for the given model name, and sets the global tokenizer type variable"""
+
+    global _tokenizer_type
+
     # Try to infer the model base name from the model name:
     # e.g. "llama2-7b-chat" -> "llama2"
     if model_base_name is None:
@@ -107,29 +117,45 @@ def _build_chat_tokenizer(
     logger.info(
         f"using tokenizer = {tokenizer.__class__.__module__}.{tokenizer.__class__.__name__}"
     )
+    # set global variable _tokenizer_type
+    if isinstance(tokenizer, TiktokenTokenizer):
+        _tokenizer_type = TokenizerType.Tiktoken
+    elif isinstance(tokenizer, SentencePieceProcessor):
+        _tokenizer_type = TokenizerType.SentencePiece
+    else:
+        raise ValueError(f"Unknown tokenizer type: {tokenizer.__class__}")
+
+    logger.info(f"tokenizer type = {_tokenizer_type}")
     return tokenizer
 
 
-def _load_model_weights(stage_module, distribution, device, model_config):
+def _load_model_weights(
+    stage_module: torch.nn.Module,
+    distribution: str,
+    device: torch.device,
+    model_config: ModelArgs,
+    chpt_from: str,
+):
     """Load the weights from the safetensor file(s) into the model stage.
     Model config is needed b/c we permute wq and wk weights based on attn heads.
+
+    Args:
+        stage_module (torch.nn.Module): The model stage to load the weights into.
+        distribution (str): The distribution name, e.g. "meta-llama/Meta-Llama-3-8B-Instruct".
+        device (torch.device): The device to load the weights onto.
+        model_config (ModelArgs): The model config.
+        chpt_from (str): The checkpoint format to load the weights from, e.g. "torchchat" or "hf".
     """
-
-    weight_map, weight_path, key_map = get_hf_weight_map_and_path(distribution)
-
-    num_loaded_weights, num_missing_weights = load_safetensor_weights(
-        stage_module,
-        weight_map,
-        weight_path,
-        key_map,
-        device,
-        model_config=model_config,
-    )
-    logger.info(
-        f"Success - Loaded {num_loaded_weights} weights, {num_missing_weights} missing weights"
-    )
-    if num_missing_weights > 0:
-        raise ValueError(f"Missing {num_missing_weights} weights")
+    if chpt_from == "hf":
+        # This format stands for: index file + multiple binary files
+        load_weights_from_hf_format(stage_module, distribution, device, model_config)
+    elif chpt_from == "torchchat":
+        # This format stands for:
+        # single binary file, OR
+        # multiple binary files without index files.
+        load_weights_from_torchchat_format(stage_module, distribution, device, model_config)
+    else:
+        raise ValueError(f"Unknown checkpoint format: {chpt_from}")
 
 
 def _encode_strings(
@@ -269,6 +295,7 @@ def _cleanup():
 
 prompt = [
     "What is Snow?",
+    # "Can you explain what is the purpose of back propagation in neural networks?",
     "Who is Santa Claus?",
     "Where does Santa live?",
     # "Who is Abraham Lincoln?",
@@ -286,7 +313,7 @@ def main(args):
     logger.info(f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}")
 
     distribution, model_dtype = NAME_TO_DISTRIBUTION_AND_DTYPE[model_name]
-    logger.info(f"Using HF model weights from {distribution} and dtype {model_dtype}")
+    logger.info(f"Using model weights from {distribution} and dtype {model_dtype}")
 
     # Model-level config
     model_config = ModelArgs.from_name(distribution)
@@ -348,7 +375,7 @@ def main(args):
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
     with CUDATrackTime() as timer:
-        _load_model_weights(model, distribution, device=device, model_config=config)
+        _load_model_weights(model, distribution, device, config, args.chpt_from)
 
     logger.info(
         f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
@@ -487,7 +514,7 @@ def main(args):
         group=pp_group,
     )
     # create schedule
-    decorder = ScheduleGPipe(decode_stage, 1)
+    decoder = ScheduleGPipe(decode_stage, 1)
 
     # Decoding
     with torch.no_grad(), CUDATrackTime() as timer:
@@ -510,11 +537,11 @@ def main(args):
 
             # Run data through pipeline
             if pp_rank == first_pp_rank:
-                output = decorder.step(new_token, **kwargs)
+                output = decoder.step(new_token, **kwargs)
             elif pp_rank == last_pp_rank:
-                output = decorder.step(**kwargs)
+                output = decoder.step(**kwargs)
             else:  # middle pp ranks
-                decorder.step(**kwargs)
+                decoder.step(**kwargs)
 
             # Decode the output
             if pp_rank == last_pp_rank:
@@ -539,13 +566,16 @@ def main(args):
         # token ids. Thus cat'ing along dim 1.
         res = torch.cat(res, dim=1)
         res_list = res.tolist()
-        if isinstance(tokenizer, TiktokenTokenizer):
+        if _tokenizer_type == TokenizerType.Tiktoken:
             # For TiktokenTokenizer, we need to decode prompt by prompt.
             # TODO: is there a better way to do this?
             responses = [tokenizer.decode(sequence) for sequence in res_list]
-        else:  # SentencePieceProcessor
+        elif _tokenizer_type == TokenizerType.SentencePiece:  # SentencePieceProcessor
             # For SentencePieceProcessor, we can decode the entire 2D list at once.
             responses = tokenizer.decode(res_list)
+        else:
+            raise ValueError(f"Unknown tokenizer type {_tokenizer_type}")
+
         # Show prompts and responses
         for prompt_text, response_text in zip(prompt, responses):
             logger.info(f"Prompt: {color.green}{prompt_text} {color.reset}")
@@ -578,6 +608,13 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="Whether to decode token into string in flight",
+    )
+    parser.add_argument(
+        "--chpt-from",
+        type=str,
+        default="hf",  # TODO: change to torchchat once we support it well
+        help="Checkpoint format to load from",
+        choices=["hf", "torchchat"],
     )
     args = parser.parse_args()
 

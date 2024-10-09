@@ -34,7 +34,7 @@ from torch.nn import functional as F
 try:
     # TODO: remove this after we figure out where in torchtune an `evaluate` module
     # is being imported, which is being confused with huggingface's `evaluate``.
-    import lm_eval  # noqa 
+    import lm_eval  # noqa
 except Exception:
     pass
 
@@ -278,6 +278,9 @@ class TransformerArgs:
     # For pipeline parallel
     n_stages: int = 1
     stage_idx: int = 0
+    # Optional biases
+    attention_bias: bool = False
+    feed_forward_bias: bool = False
 
     def __post_init__(self):
         if self.n_local_heads == -1:
@@ -394,7 +397,7 @@ class ModelArgs:
         config = [
             config
             for config in known_model_params
-            if config in str(name).upper() or config in str(name)
+            if config.upper() in str(name).upper() or config in str(name)
         ]
 
         # We may have two or more configs matched (e.g., "7B" and
@@ -471,7 +474,7 @@ class Model(ABC, nn.Module):
                 modules[name] = module_class(TransformerArgs.from_params(config_args))
             else:
                 modules[name] = module_class(**config_args)
-        
+
         # Temporary add extra params to the DeepFusionModel.
         # TODO: Remove it once we can make fusion model configurable in model_param.
         if recipe.fusion_class == DeepFusionModel:
@@ -730,16 +733,16 @@ class Attention(nn.Module):
 
         # key, query, value projections for all heads, but in a batch
         # total_head_dim = (config.n_heads + 2 * config.n_local_heads) * config.head_dim
-        # self.wqkv = nn.Linear(config.dim, total_head_dim, bias=False)
-        self.wq = nn.Linear(config.dim, config.n_heads * config.head_dim, bias=False)
+        # self.wqkv = nn.Linear(config.dim, total_head_dim, bias=config.attention_bias)
+        self.wq = nn.Linear(config.dim, config.n_heads * config.head_dim, bias=config.attention_bias)
         self.wk = nn.Linear(
-            config.dim, config.n_local_heads * config.head_dim, bias=False
+            config.dim, config.n_local_heads * config.head_dim, bias=config.attention_bias
         )
         self.wv = nn.Linear(
-            config.dim, config.n_local_heads * config.head_dim, bias=False
+            config.dim, config.n_local_heads * config.head_dim, bias=config.attention_bias
         )
 
-        self.wo = nn.Linear(config.dim, config.dim, bias=False)
+        self.wo = nn.Linear(config.dim, config.dim, bias=config.attention_bias)
         self.kv_cache = None
 
         self.n_heads = config.n_heads
@@ -766,14 +769,16 @@ class Attention(nn.Module):
         #     wv = state_dict.pop(prefix + "wv.weight")
         #     state_dict[prefix + "wqkv.weight"] = torch.cat([wq, wk, wv])
 
-        if prefix + "wqkv.weight" in state_dict:
-            wqkv = state_dict.pop(prefix + "wqkv.weight")
-            q_size = self.n_heads * self.head_dim
-            kv_size = self.n_local_heads * self.head_dim
-            wq, wk, wv = torch.split(wqkv, (q_size, kv_size, kv_size), dim=0)
-            state_dict[prefix + "wq.weight"] = wq
-            state_dict[prefix + "wk.weight"] = wk
-            state_dict[prefix + "wv.weight"] = wv
+        for tensor_suffix in ["weight", "bias"]:
+            wqkv_key = f"{prefix}wqkv.{tensor_suffix}"
+            if wqkv_key in state_dict:
+                wqkv = state_dict.pop(wqkv_key)
+                q_size = self.n_heads * self.head_dim
+                kv_size = self.n_local_heads * self.head_dim
+                wq, wk, wv = torch.split(wqkv, (q_size, kv_size, kv_size), dim=0)
+                state_dict[f"{prefix}wq.{tensor_suffix}"] = wq
+                state_dict[f"{prefix}wk.{tensor_suffix}"] = wk
+                state_dict[f"{prefix}wv.{tensor_suffix}"] = wv
 
         return
 
@@ -852,9 +857,9 @@ class Attention(nn.Module):
 class FeedForward(nn.Module):
     def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
-        self.w1 = nn.Linear(config.dim, config.hidden_dim, bias=False)
-        self.w2 = nn.Linear(config.hidden_dim, config.dim, bias=False)
-        self.w3 = nn.Linear(config.dim, config.hidden_dim, bias=False)
+        self.w1 = nn.Linear(config.dim, config.hidden_dim, bias=config.feed_forward_bias)
+        self.w2 = nn.Linear(config.hidden_dim, config.dim, bias=config.feed_forward_bias)
+        self.w3 = nn.Linear(config.dim, config.hidden_dim, bias=config.feed_forward_bias)
 
     def distribute(self, device_mesh: DeviceMesh):
         parallelize_module(self.w1, device_mesh, ColwiseParallel())
