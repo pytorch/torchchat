@@ -91,7 +91,7 @@ REQUIREMENTS_TO_INSTALL=(
 
 (
   set -x
-  $PIP_EXECUTABLE install torchao=="0.5.0"
+  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@dfd4cdacb41014b37a2bb6813fbd7a035802bff8
 )
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
