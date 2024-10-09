@@ -30,6 +30,7 @@ from torchchat.model import Model, ModelArgs, ModelType
 
 from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
 
+from torchchat.cli.download import get_model_dir
 from torchchat.model_config.model_config import resolve_model_config
 from torchchat.utils.build_utils import (
     device_sync,
@@ -73,7 +74,7 @@ class BuilderArgs:
             or (self.pte_path and Path(self.pte_path).is_file())
         ):
             raise RuntimeError(
-                "need to specified a valid checkpoint path, checkpoint dir, gguf path, DSO path, or PTE path"
+                f"need to specified a valid checkpoint path, checkpoint dir, gguf path, DSO path, or PTE path {self.checkpoint_path}"
             )
 
         if self.dso_path and self.pte_path:
@@ -109,10 +110,10 @@ class BuilderArgs:
             model_config = resolve_model_config(args.model)
 
             checkpoint_path = (
-                Path(args.model_directory)
-                / model_config.name
+                get_model_dir(model_config, args.model_directory)
                 / model_config.checkpoint_file
             )
+            print(f"Using checkpoint path: {checkpoint_path}")
             # The transformers config is keyed on the last section
             # of the name/path.
             params_table = (
@@ -264,8 +265,7 @@ class TokenizerArgs:
         elif args.model:  # Using a named, well-known model
             model_config = resolve_model_config(args.model)
             tokenizer_path = (
-                Path(args.model_directory)
-                / model_config.name
+                get_model_dir(model_config, args.model_directory)
                 / model_config.tokenizer_file
             )
         elif args.checkpoint_path:
