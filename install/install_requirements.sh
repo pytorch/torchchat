@@ -106,5 +106,3 @@ fi
   set -x
   $PIP_EXECUTABLE install evaluate=="0.4.3" lm-eval=="0.4.2" psutil=="6.0.0"
 )
-
-export HF_HUB_ENABLE_HF_TRANSFER=1

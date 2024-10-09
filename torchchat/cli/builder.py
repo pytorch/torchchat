@@ -74,7 +74,7 @@ class BuilderArgs:
             or (self.pte_path and Path(self.pte_path).is_file())
         ):
             raise RuntimeError(
-                f"need to specified a valid checkpoint path, checkpoint dir, gguf path, DSO path, or PTE path {self.checkpoint_path}"
+                f"{self.checkpoint_path} is not a valid checkpoint path, checkpoint dir, gguf path, DSO path, or PTE path"
             )
 
         if self.dso_path and self.pte_path:
