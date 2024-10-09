@@ -204,7 +204,7 @@ public class MainActivity extends Activity implements Runnable, LlamaCallback {
         mSendButton.setText("Generate");
         mSendButton.setOnClickListener(
                 view -> {
-                    String prompt = mEditTextMessage.getText().toString();
+                    String prompt = mEditTextMessage.getText().toString() + "<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
                     mMessageAdapter.add(new Message(prompt, true));
                     mMessageAdapter.notifyDataSetChanged();
                     mEditTextMessage.setText("");
