@@ -158,7 +158,8 @@ class QuantHandler:
         self.model_.load_state_dict(model_updated_state_dict)
         return self.model_
 
-    def quantize(model: nn.Module) -> nn.Module:
+    # fallback for TC QuantHandlers that do not implement the method .quantize()
+    def quantize(self, model: nn.Module) -> nn.Module:
         self.model_ = model
         return self.quantized_model()
 
