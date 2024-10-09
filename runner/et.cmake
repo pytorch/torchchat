@@ -94,6 +94,7 @@ if(executorch_FOUND)
     optimized_native_cpu_ops_lib
     quantized_ops_lib
     xnnpack_backend
+    microkernels-prod
     XNNPACK
     pthreadpool
     cpuinfo
