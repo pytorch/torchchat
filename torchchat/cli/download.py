@@ -22,6 +22,9 @@ from torchchat.model_config.model_config import (
 # Both $HF_HOME and $HUGGINGFACE_HUB_CACHE are valid environment variables for the same directory.
 HUGGINGFACE_HOME_PATH = Path(os.environ.get("HF_HOME", os.environ.get("HUGGINGFACE_HUB_CACHE", os.path.expanduser("~/.cache/huggingface/hub"))))
 
+if os.environ.get("HF_HUB_ENABLE_HF_TRANSFER", None) is None:
+    os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
+
 def _download_hf_snapshot(
     model_config: ModelConfig, hf_token: Optional[str]
 ):
