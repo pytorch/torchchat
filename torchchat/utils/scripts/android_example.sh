@@ -30,8 +30,8 @@ else
   exit -1
 fi
 
-LLAMA_AAR_URL="https://ossci-android.s3.amazonaws.com/executorch/main/executorch-240919.aar"
-LLAMA_AAR_SHASUM="c8a5d38ead03bfa28ee8469f6355840ad0d182ba"
+LLAMA_AAR_URL="https://ossci-android.s3.amazonaws.com/executorch/release/executorch-241002/executorch.aar"
+LLAMA_AAR_SHASUM="2546feed560cef01cc7b47260c694311346196934f41900cac08e418f4a60096"
 
 mkdir -p ${TORCHCHAT_ROOT}/build/android
 
