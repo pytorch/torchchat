@@ -49,6 +49,7 @@ if __name__ == "__main__":
         "where": "Return directory containing downloaded model artifacts",
         "server": "[WIP] Starts a locally hosted REST server for model interaction",
         "eval": "Evaluate a model via lm-eval",
+        "save_quant": "Quantize a model and save it to disk",
     }
     for verb, description in VERB_HELP.items():
         subparser = subparsers.add_parser(verb, help=description)
@@ -115,5 +116,9 @@ if __name__ == "__main__":
         from torchchat.cli.download import remove_main
 
         remove_main(args)
+    elif args.command == "save_quant":
+        from torchchat.save_quant import main as save_quant_main
+
+        save_quant_main(args)
     else:
         parser.print_help()
