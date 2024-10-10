@@ -477,9 +477,9 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 1. Download the AAR file, which contains the Java library and corresponding JNI library, to build and run the app.
 
-   - [executorch-240919.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-240919.aar) (SHASUM: c8a5d38ead03bfa28ee8469f6355840ad0d182ba)
+   - [executorch.aar](https://ossci-android.s3.amazonaws.com/executorch/release/executorch-241002/executorch.aar) ([sha256sums](https://ossci-android.s3.amazonaws.com/executorch/release/executorch-241002/executorch.aar.sha256sums))
 
-2. Rename the downloaded AAR file to `executorch.aar` and move the file to `torchchat/edge/android/torchchat/app/libs/`. You may need to create directory `torchchat/edge/android/torchchat/app/libs/` if it does not exist.
+2. Move the downloaded AAR file to `torchchat/edge/android/torchchat/app/libs/`. You may need to create directory `torchchat/edge/android/torchchat/app/libs/` if it does not exist.
 
 3. Push the model and tokenizer file to your device. You can find the model file called `llama3.1.pte` in the current `torchchat` directory and the tokenizer file at `$(python3 torchchat.py where llama3.1)/tokenizer.model` path.
     ```

@@ -94,7 +94,7 @@ try:
     from executorch.backends.xnnpack.partition.xnnpack_partitioner import (
         XnnpackDynamicallyQuantizedPartitioner,
     )
-    from executorch.backends.xnnpack.passes.convert_to_linear import (
+    from executorch.backends.xnnpack._passes.convert_to_linear import (
         ConvertToLinearPass,
     )
     from executorch.exir import EdgeProgramManager, to_edge
