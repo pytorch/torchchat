@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-package com.example.executorchllamademo;
+package org.pytorch.torchchat;
 
 /**
  * A helper interface within the app for MainActivity and Benchmarking to handle callback from

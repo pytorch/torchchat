@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-package com.example.executorchllamademo;
+package org.pytorch.torchchat;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

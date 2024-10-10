@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-package com.example.executorchllamademo;
+package org.pytorch.torchchat;
 
 import android.os.Handler;
 import android.os.HandlerThread;
