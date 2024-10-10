@@ -31,7 +31,7 @@ else
 fi
 
 LLAMA_AAR_URL="https://ossci-android.s3.amazonaws.com/executorch/release/executorch-241002/executorch.aar"
-LLAMA_AAR_SHASUM="2546feed560cef01cc7b47260c694311346196934f41900cac08e418f4a60096"
+LLAMA_AAR_SHASUM_URL="https://ossci-android.s3.amazonaws.com/executorch/release/executorch-241002/executorch.aar.sha256sums"
 
 mkdir -p ${TORCHCHAT_ROOT}/build/android
 
@@ -88,8 +88,10 @@ setup_android_sdk() {
 
 download_aar_library() {
   mkdir -p ${TORCHCHAT_ROOT}/android/torchchat/app/libs
-  curl "${LLAMA_AAR_URL}" -o ${TORCHCHAT_ROOT}/android/torchchat/app/libs/executorch.aar
-  echo "${LLAMA_AAR_SHASUM}  ${TORCHCHAT_ROOT}/android/torchchat/app/libs/executorch.aar" | shasum --check --status
+  curl "${LLAMA_AAR_URL}" -O
+  curl "${LLAMA_AAR_SHASUM_URL}" -O
+  shasum --check --status executorch.aar.sha256sums
+  mv executorch.aar ${TORCHCHAT_ROOT}/android/torchchat/app/libs/
 }
 
 build_app() {
