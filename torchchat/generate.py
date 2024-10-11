@@ -959,8 +959,16 @@ class Generator:
         max_seq_length = (
             text_transformer_args.max_seq_length if text_transformer_args else 2048
         )
+
+        # For Llama 3.2 11B (Flamingo), format the input as a dialog
+        # Else for other models, format the input as a single string
+        text_prompt = (
+            generator_args.prompt
+            if self.model.config.model_type != ModelType.Flamingo
+            else [{"role": "user", "content": generator_args.prompt}]
+        )
         encoded, batch = self._gen_model_input(
-            [{"role": "user", "content": generator_args.prompt}],
+            text_prompt,
             generator_args.image_prompts,
             generator_args.max_new_tokens,
             max_seq_length,
