@@ -95,7 +95,7 @@ download_aar_library() {
 }
 
 build_app() {
-  pushd android/torchchat
+  pushd torchchat/edge/android/torchchat
   ./gradlew :app:build
   popd
 }
@@ -138,7 +138,7 @@ push_files_to_android() {
 }
 
 run_android_instrumented_test() {
-  pushd android/torchchat
+  pushd torchchat/edge/android/torchchat
   ./gradlew connectedAndroidTest
   popd
 }
@@ -155,7 +155,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   run_android_instrumented_test
 fi
 
-adb install -t android/torchchat/app/build/outputs/apk/debug/app-debug.apk
+adb install -t torchchat/edge/android/torchchat/app/build/outputs/apk/debug/app-debug.apk
 
 if [ -z "${CI_ENV:-}" ]; then
   read -p "Press enter to exit emulator and finish"
