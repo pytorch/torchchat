@@ -95,7 +95,7 @@ download_aar_library() {
 }
 
 build_app() {
-  pushd android/torchchat
+  pushd torchchat/edge/android/torchchat
   ./gradlew :app:build
   popd
 }
@@ -138,7 +138,7 @@ push_files_to_android() {
 }
 
 run_android_instrumented_test() {
-  pushd android/torchchat
+  pushd torchchat/edge/android/torchchat
   ./gradlew connectedAndroidTest
   popd
 }
