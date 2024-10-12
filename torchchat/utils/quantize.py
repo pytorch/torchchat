@@ -73,7 +73,7 @@ def get_named_parameters(func: Callable) -> List[str]:
     ]
     return named_params
 
-def validate_args(named_params: List[str], quantizer: Optional[str] = None, q_kwargs: Dict[str, Any]) -> Dict:
+def validate_args(named_params: List[str], q_kwargs: Dict[str, Any], quantizer: Optional[str] = None) -> Dict[str, Any]:
     named_params = 
     for key in q_kwargs.keys():
         if key not in q_kwargs:
