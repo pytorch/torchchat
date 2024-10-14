@@ -74,9 +74,8 @@ def get_named_parameters(func: Callable) -> List[str]:
     return named_params
 
 def validate_args(named_params: List[str], q_kwargs: Dict[str, Any], quantizer: Optional[str] = None) -> Dict[str, Any]:
-    named_params = 
     for key in q_kwargs.keys():
-        if key not in q_kwargs:
+        if key not in named_params:
             print(f"Specification for quantizer {quantizer} has extraneous key {key}. Ignoring.")
             del q_kwargs[key]
     return q_kwargs
