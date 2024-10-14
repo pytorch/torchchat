@@ -787,7 +787,7 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
     def __init__(
         self,
         model: Optional[nn.Module] = None,
-        device,
+        device=None,
         precision=None,
         tokenizer=None,
         *,
