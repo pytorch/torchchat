@@ -122,7 +122,7 @@ def quantize_model(
 
             q = quantizer_class_dict[quantizer]
             named_params = get_named_parameters(q.__init__)
-            q_kwargs = validate_args(named_params, quantizer, q_kwargs)
+            q_kwargs = validate_args(named_params, q_kwargs, quantizer)
 
             # Handle tokenizer for scenarios where the quantizer needs to tokenizer sample inputs
             if "tokenizer" in named_params:
