@@ -16,19 +16,11 @@ import torch._dynamo.config
 import torch._inductor.config
 import torch.nn as nn
 
-from torchtune.models.llama3_2_vision._convert_weights import llama3_vision_meta_to_tune
+from torch.distributed.device_mesh import DeviceMesh
 
 from torchchat.distributed import launch_distributed, ParallelDims, parallelize_llama
 
-from torch.distributed.device_mesh import DeviceMesh
-
-from torchtune.models.convert_weights import meta_to_tune
-
-from torchtune.training import set_default_dtype
-
 from torchchat.model import Model, ModelArgs, ModelType
-
-from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
 
 from torchchat.model_config.model_config import resolve_model_config
 from torchchat.utils.build_utils import (
@@ -39,6 +31,14 @@ from torchchat.utils.build_utils import (
 )
 from torchchat.utils.measure_time import measure_time
 from torchchat.utils.quantize import quantize_model
+
+from torchtune.models.convert_weights import meta_to_tune
+
+from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
+
+from torchtune.models.llama3_2_vision._convert_weights import llama3_vision_meta_to_tune
+
+from torchtune.training import set_default_dtype
 
 
 @dataclass
@@ -55,7 +55,10 @@ class BuilderArgs:
     device: Optional[str] = None
     precision: torch.dtype = torch.float32
     setup_caches: bool = False
-    use_distributed: bool = False
+    distributed: bool = False
+    num_gpus: int = 1
+    num_nodes: int = 1
+    pp_dim: int = 1
     is_chat_model: bool = False
     prefill_possible: bool = False
     dynamic_shapes: bool = False
@@ -156,7 +159,11 @@ class BuilderArgs:
                 dtype = torch.float16
         else:
             dtype = name_to_dtype(args.dtype, args.device)
-
+        # distributed args
+        distributed = getattr(args, "distributed", False)
+        num_gpus = getattr(args, "num_gpus", 1)
+        num_nodes = getattr(args, "num_nodes", 1)
+        pp_dim = getattr(args, "pp_dim", 1)
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
@@ -170,7 +177,10 @@ class BuilderArgs:
             device=args.device,
             precision=dtype,
             setup_caches=(output_dso_path or output_pte_path),
-            use_distributed=args.distributed,
+            distributed=distributed,
+            num_gpus=num_gpus,
+            num_nodes=num_nodes,
+            pp_dim=pp_dim,
             is_chat_model=is_chat_model,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),
@@ -400,10 +410,10 @@ def _load_model_default(builder_args: BuilderArgs) -> Model:
             # does not host any actual values, need to reinitialize them in the actual
             # device. Only do those buffer initialization, without initializing the entire
             # model.
-            decoder_config = model.config.transformer_args['decoder']
-            head_dim = decoder_config['embed_dim'] // decoder_config['num_heads']
-            max_seq_len = decoder_config['max_seq_len']
-            rope_base = decoder_config['rope_base']
+            decoder_config = model.config.transformer_args["decoder"]
+            head_dim = decoder_config["embed_dim"] // decoder_config["num_heads"]
+            max_seq_len = decoder_config["max_seq_len"]
+            rope_base = decoder_config["rope_base"]
             for submodule in model.modules():
                 if isinstance(submodule, Llama3ScaledRoPE):
                     submodule.__init__(head_dim, max_seq_len, rope_base)
@@ -490,6 +500,7 @@ def _load_model(builder_args: BuilderArgs) -> Model:
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
+
 
 def _initialize_model(
     builder_args: BuilderArgs,

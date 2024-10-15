@@ -24,15 +24,6 @@ import torch._inductor.config
 
 from PIL import Image
 
-# torchtune model definition dependencies
-from torchtune.data import Message, padded_collate_tiled_images_and_mask
-
-from torchtune.generation import sample as tune_sample
-from torchtune.models.llama3 import llama3_tokenizer
-
-from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
-from torchtune.training import set_default_dtype
-
 from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
@@ -42,6 +33,15 @@ from torchchat.cli.builder import (
 from torchchat.model import Model, ModelType
 from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
+
+# torchtune model definition dependencies
+from torchtune.data import Message, padded_collate_tiled_images_and_mask
+
+from torchtune.generation import sample as tune_sample
+from torchtune.models.llama3 import llama3_tokenizer
+
+from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
+from torchtune.training import set_default_dtype
 
 
 class _ChatFormatter(ABC):
@@ -239,23 +239,17 @@ class Generator:
         self.is_torchtune_model = generator_args.is_torchtune_model
         self.dtype = builder_args.precision
 
-        # global print
-        #    from tp import maybe_init_dist
-        #    rank = maybe_init_dist()
-        # use_distributed = False
         self.rank: Optional[int] = None
-        #    if use_distributed:
-        #        if rank != 0:
-        #            # only print on rank 0
-        #            print = lambda *args, **kwargs: None
 
         print(
             f"Using device={self.builder_args.device} {get_device_info(self.builder_args.device)}"
         )
         set_precision(self.builder_args.precision)
-        if builder_args.use_distributed:
+        if builder_args.distributed:
+            print(f"Using distributed={builder_args.distributed}")
             device = torch.device(f"cuda:{int(os.environ['LOCAL_RANK'])}")
             torch.cuda.set_device(device)
+            assert False, "Distributed is not supported yet"
         self.is_speculative = self.speculative_builder_args.checkpoint_path is not None
 
         if generator_args.chat_mode and not self.builder_args.is_chat_model:
@@ -938,7 +932,8 @@ class Generator:
                     TransformerCrossAttentionLayer,
                     TransformerSelfAttentionLayer,
                 )
-                decoder = self.model.model.decoder 
+
+                decoder = self.model.model.decoder
                 for m in reversed(list(decoder.modules())):
                     if isinstance(m, TransformerSelfAttentionLayer) or isinstance(
                         m, TransformerCrossAttentionLayer
@@ -984,7 +979,10 @@ class Generator:
         # `is_torchtune_model` is a misnomer since it doesn't capture all
         # torchtune models (i.e. Flamingo)
         # See Issue: https://github.com/pytorch/torchchat/issues/1273
-        elif not generator_args.is_torchtune_model and self.model.config.model_type != ModelType.Flamingo:
+        elif (
+            not generator_args.is_torchtune_model
+            and self.model.config.model_type != ModelType.Flamingo
+        ):
             max_seq_length = min(
                 encoded.size(0) + generator_args.max_new_tokens,
                 (
