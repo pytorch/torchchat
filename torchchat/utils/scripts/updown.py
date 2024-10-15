@@ -183,6 +183,7 @@ def process_command(
                 suppress_list=suppress_list,
             )
         elif trailing_command == "end":
+            skip_nesting_level -= 1
             if skip_nesting_level < 0:
                 output(
                     "echo 'skip end without matching skip begin in line {lineno} of {filename}'\nexit 1;",
