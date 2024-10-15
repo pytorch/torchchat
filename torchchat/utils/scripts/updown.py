@@ -9,6 +9,7 @@ import argparse
 import os
 import re
 
+skip_nesting_level = 0
 
 ###############################################################################################
 ###
@@ -115,7 +116,7 @@ def updown_process_line(
             return
         if len(options) > 1:
             output(
-                "echo 'cross product of options not yet supported anot line {line} of {filename}'\nexit 1",
+                "echo 'cross product of options not yet supported in line {line} of {filename}'\nexit 1",
                 suppress_list=None,
                 replace_list=None,
             )
@@ -137,7 +138,8 @@ def updown_process_line(
 def process_command(
     line, lineno, filename, predicate_list, replace_list, suppress_list, create_sections
 ) -> bool:
-
+    
+    global skip_nesting_level
     command = r"^\[\s*(\w+)\s+(\w+)\s*\]\s*:\s*(.*)"
     match = re.search(command, line)
 
@@ -168,12 +170,25 @@ def process_command(
         )
     elif keyword == "skip":
         if trailing_command == "begin":
+            skip_nesting_level += 1
+            if skip_nesting_level > 1:
+                output(
+                    "echo 'nested skips are discouraged in line {lineno} of {filename} and may be prohibited in the future'",
+                    replace_list=replace_list,
+                    suppress_list=suppress_list,
+                )
             output(
                 "if false; then",
                 replace_list=replace_list,
                 suppress_list=suppress_list,
             )
         elif trailing_command == "end":
+            if skip_nesting_level < 0:
+                output(
+                    "echo 'skip end without matching skip begin in line {lineno} of {filename}'\nexit 1;",
+                    replace_list=replace_list,
+                    suppress_list=suppress_list,
+                )
             output(
                 "fi",
                 replace_list=replace_list,
@@ -187,6 +202,12 @@ def process_command(
             )
             exit(1)
     elif keyword == "end":
+        if skip_nesting_level > 0:
+            output(
+                "echo 'skip begin without matching skip end in line {lineno} of {filename}'\nexit 1;",
+                replace_list=replace_list,
+                suppress_list=suppress_list,
+            )
         if create_sections:
             output(
                 "echo '::endgroup::'",
@@ -303,7 +324,7 @@ def updown_processor(
             )
 
     output(
-        "echo 'reached end of file without exit command'\nexit 1;",
+        "echo 'reached end of file without `end` command'\nexit 1;",
         suppress_list=None,
         replace_list=None,
     )
