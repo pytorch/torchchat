@@ -59,6 +59,7 @@ class BuilderArgs:
     num_gpus: int = 1
     num_nodes: int = 1
     pp_dim: int = 1
+    tp_dim: int = 1
     is_chat_model: bool = False
     prefill_possible: bool = False
     dynamic_shapes: bool = False
@@ -164,6 +165,7 @@ class BuilderArgs:
         num_gpus = getattr(args, "num_gpus", 1)
         num_nodes = getattr(args, "num_nodes", 1)
         pp_dim = getattr(args, "pp_dim", 1)
+        tp_dim = getattr(args, "tp_dim", 1)
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
@@ -181,6 +183,7 @@ class BuilderArgs:
             num_gpus=num_gpus,
             num_nodes=num_nodes,
             pp_dim=pp_dim,
+            tp_dim=tp_dim,
             is_chat_model=is_chat_model,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),
