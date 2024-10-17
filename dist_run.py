@@ -12,13 +12,13 @@ import argparse
 import os
 from enum import auto, Enum
 from pathlib import Path
-from types import SimpleNamespace
+from types import SimpleNamespace, MethodType
 from typing import Any, Dict, List, Optional, Tuple
 
 import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
-from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
+from torchchat.cli.builder import TokenizerArgs
 
 # TODO - these are not distributed specific, consider moving to new package
 from torchchat.distributed.checkpoint_utils import (
@@ -50,7 +50,6 @@ except ImportError:
 
 
 logger = SingletonLogger.get_logger()
-_tokenizer_type = None  # global variable to store the tokenizer type
 
 # Using model name to identify the model to load, for example "llama2-7b-chat".
 # You can change it to other values listed below.
@@ -59,11 +58,6 @@ NAME_TO_DISTRIBUTION_AND_DTYPE = {
     "llama2-7b-chat": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
     "llama3": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16),
 }
-
-
-class TokenizerType(Enum):
-    Tiktoken = auto()
-    SentencePiece = auto()
 
 
 def _init_distributed():
@@ -82,14 +76,29 @@ def _create_device_mesh(mesh_dimensions):
 def dict_to_args(dictionary: Dict[str, Any]) -> SimpleNamespace:
     return SimpleNamespace(**dictionary)
 
+def _patch_tokenizer(tokenizer):
+    """Patch the tokenizer to support decoding of token ids."""
+    if isinstance(tokenizer, TiktokenTokenizer):
+        # Patch tiktokenizer to allow a list of sequences.
+        #TODO: Upstream to tokenizer modules
+        old_decode = tokenizer.decode
+
+        def decode(self, token_ids: List[int|List[int]], *args, **kwargs) -> str | List[str]:
+            if len(token_ids)<1:
+                return ""
+            if isinstance(token_ids[0], list):
+                return [old_decode(t, *args, **kwargs) for t in token_ids]
+            else:
+                return old_decode(token_ids, *args, **kwargs)
+
+        tokenizer.decode = MethodType(decode, tokenizer)
+    return tokenizer
 
 def _build_chat_tokenizer(
     model_name: str,
     model_base_name: Optional[str] = None,
 ) -> SentencePieceProcessor | TiktokenTokenizer:
-    """Builds a tokenizer for the given model name, and sets the global tokenizer type variable"""
-
-    global _tokenizer_type
+    """Builds a tokenizer for the given model name"""
 
     # Try to infer the model base name from the model name:
     # e.g. "llama2-7b-chat" -> "llama2"
@@ -112,20 +121,14 @@ def _build_chat_tokenizer(
     }
     args = dict_to_args(tokenconfig)
     tokenizer_args = TokenizerArgs.from_args(args)
-    tokenizer = _initialize_tokenizer(tokenizer_args)
+    tokenizer = tokenizer_args.t
     assert tokenizer is not None, f"Failed to get tokenizer using {tokenconfig=}"
     logger.info(
         f"using tokenizer = {tokenizer.__class__.__module__}.{tokenizer.__class__.__name__}"
     )
-    # set global variable _tokenizer_type
-    if isinstance(tokenizer, TiktokenTokenizer):
-        _tokenizer_type = TokenizerType.Tiktoken
-    elif isinstance(tokenizer, SentencePieceProcessor):
-        _tokenizer_type = TokenizerType.SentencePiece
-    else:
-        raise ValueError(f"Unknown tokenizer type: {tokenizer.__class__}")
 
-    logger.info(f"tokenizer type = {_tokenizer_type}")
+    tokenizer = _patch_tokenizer(tokenizer)
+
     return tokenizer
 
 
@@ -568,15 +571,8 @@ def main(args):
         # token ids. Thus cat'ing along dim 1.
         res = torch.cat(res, dim=1)
         res_list = res.tolist()
-        if _tokenizer_type == TokenizerType.Tiktoken:
-            # For TiktokenTokenizer, we need to decode prompt by prompt.
-            # TODO: is there a better way to do this?
-            responses = [tokenizer.decode(sequence) for sequence in res_list]
-        elif _tokenizer_type == TokenizerType.SentencePiece:  # SentencePieceProcessor
-            # For SentencePieceProcessor, we can decode the entire 2D list at once.
-            responses = tokenizer.decode(res_list)
-        else:
-            raise ValueError(f"Unknown tokenizer type {_tokenizer_type}")
+
+        responses = tokenizer.decode(res_list)
 
         # Show prompts and responses
         for prompt_text, response_text in zip(prompt, responses):
