@@ -20,14 +20,14 @@ import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
 
-from torchchat.distributed.logging_utils import SingletonLogger
-
 # TODO - these are not distributed specific, consider moving to new package
 from torchchat.distributed.checkpoint_utils import (
     get_hf_config_file,
     load_weights_from_hf_format,
     load_weights_from_torchchat_format,
 )
+
+from torchchat.distributed.logging_utils import SingletonLogger
 from torchchat.distributed.utils import (
     bytes_to_readable,
     Color as color,
@@ -153,7 +153,9 @@ def _load_model_weights(
         # This format stands for:
         # single binary file, OR
         # multiple binary files without index files.
-        load_weights_from_torchchat_format(stage_module, distribution, device, model_config)
+        load_weights_from_torchchat_format(
+            stage_module, distribution, device, model_config
+        )
     else:
         raise ValueError(f"Unknown checkpoint format: {chpt_from}")
 
@@ -304,7 +306,7 @@ prompt = [
 
 
 def main(args):
-    model_name = args.model_name
+    model_name = "llama3"  # args.model_name
     pp_degree = args.pp
 
     rank, world_size = _init_distributed()
@@ -590,12 +592,14 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
+    """parser.add_argument(
         "model_name",
         type=str,
+        default="llama3",
         help="Name of the model to load",
-        choices=NAME_TO_DISTRIBUTION_AND_DTYPE.keys(),
+        # choices=NAME_TO_DISTRIBUTION_AND_DTYPE.keys(),
     )
+    """
     parser.add_argument("--pp", type=int, default=1, help="Pipeline parallel degree")
     parser.add_argument(
         "--ntokens",

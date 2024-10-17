@@ -510,23 +510,29 @@ def _load_model(builder_args: BuilderArgs) -> Model:
     return model.eval()
 
 
-@record
-def run_main(local_rank):
-    # Add the directory containing the train file to sys.path
-    train_file_path = Path(__file__).parent.parent.parent / "dist_run.py"
-    print(f"******* {train_file_path=}")
-    sys.path.insert(0, os.path.dirname(os.path.abspath(train_file_path)))
+import importlib.util
+import subprocess
 
-    # Set environment variables for distributed training
-    os.environ["LOCAL_RANK"] = str(local_rank)
-    os.environ["RANK"] = str(
-        local_rank  # + kwargs.get("node_rank", 0) * num_processes_per_node
+
+def run_script(script_path, *args):
+    # Construct the command to run the script
+    cmd = [sys.executable, script_path] + list(args)
+
+    # Run the script as a subprocess
+    process = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
     )
-    os.environ["WORLD_SIZE"] = str(4 * 1)  # num_nodes)
 
-    # Execute the train file
-    with open(train_file_path, "rb") as file:
-        exec(compile(file.read(), train_file_path, "exec"))
+    # Stream the output in real-time
+    for line in process.stdout:
+        print(line, end="")
+    for line in process.stderr:
+        print(line, end="", file=sys.stderr)
+
+    # Wait for the process to complete and get the return code
+    return_code = process.wait()
+    if return_code != 0:
+        raise subprocess.CalledProcessError(return_code, cmd)
 
 
 def _launch_distributed_inference(builder_args: BuilderArgs) -> None:
@@ -546,12 +552,20 @@ def _launch_distributed_inference(builder_args: BuilderArgs) -> None:
         monitor_interval=1,
     )
 
-    train_file_path = Path(__file__).parent / "distributed" / "dist_run.py"
+    train_file_path = Path(__file__).parent.parent.parent / "dist_run.py"
+    print(f"train_file_path: {train_file_path}")
+    # import argparse
+
+    # parser2 = argparse.ArgumentParser()
+
+    # args = parser2.parse_args()
+    args = []
+    print(f"args: {args}")
 
     elastic_launch(
         config=lc,
-        entrypoint=run_main,
-    )(train_file_path)
+        entrypoint=run_script,
+    )(train_file_path, *args)
     print(
         f"Done launching distributed inference on **4 ** {builder_args.num_gpus} GPUs."
     )
