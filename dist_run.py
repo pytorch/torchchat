@@ -57,6 +57,7 @@ logger = SingletonLogger.get_logger()
 NAME_TO_DISTRIBUTION_AND_DTYPE = {
     "llama2-7b-chat": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
     "llama3": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16),
+    "llama3.1": ("meta-llama/Meta-Llama-3.1-8B-Instruct", torch.bfloat16),
 }
 
 
