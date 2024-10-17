@@ -10,3 +10,6 @@
 [submodule "tokenizer/third-party/json"]
 	path = tokenizer/third-party/json
 	url = https://github.com/nlohmann/json.git
+[submodule "tokenizer/third-party/googletest"]
+	path = tokenizer/third-party/googletest
+	url = https://github.com/google/googletest.git
