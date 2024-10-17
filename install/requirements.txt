@@ -1,7 +1,7 @@
 # Requires python >=3.10
 
 # Hugging Face download
-huggingface_hub
+huggingface_hub[hf_transfer]
 
 # GGUF import
 gguf

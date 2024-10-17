@@ -244,7 +244,7 @@ def _add_jit_downloading_args(parser) -> None:
         "--model-directory",
         type=Path,
         default=default_model_dir,
-        help=f"The directory to store downloaded model artifacts. Default: {default_model_dir}",
+        help=f"The directory to store downloaded model artifacts. Default: {default_model_dir}. This is overriden by the huggingface cache directory if the model is downloaded from HuggingFace.",
     )
 
 

@@ -23,7 +23,7 @@ from torchtune.data import Message, padded_collate_tiled_images_and_mask
 
 from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
 
-from torchchat.cli.download import is_model_downloaded, load_model_configs
+from torchchat.cli.download import is_model_downloaded, load_model_configs, get_model_dir
 from torchchat.generate import Generator, GeneratorArgs
 from torchchat.model import FlamingoModel
 
@@ -522,7 +522,7 @@ def retrieve_model_info(args, model_id: str) -> Union[ModelInfo, None]:
     """
     if model_config := load_model_configs().get(model_id):
         if is_model_downloaded(model_id, args.model_directory):
-            path = args.model_directory / model_config.name
+            path = get_model_dir(model_config, args.model_directory)
             created = int(os.path.getctime(path))
             owned_by = getpwuid(os.stat(path).st_uid).pw_name
 
@@ -545,7 +545,7 @@ def get_model_info_list(args) -> ModelInfo:
     data = []
     for model_id, model_config in load_model_configs().items():
         if is_model_downloaded(model_id, args.model_directory):
-            path = args.model_directory / model_config.name
+            path = get_model_dir(model_config, args.model_directory)
             created = int(os.path.getctime(path))
             owned_by = getpwuid(os.stat(path).st_uid).pw_name
 
