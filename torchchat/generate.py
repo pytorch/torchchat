@@ -245,11 +245,7 @@ class Generator:
             f"Using device={self.builder_args.device} {get_device_info(self.builder_args.device)}"
         )
         set_precision(self.builder_args.precision)
-        if builder_args.distributed:
-            print(f"Using distributed={builder_args.distributed}")
-            device = torch.device(f"cuda:{int(os.environ['LOCAL_RANK'])}")
-            torch.cuda.set_device(device)
-            assert False, "Distributed is not supported yet"
+
         self.is_speculative = self.speculative_builder_args.checkpoint_path is not None
 
         if generator_args.chat_mode and not self.builder_args.is_chat_model:
@@ -1205,6 +1201,15 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
             print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
 
+def _launch_distributed_inference(
+    builder_args: BuilderArgs,
+):
+    from torch.distributed import launcher
+    from torch.distributed.elastic.utils.distributed import get_free_port
+
+    print("Launching distributed inference within generator")
+
+
 def main(args):
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
@@ -1221,5 +1226,8 @@ def main(args):
     )
     if torch.cuda.is_available():
         torch.cuda.reset_peak_memory_stats()
+    if builder_args.distributed:
+
+        return
     for _ in gen.chat(generator_args):
         pass

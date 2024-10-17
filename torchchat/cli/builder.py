@@ -16,7 +16,12 @@ import torch._dynamo.config
 import torch._inductor.config
 import torch.nn as nn
 
+from torch.distributed import launcher
+
 from torch.distributed.device_mesh import DeviceMesh
+from torch.distributed.elastic.multiprocessing.errors import record
+from torch.distributed.elastic.utils.distributed import get_free_port
+from torch.distributed.launcher.api import elastic_launch
 
 from torchchat.distributed import launch_distributed, ParallelDims, parallelize_llama
 
@@ -58,8 +63,8 @@ class BuilderArgs:
     distributed: bool = False
     num_gpus: int = 1
     num_nodes: int = 1
-    pp_dim: int = 1
-    tp_dim: int = 1
+    pp: int = 1
+    tp: int = 1
     is_chat_model: bool = False
     prefill_possible: bool = False
     dynamic_shapes: bool = False
@@ -164,8 +169,8 @@ class BuilderArgs:
         distributed = getattr(args, "distributed", False)
         num_gpus = getattr(args, "num_gpus", 1)
         num_nodes = getattr(args, "num_nodes", 1)
-        pp_dim = getattr(args, "pp_dim", 1)
-        tp_dim = getattr(args, "tp_dim", 1)
+        pp = getattr(args, "pp", 1)
+        tp = getattr(args, "tp", 1)
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
@@ -182,8 +187,8 @@ class BuilderArgs:
             distributed=distributed,
             num_gpus=num_gpus,
             num_nodes=num_nodes,
-            pp_dim=pp_dim,
-            tp_dim=tp_dim,
+            pp=pp,
+            tp=tp,
             is_chat_model=is_chat_model,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),
@@ -492,17 +497,68 @@ def _maybe_parellelize_model(
 
 
 def _load_model(builder_args: BuilderArgs) -> Model:
-    world_mesh, parallel_dims = _maybe_init_distributed(builder_args)
+    # world_mesh, parallel_dims = _maybe_init_distributed(builder_args)
     if builder_args.gguf_path:
         model = _load_model_gguf(builder_args)
-    elif builder_args.use_distributed:
-        model = _init_model_on_meta_device(builder_args)
+    # elif builder_args.use_distributed:
+    #    model = _init_model_on_meta_device(builder_args)
     else:
         model = _load_model_default(builder_args)
-    model = _maybe_parellelize_model(model, builder_args, world_mesh, parallel_dims)
+    # model = _maybe_parellelize_model(model, builder_args, world_mesh, parallel_dims)
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
+
+
+@record
+def run_main(local_rank):
+    # Add the directory containing the train file to sys.path
+    train_file_path = Path(__file__).parent.parent.parent / "dist_run.py"
+    print(f"******* {train_file_path=}")
+    sys.path.insert(0, os.path.dirname(os.path.abspath(train_file_path)))
+
+    # Set environment variables for distributed training
+    os.environ["LOCAL_RANK"] = str(local_rank)
+    os.environ["RANK"] = str(
+        local_rank  # + kwargs.get("node_rank", 0) * num_processes_per_node
+    )
+    os.environ["WORLD_SIZE"] = str(4 * 1)  # num_nodes)
+
+    # Execute the train file
+    with open(train_file_path, "rb") as file:
+        exec(compile(file.read(), train_file_path, "exec"))
+
+
+def _launch_distributed_inference(builder_args: BuilderArgs) -> None:
+    # create programmatic elastic launch
+    print("Launching distributed inference ...")
+
+    num_processes_per_node = 4  # builder_args.num_gpus + 1
+
+    lc = launcher.LaunchConfig(
+        min_nodes=1,
+        max_nodes=1,
+        nproc_per_node=num_processes_per_node,
+        # run_id=str(uuid.uuid4()),
+        rdzv_backend="c10d",
+        rdzv_endpoint="localhost:29401",
+        max_restarts=0,
+        monitor_interval=1,
+    )
+
+    train_file_path = Path(__file__).parent / "distributed" / "dist_run.py"
+
+    elastic_launch(
+        config=lc,
+        entrypoint=run_main,
+    )(train_file_path)
+    print(
+        f"Done launching distributed inference on **4 ** {builder_args.num_gpus} GPUs."
+    )
+    #  role=role, *args, **kwargs)
+
+    # assert False, "distributed inference is not supported yet"
+    # pass
 
 
 def _initialize_model(
@@ -513,6 +569,10 @@ def _initialize_model(
     support_tensor_subclass: bool = True,
 ) -> Model:
     print("Loading model...")
+    if builder_args.distributed:
+        # we part ways here with torchchat cli and move into dist inference
+        _launch_distributed_inference(builder_args)
+        return None
 
     if builder_args.gguf_path and (builder_args.dso_path or builder_args.pte_path):
         print("Setting gguf_kwargs for generate.")
