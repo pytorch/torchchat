@@ -12,7 +12,8 @@ add_library(
     tokenizer.h
     sentencepiece.cpp
     tiktoken.cpp
-    tokenizers.cpp)
+    tokenizers.cpp
+    pre_tokenizer.cpp)
 
 target_include_directories(
     tokenizer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
@@ -33,9 +34,31 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ${_pic_flag})
 target_link_libraries(tokenizer PUBLIC re2::re2 sentencepiece-static)
 
 # Add tokenizer_tool binary for testing
+set(binary_dir "${CMAKE_BINARY_DIR}/bin")
 OPTION(BUILD_TOKENIZE_TOOL "Build the tokenize_tool binary" OFF)
 if (BUILD_TOKENIZE_TOOL)
     add_executable(tokenize_tool tokenize_tool.cpp)
+    set_target_properties(tokenize_tool PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${binary_dir})
     target_include_directories(tokenize_tool PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
     target_link_libraries(tokenize_tool tokenizer)
+endif()
+
+# Add unit tests
+OPTION(BUILD_UNIT_TESTS "Enable unit testing" OFF)
+if (BUILD_UNIT_TESTS)
+    add_subdirectory(third-party/googletest)
+    enable_testing()
+    set(test_binary_dir "${binary_dir}/test")
+
+    file(GLOB test_source_files tests/*_test.cpp)
+    foreach(test_source_file ${test_source_files})
+        get_filename_component(test_name ${test_source_file} NAME_WE)
+        message(STATUS "Configuring unit test ${test_name}")
+        add_executable(${test_name} tests/main.cpp ${test_source_file})
+        set_target_properties(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${test_binary_dir})
+        target_include_directories(${test_name} PRIVATE ${CMAKE_SOURCE_DIR})
+        target_include_directories(${test_name} PRIVATE third-party/googletest/googletest/include)
+        target_link_libraries(${test_name} gtest tokenizer)
+        add_test(${test_name} "${test_binary_dir}/${test_name}")
+    endforeach()
 endif()
