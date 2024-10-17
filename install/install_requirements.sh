@@ -49,9 +49,6 @@ fi
 # package versions.
 PYTORCH_NIGHTLY_VERSION=dev20241002
 
-# Nightly version for torchvision
-VISION_NIGHTLY_VERSION=dev20241002
-
 # Nightly version for torchtune
 TUNE_NIGHTLY_VERSION=dev20241010
 
