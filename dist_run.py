@@ -69,8 +69,8 @@ def _init_distributed():
     return rank, world_size
 
 
-def _create_device_mesh(mesh_dimensions):
-    return dist.init_device_mesh("cuda", mesh_dimensions, mesh_dim_names=("pp", "tp"))
+def _create_device_mesh(pp_degree, tp_degree):
+    return dist.init_device_mesh("cuda", (pp_degree, tp_degree), mesh_dim_names=("pp", "tp"))
 
 
 def dict_to_args(dictionary: Dict[str, Any]) -> SimpleNamespace:
@@ -343,8 +343,7 @@ def main(args):
     tp_degree = world_size // pp_degree
 
     # Create device mesh
-    mesh_dimensions = (pp_degree, tp_degree)
-    device_mesh = _create_device_mesh(mesh_dimensions)
+    device_mesh = _create_device_mesh(pp_degree, tp_degree)
     tp_mesh = device_mesh["tp"]
     pp_mesh = device_mesh["pp"]
     logger.info(f"Created device mesh: {device_mesh}\n{tp_mesh=}, {pp_mesh=}")
