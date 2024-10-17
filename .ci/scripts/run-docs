@@ -7,7 +7,7 @@ fi
 
 if [ "$1" == "readme" ]; then
         echo "::group::Create script to run README"
-        python3 torchchat/utils/scripts/updown.py --create-sections --file README.md --replace 'llama3:stories15M,-l 3:-l 2' --suppress huggingface-cli,HF_TOKEN > ./run-readme.sh
+        python3 torchchat/utils/scripts/updown.py --create-sections --file README.md --replace 'llama3.1:stories15M,-l 3:-l 2' --suppress huggingface-cli,HF_TOKEN > ./run-readme.sh
         # for good measure, if something happened to updown processor,
         # and it did not error out, fail with an exit 1
         echo "exit 1" >> ./run-readme.sh
