@@ -12,8 +12,6 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
-import torchvision
-
 from typing import Any, Callable, Dict, Optional, Union
 from collections.abc import Hashable
 
