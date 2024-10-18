@@ -501,7 +501,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library.
 
 <p align="center">
-    <img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
+    <img src="https://pytorch.org/executorch/main/_static/img/chat.png" width="600" alt="Android app running a LlaMA model">
 </p>
 
 
