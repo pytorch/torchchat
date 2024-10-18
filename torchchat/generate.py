@@ -31,6 +31,7 @@ from torchchat.cli.builder import (
     TokenizerArgs,
 )
 from torchchat.model import Model, ModelType
+from torchchat.distributed.generate import DistributedGenerator
 from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
 
@@ -1215,19 +1216,37 @@ def main(args):
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
     generator_args = GeneratorArgs.from_args(args)
-    gen = Generator(
-        builder_args,
-        speculative_builder_args,
-        tokenizer_args,
-        generator_args,
-        args.profile,
-        args.quantize,
-        args.draft_quantize,
-    )
-    if torch.cuda.is_available():
-        torch.cuda.reset_peak_memory_stats()
-    if builder_args.distributed:
+    if not builder_args.distributed:
+        gen = Generator(
+            builder_args,
+            speculative_builder_args,
+            tokenizer_args,
+            generator_args,
+            args.profile,
+            args.quantize,
+            args.draft_quantize,
+        )
+        if torch.cuda.is_available():
+            torch.cuda.reset_peak_memory_stats()
+        
 
-        return
-    for _ in gen.chat(generator_args):
-        pass
+        for _ in gen.chat(generator_args):
+            pass
+    else:
+        dist_gen = DistributedGenerator(
+            builder_args,
+            speculative_builder_args,
+            tokenizer_args,
+            # generator_args,
+            args.profile,
+            args.quantize,
+            args.draft_quantize,
+        )
+
+        dist_gen.add_request(0, "Tell me a joke")
+        dist_gen.add_request(1, "Tell me another joke")
+
+        outputs = dist_gen.step()
+        while len(outputs):
+            print(outputs)
+            outputs = dist_gen.step()

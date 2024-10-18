@@ -409,6 +409,22 @@ def _add_distributed_args(parser) -> None:
         help=argparse.SUPPRESS,
         # "Use the specified model checkpoint directory",
     )
+    parser.add_argument(
+        "--pp",
+        "--pipeline-parallel",
+        type=int,
+        default=1,
+        help=argparse.SUPPRESS,
+        # "Pipeline parallel degree",
+    )
+    parser.add_argument(
+        "--tp",
+        "--tensor-parallel",
+        type=int,
+        default=1,
+        help=argparse.SUPPRESS,
+        # "Tensor parallel degree",
+    )
 
 
 # Add CLI Args related to custom model inputs
