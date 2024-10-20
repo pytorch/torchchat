@@ -52,7 +52,7 @@ from torchchat.utils.build_utils import (
 
 
 # Flag for whether the a8wxdq quantizer is available.
-a8wxdq_load_error: Optional[Exception] = None
+torchao_experimental_load_error: Optional[Exception] = None
 
 #########################################################################
 ###                       handle arg validation                       ###
@@ -887,8 +887,9 @@ quantizer_class_dict = {
 
 try:
     import importlib.util
-    import sys
     import os
+    import sys
+
     torchao_build_path = f"{os.getcwd()}/torchao-build"
 
     # Try loading quantizer
@@ -896,15 +897,25 @@ try:
         "torchao_experimental_quant_api",
         f"{torchao_build_path}/src/ao/torchao/experimental/quant_api.py",
     )
-    torchao_experimental_quant_api = importlib.util.module_from_spec(torchao_experimental_quant_api_spec)
+    torchao_experimental_quant_api = importlib.util.module_from_spec(
+        torchao_experimental_quant_api_spec
+    )
     sys.modules["torchao_experimental_quant_api"] = torchao_experimental_quant_api
-    torchao_experimental_quant_api_spec.loader.exec_module(torchao_experimental_quant_api)
-    from torchao_experimental_quant_api import Int8DynActIntxWeightQuantizer
-    quantizer_class_dict["linear:a8wxdq"] = Int8DynActIntxWeightQuantizer
+    torchao_experimental_quant_api_spec.loader.exec_module(
+        torchao_experimental_quant_api
+    )
+    from torchao_experimental_quant_api import (
+        Int8DynActIntxWeightLinearQuantizer,
+        IntxWeightEmbeddingQuantizer,
+    )
+
+    ao_quantizer_class_dict["linear:a8wxdq"] = Int8DynActIntxWeightLinearQuantizer
+    ao_quantizer_class_dict["embedding:wx"] = IntxWeightEmbeddingQuantizer
 
     # Try loading custom op
     try:
         import glob
+
         libs = glob.glob(f"{torchao_build_path}/cmake-out/lib/libtorchao_ops_aten.*")
         libs = list(filter(lambda l: (l.endswith("so") or l.endswith("dylib")), libs))
         torch.ops.load_library(libs[0])
@@ -915,8 +926,9 @@ try:
 except Exception as e:
     class ErrorHandler(QuantHandler):
         def __init__(self, model: Optional[nn.Module]=None, device="cpu", precision=None):
-            global a8wxdq_load_error
-            raise Exception(f"Note: Failed to load torchao experimental a8wxdq quantizer with error: {a8wxdq_load_error}")
+            global torchao_experimental_load_error
+            raise Exception(f"Note: Failed to load torchao experimental quantizer with error: {torchao_experimental_load_error}")
             
     a8wxdq_load_error = e
     quantizer_class_dict["linear:a8wxdq"] = ErrorHandler
+    quantizer_class_dict["embedding:wx"] = ErrorHandler
