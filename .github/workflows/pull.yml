@@ -1132,14 +1132,14 @@ jobs:
           wget -O ./tokenizer.model https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
           export PRMT="Once upon a time in a land far away"
           echo "Generate eager"
-          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"linear:a8wxdq": {"bitwidth": 4, "groupsize": 256, "has_weight_zeros": false}}'
+          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
           echo "Generate compile"
-          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"linear:a8wxdq": {"bitwidth": 4, "groupsize": 256, "has_weight_zeros": false}}' --compile
+          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}' --compile
           echo "Export and run ET (C++ runner)"
-          python torchchat.py export stories110M --output-pte-path ./model.pte --dtype float32 --quantize '{"linear:a8wxdq": {"bitwidth": 4, "groupsize": 256, "has_weight_zeros": false}}'
+          python torchchat.py export stories110M --output-pte-path ./model.pte --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
           ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
           echo "Export and run AOTI (C++ runner)"
-          python torchchat.py export stories110M --output-dso-path ./model.so --dtype float32 --quantize '{"linear:a8wxdq": {"bitwidth": 4, "groupsize": 256, "has_weight_zeros": false}}'
+          python torchchat.py export stories110M --output-dso-path ./model.so --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
           ./cmake-out/aoti_run ./model.so -z ./tokenizer.model -t 0 -i "${PRMT}"
           echo "Generate AOTI"
           python torchchat.py generate stories110M --dso-path ./model.so --prompt "${PRMT}"
