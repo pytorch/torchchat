@@ -110,7 +110,7 @@ try:
     from executorch.exir.tracer import Value
 
     from torch._export import capture_pre_autograd_graph
-    from torch.export import export, ExportedProgram
+    from torch.export import export_for_training, ExportedProgram
 
     from torchchat.model import apply_rotary_emb, Attention
     from torchchat.utils.build_utils import get_precision
@@ -226,7 +226,7 @@ try:
             raise ValueError(
                 f"Expected passed in model to be an instance of fx.GraphModule, got {type(model)}"
             )
-        core_aten_ep = export(model, example_inputs, dynamic_shapes=dynamic_shapes)
+        core_aten_ep = export_for_training(model, example_inputs, dynamic_shapes=dynamic_shapes)
         if verbose:
             logging.info(f"Core ATen graph:\n{core_aten_ep.graph}")
         return core_aten_ep
