@@ -426,6 +426,20 @@ def _add_distributed_args(parser) -> None:
         # "Tensor parallel degree",
     )
 
+    parser.add_argument(
+        "--ntokens",
+        type=int,
+        default=40,
+        help="Number of tokens to generate",
+    )
+    parser.add_argument(
+        "--chpt-from",
+        type=str,
+        default="hf",  # TODO: change to torchchat once we support it well
+        help="Checkpoint format to load from",
+        choices=["hf", "torchchat"],
+    )
+
 
 # Add CLI Args related to custom model inputs
 def _add_custom_model_args(parser) -> None:

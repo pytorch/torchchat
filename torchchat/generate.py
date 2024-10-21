@@ -1245,8 +1245,20 @@ def main(args):
 
         dist_gen.add_request(0, "Tell me a joke")
         dist_gen.add_request(1, "Tell me another joke")
+        dist_gen.add_request(2, "Who is this Santa")
+        dist_gen.add_request(3, "What did the fish say to the duck")
 
-        outputs = dist_gen.step()
-        while len(outputs):
-            print(outputs)
+        responses = {}
+
+        running = True
+        while running:
             outputs = dist_gen.step()
+            for o in outputs:
+                responses[o.request_id] = responses.get(o.request_id, "") +  o.output
+                running &= not o.is_finished
+
+        print(responses)
+        
+        dist_gen.shutdown()
+
+            

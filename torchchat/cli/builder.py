@@ -16,12 +16,9 @@ import torch._dynamo.config
 import torch._inductor.config
 import torch.nn as nn
 
-from torch.distributed import launcher
-
 from torch.distributed.device_mesh import DeviceMesh
 from torch.distributed.elastic.multiprocessing.errors import record
 from torch.distributed.elastic.utils.distributed import get_free_port
-from torch.distributed.launcher.api import elastic_launch
 
 from torchchat.distributed import launch_distributed, ParallelDims, parallelize_llama
 
@@ -65,6 +62,8 @@ class BuilderArgs:
     num_nodes: int = 1
     pp: int = 1
     tp: int = 1
+    chpt_from: str = "hf"
+    ntokens: int = 40
     is_chat_model: bool = False
     prefill_possible: bool = False
     dynamic_shapes: bool = False
@@ -171,6 +170,8 @@ class BuilderArgs:
         num_nodes = getattr(args, "num_nodes", 1)
         pp = getattr(args, "pp", 1)
         tp = getattr(args, "tp", 1)
+        chpt_from = getattr(args, "chpt_from", "hf")
+        ntokens = getattr(args, "ntokens", 40)
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
@@ -189,6 +190,8 @@ class BuilderArgs:
             num_nodes=num_nodes,
             pp=pp,
             tp=tp,
+            chpt_from=chpt_from,
+            ntokens=ntokens,
             is_chat_model=is_chat_model,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),
@@ -508,7 +511,7 @@ def _load_model(builder_args: BuilderArgs) -> Model:
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
-    
+
 
 def _initialize_model(
     builder_args: BuilderArgs,
