@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
 
+"""
 from sarathi.config import SystemConfig
 from sarathi.core.datatypes.request_output import RequestOutput
 from sarathi.core.datatypes.scheduler_output import SchedulerOutputs
@@ -13,12 +14,15 @@ from sarathi.core.datatypes.sequence import (
     SequenceScheduleMetadata,
 )
 from sarathi.core.datatypes.sequence_status import SequenceStatus
-from sarathi.utils.threading_utils import synchronized
+"""
+from torchchat.distributed.adaptive.threading import synchronized
+
 
 @dataclass
 class SequenceProcessingResult:
     ignored_seqs: List[Sequence]
     seq_metadata_list: List[SequenceMetadata]
+
 
 class BaseSequenceManager(ABC):
 
@@ -49,7 +53,9 @@ class BaseSequenceManager(ABC):
     def _resume_seq(self, seq_id: str) -> None:
         seq = self._get_seq(seq_id)
         if not (seq.is_waiting() or seq.is_paused()):
-            raise ValueError(f"Cannot resume sequence {seq_id}: neither waiting nor paused")
+            raise ValueError(
+                f"Cannot resume sequence {seq_id}: neither waiting nor paused"
+            )
         seq.set_status(SequenceStatus.RUNNING)
 
     def _on_seq_scheduled(self, seq_sched_metadata: SequenceScheduleMetadata) -> None:
@@ -60,9 +66,14 @@ class BaseSequenceManager(ABC):
         pass
 
     @synchronized
-    def on_schedule(self, scheduler_outputs: SchedulerOutputs) -> SequenceProcessingResult:
-        ignored_seqs = [self._free_and_get_seq(seq_id) for seq_id in scheduler_outputs.ignored_seq_ids]
-        
+    def on_schedule(
+        self, scheduler_outputs: SchedulerOutputs
+    ) -> SequenceProcessingResult:
+        ignored_seqs = [
+            self._free_and_get_seq(seq_id)
+            for seq_id in scheduler_outputs.ignored_seq_ids
+        ]
+
         for seq_id in scheduler_outputs.preempted_seq_ids:
             self._preempt_seq(seq_id)
 
@@ -73,7 +84,9 @@ class BaseSequenceManager(ABC):
 
         return SequenceProcessingResult(ignored_seqs, seq_metadata_list)
 
-    def _create_sequence_metadata(self, seq_sched_metadata: SequenceScheduleMetadata) -> SequenceMetadata:
+    def _create_sequence_metadata(
+        self, seq_sched_metadata: SequenceScheduleMetadata
+    ) -> SequenceMetadata:
         self._on_seq_scheduled(seq_sched_metadata)
         seq = self._get_seq(seq_sched_metadata.seq_id)
         return SequenceMetadata(
@@ -97,27 +110,43 @@ class BaseSequenceManager(ABC):
             self._free_seq(seq.seq_id)
 
     @synchronized
-    def on_step_completed(self, scheduler_outputs: SchedulerOutputs, sampler_outputs: Optional[SamplerOutputs]) -> None:
+    def on_step_completed(
+        self,
+        scheduler_outputs: SchedulerOutputs,
+        sampler_outputs: Optional[SamplerOutputs],
+    ) -> None:
         if sampler_outputs is None:
             return
 
-        for scheduled_seq_metadata, sampler_output in zip(scheduler_outputs.scheduled_seq_metadata_list, sampler_outputs):
+        for scheduled_seq_metadata, sampler_output in zip(
+            scheduler_outputs.scheduled_seq_metadata_list, sampler_outputs
+        ):
             if scheduled_seq_metadata.seq_id != sampler_output.seq_id:
-                raise ValueError(f"Mismatch in sequence IDs: {scheduled_seq_metadata.seq_id} != {sampler_output.seq_id}")
-            
+                raise ValueError(
+                    f"Mismatch in sequence IDs: {scheduled_seq_metadata.seq_id} != {sampler_output.seq_id}"
+                )
+
             seq = self._get_seq(scheduled_seq_metadata.seq_id)
             if seq.is_waiting():
                 continue
 
             if not seq.prompt_processing_finished:
-                seq.update_prompt_tokens_stage_processed(scheduled_seq_metadata.prompt_chunk_len)
-                seq.update_prompt_tokens_processed(scheduled_seq_metadata.prompt_chunk_len)
+                seq.update_prompt_tokens_stage_processed(
+                    scheduled_seq_metadata.prompt_chunk_len
+                )
+                seq.update_prompt_tokens_processed(
+                    scheduled_seq_metadata.prompt_chunk_len
+                )
 
             self._pause_seq(scheduled_seq_metadata.seq_id)
             self._process_seq_output(seq, sampler_output)
 
-    def generate_request_outputs(self, processing_result: SequenceProcessingResult) -> List[RequestOutput]:
-        all_seqs = processing_result.ignored_seqs + [x.seq for x in processing_result.seq_metadata_list]
+    def generate_request_outputs(
+        self, processing_result: SequenceProcessingResult
+    ) -> List[RequestOutput]:
+        all_seqs = processing_result.ignored_seqs + [
+            x.seq for x in processing_result.seq_metadata_list
+        ]
         return [RequestOutput.from_seq(seq) for seq in all_seqs]
 
     def _get_seq(self, seq_id: str) -> Sequence:
