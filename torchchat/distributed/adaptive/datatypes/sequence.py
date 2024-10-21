@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from sarathi.core.datatypes.block import LogicalTokenBlock
-from sarathi.core.datatypes.sampling_params import SamplingParams
-from sarathi.core.datatypes.sequence_state import SequenceState
-from sarathi.core.datatypes.sequence_status import SequenceStatus
+# from sarathi.core.datatypes.block import LogicalTokenBlock
+# from sarathi.core.datatypes.sampling_params import SamplingParams
+from torchchat.distributed.adaptive.datatypes.sequence_state import SequenceState
+from torchchat.distributed.adaptive.datatypes.sequence_status import SequenceStatus
 
 
 @dataclass

@@ -1,8 +1,9 @@
+import time
 from dataclasses import dataclass, field
 from typing import Optional
-import time
 
-from improved_sequence_status import SequenceStatus  # Assuming we're using the improved version
+from torchchat.distributed.adaptive.datatypes.sequence_status import SequenceStatus
+
 
 @dataclass
 class SequenceState:
@@ -37,7 +38,9 @@ class SequenceState:
 
     @property
     def e2e_time_piecewise_normalized(self) -> float:
-        return self.scheduling_delay + (self.execution_plus_preemption_time / self.num_output_tokens)
+        return self.scheduling_delay + (
+            self.execution_plus_preemption_time / self.num_output_tokens
+        )
 
     @property
     def e2e_time_normalized(self) -> Optional[float]:
@@ -45,17 +48,27 @@ class SequenceState:
 
     @property
     def e2e_prefill_time(self) -> Optional[float]:
-        return self.prompt_processing_completed_at - self.arrived_at if self.prompt_processing_completed_at else None
+        return (
+            self.prompt_processing_completed_at - self.arrived_at
+            if self.prompt_processing_completed_at
+            else None
+        )
 
     @property
     def e2e_prefill_time_normalized(self) -> Optional[float]:
-        return self.e2e_prefill_time / self.num_prompt_tokens if self.e2e_prefill_time else None
+        return (
+            self.e2e_prefill_time / self.num_prompt_tokens
+            if self.e2e_prefill_time
+            else None
+        )
 
     @property
     def e2e_prefill_time_piecewise_normalized(self) -> Optional[float]:
         if not self.prompt_processing_completed_at:
             return None
-        return self.scheduling_delay + (self.prefill_execution_plus_preemption_time / self.num_prompt_tokens)
+        return self.scheduling_delay + (
+            self.prefill_execution_plus_preemption_time / self.num_prompt_tokens
+        )
 
     @property
     def prefill_execution_plus_preemption_time(self) -> Optional[float]:
@@ -105,13 +118,19 @@ class SequenceState:
         elif self.status == SequenceStatus.PAUSED:
             self._handle_transitions_from_paused(current_time, new_status)
         elif self.status.is_finished:
-            raise ValueError(f"Cannot transition from finished state {self.status} to {new_status} for request {self.id}.")
+            raise ValueError(
+                f"Cannot transition from finished state {self.status} to {new_status} for request {self.id}."
+            )
         else:
-            raise ValueError(f"Invalid state transition from {self.status} to {new_status} for request {self.id}.")
+            raise ValueError(
+                f"Invalid state transition from {self.status} to {new_status} for request {self.id}."
+            )
 
         self.status = new_status
 
-    def _handle_transitions_from_waiting(self, current_time: float, new_status: SequenceStatus) -> None:
+    def _handle_transitions_from_waiting(
+        self, current_time: float, new_status: SequenceStatus
+    ) -> None:
         if new_status == SequenceStatus.RUNNING:
             if not self.scheduled_at:
                 self.is_scheduled = True
@@ -124,9 +143,13 @@ class SequenceState:
             self.is_completed = True
             self.completed_at = self.scheduled_at = current_time
         else:
-            raise ValueError(f"Invalid transition from WAITING to {new_status} for request {self.id}.")
+            raise ValueError(
+                f"Invalid transition from WAITING to {new_status} for request {self.id}."
+            )
 
-    def _handle_transitions_from_running(self, current_time: float, new_status: SequenceStatus) -> None:
+    def _handle_transitions_from_running(
+        self, current_time: float, new_status: SequenceStatus
+    ) -> None:
         self.execution_time += current_time - self.last_execution_start_at
         if new_status == SequenceStatus.PAUSED:
             self.num_pauses += 1
@@ -135,9 +158,13 @@ class SequenceState:
             self.num_restarts += 1
             self.last_restart_at = current_time
         else:
-            raise ValueError(f"Invalid transition from RUNNING to {new_status} for request {self.id}.")
+            raise ValueError(
+                f"Invalid transition from RUNNING to {new_status} for request {self.id}."
+            )
 
-    def _handle_transitions_from_paused(self, current_time: float, new_status: SequenceStatus) -> None:
+    def _handle_transitions_from_paused(
+        self, current_time: float, new_status: SequenceStatus
+    ) -> None:
         self.preempted_time += current_time - self.last_pause_at
         if new_status.is_finished:
             self.is_completed = True
@@ -148,7 +175,9 @@ class SequenceState:
             self.num_restarts += 1
             self.last_restart_at = current_time
         else:
-            raise ValueError(f"Invalid transition from PAUSED to {new_status} for request {self.id}.")
+            raise ValueError(
+                f"Invalid transition from PAUSED to {new_status} for request {self.id}."
+            )
 
     def on_prompt_processing_completed(self) -> None:
         self.prompt_processing_completed_at = time.monotonic()
@@ -157,5 +186,7 @@ class SequenceState:
         current_time = time.monotonic()
         self.num_output_tokens += 1
         if self.last_token_generated_at:
-            self.last_token_generation_time = current_time - self.last_token_generated_at
+            self.last_token_generation_time = (
+                current_time - self.last_token_generated_at
+            )
         self.last_token_generated_at = current_time
