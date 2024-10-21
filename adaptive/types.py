@@ -1,39 +1,58 @@
 from dataclasses import dataclass
-from enum import Enum
-from typing import Dict, List, Optional, Tuple
+from enum import Enum, auto
+from typing import Dict, List, Optional, Tuple, NewType
 
-GPULocation = Tuple[Optional[str], int]  # (node_ip, gpu_id)
-ResourceMapping = List[GPULocation]
-ReplicaResourceMapping = List[ResourceMapping]  # List ResourceMapping for each replica
+# Custom types
+GPULocation = NewType('GPULocation', Tuple[Optional[str], int])
+ResourceMapping = NewType('ResourceMapping', List[GPULocation])
+ReplicaResourceMapping = NewType('ReplicaResourceMapping', List[ResourceMapping])
 
+class BaseEnum(Enum):
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
 
-class SchedulerType(Enum):
-    VLLM = "VLLM"
-    ORCA = "ORCA"
-    FASTER_TRANSFORMER = "FASTER_TRANSFORMER"
-    ADAPTIVE = "Adaptive"
-    SIMPLE_CHUNKING = "SIMPLE_CHUNKING"
+class SchedulerType(BaseEnum):
+    VLLM = auto()
+    ORCA = auto()
+    FASTER_TRANSFORMER = auto()
+    ADAPTIVE = auto()
+    SIMPLE_CHUNKING = auto()
 
+class RequestGeneratorType(BaseEnum):
+    SYNTHETIC = auto()
+    TRACE = auto()
 
-class RequestGeneratorType(Enum):
-    SYNTHETIC = "SYNTHETIC"
-    TRACE = "TRACE"
+class RequestIntervalGeneratorType(BaseEnum):
+    POISSON = auto()
+    GAMMA = auto()
+    STATIC = auto()
+    TRACE = auto()
 
+class RequestLengthGeneratorType(BaseEnum):
+    UNIFORM = auto()
+    ZIPF = auto()
+    TRACE = auto()
+    FIXED = auto()
 
-class RequestIntervalGeneratorType(Enum):
-    POISSON = "POISSON"
-    GAMMA = "GAMMA"
-    STATIC = "STATIC"
-    TRACE = "TRACE"
+class AttentionBackend(BaseEnum):
+    FLASHINFER = auto()
+    NO_OP = auto()
 
+@dataclass
+class GPUInfo:
+    node_ip: Optional[str]
+    gpu_id: int
 
-class RequestLengthGeneratorType(Enum):
-    UNIFORM = "UNIFORM"
-    ZIPF = "ZIPF"
-    TRACE = "TRACE"
-    FIXED = "FIXED"
+    def to_tuple(self) -> GPULocation:
+        return GPULocation((self.node_ip, self.gpu_id))
 
+    @classmethod
+    def from_tuple(cls, location: GPULocation) -> 'GPUInfo':
+        return cls(node_ip=location[0], gpu_id=location[1])
 
-class AttentionBackend(Enum):
-    FLASHINFER = "FLASHINFER"
-    NO_OP = "NO_OP"
+def create_resource_mapping(gpu_infos: List[GPUInfo]) -> ResourceMapping:
+    return ResourceMapping([gpu_info.to_tuple() for gpu_info in gpu_infos])
+
+def create_replica_resource_mapping(resource_mappings: List[ResourceMapping]) -> ReplicaResourceMapping:
+    return ReplicaResourceMapping(resource_mappings)
