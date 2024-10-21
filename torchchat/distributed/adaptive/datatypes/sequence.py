@@ -1,9 +1,11 @@
- from dataclasses import dataclass, field
+from dataclasses import dataclass, field
 from typing import List, Optional
+
 from sarathi.core.datatypes.block import LogicalTokenBlock
 from sarathi.core.datatypes.sampling_params import SamplingParams
 from sarathi.core.datatypes.sequence_state import SequenceState
 from sarathi.core.datatypes.sequence_status import SequenceStatus
+
 
 @dataclass
 class Sequence:
@@ -27,7 +29,9 @@ class Sequence:
     tokens: Optional[List[str]] = None
 
     def __post_init__(self):
-        self.state = SequenceState(self.seq_id, self.arrival_time, len(self.prompt_token_ids))
+        self.state = SequenceState(
+            self.seq_id, self.arrival_time, len(self.prompt_token_ids)
+        )
         self._append_tokens_to_blocks(self.prompt_token_ids)
 
     @property
@@ -39,10 +43,12 @@ class Sequence:
         self.state.set_status(status)
 
     def _append_logical_block(self) -> None:
-        self.logical_token_blocks.append(LogicalTokenBlock(
-            block_number=len(self.logical_token_blocks),
-            block_size=self.block_size,
-        ))
+        self.logical_token_blocks.append(
+            LogicalTokenBlock(
+                block_number=len(self.logical_token_blocks),
+                block_size=self.block_size,
+            )
+        )
 
     def _append_tokens_to_blocks(self, token_ids: List[int]) -> None:
         for token_id in token_ids:
@@ -98,7 +104,11 @@ class Sequence:
         return self.prompt_token_ids + self.output_token_ids
 
     def get_last_token_id(self) -> int:
-        return self.output_token_ids[-1] if self.output_token_ids else self.prompt_token_ids[-1]
+        return (
+            self.output_token_ids[-1]
+            if self.output_token_ids
+            else self.prompt_token_ids[-1]
+        )
 
     def get_next_prompt_chunk_token_ids(self, chunk_size: int) -> List[int]:
         start = self.prompt_tokens_stage_processed
@@ -106,7 +116,9 @@ class Sequence:
         return self.prompt_token_ids[start:end]
 
     def get_next_prompt_chunk_len(self, chunk_size: int) -> int:
-        return min(chunk_size, len(self.prompt_token_ids) - self.prompt_tokens_stage_processed)
+        return min(
+            chunk_size, len(self.prompt_token_ids) - self.prompt_tokens_stage_processed
+        )
 
     def is_finished(self) -> bool:
         return self.status.is_finished
@@ -135,7 +147,7 @@ class Sequence:
     def check_stop(self) -> None:
         for stop_str in self.sampling_params.stop:
             if self.output_text.endswith(stop_str):
-                self.output_text = self.output_text[:-len(stop_str)]
+                self.output_text = self.output_text[: -len(stop_str)]
                 self.status = SequenceStatus.FINISHED_STOPPED
                 return
 
@@ -143,7 +155,10 @@ class Sequence:
             self.status = SequenceStatus.FINISHED_LENGTH_CAPPED
             return
 
-        if not self.sampling_params.ignore_eos and self.get_last_token_id() == self.eos_token_id:
+        if (
+            not self.sampling_params.ignore_eos
+            and self.get_last_token_id() == self.eos_token_id
+        ):
             self.status = SequenceStatus.FINISHED_STOPPED
 
     def __repr__(self) -> str:
@@ -158,6 +173,7 @@ class Sequence:
             f"num_prompt_tokens_stage_processed={self.prompt_tokens_stage_processed}, "
             f"prompt_stage_processing_finished={self.prompt_stage_processing_finished})"
         )
+
 
 @dataclass
 class SequenceScheduleMetadata:
@@ -181,10 +197,15 @@ class SequenceScheduleMetadata:
         return max(self.prompt_chunk_len, 1)
 
     @classmethod
-    def from_sequence(cls, seq: Sequence, prompt_chunk_len: Optional[int] = None) -> "SequenceScheduleMetadata":
+    def from_sequence(
+        cls, seq: Sequence, prompt_chunk_len: Optional[int] = None
+    ) -> "SequenceScheduleMetadata":
         if prompt_chunk_len is None:
-            prompt_chunk_len = 0 if seq.prompt_stage_processing_finished else seq.get_prompt_len()
+            prompt_chunk_len = (
+                0 if seq.prompt_stage_processing_finished else seq.get_prompt_len()
+            )
         return cls(seq_id=seq.seq_id, prompt_chunk_len=prompt_chunk_len)
+
 
 @dataclass
 class SequenceMetadata:
@@ -208,6 +229,7 @@ class SequenceMetadata:
     def num_tokens(self) -> int:
         return max(self.prompt_chunk_len, 1)
 
+
 @dataclass
 class SamplerOutput:
     seq_id: str
@@ -217,5 +239,6 @@ class SamplerOutput:
         if not isinstance(other, SamplerOutput):
             return NotImplemented
         return self.seq_id == other.seq_id and self.output_token == other.output_token
+
 
 SamplerOutputs = List[SamplerOutput]

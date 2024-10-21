@@ -6,15 +6,17 @@ from typing import Dict, List, Optional, Tuple
 from sarathi.config import SystemConfig
 from sarathi.core.datatypes.request_output import RequestOutput
 from sarathi.core.datatypes.scheduler_output import SchedulerOutputs
-from sarathi.core.datatypes.sequence import (
+
+
+"""
+from torchchat.distributed.adaptive.datatypes.sequence import (
     SamplerOutput,
     SamplerOutputs,
     Sequence,
     SequenceMetadata,
     SequenceScheduleMetadata,
 )
-from sarathi.core.datatypes.sequence_status import SequenceStatus
-"""
+from torchchat.distributed.adaptive.datatypes.sequence_status import SequenceStatus
 from torchchat.distributed.adaptive.threading import synchronized
 
 
