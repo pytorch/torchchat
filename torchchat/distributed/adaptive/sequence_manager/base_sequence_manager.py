@@ -4,11 +4,11 @@ from typing import Dict, List, Optional, Tuple
 
 """
 from sarathi.config import SystemConfig
-from sarathi.core.datatypes.request_output import RequestOutput
-from sarathi.core.datatypes.scheduler_output import SchedulerOutputs
 
 
 """
+from torchchat.distributed.adaptive.datatypes.request_output import RequestOutput
+from torchchat.distributed.adaptive.datatypes.scheduler_output import SchedulerOutputs
 from torchchat.distributed.adaptive.datatypes.sequence import (
     SamplerOutput,
     SamplerOutputs,
@@ -17,7 +17,7 @@ from torchchat.distributed.adaptive.datatypes.sequence import (
     SequenceScheduleMetadata,
 )
 from torchchat.distributed.adaptive.datatypes.sequence_status import SequenceStatus
-from torchchat.distributed.adaptive.threading import synchronized
+from torchchat.distributed.adaptive.threading_utils import synchronized
 
 
 @dataclass
@@ -28,7 +28,9 @@ class SequenceProcessingResult:
 
 class BaseSequenceManager(ABC):
 
-    def __init__(self, config: SystemConfig):
+    def __init__(
+        self,
+    ):  # config: SystemConfig):
         self.seq_map: Dict[str, Sequence] = {}
 
     @synchronized

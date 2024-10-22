@@ -24,7 +24,8 @@ from typing import Any, List, Optional
 )
 """
 
-from torchchat.distributed.adaptive.engine.base_engine import BaseLLMEngine
+from torchchat.distributed.adaptive.datatypes.request_output import RequestOutput
+from torchchat.distributed.adaptive.engine.base_engine import BaseLLMEngine as LLMEngine
 from torchchat.distributed.logging_utils import SingletonLogger
 from tqdm import tqdm
 
@@ -101,10 +102,12 @@ class TextGenerator:
         """Create output directory if it doesn't exist."""
         self.config.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def _initialize_engine(self) -> Any:
+    def _initialize_engine(self, model_name) -> Any:
         """Initialize the LLM engine with system configuration."""
         try:
-            return LLMEngine.from_system_config(self.config.create_system_config())
+            return LLMEngine(
+                model_name
+            )  # .from_system_config(self.config.create_system_config())
         except Exception as e:
             logger.error(f"Failed to initialize LLM engine: {e}")
             raise

@@ -188,7 +188,7 @@ class BaseLLMEngine:
         """Initialize the sequence manager."""
         return EngineSequenceManager(self.tokenizer, self.config)
 
-    def _initialize_metrics_store(self) -> MetricsStore:
+    '''def _initialize_metrics_store(self) -> MetricsStore:
         """Initialize the metrics store."""
         return MetricsStore.get_or_create_instance(
             self.config.replica_config,
@@ -292,6 +292,7 @@ class BaseLLMEngine:
         self._process_model_outputs_timer = CpuTimer(
             CpuOperationMetrics.PROCESS_MODEL_OUTPUTS
         )
+    '''
 
     @synchronized
     def add_request(

@@ -1,9 +1,12 @@
 from typing import List, Union
 
-from sarathi.config import SystemConfig
-from sarathi.core.sequence_manager.base_sequence_manager import BaseSequenceManager
-from sarathi.transformers_utils.tokenizer import detokenize_incrementally
+# from sarathi.transformers_utils.tokenizer import detokenize_incrementally
 from torchchat.distributed.adaptive.datatypes.sequence import Sequence
+
+# from sarathi.config import SystemConfig
+from torchchat.distributed.adaptive.sequence_manager.base_sequence_manager import (
+    BaseSequenceManager,
+)
 from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
 
 
@@ -15,7 +18,7 @@ class EngineSequenceManager(BaseSequenceManager):
     def __init__(
         self,
         tokenizer: Union[PreTrainedTokenizer, PreTrainedTokenizerFast],
-        config: SystemConfig,
+        # config: SystemConfig,
     ):
         """
         Initialize the EngineSequenceManager.
@@ -24,7 +27,7 @@ class EngineSequenceManager(BaseSequenceManager):
             tokenizer: The tokenizer to use for decoding.
             config: The system configuration.
         """
-        super().__init__(config)
+        super().__init__()  # (config)
         self.tokenizer = tokenizer
 
     def _decode_seq(self, seq: Sequence) -> None:

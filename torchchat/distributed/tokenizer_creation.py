@@ -1,5 +1,10 @@
-from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
+import os
+from enum import auto, Enum
+from pathlib import Path
+from types import SimpleNamespace
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
 
 try:
     from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
@@ -18,12 +23,16 @@ _tokenizer_type = None  # global variable to store the tokenizer type
 logger = SingletonLogger.get_logger()
 
 
+def dict_to_args(dictionary: Dict[str, Any]) -> SimpleNamespace:
+    return SimpleNamespace(**dictionary)
+
+
 class TokenizerType(Enum):
     Tiktoken = auto()
     SentencePiece = auto()
 
 
-def _build_chat_tokenizer(
+def create_tokenizer(
     model_name: str,
     model_base_name: Optional[str] = None,
 ) -> SentencePieceProcessor | TiktokenTokenizer:
@@ -50,6 +59,7 @@ def _build_chat_tokenizer(
         "model": model_base_name,
         "tokenizer_path": None,
     }
+
     args = dict_to_args(tokenconfig)
     tokenizer_args = TokenizerArgs.from_args(args)
     tokenizer = _initialize_tokenizer(tokenizer_args)
