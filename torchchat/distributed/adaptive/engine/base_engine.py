@@ -1,47 +1,55 @@
- """Base Language Model Engine for distributed text generation.
+"""Base Language Model Engine for distributed text generation.
 
 This module provides the core engine functionality for managing distributed LLM inference,
 including worker management, scheduling, and metrics collection.
 """
 
 import copy
+import logging
 import math
 import time
 from dataclasses import dataclass
 from functools import partial
 from typing import Any, Dict, List, Optional, Tuple, TypeVar
-import logging
 
-import zmq
-import ray
+# import zmq
+# import ray
 
-from sarathi.config import ModelConfig, SystemConfig
-from sarathi.core.datatypes.comm_info import CommInfo
-from sarathi.core.datatypes.request_output import RequestOutput
-from sarathi.core.datatypes.sampling_params import SamplingParams
-from sarathi.core.datatypes.scheduler_output import SchedulerOutputs
-from sarathi.core.datatypes.sequence import (
-    SamplerOutputs, Sequence, SequenceMetadata
+# from sarathi.config import ModelConfig, SystemConfig
+# from sarathi.core.datatypes.comm_info import CommInfo
+from torchchat.distributed.adaptive.datatypes.request_output import RequestOutput
+
+# from sarathi.engine.ray_utils import RayWorker, initialize_cluster
+# from sarathi.metrics.constants import CpuOperationMetrics
+# from sarathi.metrics.cpu_timer import CpuTimer
+# from sarathi.metrics.metrics_store import MetricsStore
+
+from torchchat.distributed.adaptive.datatypes.scheduler_output import SchedulerOutputs
+from torchchat.distributed.adaptive.datatypes.sequence import (
+    SamplerOutputs,
+    Sequence,
+    SequenceMetadata,
 )
-from sarathi.core.datatypes.step_inputs import StepInputs
-from sarathi.core.scheduler.scheduler_registry import SchedulerRegistry
-from sarathi.core.sequence_manager.engine_sequence_manager import EngineSequenceManager
-from sarathi.engine.ray_utils import RayWorker, initialize_cluster
-from sarathi.metrics.constants import CpuOperationMetrics
-from sarathi.metrics.cpu_timer import CpuTimer
-from sarathi.metrics.metrics_store import MetricsStore
-from sarathi.transformers_utils.tokenizer import get_tokenizer
-from sarathi.utils import Counter, get_ip, unset_cuda_visible_devices
-from sarathi.utils.threading_utils import synchronized
+from torchchat.distributed.adaptive.datatypes.step_inputs import StepInputs
+from torchchat.distributed.adaptive.datatypes.token_sampling import SamplingParams
+
+# from sarathi.core.scheduler.scheduler_registry import SchedulerRegistry
+from torchchat.distributed.adaptive.engine.engine_sequence_manager import (
+    EngineSequenceManager,
+)
+
+# from sarathi.utils import Counter, get_ip, unset_cuda_visible_devices
+from torchchat.distributed.adaptive.threading_utils import synchronized
+from torchchat.distributed.tokenizer_creation import create_tokenizer
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 # Constants
 MAX_WORKER_CONCURRENCY = 1
 ModelParallelRank = Tuple[int, int]
-
+'''
 @dataclass
 class WorkerInitConfig:
     """Configuration for worker initialization."""
@@ -123,6 +131,8 @@ class DistributedWorkerManager:
         except Exception as e:
             logger.error(f"Failed to initialize worker {rank}: {e}")
             raise
+'''
+
 
 class BaseLLMEngine:
     """Distributed LLM engine for text generation.
@@ -131,32 +141,40 @@ class BaseLLMEngine:
     handling request scheduling, execution, and metrics collection.
     """
 
-    def __init__(self, config: SystemConfig) -> None:
+    def __init__(
+        self,
+        model_name: str = "llama3",
+    ) -> None:  # config: SystemConfig) -> None:
         """Initialize the LLM engine.
 
         Args:
             config: System configuration for the engine.
         """
-        self.config = config
-        self._validate_configuration()
-        
-        self.tokenizer = self._initialize_tokenizer()
+        # self.config = config
+        # self._validate_configuration()
+        self.model_name = model_name
+        self.tokenizer, self.tokenizer_type = create_tokenizer(self.model_name)
+        logger.info(f"Tokenizer type: {self.tokenizer_type}")
+        assert False, "check tokenizer type"
+
         self.seq_manager = self._initialize_sequence_manager()
         self.seq_counter = Counter()
         self.metrics_store = self._initialize_metrics_store()
-        
+
         self.worker_manager = DistributedWorkerManager(config)
         self._initialize_distributed_system()
-        
+
         self.scheduler = self._initialize_scheduler()
         self._initialize_timers()
-        
+
         self.new_seqs: List[Sequence] = []
 
     def _validate_configuration(self) -> None:
         """Validate engine configuration."""
         assert self.config.parallel_config.pipeline_parallel_size == 1
-        self.config.model_config.verify_with_parallel_config(self.config.parallel_config)
+        self.config.model_config.verify_with_parallel_config(
+            self.config.parallel_config
+        )
 
     def _initialize_tokenizer(self):
         """Initialize the tokenizer."""
@@ -181,10 +199,10 @@ class BaseLLMEngine:
     def _initialize_distributed_system(self) -> None:
         """Initialize the distributed system components."""
         initialize_cluster()
-        
+
         init_config = self._create_worker_init_config()
         self.worker_manager.initialize_workers(init_config)
-        
+
         self._initialize_zmq_communication()
         self._initialize_cache()
         self._initialize_worker_mapping()
@@ -203,7 +221,7 @@ class BaseLLMEngine:
         self.zmq_context = zmq.Context()
         self.enqueue_socket = self.zmq_context.socket(zmq.PUB)
         self.output_socket = self.zmq_context.socket(zmq.PULL)
-        
+
         self.enqueue_socket.bind(
             f"tcp://*:{self.worker_manager.comm_info.enqueue_socket_port}"
         )
@@ -215,7 +233,7 @@ class BaseLLMEngine:
         """Initialize the cache system."""
         num_gpu_blocks = self._profile_gpu_blocks()
         self.config.cache_config.num_gpu_blocks = num_gpu_blocks
-        
+
         self._initialize_worker_caches()
 
     def _profile_gpu_blocks(self) -> int:
@@ -226,7 +244,7 @@ class BaseLLMEngine:
             block_size=self.config.cache_config.block_size,
             gpu_memory_utilization=self.config.worker_config.gpu_memory_utilization,
         )
-        
+
         num_blocks = min(num_blocks_per_worker)
         self._validate_gpu_blocks(num_blocks)
         return num_blocks
@@ -238,12 +256,11 @@ class BaseLLMEngine:
                 "No available memory for cache blocks. "
                 "Try increasing gpu_memory_utilization."
             )
-            
+
         max_blocks_per_request = math.ceil(
-            self.config.model_config.max_model_len / 
-            self.config.cache_config.block_size
+            self.config.model_config.max_model_len / self.config.cache_config.block_size
         )
-        
+
         if num_blocks < max_blocks_per_request:
             raise ValueError(
                 f"Insufficient memory for maximum sequence length. "
@@ -296,7 +313,7 @@ class BaseLLMEngine:
         """
         arrival_time = arrival_time or time.monotonic()
         seq_id = seq_id or str(next(self.seq_counter))
-        
+
         if prompt_token_ids is None:
             if prompt is None:
                 raise ValueError("Either prompt or prompt_token_ids must be provided")
@@ -305,7 +322,7 @@ class BaseLLMEngine:
         sequence = self._create_sequence(
             seq_id, prompt, prompt_token_ids, arrival_time, sampling_params
         )
-        
+
         self._add_sequence_to_engine(sequence)
 
     def _create_sequence(

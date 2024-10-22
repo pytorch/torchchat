@@ -5,30 +5,36 @@ with configurable parameters and metrics collection.
 """
 
 import datetime
+import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
-from tqdm import tqdm
-import logging
+from typing import Any, List, Optional
 
-from sarathi import (
+"""from sarathi import (
     LLMEngine,
-    SamplingParams,
-    RequestOutput,
-    SystemConfig,
+    MetricsConfig,
     ModelConfig,
     ParallelConfig,
-    SarathiSchedulerConfig,
-    MetricsConfig,
     ReplicaConfig,
+    RequestOutput,
+    SamplingParams,
+    SarathiSchedulerConfig,
+    SystemConfig,
 )
+"""
 
-logger = logging.getLogger(__name__)
+from torchchat.distributed.adaptive.engine.base_engine import BaseLLMEngine
+from torchchat.distributed.logging_utils import SingletonLogger
+from tqdm import tqdm
+
+logger = SingletonLogger.get_logger()
+
 
 @dataclass
 class InferenceConfig:
     """Configuration for inference settings."""
+
     base_output_dir: Path
     model_name: str
     temperature: float = 0.8
@@ -44,12 +50,12 @@ class InferenceConfig:
     @property
     def output_dir(self) -> Path:
         """Generate timestamped output directory path."""
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         return self.base_output_dir / timestamp
 
-    def create_system_config(self) -> SystemConfig:
+    def create_system_config(self) -> None:
         """Create SystemConfig from inference settings."""
-        return SystemConfig(
+        """return SystemConfig(
             replica_config=ReplicaConfig(
                 output_dir=str(self.output_dir),
             ),
@@ -68,7 +74,9 @@ class InferenceConfig:
                 write_metrics=self.enable_metrics,
                 enable_chrome_trace=self.enable_chrome_trace,
             ),
-        )
+        """
+        return None
+
 
 class TextGenerator:
     """Handles text generation using LLM engine."""
@@ -81,7 +89,8 @@ class TextGenerator:
         """
         self.config = config
         self._ensure_output_directory()
-        self.engine = self._initialize_engine()
+        self.engine = self._initialize_engine(self.config.model_name)
+
         self.sampling_params = SamplingParams(
             temperature=config.temperature,
             top_p=config.top_p,
@@ -92,7 +101,7 @@ class TextGenerator:
         """Create output directory if it doesn't exist."""
         self.config.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def _initialize_engine(self) -> LLMEngine:
+    def _initialize_engine(self) -> Any:
         """Initialize the LLM engine with system configuration."""
         try:
             return LLMEngine.from_system_config(self.config.create_system_config())
@@ -139,9 +148,7 @@ class TextGenerator:
         with tqdm(total=num_requests, desc="Processing prompts") as pbar:
             while self.engine.has_unfinished_requests():
                 step_outputs = self.engine.step()
-                outputs.extend(
-                    output for output in step_outputs if output.finished
-                )
+                outputs.extend(output for output in step_outputs if output.finished)
                 pbar.update(len([o for o in step_outputs if o.finished]))
 
         return sorted(outputs, key=lambda x: int(x.seq_id))
@@ -172,6 +179,7 @@ class TextGenerator:
             "=" * 60 + "\n"
         )
 
+
 def main():
     """Main execution function."""
     # Example prompts
@@ -181,9 +189,10 @@ def main():
         "Hydrogen ions are the key component...",
     ]
 
+    # "llama3": ("meta-llama/Meta-Llama-3-8B-Instruct"
     config = InferenceConfig(
         base_output_dir=Path("./offline_inference_output"),
-        model_name="mistralai/Mixtral-8x7B-Instruct-v0.1",
+        model_name="llama3",
     )
 
     try:
@@ -195,16 +204,12 @@ def main():
             print(generator.format_output(output))
 
         # Collect metrics
-        generator.collect_metrics()
+        # generator.collect_metrics()
 
     except Exception as e:
         logger.error(f"Generation failed: {e}")
         raise
 
+
 if __name__ == "__main__":
-    # Configure logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
     main()

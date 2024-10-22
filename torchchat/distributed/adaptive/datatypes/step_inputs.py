@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
-from sarathi.core.datatypes.scheduler_output import SchedulerOutputs
-from sarathi.core.datatypes.sequence import SamplerOutputs, Sequence
+
+from torchchat.distributed.adaptive.datatypes.scheduler_output import SchedulerOutputs
+from torchchat.distributed.adaptive.datatypes.sequence import SamplerOutputs, Sequence
+
 
 @dataclass
 class StepInputs:
@@ -14,9 +16,12 @@ class StepInputs:
         pending_step_outputs: A list of tuples of scheduler outputs and sampler outputs
                               from previous steps that need to be processed.
     """
+
     scheduler_outputs: SchedulerOutputs
     new_seqs: List[Sequence] = field(default_factory=list)
-    pending_step_outputs: List[Tuple[SchedulerOutputs, SamplerOutputs]] = field(default_factory=list)
+    pending_step_outputs: List[Tuple[SchedulerOutputs, SamplerOutputs]] = field(
+        default_factory=list
+    )
 
     def __post_init__(self):
         if self.new_seqs is None:
@@ -35,13 +40,17 @@ class StepInputs:
         return bool(self.pending_step_outputs)
 
     def __str__(self) -> str:
-        return (f"StepInputs(scheduler_outputs_id={self.scheduler_outputs.id}, "
-                f"new_sequences={len(self.new_seqs)}, "
-                f"pending_outputs={len(self.pending_step_outputs)})")
+        return (
+            f"StepInputs(scheduler_outputs_id={self.scheduler_outputs.id}, "
+            f"new_sequences={len(self.new_seqs)}, "
+            f"pending_outputs={len(self.pending_step_outputs)})"
+        )
 
     def __repr__(self) -> str:
-        return (f"StepInputs(\n"
-                f"  scheduler_outputs={self.scheduler_outputs!r},\n"
-                f"  new_seqs={self.new_seqs!r},\n"
-                f"  pending_step_outputs={self.pending_step_outputs!r}\n"
-                f")")
+        return (
+            f"StepInputs(\n"
+            f"  scheduler_outputs={self.scheduler_outputs!r},\n"
+            f"  new_seqs={self.new_seqs!r},\n"
+            f"  pending_step_outputs={self.pending_step_outputs!r}\n"
+            f")"
+        )

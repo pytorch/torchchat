@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from typing import List, Optional
-from sarathi.core.datatypes.sequence import Sequence
-from sarathi.core.datatypes.sequence_status import SequenceStatus
+
+from torchchat.distributed.adaptive.datatypes.sequence import Sequence
+from torchchat.distributed.adaptive.datatypes.sequence_status import SequenceStatus
+
 
 @dataclass
 class RequestOutput:
@@ -17,6 +19,7 @@ class RequestOutput:
         finished: Whether the whole request is finished.
         finish_reason: The reason for finishing, if applicable.
     """
+
     seq_id: str
     prompt: str
     prompt_token_ids: List[int]
@@ -43,7 +46,7 @@ class RequestOutput:
             text=seq.output_text,
             token_ids=seq.output_token_ids,
             finished=seq.is_finished(),
-            finish_reason=seq.status.finish_reason
+            finish_reason=seq.status.finish_reason,
         )
 
     @property
@@ -57,8 +60,10 @@ class RequestOutput:
         return len(self.prompt_token_ids) + len(self.token_ids)
 
     def __str__(self) -> str:
-        return (f"RequestOutput(seq_id={self.seq_id}, "
-                f"prompt='{self.prompt[:20]}...', "
-                f"text='{self.text[:20]}...', "
-                f"finished={self.finished}, "
-                f"finish_reason={self.finish_reason})")
+        return (
+            f"RequestOutput(seq_id={self.seq_id}, "
+            f"prompt='{self.prompt[:20]}...', "
+            f"text='{self.text[:20]}...', "
+            f"finished={self.finished}, "
+            f"finish_reason={self.finish_reason})"
+        )

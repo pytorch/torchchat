@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List
-from sarathi.core.datatypes.sequence import SequenceScheduleMetadata
+
+from torchchat.distributed.adaptive.datatypes.sequence import SequenceScheduleMetadata
+
 
 @dataclass
 class SchedulerOutputs:
@@ -13,6 +15,7 @@ class SchedulerOutputs:
         preempted_seq_ids: List of sequence IDs that were preempted.
         scheduled_seq_metadata_list: List of metadata for scheduled sequences.
     """
+
     id: int
     ignored_seq_ids: List[str]
     preempted_seq_ids: List[str]
@@ -25,10 +28,16 @@ class SchedulerOutputs:
 
     def __post_init__(self):
         self.scheduled_seq_metadata_list.sort(key=lambda x: not x.is_prompt)
-        self.prompt_chunk_lens = [metadata.num_prompt_tokens for metadata in self.scheduled_seq_metadata_list]
+        self.prompt_chunk_lens = [
+            metadata.num_prompt_tokens for metadata in self.scheduled_seq_metadata_list
+        ]
         self.num_batched_prompt_tokens = sum(self.prompt_chunk_lens)
-        self.num_batched_output_tokens = sum(metadata.num_output_tokens for metadata in self.scheduled_seq_metadata_list)
-        self.num_batched_tokens = sum(metadata.num_tokens for metadata in self.scheduled_seq_metadata_list)
+        self.num_batched_output_tokens = sum(
+            metadata.num_output_tokens for metadata in self.scheduled_seq_metadata_list
+        )
+        self.num_batched_tokens = sum(
+            metadata.num_tokens for metadata in self.scheduled_seq_metadata_list
+        )
 
     @property
     def is_empty(self) -> bool:
@@ -38,7 +47,11 @@ class SchedulerOutputs:
     @property
     def has_no_output(self) -> bool:
         """Check if there are no scheduled, ignored, or preempted sequences."""
-        return not (self.scheduled_seq_metadata_list or self.ignored_seq_ids or self.preempted_seq_ids)
+        return not (
+            self.scheduled_seq_metadata_list
+            or self.ignored_seq_ids
+            or self.preempted_seq_ids
+        )
 
     @property
     def seq_ids(self) -> List[str]:
