@@ -1,9 +1,11 @@
- from dataclasses import dataclass, field
+from dataclasses import dataclass, field
 from typing import List, Tuple, Union
+
 from torch import Tensor
 
 BLANK_TOKEN_ID: int = -1
 KVCache = Union[Tuple[Tensor, Tensor], Tensor]
+
 
 @dataclass
 class LogicalTokenBlock:
@@ -12,6 +14,7 @@ class LogicalTokenBlock:
     Logical blocks are used to represent the states of the corresponding
     physical blocks in the KV cache.
     """
+
     block_number: int
     block_size: int
     token_ids: List[int] = field(init=False)
@@ -34,22 +37,28 @@ class LogicalTokenBlock:
 
     def append_tokens(self, new_token_ids: List[int]) -> None:
         if len(new_token_ids) > self.num_empty_slots:
-            raise ValueError(f"Cannot append {len(new_token_ids)} tokens. Only {self.num_empty_slots} slots available.")
-        
-        self.token_ids[self.num_tokens:self.num_tokens + len(new_token_ids)] = new_token_ids
+            raise ValueError(
+                f"Cannot append {len(new_token_ids)} tokens. Only {self.num_empty_slots} slots available."
+            )
+
+        self.token_ids[self.num_tokens : self.num_tokens + len(new_token_ids)] = (
+            new_token_ids
+        )
         self.num_tokens += len(new_token_ids)
 
     def get_token_ids(self) -> List[int]:
-        return self.token_ids[:self.num_tokens]
+        return self.token_ids[: self.num_tokens]
 
     def get_last_token_id(self) -> int:
         if self.is_empty:
             raise IndexError("Cannot get last token from an empty block.")
         return self.token_ids[self.num_tokens - 1]
 
+
 @dataclass
 class PhysicalTokenBlock:
     """Represents the state of a block in the KV cache."""
+
     block_number: int
     block_size: int
     device: str = field(default="cpu", init=False)
