@@ -1243,7 +1243,7 @@ def main(args):
         )
 
         response = ""
-        for output in dist_gen.generate("Tell me a joke"):
+        for output in dist_gen.generate(generator_args.prompt):
             response += output.text
 
         print(f"Model output: {response}")

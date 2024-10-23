@@ -448,13 +448,13 @@ def _add_custom_model_args(parser) -> None:
         "--params-path",
         type=Path,
         default=None,
-        help= "Use the specified parameter file, instead of one specified under torchchat.model_params",
+        help="Use the specified parameter file, instead of one specified under torchchat.model_params",
     )
     parser.add_argument(
         "--tokenizer-path",
         type=Path,
         default=None,
-        help= "Use the specified model tokenizer file, instead of the one downloaded from HuggingFace",
+        help="Use the specified model tokenizer file, instead of the one downloaded from HuggingFace",
     )
 
 

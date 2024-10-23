@@ -3,25 +3,25 @@
 
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+import asyncio
+import atexit
+import importlib.util
+import subprocess
+import threading
 from abc import abstractmethod
 from collections import deque
 from dataclasses import dataclass
 from functools import partial
 from os import environ
 from pathlib import Path
-from torchchat.cli.builder import BuilderArgs, TokenizerArgs
 from typing import List, Optional
 from uuid import uuid4
 
-import asyncio
-import atexit
 import torch.multiprocessing as mp
-import threading
-import importlib.util
-import subprocess
+from torchchat.cli.builder import BuilderArgs, TokenizerArgs
 
 
-def _setup_env(world_size:int, rank:int, target: callable, *args, **kwargs):
+def _setup_env(world_size: int, rank: int, target: callable, *args, **kwargs):
     environ["MASTER_ADDR"] = "localhost"
     environ["MASTER_PORT"] = "29500"
     environ["RDZV_BACKEND"] = "c10d"
@@ -36,10 +36,11 @@ def _launch_distributed_inference(builder_args: BuilderArgs) -> None:
     # create programmatic elastic launch
     print("Launching distributed inference ...")
 
-    num_processes_per_node = 4  # builder_args.num_gpus + 1
+    num_processes_per_node = builder_args.pp * builder_args.tp
 
     from torchchat.distributed.dist_run import main
-    mp.set_start_method('spawn')
+
+    mp.set_start_method("spawn")
 
     pipes = []
     procs = []
@@ -48,24 +49,23 @@ def _launch_distributed_inference(builder_args: BuilderArgs) -> None:
         pipes.append(server_pipe)
         proc = mp.Process(
             target=partial(_setup_env, num_processes_per_node, rank, main),
-            args=(builder_args, client_pipe)
+            args=(builder_args, client_pipe),
         )
         proc.start()
-
 
     for pipe in pipes:
         response = pipe.recv()
 
-    print(
-        f"Done launching distributed inference on **4 ** {builder_args.num_gpus} GPUs."
-    )
+    print(f"Done launching distributed inference on {num_processes_per_node} GPUs.")
     return procs, pipes
+
 
 @dataclass
 class Output:
     is_finished: bool = False
     text: Optional[str] = None
     token: Optional[list] = None
+
 
 @dataclass
 class Request:
@@ -84,7 +84,7 @@ class Scheduler(object):
         generator_args,
         pipes,
         loop,
-        ):
+    ):
         self.builder_args = builder_args
         self.generator_args = generator_args
         self.requests = {}
@@ -107,7 +107,7 @@ class Scheduler(object):
             if req == "stop":
                 break
             self.requests = {req.request_id: req.prompt}
-            
+
             responses = {}
             running = True
             while running:
@@ -128,17 +128,17 @@ class Scheduler(object):
                 yield output
         del self.req_to_states[req.request_id]
         del self.req_to_results[req.request_id]
-    
+
     def step(self) -> List[Output]:
         responses = []
-        #TODO: Implement a scheduler to handle the requests
+        # TODO: Implement a scheduler to handle the requests
         if len(self.in_flight_requests) > 0:
-            #Receive decoded token
+            # Receive decoded token
             for p in self.pipes:
                 p.send("step")
             for p in self.pipes:
                 responses.append(p.recv())
-            
+
         else:
             # Send requests to backend
             self.in_flight_batch_order = list(self.requests.keys())
@@ -148,25 +148,26 @@ class Scheduler(object):
             self.in_flight_requests = self.requests
             self.requests = {}
             self.current_step = 0
-            #Receive first token
+            # Receive first token
             for p in self.pipes:
                 responses.append(p.recv())
-        responses = responses[0]
+        # Filter out None responses from in-between stages
+        responses = [r for r in responses if r is not None][0]
         outputs = []
         for k, v in zip(self.in_flight_batch_order, zip(responses[0], responses[1])):
             text, token_ids = v
             outputs.append(
                 Output(
-                    is_finished=self.current_step>=self.generator_args.max_new_tokens,
+                    is_finished=self.current_step >= self.generator_args.max_new_tokens,
                     text=text,
                     token=token_ids,
-                    )
                 )
+            )
         if self.current_step >= self.generator_args.max_new_tokens:
             for p in self.pipes:
                 p.send("stop")
             self.in_flight_requests = []
-        
+
         self.current_step += 1
 
         return outputs
@@ -177,15 +178,17 @@ class DistributedGenerator(object):
         self,
         builder_args: BuilderArgs,
         tokenizer_args: TokenizerArgs,
-        #TODO: move GeneratorArgs into a different module
+        # TODO: move GeneratorArgs into a different module
         generator_args,
         profile: Optional[Path],
         quantize: bool,
         draft_quantize: bool,
-        ):
+    ):
         self.builder_args = builder_args
         self.generate_args = generator_args
-        
+
+        self.check_args()
+
         self.procs, self.pipes = _launch_distributed_inference(builder_args)
 
         self.loop = asyncio.new_event_loop()
@@ -193,8 +196,10 @@ class DistributedGenerator(object):
 
         self.scheduler = Scheduler(builder_args, generator_args, self.pipes, self.loop)
 
-        #TODO: Mode into process and use pipe or queue for comm
-        self.scheduler_thread = threading.Thread(target=self.scheduler.process_requests_loop)
+        # TODO: Mode into process and use pipe or queue for comm
+        self.scheduler_thread = threading.Thread(
+            target=self.scheduler.process_requests_loop
+        )
         self.scheduler_thread.start()
 
         atexit.register(self.shutdown)
@@ -220,3 +225,9 @@ class DistributedGenerator(object):
             running &= not output.is_finished
 
             yield output
+
+    def check_args(self):
+        if self.generate_args.chat_mode:
+            raise NotImplementedError(
+                "Currently we only support generate with --distributed"
+            )

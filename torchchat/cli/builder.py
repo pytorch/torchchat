@@ -58,8 +58,6 @@ class BuilderArgs:
     precision: torch.dtype = torch.float32
     setup_caches: bool = False
     distributed: bool = False
-    num_gpus: int = 1
-    num_nodes: int = 1
     pp: int = 1
     tp: int = 1
     chpt_from: str = "hf"
@@ -165,8 +163,6 @@ class BuilderArgs:
             dtype = name_to_dtype(args.dtype, args.device)
         # distributed args
         distributed = getattr(args, "distributed", False)
-        num_gpus = getattr(args, "num_gpus", 1)
-        num_nodes = getattr(args, "num_nodes", 1)
         pp = getattr(args, "pp", 1)
         tp = getattr(args, "tp", 1)
         chpt_from = getattr(args, "chpt_from", "hf")
@@ -184,8 +180,6 @@ class BuilderArgs:
             precision=dtype,
             setup_caches=(output_dso_path or output_pte_path),
             distributed=distributed,
-            num_gpus=num_gpus,
-            num_nodes=num_nodes,
             pp=pp,
             tp=tp,
             chpt_from=chpt_from,
