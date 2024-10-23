@@ -128,12 +128,12 @@ It takes arguments bitwidth (1, 2, 3, 4, 5, 6, 7), groupsize, and has_weight_zer
 The argument has_weight_zeros indicates whether the weights are quantized with scales only (has_weight_zeros: false) or with both scales and zeros (has_weight_zeros: true).
 Roughly speaking, {bitwidth: 4, groupsize: 32, has_weight_zeros: false} is similar to GGML's Q4_0 quantization scheme.
 
-You should expect high performance on ARM CPU if bitwidth is 1, 2, 3, 4, 5, or 6 and groupsize is divisible by 16.  With other platforms and argument choices, a slow fallback kernel will be used.  You will see warnings about this during quantization.
+You should expect high performance on ARM CPU if groupsize is divisible by 16.  With other platforms and argument choices, a slow fallback kernel will be used.  You will see warnings about this during quantization.
 
 #### embedding:wx
 The quantization scheme embedding:wx quantizes embeddings in a groupwise manner with the specified bitwidth and groupsize.  It takes arguments bitwidth (1, 2, 3, 4, 5, 6, 7) and groupsize.  Unlike linear:a8wxdq, embedding:wx always quantizes with scales and zeros.
 
-You should expect high performance on ARM CPU if bitwidth is 1, 2, 3, 4, 5, or 6 and groupsize is divisible by 32.  With other platforms and argument choices, a slow fallback kernel will be used.  You will see warnings about this during quantization.
+You should expect high performance on ARM CPU if groupsize is divisible by 32.  With other platforms and argument choices, a slow fallback kernel will be used.  You will see warnings about this during quantization.
 
 ### Setup
 To use linear:a8wxdq and embedding:wx, you must set up the torchao experimental kernels.  These will only work on devices with ARM CPUs, for example on Mac computers with Apple Silicon.
