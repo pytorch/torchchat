@@ -24,15 +24,6 @@ import torch._inductor.config
 
 from PIL import Image
 
-# torchtune model definition dependencies
-from torchtune.data import Message, padded_collate_tiled_images_and_mask
-
-from torchtune.generation import sample as tune_sample
-from torchtune.models.llama3 import llama3_tokenizer
-
-from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
-from torchtune.training import set_default_dtype
-
 from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
@@ -42,6 +33,15 @@ from torchchat.cli.builder import (
 from torchchat.model import Model, ModelType
 from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
+
+# torchtune model definition dependencies
+from torchtune.data import Message, padded_collate_tiled_images_and_mask
+
+from torchtune.generation import sample as tune_sample
+from torchtune.models.llama3 import llama3_tokenizer
+
+from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
+from torchtune.training import set_default_dtype
 
 
 class _ChatFormatter(ABC):
@@ -180,10 +180,14 @@ class GeneratorArgs:
         # Validate that all image prompts exist before expensive model load
         if image_prompts := getattr(args, "image_prompts", None):
             non_existent_image_prompts = [
-                image_prompt if (not os.path.exists(image_prompt)) for image_prompt in image_prompts
+                image_prompt
+                for image_prompt in image_prompts
+                if (not os.path.exists(image_prompt))
             ]
             if len(non_existent_image_prompts):
-                raise RuntimeError(f"Image prompt {non_existent_image_prompts} does not exist")
+                raise RuntimeError(
+                    f"Image prompt {non_existent_image_prompts} does not exist"
+                )
 
         return cls(
             prompt=getattr(args, "prompt", ""),
@@ -941,6 +945,7 @@ class Generator:
                     TransformerCrossAttentionLayer,
                     TransformerSelfAttentionLayer,
                 )
+
                 decoder = self.model.model.decoder
                 for m in reversed(list(decoder.modules())):
                     if isinstance(m, TransformerSelfAttentionLayer) or isinstance(
@@ -987,7 +992,10 @@ class Generator:
         # `is_torchtune_model` is a misnomer since it doesn't capture all
         # torchtune models (i.e. Flamingo)
         # See Issue: https://github.com/pytorch/torchchat/issues/1273
-        elif not generator_args.is_torchtune_model and self.model.config.model_type != ModelType.Flamingo:
+        elif (
+            not generator_args.is_torchtune_model
+            and self.model.config.model_type != ModelType.Flamingo
+        ):
             max_seq_length = min(
                 encoded.size(0) + generator_args.max_new_tokens,
                 (
