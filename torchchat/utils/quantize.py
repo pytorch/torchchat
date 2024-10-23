@@ -45,6 +45,7 @@ from torchchat.utils.build_utils import (
     find_multiple,
     get_device_str,
     get_precision,
+    set_precision,
     name_to_dtype,
     state_dict_device,
     use_et_backend,
@@ -52,7 +53,7 @@ from torchchat.utils.build_utils import (
 
 
 # Flag for whether the a8wxdq quantizer is available.
-a8wxdq_load_error: Optional[Exception] = None
+torchao_experimental_load_error: Optional[Exception] = None
 
 #########################################################################
 ###                       handle arg validation                       ###
@@ -115,6 +116,13 @@ def quantize_model(
                 if not support_tensor_subclass:
                     unwrap_tensor_subclass(model)
                 continue
+            
+            if quantizer in ["linear:a8wxdq", "embedding:wx"]:
+                # These quantizers require float32 input weights.  Note that after quantization,
+                # the weights will no longer be float32, but lowbit integers
+                if get_precision() != torch.float32:
+                    print(f"Quantizer {quantizer} requires float32 inputs, but received {get_precision()}.  Changing dtype to float32.  Note that after quantization, the weights will be lowbit integers, not float32.")
+                    set_precision(torch.float32)
                 
             # We set global precision from quantize options if it is specified at cli.py:485 
             # so the precision returned by get_precision() is always the authoritative precision/dtype in torchchat
@@ -887,8 +895,9 @@ quantizer_class_dict = {
 
 try:
     import importlib.util
-    import sys
     import os
+    import sys
+
     torchao_build_path = f"{os.getcwd()}/torchao-build"
 
     # Try loading quantizer
@@ -896,15 +905,25 @@ try:
         "torchao_experimental_quant_api",
         f"{torchao_build_path}/src/ao/torchao/experimental/quant_api.py",
     )
-    torchao_experimental_quant_api = importlib.util.module_from_spec(torchao_experimental_quant_api_spec)
+    torchao_experimental_quant_api = importlib.util.module_from_spec(
+        torchao_experimental_quant_api_spec
+    )
     sys.modules["torchao_experimental_quant_api"] = torchao_experimental_quant_api
-    torchao_experimental_quant_api_spec.loader.exec_module(torchao_experimental_quant_api)
-    from torchao_experimental_quant_api import Int8DynActIntxWeightQuantizer
-    quantizer_class_dict["linear:a8wxdq"] = Int8DynActIntxWeightQuantizer
+    torchao_experimental_quant_api_spec.loader.exec_module(
+        torchao_experimental_quant_api
+    )
+    from torchao_experimental_quant_api import (
+        Int8DynActIntxWeightLinearQuantizer,
+        IntxWeightEmbeddingQuantizer,
+    )
+
+    quantizer_class_dict["linear:a8wxdq"] = Int8DynActIntxWeightLinearQuantizer
+    quantizer_class_dict["embedding:wx"] = IntxWeightEmbeddingQuantizer
 
     # Try loading custom op
     try:
         import glob
+
         libs = glob.glob(f"{torchao_build_path}/cmake-out/lib/libtorchao_ops_aten.*")
         libs = list(filter(lambda l: (l.endswith("so") or l.endswith("dylib")), libs))
         torch.ops.load_library(libs[0])
@@ -915,8 +934,9 @@ try:
 except Exception as e:
     class ErrorHandler(QuantHandler):
         def __init__(self, model: Optional[nn.Module]=None, device="cpu", precision=None):
-            global a8wxdq_load_error
-            raise Exception(f"Note: Failed to load torchao experimental a8wxdq quantizer with error: {a8wxdq_load_error}")
+            global torchao_experimental_load_error
+            raise Exception(f"Note: Failed to load torchao experimental quantizer with error: {torchao_experimental_load_error}")
             
-    a8wxdq_load_error = e
+    torchao_experimental_load_error = e
     quantizer_class_dict["linear:a8wxdq"] = ErrorHandler
+    quantizer_class_dict["embedding:wx"] = ErrorHandler
