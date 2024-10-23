@@ -56,9 +56,9 @@ jobs:
         for DTYPE in bfloat16; do
             python torchchat.py generate --dtype ${DTYPE} --checkpoint-path ${MODEL_DIR}/stories15M.pt --temperature 0 --prompt "${PROMPT}" --device cuda
 
-            python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-dso-path /tmp/model.so
+            python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-pt2-path /tmp/model.pt2
 
-            ./cmake-out/aoti_run /tmp/model.so -d CUDA -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}"
+            ./cmake-out/aoti_run /tmp/model.pt2 -d CUDA -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}"
 
         done
 

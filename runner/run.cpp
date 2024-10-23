@@ -31,10 +31,7 @@ LICENSE file in the root directory of this source tree.
 #endif
 
 #ifdef __AOTI_MODEL__
-#include <torch/csrc/inductor/aoti_runner/model_container_runner_cpu.h>
-#ifdef USE_CUDA
-#include <torch/csrc/inductor/aoti_runner/model_container_runner_cuda.h>
-#endif
+#include <torch/csrc/inductor/aoti_package/model_package_loader.h>
 torch::Device aoti_device(torch::kCPU);
 
 #else // __ET_MODEL__
@@ -94,7 +91,7 @@ typedef struct {
   RunState state; // buffers for the "wave" of activations in the forward pass
 
 #ifdef __AOTI_MODEL__
-  torch::inductor::AOTIModelContainerRunner* runner;
+  torch::inductor::AOTIModelPackageLoader* runner;
 #else // __ET_MODEL__
   Module* runner;
 #endif
@@ -144,16 +141,8 @@ void build_transformer(
   malloc_run_state(&t->state, &t->config);
 
 #ifdef __AOTI_MODEL__
-#ifdef USE_CUDA
-  if (aoti_device.type() == torch::kCUDA) {
-    t->runner = new torch::inductor::AOTIModelContainerRunnerCuda(model_path);
-    aoti_device = torch::Device(torch::kCUDA);
-  } else {
-#else
-  {
-#endif
-    t->runner = new torch::inductor::AOTIModelContainerRunnerCpu(model_path);
-  }
+  t->runner = new torch::inductor::AOTIModelPackageLoader(model_path);
+  aoti_device = t->runner->get_metadata()["AOTI_DEVICE_KEY"] == "cpu" ? torch::Device(torch::kCPU) : torch::Device(torch::kCUDA);
 #else //__ET_MODEL__
   t->runner = new Module(
       /* path to PTE model */ model_path,
