@@ -63,7 +63,6 @@ class BuilderArgs:
     pp: int = 1
     tp: int = 1
     chpt_from: str = "hf"
-    ntokens: int = 40
     is_chat_model: bool = False
     prefill_possible: bool = False
     dynamic_shapes: bool = False
@@ -171,7 +170,6 @@ class BuilderArgs:
         pp = getattr(args, "pp", 1)
         tp = getattr(args, "tp", 1)
         chpt_from = getattr(args, "chpt_from", "hf")
-        ntokens = getattr(args, "ntokens", 40)
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
@@ -191,7 +189,6 @@ class BuilderArgs:
             pp=pp,
             tp=tp,
             chpt_from=chpt_from,
-            ntokens=ntokens,
             is_chat_model=is_chat_model,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),

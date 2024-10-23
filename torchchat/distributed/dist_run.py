@@ -388,7 +388,7 @@ def main(args, pipe):
     # Batch size. Since we push batches dynamically through the pipeline rather
     # than chunking them, this is effectively micro-batch size in pipeline
     # sense. Thus it is interchangeable with micro-batch size below.
-    batch_size = 4# len(prompt)
+    batch_size = 1# len(prompt)
     seqlen_prefill = 1024  # sequence length
     dim = 4096  # embedding dimension
 
@@ -410,9 +410,6 @@ def main(args, pipe):
     logger.info(
         f"Stage {rank} has {color.blue}{stage_num_params} params{color.reset}, Size: {color.blue}{stage_size_formatted}{color.reset}"
     )
-
-    # Setup input position (input_pos) for prefill: a list of increasing integers from 0 to seqlen
-    input_pos = torch.arange(seqlen_prefill, device=device)
     model.eval()
 
     # Helper function to get example inputs and outputs for the stages.
@@ -470,6 +467,8 @@ def main(args, pipe):
             logger.info(f"{color.green}Prompt: {prompt}{color.reset}")
 
             start_pos = 0
+            # Setup input position (input_pos) for prefill: a list of increasing integers from 0 to seqlen
+            input_pos = torch.arange(seqlen_prefill, device=device)
 
         # encode the prompt
         input_ids = _encode_strings(
@@ -511,9 +510,8 @@ def main(args, pipe):
             res.append(new_token)
             #TODO: Move to a separate decoding thread
             resp = _decode_in_flight(new_token, tokenizer, tp_rank)
-            pipe.send(resp)
+            pipe.send((resp, new_token.tolist()))
         else:
-            logger.info(f"sending None {tp_rank=}")
             pipe.send(None)
 
         # seqlen = 1 now
@@ -577,7 +575,7 @@ def main(args, pipe):
                     res.append(new_token)
                     #TODO: Move to a separate decoding thread
                     resp = _decode_in_flight(new_token, tokenizer, tp_rank)
-                    pipe.send(resp)
+                    pipe.send((resp, new_token))
                 else:
                     pipe.send(None)
 

@@ -425,13 +425,6 @@ def _add_distributed_args(parser) -> None:
         help=argparse.SUPPRESS,
         # "Tensor parallel degree",
     )
-
-    parser.add_argument(
-        "--ntokens",
-        type=int,
-        default=40,
-        help="Number of tokens to generate",
-    )
     parser.add_argument(
         "--chpt-from",
         type=str,

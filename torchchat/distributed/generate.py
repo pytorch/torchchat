@@ -4,15 +4,19 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 from abc import abstractmethod
-from typing import List, Optional
+from collections import deque
 from dataclasses import dataclass
-from pathlib import Path
-from os import environ
-from torchchat.cli.builder import BuilderArgs, TokenizerArgs
 from functools import partial
+from os import environ
+from pathlib import Path
+from torchchat.cli.builder import BuilderArgs, TokenizerArgs
+from typing import List, Optional
+from uuid import uuid4
 
+import asyncio
 import atexit
 import torch.multiprocessing as mp
+import threading
 import importlib.util
 import subprocess
 
@@ -51,7 +55,6 @@ def _launch_distributed_inference(builder_args: BuilderArgs) -> None:
 
     for pipe in pipes:
         response = pipe.recv()
-        print(f"Received: {response=}")
 
     print(
         f"Done launching distributed inference on **4 ** {builder_args.num_gpus} GPUs."
@@ -60,56 +63,72 @@ def _launch_distributed_inference(builder_args: BuilderArgs) -> None:
 
 @dataclass
 class Output:
-    request_id: int
     is_finished: bool = False
-    output: Optional[str] = None
+    text: Optional[str] = None
+    token: Optional[list] = None
 
-class Generator(object):
+@dataclass
+class Request:
+    request_id: int
+    prompt: str
 
-    @abstractmethod
-    def add_request(self, request_id: int, prompt: str):
-        raise NotImplementedError()
-
-    def step(self) -> List[Output]:
-        raise NotImplementedError()
+    @classmethod
+    def new_request(cls, prompt):
+        return cls(request_id=uuid4().int, prompt=prompt)
 
 
-class DistributedGenerator(Generator):
+class Scheduler(object):
     def __init__(
         self,
-        builder_args: BuilderArgs,
-        speculative_builder_args: BuilderArgs,
-        tokenizer_args: TokenizerArgs,
-        #TODO: move GeneratorArgs into a different module
-        # generator_args: GeneratorArgs,
-        profile: Optional[Path],
-        quantize: bool,
-        draft_quantize: bool,
+        builder_args,
+        generator_args,
+        pipes,
+        loop,
         ):
         self.builder_args = builder_args
+        self.generator_args = generator_args
         self.requests = {}
         self.in_flight_requests = {}
-        # For now we have a static batch order we save separately
         self.in_flight_batch_order = []
-        # if builder_args.distributed:
-        # # we part ways here with torchchat cli and move into dist inference
-        self.procs, self.pipes = _launch_distributed_inference(builder_args)
-        self.current_step = 0
+        self.pipes = pipes
+        self.req_to_states = {}
+        self.req_to_results = {}
+        self.request_queue = mp.Queue()
+        self.loop = loop
 
-        atexit.register(self.shutdown)
+    def schedule_request(self, req: Request):
+        self.req_to_states[req.request_id] = asyncio.Event()
+        self.req_to_results[req.request_id] = deque()
+        self.request_queue.put(req)
 
-    def shutdown(self):
-        for p in self.pipes:
-                p.send("stop")
-        for p in self.procs:
-            p.kill()
+    def process_requests_loop(self):
+        while True:
+            req = self.request_queue.get()
+            if req == "stop":
+                break
+            self.requests = {req.request_id: req.prompt}
+            
+            responses = {}
+            running = True
+            while running:
+                outputs = self.step()
+                self.req_to_results[req.request_id].append(outputs[0])
 
-    #TODO: Replace against (async) generate
-    def add_request(self, request_id: int, prompt: str):
-        assert request_id not in self.requests
-        self.requests[request_id] = prompt
+                self.loop.call_soon_threadsafe(self.req_to_states[req.request_id].set)
 
+                running &= not outputs[0].is_finished
 
+    async def wait_for_request(self, req: Request) -> Output:
+        is_finished = False
+        while not is_finished:
+            await self.req_to_states[req.request_id].wait()
+            while len(self.req_to_results[req.request_id]):
+                output = self.req_to_results[req.request_id].popleft()
+                is_finished |= output.is_finished
+                yield output
+        del self.req_to_states[req.request_id]
+        del self.req_to_results[req.request_id]
+    
     def step(self) -> List[Output]:
         responses = []
         #TODO: Implement a scheduler to handle the requests
@@ -132,12 +151,72 @@ class DistributedGenerator(Generator):
             #Receive first token
             for p in self.pipes:
                 responses.append(p.recv())
-
         responses = responses[0]
         outputs = []
-        for k, v in zip(self.in_flight_batch_order, responses):
-            outputs.append(Output(k, is_finished=self.current_step>=self.builder_args.ntokens, output=v))
+        for k, v in zip(self.in_flight_batch_order, zip(responses[0], responses[1])):
+            text, token_ids = v
+            outputs.append(
+                Output(
+                    is_finished=self.current_step>=self.generator_args.max_new_tokens,
+                    text=text,
+                    token=token_ids,
+                    )
+                )
+        if self.current_step >= self.generator_args.max_new_tokens:
+            for p in self.pipes:
+                p.send("stop")
+            self.in_flight_requests = []
         
         self.current_step += 1
 
         return outputs
+
+
+class DistributedGenerator(object):
+    def __init__(
+        self,
+        builder_args: BuilderArgs,
+        tokenizer_args: TokenizerArgs,
+        #TODO: move GeneratorArgs into a different module
+        generator_args,
+        profile: Optional[Path],
+        quantize: bool,
+        draft_quantize: bool,
+        ):
+        self.builder_args = builder_args
+        self.generate_args = generator_args
+        
+        self.procs, self.pipes = _launch_distributed_inference(builder_args)
+
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
+
+        self.scheduler = Scheduler(builder_args, generator_args, self.pipes, self.loop)
+
+        #TODO: Mode into process and use pipe or queue for comm
+        self.scheduler_thread = threading.Thread(target=self.scheduler.process_requests_loop)
+        self.scheduler_thread.start()
+
+        atexit.register(self.shutdown)
+
+    def shutdown(self):
+        self.scheduler.request_queue.put("stop")
+        self.scheduler_thread.join()
+
+        for p in self.pipes:
+            p.send("stop")
+        for p in self.procs:
+            p.kill()
+
+    def generate(self, text):
+        req = Request.new_request(text)
+        self.scheduler.schedule_request(req)
+
+        generator = self.scheduler.wait_for_request(req)
+
+        running = True
+        while running:
+            output = self.loop.run_until_complete(generator.__anext__())
+            running &= not output.is_finished
+
+            yield output
