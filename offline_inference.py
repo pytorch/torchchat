@@ -25,6 +25,7 @@ from typing import Any, List, Optional
 """
 
 from torchchat.distributed.adaptive.datatypes.request_output import RequestOutput
+from torchchat.distributed.adaptive.datatypes.token_sampling import SamplingParams
 from torchchat.distributed.adaptive.engine.base_engine import BaseLLMEngine as LLMEngine
 from torchchat.distributed.logging_utils import SingletonLogger
 from tqdm import tqdm
@@ -92,10 +93,11 @@ class TextGenerator:
         self._ensure_output_directory()
         self.engine = self._initialize_engine(self.config.model_name)
 
+        # TODO - add config for sampling params
         self.sampling_params = SamplingParams(
-            temperature=config.temperature,
-            top_p=config.top_p,
-            max_tokens=config.max_tokens,
+            temperature=0,  # config.temperature,
+            top_p=1.0,  # config.top_p,
+            max_tokens=40,  # config.max_tokens,
         )
 
     def _ensure_output_directory(self) -> None:

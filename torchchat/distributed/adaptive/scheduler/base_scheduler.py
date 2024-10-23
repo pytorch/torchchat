@@ -8,10 +8,10 @@ from sarathi.core.block_space_manager.block_space_manager_registry import BlockS
 from sarathi.core.datatypes.scheduler_output import SchedulerOutputs
 from sarathi.core.datatypes.sequence import Sequence, SequenceStatus
 from sarathi.core.policy import PolicyFactory
-from sarathi.logger import init_logger
-from sarathi.metrics.metrics_store import MetricsStore
 
-logger = init_logger(__name__)
+from torchchat.distributed.logging_utils import SingletonLogger
+
+logger = SingletonLogger.get_logger()
 
 @dataclass
 class SchedulerState:

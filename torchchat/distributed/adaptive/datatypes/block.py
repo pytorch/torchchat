@@ -5,6 +5,9 @@ from torch import Tensor
 
 BLANK_TOKEN_ID: int = -1
 KVCache = Union[Tuple[Tensor, Tensor], Tensor]
+from torchchat.distributed.logging_utils import SingletonLogger
+
+logger = SingletonLogger.get_logger()
 
 
 @dataclass

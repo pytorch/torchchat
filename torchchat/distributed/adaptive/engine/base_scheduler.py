@@ -1,16 +1,21 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
 from collections import deque
+from typing import List, Optional
 
 from sarathi.config import BaseSchedulerConfig, CacheConfig, ModelConfig, ParallelConfig
-from sarathi.core.block_space_manager.block_space_manager_registry import BlockSpaceManagerRegistry
+from sarathi.core.block_space_manager.block_space_manager_registry import (
+    BlockSpaceManagerRegistry,
+)
 from sarathi.core.datatypes.scheduler_output import SchedulerOutputs
 from sarathi.core.datatypes.sequence import Sequence, SequenceStatus
 from sarathi.core.policy import PolicyFactory
 from sarathi.logger import init_logger
 from sarathi.metrics.metrics_store import MetricsStore
 
-logger = init_logger(__name__)
+from torchchat.distributed.logging_utils import SingletonLogger
+
+logger = SingletonLogger.get_logger()
+
 
 class BaseScheduler(ABC):
     def __init__(

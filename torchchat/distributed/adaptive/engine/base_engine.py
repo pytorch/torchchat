@@ -37,12 +37,18 @@ from torchchat.distributed.adaptive.datatypes.token_sampling import SamplingPara
 from torchchat.distributed.adaptive.engine.engine_sequence_manager import (
     EngineSequenceManager,
 )
+from torchchat.distributed.adaptive.int_counter import IntCounter
+from torchchat.distributed.adaptive.scheduler.base_scheduler_registry import (
+    SchedulerRegistry,
+)
 
 # from sarathi.utils import Counter, get_ip, unset_cuda_visible_devices
 from torchchat.distributed.adaptive.threading_utils import synchronized
+from torchchat.distributed.logging_utils import SingletonLogger
 from torchchat.distributed.tokenizer_creation import create_tokenizer
 
-logger = logging.getLogger(__name__)
+logger = SingletonLogger.get_logger()
+
 
 T = TypeVar("T")
 
@@ -155,17 +161,16 @@ class BaseLLMEngine:
         self.model_name = model_name
         self.tokenizer, self.tokenizer_type = create_tokenizer(self.model_name)
         logger.info(f"Tokenizer type: {self.tokenizer_type}")
-        assert False, "check tokenizer type"
 
         self.seq_manager = self._initialize_sequence_manager()
-        self.seq_counter = Counter()
-        self.metrics_store = self._initialize_metrics_store()
+        self.seq_counter = IntCounter()
+        # self.metrics_store = self._initialize_metrics_store()
 
-        self.worker_manager = DistributedWorkerManager(config)
-        self._initialize_distributed_system()
+        # self.worker_manager = DistributedWorkerManager(config)
+        # self._initialize_distributed_system()
 
         self.scheduler = self._initialize_scheduler()
-        self._initialize_timers()
+        # self._initialize_timers()
 
         self.new_seqs: List[Sequence] = []
 
@@ -186,7 +191,9 @@ class BaseLLMEngine:
 
     def _initialize_sequence_manager(self) -> EngineSequenceManager:
         """Initialize the sequence manager."""
-        return EngineSequenceManager(self.tokenizer, self.config)
+        return EngineSequenceManager(
+            self.tokenizer,
+        )  # self.config)
 
     '''def _initialize_metrics_store(self) -> MetricsStore:
         """Initialize the metrics store."""
@@ -275,16 +282,12 @@ class BaseLLMEngine:
             cache_config=self.config.cache_config,
             get_all_outputs=True,
         )
+    '''
 
     def _initialize_scheduler(self):
         """Initialize the scheduler."""
-        return SchedulerRegistry.get(
-            self.config.scheduler_config.get_type(),
-            self.config.model_config,
-            self.config.scheduler_config,
-            self.config.cache_config,
-            self.config.parallel_config,
-        )
+        config = {}
+        scheduler = SchedulerRegistry.create_scheduler(SchedulerType.VLLM, **config)
 
     def _initialize_timers(self) -> None:
         """Initialize performance timers."""
@@ -292,7 +295,6 @@ class BaseLLMEngine:
         self._process_model_outputs_timer = CpuTimer(
             CpuOperationMetrics.PROCESS_MODEL_OUTPUTS
         )
-    '''
 
     @synchronized
     def add_request(
@@ -335,22 +337,24 @@ class BaseLLMEngine:
         sampling_params: SamplingParams,
     ) -> Sequence:
         """Create a new sequence for processing."""
-        return Sequence(
+        new_sequence = Sequence(
             seq_id=seq_id,
             prompt=prompt,
             prompt_token_ids=prompt_token_ids,
-            block_size=self.config.cache_config.block_size,
-            eos_token_id=self.tokenizer.eos_token_id,
+            block_size=100,  # TODO self.config.cache_config.block_size,
+            eos_token_id=self.tokenizer.eos_id(),  # .eos_token_id,
             arrival_time=arrival_time,
             sampling_params=sampling_params,
         )
+        logger.info(f"New sequence: {new_sequence}")
+        return new_sequence
 
     def _add_sequence_to_engine(self, sequence: Sequence) -> None:
         """Add a sequence to the engine components."""
         self.seq_manager.add_seq(sequence)
         self._append_new_seq(copy.deepcopy(sequence))
         self.scheduler.add_seq(sequence)
-        self.metrics_store.on_request_arrival(sequence)
+        # self.metrics_store.on_request_arrival(sequence)
 
     def step(self) -> List[RequestOutput]:
         """Perform one generation step.
@@ -394,5 +398,94 @@ class BaseLLMEngine:
             start_time,
         )
 
-    # ... Rest of the methods remain similar but with improved error handling
-    # and documentation ...
+    @synchronized
+    def _append_new_seq(self, seq: Sequence) -> None:
+        self.new_seqs.append(seq)
+
+    @synchronized
+    def _get_new_seqs(
+        self,
+    ) -> List[Sequence]:
+        new_seqs = self.new_seqs
+        self.new_seqs = []
+        return new_seqs
+
+    def get_num_unfinished_requests(self) -> int:
+        """Gets the number of unfinished requests."""
+        return self.scheduler.get_num_unfinished_seqs()
+
+    def has_unfinished_requests(self) -> bool:
+        """Returns True if there are unfinished requests."""
+        return self.scheduler.has_unfinished_seqs()
+
+    def step(self) -> List[RequestOutput]:
+        """Performs one decoding iteration and returns newly generated results.
+
+        This function performs one decoding iteration of the engine. It first
+        schedules the sequences to be executed in the next iteration.
+        Then, it executes the model and updates the scheduler with the model outputs.
+        Finally, it decodes the sequences and returns the newly generated results.
+        """
+        start_time = time.perf_counter()
+
+        with self._scheduler_timer:
+            scheduler_outputs = self.scheduler.schedule()
+
+        if scheduler_outputs.is_empty():
+            return []
+
+        ignored_seqs, seq_metadata_list = self.seq_manager.on_schedule(
+            scheduler_outputs
+        )
+
+        """self.enqueue_socket.send_pyobj(
+            StepInputs(
+                scheduler_outputs,
+                new_seqs=self._get_new_seqs(),
+            )
+        )
+        """
+        # TODO - send to distributed workers
+        # sampler_outputs = self.output_socket.recv_pyobj()
+        assert False, "TODO send to dist pipeline"
+        return self._on_step_completed(
+            scheduler_outputs,
+            ignored_seqs,
+            seq_metadata_list,
+            sampler_outputs,
+            start_time,
+        )
+
+    # removed _run_workers via Ray
+
+    def plot_metrics(self) -> None:
+        pass  # self.metrics_store.plot()
+
+    def pull_worker_metrics(self) -> None:
+        pass
+        """worker_metrics = self._run_workers(
+            "get_metrics_store",
+            get_all_outputs=True,
+        )
+        for worker_metric in worker_metrics:
+            self.metrics_store.merge(worker_metric)
+        """
+
+    def mark_initial_memory_profiling_done(self):
+        pass
+        # self.metrics_store.mark_initial_memory_profiling_done()
+        # self._run_workers("mark_initial_memory_profiling_done", get_all_outputs=True)
+
+    def reset_metrics(self) -> None:
+        self.scheduler.reset_state()
+        # self.metrics_store.reset()
+        # self._run_workers("reset_metrics", get_all_outputs=True)
+
+    def start_profiling(self) -> None:
+        pass  # self._run_workers("start_profiling")
+
+    def stop_profiling(self) -> None:
+        pass  # self._run_workers("stop_profiling")
+
+    def get_metric_store(self) -> Any:  # MetricsStore:
+        pass  # return self.metrics_store

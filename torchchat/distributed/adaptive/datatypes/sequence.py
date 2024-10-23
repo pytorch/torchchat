@@ -5,6 +5,9 @@ from torchchat.distributed.adaptive.datatypes.block import LogicalTokenBlock
 from torchchat.distributed.adaptive.datatypes.sequence_state import SequenceState
 from torchchat.distributed.adaptive.datatypes.sequence_status import SequenceStatus
 from torchchat.distributed.adaptive.datatypes.token_sampling import SamplingParams
+from torchchat.distributed.logging_utils import SingletonLogger
+
+logger = SingletonLogger.get_logger()
 
 
 @dataclass
@@ -36,7 +39,7 @@ class Sequence:
 
     @property
     def status(self) -> SequenceStatus:
-        return self.state._status
+        return self.state  # ._status
 
     @status.setter
     def status(self, status: SequenceStatus) -> None:
@@ -52,9 +55,12 @@ class Sequence:
 
     def _append_tokens_to_blocks(self, token_ids: List[int]) -> None:
         for token_id in token_ids:
+            logger.info(f"Appending token {token_id}")
+            """
             if not self.logical_token_blocks or self.logical_token_blocks[-1].is_full():
                 self._append_logical_block()
             self.logical_token_blocks[-1].append_tokens([token_id])
+            """
 
     def update_prompt_tokens_processed(self, num_tokens: int) -> None:
         if self.prompt_processing_finished:
@@ -164,7 +170,7 @@ class Sequence:
     def __repr__(self) -> str:
         return (
             f"Sequence(seq_id={self.seq_id}, "
-            f"status={self.status.name}, "
+            f"status={self.status}, "
             f"num_blocks={len(self.logical_token_blocks)}, "
             f"num_prompt_tokens={len(self.prompt_token_ids)}, "
             f"num_output_tokens={len(self.output_token_ids)}, "

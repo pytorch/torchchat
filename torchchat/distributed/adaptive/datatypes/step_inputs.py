@@ -4,6 +4,10 @@ from typing import List, Optional, Tuple
 from torchchat.distributed.adaptive.datatypes.scheduler_output import SchedulerOutputs
 from torchchat.distributed.adaptive.datatypes.sequence import SamplerOutputs, Sequence
 
+from torchchat.distributed.logging_utils import SingletonLogger
+
+logger = SingletonLogger.get_logger()
+
 
 @dataclass
 class StepInputs:

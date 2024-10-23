@@ -3,6 +3,10 @@ from typing import List
 
 from torchchat.distributed.adaptive.datatypes.sequence import SequenceScheduleMetadata
 
+from torchchat.distributed.logging_utils import SingletonLogger
+
+logger = SingletonLogger.get_logger()
+
 
 @dataclass
 class SchedulerOutputs:

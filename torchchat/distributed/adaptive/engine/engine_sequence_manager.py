@@ -7,7 +7,11 @@ from torchchat.distributed.adaptive.datatypes.sequence import Sequence
 from torchchat.distributed.adaptive.sequence_manager.base_sequence_manager import (
     BaseSequenceManager,
 )
+
+from torchchat.distributed.logging_utils import SingletonLogger
 from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
+
+logger = SingletonLogger.get_logger()
 
 
 class EngineSequenceManager(BaseSequenceManager):

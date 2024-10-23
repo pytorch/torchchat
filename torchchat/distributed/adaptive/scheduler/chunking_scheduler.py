@@ -1,20 +1,31 @@
 import time
-from enum import Enum, auto
-from typing import List, Tuple
 from dataclasses import dataclass
+from enum import auto, Enum
+from typing import List, Tuple
 
-from sarathi.config import CacheConfig, ModelConfig, ParallelConfig, SimpleChunkingSchedulerConfig
-from sarathi.core.block_space_manager.vllm_block_space_manager import VLLMBlockSpaceManager
+from sarathi.config import (
+    CacheConfig,
+    ModelConfig,
+    ParallelConfig,
+    SimpleChunkingSchedulerConfig,
+)
+from sarathi.core.block_space_manager.vllm_block_space_manager import (
+    VLLMBlockSpaceManager,
+)
 from sarathi.core.datatypes.scheduler_output import SchedulerOutputs
 from sarathi.core.datatypes.sequence import Sequence, SequenceScheduleMetadata
-from sarathi.core.scheduler.base_scheduler import BaseScheduler
-from sarathi.logger import init_logger
+from torchchat.distributed.adaptive.base_scheduler import BaseScheduler
 
-logger = init_logger(__name__)
+from torchchat.distributed.logging_utils import SingletonLogger
+from torchchat.distributed.tokenizer_creation import create_tokenizer
+
+logger = SingletonLogger.get_logger()
+
 
 class Turn(Enum):
     PREFILL = auto()
     DECODE = auto()
+
 
 @dataclass
 class SchedulerState:
@@ -23,6 +34,7 @@ class SchedulerState:
     preempted_seq_ids: List[str]
     scheduled_seq_metadata_list: List[SequenceScheduleMetadata]
     num_batched_tokens: int
+
 
 class SimpleChunkingScheduler(BaseScheduler):
     def __init__(
@@ -39,7 +51,9 @@ class SimpleChunkingScheduler(BaseScheduler):
     def get_block_space_manager_class(self):
         return VLLMBlockSpaceManager
 
-    def _get_seq_next_num_prefill_tokens(self, seq: Sequence, num_batched_tokens: int) -> int:
+    def _get_seq_next_num_prefill_tokens(
+        self, seq: Sequence, num_batched_tokens: int
+    ) -> int:
         assert not seq.is_finished()
         return min(
             seq.get_prompt_len() - seq.get_num_prompt_tokens_stage_processed(),
@@ -51,11 +65,13 @@ class SimpleChunkingScheduler(BaseScheduler):
         state = SchedulerState([], [], [], [], 0)
 
         self._process_prefill_turn(state, now)
-        
+
         if not state.scheduled_seq_metadata_list:
             self._process_decode_turn(state)
 
-        self.whose_turn = Turn.PREFILL if self.whose_turn == Turn.DECODE else Turn.DECODE
+        self.whose_turn = (
+            Turn.PREFILL if self.whose_turn == Turn.DECODE else Turn.DECODE
+        )
         self.running = state.running
 
         return SchedulerOutputs(
@@ -80,7 +96,9 @@ class SimpleChunkingScheduler(BaseScheduler):
                 state.running.append(seq)
                 continue
 
-            next_num_prefill_tokens = self._get_seq_next_num_prefill_tokens(seq, state.num_batched_tokens)
+            next_num_prefill_tokens = self._get_seq_next_num_prefill_tokens(
+                seq, state.num_batched_tokens
+            )
             if next_num_prefill_tokens == 0:
                 state.running.append(seq)
                 continue
@@ -88,7 +106,9 @@ class SimpleChunkingScheduler(BaseScheduler):
             state.num_batched_tokens += next_num_prefill_tokens
             state.running.append(seq)
             state.scheduled_seq_metadata_list.append(
-                SequenceScheduleMetadata.from_sequence(seq, prompt_chunk_len=next_num_prefill_tokens)
+                SequenceScheduleMetadata.from_sequence(
+                    seq, prompt_chunk_len=next_num_prefill_tokens
+                )
             )
 
         self.running, state.running = state.running, []
@@ -96,10 +116,14 @@ class SimpleChunkingScheduler(BaseScheduler):
     def _process_waiting_prefill(self, state: SchedulerState, now: float) -> None:
         while self.state.waiting:
             seq = self.state.waiting[0]
-            if seq.arrival_time > now or not self._can_schedule_waiting_sequence(seq, state):
+            if seq.arrival_time > now or not self._can_schedule_waiting_sequence(
+                seq, state
+            ):
                 break
 
-            next_num_prefill_tokens = self._get_seq_next_num_prefill_tokens(seq, state.num_batched_tokens)
+            next_num_prefill_tokens = self._get_seq_next_num_prefill_tokens(
+                seq, state.num_batched_tokens
+            )
             if next_num_prefill_tokens == 0:
                 break
 
@@ -108,10 +132,14 @@ class SimpleChunkingScheduler(BaseScheduler):
             self.running.append(seq)
             state.num_batched_tokens += next_num_prefill_tokens
             state.scheduled_seq_metadata_list.append(
-                SequenceScheduleMetadata.from_sequence(seq, prompt_chunk_len=next_num_prefill_tokens)
+                SequenceScheduleMetadata.from_sequence(
+                    seq, prompt_chunk_len=next_num_prefill_tokens
+                )
             )
 
-    def _can_schedule_waiting_sequence(self, seq: Sequence, state: SchedulerState) -> bool:
+    def _can_schedule_waiting_sequence(
+        self, seq: Sequence, state: SchedulerState
+    ) -> bool:
         if not self._check_request_prompt_length(seq):
             state.ignored_seq_ids.append(seq.seq_id)
             return False
@@ -142,5 +170,7 @@ class SimpleChunkingScheduler(BaseScheduler):
 
         self._append_slot(seq)
         state.running.append(seq)
-        state.scheduled_seq_metadata_list.append(SequenceScheduleMetadata.from_sequence(seq))
+        state.scheduled_seq_metadata_list.append(
+            SequenceScheduleMetadata.from_sequence(seq)
+        )
         return True

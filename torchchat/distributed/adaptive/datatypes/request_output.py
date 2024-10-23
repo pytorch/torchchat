@@ -3,6 +3,9 @@ from typing import List, Optional
 
 from torchchat.distributed.adaptive.datatypes.sequence import Sequence
 from torchchat.distributed.adaptive.datatypes.sequence_status import SequenceStatus
+from torchchat.distributed.logging_utils import SingletonLogger
+
+logger = SingletonLogger.get_logger()
 
 
 @dataclass

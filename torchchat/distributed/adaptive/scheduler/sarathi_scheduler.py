@@ -1,22 +1,32 @@
 import time
-from typing import List, Optional
 from dataclasses import dataclass
+from typing import List, Optional
 
 import numpy as np
 
-from sarathi.config import CacheConfig, ModelConfig, ParallelConfig, SarathiSchedulerConfig
-from sarathi.core.block_space_manager.sarathi_block_space_manager import SarathiBlockSpaceManager
+from sarathi.config import (
+    CacheConfig,
+    ModelConfig,
+    ParallelConfig,
+    SarathiSchedulerConfig,
+)
+from sarathi.core.block_space_manager.sarathi_block_space_manager import (
+    SarathiBlockSpaceManager,
+)
 from sarathi.core.datatypes.scheduler_output import SchedulerOutputs
 from sarathi.core.datatypes.sequence import Sequence, SequenceScheduleMetadata
 from sarathi.core.scheduler.base_scheduler import BaseScheduler
-from sarathi.logger import init_logger
 
-logger = init_logger(__name__)
+from torchchat.distributed.logging_utils import SingletonLogger
+
+logger = SingletonLogger.get_logger()
+
 
 @dataclass
 class ChunkSchedule:
     chunk_sizes: List[int]
     tokens_per_stage: int
+
 
 class SarathiScheduler(BaseScheduler):
     def __init__(
@@ -29,7 +39,9 @@ class SarathiScheduler(BaseScheduler):
         super().__init__(model_config, scheduler_config, cache_config, parallel_config)
 
         self.chunk_size = self.scheduler_config.chunk_size
-        self.enable_dynamic_chunking_schedule = self.scheduler_config.enable_dynamic_chunking_schedule
+        self.enable_dynamic_chunking_schedule = (
+            self.scheduler_config.enable_dynamic_chunking_schedule
+        )
         self.chunk_schedule: Optional[ChunkSchedule] = None
 
         if self.enable_dynamic_chunking_schedule:
@@ -37,10 +49,18 @@ class SarathiScheduler(BaseScheduler):
             self.chunk_schedule = self._compute_chunk_size_schedule()
 
     def _validate_dynamic_chunking_config(self) -> None:
-        assert self.scheduler_config.chunk_schedule_stages > 0, "Chunk schedule stages must be positive"
-        assert self.scheduler_config.chunk_schedule_max_tokens > 0, "Chunk schedule max tokens must be positive"
-        assert self.scheduler_config.low_chunk_size % 32 == 0, "Low chunk size must be a multiple of 32"
-        assert self.scheduler_config.high_chunk_size % 32 == 0, "High chunk size must be a multiple of 32"
+        assert (
+            self.scheduler_config.chunk_schedule_stages > 0
+        ), "Chunk schedule stages must be positive"
+        assert (
+            self.scheduler_config.chunk_schedule_max_tokens > 0
+        ), "Chunk schedule max tokens must be positive"
+        assert (
+            self.scheduler_config.low_chunk_size % 32 == 0
+        ), "Low chunk size must be a multiple of 32"
+        assert (
+            self.scheduler_config.high_chunk_size % 32 == 0
+        ), "High chunk size must be a multiple of 32"
 
     def _compute_chunk_size_schedule(self) -> ChunkSchedule:
         chunk_sizes = np.linspace(
@@ -49,27 +69,39 @@ class SarathiScheduler(BaseScheduler):
             self.scheduler_config.chunk_schedule_stages,
             dtype=np.int32,
         )[::-1]
-        
+
         round_of_chunk_sizes = min(32, self.scheduler_config.low_chunk_size)
-        chunk_sizes = np.round(chunk_sizes / round_of_chunk_sizes) * round_of_chunk_sizes
+        chunk_sizes = (
+            np.round(chunk_sizes / round_of_chunk_sizes) * round_of_chunk_sizes
+        )
         chunk_sizes = chunk_sizes.astype(np.int64).tolist()
 
-        tokens_per_stage = int(np.ceil(
-            self.scheduler_config.chunk_schedule_max_tokens / self.scheduler_config.chunk_schedule_stages
-        ))
+        tokens_per_stage = int(
+            np.ceil(
+                self.scheduler_config.chunk_schedule_max_tokens
+                / self.scheduler_config.chunk_schedule_stages
+            )
+        )
 
         return ChunkSchedule(chunk_sizes, tokens_per_stage)
 
     def get_block_space_manager_class(self):
         return SarathiBlockSpaceManager
 
-    def _get_seq_next_num_prefill_tokens(self, seq: Sequence, num_batched_tokens: int) -> int:
+    def _get_seq_next_num_prefill_tokens(
+        self, seq: Sequence, num_batched_tokens: int
+    ) -> int:
         assert not seq.is_finished()
 
         if self.enable_dynamic_chunking_schedule and self.chunk_schedule:
             request_stage_idx = min(
-                int(np.ceil(seq.get_num_prompt_tokens_stage_processed() / self.chunk_schedule.tokens_per_stage)),
-                len(self.chunk_schedule.chunk_sizes) - 1
+                int(
+                    np.ceil(
+                        seq.get_num_prompt_tokens_stage_processed()
+                        / self.chunk_schedule.tokens_per_stage
+                    )
+                ),
+                len(self.chunk_schedule.chunk_sizes) - 1,
             )
             chunk_size = self.chunk_schedule.chunk_sizes[request_stage_idx]
         else:
@@ -90,8 +122,20 @@ class SarathiScheduler(BaseScheduler):
 
         num_batched_tokens: int = 0
 
-        self._process_running_sequences(now, running, preempted_seq_ids, scheduled_seq_metadata_list, num_batched_tokens)
-        self._process_waiting_sequences(now, running, ignored_seq_ids, scheduled_seq_metadata_list, num_batched_tokens)
+        self._process_running_sequences(
+            now,
+            running,
+            preempted_seq_ids,
+            scheduled_seq_metadata_list,
+            num_batched_tokens,
+        )
+        self._process_waiting_sequences(
+            now,
+            running,
+            ignored_seq_ids,
+            scheduled_seq_metadata_list,
+            num_batched_tokens,
+        )
 
         self.running = running
 
@@ -124,10 +168,18 @@ class SarathiScheduler(BaseScheduler):
                 running_prefills.append(seq)
                 continue
 
-            self._process_completed_prefill_sequence(seq, running, preempted_seq_ids, scheduled_seq_metadata_list, num_batched_tokens)
+            self._process_completed_prefill_sequence(
+                seq,
+                running,
+                preempted_seq_ids,
+                scheduled_seq_metadata_list,
+                num_batched_tokens,
+            )
 
         for seq in running_prefills:
-            self._process_incomplete_prefill_sequence(seq, running, scheduled_seq_metadata_list, num_batched_tokens)
+            self._process_incomplete_prefill_sequence(
+                seq, running, scheduled_seq_metadata_list, num_batched_tokens
+            )
 
     def _process_completed_prefill_sequence(
         self,
@@ -161,7 +213,9 @@ class SarathiScheduler(BaseScheduler):
     ) -> None:
         assert not seq.prompt_stage_processing_finished
 
-        next_num_prefill_tokens = self._get_seq_next_num_prefill_tokens(seq, num_batched_tokens)
+        next_num_prefill_tokens = self._get_seq_next_num_prefill_tokens(
+            seq, num_batched_tokens
+        )
 
         if next_num_prefill_tokens == 0:
             running.append(seq)
@@ -169,7 +223,9 @@ class SarathiScheduler(BaseScheduler):
 
         num_batched_tokens += next_num_prefill_tokens
         scheduled_seq_metadata_list.append(
-            SequenceScheduleMetadata.from_sequence(seq, prompt_chunk_len=next_num_prefill_tokens)
+            SequenceScheduleMetadata.from_sequence(
+                seq, prompt_chunk_len=next_num_prefill_tokens
+            )
         )
         running.append(seq)
 
@@ -198,7 +254,9 @@ class SarathiScheduler(BaseScheduler):
             if len(running) >= self.scheduler_config.max_num_seqs:
                 break
 
-            next_num_prefill_tokens = self._get_seq_next_num_prefill_tokens(seq, num_batched_tokens)
+            next_num_prefill_tokens = self._get_seq_next_num_prefill_tokens(
+                seq, num_batched_tokens
+            )
 
             if next_num_prefill_tokens == 0:
                 break
@@ -207,6 +265,8 @@ class SarathiScheduler(BaseScheduler):
             self._allocate(seq)
             num_batched_tokens += next_num_prefill_tokens
             scheduled_seq_metadata_list.append(
-                SequenceScheduleMetadata.from_sequence(seq, prompt_chunk_len=next_num_prefill_tokens)
+                SequenceScheduleMetadata.from_sequence(
+                    seq, prompt_chunk_len=next_num_prefill_tokens
+                )
             )
             running.append(seq)
