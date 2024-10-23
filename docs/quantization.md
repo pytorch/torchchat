@@ -120,6 +120,8 @@ python3 torchchat.py generate llama3 --pte-path llama3.pte  --prompt "Hello my n
 
 ## Experimental TorchAO lowbit kernels
 
+WARNING: These kernels only work on devices with ARM CPUs, for example on Mac computers with Apple Silicon.
+
 ### Use
 
 #### linear:a8wxdq
