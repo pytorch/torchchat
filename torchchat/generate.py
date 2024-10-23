@@ -179,8 +179,11 @@ class GeneratorArgs:
 
         # Validate that all image prompts exist before expensive model load
         if image_prompts := getattr(args, "image_prompts", None):
-            if not all(os.path.exists(image_prompt) for image_prompt in image_prompts):
-                raise RuntimeError(f"Image prompt {image_prompt} does not exist")
+            non_existent_image_prompts = [
+                image_prompt if (not os.path.exists(image_prompt)) for image_prompt in image_prompts
+            ]
+            if len(non_existent_image_prompts):
+                raise RuntimeError(f"Image prompt {non_existent_image_prompts} does not exist")
 
         return cls(
             prompt=getattr(args, "prompt", ""),
@@ -938,7 +941,7 @@ class Generator:
                     TransformerCrossAttentionLayer,
                     TransformerSelfAttentionLayer,
                 )
-                decoder = self.model.model.decoder 
+                decoder = self.model.model.decoder
                 for m in reversed(list(decoder.modules())):
                     if isinstance(m, TransformerSelfAttentionLayer) or isinstance(
                         m, TransformerCrossAttentionLayer
