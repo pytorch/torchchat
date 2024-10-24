@@ -9,7 +9,7 @@
 
 Torchchat provides evaluation functionality for your language model on
 a variety of tasks using the
-[lm-evaluation-harness](https://github.com/facebookresearch/lm_eval)
+[lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness)
 library.
 
 ## Usage
@@ -34,6 +34,6 @@ Running multiple tasks and calling eval.py directly:
 python3 torchchat.py eval stories15M --pte-path stories15M.pte --tasks wikitext hellaswag
 ```
 
-For more information and a list of tasks/metrics see [lm-evaluation-harness](https://github.com/facebookresearch/lm_eval).
+For more information and a list of tasks/metrics see [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness).
 
 [end default]: end
