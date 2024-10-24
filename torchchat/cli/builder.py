@@ -92,7 +92,9 @@ class BuilderArgs:
             ]
             for param, param_msg in ignored_params:
                 if param:
-                    print(f"Warning: {param_msg} ignored because an exported DSO or PTE path was specified")
+                    print(
+                        f"Warning: {param_msg} ignored because an exported DSO or PTE path was specified"
+                    )
         else:
             self.prefill_possible = True
 
@@ -495,7 +497,7 @@ def _load_model(builder_args: BuilderArgs) -> Model:
     #    model = _init_model_on_meta_device(builder_args)
     else:
         model = _load_model_default(builder_args)
-    model = _maybe_parallelize_model(model, builder_args, world_mesh, parallel_dims)
+    # model = _maybe_parallelize_model(model, builder_args, world_mesh, parallel_dims)
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
