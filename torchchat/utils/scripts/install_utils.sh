@@ -27,6 +27,14 @@ function find_cmake_prefix_path() {
   MY_CMAKE_PREFIX_PATH=$path
 }
 
+
+function get_executorch_commit_hash_pin() {
+  # Assuming inside executorch
+  nightly_str=$(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt)
+  nightly_commit_hash=$(git log origin/nightly --format=%H --grep="${nightly_str} nightly release")
+  echo "Nightly commit hash: ${nightly_commit_hash}"
+}
+
 clone_executorch_internal() {
   rm -rf ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
 
@@ -34,7 +42,9 @@ clone_executorch_internal() {
   pushd ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
   git clone https://github.com/pytorch/executorch.git
   cd executorch
-  git checkout $(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt)
+  get_executorch_commit_hash_pin
+
+  git checkout "$nightly_commit_hash"
   echo "Install ExecuTorch: submodule update"
   git submodule sync
   git submodule update --init
@@ -60,9 +70,9 @@ clone_executorch() {
 
     # Check if the version is the same
     current_version=$(git rev-parse HEAD)
-    desired_version=$(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt)
+    get_executorch_commit_hash_pin
 
-    if [ "$current_version" == "$desired_version" ]; then
+    if [ "$current_version" == "$nightly_commit_hash" ]; then
       echo "ExecuTorch is already cloned with the correct version. Skipping clone."
       popd
       return
@@ -77,31 +87,16 @@ clone_executorch() {
 
 
 install_executorch_python_libs() {
-  if [ ! -d "${TORCHCHAT_ROOT}/${ET_BUILD_DIR}" ]; then
-    echo "Directory ${TORCHCHAT_ROOT}/${ET_BUILD_DIR} does not exist."
-    echo "Make sure you run clone_executorch"
-    exit 1
-  fi
-  pushd ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src
-  cd executorch
-
-  echo "Building and installing python libraries"
-  if [ "${ENABLE_ET_PYBIND}" = false ]; then
-      echo "Not installing pybind"
-      bash ./install_requirements.sh
-  else
-      echo "Installing pybind"
-      bash ./install_requirements.sh --pybind xnnpack
-  fi
-
+  NIGHTLY=$(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt | tr -d "-")
+  echo "Installing ExecuTorch nightly 0.5.0.dev${NIGHTLY}"
+  pip install executorch=="0.5.0.dev${NIGHTLY}" --extra-index-url https://download.pytorch.org/whl/nightly/cpu
   # TODO: figure out the root cause of 'AttributeError: module 'evaluate'
   # has no attribute 'utils'' error from evaluate CI jobs and remove
   # `import lm_eval` from torchchat.py since it requires a specific version
   # of numpy.
   pip install numpy=='1.26.4'
 
-  pip3 list
-  popd
+  pip list
 }
 
 COMMON_CMAKE_ARGS="\
