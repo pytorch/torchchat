@@ -399,8 +399,7 @@ def _add_distributed_args(parser) -> None:
     parser.add_argument(
         "--distributed",
         action="store_true",
-        help=argparse.SUPPRESS,
-        # "Whether to enable distributed inference",
+        help="Whether to enable distributed inference",
     )
     parser.add_argument(
         "--dcp-dir",
@@ -414,16 +413,14 @@ def _add_distributed_args(parser) -> None:
         "--pipeline-parallel",
         type=int,
         default=1,
-        help=argparse.SUPPRESS,
-        # "Pipeline parallel degree",
+        help="Pipeline parallel degree",
     )
     parser.add_argument(
         "--tp",
         "--tensor-parallel",
         type=int,
-        default=1,
-        help=argparse.SUPPRESS,
-        # "Tensor parallel degree",
+        default=2,
+        help="Tensor parallel degree",
     )
     parser.add_argument(
         "--chpt-from",

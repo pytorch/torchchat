@@ -231,3 +231,5 @@ class DistributedGenerator(object):
             raise NotImplementedError(
                 "Currently we only support generate with --distributed"
             )
+        elif self.builder_args.tp < 2:
+            raise RuntimeError("TP degree must be at least 2 for distributed inference")

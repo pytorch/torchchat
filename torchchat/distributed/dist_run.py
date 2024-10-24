@@ -12,7 +12,7 @@ import argparse
 import os
 from enum import auto, Enum
 from pathlib import Path
-from types import SimpleNamespace, MethodType
+from types import MethodType, SimpleNamespace
 from typing import Any, Dict, List, Optional, Tuple
 
 import torch
@@ -71,21 +71,26 @@ def _init_distributed():
 
 
 def _create_device_mesh(pp_degree, tp_degree):
-    return dist.init_device_mesh("cuda", (pp_degree, tp_degree), mesh_dim_names=("pp", "tp"))
+    return dist.init_device_mesh(
+        "cuda", (pp_degree, tp_degree), mesh_dim_names=("pp", "tp")
+    )
 
 
 def dict_to_args(dictionary: Dict[str, Any]) -> SimpleNamespace:
     return SimpleNamespace(**dictionary)
 
+
 def _patch_tokenizer(tokenizer):
     """Patch the tokenizer to support decoding of token ids."""
     if isinstance(tokenizer, TiktokenTokenizer):
         # Patch tiktokenizer to allow a list of sequences.
-        #TODO: Upstream to tokenizer modules
+        # TODO: Upstream to tokenizer modules
         old_decode = tokenizer.decode
 
-        def decode(self, token_ids: List[int|List[int]], *args, **kwargs) -> str | List[str]:
-            if len(token_ids)<1:
+        def decode(
+            self, token_ids: List[int | List[int]], *args, **kwargs
+        ) -> str | List[str]:
+            if len(token_ids) < 1:
                 return ""
             if isinstance(token_ids[0], list):
                 return [old_decode(t, *args, **kwargs) for t in token_ids]
@@ -94,6 +99,7 @@ def _patch_tokenizer(tokenizer):
 
         tokenizer.decode = MethodType(decode, tokenizer)
     return tokenizer
+
 
 def _build_chat_tokenizer(
     model_name: str,
@@ -221,7 +227,7 @@ def _create_padded_prompts(
 
 def _batch_decode_next_tokens(
     output: torch.Tensor,
-    pos: List[int]=None,
+    pos: List[int] = None,
     temperature: float = 1.0,
     topk: int = 10,
 ) -> torch.Tensor:
@@ -388,7 +394,7 @@ def main(args, pipe):
     # Batch size. Since we push batches dynamically through the pipeline rather
     # than chunking them, this is effectively micro-batch size in pipeline
     # sense. Thus it is interchangeable with micro-batch size below.
-    batch_size = 1# len(prompt)
+    batch_size = 1  # len(prompt)
     seqlen_prefill = 1024  # sequence length
     dim = 4096  # embedding dimension
 
@@ -463,7 +469,9 @@ def main(args, pipe):
                 raise ValueError(f"Unknown command: {command}")
         else:
             prompt = command
-            assert len(prompt) == batch_size, f"Expecting {batch_size=} prompts but got {len(prompt)=}"
+            assert (
+                len(prompt) == batch_size
+            ), f"Expecting {batch_size=} prompts but got {len(prompt)=}"
             logger.info(f"{color.green}Prompt: {prompt}{color.reset}")
 
             start_pos = 0
@@ -508,7 +516,7 @@ def main(args, pipe):
             logger.info(f"{color.green}Decoding...{prompt_lengths=}{color.reset}")
             new_token = _batch_decode_next_tokens(output, prompt_lengths)
             res.append(new_token)
-            #TODO: Move to a separate decoding thread
+            # TODO: Move to a separate decoding thread
             resp = _decode_in_flight(new_token, tokenizer, tp_rank)
             pipe.send((resp, new_token.tolist()))
         else:
@@ -539,7 +547,7 @@ def main(args, pipe):
                 command = pipe.recv()
                 assert isinstance(command, str)
                 if command == "stop":
-                    break   
+                    break
                 elif command == "step":
                     pass
                 else:
@@ -573,7 +581,7 @@ def main(args, pipe):
                 if pp_rank == last_pp_rank:
                     new_token = _batch_decode_next_tokens(output)
                     res.append(new_token)
-                    #TODO: Move to a separate decoding thread
+                    # TODO: Move to a separate decoding thread
                     resp = _decode_in_flight(new_token, tokenizer, tp_rank)
                     pipe.send((resp, new_token))
                 else:
@@ -602,7 +610,7 @@ def main(args, pipe):
             for prompt_text, response_text in zip(prompt, responses):
                 logger.info(f"Prompt: {color.green}{prompt_text} {color.reset}")
                 logger.info(f"Response: {color.red}{response_text} {color.reset}")
-                
+
     # Cleanup
     _cleanup()
     logger.info(
