@@ -1092,32 +1092,11 @@ jobs:
         id: install-torchao-ops
         run: |
           bash torchchat/utils/scripts/build_torchao_ops.sh
-      - name: Set git shas
-        id: setup-hash
-        run: |
-          export TORCHCHAT_ROOT=${PWD}
-          echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt)" >> "$GITHUB_ENV"
-      - name: Load or install ET
-        id: install-et
-        uses: actions/cache@v4
-        with:
-          path: |
-            ./et-build
-            ./torchchat/utils/scripts/install_et.sh
-          key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}-${{ hashFiles('**/install_et.sh') }}
-      - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
-        continue-on-error: true
+      - name: Install ET
         run: |
           echo "Installing ExecuTorch"
+          export TORCHCHAT_ROOT=${PWD}
           bash torchchat/utils/scripts/install_et.sh
-      - name: Install ExecuTorch python
-        run: |
-          echo "Install ExecuTorch python"
-          export TORCHCHAT_ROOT=$PWD
-          export ET_BUILD_DIR="et-build"
-          ENABLE_ET_PYBIND="${1:-true}"
-          source "torchchat/utils/scripts/install_utils.sh"
-          install_executorch_python_libs $ENABLE_ET_PYBIND
       - name: Install runner
         run: |
           echo "Installing runner"
@@ -1132,14 +1111,14 @@ jobs:
           wget -O ./tokenizer.model https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
           export PRMT="Once upon a time in a land far away"
           echo "Generate eager"
-          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"linear:a8wxdq": {"bitwidth": 4, "groupsize": 256, "has_weight_zeros": false}}'
+          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
           echo "Generate compile"
-          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"linear:a8wxdq": {"bitwidth": 4, "groupsize": 256, "has_weight_zeros": false}}' --compile
+          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}' --compile
           echo "Export and run ET (C++ runner)"
-          python torchchat.py export stories110M --output-pte-path ./model.pte --dtype float32 --quantize '{"linear:a8wxdq": {"bitwidth": 4, "groupsize": 256, "has_weight_zeros": false}}'
+          python torchchat.py export stories110M --output-pte-path ./model.pte --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
           ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
           echo "Export and run AOTI (C++ runner)"
-          python torchchat.py export stories110M --output-dso-path ./model.so --dtype float32 --quantize '{"linear:a8wxdq": {"bitwidth": 4, "groupsize": 256, "has_weight_zeros": false}}'
+          python torchchat.py export stories110M --output-dso-path ./model.so --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
           ./cmake-out/aoti_run ./model.so -z ./tokenizer.model -t 0 -i "${PRMT}"
           echo "Generate AOTI"
           python torchchat.py generate stories110M --dso-path ./model.so --prompt "${PRMT}"
