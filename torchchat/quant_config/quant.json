@@ -53,30 +53,6 @@
                   "weight_group_sizes": [256],
                   "embedding_group_sizes": [256]
                 }
-              },
-              {
-                "mode": "eager",
-                "quantization_options": {
-                  "quant_schemes": [
-                    {
-                      "scheme": "linear",
-                      "weight_dtypes": [4, 8]
-                    },
-                    {
-                      "scheme": "dynamic",
-                      "weight_dtypes": [4, 8],
-                      "activation_dtypes": [4, 8]
-                    }
-                  ],
-                  "embedding_quant_schemes": [
-                    {
-                      "scheme": "linear",
-                      "weight_dtipes": [4, 8]
-                    }
-                  ],
-                  "weight_group_sizes": [256],
-                  "embedding_group_sizes": [256]
-                }
               }
             ]
           },
