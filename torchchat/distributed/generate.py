@@ -19,6 +19,7 @@ from uuid import uuid4
 
 import torch.multiprocessing as mp
 from torchchat.cli.builder import BuilderArgs, TokenizerArgs
+from torchchat.distributed.dist_run import NAME_TO_DISTRIBUTION_AND_DTYPE
 
 
 def _setup_env(world_size: int, rank: int, target: callable, *args, **kwargs):
@@ -33,7 +34,7 @@ def _setup_env(world_size: int, rank: int, target: callable, *args, **kwargs):
 
 
 def _launch_distributed_inference(
-    builder_args: BuilderArgs, tokenizer_args: TokenizerArgs
+    model_name: str, builder_args: BuilderArgs, tokenizer_args: TokenizerArgs
 ) -> tuple[List]:
     # create programmatic elastic launch
     print("Launching distributed inference ...")
@@ -51,7 +52,7 @@ def _launch_distributed_inference(
         pipes.append(server_pipe)
         proc = mp.Process(
             target=partial(_setup_env, num_processes_per_node, rank, main),
-            args=(builder_args, tokenizer_args, client_pipe),
+            args=(model_name, builder_args, tokenizer_args, client_pipe),
         )
         proc.start()
 
@@ -178,6 +179,8 @@ class Scheduler(object):
 class DistributedGenerator(object):
     def __init__(
         self,
+        # TODO: switch this to torchchat method
+        model_name: str,
         builder_args: BuilderArgs,
         tokenizer_args: TokenizerArgs,
         # TODO: move GeneratorArgs into a different module
@@ -186,13 +189,14 @@ class DistributedGenerator(object):
         quantize: bool,
         draft_quantize: bool,
     ):
+        self.model_name = model_name
         self.builder_args = builder_args
         self.generate_args = generator_args
 
         self.check_args()
 
         self.procs, self.pipes = _launch_distributed_inference(
-            builder_args, tokenizer_args
+            model_name, builder_args, tokenizer_args
         )
 
         self.loop = asyncio.new_event_loop()
@@ -236,4 +240,12 @@ class DistributedGenerator(object):
                 "Currently we only support generate with --distributed"
             )
         elif self.builder_args.tp < 2:
-            raise RuntimeError("TP degree must be at least 2 for distributed inference")
+            raise ValueError("TP degree must be at least 2 for distributed inference")
+        elif self.model_name not in NAME_TO_DISTRIBUTION_AND_DTYPE.keys():
+            raise ValueError(
+                f"Distributed inference currently only supports then following models: {list(NAME_TO_DISTRIBUTION_AND_DTYPE.keys())}"
+            )
+        elif self.builder_args.chpt_from == "torchchat":
+            raise ValueError(
+                f"Distributed inference currently only supports HF checkpoints"
+            )

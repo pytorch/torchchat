@@ -105,7 +105,7 @@ def _build_chat_tokenizer(
     tokenizer_args: TokenizerArgs,
 ) -> SentencePieceProcessor | TiktokenTokenizer:
     """Builds a tokenizer for the given model name"""
-    
+
     tokenizer_args = TokenizerArgs.from_args(tokenizer_args)
     tokenizer = tokenizer_args.t
     assert tokenizer is not None, f"Failed to get tokenizer using {tokenconfig=}"
@@ -293,12 +293,11 @@ prompts = [
 
 
 def main(
+    model_name,
     builder_args,
     tokenizer_args,
     pipe,
 ):
-    model_name = "llama3"  # args.model_name
-    # print(f"{builder_args.checkpoint_path=}")
     pp_degree = builder_args.pp
 
     rank, world_size = _init_distributed()

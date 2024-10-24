@@ -1233,6 +1233,7 @@ def main(args):
             pass
     else:
         dist_gen = DistributedGenerator(
+            args.model,
             builder_args,
             tokenizer_args,
             generator_args,
