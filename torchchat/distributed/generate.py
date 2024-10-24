@@ -20,6 +20,9 @@ from uuid import uuid4
 import torch.multiprocessing as mp
 from torchchat.cli.builder import BuilderArgs, TokenizerArgs
 from torchchat.distributed.dist_run import NAME_TO_DISTRIBUTION_AND_DTYPE
+from torchchat.distributed.logging_utils import SingletonLogger
+
+logger = SingletonLogger.get_logger()
 
 
 def _setup_env(world_size: int, rank: int, target: callable, *args, **kwargs):
@@ -37,7 +40,7 @@ def _launch_distributed_inference(
     model_name: str, builder_args: BuilderArgs, tokenizer_args: TokenizerArgs
 ) -> tuple[List]:
     # create programmatic elastic launch
-    print("Launching distributed inference ...")
+    logger.info("Launching distributed inference ...")
 
     num_processes_per_node = builder_args.pp * builder_args.tp
 
@@ -59,7 +62,9 @@ def _launch_distributed_inference(
     for pipe in pipes:
         response = pipe.recv()
 
-    print(f"Done launching distributed inference on {num_processes_per_node} GPUs.")
+    logger.info(
+        f"Done launching distributed inference on {num_processes_per_node} GPUs."
+    )
     return procs, pipes
 
 
