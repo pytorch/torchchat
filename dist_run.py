@@ -306,7 +306,7 @@ prompt = [
 
 
 def main(args):
-    model_name = "llama3"  # args.model_name
+    model_name = args.model_name
     pp_degree = args.pp
 
     rank, world_size = _init_distributed()
@@ -592,14 +592,14 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    """parser.add_argument(
+    parser.add_argument(
         "model_name",
         type=str,
         default="llama3",
         help="Name of the model to load",
-        # choices=NAME_TO_DISTRIBUTION_AND_DTYPE.keys(),
+        choices=NAME_TO_DISTRIBUTION_AND_DTYPE.keys(),
     )
-    """
+
     parser.add_argument("--pp", type=int, default=1, help="Pipeline parallel degree")
     parser.add_argument(
         "--ntokens",
