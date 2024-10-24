@@ -12,13 +12,13 @@ import argparse
 import os
 from enum import auto, Enum
 from pathlib import Path
-from types import SimpleNamespace
+from types import MethodType, SimpleNamespace
 from typing import Any, Dict, List, Optional, Tuple
 
 import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
-from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
+from torchchat.cli.builder import TokenizerArgs
 
 # TODO - these are not distributed specific, consider moving to new package
 from torchchat.distributed.checkpoint_utils import (
@@ -50,7 +50,6 @@ except ImportError:
 
 
 logger = SingletonLogger.get_logger()
-_tokenizer_type = None  # global variable to store the tokenizer type
 
 # Using model name to identify the model to load, for example "llama2-7b-chat".
 # You can change it to other values listed below.
@@ -58,12 +57,8 @@ _tokenizer_type = None  # global variable to store the tokenizer type
 NAME_TO_DISTRIBUTION_AND_DTYPE = {
     "llama2-7b-chat": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
     "llama3": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16),
+    "llama3.1": ("meta-llama/Meta-Llama-3.1-8B-Instruct", torch.bfloat16),
 }
-
-
-class TokenizerType(Enum):
-    Tiktoken = auto()
-    SentencePiece = auto()
 
 
 def _init_distributed():
@@ -75,57 +70,51 @@ def _init_distributed():
     return rank, world_size
 
 
-def _create_device_mesh(mesh_dimensions):
-    return dist.init_device_mesh("cuda", mesh_dimensions, mesh_dim_names=("pp", "tp"))
+def _create_device_mesh(pp_degree, tp_degree):
+    return dist.init_device_mesh(
+        "cuda", (pp_degree, tp_degree), mesh_dim_names=("pp", "tp")
+    )
 
 
 def dict_to_args(dictionary: Dict[str, Any]) -> SimpleNamespace:
     return SimpleNamespace(**dictionary)
 
 
+def _patch_tokenizer(tokenizer):
+    """Patch the tokenizer to support decoding of token ids."""
+    if isinstance(tokenizer, TiktokenTokenizer):
+        # Patch tiktokenizer to allow a list of sequences.
+        # TODO: Upstream to tokenizer modules
+        old_decode = tokenizer.decode
+
+        def decode(
+            self, token_ids: List[int | List[int]], *args, **kwargs
+        ) -> str | List[str]:
+            if len(token_ids) < 1:
+                return ""
+            if isinstance(token_ids[0], list):
+                return [old_decode(t, *args, **kwargs) for t in token_ids]
+            else:
+                return old_decode(token_ids, *args, **kwargs)
+
+        tokenizer.decode = MethodType(decode, tokenizer)
+    return tokenizer
+
+
 def _build_chat_tokenizer(
-    model_name: str,
-    model_base_name: Optional[str] = None,
+    tokenizer_args: TokenizerArgs,
 ) -> SentencePieceProcessor | TiktokenTokenizer:
-    """Builds a tokenizer for the given model name, and sets the global tokenizer type variable"""
+    """Builds a tokenizer for the given model name"""
 
-    global _tokenizer_type
-
-    # Try to infer the model base name from the model name:
-    # e.g. "llama2-7b-chat" -> "llama2"
-    if model_base_name is None:
-        model_base_name = model_name.split("-")[0]
-        logger.info(
-            f"Using model base name '{model_base_name}' to build tokenizer. "
-            "If not found, please specify it using the `model_base_name` argument."
-        )
-
-    # Create base args for tokenizer
-    default_model_dir = Path(
-        os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")
-    ).expanduser()
-
-    tokenconfig = {
-        "model_directory": default_model_dir,
-        "model": model_base_name,
-        "tokenizer_path": None,
-    }
-    args = dict_to_args(tokenconfig)
-    tokenizer_args = TokenizerArgs.from_args(args)
-    tokenizer = _initialize_tokenizer(tokenizer_args)
+    tokenizer_args = TokenizerArgs.from_args(tokenizer_args)
+    tokenizer = tokenizer_args.t
     assert tokenizer is not None, f"Failed to get tokenizer using {tokenconfig=}"
     logger.info(
         f"using tokenizer = {tokenizer.__class__.__module__}.{tokenizer.__class__.__name__}"
     )
-    # set global variable _tokenizer_type
-    if isinstance(tokenizer, TiktokenTokenizer):
-        _tokenizer_type = TokenizerType.Tiktoken
-    elif isinstance(tokenizer, SentencePieceProcessor):
-        _tokenizer_type = TokenizerType.SentencePiece
-    else:
-        raise ValueError(f"Unknown tokenizer type: {tokenizer.__class__}")
 
-    logger.info(f"tokenizer type = {_tokenizer_type}")
+    tokenizer = _patch_tokenizer(tokenizer)
+
     return tokenizer
 
 
@@ -217,8 +206,7 @@ def _create_padded_prompts(
 
 def _batch_decode_next_tokens(
     output: torch.Tensor,
-    pos: List[int],
-    step: int = -1,
+    pos: List[int] = None,
     temperature: float = 1.0,
     topk: int = 10,
 ) -> torch.Tensor:
@@ -236,7 +224,7 @@ def _batch_decode_next_tokens(
     """
     batch_size, seq_len, vocab_size = output.shape
 
-    if step != -1:
+    if pos is None:
         # `pos` is not provided, so we can use the first token
         next_token_logits = output[:, 0, :]
     else:
@@ -279,8 +267,6 @@ def _decode_in_flight(token, tokenizer, tp_rank):
     # `token` is a tensor of shape (batch_size, 1).
     # For TiktokenTokenizer, we need to squeeze it to 1D.
     # For SentencePieceProcessor, we don't.
-    if isinstance(tokenizer, TiktokenTokenizer):
-        token = torch.squeeze(token, dim=1)
     token_str = tokenizer.decode(token.tolist())
     # print the token string on tp rank 0
     if tp_rank == 0:
@@ -288,6 +274,7 @@ def _decode_in_flight(token, tokenizer, tp_rank):
             f"{color.green} responses ====>>>> "
             f"{color.blue} {token_str} {color.reset}"
         )
+    return token_str
 
 
 def _cleanup():
@@ -295,21 +282,26 @@ def _cleanup():
     dist.destroy_process_group()
 
 
-prompt = [
+prompts = [
     "What is Snow?",
     # "Can you explain what is the purpose of back propagation in neural networks?",
     "Who is Santa Claus?",
     "Where does Santa live?",
-    # "Who is Abraham Lincoln?",
+    "Who is Abraham Lincoln?",
     # "How are models trained?",
 ]
 
 
-def main(args):
-    model_name = args.model_name
-    pp_degree = args.pp
+def main(
+    model_name,
+    builder_args,
+    tokenizer_args,
+    pipe,
+):
+    pp_degree = builder_args.pp
 
     rank, world_size = _init_distributed()
+    logger.info(f"Worker started: {rank=}, {world_size=}")
 
     gpu_memory_monitor = GPUMemoryMonitor("cuda")
     logger.info(f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}")
@@ -323,7 +315,7 @@ def main(args):
     config = TransformerArgs.from_params(model_config.transformer_args["text"])
     logger.info(f"Transformer Config: {config}")
 
-    tokenizer = _build_chat_tokenizer(model_name)
+    tokenizer = _build_chat_tokenizer(tokenizer_args)
 
     set_precision(model_dtype)
     logger.info(f"Using cache precision {model_dtype}")
@@ -340,8 +332,7 @@ def main(args):
     tp_degree = world_size // pp_degree
 
     # Create device mesh
-    mesh_dimensions = (pp_degree, tp_degree)
-    device_mesh = _create_device_mesh(mesh_dimensions)
+    device_mesh = _create_device_mesh(pp_degree, tp_degree)
     tp_mesh = device_mesh["tp"]
     pp_mesh = device_mesh["pp"]
     logger.info(f"Created device mesh: {device_mesh}\n{tp_mesh=}, {pp_mesh=}")
@@ -377,7 +368,7 @@ def main(args):
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
     with CUDATrackTime() as timer:
-        _load_model_weights(model, distribution, device, config, args.chpt_from)
+        _load_model_weights(model, distribution, device, config, builder_args.chpt_from)
 
     logger.info(
         f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
@@ -386,7 +377,7 @@ def main(args):
     # Batch size. Since we push batches dynamically through the pipeline rather
     # than chunking them, this is effectively micro-batch size in pipeline
     # sense. Thus it is interchangeable with micro-batch size below.
-    batch_size = len(prompt)
+    batch_size = 1  # len(prompt)
     seqlen_prefill = 1024  # sequence length
     dim = 4096  # embedding dimension
 
@@ -408,9 +399,6 @@ def main(args):
     logger.info(
         f"Stage {rank} has {color.blue}{stage_num_params} params{color.reset}, Size: {color.blue}{stage_size_formatted}{color.reset}"
     )
-
-    # Setup input position (input_pos) for prefill: a list of increasing integers from 0 to seqlen
-    input_pos = torch.arange(seqlen_prefill, device=device)
     model.eval()
 
     # Helper function to get example inputs and outputs for the stages.
@@ -448,140 +436,163 @@ def main(args):
     # pipelining effect.
     prefiller = ScheduleGPipe(prefill_stage, 1)
 
-    start_pos = 0
-
     # Need these global ids due to the API definition of dist.send and recv
     first_pp_rank_global_id = dist.get_global_rank(pp_group, first_pp_rank)
     last_pp_rank_global_id = dist.get_global_rank(pp_group, last_pp_rank)
 
-    # encode the prompt
-    input_ids = _encode_strings(
-        prompt, tokenizer, bos=True, device=device, dtype=torch.int64
-    )
+    pipe.send("ready")
 
-    # create a padded tensor for the input prompt
-    padded_sequence, prompt_lengths = _create_padded_prompts(
-        input_ids, tokenizer, seqlen_prefill, start_pos, device
-    )
-
-    # Need these global ids due to the API definition of dist.send and recv
-    first_pp_rank_global_id = dist.get_global_rank(pp_group, first_pp_rank)
-    last_pp_rank_global_id = dist.get_global_rank(pp_group, last_pp_rank)
-
-    # New token generated each iteration
-    # need a row dimension for each prompt in the batch
-    new_token = torch.zeros(batch_size, 1, device=device, dtype=torch.int64)
-    # Store the generated tokens
-    res = []
-
-    # Prefill phase
-    # Run context input through pipeline
-    # TODO: we need to pass `input_pos` and `cache_lane` to each stage.
-    lane = 0
-    kwargs = {"input_pos": input_pos, "cache_lane": lane}
-    with torch.no_grad(), CUDATrackTime() as timer:
-        if pp_rank == first_pp_rank:
-            output = prefiller.step(padded_sequence, **kwargs)
-        elif pp_rank == last_pp_rank:
-            output = prefiller.step(**kwargs)
-        else:  # middle pp ranks
-            prefiller.step(**kwargs)
-
-    logger.info(
-        f"{color.green}Prefilling time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
-    )
-
-    # Decode the output -- first generated token
-    if pp_rank == last_pp_rank:
-        logger.info(f"{color.green}Decoding...{prompt_lengths=}{color.reset}")
-        new_token = _batch_decode_next_tokens(output, prompt_lengths)
-        res.append(new_token)
-        if not args.disable_in_flight_decode:
-            _decode_in_flight(new_token, tokenizer, tp_rank)
-
-    # seqlen = 1 now
-    seqlen_decode = 1
-    input_pos = torch.tensor([prompt_lengths[0]], device=device)
-
-    # Create decode stage
-    logger.info(f"Creating pipeline stage for decode {pp_rank=}, {pp_degree=}")
-    example_inputs, example_outputs = get_example_ins_outs(seqlen_decode)
-    decode_stage = PipelineStage(
-        model,
-        pp_rank,
-        pp_degree,
-        device,
-        input_args=example_inputs,
-        output_args=example_outputs,
-        group=pp_group,
-    )
-    # create schedule
-    decoder = ScheduleGPipe(decode_stage, 1)
-
-    # Decoding
-    with torch.no_grad(), CUDATrackTime() as timer:
-        for step in range(args.ntokens - 1):
-            kwargs = {"input_pos": input_pos, "cache_lane": lane}
-            # sendrecv between last and first ranks, only if:
-            # first_pp_rank != last_pp_rank.
-            if pp_rank == last_pp_rank and pp_rank != first_pp_rank:
-                dist.send(
-                    new_token,
-                    dst=first_pp_rank_global_id,
-                    group=pp_group,
-                )
-            elif pp_rank == first_pp_rank and pp_rank != last_pp_rank:
-                dist.recv(
-                    new_token,
-                    src=last_pp_rank_global_id,
-                    group=pp_group,
-                )
-
-            # Run data through pipeline
-            if pp_rank == first_pp_rank:
-                output = decoder.step(new_token, **kwargs)
-            elif pp_rank == last_pp_rank:
-                output = decoder.step(**kwargs)
-            else:  # middle pp ranks
-                decoder.step(**kwargs)
-
-            # Decode the output
-            if pp_rank == last_pp_rank:
-                new_token = _batch_decode_next_tokens(output, prompt_lengths, step)
-                res.append(new_token)
-                if not args.disable_in_flight_decode:
-                    _decode_in_flight(new_token, tokenizer, tp_rank)
-
-            # Increment input position
-            input_pos += 1
-
-    logger.info(
-        f"{color.green}Decoding time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
-    )
-
-    # Display the decoding results
-
-    # output formatted response via last pp group and tp rank 0
-    if pp_rank == last_pp_rank and tp_rank == 0:
-        # `res` is a list of tensors, each being a batch of generated token ids.
-        # We need to concatenate them to get the full sequence of generated
-        # token ids. Thus cat'ing along dim 1.
-        res = torch.cat(res, dim=1)
-        res_list = res.tolist()
-        if _tokenizer_type == TokenizerType.Tiktoken:
-            # For TiktokenTokenizer, we need to decode prompt by prompt.
-            # TODO: is there a better way to do this?
-            responses = [tokenizer.decode(sequence) for sequence in res_list]
-        elif _tokenizer_type == TokenizerType.SentencePiece:  # SentencePieceProcessor
-            # For SentencePieceProcessor, we can decode the entire 2D list at once.
-            responses = tokenizer.decode(res_list)
+    while True:
+        command = pipe.recv()
+        assert isinstance(command, (str, list))
+        if isinstance(command, str):
+            if command == "stop":
+                break
+            else:
+                raise ValueError(f"Unknown command: {command}")
         else:
-            raise ValueError(f"Unknown tokenizer type {_tokenizer_type}")
+            prompt = command
+            assert (
+                len(prompt) == batch_size
+            ), f"Expecting {batch_size=} prompts but got {len(prompt)=}"
+            logger.info(f"{color.green}Prompt: {prompt}{color.reset}")
 
-        # Show prompts and responses
-        for prompt_text, response_text in zip(prompt, responses):
-            logger.info(f"Prompt: {color.green}{prompt_text} {color.reset}")
-            logger.info(f"Response: {color.red}{response_text} {color.reset}")
+            start_pos = 0
+            # Setup input position (input_pos) for prefill: a list of increasing integers from 0 to seqlen
+            input_pos = torch.arange(seqlen_prefill, device=device)
+
+        # encode the prompt
+        input_ids = _encode_strings(
+            prompt, tokenizer, bos=True, device=device, dtype=torch.int64
+        )
+
+        # create a padded tensor for the input prompt
+        padded_sequence, prompt_lengths = _create_padded_prompts(
+            input_ids, tokenizer, seqlen_prefill, start_pos, device
+        )
+
+        # New token generated each iteration
+        # need a row dimension for each prompt in the batch
+        new_token = torch.zeros(batch_size, 1, device=device, dtype=torch.int64)
+        # Store the generated tokens
+        res = []
+
+        # Prefill phase
+        # Run context input through pipeline
+        # TODO: we need to pass `input_pos` and `cache_lane` to each stage.
+        lane = 0
+        kwargs = {"input_pos": input_pos, "cache_lane": lane}
+        with torch.no_grad(), CUDATrackTime() as timer:
+            if pp_rank == first_pp_rank:
+                output = prefiller.step(padded_sequence, **kwargs)
+            elif pp_rank == last_pp_rank:
+                output = prefiller.step(**kwargs)
+            else:  # middle pp ranks
+                prefiller.step(**kwargs)
+
+        logger.info(
+            f"{color.green}Prefilling time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
+        )
+
+        # Decode the output -- first generated token
+        if pp_rank == last_pp_rank:
+            logger.info(f"{color.green}Decoding...{prompt_lengths=}{color.reset}")
+            new_token = _batch_decode_next_tokens(output, prompt_lengths)
+            res.append(new_token)
+            # TODO: Move to a separate decoding thread
+            resp = _decode_in_flight(new_token, tokenizer, tp_rank)
+            pipe.send((resp, new_token.tolist()))
+        else:
+            pipe.send(None)
+
+        # seqlen = 1 now
+        seqlen_decode = 1
+        input_pos = torch.tensor([prompt_lengths[0]], device=device)
+
+        # Create decode stage
+        logger.info(f"Creating pipeline stage for decode {pp_rank=}, {pp_degree=}")
+        example_inputs, example_outputs = get_example_ins_outs(seqlen_decode)
+        decode_stage = PipelineStage(
+            model,
+            pp_rank,
+            pp_degree,
+            device,
+            input_args=example_inputs,
+            output_args=example_outputs,
+            group=pp_group,
+        )
+        # create schedule
+        decoder = ScheduleGPipe(decode_stage, 1)
+
+        # Decoding
+        with torch.no_grad(), CUDATrackTime() as timer:
+            while True:
+                command = pipe.recv()
+                assert isinstance(command, str)
+                if command == "stop":
+                    break
+                elif command == "step":
+                    pass
+                else:
+                    raise ValueError(f"Unknown command: {command}")
+
+                kwargs = {"input_pos": input_pos, "cache_lane": lane}
+                # sendrecv between last and first ranks, only if:
+                # first_pp_rank != last_pp_rank.
+                if pp_rank == last_pp_rank and pp_rank != first_pp_rank:
+                    dist.send(
+                        new_token,
+                        dst=first_pp_rank_global_id,
+                        group=pp_group,
+                    )
+                elif pp_rank == first_pp_rank and pp_rank != last_pp_rank:
+                    dist.recv(
+                        new_token,
+                        src=last_pp_rank_global_id,
+                        group=pp_group,
+                    )
+
+                # Run data through pipeline
+                if pp_rank == first_pp_rank:
+                    output = decoder.step(new_token, **kwargs)
+                elif pp_rank == last_pp_rank:
+                    output = decoder.step(**kwargs)
+                else:  # middle pp ranks
+                    decoder.step(**kwargs)
+
+                # Decode the output
+                if pp_rank == last_pp_rank:
+                    new_token = _batch_decode_next_tokens(output)
+                    res.append(new_token)
+                    # TODO: Move to a separate decoding thread
+                    resp = _decode_in_flight(new_token, tokenizer, tp_rank)
+                    pipe.send((resp, new_token))
+                else:
+                    pipe.send(None)
+
+                # Increment input position
+                input_pos += 1
+
+        logger.info(
+            f"{color.green}Decoding time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
+        )
+
+        # Display the decoding results
+
+        # output formatted response via last pp group and tp rank 0
+        if pp_rank == last_pp_rank and tp_rank == 0:
+            # `res` is a list of tensors, each being a batch of generated token ids.
+            # We need to concatenate them to get the full sequence of generated
+            # token ids. Thus cat'ing along dim 1.
+            res = torch.cat(res, dim=1)
+            res_list = res.tolist()
+
+            responses = tokenizer.decode(res_list)
+
+            # Show prompts and responses
+            for prompt_text, response_text in zip(prompt, responses):
+                logger.info(f"Prompt: {color.green}{prompt_text} {color.reset}")
+                logger.info(f"Response: {color.red}{response_text} {color.reset}")
 
     # Cleanup
     _cleanup()
@@ -589,37 +600,30 @@ def main(args):
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
     )
 
+# TODO: remove or make it work again
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument(
+#         "model_name",
+#         type=str,
+#         default="llama3",
+#         help="Name of the model to load",
+#         choices=NAME_TO_DISTRIBUTION_AND_DTYPE.keys(),
+#     )
+#     parser.add_argument("--pp", type=int, default=1, help="Pipeline parallel degree")
+#     parser.add_argument(
+#         "--ntokens",
+#         type=int,
+#         default=40,
+#         help="Number of tokens to generate",
+#     )
+#     parser.add_argument(
+#         "--chpt-from",
+#         type=str,
+#         default="hf",  # TODO: change to torchchat once we support it well
+#         help="Checkpoint format to load from",
+#         choices=["hf", "torchchat"],
+#     )
+#     args = parser.parse_args()
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "model_name",
-        type=str,
-        default="llama3",
-        help="Name of the model to load",
-        choices=NAME_TO_DISTRIBUTION_AND_DTYPE.keys(),
-    )
-
-    parser.add_argument("--pp", type=int, default=1, help="Pipeline parallel degree")
-    parser.add_argument(
-        "--ntokens",
-        type=int,
-        default=40,
-        help="Number of tokens to generate",
-    )
-    parser.add_argument(
-        "--disable-in-flight-decode",
-        action="store_true",
-        default=False,
-        help="Whether to decode token into string in flight",
-    )
-    parser.add_argument(
-        "--chpt-from",
-        type=str,
-        default="hf",  # TODO: change to torchchat once we support it well
-        help="Checkpoint format to load from",
-        choices=["hf", "torchchat"],
-    )
-    args = parser.parse_args()
-
-    main(args)
+#     main()

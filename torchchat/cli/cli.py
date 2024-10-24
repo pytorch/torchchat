@@ -399,8 +399,7 @@ def _add_distributed_args(parser) -> None:
     parser.add_argument(
         "--distributed",
         action="store_true",
-        help=argparse.SUPPRESS,
-        # "Whether to enable distributed inference",
+        help="Whether to enable distributed inference",
     )
     parser.add_argument(
         "--dcp-dir",
@@ -408,6 +407,27 @@ def _add_distributed_args(parser) -> None:
         default=None,
         help=argparse.SUPPRESS,
         # "Use the specified model checkpoint directory",
+    )
+    parser.add_argument(
+        "--pp",
+        "--pipeline-parallel",
+        type=int,
+        default=1,
+        help="Pipeline parallel degree",
+    )
+    parser.add_argument(
+        "--tp",
+        "--tensor-parallel",
+        type=int,
+        default=2,
+        help="Tensor parallel degree",
+    )
+    parser.add_argument(
+        "--chpt-from",
+        type=str,
+        default="hf",  # TODO: change to torchchat once we support it well
+        help="Checkpoint format to load from",
+        choices=["hf", "torchchat"],
     )
 
 
@@ -425,13 +445,13 @@ def _add_custom_model_args(parser) -> None:
         "--params-path",
         type=Path,
         default=None,
-        help= "Use the specified parameter file, instead of one specified under torchchat.model_params",
+        help="Use the specified parameter file, instead of one specified under torchchat.model_params",
     )
     parser.add_argument(
         "--tokenizer-path",
         type=Path,
         default=None,
-        help= "Use the specified model tokenizer file, instead of the one downloaded from HuggingFace",
+        help="Use the specified model tokenizer file, instead of the one downloaded from HuggingFace",
     )
 
 
