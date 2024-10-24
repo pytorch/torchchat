@@ -66,8 +66,10 @@ def get_named_parameters(func: Callable) -> List[str]:
     # Get the signature of the function
     signature = inspect.signature(func)
 
+
     # Extract the parameters from the signature
     parameters = signature.parameters
+
 
     # Filter and return named parameters
     named_params = [
@@ -89,6 +91,8 @@ def validate_args(
             )
             del q_kwargs[key]
     return q_kwargs
+
+
 
 
 #########################################################################
@@ -132,6 +136,7 @@ def quantize_model(
                 if not support_tensor_subclass:
                     unwrap_tensor_subclass(model)
                 continue
+
 
             if quantizer in ["linear:a8wxdq", "embedding:wx"]:
                 # These quantizers require float32 input weights.  Note that after quantization,
