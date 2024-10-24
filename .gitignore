@@ -18,6 +18,7 @@ torchao-build/*
 runner-et/cmake-out/*
 runner-aoti/cmake-out/*
 cmake-out/
+build/
 
 # pte files
 *.pte
