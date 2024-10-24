@@ -47,6 +47,7 @@ class ModelConfig:
     tokenizer_file: str = field(default="tokenizer.model")
     transformer_params_key: str = field(default=None)
     prefer_safetensors: bool = field(default=False)
+    model_type: str = field(default="textOnly")
 
 
 # Keys are stored in lowercase.

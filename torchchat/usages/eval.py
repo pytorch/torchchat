@@ -19,6 +19,8 @@ from torchchat.cli.builder import (
 from torchchat.cli.cli import add_arguments_for_verb, arg_init
 
 from torchchat.model import Model
+from torchchat.model_config import model_config
+from torchchat.quant_config import quant_config
 from torchchat.utils.build_utils import set_precision
 from torchchat.utils.measure_time import measure_time
 
@@ -244,6 +246,9 @@ def main(args) -> None:
     compile = args.compile
     max_seq_length = args.max_seq_length
 
+    quant_options = quant_config.resolve_device_config(device)
+    # model_config.resolve_model_config() TODO: get modeltype from the config using the args so that we can pick the right set of quant configs
+    # print(quant_options) you now can look at all options for this device. Just need to lookup model
     print(f"Using device={device}")
     set_precision(builder_args.precision)
 
@@ -254,6 +259,7 @@ def main(args) -> None:
         quantize,
         tokenizer,
     )
+
     tokenizer_args.validate_model(model)
 
     model_forward = lambda x, input_pos: model(x, input_pos)  # noqa
@@ -265,7 +271,9 @@ def main(args) -> None:
         model_forward = torch.compile(
             model_forward, mode="reduce-overhead", dynamic=True, fullgraph=True
         )
-        torch._inductor.config.coordinate_descent_tuning = False if device == "cpu" else True
+        torch._inductor.config.coordinate_descent_tuning = (
+            False if device == "cpu" else True
+        )
 
     with measure_time("Time to run eval: {time:.02f}s."):
         result = eval(

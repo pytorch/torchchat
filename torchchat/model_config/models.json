@@ -3,143 +3,168 @@
         "aliases": ["llama2-base", "llama2-7b"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Llama-2-7b-hf",
-        "transformer_params_key": "7B"
+        "transformer_params_key": "7B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Llama-2-7b-chat-hf": {
         "aliases": ["llama2", "llama2-chat", "llama2-7b-chat"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Llama-2-7b-chat-hf",
-        "transformer_params_key": "7B"
+        "transformer_params_key": "7B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Llama-2-13b-chat-hf": {
         "aliases": ["llama2-13b-chat"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Llama-2-13b-chat-hf",
-        "transformer_params_key": "13B"
+        "transformer_params_key": "13B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Llama-2-70b-chat-hf": {
         "aliases": ["llama2-70b-chat"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Llama-2-70b-chat-hf",
-        "transformer_params_key": "70B"
+        "transformer_params_key": "70B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Meta-Llama-3-8B": {
         "aliases": ["llama3-base"],
         "distribution_channel": "HuggingFaceSnapshot",
-        "distribution_path": "meta-llama/Meta-Llama-3-8B"
+        "distribution_path": "meta-llama/Meta-Llama-3-8B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Meta-Llama-3-8B-Instruct": {
         "aliases": ["llama3", "llama3-chat", "llama3-instruct"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Meta-Llama-3-8B-Instruct",
-        "transformer_params_key": "Meta-Llama-3-8B"
+        "transformer_params_key": "Meta-Llama-3-8B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Meta-Llama-3-70B-Instruct": {
         "aliases": ["llama3-70b"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Meta-Llama-3-70B-Instruct",
-        "transformer_params_key": "Meta-Llama-3-70B"
+        "transformer_params_key": "Meta-Llama-3-70B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Meta-Llama-3.1-8B": {
         "aliases": ["llama3.1-base"],
         "distribution_channel": "HuggingFaceSnapshot",
-        "distribution_path": "meta-llama/Meta-Llama-3.1-8B"
+        "distribution_path": "meta-llama/Meta-Llama-3.1-8B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Meta-Llama-3.1-8B-Instruct": {
         "aliases": ["llama3.1", "llama3.1-chat", "llama3.1-instruct"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Meta-Llama-3.1-8B-Instruct",
-        "transformer_params_key": "Meta-Llama-3.1-8B"
+        "transformer_params_key": "Meta-Llama-3.1-8B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Meta-Llama-3.1-70B-Instruct": {
         "aliases": ["llama3.1-70b"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Meta-Llama-3.1-70B-Instruct",
-        "transformer_params_key": "Meta-Llama-3.1-70B"
+        "transformer_params_key": "Meta-Llama-3.1-70B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Meta-Llama-3.1-8B-Instruct-Tune": {
         "aliases": ["llama3.1-tune", "llama3.1-chat-tune", "llama3.1-instruct-tune"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Meta-Llama-3.1-8B-Instruct",
-        "transformer_params_key": "Meta-Llama-3.1-8B-Tune"
+        "transformer_params_key": "Meta-Llama-3.1-8B-Tune",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Meta-Llama-3.1-70B-Instruct-Tune": {
         "aliases": ["llama3.1-70b-tune"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Meta-Llama-3.1-70B-Instruct",
-        "transformer_params_key": "Meta-Llama-3.1-70B-Tune"
+        "transformer_params_key": "Meta-Llama-3.1-70B-Tune",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Meta-Llama-3.2-1B": {
         "aliases": ["llama3.2-1b-base"],
         "distribution_channel": "HuggingFaceSnapshot",
-        "distribution_path": "meta-llama/Llama-3.2-1B"
+        "distribution_path": "meta-llama/Llama-3.2-1B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Meta-Llama-3.2-1B-Instruct": {
         "aliases": ["llama3.2-1b", "llama3.2-1b-chat", "llama3.2-1b-instruct"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Llama-3.2-1B-Instruct",
-        "transformer_params_key": "Meta-Llama-3.2-1B"
+        "transformer_params_key": "Meta-Llama-3.2-1B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Llama-Guard-3-1B": {
         "aliases": ["llama3-1b-guard", "llama3.2-1b-guard"],
         "distribution_channel": "HuggingFaceSnapshot",
-        "distribution_path": "meta-llama/Llama-Guard-3-1B"
+        "distribution_path": "meta-llama/Llama-Guard-3-1B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Meta-Llama-3.2-3B": {
         "aliases": ["llama3.2-3b-base"],
         "distribution_channel": "HuggingFaceSnapshot",
-        "distribution_path": "meta-llama/Llama-3.2-3B"
+        "distribution_path": "meta-llama/Llama-3.2-3B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Meta-Llama-3.2-3B-Instruct": {
         "aliases": ["llama3.2-3b", "llama3.2-3b-chat", "llama3.2-3b-instruct"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Llama-3.2-3B-Instruct",
-        "transformer_params_key": "Meta-Llama-3.2-3B"
+        "transformer_params_key": "Meta-Llama-3.2-3B",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/Llama-3.2-11B-Vision": {
         "aliases": ["llama3.2-11B-base", "Llama-3.2-11B-Vision-base"],
         "distribution_channel": "HuggingFaceSnapshot",
-        "distribution_path": "meta-llama/Llama-3.2-11B-Vision"
+        "distribution_path": "meta-llama/Llama-3.2-11B-Vision",
+        "model_type": "llamaVision"
     },
     "meta-llama/Llama-3.2-11B-Vision-Instruct": {
         "aliases": ["llama3.2-11B", "Llama-3.2-11B-Vision", "Llama-3.2-mm"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "meta-llama/Llama-3.2-11B-Vision-Instruct",
-        "transformer_params_key": "Llama-3.2-11B-Vision"
+        "transformer_params_key": "Llama-3.2-11B-Vision",
+        "model_type": "llamaVision"
     },
     "meta-llama/CodeLlama-7b-Python-hf": {
         "aliases": ["codellama", "codellama-7b"],
         "distribution_channel": "HuggingFaceSnapshot",
-        "distribution_path": "meta-llama/CodeLlama-7b-Python-hf"
+        "distribution_path": "meta-llama/CodeLlama-7b-Python-hf",
+        "model_type": "llamaTextOnly"
     },
     "meta-llama/CodeLlama-34b-Python-hf": {
         "aliases": ["codellama-34b"],
         "distribution_channel": "HuggingFaceSnapshot",
-        "distribution_path": "meta-llama/CodeLlama-34b-Python-hf"
+        "distribution_path": "meta-llama/CodeLlama-34b-Python-hf",
+        "model_type": "llamaTextOnly"
     },
     "mistralai/Mistral-7B-v0.1": {
         "aliases": ["mistral-7b-v01-base"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "mistralai/Mistral-7B-Instruct-v0.1",
-        "transformer_params_key": "Mistral-7B"
+        "transformer_params_key": "Mistral-7B",
+        "model_type": "textOnly"
     },
     "mistralai/Mistral-7B-Instruct-v0.1": {
         "aliases": ["mistral-7b-v01-instruct"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "mistralai/Mistral-7B-Instruct-v0.1",
-        "transformer_params_key": "Mistral-7B"
+        "transformer_params_key": "Mistral-7B",
+        "model_type": "textOnly"
     },
     "mistralai/Mistral-7B-Instruct-v0.2": {
         "aliases": ["mistral", "mistral-7b", "mistral-7b-instruct"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "mistralai/Mistral-7B-Instruct-v0.2",
-        "transformer_params_key": "Mistral-7B"
+        "transformer_params_key": "Mistral-7B",
+        "model_type": "textOnly"
     },
     "openlm-research/open_llama_7b": {
         "aliases": ["open-llama", "open-llama-7b"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "openlm-research/open_llama_7b",
-        "transformer_params_key": "7B"
+        "transformer_params_key": "7B",
+        "model_type": "llamaTextOnly"
     },
     "stories15M": {
         "distribution_channel": "DirectDownload",
@@ -147,7 +172,8 @@
             "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt",
             "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
         ],
-        "checkpoint_file": "stories15M.pt"
+        "checkpoint_file": "stories15M.pt",
+        "model_type": "textOnly"
     },
     "stories42M": {
         "distribution_channel": "DirectDownload",
@@ -155,7 +181,8 @@
             "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories42M.pt",
             "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
         ],
-        "checkpoint_file": "stories42M.pt"
+        "checkpoint_file": "stories42M.pt",
+        "model_type": "textOnly"
     },
     "stories110M": {
         "distribution_channel": "DirectDownload",
@@ -163,6 +190,7 @@
             "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.pt",
             "https://github.com/karpathy/llama2.c/raw/master/tokenizer.model"
         ],
-        "checkpoint_file": "stories110M.pt"
+        "checkpoint_file": "stories110M.pt",
+        "model_type": "textOnly"
     }
 }
