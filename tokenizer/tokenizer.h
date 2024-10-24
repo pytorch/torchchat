@@ -137,13 +137,18 @@ class Tiktoken : public Tokenizer {
   // Removed negative lookahead \s+(?!\S) since it's not supported by RE2.
   const std::string _pattern =
       R"((?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+)";
-  Encoder _encoder;
-  Encoder _special_token_encoder;
-  Decoder _decoder;
-  Decoder _special_token_decoder;
 
-  Re2UPtr _regex;
+  // Private members tht cannot be overloaded by other BPE tokenizers
   Re2UPtr _special_token_regex;
+
+ protected:
+
+  // Protected members that can be overloaded by other BPE tokenizers
+  Encoder encoder_;
+  Encoder special_token_encoder_;
+  Decoder decoder_;
+  Decoder special_token_decoder_;
+  std::vector<Re2UPtr> regexes_;
 };
 
 
@@ -153,7 +158,7 @@ class Tiktoken : public Tokenizer {
 // and the corresponding support in llama.cpp
 // (https://github.com/ggerganov/llama.cpp)
 
-class TokenizersTokenizer : public Tokenizer {
+class TokenizersTokenizer : public Tiktoken {
  public:
   /*-- Public Interface --*/
 
@@ -167,29 +172,4 @@ class TokenizersTokenizer : public Tokenizer {
    * Load the model data into the
    */
   void load(const std::string& tokenizer_path) override;
-
-  /**
-   * Encode the input string as a list of token IDs
-   */
-  std::vector<uint64_t>
-  encode(const std::string& input, int8_t bos, int8_t eos) const override;
-
-  /**
-   * Decode the list of token IDs into a string
-   */
-  std::string decode(uint64_t prev_token, uint64_t token) const override;
-
- private:
-  /*-- Private Methods --*/
-
-  /*-- Private Members --*/
-
-  // Sequential regex patterns to evaluate
-  std::vector<std::string> _patterns;
-
-  // Forward/backward mappings to/from (special) tokens and their IDs
-  Encoder _encoder;
-  Encoder _special_token_encoder;
-  Decoder _decoder;
-  Decoder _special_token_decoder;
 };

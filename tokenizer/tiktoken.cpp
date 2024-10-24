@@ -275,17 +275,21 @@ void Tiktoken::_encode(
     std::vector<uint64_t>& ret,
     uint64_t& last_piece_token_len) const {
   std::string piece;
-  assert(_regex);
-  while (re2::RE2::FindAndConsume(&input, *_regex, &piece)) {
-    auto iter = _encoder.find(piece);
-    if (iter != _encoder.end()) {
-      last_piece_token_len = 1;
-      ret.push_back(iter->second);
-      continue;
+  assert(regexes_.size());
+  for (const auto& regex : regexes_) {
+    assert(regex);
+    while (re2::RE2::FindAndConsume(&input, *regex, &piece)) {
+      auto iter = encoder_.find(piece);
+      if (iter != encoder_.end()) {
+        last_piece_token_len = 1;
+        ret.push_back(iter->second);
+        continue;
+      }
+      auto tokens = _byte_pair_encode(piece, encoder_);
+
+      last_piece_token_len = tokens.size();
+      ret.insert(ret.end(), tokens.begin(), tokens.end());
     }
-    auto tokens = _byte_pair_encode(piece, _encoder);
-    last_piece_token_len = tokens.size();
-    ret.insert(ret.end(), tokens.begin(), tokens.end());
   }
 }
 
@@ -305,7 +309,7 @@ std::pair<std::vector<uint64_t>, uint64_t> Tiktoken::_encode_with_special_token(
     if (special) {
       uint64_t token = 0;
       try {
-        token = _special_token_encoder.at(*special);
+        token = special_token_encoder_.at(*special);
       } catch (const std::out_of_range&) {
         // Should never go here, since special pattern includes all special
         // chars.
@@ -332,19 +336,19 @@ std::pair<std::vector<uint64_t>, uint64_t> Tiktoken::_encode_with_special_token(
 Tiktoken::Tiktoken() : Tokenizer() {}
 
 void Tiktoken::load(const std::string& path) {
-  _encoder = _load_encoder(path);
-  _special_token_encoder = _get_special_tokens(_encoder.size());
+  encoder_ = _load_encoder(path);
+  special_token_encoder_ = _get_special_tokens(encoder_.size());
 
-  _decoder = _build_decoder(_encoder);
-  _special_token_decoder = _build_decoder(_special_token_encoder);
+  decoder_ = _build_decoder(encoder_);
+  special_token_decoder_ = _build_decoder(special_token_encoder_);
 
-  _regex = _create_regex(_pattern);
-  _special_token_regex = _build_special_token_regex(_special_token_encoder);
+  regexes_.push_back(_create_regex(_pattern));
+  _special_token_regex = _build_special_token_regex(special_token_encoder_);
 
   // initialize vocab_size, bos_tok, eos_tok
-  vocab_size_ = _encoder.size() + _special_token_encoder.size();
-  bos_tok_ = _encoder.size(); // hardcoded (see _get_special_tokens)
-  eos_tok_ = _encoder.size() + 1; // hardcoded (see _get_special_tokens)
+  vocab_size_ = encoder_.size() + special_token_encoder_.size();
+  bos_tok_ = encoder_.size(); // hardcoded (see _get_special_tokens)
+  eos_tok_ = encoder_.size() + 1; // hardcoded (see _get_special_tokens)
   initialized_ = true;
 }
 
@@ -353,7 +357,7 @@ Tiktoken::encode(const std::string& text, int8_t bos, int8_t eos) const {
   if (!initialized_) {
     exit(EXIT_FAILURE);
   }
-  auto res = _encode_with_special_token(text, _special_token_encoder).first;
+  auto res = _encode_with_special_token(text, special_token_encoder_).first;
   for (auto i = 0; i < bos; ++i) {
     res.insert(res.begin(), bos_tok_);
   }
@@ -371,12 +375,12 @@ std::string Tiktoken::decode(uint64_t prev, uint64_t cur) const {
   std::string ret;
 
   std::string token_bytes;
-  auto iter = _decoder.find(cur);
-  if (iter != _decoder.end()) {
+  auto iter = decoder_.find(cur);
+  if (iter != decoder_.end()) {
     token_bytes = iter->second;
   } else {
-    iter = _special_token_decoder.find(cur);
-    if (iter != _special_token_decoder.end()) {
+    iter = special_token_decoder_.find(cur);
+    if (iter != special_token_decoder_.end()) {
       token_bytes = iter->second;
     } else {
       fprintf(stderr, "unknown token: %" PRIu64 "\n", cur);
