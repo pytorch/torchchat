@@ -102,32 +102,11 @@ def _patch_tokenizer(tokenizer):
 
 
 def _build_chat_tokenizer(
-    model_name: str,
-    model_base_name: Optional[str] = None,
+    tokenizer_args: TokenizerArgs,
 ) -> SentencePieceProcessor | TiktokenTokenizer:
     """Builds a tokenizer for the given model name"""
-
-    # Try to infer the model base name from the model name:
-    # e.g. "llama2-7b-chat" -> "llama2"
-    if model_base_name is None:
-        model_base_name = model_name.split("-")[0]
-        logger.info(
-            f"Using model base name '{model_base_name}' to build tokenizer. "
-            "If not found, please specify it using the `model_base_name` argument."
-        )
-
-    # Create base args for tokenizer
-    default_model_dir = Path(
-        os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")
-    ).expanduser()
-
-    tokenconfig = {
-        "model_directory": default_model_dir,
-        "model": model_base_name,
-        "tokenizer_path": None,
-    }
-    args = dict_to_args(tokenconfig)
-    tokenizer_args = TokenizerArgs.from_args(args)
+    
+    tokenizer_args = TokenizerArgs.from_args(tokenizer_args)
     tokenizer = tokenizer_args.t
     assert tokenizer is not None, f"Failed to get tokenizer using {tokenconfig=}"
     logger.info(
@@ -313,9 +292,14 @@ prompts = [
 ]
 
 
-def main(args, pipe):
+def main(
+    builder_args,
+    tokenizer_args,
+    pipe,
+):
     model_name = "llama3"  # args.model_name
-    pp_degree = args.pp
+    # print(f"{builder_args.checkpoint_path=}")
+    pp_degree = builder_args.pp
 
     rank, world_size = _init_distributed()
     logger.info(f"Worker started: {rank=}, {world_size=}")
@@ -332,7 +316,7 @@ def main(args, pipe):
     config = TransformerArgs.from_params(model_config.transformer_args["text"])
     logger.info(f"Transformer Config: {config}")
 
-    tokenizer = _build_chat_tokenizer(model_name)
+    tokenizer = _build_chat_tokenizer(tokenizer_args)
 
     set_precision(model_dtype)
     logger.info(f"Using cache precision {model_dtype}")
@@ -385,7 +369,7 @@ def main(args, pipe):
     # Load weights
     logger.info(f"Loading weights for {pp_rank=} on {device=}")
     with CUDATrackTime() as timer:
-        _load_model_weights(model, distribution, device, config, args.chpt_from)
+        _load_model_weights(model, distribution, device, config, builder_args.chpt_from)
 
     logger.info(
         f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"

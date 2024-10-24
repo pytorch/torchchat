@@ -30,8 +30,8 @@ from torchchat.cli.builder import (
     BuilderArgs,
     TokenizerArgs,
 )
-from torchchat.model import Model, ModelType
 from torchchat.distributed.generate import DistributedGenerator
+from torchchat.model import Model, ModelType
 from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
 
@@ -1228,7 +1228,6 @@ def main(args):
         )
         if torch.cuda.is_available():
             torch.cuda.reset_peak_memory_stats()
-        
 
         for _ in gen.chat(generator_args):
             pass
@@ -1248,5 +1247,3 @@ def main(args):
 
         print(f"Model output: {response}")
         dist_gen.shutdown()
-
-            

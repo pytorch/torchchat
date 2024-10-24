@@ -32,7 +32,9 @@ def _setup_env(world_size: int, rank: int, target: callable, *args, **kwargs):
     return target(*args, **kwargs)
 
 
-def _launch_distributed_inference(builder_args: BuilderArgs) -> None:
+def _launch_distributed_inference(
+    builder_args: BuilderArgs, tokenizer_args: TokenizerArgs
+) -> tuple[List]:
     # create programmatic elastic launch
     print("Launching distributed inference ...")
 
@@ -49,7 +51,7 @@ def _launch_distributed_inference(builder_args: BuilderArgs) -> None:
         pipes.append(server_pipe)
         proc = mp.Process(
             target=partial(_setup_env, num_processes_per_node, rank, main),
-            args=(builder_args, client_pipe),
+            args=(builder_args, tokenizer_args, client_pipe),
         )
         proc.start()
 
@@ -189,7 +191,9 @@ class DistributedGenerator(object):
 
         self.check_args()
 
-        self.procs, self.pipes = _launch_distributed_inference(builder_args)
+        self.procs, self.pipes = _launch_distributed_inference(
+            builder_args, tokenizer_args
+        )
 
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
