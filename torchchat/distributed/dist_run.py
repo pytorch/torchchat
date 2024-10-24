@@ -287,7 +287,7 @@ prompts = [
     # "Can you explain what is the purpose of back propagation in neural networks?",
     "Who is Santa Claus?",
     "Where does Santa live?",
-    # "Who is Abraham Lincoln?",
+    "Who is Abraham Lincoln?",
     # "How are models trained?",
 ]
 
@@ -600,31 +600,30 @@ def main(
         f"{color.green}Success{color.white} - {color.blue}Rank {rank} has completed.{color.reset}"
     )
 
+# TODO: remove or make it work again
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument(
+#         "model_name",
+#         type=str,
+#         default="llama3",
+#         help="Name of the model to load",
+#         choices=NAME_TO_DISTRIBUTION_AND_DTYPE.keys(),
+#     )
+#     parser.add_argument("--pp", type=int, default=1, help="Pipeline parallel degree")
+#     parser.add_argument(
+#         "--ntokens",
+#         type=int,
+#         default=40,
+#         help="Number of tokens to generate",
+#     )
+#     parser.add_argument(
+#         "--chpt-from",
+#         type=str,
+#         default="hf",  # TODO: change to torchchat once we support it well
+#         help="Checkpoint format to load from",
+#         choices=["hf", "torchchat"],
+#     )
+#     args = parser.parse_args()
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    """parser.add_argument(
-        "model_name",
-        type=str,
-        default="llama3",
-        help="Name of the model to load",
-        # choices=NAME_TO_DISTRIBUTION_AND_DTYPE.keys(),
-    )
-    """
-    parser.add_argument("--pp", type=int, default=1, help="Pipeline parallel degree")
-    parser.add_argument(
-        "--ntokens",
-        type=int,
-        default=40,
-        help="Number of tokens to generate",
-    )
-    parser.add_argument(
-        "--chpt-from",
-        type=str,
-        default="hf",  # TODO: change to torchchat once we support it well
-        help="Checkpoint format to load from",
-        choices=["hf", "torchchat"],
-    )
-    args = parser.parse_args()
-
-    main(args)
+#     main()
