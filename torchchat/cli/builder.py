@@ -204,7 +204,7 @@ class TokenizerArgs:
     tokenizer_path: Optional[Union[Path, str]] = None
     is_sentencepiece: bool = False
     is_tiktoken: bool = False
-    is_tokenizers: bool = False
+    is_hf_tokenizer: bool = False
     t: Optional[Any] = None
 
     def __post_init__(self):
@@ -214,7 +214,7 @@ class TokenizerArgs:
             self.t = TiktokenTokenizer(model_path=str(self.tokenizer_path))
             self.is_tiktoken = True
             self.is_sentencepiece = False
-            self.is_tokenizers = False
+            self.is_hf_tokenizer = False
             return
         except:
             pass
@@ -225,25 +225,25 @@ class TokenizerArgs:
             self.t = SentencePieceProcessor(model_file=str(self.tokenizer_path))
             self.is_tiktoken = False
             self.is_sentencepiece = True
-            self.is_tokenizers = False
+            self.is_hf_tokenizer = False
             return
         except:
             pass
 
         try:
-            from tokenizer.tokenizers import TokenizersTokenizer
+            from tokenizer.hf_tokenizer import HFTokenizer
 
-            self.t = TokenizersTokenizer(str(self.tokenizer_path))
+            self.t = HFTokenizer(str(self.tokenizer_path))
             self.is_tiktoken = False
             self.is_sentencepiece = False
-            self.is_tokenizers = True
+            self.is_hf_tokenizer = True
             return
         except:
             pass
 
         self.is_tiktoken = False
         self.is_sentencepiece = False
-        self.is_tokenizers = False
+        self.is_hf_tokenizer = False
         self.t = None
         return
 
@@ -255,25 +255,25 @@ class TokenizerArgs:
         if model is None:
             return
 
-        if len(list(filter(lambda x: x, [self.is_tiktoken, self.is_tokenizers, self.is_sentencepiece]))) != 1:
+        if sum([self.is_tiktoken, self.is_hf_tokenizer, self.is_sentencepiece]) != 1:
             raise RuntimeError(f"no tokenizer was found at {self.tokenizer_path}")
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
-        is_tokenizers = self.is_tokenizers
+        is_hf_tokenizer = self.is_hf_tokenizer
         use_tiktoken = model.config.use_tiktoken
-        use_tokenizers = model.config.use_tokenizers
-        use_sentencepiece = not (use_tiktoken or use_tokenizers)
+        use_hf_tokenizer = model.config.use_hf_tokenizer
+        use_sentencepiece = not (use_tiktoken or use_hf_tokenizer)
 
         if (
             (is_tiktoken and not use_tiktoken) or
-            (is_tokenizers and not use_tokenizers) or
+            (is_hf_tokenizer and not use_hf_tokenizer) or
             (is_sentencepiece and not use_sentencepiece)
         ):
             raise RuntimeError(
                 "model-specified tokenizer ({}) does not match provided tokenizer ({}) for {}".format(
-                    tokenizer_setting_to_name(use_tiktoken, use_tokenizers),
-                    tokenizer_setting_to_name(is_tiktoken, is_tokenizers),
+                    tokenizer_setting_to_name(use_tiktoken, use_hf_tokenizer),
+                    tokenizer_setting_to_name(is_tiktoken, is_hf_tokenizer),
                     model_description,
                 )
             )

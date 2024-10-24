@@ -16,9 +16,9 @@ from tokenizers import Tokenizer
 from .base import TokenizerBase
 
 
-class TokenizersTokenizer(TokenizerBase):
+class HFTokenizer(TokenizerBase):
     """
-    Wrapper around the `tokenizers` library for API compatibility
+    Wrapper around the Huggingface `tokenizers` library for API compatibility
     """
 
     def __init__(self, file_path: str):
