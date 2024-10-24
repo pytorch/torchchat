@@ -39,7 +39,7 @@ def _setup_env(world_size: int, rank: int, target: callable, *args, **kwargs):
 def _launch_distributed_inference(
     model_name: str, builder_args: BuilderArgs, tokenizer_args: TokenizerArgs
 ) -> tuple[List]:
-    # create programmatic elastic launch
+    # launch distributed inference worker, each worker gets a pipe to communicate with the main process
     logger.info("Launching distributed inference ...")
 
     num_processes_per_node = builder_args.pp * builder_args.tp
@@ -50,17 +50,25 @@ def _launch_distributed_inference(
 
     pipes = []
     procs = []
-    for rank in range(num_processes_per_node):
-        server_pipe, client_pipe = mp.Pipe(duplex=True)
-        pipes.append(server_pipe)
-        proc = mp.Process(
-            target=partial(_setup_env, num_processes_per_node, rank, main),
-            args=(model_name, builder_args, tokenizer_args, client_pipe),
-        )
-        proc.start()
+    try:
+        for rank in range(num_processes_per_node):
+            server_pipe, client_pipe = mp.Pipe(duplex=True)
+            pipes.append(server_pipe)
+            procs.append(
+                mp.Process(
+                    target=partial(_setup_env, num_processes_per_node, rank, main),
+                    args=(model_name, builder_args, tokenizer_args, client_pipe),
+                )
+            )
+            procs[-1].start()
 
-    for pipe in pipes:
-        response = pipe.recv()
+        for pipe in pipes:
+            assert pipe.recv() == "ready", "Starting the worker failed"
+    except Exception as e:
+        logger.error(f"Error during distributed inference: {str(e)}")
+        for p in procs:
+            p.kill()
+        raise e
 
     logger.info(
         f"Done launching distributed inference on {num_processes_per_node} GPUs."
@@ -105,11 +113,13 @@ class Scheduler(object):
         self.loop = loop
 
     def schedule_request(self, req: Request):
+        # add request to queue and create deque and async event for response
         self.req_to_states[req.request_id] = asyncio.Event()
         self.req_to_results[req.request_id] = deque()
         self.request_queue.put(req)
 
     def process_requests_loop(self):
+        # Continuously process requests (one at a time for now), results are routed into the requests deque
         while True:
             req = self.request_queue.get()
             if req == "stop":
@@ -127,6 +137,7 @@ class Scheduler(object):
                 running &= not outputs[0].is_finished
 
     async def wait_for_request(self, req: Request) -> Output:
+        # Wait for request to deliver result, uses event to trigger and reads from left side of deque
         is_finished = False
         while not is_finished:
             await self.req_to_states[req.request_id].wait()
@@ -138,6 +149,7 @@ class Scheduler(object):
         del self.req_to_results[req.request_id]
 
     def step(self) -> List[Output]:
+        # Make a prefill or decoding step and receive results
         responses = []
         # TODO: Implement a scheduler to handle the requests
         if len(self.in_flight_requests) > 0:
@@ -166,6 +178,7 @@ class Scheduler(object):
             text, token_ids = v
             outputs.append(
                 Output(
+                    # TODO: Look for tokenizer.eos_id as well
                     is_finished=self.current_step >= self.generator_args.max_new_tokens,
                     text=text,
                     token=token_ids,
@@ -218,6 +231,7 @@ class DistributedGenerator(object):
         atexit.register(self.shutdown)
 
     def shutdown(self):
+        # Stop all processes and threads
         self.scheduler.request_queue.put("stop")
         self.scheduler_thread.join()
 
@@ -227,6 +241,7 @@ class DistributedGenerator(object):
             p.kill()
 
     def generate(self, text):
+        # Function to generate text from prompt
         req = Request.new_request(text)
         self.scheduler.schedule_request(req)
 
