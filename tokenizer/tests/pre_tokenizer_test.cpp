@@ -24,7 +24,7 @@ void assert_split_match(
 ) {
   re2::StringPiece prompt_view(prompt);
   const auto& got = tok.pre_tokenize(prompt_view);
-  EXPECT_EQ(got.size(), 5);
+  EXPECT_EQ(got.size(), expected.size());
   for (auto i = 0; i < got.size(); ++i) {
     EXPECT_EQ(got[i], expected[i]);
   }
@@ -43,4 +43,27 @@ TEST_F(RegexPreTokenizerTest, Construct) {
 TEST_F(RegexPreTokenizerTest, TiktokenExpr) {
   RegexPreTokenizer tok(R"((?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+)");
   assert_split_match(tok, "How are you doing?", {"How", " are", " you", " doing", "?"});
+}
+
+// DigitsPreTokenizer //////////////////////////////////////////////////////////
+class DigitsPreTokenizerTest : public ::testing::Test {};
+
+// Test digit splitting with individual digits
+TEST_F(DigitsPreTokenizerTest, IndividualDigits) {
+  DigitsPreTokenizer tok(true);
+  assert_split_match(
+    tok,
+    "The number 1 then 234 then 5.",
+    {"The number ", "1", " then ", "2", "3", "4", " then ", "5", "."}
+  );
+}
+
+// Test digit splitting with contiguous digits
+TEST_F(DigitsPreTokenizerTest, ContiguousDigits) {
+  DigitsPreTokenizer tok(false);
+  assert_split_match(
+    tok,
+    "The number 1 then 234 then 5.",
+    {"The number ", "1", " then ", "234", " then ", "5", "."}
+  );
 }

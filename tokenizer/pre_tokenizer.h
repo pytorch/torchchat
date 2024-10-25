@@ -72,6 +72,13 @@ class RegexPreTokenizer : public PreTokenizer {
 // Used by tokenizers
 // CITE: https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/pre_tokenizers/digits.rs
 
+class DigitsPreTokenizer : public RegexPreTokenizer {
+ public:
+  explicit DigitsPreTokenizer(bool individual_digits)
+    : RegexPreTokenizer(individual_digits ? R"([^\p{N}]+|\p{N})" : R"([^\p{N}]+|[\p{N}]+)")
+  {}
+};  // end class DigitsPreTokenizer
+
 // -- ByteLevel ----------------------------------------------------------------
 // Used by tokenizers
 // CITE: https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/pre_tokenizers/byte_level.rs
