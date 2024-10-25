@@ -149,10 +149,10 @@ def _add_model_config_args(parser, verb: str) -> None:
         )
 
     model_config_parser.add_argument(
-        "--quantized-state-path",
+        "--state-dict-path",
         type=str,
         default=None,
-        help="Quantized state_dict to load (if path exists) or write out to (if path doesn't exist)",
+        help="Model state dict to load (if path exists) or write out to (if path doesn't exist). Supercedes --quantize arg.",
     )
     model_config_parser.add_argument(
         "--dtype",
@@ -431,13 +431,13 @@ def _add_custom_model_args(parser) -> None:
         "--params-path",
         type=Path,
         default=None,
-        help= "Use the specified parameter file, instead of one specified under torchchat.model_params",
+        help="Use the specified parameter file, instead of one specified under torchchat.model_params",
     )
     parser.add_argument(
         "--tokenizer-path",
         type=Path,
         default=None,
-        help= "Use the specified model tokenizer file, instead of the one downloaded from HuggingFace",
+        help="Use the specified model tokenizer file, instead of the one downloaded from HuggingFace",
     )
 
 

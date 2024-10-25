@@ -16,19 +16,11 @@ import torch._dynamo.config
 import torch._inductor.config
 import torch.nn as nn
 
-from torchtune.models.llama3_2_vision._convert_weights import llama3_vision_meta_to_tune
+from torch.distributed.device_mesh import DeviceMesh
 
 from torchchat.distributed import launch_distributed, ParallelDims, parallelize_llama
 
-from torch.distributed.device_mesh import DeviceMesh
-
-from torchtune.models.convert_weights import meta_to_tune
-
-from torchtune.training import set_default_dtype
-
 from torchchat.model import Model, ModelArgs, ModelType
-
-from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
 
 from torchchat.model_config.model_config import resolve_model_config
 from torchchat.utils.build_utils import (
@@ -39,6 +31,14 @@ from torchchat.utils.build_utils import (
 )
 from torchchat.utils.measure_time import measure_time
 from torchchat.utils.quantize import quantize_model
+
+from torchtune.models.convert_weights import meta_to_tune
+
+from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
+
+from torchtune.models.llama3_2_vision._convert_weights import llama3_vision_meta_to_tune
+
+from torchtune.training import set_default_dtype
 
 
 @dataclass
@@ -61,7 +61,7 @@ class BuilderArgs:
     dynamic_shapes: bool = False
     max_seq_length: Optional[int] = None
 
-    quantized_state_path: Optional[Union[Path, str]] = None
+    state_dict_path: Optional[Union[Path, str]] = None
 
     def __post_init__(self):
         if self.device is None:
@@ -89,7 +89,9 @@ class BuilderArgs:
             ]
             for param, param_msg in ignored_params:
                 if param:
-                    print(f"Warning: {param_msg} ignored because an exported DSO or PTE path was specified")
+                    print(
+                        f"Warning: {param_msg} ignored because an exported DSO or PTE path was specified"
+                    )
         else:
             self.prefill_possible = True
 
@@ -173,7 +175,7 @@ class BuilderArgs:
             is_chat_model=is_chat_model,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),
-            quantized_state_path=args.quantized_state_path,
+            state_dict_path=args.state_dict_path,
         )
 
     @classmethod
@@ -400,10 +402,10 @@ def _load_model_default(builder_args: BuilderArgs) -> Model:
             # does not host any actual values, need to reinitialize them in the actual
             # device. Only do those buffer initialization, without initializing the entire
             # model.
-            decoder_config = model.config.transformer_args['decoder']
-            head_dim = decoder_config['embed_dim'] // decoder_config['num_heads']
-            max_seq_len = decoder_config['max_seq_len']
-            rope_base = decoder_config['rope_base']
+            decoder_config = model.config.transformer_args["decoder"]
+            head_dim = decoder_config["embed_dim"] // decoder_config["num_heads"]
+            max_seq_len = decoder_config["max_seq_len"]
+            rope_base = decoder_config["rope_base"]
             for submodule in model.modules():
                 if isinstance(submodule, Llama3ScaledRoPE):
                     submodule.__init__(head_dim, max_seq_len, rope_base)
@@ -491,6 +493,7 @@ def _load_model(builder_args: BuilderArgs) -> Model:
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
 
+
 def _initialize_model(
     builder_args: BuilderArgs,
     quantize,
@@ -568,17 +571,19 @@ def _initialize_model(
             model = _load_model(builder_args)
             device_sync(device=builder_args.device)
 
-        cache_path = builder_args.quantized_state_path
-        quant_checkpoint_exists: bool = cache_path and os.path.isfile(cache_path)
-        if quantize or quant_checkpoint_exists:
+        state_dict_path = builder_args.state_dict_path
+        state_dict_exists: bool = state_dict_path and os.path.isfile(state_dict_path)
+        if quantize or state_dict_exists:
 
-            if quantize and quant_checkpoint_exists:
-                print("WARNING: Both a quantized checkpoint and quantize arg were provided; Ignoring quantize arg")
+            if quantize and state_dict_exists:
+                print(
+                    "WARNING: Both a state_dict and quantize arg were provided; Ignoring quantize arg"
+                )
 
-            if quant_checkpoint_exists:
+            if state_dict_exists:
                 with measure_time("Time to load quantized state: {time:.02f} seconds"):
-                    print(f"Loading the model_state in: {cache_path}")
-                    model.load_state_dict(cache_path)
+                    print(f"Loading the model_state in: {state_dict_path}")
+                    model.load_state_dict(state_dict_path)
                     device_sync(device=builder_args.device)
             else:
                 with measure_time("Time to quantize model: {time:.02f} seconds"):
@@ -592,11 +597,12 @@ def _initialize_model(
                     )
                     device_sync(device=builder_args.device)
 
-                if cache_path:
-                    with measure_time("Time to save quantized state: {time:.02f} seconds"):
+                if state_dict_path:
+                    with measure_time(
+                        "Time to save quantized state: {time:.02f} seconds"
+                    ):
                         print(f"Saving the quantized state dict")
-                        torch.save(model.state_dict(), cache_path)
-
+                        torch.save(model.state_dict(), state_dict_path)
 
             if builder_args.setup_caches:
                 with torch.device(builder_args.device):
