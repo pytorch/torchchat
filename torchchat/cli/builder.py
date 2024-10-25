@@ -16,19 +16,13 @@ import torch._dynamo.config
 import torch._inductor.config
 import torch.nn as nn
 
-from torchtune.models.llama3_2_vision._convert_weights import llama3_vision_meta_to_tune
+from torch.distributed.device_mesh import DeviceMesh
+from torch.distributed.elastic.multiprocessing.errors import record
+from torch.distributed.elastic.utils.distributed import get_free_port
 
 from torchchat.distributed import launch_distributed, ParallelDims, parallelize_llama
 
-from torch.distributed.device_mesh import DeviceMesh
-
-from torchtune.models.convert_weights import meta_to_tune
-
-from torchtune.training import set_default_dtype
-
 from torchchat.model import Model, ModelArgs, ModelType
-
-from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
 
 from torchchat.model_config.model_config import resolve_model_config
 from torchchat.utils.build_utils import (
@@ -39,6 +33,14 @@ from torchchat.utils.build_utils import (
 )
 from torchchat.utils.measure_time import measure_time
 from torchchat.utils.quantize import quantize_model
+
+from torchtune.models.convert_weights import meta_to_tune
+
+from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
+
+from torchtune.models.llama3_2_vision._convert_weights import llama3_vision_meta_to_tune
+
+from torchtune.training import set_default_dtype
 
 
 @dataclass
@@ -55,7 +57,10 @@ class BuilderArgs:
     device: Optional[str] = None
     precision: torch.dtype = torch.float32
     setup_caches: bool = False
-    use_distributed: bool = False
+    distributed: bool = False
+    pp: int = 1
+    tp: int = 1
+    chpt_from: str = "hf"
     is_chat_model: bool = False
     prefill_possible: bool = False
     dynamic_shapes: bool = False
@@ -87,7 +92,9 @@ class BuilderArgs:
             ]
             for param, param_msg in ignored_params:
                 if param:
-                    print(f"Warning: {param_msg} ignored because an exported DSO or PTE path was specified")
+                    print(
+                        f"Warning: {param_msg} ignored because an exported DSO or PTE path was specified"
+                    )
         else:
             self.prefill_possible = True
 
@@ -153,7 +160,11 @@ class BuilderArgs:
                 dtype = torch.float16
         else:
             dtype = name_to_dtype(args.dtype, args.device)
-
+        # distributed args
+        distributed = getattr(args, "distributed", False)
+        pp = getattr(args, "pp", 1)
+        tp = getattr(args, "tp", 1)
+        chpt_from = getattr(args, "chpt_from", "hf")
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
@@ -167,7 +178,10 @@ class BuilderArgs:
             device=args.device,
             precision=dtype,
             setup_caches=(output_dso_path or output_pte_path),
-            use_distributed=args.distributed,
+            distributed=distributed,
+            pp=pp,
+            tp=tp,
+            chpt_from=chpt_from,
             is_chat_model=is_chat_model,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),
@@ -397,10 +411,10 @@ def _load_model_default(builder_args: BuilderArgs) -> Model:
             # does not host any actual values, need to reinitialize them in the actual
             # device. Only do those buffer initialization, without initializing the entire
             # model.
-            decoder_config = model.config.transformer_args['decoder']
-            head_dim = decoder_config['embed_dim'] // decoder_config['num_heads']
-            max_seq_len = decoder_config['max_seq_len']
-            rope_base = decoder_config['rope_base']
+            decoder_config = model.config.transformer_args["decoder"]
+            head_dim = decoder_config["embed_dim"] // decoder_config["num_heads"]
+            max_seq_len = decoder_config["max_seq_len"]
+            rope_base = decoder_config["rope_base"]
             for submodule in model.modules():
                 if isinstance(submodule, Llama3ScaledRoPE):
                     submodule.__init__(head_dim, max_seq_len, rope_base)
@@ -476,17 +490,18 @@ def _maybe_parallelize_model(
 
 
 def _load_model(builder_args: BuilderArgs) -> Model:
-    world_mesh, parallel_dims = _maybe_init_distributed(builder_args)
+    # world_mesh, parallel_dims = _maybe_init_distributed(builder_args)
     if builder_args.gguf_path:
         model = _load_model_gguf(builder_args)
-    elif builder_args.use_distributed:
-        model = _init_model_on_meta_device(builder_args)
+    # elif builder_args.use_distributed:
+    #    model = _init_model_on_meta_device(builder_args)
     else:
         model = _load_model_default(builder_args)
-    model = _maybe_parallelize_model(model, builder_args, world_mesh, parallel_dims)
+    # model = _maybe_parallelize_model(model, builder_args, world_mesh, parallel_dims)
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
+
 
 def _initialize_model(
     builder_args: BuilderArgs,
@@ -496,7 +511,6 @@ def _initialize_model(
     support_tensor_subclass: bool = True,
 ) -> Model:
     print("Loading model...")
-
     if builder_args.gguf_path and (builder_args.dso_path or builder_args.pte_path):
         print("Setting gguf_kwargs for generate.")
         is_dso = builder_args.dso_path is not None

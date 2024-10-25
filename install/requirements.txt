@@ -30,3 +30,6 @@ streamlit
 
 # Server mode
 flask
+
+# eval
+lm_eval==0.4.2
