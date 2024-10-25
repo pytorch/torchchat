@@ -149,6 +149,12 @@ def _add_model_config_args(parser, verb: str) -> None:
         )
 
     model_config_parser.add_argument(
+        "--quantized-state-path",
+        type=str,
+        default=None,
+        help="Quantized state_dict to load (if path exists) or write out to (if path doesn't exist)",
+    )
+    model_config_parser.add_argument(
         "--dtype",
         default="fast",
         choices=allowable_dtype_names(),

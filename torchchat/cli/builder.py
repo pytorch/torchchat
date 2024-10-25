@@ -61,6 +61,8 @@ class BuilderArgs:
     dynamic_shapes: bool = False
     max_seq_length: Optional[int] = None
 
+    quantized_state_path: Optional[Union[Path, str]] = None
+
     def __post_init__(self):
         if self.device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -171,6 +173,7 @@ class BuilderArgs:
             is_chat_model=is_chat_model,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),
+            quantized_state_path=args.quantized_state_path,
         )
 
     @classmethod
@@ -565,25 +568,43 @@ def _initialize_model(
             model = _load_model(builder_args)
             device_sync(device=builder_args.device)
 
-        if quantize:
-            print(f"Quantizing the model with: {quantize}")
-            with measure_time("Time to quantize model: {time:.02f} seconds"):
-                quantize_model(
-                    model,
-                    builder_args.device,
-                    quantize,
-                    tokenizer,
-                    support_tensor_subclass,
-                )
-                device_sync(device=builder_args.device)
+        cache_path = builder_args.quantized_state_path
+        quant_checkpoint_exists: bool = os.path.isfile(cache_path)
+        if quantize or quant_checkpoint_exists:
 
-        if builder_args.setup_caches:
-            with torch.device(builder_args.device):
-                model.setup_caches(
-                    max_batch_size=1,
-                    max_seq_length=max_seq_length
-                    or model.text_transformer_args.max_seq_length,
-                )
+            if quantize and quant_checkpoint_exists:
+                print("WARNING: Both a quantized checkpoint and quantize arg were provided; Ignoring quantize arg")
+
+            if quant_checkpoint_exists:
+                with measure_time("Time to load quantized state: {time:.02f} seconds"):
+                    print(f"Loading the model_state in: {cache_path}")
+                    model.load_state_dict(cache_path)
+                    device_sync(device=builder_args.device)
+            else:
+                with measure_time("Time to quantize model: {time:.02f} seconds"):
+                    print(f"Quantizing the model with: {quantize}")
+                    quantize_model(
+                        model,
+                        builder_args.device,
+                        quantize,
+                        tokenizer,
+                        support_tensor_subclass,
+                    )
+                    device_sync(device=builder_args.device)
+
+                if cache_path:
+                    with measure_time("Time to save quantized state: {time:.02f} seconds"):
+                        print(f"Saving the quantized state dict")
+                        torch.save(model.state_dict(), cache_path)
+
+
+            if builder_args.setup_caches:
+                with torch.device(builder_args.device):
+                    model.setup_caches(
+                        max_batch_size=1,
+                        max_seq_length=max_seq_length
+                        or model.text_transformer_args.max_seq_length,
+                    )
 
         model.to(dtype=builder_args.precision)
 
