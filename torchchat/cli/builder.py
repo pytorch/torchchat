@@ -17,6 +17,8 @@ import torch._inductor.config
 import torch.nn as nn
 
 from torch.distributed.device_mesh import DeviceMesh
+from torch.distributed.elastic.multiprocessing.errors import record
+from torch.distributed.elastic.utils.distributed import get_free_port
 
 from torchchat.distributed import launch_distributed, ParallelDims, parallelize_llama
 
@@ -55,7 +57,10 @@ class BuilderArgs:
     device: Optional[str] = None
     precision: torch.dtype = torch.float32
     setup_caches: bool = False
-    use_distributed: bool = False
+    distributed: bool = False
+    pp: int = 1
+    tp: int = 1
+    chpt_from: str = "hf"
     is_chat_model: bool = False
     prefill_possible: bool = False
     dynamic_shapes: bool = False
@@ -157,7 +162,11 @@ class BuilderArgs:
                 dtype = torch.float16
         else:
             dtype = name_to_dtype(args.dtype, args.device)
-
+        # distributed args
+        distributed = getattr(args, "distributed", False)
+        pp = getattr(args, "pp", 1)
+        tp = getattr(args, "tp", 1)
+        chpt_from = getattr(args, "chpt_from", "hf")
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
@@ -171,7 +180,10 @@ class BuilderArgs:
             device=args.device,
             precision=dtype,
             setup_caches=(output_dso_path or output_pte_path),
-            use_distributed=args.distributed,
+            distributed=distributed,
+            pp=pp,
+            tp=tp,
+            chpt_from=chpt_from,
             is_chat_model=is_chat_model,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),
@@ -481,14 +493,14 @@ def _maybe_parallelize_model(
 
 
 def _load_model(builder_args: BuilderArgs) -> Model:
-    world_mesh, parallel_dims = _maybe_init_distributed(builder_args)
+    # world_mesh, parallel_dims = _maybe_init_distributed(builder_args)
     if builder_args.gguf_path:
         model = _load_model_gguf(builder_args)
-    elif builder_args.use_distributed:
-        model = _init_model_on_meta_device(builder_args)
+    # elif builder_args.use_distributed:
+    #    model = _init_model_on_meta_device(builder_args)
     else:
         model = _load_model_default(builder_args)
-    model = _maybe_parallelize_model(model, builder_args, world_mesh, parallel_dims)
+    # model = _maybe_parallelize_model(model, builder_args, world_mesh, parallel_dims)
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
@@ -502,7 +514,6 @@ def _initialize_model(
     support_tensor_subclass: bool = True,
 ) -> Model:
     print("Loading model...")
-
     if builder_args.gguf_path and (builder_args.dso_path or builder_args.pte_path):
         print("Setting gguf_kwargs for generate.")
         is_dso = builder_args.dso_path is not None

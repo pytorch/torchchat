@@ -405,8 +405,7 @@ def _add_distributed_args(parser) -> None:
     parser.add_argument(
         "--distributed",
         action="store_true",
-        help=argparse.SUPPRESS,
-        # "Whether to enable distributed inference",
+        help="Whether to enable distributed inference",
     )
     parser.add_argument(
         "--dcp-dir",
@@ -414,6 +413,27 @@ def _add_distributed_args(parser) -> None:
         default=None,
         help=argparse.SUPPRESS,
         # "Use the specified model checkpoint directory",
+    )
+    parser.add_argument(
+        "--pp",
+        "--pipeline-parallel",
+        type=int,
+        default=1,
+        help="Pipeline parallel degree",
+    )
+    parser.add_argument(
+        "--tp",
+        "--tensor-parallel",
+        type=int,
+        default=2,
+        help="Tensor parallel degree",
+    )
+    parser.add_argument(
+        "--chpt-from",
+        type=str,
+        default="hf",  # TODO: change to torchchat once we support it well
+        help="Checkpoint format to load from",
+        choices=["hf", "torchchat"],
     )
 
 
