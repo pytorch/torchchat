@@ -30,6 +30,7 @@ from torchchat.cli.builder import (
     BuilderArgs,
     TokenizerArgs,
 )
+from torchchat.distributed.generate import DistributedGenerator
 from torchchat.model import Model, ModelType
 from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
@@ -246,23 +247,13 @@ class Generator:
         self.is_torchtune_model = generator_args.is_torchtune_model
         self.dtype = builder_args.precision
 
-        # global print
-        #    from tp import maybe_init_dist
-        #    rank = maybe_init_dist()
-        # use_distributed = False
         self.rank: Optional[int] = None
-        #    if use_distributed:
-        #        if rank != 0:
-        #            # only print on rank 0
-        #            print = lambda *args, **kwargs: None
 
         print(
             f"Using device={self.builder_args.device} {get_device_info(self.builder_args.device)}"
         )
         set_precision(self.builder_args.precision)
-        if builder_args.use_distributed:
-            device = torch.device(f"cuda:{int(os.environ['LOCAL_RANK'])}")
-            torch.cuda.set_device(device)
+
         self.is_speculative = self.speculative_builder_args.checkpoint_path is not None
 
         if generator_args.chat_mode and not self.builder_args.is_chat_model:
@@ -1218,21 +1209,49 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
             print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
 
+def _launch_distributed_inference(
+    builder_args: BuilderArgs,
+):
+    from torch.distributed import launcher
+    from torch.distributed.elastic.utils.distributed import get_free_port
+
+    print("Launching distributed inference within generator")
+
+
 def main(args):
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
     generator_args = GeneratorArgs.from_args(args)
-    gen = Generator(
-        builder_args,
-        speculative_builder_args,
-        tokenizer_args,
-        generator_args,
-        args.profile,
-        args.quantize,
-        args.draft_quantize,
-    )
-    if torch.cuda.is_available():
-        torch.cuda.reset_peak_memory_stats()
-    for _ in gen.chat(generator_args):
-        pass
+    if not builder_args.distributed:
+        gen = Generator(
+            builder_args,
+            speculative_builder_args,
+            tokenizer_args,
+            generator_args,
+            args.profile,
+            args.quantize,
+            args.draft_quantize,
+        )
+        if torch.cuda.is_available():
+            torch.cuda.reset_peak_memory_stats()
+
+        for _ in gen.chat(generator_args):
+            pass
+    else:
+        dist_gen = DistributedGenerator(
+            args.model,
+            builder_args,
+            tokenizer_args,
+            generator_args,
+            args.profile,
+            args.quantize,
+            args.draft_quantize,
+        )
+
+        response = ""
+        for output in dist_gen.generate(generator_args.prompt):
+            response += output.text
+
+        print(f"Model output: {response}")
+        dist_gen.shutdown()
