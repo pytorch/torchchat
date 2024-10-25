@@ -14,7 +14,7 @@ add_subdirectory(tokenizer)
 # include et_run executable
 include(runner/et.cmake)
 if(TARGET et_run)
-    target_link_libraries(et_run PUBLIC tokenizer)
+    target_link_libraries(et_run PUBLIC tokenizer microkernels-prod)
 endif()
 
 # include aoti_run executable

@@ -2,8 +2,8 @@
 
 <!--
 [shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
-[shell default]: ./install_requirements.sh
-[shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
+[shell default]: ./install/install_requirements.sh
+[shell default]: TORCHCHAT_ROOT=${PWD} ./torchchat/utils/scripts/install_et.sh
 -->
 
 ## Introduction
@@ -47,8 +47,8 @@ on-device usecases.
 ## Quantization API
 
 Quantization options are passed in json format either as a config file
-(see [cuda.json](../config/data/cuda.json) and
-[mobile.json](../config/data/mobile.json)) or a JSON string.
+(see [cuda.json](../torchchat/quant_config/cuda.json) and
+[mobile.json](../torchchat/quant_config/mobile.json)) or a JSON string.
 
 The expected JSON format is described below. Refer to the tables above
 for valid `bitwidth` and `groupsize` values.
@@ -59,7 +59,7 @@ for valid `bitwidth` and `groupsize` values.
 | linear with dynamic activations (symmetric) | `'{"linear:a8w4dq" : {"groupsize" : <groupsize>}}'`|
 | embedding | `'{"embedding": {"bitwidth": <bitwidth>, "groupsize":<groupsize>}}'` |
 
-See the available quantization schemes [here](https://github.com/pytorch/torchchat/blob/main/quantization/quantize.py#L1260-L1266).
+See the available quantization schemes [here](https://github.com/pytorch/torchchat/blob/main/torchchat/utils/quantize.py#L1260-L1266).
 
 In addition to quantization, the [accelerator](model_customization.md#device)
 and [precision](model_customization.md#model-precision) can also be specified.
@@ -105,22 +105,100 @@ with `export`.
 
 ### Eager mode
 ```
-python3 generate.py llama3 --prompt "Hello, my name is" --quantize '{"embedding" : {"bitwidth": 8, "groupsize": 0}}'
+python3 torchchat.py generate llama3 --prompt "Hello, my name is" --quantize '{"embedding" : {"bitwidth": 8, "groupsize": 0}}'
 ```
 ### AOTI
 ```
 python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:int4": {"groupsize" : 256}}' --output-dso-path llama3.so
-python3 generate.py llama3 --dso-path llama3.so  --prompt "Hello my name is"
+python3 torchchat.py generate llama3 --dso-path llama3.so  --prompt "Hello my name is"
 ```
 ### ExecuTorch
 ```
 python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}' --output-pte-path llama3.pte
-python3 generate.py llama3 --pte-path llama3.pte  --prompt "Hello my name is"
+python3 torchchat.py generate llama3 --pte-path llama3.pte  --prompt "Hello my name is"
+```
+
+## Experimental TorchAO lowbit kernels
+
+WARNING: These kernels only work on devices with ARM CPUs, for example on Mac computers with Apple Silicon.
+
+### Use
+
+#### linear:a8wxdq
+The quantization scheme linear:a8wxdq dynamically quantizes activations to 8 bits, and quantizes the weights in a groupwise manner with a specified bitwidth and groupsize.
+It takes arguments bitwidth (1, 2, 3, 4, 5, 6, 7), groupsize, and has_weight_zeros (true, false).
+The argument has_weight_zeros indicates whether the weights are quantized with scales only (has_weight_zeros: false) or with both scales and zeros (has_weight_zeros: true).
+Roughly speaking, {bitwidth: 4, groupsize: 32, has_weight_zeros: false} is similar to GGML's Q4_0 quantization scheme.
+
+You should expect high performance on ARM CPU if groupsize is divisible by 16.  With other platforms and argument choices, a slow fallback kernel will be used.  You will see warnings about this during quantization.
+
+#### embedding:wx
+The quantization scheme embedding:wx quantizes embeddings in a groupwise manner with the specified bitwidth and groupsize.  It takes arguments bitwidth (1, 2, 3, 4, 5, 6, 7) and groupsize.  Unlike linear:a8wxdq, embedding:wx always quantizes with scales and zeros.
+
+You should expect high performance on ARM CPU if groupsize is divisible by 32.  With other platforms and argument choices, a slow fallback kernel will be used.  You will see warnings about this during quantization.
+
+### Setup
+To use linear:a8wxdq and embedding:wx, you must set up the torchao experimental kernels.  These will only work on devices with ARM CPUs, for example on Mac computers with Apple Silicon.
+
+From the torchchat root directory, run
+```
+sh torchchat/utils/scripts/build_torchao_ops.sh
+```
+
+This should take about 10 seconds to complete.
+
+Note: if you want to use the new kernels in the AOTI and C++ runners, you must pass the flag link_torchao_ops when running the scripts the build the runners.
+
+```
+sh torchchat/utils/scripts/build_native.sh aoti link_torchao_ops
+```
+
+```
+sh torchchat/utils/scripts/build_native.sh et link_torchao_ops
+```
+
+Note before running `sh torchchat/utils/scripts/build_native.sh et link_torchao_ops`, you must first install executorch with `sh torchchat/utils/scripts/install_et.sh` if you have not done so already.
+
+### Examples
+
+Below we show how to use the new kernels.  Except for ExecuTorch, you can specify the number of threads used by setting OMP_NUM_THREADS (as is the case with PyTorch in general).  Doing so is optional and a default number of threads will be chosen automatically if you do not specify.
+
+#### Eager mode
+```
+OMP_NUM_THREADS=6 python3 torchchat.py generate llama3.1 --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}' --prompt "Once upon a time,"  --num-samples 5
+```
+
+#### torch.compile
+```
+OMP_NUM_THREADS=6 python3 torchchat.py generate llama3.1 --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}' --compile --prompt "Once upon a time,"  --num-samples 5
+```
+
+#### AOTI
+```
+OMP_NUM_THREADS=6 python torchchat.py export llama3.1 --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}' --output-dso llama3_1.so
+OMP_NUM_THREADS=6 python3 torchchat.py generate llama3.1 --dso-path llama3_1.so --prompt "Once upon a time,"  --num-samples 5
+```
+
+If you built the AOTI runner with link_torchao_ops as discussed in the setup section, you can also use the C++ runner:
+
+```
+OMP_NUM_THREADS=6 ./cmake-out/aoti_run llama3_1.so -z $HOME/.torchchat/model-cache/meta-llama/Meta-Llama-3.1-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time,"
+```
+
+#### ExecuTorch
+```
+python torchchat.py export llama3.1 --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}' --output-pte llama3_1.pte
+```
+
+Note: only the ExecuTorch C++ runner in torchchat when built using the instructions in the setup can run the exported *.pte file.  It will not work with the `python torchchat.py generate` command.
+
+```
+./cmake-out/et_run llama3_1.pte -z $HOME/.torchchat/model-cache/meta-llama/Meta-Llama-3.1-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time,"
 ```
 
 ## Quantization Profiles
 
-Four [sample profiles](https://github.com/pytorch/torchchat/tree/main/config/data) are included with the torchchat distribution: `cuda.json`, `desktop.json`, `mobile.json`, `pi5.json`
+Four [sample profiles](https://github.com/pytorch/torchchat/tree/main/torchchat/quant_config/) are included with the torchchat distribution: `cuda.json`, `desktop.json`, `mobile.json`, `pi5.json`
 with profiles optimizing for execution on cuda, desktop, mobile and
 raspberry Pi devices.
 

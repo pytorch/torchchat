@@ -22,14 +22,14 @@ function convert_checkpoint() {
         return 0
     fi
 
-    [ -f "build/convert_hf_checkpoint.py" ] || exit 1
+    [ -f "torchchat/cli/convert_hf_checkpoint.py" ] || exit 1
 
     if [ -f "checkpoints/$MODEL_REPO/model.pth" ]; then
         echo "Converted checkpoint already exists. Skipping conversion for $MODEL_REPO."
         return 0
     fi
     echo "Convert Huggingface checkpoint for $MODEL_REPO"
-    python3 build/convert_hf_checkpoint.py --checkpoint-dir "checkpoints/$MODEL_REPO"
+    python3 torchchat/cli/convert_hf_checkpoint.py --checkpoint-dir "checkpoints/$MODEL_REPO"
 }
 
 

@@ -1,0 +1,29 @@
+{
+    "model_type": "flamingo",
+    "use_tiktoken": true,
+    "encoder": {
+        "patch_size": 14,
+        "num_heads": 16,
+        "clip_embed_dim": 1280,
+        "clip_num_layers": 32,
+        "clip_hidden_states": [3, 7, 15, 23, 30],
+        "decoder_embed_dim": 4096,
+        "num_layers_projection": 8,
+        "tile_size": 560,
+        "max_num_tiles": 4,
+        "in_channels": 3
+    },
+    "decoder": {
+        "vocab_size": 128256,
+        "num_layers": 32,
+        "fusion_interval": 4,
+        "num_special_tokens": 8,
+        "num_heads": 32,
+        "num_kv_heads": 8,
+        "embed_dim": 4096,
+        "max_seq_len": 131072,
+        "encoder_max_seq_len": 128080,
+        "rope_base": 500000.0,
+        "intermediate_dim": 14336
+    }
+}

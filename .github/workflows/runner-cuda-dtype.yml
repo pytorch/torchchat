@@ -30,8 +30,8 @@ jobs:
         echo "::group::Download checkpoints"
         # Install requirements
 
-        ./install_requirements.sh cuda
-        bash scripts/build_native.sh aoti
+        ./install/install_requirements.sh cuda
+        bash torchchat/utils/scripts/build_native.sh aoti
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"

@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 
+.vscode
 .model-artifacts/
 .venv
 .torchchat
@@ -13,11 +14,23 @@ __pycache__/
 # Build directories
 build/android/*
 et-build/*
+torchao-build/*
 runner-et/cmake-out/*
 runner-aoti/cmake-out/*
+cmake-out/
 
 # pte files
 *.pte
 
 # debug / logging files
 system_info.txt
+
+# intermediate system file
+.DS_Store
+
+# build artifacts
+checkpoints/
+exportedModels/
+
+# test script
+_torchchat_test_script.py

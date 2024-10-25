@@ -46,7 +46,7 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          ./install_requirements.sh
+          ./install/install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -81,7 +81,7 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          ./install_requirements.sh
+          ./install/install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -115,7 +115,7 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          ./install_requirements.sh
+          ./install/install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -150,7 +150,7 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          ./install_requirements.sh
+          ./install/install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -185,7 +185,7 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          ./install_requirements.sh
+          ./install/install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download checkpoints
@@ -231,7 +231,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        ./install_requirements.sh cuda
+        ./install/install_requirements.sh cuda
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -272,7 +272,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        ./install_requirements.sh cuda
+        ./install/install_requirements.sh cuda
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -312,7 +312,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        ./install_requirements.sh cuda
+        ./install/install_requirements.sh cuda
         pip list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -332,7 +332,7 @@ jobs:
 
         echo "::group::Run inference with quantize file"
         if [ $(uname -s) != Darwin ]; then
-          python3 generate.py --quantize config/data/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+          python3 torchchat.py generate --quantize torchchat/quant_config/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
         fi
         echo "::endgroup::"
 
@@ -358,7 +358,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        ./install_requirements.sh cuda
+        ./install/install_requirements.sh cuda
         pip list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -378,8 +378,8 @@ jobs:
 
         echo "::group::Run inference with quantize file"
         if [ $(uname -s) == Darwin ]; then
-          python3 export.py --output-dso-path /tmp/model.so --quantize config/data/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
-             python3 generate.py --dso-path /tmp/model.so --checkpoint "./checkpoints/${REPO_NAME}/model.pth"~
+          python3 torchchat.py export --output-dso-path /tmp/model.so --quantize torchchat/quant_config/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+             python3 torchchat.py generate --dso-path /tmp/model.so --checkpoint "./checkpoints/${REPO_NAME}/model.pth"~
         fi
         echo "::endgroup::"
 
@@ -405,7 +405,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install required packages"
-        ./install_requirements.sh cuda
+        ./install/install_requirements.sh cuda
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -434,7 +434,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.10.11
+          python-version: '3.10.11'
       - name: Setup Xcode
         if: runner.os == 'macOS'
         uses: maxim-lobanov/setup-xcode@v1
@@ -450,15 +450,14 @@ jobs:
       - name: Install requirements
         run: |
           echo "Intalling pip3 packages"
-          ./install_requirements.sh
+          ./install/install_requirements.sh
 
           export TORCHCHAT_ROOT=$PWD
-          ./scripts/install_et.sh
+          ./torchchat/utils/scripts/install_et.sh
 
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
-          python3 -c 'import torchaudio;print(f"torchaudio: {torchaudio.__version__, torchaudio.version.git_version}")'
 
           cd ../..
           echo "Inside: ${PWD}"
@@ -483,7 +482,7 @@ jobs:
 
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0  --device cpu
 
-          python export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
+          python torchchat.py export --checkpoint-path ${MODEL_PATH} --output-pte-path ${PWD}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${PWD}/${MODEL_NAME}.pte
 
           echo "Tests complete."
@@ -497,62 +496,62 @@ jobs:
           echo "******************************************"
           echo "***               vanilla              ***"
           echo "******************************************"
-          python export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat.py export --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
-          echo "*** --quantize config/data/mobile.json ***"
+          echo "*** --quantize torchchat/quant_config/mobile.json ***"
           echo "******************************************"
-          # python export.py --quantize config/data/mobile.json --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python torchchat.py export --quantize torchchat/quant_config/mobile.json --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           # python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
 
           echo "******************************************"
           echo "******* Emb: channel-wise quantized ******"
           echo "******************************************"
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat.py export --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******** Emb: group-wise quantized *******"
           echo "******************************************"
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat.py export --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "**** Emb 4bit: channel-wise quantized ****"
           echo "******************************************"
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat.py export --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "****** Emb 4bit: group-wise quantized ****"
           echo "******************************************"
-          python export.py --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat.py export --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******* INT8 channel-wise quantized ******"
           echo "******************************************"
-          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat.py export --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******** INT8 group-wise quantized *******"
           echo "******************************************"
-          python export.py --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat.py export --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******** ET: a8w4dq INT4 group-wise quantized *******"
           echo "******************************************"
-          python export.py --quant '{"linear:a8w4dq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat.py export --quant '{"linear:a8w4dq" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******** INT4 group-wise quantized *******"
           echo "******************************************"
-          # python export.py --quant '{"linear:int4" : {"groupsize": 32}}' --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python torchchat.py export --quant '{"linear:int4" : {"groupsize": 32}}' --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           # python3 torchchat.py generate --tokenizer-path ${TOKENIZER_PATH} --gguf-path ${GGUF_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "tests complete"
@@ -578,7 +577,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.10.11
+          python-version: '3.10.11'
       - name: Print machine info
         run: |
           uname -a
@@ -589,7 +588,7 @@ jobs:
       - name: Install requirements
         run: |
           echo "Installing pip3 packages"
-          ./install_requirements.sh
+          ./install/install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
@@ -622,70 +621,87 @@ jobs:
           python torchchat.py remove stories15m
 
   test-mps:
-    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
-    with:
-      runner: macos-m1-stable  # neeps MPS, was macos-m1-stable
-      script: |
-        set -x
-        # NS/MC: Remove previous installation of torch and torchao first
-        # as this script does not install anything into conda env but rather as system dep
-        pip3 uninstall -y torch || true
-        set -eou pipefail
+    strategy:
+      matrix:
+        runner: [macos-m1-stable ]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Run test
+        run: |
+          export PYTHON_VERSION="3.10"
+          set -x
+          # NS/MC: Remove previous installation of torch and torchao first
+          # as this script does not install anything into conda env but rather as system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
 
-        pip3 uninstall -y torchao || true
-        set -eou pipefail
+          pip3 uninstall -y torchao || true
+          set -eou pipefail
 
-        echo "::group::Print machine info"
-        uname -a
-        sysctl machdep.cpu.brand_string
-        sysctl machdep.cpu.core_count
-        echo "::endgroup::"
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+          echo "::endgroup::"
 
-        echo "::group::Install requirements"
-        # Install requirements
-        ./install_requirements.sh
-        ls -la
-        pwd
-        pip3 list
-        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
-        echo "::endgroup::"
+          echo "::group::Install requirements"
+          # Install requirements
+          ./install/install_requirements.sh
+          ls -la
+          pwd
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          echo "::endgroup::"
 
-        echo "::group::Download checkpoints"
-        (
-          mkdir -p checkpoints/stories15M
-          pushd checkpoints/stories15M
-          curl -fsSL -O https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
-          curl -fsSL -O https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
-          popd
-        )
-        echo "::endgroup::"
+          echo "::group::Download checkpoints"
+          (
+            mkdir -p checkpoints/stories15M
+            pushd checkpoints/stories15M
+            curl -fsSL -O https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+            curl -fsSL -O https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+            popd
+          )
+          echo "::endgroup::"
 
-        echo "::group::Run inference"
-        export MODEL_PATH=checkpoints/stories15M/stories15M.pt
-        export MODEL_NAME=stories15M
-        export MODEL_DIR=/tmp
+          echo "::group::Run inference"
+          export MODEL_PATH=checkpoints/stories15M/stories15M.pt
+          export MODEL_NAME=stories15M
+          export MODEL_DIR=/tmp
 
-        python3 torchchat.py generate --device mps --checkpoint-path ${MODEL_PATH} --temperature 0
+          python3 torchchat.py generate --device mps --checkpoint-path ${MODEL_PATH} --temperature 0
 
-        echo "************************************************************"
-        echo "*** embedding"
-        echo "************************************************************"
+          echo "************************************************************"
+          echo "*** embedding"
+          echo "************************************************************"
 
-        python3 torchchat.py generate --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
-        python3 torchchat.py generate --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+          python3 torchchat.py generate --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+          python3 torchchat.py generate --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-        echo "************************************************************"
-        echo "*** linear int8"
-        echo "************************************************************"
+          echo "************************************************************"
+          echo "*** linear int8"
+          echo "************************************************************"
 
-        python3 torchchat.py generate --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
-        python3 torchchat.py generate --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+          python3 torchchat.py generate --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+          python3 torchchat.py generate --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-        echo "************************************************************"
-        echo "*** linear int4"
-        echo "************************************************************"
+          echo "************************************************************"
+          echo "*** linear int4"
+          echo "************************************************************"
 
-        PYTORCH_ENABLE_MPS_FALLBACK=1 python3 torchchat.py generate --device mps --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+          PYTORCH_ENABLE_MPS_FALLBACK=1 python3 torchchat.py generate --device mps --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0
   test-gguf-util:
     strategy:
       matrix:
@@ -709,7 +725,7 @@ jobs:
         run: |
           echo "Intalling pip3 packages"
           pip3 install gguf
-          ./install_requirements.sh
+          ./install/install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
@@ -721,78 +737,95 @@ jobs:
       - name: Download GGUF files
         run: |
           mkdir gguf_files
-          wget -O gguf_files/llama-2-7b.Q4_0.gguf "https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_0.gguf?download=true"
-          ./llama.cpp/llama-quantize --allow-requantize gguf_files/llama-2-7b.Q4_0.gguf gguf_files/llama-2-7b.Q4_0.requant_F32.gguf F32
+          wget -O gguf_files/TinyLlama-1.1B-openorca.Q4_0.gguf "https://huggingface.co/TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF/resolve/main/tinyllama-1.1b-1t-openorca.Q4_0.gguf?download=true"
+          ./llama.cpp/llama-quantize --allow-requantize gguf_files/TinyLlama-1.1B-openorca.Q4_0.gguf gguf_files/TinyLlama-1.1B-openorca.Q4_0.requant_F32.gguf F32
 
       - name: Load files
         run: |
           touch test.py
-          echo "from build.gguf_util import test_by_to_float" >> test.py
-          echo "test_by_to_float(\"gguf_files/llama-2-7b.Q4_0.gguf\", \"gguf_files/llama-2-7b.Q4_0.requant_F32.gguf\")" >> test.py
+          echo "from torchchat.utils.gguf_loader import test_by_to_float" >> test.py
+          echo "test_by_to_float(\"gguf_files/TinyLlama-1.1B-openorca.Q4_0.gguf\", \"gguf_files/TinyLlama-1.1B-openorca.Q4_0.requant_F32.gguf\")" >> test.py
           cat test.py
           python test.py
 
           echo "Tests complete."
   test-mps-dtype:
-    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
-    with:
-      runner: macos-m1-stable  # needs MPS, was macos-m1-stable
-      script: |
-        set -x
-        # NS/MC: Remove previous installation of torch and torchao first
-        # as this script does not install anything into conda env but rather as system dep
-        pip3 uninstall -y torch || true
-        set -eou pipefail
+    strategy:
+      matrix:
+        runner: [macos-m1-stable ]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Run test
+        run: |
+          export PYTHON_VERSION="3.10"
+          set -x
+          # NS/MC: Remove previous installation of torch and torchao first
+          # as this script does not install anything into conda env but rather as system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
 
-        pip3 uninstall -y torchao || true
-        set -eou pipefail
+          pip3 uninstall -y torchao || true
+          set -eou pipefail
 
-        echo "::group::Print machine info"
-        uname -a
-        sysctl machdep.cpu.brand_string
-        sysctl machdep.cpu.core_count
-        echo "::endgroup::"
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+          echo "::endgroup::"
 
-        echo "::group::Install requirements"
-        # Install requirements
-        ./install_requirements.sh
-        ls -la
-        pwd
-        pip3 list
-        python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
-        echo "::endgroup::"
+          echo "::group::Install requirements"
+          # Install requirements
+          ./install/install_requirements.sh
+          ls -la
+          pwd
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          echo "::endgroup::"
 
-        echo "::group::Download checkpoints"
-        (
-          mkdir -p checkpoints/stories15M
-          pushd checkpoints/stories15M
-          curl -fsSL -O https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
-          curl -fsSL -O https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
-          popd
-        )
-        echo "::endgroup::"
+          echo "::group::Download checkpoints"
+          (
+            mkdir -p checkpoints/stories15M
+            pushd checkpoints/stories15M
+            curl -fsSL -O https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+            curl -fsSL -O https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+            popd
+          )
+          echo "::endgroup::"
 
-        echo "::group::Run inference"
-        export MODEL_PATH=checkpoints/stories15M/stories15M.pt
-        export MODEL_NAME=stories15M
-        export MODEL_DIR=/tmp
-        for DTYPE in float16 float32; do
-          # if [ $(uname -s) == Darwin ]; then
-          #   export DTYPE=float16
-          # fi
+          echo "::group::Run inference"
+          export MODEL_PATH=checkpoints/stories15M/stories15M.pt
+          export MODEL_NAME=stories15M
+          export MODEL_DIR=/tmp
+          for DTYPE in float16 float32; do
+            # if [ $(uname -s) == Darwin ]; then
+            #   export DTYPE=float16
+            # fi
 
-          python3 torchchat.py generate --dtype ${DTYPE} --device mps --checkpoint-path ${MODEL_PATH} --temperature 0
+            python3 torchchat.py generate --dtype ${DTYPE} --device mps --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+            python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+            python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+            python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+            python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int8" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --temperature 0
 
-          PYTORCH_ENABLE_MPS_FALLBACK=1 python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0
-        done
+            PYTORCH_ENABLE_MPS_FALLBACK=1 python3 torchchat.py generate --dtype ${DTYPE} --device mps --quant '{"linear:int4" : {"groupsize": 32}}' --checkpoint-path ${MODEL_PATH} --temperature 0
+          done
   compile-gguf:
     strategy:
       matrix:
@@ -814,7 +847,7 @@ jobs:
           fi
       - name: Install requirements
         run: |
-          ./install_requirements.sh
+          ./install/install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Download GGUF
@@ -893,53 +926,39 @@ jobs:
       - name: Install torchchat
         run: |
           echo "Intalling pip3 packages"
-          ./install_requirements.sh
+          ./install/install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
       - name: Set ET git sha
         id: setup-hash
         run: |
           export TORCHCHAT_ROOT=${PWD}
-          echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/.pins/et-pin.txt)" >> "$GITHUB_ENV"
+          echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt)" >> "$GITHUB_ENV"
       - name: Load or install ET
         id: install-et
-        uses: actions/cache@v3
-        env:
-          cache-key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}
+        uses: actions/cache@v4
         with:
-          path: ./et-build
-          key: ${{env.cache-key}}
-          restore-keys: |
-            ${{env.cache-key}}
+          path: |
+            ./et-build
+            ./torchchat/utils/scripts
+          key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}-${{ hashFiles('**/install_et.sh') }}
       - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
         continue-on-error: true
         run: |
           echo "Installing ExecuTorch"
-          bash scripts/build_native.sh et
-      - name: Install ET pip
+          bash torchchat/utils/scripts/install_et.sh
+      - name: Install ExecuTorch python
         run: |
-          echo "ET build directory"
-          ls et-build | cat
-
-          pushd et-build/src/executorch
-          if [ $(git rev-parse HEAD) != ${{env.et-git-hash}} ]; then
-            echo "Mismatched hash.  Make sure branch install_et.sh matches branch from Github cache."
-            echo "On commit $(git rev-parse HEAD)"
-            echo "Expected commit ${{env.et-git-hash}}"
-            exit 1
-          fi
-          pip install .
-          popd
+          echo "Install ExecuTorch python"
+          export TORCHCHAT_ROOT=$PWD
+          export ET_BUILD_DIR="et-build"
+          ENABLE_ET_PYBIND="${1:-true}"
+          source "torchchat/utils/scripts/install_utils.sh"
+          install_executorch_python_libs $ENABLE_ET_PYBIND
       - name: Install runner
         run: |
-          # Pull submodules (re2, abseil) for Tiktoken
-          git submodule sync
-          git submodule update --init
-
-          export TORCHCHAT_ROOT=${PWD}
-          cmake -S . -B ./cmake-out -G Ninja
-          cmake --build ./cmake-out --target et_run
-
+          echo "Installing runner"
+          bash torchchat/utils/scripts/build_native.sh et
       - name: Run inference
         run: |
           python torchchat.py download stories15M
@@ -952,7 +971,7 @@ jobs:
           python torchchat.py export stories15M --output-pte-path ./model.pte
           ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
 
-          for dtype in fp32 fp16; do   # bf16 needs to be supported
+          for dtype in fp32 fp16 bf16; do
             echo "Testing export + runner with dtype=$dtype"
             python torchchat.py export stories15M --dtype $dtype --output-pte-path ./model.pte
             ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
@@ -980,11 +999,11 @@ jobs:
           echo "$(uname -a)"
       - name: Install dependencies
         run: |
-          ./install_requirements.sh
+          ./install/install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
-          bash scripts/build_native.sh aoti
+          bash torchchat/utils/scripts/build_native.sh aoti
 
       - name: Download checkpoint
         run: |
@@ -1020,7 +1039,7 @@ jobs:
             sysctl machdep.cpu.brand_string
             sysctl machdep.cpu.core_count
           fi
-          ./install_requirements.sh
+          ./install/install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
 
@@ -1035,4 +1054,72 @@ jobs:
           git submodule sync
           git submodule update --init
           ./runner/build_android.sh
+          echo "Tests complete."
+
+  test-torchao-experimental:
+    strategy:
+      matrix:
+        runner: [macos-14-xlarge]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.11
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Install torchchat
+        run: |
+          echo "Intalling pip3 packages"
+          ./install/install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Install torchao-ops
+        id: install-torchao-ops
+        run: |
+          bash torchchat/utils/scripts/build_torchao_ops.sh
+      - name: Install ET
+        run: |
+          echo "Installing ExecuTorch"
+          export TORCHCHAT_ROOT=${PWD}
+          bash torchchat/utils/scripts/install_et.sh
+      - name: Install runner
+        run: |
+          echo "Installing runner"
+          bash torchchat/utils/scripts/build_native.sh et link_torchao_ops
+      - name: Install runner AOTI
+        id: install-runner-aoti
+        run: |
+          bash torchchat/utils/scripts/build_native.sh aoti link_torchao_ops
+      - name: Run inference
+        run: |
+          python torchchat.py download stories110M
+          wget -O ./tokenizer.model https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+          export PRMT="Once upon a time in a land far away"
+          echo "Generate eager"
+          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
+          echo "Generate compile"
+          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}' --compile
+          echo "Export and run ET (C++ runner)"
+          python torchchat.py export stories110M --output-pte-path ./model.pte --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
+          ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
+          echo "Export and run AOTI (C++ runner)"
+          python torchchat.py export stories110M --output-dso-path ./model.so --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
+          ./cmake-out/aoti_run ./model.so -z ./tokenizer.model -t 0 -i "${PRMT}"
+          echo "Generate AOTI"
+          python torchchat.py generate stories110M --dso-path ./model.so --prompt "${PRMT}"
           echo "Tests complete."

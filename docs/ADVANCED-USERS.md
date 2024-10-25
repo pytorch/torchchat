@@ -13,9 +13,9 @@ Torchchat is currently in a pre-release state and under extensive development.
 
 [shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
 
-[shell default]: ./install_requirements.sh
+[shell default]: ./install/install_requirements.sh
 
-[shell default]: TORCHCHAT_ROOT=${PWD} ./scripts/install_et.sh
+[shell default]: TORCHCHAT_ROOT=${PWD} ./torchchat/utils/scripts/install_et.sh
 
 
 This is the advanced users guide, if you're looking to get started
@@ -112,25 +112,25 @@ architecture, provided you have the model weights in llama format, the
 model parameters and the tokenizer model used by your language model.
 
 Some common models are recognized by torchchat based on their filename
-through `Transformer.from_name()` to perform a fuzzy match against a
+through `Model.from_name()` to perform a fuzzy match against a
 table of known model architectures. Alternatively, you can specify the
 index into that table with the option `--params-table ${INDEX}` where
 the index is the lookup key key in the [the list of known
-pconfigurations](https://github.com/pytorch/torchchat/tree/main/build/known_model_params)
+pconfigurations](https://github.com/pytorch/torchchat/tree/main/torchchat/model_params)
 For example, for the stories15M model, this would be expressed as
 `--params-table stories15M`. (We use the model constructor
-`Transformer.from_table()`)
+`Model.from_table()`)
 
 For models using a configuration not in the list of known
 configurations, you can construct the model by initializing the
-`TransformerArgs` dataclass that controls model construction from a
+`ModelArgs` dataclass that controls model construction from a
 parameter json using the `params-path ${PARAMS_PATH}` containing the
-appropriate model parameters to initialize the `TransformerArgs` for the
-model. (We use the model constructor `Transformer.from_params()`).
+appropriate model parameters to initialize the `ModelArgs` for the
+model. (We use the model constructor `Model.from_params()`).
 
 The parameter file should be in JSON format specifying these
-parameters. You can find the `TransformerArgs` data class in
-[`model.py`](https://github.com/pytorch/torchchat/blob/main/model.py#L22).
+parameters. You can find the `ModelArgs` data class in
+[`model.py`](https://github.com/pytorch/torchchat/blob/main/build/model.py#L70).
 
 The final way to initialize a torchchat model is from GGUF. You load a
 GGUF model with the option `--load-gguf ${MODELNAME}.gguf`. Presently,
@@ -205,7 +205,7 @@ We use `[ optional input ]` to indicate optional inputs, and `[ choice
 ## Torchchat Overview
 
 The torchchat Model definition may be found in `build/model.py`, the
-code to build the model in `build/builder.py` and sequence generation
+code to build the model in `torchchat/cli/builder.py` and sequence generation
 code for prompted sequence generation and chat in `generate.py`. The
 model checkpoint will commonly have extensions `pth` (checkpoint and model
 definition) or `pt` (model checkpoint).  At present, we always use the
@@ -244,7 +244,7 @@ ExecuTorch-exported PTE models.
 
 ## PyTorch eager mode and JIT-compiled execution
 ```
-python3 generate.py [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --device [ cuda | mps | cpu ]
+python3 torchchat.py generate [--compile] --checkpoint-path ${MODEL_PATH} --prompt "Hello, my name is" --device [ cuda | mps | cpu ]
 ```
 
 To improve performance, you can compile the model with `--compile`
@@ -273,7 +273,7 @@ run any tests and evaluations that you want to run on the exported
 models without requiring changes to your test harnesses and evaluation
 scripts.
 
-Learn more about model evaluation in [evaluation.md].
+Learn more about model evaluation in [torchchat/utils/evaluation.md].
 
 
 ## Model Export for Native Execution
@@ -300,7 +300,7 @@ execution with the ExecuTorch runtime (and enabling execution on a
 wide range of community and vendor supported backends):
 
 ```
-python3 export.py --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_NAME}.pte
+python3 torchchat.py export --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_NAME}.pte
 ```
 
 Alternatively, we may generate a native instruction stream binary
@@ -308,7 +308,7 @@ using AOT Inductor for CPU oor GPUs (the latter using Triton for
 optimizations such as operator fusion):
 
 ```
-python3 export.py --checkpoint-path ${MODEL_PATH} --device [ cuda | cpu ] --output-dso-path ${MODEL_NAME}.so
+python3 torchchat.py export --checkpoint-path ${MODEL_PATH} --device [ cuda | cpu ] --output-dso-path ${MODEL_NAME}.so
 ```
 
 
@@ -325,7 +325,7 @@ Jupyter notebooks and/or Google colab.
 Here is how to load an exported model into the python environment on the example of using an exported model with `generate.oy`.
 
 ```
-python3 generate.py --checkpoint-path ${MODEL_PATH} --pte-path ${MODEL_NAME}.pte --device cpu --prompt "Once upon a time"
+python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --pte-path ${MODEL_NAME}.pte --device cpu --prompt "Once upon a time"
 ```
 
 After you have exported the model, you can test the model with the
@@ -336,7 +336,7 @@ tests against the exported model with the same interface, and support
 additional experiments to confirm model quality and speed.
 
 ```
-python3 generate.py --device [ cuda | cpu ] --dso-path ${MODEL_NAME}.so --prompt "Once upon a time"
+python3 torchchat.py generate --device [ cuda | cpu ] --dso-path ${MODEL_NAME}.so --prompt "Once upon a time"
 ```
 
 
@@ -394,8 +394,8 @@ have good support for bfloat16 and float16. This can be taken advantage of via `
 
 [skip default]: begin
 ```
-python3 generate.py --dtype [bf16 | fp16 | fp32] ...
-python3 export.py --dtype [bf16 | fp16 | fp32] ...
+python3 torchchat.py generate --dtype [bf16 | fp16 | fp32] ...
+python3 torchchat.py export --dtype [bf16 | fp16 | fp32] ...
 ```
 [skip default]: end
 
@@ -417,7 +417,7 @@ into native torchchat models by using the load-gguf option:
 
 [skip default]: begin
 ```
-python3 [ export.py | generate.py | ... ] --gguf-path <gguf_filename>
+python3 torchchat.py [ export | generate | ... ] --gguf-path <gguf_filename>
 ```
 [skip default]: end
 
@@ -467,7 +467,7 @@ significant impact on accuracy.
 Refer to the [README](README.md] for an introduction toNative
 execution on servers, desktops and laptops is described under
 [runner-build.md].  Mobile and Edge executipon for Android and iOS are
-described under [Android.md] and [iOS.md], respectively.
+described under [torchchat/edge/docs/Android.md] and [torchchat/edge/docs/iOS.md], respectively.
 
 
 

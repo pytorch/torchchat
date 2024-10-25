@@ -39,19 +39,20 @@ torch::Device aoti_device(torch::kCPU);
 
 #else // __ET_MODEL__
 #include <executorch/extension/module/module.h>
-#include <executorch/extension/runner_util/managed_tensor.h>
+#include <executorch/extension/tensor/tensor_ptr.h>
 #include <executorch/runtime/core/evalue.h>
 #include <executorch/runtime/core/exec_aten/exec_aten.h>
 #include <executorch/runtime/core/exec_aten/util/scalar_type_util.h>
 
 #if defined(ET_USE_ADAPTIVE_THREADS)
-#include <executorch/backends/xnnpack/threadpool/cpuinfo_utils.h>
-#include <executorch/backends/xnnpack/threadpool/threadpool.h>
+#include <executorch/extension/threadpool/cpuinfo_utils.h>
+#include <executorch/extension/threadpool/threadpool.h>
 #endif
 
 using exec_aten::ScalarType;
 using torch::executor::EValue;
-using torch::executor::ManagedTensor;
+using executorch::extension::TensorPtr;
+using executorch::extension::make_tensor_ptr;
 using torch::executor::Module;
 using torch::executor::Result;
 #endif
@@ -211,12 +212,13 @@ float* forward(Transformer* transformer, int token, int pos) {
                              .to(torch::dtype(torch::kFloat32))
                              .to(torch::kCPU);
   auto logits = result[0].data_ptr();
+  memcpy(s->logits, logits, p->vocab_size * sizeof(float));
 #else // __ET_MODEL__
-  ManagedTensor pos_managed(pos_buffer, {1}, ScalarType::Long);
-  ManagedTensor tokens_managed(token_buffer, {1, 1}, ScalarType::Long);
+  TensorPtr pos_managed = make_tensor_ptr({1}, pos_buffer, ScalarType::Long);
+  TensorPtr tokens_managed = make_tensor_ptr({1, 1}, token_buffer, ScalarType::Long);
   std::vector<EValue> inputs;
-  auto tmp1 = EValue(tokens_managed.get_aliasing_tensor());
-  auto tmp2 = EValue(pos_managed.get_aliasing_tensor());
+  auto tmp1 = EValue(tokens_managed);
+  auto tmp2 = EValue(pos_managed);
 
   inputs.push_back(tmp1);
   inputs.push_back(tmp2);
@@ -227,10 +229,23 @@ float* forward(Transformer* transformer, int token, int pos) {
     exit(EXIT_FAILURE);
   }
   std::vector<EValue> result = outputs_res.get();
-  auto logits = result[0].toTensor().const_data_ptr();
+  // HACK: the rest of this runner assumes that logits must be float,
+  // so we simply convert them rather than plumbing
+  // templating/switch-on-type through the rest of this file.
+  const auto& result_tensor = result[0].toTensor();
+  ET_SWITCH_REALHBBF16_TYPES(
+      result_tensor.scalar_type(),
+      unused,
+      "forward",
+      CTYPE,
+      [&]() {
+        const CTYPE* logits = result_tensor.const_data_ptr<CTYPE>();
+        std::transform(logits, logits + p->vocab_size, s->logits, [](auto x) {
+          return static_cast<float>(x);
+        });
+      });
 #endif
 
-  memcpy(s->logits, logits, p->vocab_size * sizeof(float));
   return s->logits;
 }
 
@@ -834,7 +849,7 @@ int main(int argc, char* argv[]) {
   float topp = 0.9f; // top-p in nucleus sampling. 1.0 = off. 0.9 works well,
                      // but slower
 
-  int steps = 256; // number of steps to run for
+  int steps = 128; // number of steps to run for
   const char* prompt = NULL; // prompt string
   unsigned long long rng_seed = 0; // seed rng with time by default
   const char* mode = "generate"; // generate|chat

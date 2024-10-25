@@ -28,7 +28,7 @@ jobs:
 
         echo "::group::Download checkpoints"
         # Install requirements
-        ./install_requirements.sh cuda
+        ./install/install_requirements.sh cuda
         pip3 list
         python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
         echo "::endgroup::"
@@ -49,37 +49,37 @@ jobs:
         for DTYPE in bfloat16 float16 float32; do
           ###################################################################
           # group with different temperatures
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500
           ###################################################################
           # group with different temperatures and prefill, and compile
           # and prefill compile
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 --compile --compile-prefill
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 --compile --compile-prefill
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0 --compile --compile-prefill
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100 --compile --compile-prefill
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200 --compile --compile-prefill
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500 --compile --compile-prefill
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 --compile --compile-prefill
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 --compile --compile-prefill
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0 --compile --compile-prefill
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100 --compile --compile-prefill
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200 --compile --compile-prefill
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500 --compile --compile-prefill
           ###################################################################
           # group with different temperatures and sequential prefill
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 --sequential-prefill
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 --sequential-prefill
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0 --sequential-prefill
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100 --sequential-prefill
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200 --sequential-prefill
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500 --sequential-prefill
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 --sequential-prefill
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 --sequential-prefill
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0 --sequential-prefill
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100 --sequential-prefill
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200 --sequential-prefill
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500 --sequential-prefill
           ###################################################################
           # group with different temperatures and prefill, and compile
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 --sequential-prefill --compile
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 --sequential-prefill --compile
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0 --sequential-prefill --compile
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100 --sequential-prefill --compile
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200 --sequential-prefill --compile
-          python generate.py --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500 --sequential-prefill --compile
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0 --sequential-prefill --compile
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 0.9 --sequential-prefill --compile
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --temperature 1.0 --sequential-prefill --compile
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 100 --sequential-prefill --compile
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 200 --sequential-prefill --compile
+          python torchchat.py generate --checkpoint-path ${MODEL_PATH} --device cpu --dtype ${DTYPE} --top-k 500 --sequential-prefill --compile
 
         done
 

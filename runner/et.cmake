@@ -62,13 +62,15 @@ if(executorch_FOUND)
 
     set(EXECUTORCH_SRC_ROOT ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src/executorch)
     set(XNNPACK_ROOT ${EXECUTORCH_SRC_ROOT}/backends/xnnpack)
-    list(APPEND _srcs ${XNNPACK_ROOT}/threadpool/cpuinfo_utils.cpp)
+    list(APPEND _srcs ${EXECUTORCH_SRC_ROOT}/extension/threadpool/cpuinfo_utils.cpp)
     list(APPEND _common_include_directories
          ${XNNPACK_ROOT}/third-party/cpuinfo/include)
 
     list(APPEND _common_include_directories
          ${XNNPACK_ROOT}/third-party/pthreadpool/include)
   endif()
+  add_library(custom_ops STATIC IMPORTED)
+  set_property(TARGET custom_ops PROPERTY IMPORTED_LOCATION ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libcustom_ops.a)
 
   target_include_directories(executorch INTERFACE ${_common_include_directories}) # Ideally ExecuTorch installation process would do this
   add_executable(et_run ${_srcs})
@@ -80,7 +82,9 @@ if(executorch_FOUND)
     et_run PRIVATE
     executorch
     extension_module
+    extension_tensor
     extension_data_loader
+    extension_threadpool
     optimized_kernels
     quantized_kernels
     portable_kernels
@@ -90,13 +94,17 @@ if(executorch_FOUND)
     optimized_native_cpu_ops_lib
     quantized_ops_lib
     xnnpack_backend
+    microkernels-prod
     XNNPACK
     pthreadpool
     cpuinfo
+    custom_ops
   )
   target_link_options_shared_lib(optimized_native_cpu_ops_lib)
   target_link_options_shared_lib(quantized_ops_lib)
   target_link_options_shared_lib(xnnpack_backend)
+  target_link_options_shared_lib(custom_ops)
+
   # Not clear why linking executorch as whole-archive outside android/apple is leading
   # to double registration. Most likely because of linkage issues.
   # Will figure this out later. Until then use this.
@@ -104,28 +112,18 @@ if(executorch_FOUND)
     target_link_options_shared_lib(executorch)
   endif()
 
-  target_link_libraries(et_run PRIVATE
-  "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libcustom_ops.a>")
   # This one is needed for cpuinfo where it uses android specific log lib
   if(ANDROID)
     target_link_libraries(et_run PRIVATE log)
   endif()
 
-  # Adding target_link_options_shared_lib as commented out below leads to this:
-  #
-  # CMake Error at Utils.cmake:22 (target_link_options):
-  #   Cannot specify link options for target
-  #   "/Users/scroy/etorch/torchchat/et-build/src/executorch/${CMAKE_OUT_DIR}/examples/models/llama2/custom_ops/libcustom_ops_lib.a"
-  #   which is not built by this project.
-  # Call Stack (most recent call first):
-  #   Utils.cmake:30 (macos_kernel_link_options)
-  #   CMakeLists.txt:41 (target_link_options_shared_lib)
-  #
-  #target_link_options_shared_lib("${TORCHCHAT_ROOT}/et-build/src/executorch/${CMAKE_OUT_DIR}/examples/models/llama2/custom_ops/libcustom_ops_lib.a") # This one does not get installed by ExecuTorch
+  if(LINK_TORCHAO_OPS)
+    target_link_libraries(et_run PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/libtorchao_ops_executorch.a>")
+    target_link_libraries(et_run PRIVATE
+      "${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/libtorchao_kernels_aarch64.a"
+    )
+  endif()
 
-  # This works on mac, but appears to run into issues on linux
-  # It is needed to solve:
-  # E 00:00:00.055965 executorch:method.cpp:536] Missing operator: [8] llama::sdpa_with_kv_cache.out
 else()
   MESSAGE(WARNING "ExecuTorch package not found")
 endif()

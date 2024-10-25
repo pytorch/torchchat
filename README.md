@@ -2,6 +2,12 @@
 
 torchchat is a small codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
 
+> [!IMPORTANT]
+> Update September 25, 2024: torchchat has multimodal support for **Llama3.2 11B**!!
+>
+> To try it out, finish the [Installation](#Installation) section below, then hop
+> over to our [multimodal guide](docs/multimodal.md) to learn more.
+
 
 ## What can you do with torchchat?
 - [Run models via PyTorch / Python](#running-via-pytorch--python)
@@ -10,7 +16,7 @@ torchchat is a small codebase showcasing the ability to run large language model
   - [Run chat in the Browser](#browser)
 - [Run models on desktop/server without python](#desktopserver-execution)
   - [Use AOT Inductor for faster execution](#aoti-aot-inductor)
-  - [Running in c++ using the runner](#running-native-using-our-c-runner)
+  - [Running in c++ using the runner](#run-using-our-c-runner)
 - [Run models on mobile](#mobile-execution)
   - [Deploy and run on iOS](#deploy-and-run-on-ios)
   - [Deploy and run on Android](#deploy-and-run-on-android)
@@ -18,6 +24,8 @@ torchchat is a small codebase showcasing the ability to run large language model
 
 
 ## Highlights
+
+- [[New!!] Multimodal Support for Llama 3.2 11B](docs/multimodal.md)
 - Command line interaction with popular LLMs such as Llama 3, Llama 2, Stories, Mistral and more
 - PyTorch-native execution with performance
 - Supports popular hardware and OS
@@ -30,25 +38,55 @@ torchchat is a small codebase showcasing the ability to run large language model
 - Multiple execution modes including: Python (Eager, Compile) or Native (AOT Inductor (AOTI), ExecuTorch)
 
 
+## Models
+
+The following models are supported by torchchat and have associated
+aliases.
+
+| Model | Mobile Friendly | Notes |
+|------------------|---|---------------------|
+|[meta-llama/Meta-Llama-3.2-3B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct)|✅|Tuned for `chat` . Alias to `llama3.2-3b`.|
+|[meta-llama/Meta-Llama-3.2-3B](https://huggingface.co/meta-llama/Llama-3.2-3B)|✅|Best for `generate`. Alias to `llama3.2-3b-base`.|
+|[meta-llama/Llama-Guard-3-1B](https://huggingface.co/meta-llama/Llama-Guard-3-1B)|✅|Tuned for classification . Alias to `llama3-1b-guard`.|
+|[meta-llama/Meta-Llama-3.2-1B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-1B-Instruct)|✅|Tuned for `chat` . Alias to `llama3.2-1b`.|
+|[meta-llama/Meta-Llama-3.2-1B](https://huggingface.co/meta-llama/Llama-3.2-1B)|✅|Best for `generate`. Alias to `llama3.2-1b-base`.|
+|[meta-llama/Llama-3.2-11B-Vision-Instruct](https://huggingface.co/meta-llama/Llama-3.2-11B-Vision-Instruct)||Multimodal (Image + Text). Tuned for `chat` . Alias to `llama3.2-11B`.|
+|[meta-llama/Llama-3.2-11B-Vision](https://huggingface.co/meta-llama/Llama-3.2-11B-Vision)||Multimodal (Image + Text). Tuned for `generate` . Alias to `llama3.2-11B-base`.|
+|[meta-llama/Meta-Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3.1`.|
+|[meta-llama/Meta-Llama-3.1-8B](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B)|✅|Best for `generate`. Alias to `llama3.1-base`.|
+|[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3`.|
+|[meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅|Best for `generate`. Alias to `llama3-base`.|
+|[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|✅|Tuned for `chat`. Alias to `llama2`.|
+|[meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-13b-chat-hf)||Tuned for `chat`. Alias to `llama2-13b-chat`.|
+|[meta-llama/Llama-2-70b-chat-hf](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf)||Tuned for `chat`. Alias to `llama2-70b-chat`.|
+|[meta-llama/Llama-2-7b-hf](https://huggingface.co/meta-llama/Llama-2-7b-hf)|✅|Best for `generate`. Alias to `llama2-base`.|
+|[meta-llama/CodeLlama-7b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-7b-Python-hf)|✅|Tuned for Python and `generate`. Alias to `codellama`.|
+|[meta-llama/CodeLlama-34b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-34b-Python-hf)|✅|Tuned for Python and `generate`. Alias to `codellama-34b`.|
+|[mistralai/Mistral-7B-v0.1](https://huggingface.co/mistralai/Mistral-7B-v0.1)|✅|Best for `generate`. Alias to `mistral-7b-v01-base`.|
+|[mistralai/Mistral-7B-Instruct-v0.1](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1)|✅|Tuned for `chat`. Alias to `mistral-7b-v01-instruct`.|
+|[mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)|✅|Tuned for `chat`. Alias to `mistral`.|
+|[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories15M`.|
+|[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories42M`.|
+|[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories110M`.|
+|[openlm-research/open_llama_7b](https://huggingface.co/openlm-research/open_llama_7b)|✅|Best for `generate`. Alias to `open-llama`.|
+
 ## Installation
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
+> [!TIP]
+> torchchat uses the latest changes from various PyTorch projects so it's highly recommended that you use a venv (by using the commands below) or CONDA.
+
 [skip default]: begin
 ```bash
-# get the code
 git clone https://github.com/pytorch/torchchat.git
 cd torchchat
-
-# set up a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-
-# install dependencies
-./install_requirements.sh
+./install/install_requirements.sh
 ```
 [skip default]: end
 
-[shell default]: ./install_requirements.sh
+[shell default]: ./install/install_requirements.sh
 
 ## Commands
 
@@ -100,7 +138,6 @@ __Evaluation__ (eval)
 * This command test model fidelity via EleutherAI's [lm_evaluation_harness](https://github.com/EleutherAI/lm-evaluation-harness).
 * More information is provided in the [Evaluation](https://github.com/pytorch/torchchat?tab=readme-ov-file#eval) section.
 
-
 ## Download Weights
 Most models use Hugging Face as the distribution channel, so you will need to create a Hugging Face account.
 Create a Hugging Face user access token [as documented here](https://huggingface.co/docs/hub/en/security-tokens) with the `write` role.
@@ -113,9 +150,13 @@ Log into Hugging Face:
 huggingface-cli login
 ```
 
-Once this is done, torchchat will be able to download model artifacts from
-Hugging Face.
+Take a look at the available models:
 
+```bash
+python3 torchchat.py list
+```
+
+Then download one for testing (this README uses llama3.1)
 ```
 python3 torchchat.py download llama3.1
 ```
@@ -129,22 +170,16 @@ python3 torchchat.py download llama3.1
 <details>
 <summary>Additional Model Inventory Management Commands</summary>
 
-### List
-This subcommands shows the available models
-```bash
-python3 torchchat.py list
-```
-
 ### Where
-This subcommands shows location of a particular model.
+This subcommand shows the location of a particular model.
 ```bash
-python3 torchchat.py list
+python3 torchchat.py where llama3.1
 ```
 This is useful in scripts when you do not want to hard-code paths
 
 
 ### Remove
-This subcommands removes the specified model
+This subcommand removes the specified model
 ```bash
 python3 torchchat.py remove llama3.1
 ```
@@ -181,21 +216,12 @@ This mode generates text based on an input prompt.
 python3 torchchat.py generate llama3.1 --prompt "write me a story about a boy and his bear"
 ```
 
-[skip default]: end
 
 ### Server
-**Note: This feature is still a work in progress and not all endpoints are working**
-
-
-<details>
-<summary>This mode gives a REST API that matches the OpenAI API spec for interacting with a model</summary>
-
+This mode exposes a REST API for interacting with a model.
 The server follows the [OpenAI API specification](https://platform.openai.com/docs/api-reference/chat) for chat completions.
-Since this feature is under active development, not every parameter is consumed. See api/api.py for details on
-which request parameters are implemented. If you encounter any issues, please comment on the [tracking Github issue](https://github.com/pytorch/torchchat/issues/973).
 
 To test out the REST API, **you'll need 2 terminals**: one to host the server, and one to send the request.
-
 In one terminal, start the server
 
 [skip default]: begin
@@ -207,15 +233,21 @@ python3 torchchat.py server llama3.1
 
 In another terminal, query the server using `curl`. Depending on the model configuration, this query might take a few minutes to respond.
 
-Setting `stream` to "true" in the request emits a response in chunks. If `stream` is unset or not "true", then the client will await the full response from the server.
+> [!NOTE]
+> Since this feature is under active development, not every parameter is consumed. See api/api.py for details on
+> which request parameters are implemented. If you encounter any issues, please comment on the [tracking Github issue](https://github.com/pytorch/torchchat/issues/973).
 
+<details>
+<summary>Example Query</summary>
+
+Setting `stream` to "true" in the request emits a response in chunks. If `stream` is unset or not "true", then the client will await the full response from the server.
 
 **Example Input + Output**
 
 [skip default]: begin
 
 ```
-curl http://127.0.0.1:5000/v1/chat \
+curl http://127.0.0.1:5000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "model": "llama3.1",
@@ -250,8 +282,10 @@ First, follow the steps in the Server section above to start a local server. The
 [skip default]: begin
 
 ```
-streamlit run browser/browser.py
+streamlit run torchchat/usages/browser.py
 ```
+
+[skip default]: end
 
 Use the "Max Response Tokens" slider to limit the maximum number of tokens generated by the model for each response. Click the "Reset Chat" button to remove the message history and start a fresh chat.
 
@@ -260,7 +294,7 @@ Use the "Max Response Tokens" slider to limit the maximum number of tokens gener
 
 ### AOTI (AOT Inductor)
 [AOTI](https://pytorch.org/blog/pytorch2-2/) compiles models before execution for faster inference. The process creates a [DSO](https://en.wikipedia.org/wiki/Shared_library) model (represented by a file with extension `.so`)
-that is then loaded for inference. This can be done with both Python and C++ enviroments.
+that is then loaded for inference. This can be done with both Python and C++ environments.
 
 The following example exports and executes the Llama3.1 8B Instruct
 model.  The first command compiles and performs the actual export.
@@ -270,14 +304,14 @@ python3 torchchat.py export llama3.1 --output-dso-path exportedModels/llama3.1.s
 
 > [!NOTE]
 > If your machine has cuda add this flag for performance
-`--quantize config/data/cuda.json` when exporting.
+`--quantize torchchat/quant_config/cuda.json` when exporting.
 
 For more details on quantization and what settings to use for your use
 case visit our [customization guide](docs/model_customization.md).
 
-### Run in a Python Enviroment
+### Run in a Python Environment
 
-To run in a python enviroment, use the generate subcommand like before, but include the dso file.
+To run in a python environment, use the generate subcommand like before, but include the dso file.
 
 ```
 python3 torchchat.py generate llama3.1 --dso-path exportedModels/llama3.1.so --prompt "Hello my name is"
@@ -289,7 +323,7 @@ python3 torchchat.py generate llama3.1 --dso-path exportedModels/llama3.1.so --p
 
 To run in a C++ enviroment, we need to build the runner binary.
 ```bash
-scripts/build_native.sh aoti
+torchchat/utils/scripts/build_native.sh aoti
 ```
 
 Then run the compiled executable, with the exported DSO from earlier.
@@ -317,7 +351,7 @@ ExecuTorch repo to ./et-build/src and install various ExecuTorch libraries to
 
 ```
 export TORCHCHAT_ROOT=${PWD}
-./scripts/install_et.sh
+./torchchat/utils/scripts/install_et.sh
 ```
 
 
@@ -327,11 +361,11 @@ Similar to AOTI, to deploy onto device, we first export the PTE artifact, then w
 The following example uses the Llama3.1 8B Instruct model.
 ```
 # Export
-python3 torchchat.py export llama3.1 --quantize config/data/mobile.json --output-pte-path llama3.1.pte
+python3 torchchat.py export llama3.1 --quantize torchchat/quant_config/mobile.json --output-pte-path llama3.1.pte
 ```
 
 > [!NOTE]
-> We use `--quantize config/data/mobile.json` to quantize the
+> We use `--quantize torchchat/quant_config/mobile.json` to quantize the
 llama3.1 model to reduce model size and improve performance for
 on-device use cases.
 
@@ -344,25 +378,25 @@ While ExecuTorch does not focus on desktop inference, it is capable
 of doing so. This is handy for testing out PTE
 models without sending them to a physical device.
 
-Specifically there are 2 ways of doing so: Pure Python and via a Runner
+Specifically, there are 2 ways of doing so: Pure Python and via a Runner
 
 <details>
 <summary>Deploying via Python</summary>
 
 ```
 # Execute
-python3 torchchat.py generate llama3.1 --device cpu --pte-path llama3.1.pte --prompt "Hello my name is"
+python3 torchchat.py generate llama3.1 --pte-path llama3.1.pte --prompt "Hello my name is"
 ```
 
 </details>
 
 
 <details>
-<summary>Deploying via a Runner</summary>
+<summary>Deploying via the c++ Runner</summary>
 
 Build the runner
 ```bash
-scripts/build_native.sh et
+torchchat/utils/scripts/build_native.sh et
 ```
 
 Execute using the runner
@@ -444,9 +478,9 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 1. Download the AAR file, which contains the Java library and corresponding JNI library, to build and run the app.
 
-   - [executorch-llama-tiktoken-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-tiktoken-rc3-0719.aar) (SHASUM: c3e5d2a97708f033c2b1839a89f12f737e3bbbef)
+   - [executorch.aar](https://ossci-android.s3.amazonaws.com/executorch/release/executorch-241002/executorch.aar) ([sha256sums](https://ossci-android.s3.amazonaws.com/executorch/release/executorch-241002/executorch.aar.sha256sums))
 
-2. Rename the downloaded AAR file to `executorch.aar` and move the file to `android/torchchat/app/libs/`. You may need to create directory `android/torchchat/app/libs/` if it does not exist.
+2. Move the downloaded AAR file to `torchchat/edge/android/torchchat/app/libs/`. You may need to create directory `torchchat/edge/android/torchchat/app/libs/` if it does not exist.
 
 3. Push the model and tokenizer file to your device. You can find the model file called `llama3.1.pte` in the current `torchchat` directory and the tokenizer file at `$(python3 torchchat.py where llama3.1)/tokenizer.model` path.
     ```
@@ -455,7 +489,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
     adb push <tokenizer.model or tokenizer.bin> /data/local/tmp/llama
     ```
 
-4. Use Android Studio to open the torchchat app skeleton, located at `android/torchchat`.
+4. Use Android Studio to open the torchchat app skeleton, located at `torchchat/edge/android/torchchat`.
 
 5. Click the Play button (^R) to launch it to emulator/device.
 
@@ -464,12 +498,11 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
 
 6. Follow the app's UI guidelines to pick the model and tokenizer files from the local filesystem. Then issue a prompt.
 
-**Note:** The AAR file listed in Step 1 has the tiktoken tokenizer, which is used for Llama 3. To tweak or use a custom tokenizer and runtime, modify the ExecuTorch code
-and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library. For convenience, we also provide an AAR
-for sentencepiece tokenizer (e.g. Llama 2): [executorch-llama-bpe-rc3-0719.aar](https://ossci-android.s3.amazonaws.com/executorch/main/executorch-llama-bpe-rc3-0719.aar) (SHASUM: d5fe81d9a4700c36b50ae322e6bf34882134edb0)
+**Note:** The AAR file listed in Step 1 has the tiktoken and sentensepiece tokenizer. To tweak or use a custom tokenizer and runtime, modify the ExecuTorch code
+and use [this script](https://github.com/pytorch/executorch/blob/main/build/build_android_llm_demo.sh) to build the AAR library.
 
 <p align="center">
-    <img src="https://pytorch.org/executorch/main/_static/img/android_llama_app.png" width="600" alt="Android app running a LlaMA model">
+    <img src="https://pytorch.org/executorch/main/_static/img/chat.png" width="600" alt="Android app running a LlaMA model">
 </p>
 
 
@@ -478,12 +511,11 @@ for sentencepiece tokenizer (e.g. Llama 2): [executorch-llama-bpe-rc3-0719.aar](
 <details>
 <summary>Approach 2: E2E Script</summary>
 
-Alternatively, you can run `scripts/android_example.sh` which sets up Java, Android SDK Manager, Android SDK, Android emulator (if no physical device is found), builds the app, and launches it for you. It can be used if you don't have a GUI.
+Alternatively, you can run `torchchat/utils/scripts/android_example.sh` which sets up Java, Android SDK Manager, Android SDK, Android emulator (if no physical device is found), builds the app, and launches it for you. It can be used if you don't have a GUI.
 
 ```
 export TORCHCHAT_ROOT=$(pwd)
-export USE_TIKTOKEN=ON # Set this only for tiktoken tokenizer
-sh scripts/android_example.sh
+sh torchchat/utils/scripts/android_example.sh
 ```
 
 </details>
@@ -494,7 +526,7 @@ sh scripts/android_example.sh
 
 Uses the lm_eval library to evaluate model accuracy on a variety of
 tasks. Defaults to wikitext and can be manually controlled using the
-tasks and limit args. See [Evaluation](docs/evaluation.md)
+tasks and limit args. See [Evaluation](torchchat/utils/docs/evaluation.md)
 
 **Examples**
 
@@ -509,37 +541,6 @@ the same way you would to generate:
 ```
 python3 torchchat.py eval llama3.1 --pte-path llama3.1.pte --limit 5
 ```
-
-
-
-## Models
-
-The following models are supported by torchchat and have associated
-aliases.
-
-| Model | Mobile Friendly | Notes |
-|------------------|---|---------------------|
-|[meta-llama/Meta-Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3.1`.|
-|[meta-llama/Meta-Llama-3.1-8B](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B)|✅|Best for `generate`. Alias to `llama3.1-base`.|
-|[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3`.|
-|[meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅|Best for `generate`. Alias to `llama3-base`.|
-|[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|✅|Tuned for `chat`. Alias to `llama2`.|
-|[meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-13b-chat-hf)||Tuned for `chat`. Alias to `llama2-13b-chat`.|
-|[meta-llama/Llama-2-70b-chat-hf](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf)||Tuned for `chat`. Alias to `llama2-70b-chat`.|
-|[meta-llama/Llama-2-7b-hf](https://huggingface.co/meta-llama/Llama-2-7b-hf)|✅|Best for `generate`. Alias to `llama2-base`.|
-|[meta-llama/CodeLlama-7b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-7b-Python-hf)|✅|Tuned for Python and `generate`. Alias to `codellama`.|
-|[meta-llama/CodeLlama-34b-Python-hf](https://huggingface.co/meta-llama/CodeLlama-34b-Python-hf)|✅|Tuned for Python and `generate`. Alias to `codellama-34b`.|
-|[mistralai/Mistral-7B-v0.1](https://huggingface.co/mistralai/Mistral-7B-v0.1)|✅|Best for `generate`. Alias to `mistral-7b-v01-base`.|
-|[mistralai/Mistral-7B-Instruct-v0.1](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1)|✅|Tuned for `chat`. Alias to `mistral-7b-v01-instruct`.|
-|[mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)|✅|Tuned for `chat`. Alias to `mistral`.|
-|[tinyllamas/stories15M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories15M`.|
-|[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories42M`.|
-|[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories110M`.|
-|[openlm-research/open_llama_7b](https://huggingface.co/openlm-research/open_llama_7b)|✅|Best for `generate`. Alias to `open-llama`.|
-
-While we describe how to use torchchat using the popular llama3 model,
-you can perform the example commands with any of these models.
-
 
 ## Design Principles
 
@@ -584,7 +585,7 @@ link provided in the error to get access.
 
 **Failed Building Wheel**
 
-If `./scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
+If `./torchchat/utils/scripts/install_et.sh` fails with an error like `Building wheel for executorch (pyproject.toml) did not run successfully` It's possible that it's linking to an older version of pytorch installed some other way like via homebrew. You can break the link by uninstalling other versions such as `brew uninstall pytorch` Note: You may break something that depends on this, so be aware.
 
 **CERTIFICATE_VERIFY_FAILED**
 

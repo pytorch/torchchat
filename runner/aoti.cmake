@@ -28,3 +28,7 @@ if(Torch_FOUND)
     target_link_libraries(aoti_run "${TORCH_LIBRARIES}" m)
     set_property(TARGET aoti_run PROPERTY CXX_STANDARD 17)
 endif()
+
+if (LINK_TORCHAO_OPS)
+    target_link_libraries(aoti_run "${TORCHCHAT_ROOT}/torchao-build/cmake-out/lib/libtorchao_ops_aten${CMAKE_SHARED_LIBRARY_SUFFIX}")
+endif()
