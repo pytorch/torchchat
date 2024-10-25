@@ -569,7 +569,7 @@ def _initialize_model(
             device_sync(device=builder_args.device)
 
         cache_path = builder_args.quantized_state_path
-        quant_checkpoint_exists: bool = os.path.isfile(cache_path)
+        quant_checkpoint_exists: bool = cache_path and os.path.isfile(cache_path)
         if quantize or quant_checkpoint_exists:
 
             if quantize and quant_checkpoint_exists:
