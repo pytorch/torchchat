@@ -1160,17 +1160,9 @@ class Generator:
                 t - aggregate_metrics.get("time_to_first_token", 0)
             )
 
-            if jit_compile:
-                print(
-                    f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds"
-                )
-                aggregate_metrics["tokens_per_sec_jit_compile"] = tokens_sec
-                # Don't continue here.... because we need to report and reset
-                # continue
-            else:
-                aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-                aggregate_metrics["first_token_per_sec"].append(first_token_sec)
-                aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
+            aggregate_metrics["tokens_per_sec"].append(tokens_sec)
+            aggregate_metrics["first_token_per_sec"].append(first_token_sec)
+            aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
 
             logging.info(
                 f"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\
