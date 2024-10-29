@@ -58,6 +58,7 @@ _tokenizer_type = None  # global variable to store the tokenizer type
 NAME_TO_DISTRIBUTION_AND_DTYPE = {
     "llama2-7b-chat": ("meta-llama/Llama-2-7b-chat-hf", torch.float16),
     "llama3": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16),
+    "llama3-70b": ("meta-llama/Meta-Llama-3-70B-Instruct", torch.bfloat16),
 }
 
 
