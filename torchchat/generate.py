@@ -24,6 +24,15 @@ import torch._inductor.config
 
 from PIL import Image
 
+# torchtune model definition dependencies
+from torchtune.data import Message, padded_collate_tiled_images_and_mask
+
+from torchtune.generation import sample as tune_sample
+from torchtune.models.llama3 import llama3_tokenizer
+
+from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
+from torchtune.training import set_default_dtype
+
 from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
@@ -34,15 +43,6 @@ from torchchat.distributed.generate import DistributedGenerator
 from torchchat.model import Model, ModelType
 from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
-
-# torchtune model definition dependencies
-from torchtune.data import Message, padded_collate_tiled_images_and_mask
-
-from torchtune.generation import sample as tune_sample
-from torchtune.models.llama3 import llama3_tokenizer
-
-from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
-from torchtune.training import set_default_dtype
 
 
 class _ChatFormatter(ABC):
@@ -1155,13 +1155,9 @@ class Generator:
                 print(
                     f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds"
                 )
-                aggregate_metrics["tokens_per_sec_jit_compile"] = tokens_sec
-                # Don't continue here.... because we need to report and reset
-                # continue
-            else:
-                aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-                aggregate_metrics["first_token_per_sec"].append(first_token_sec)
-                aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
+            aggregate_metrics["tokens_per_sec"].append(tokens_sec)
+            aggregate_metrics["first_token_per_sec"].append(first_token_sec)
+            aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
 
             logging.info(
                 f"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\
