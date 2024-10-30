@@ -50,6 +50,8 @@ def export_for_server(
     Returns:
         The path to the exported model.
     """
+    from torch._inductor.package import package_aoti
+
     if dynamic_shapes:
         example_inputs = (
             torch.tensor([[1, 9038, 2501, 263, 931]], dtype=torch.int, device=device),
