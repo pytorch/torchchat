@@ -41,7 +41,7 @@ def export_for_server(
     package: bool = True,
 ) -> str:
     """
-    Export the model using AOT Compile to get a .dso for server use cases.
+    Export the model using AOT Compile to get a .pt2 for server use cases.
 
     Args:
         model: The model to be exported.
