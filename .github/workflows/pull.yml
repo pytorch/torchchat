@@ -453,9 +453,9 @@ jobs:
           ./install/install_requirements.sh
 
           export TORCHCHAT_ROOT=$PWD
-          ./torchchat/utils/scripts/install_et.sh
+          source ./torchchat/utils/scripts/install_utils.sh
+          install_executorch_python_libs
 
-          pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
 
@@ -953,6 +953,7 @@ jobs:
           bash torchchat/utils/scripts/build_native.sh et
       - name: Run inference
         run: |
+          set -eou pipefail
           python torchchat.py download stories15M
           wget -O ./tokenizer.model https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
 
