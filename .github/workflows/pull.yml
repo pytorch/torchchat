@@ -947,14 +947,6 @@ jobs:
         run: |
           echo "Installing ExecuTorch"
           bash torchchat/utils/scripts/install_et.sh
-      - name: Install ExecuTorch python
-        run: |
-          echo "Install ExecuTorch python"
-          export TORCHCHAT_ROOT=$PWD
-          export ET_BUILD_DIR="et-build"
-          ENABLE_ET_PYBIND="${1:-true}"
-          source "torchchat/utils/scripts/install_utils.sh"
-          install_executorch_python_libs $ENABLE_ET_PYBIND
       - name: Install runner
         run: |
           echo "Installing runner"

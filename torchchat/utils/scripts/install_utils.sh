@@ -161,7 +161,7 @@ install_executorch_libs() {
   EXECUTORCH_BUILD_KERNELS_CUSTOM_AOT_VAR=OFF
   EXECUTORCH_BUILD_KERNELS_CUSTOM_VAR=OFF
   install_executorch_cpp_libs
-  install_executorch_python_libs $1
+  install_executorch_python_libs
 }
 
 clone_torchao() {
