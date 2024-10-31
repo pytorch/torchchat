@@ -23,7 +23,7 @@ install_pip_dependencies() {
 }
 
 function find_cmake_prefix_path() {
-  path=`python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())"`
+  path=`python -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())"`
   MY_CMAKE_PREFIX_PATH=$path
 }
 

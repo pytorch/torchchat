@@ -929,6 +929,7 @@ jobs:
           ./install/install_requirements.sh
 
           # Install ET
+          export TORCHCHAT_ROOT=$PWD
           source ./torchchat/utils/scripts/install_utils.sh
           install_executorch_python_libs
 
