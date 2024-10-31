@@ -7,7 +7,7 @@
     "n_layers": 32,
     "rope_base": 10000000,
     "vocab_size": 49152,
-    "use_tokenizers": true,
+    "use_hf_tokenizer": true,
     "norm_eps": 0.00001,
     "rope_scaling": null,
     "attention_bias": true,
