@@ -169,12 +169,14 @@
         "aliases": ["granite-code", "granite-code-3b"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "ibm-granite/granite-3b-code-instruct-128k",
-        "transformer_params_key": "3B"
+        "transformer_params_key": "Granite-3B-Code",
+        "tokenizer_file": "tokenizer.json"
     },
     "ibm-granite/granite-8b-code-instruct-128k": {
         "aliases": ["granite-code-8b"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "ibm-granite/granite-8b-code-instruct-128k",
-        "transformer_params_key": "8B"
+        "transformer_params_key": "Granite-8B-Code",
+        "tokenizer_file": "tokenizer.json"
     }
 }
