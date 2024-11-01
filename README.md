@@ -568,7 +568,11 @@ We provide
 
 ## Community Contributions
 
-We really value our community and the contributions made by our wonderful users. We'll use this section to call out some of these contributions! If you'd like to help out as well, please see the [CONTRIBUTING](CONTRIBUTING.md) guide. Additionally, you're invited to join our community on Slack by filling out this [form](https://docs.google.com/forms/d/e/1FAIpQLSeADnUNW36fjKjYzyHDOzEB_abKQE9b6gqqW9NXse6O0MWh0A/viewform) and head to the `#torchchat` channel to discuss and exchange ideas with us!
+We really value our community and the contributions made by our wonderful users. We'll use this section to call out some of these contributions! If you'd like to help out as well, please see the [CONTRIBUTING](CONTRIBUTING.md) guide.
+To connect with us and other community members, we invite you to join our Slack community by filling out this [form](https://docs.google.com/forms/d/e/1FAIpQLSeADnUNW36fjKjYzyHDOzEB_abKQE9b6gqqW9NXse6O0MWh0A/viewform). Once you've joined, you can:
+* Head to the `#torchchat-general` channel for general questions, discussion, and community support.
+* Join the `#torchchat-contribution` channel if you're interested in contributing directly to project development.
+Looking forward to discussing with you about torchchat future!
 
 ## Troubleshooting
 
