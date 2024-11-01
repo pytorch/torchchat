@@ -1,0 +1,82 @@
+python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model16.so
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model16.so
+W1031 13:04:17.715572 2306093 site-packages/torch/_export/__init__.py:225] +============================+
+W1031 13:04:17.716094 2306093 site-packages/torch/_export/__init__.py:226] |     !!!   WARNING   !!!    |
+W1031 13:04:17.716326 2306093 site-packages/torch/_export/__init__.py:227] +============================+
+W1031 13:04:17.716514 2306093 site-packages/torch/_export/__init__.py:228] torch._export.aot_compile() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export()) instead.
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 7.73 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model16.so
+The generated DSO model can be found at: /tmp/model16.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 9.40 seconds
+-----------------------------------------------------------
+Once upon a time, there was a beautiful and secluded lake surrounded by lush green forests. This lake had a special quality that made it a favorite among the local wildlife. It was calm and peaceful, filled with crystal clear water and reflecting the beauty of the surrounding landscape perfectly. Animals from far and wide would come to drink, fish, and play in its waters.
+Among the many creatures that lived around the lake, there was a wise old owl named Hootie. Hootie was a gentle soul with big round glasses and a kind heart. He loved to sit on a branch overlooking the lake, watching the sunsets, and reading books. One day, while he was engrossed in a fascinating tale of adventure and bravery, he noticed something peculiar. The lake, which was once a haven for all the creatures, had started to change.
+The water was becoming murky, and the once-clear lake was now filled with algae and debris. The animals that lived around the lake were struggling to find food and water2024-10-31:13:08:41,536 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 2.5023 sec total                 
+Time to first token: 0.0628 sec with sequential prefill.                
+
+      Total throughput: 79.9258 tokens/sec, 0.0125 s/token                 
+First token throughput: 15.9193 tokens/sec, 0.0628 s/token                 
+ Next token throughput: 81.5739 tokens/sec, 0.0123 s/token                     
+2024-10-31:13:08:41,537 INFO     [generate.py:1173] 
+Bandwidth achieved: 1283.65 GB/s
+2024-10-31:13:08:41,537 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a land far, far away...
+There was a beautiful princess named Luna who lived in a magnificent castle surrounded by a lush forest. The castle was made of marble and gold, with towering spires that reached up to the sky. Its grand halls were filled with the soft glow of candles and the sweet scent of roses.
+Princess Luna was kind, gentle, and loved by all who knew her. She had long, silvery hair and piercing blue eyes that sparkled like the stars on a clear night. She spent her days reading books, playing the harp, and exploring the forest with her loyal companion, a wise and witty owl named Orion.
+One day, a wicked sorcerer named Malakai cast a dark spell on the land. The skies turned a dark, foreboding grey, and the forest began to wither and die. The once-peaceful creatures of the forest grew angry and fearful, and Princess Luna knew she had to do something to stop the sor2024-10-31:13:08:44,004 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 2.4674 sec total                 
+Time to first token: 0.0587 sec with sequential prefill.                
+
+      Total throughput: 81.0578 tokens/sec, 0.0123 s/token                 
+First token throughput: 17.0464 tokens/sec, 0.0587 s/token                 
+ Next token throughput: 82.6168 tokens/sec, 0.0121 s/token                     
+2024-10-31:13:08:44,005 INFO     [generate.py:1173] 
+Bandwidth achieved: 1301.83 GB/s
+
+========================================
+
+Once upon a time, there were two neighboring towns, Happydale and Frowningville, located in a small valley surrounded by mountains. The townspeople of Happydale were known for their joy, optimism, and hospitality, while the people of Frowningville were infamous for their gloominess, pessimism, and hostility.
+For years, the two towns coexisted in a state of mutual disdain, with Happydale's residents often teasing Frowningville's inhabitants for their perpetual frowns, and the Frowningvillians retaliating by complaining about the Happydalers' annoying cheeriness.
+One day, a severe drought struck the valley, and the crops began to wither and die. The town councils of both Happydale and Frowningville realized that they needed to work together to find a solution to the water shortage.
+After some initial hesitation, the leaders of the two towns agreed to hold a joint meeting to discuss the crisis. At the meeting, a young woman named Lily from Happydale suggested that2024-10-31:13:08:46,460 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 2.4546 sec total                 
+Time to first token: 0.0590 sec with sequential prefill.                
+
+      Total throughput: 81.4788 tokens/sec, 0.0123 s/token                 
+First token throughput: 16.9532 tokens/sec, 0.0590 s/token                 
+ Next token throughput: 83.0676 tokens/sec, 0.0120 s/token                     
+2024-10-31:13:08:46,460 INFO     [generate.py:1173] 
+Bandwidth achieved: 1308.59 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 80.82                 
+Average tokens/sec (first token): 16.64                 
+Average tokens/sec (next tokens): 82.42 
+                
+Memory used: 16.68 GB

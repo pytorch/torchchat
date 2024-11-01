@@ -1,0 +1,64 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 8.03 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.29 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Sophia. Sophia was a curious and adventurous soul, with a heart full of wonder and a mind full of questions. She loved to explore the world around her, and was always seeking out new experiences and knowledge.
+One day, Sophia stumbled upon a mysterious and ancient-looking book hidden away in the village library. The book was bound in a strange, glowing material that seemed to shift and shimmer in the light, and its pages were filled with strange symbols and illustrations that Sophia had never seen before.
+As she opened the book, Sophia was immediately drawn into a world of magic and wonder. The pages came alive before her eyes, and she found herself transported to a fantastical realm filled with talking animals, mythical creatures, and ancient magic.
+Sophia was enchanted by the book and spent hours poring over its pages, learning about the secrets of the ancient world and the magic that lay within. She became convinced2024-10-31:10:02:57,085 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 29.1114 sec total                 
+Time to first token: 3.2525 sec with parallel prefill.                
+
+      Total throughput: 6.8702 tokens/sec, 0.1456 s/token                 
+First token throughput: 0.3075 tokens/sec, 3.2525 s/token                 
+ Next token throughput: 7.6956 tokens/sec, 0.1299 s/token                     
+2024-10-31:10:02:57,086 INFO     [generate.py:1173] 
+Bandwidth achieved: 58.80 GB/s
+2024-10-31:10:02:57,086 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a land far, far away, there was a lovely young girl named Sophia. She lived with her family in a cozy little house surrounded by rolling hills and green pastures. Sophia loved playing outside, exploring the woods, and chasing after butterflies. But most of all, she loved to read. She would spend hours curled up in her favorite chair, lost in the pages of a good book.
+One day, Sophia's teacher, Mrs. Thompson, asked the class if they wanted to participate in a special project. They would be making a time capsule to be buried on the school's grounds. The time capsule would contain items that represented the year they were living in, and it would be opened in 10 years, when Sophia and her classmates would be in high school.
+Sophia was so excited about the project that she asked her parents if they could help her choose some special items to put in the time capsule. She wanted to make sure it was perfect. Her parents, being the2024-10-31:10:03:21,319 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 24.2331 sec total                 
+Time to first token: 0.1060 sec with parallel prefill.                
+
+      Total throughput: 8.2532 tokens/sec, 0.1212 s/token                 
+First token throughput: 9.4331 tokens/sec, 0.1060 s/token                 
+ Next token throughput: 8.2480 tokens/sec, 0.1212 s/token                     
+2024-10-31:10:03:21,320 INFO     [generate.py:1173] 
+Bandwidth achieved: 70.64 GB/s
+
+========================================
+
+Once upon a time, there was a poor village surrounded by mountains. The villagers depended on the mountain water for drinking, farming, and other needs. Despite the beautiful scenery, the villagers were poor and sick. They suffered from scabies, skin rashes, and other skin problems, which led them to believe that the water was contaminated. One day, an old man visited the village and offered to treat the villagers’ water. He claimed that his magical formula could purify the water and cure the villagers’ skin problems. The villagers were desperate and agreed to try his solution. The old man brought a large tank and filled it with the villagers’ water. He then poured in his magical formula, stirred the mixture, and left it to settle. Several days passed, and the villagers saw no improvement in their condition. In fact, their skin problems worsened, and some even developed diarrhea and vomiting. They realized that the old man’s formula did not work and were tricked into paying for an ineffective treatment. The2024-10-31:10:03:45,648 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 24.3278 sec total                 
+Time to first token: 0.1114 sec with parallel prefill.                
+
+      Total throughput: 8.2210 tokens/sec, 0.1216 s/token                 
+First token throughput: 8.9786 tokens/sec, 0.1114 s/token                 
+ Next token throughput: 8.2176 tokens/sec, 0.1217 s/token                     
+2024-10-31:10:03:45,648 INFO     [generate.py:1173] 
+Bandwidth achieved: 70.36 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 7.78                 
+Average tokens/sec (first token): 6.24                 
+Average tokens/sec (next tokens): 8.05 
+                
+Memory used: 28.86 GB

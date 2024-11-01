@@ -1,0 +1,75 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.11 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in a land far, far away, there was a magical kingdom known as Azura. Azura was a place of wonder, where the skies were perpetually painted with hues of sapphire and amethyst, and the air was sweet with the scent of enchanted blooms. The kingdom was ruled by a wise and just queen, who wore a crown of crystal and a heart full of love for her people.
+
+In a small village on the outskirts of Azura, there lived a young girl named Luna. Luna was a curious and adventurous child, with eyes that shone like the stars on a clear night and hair that flowed like the golden grasses of the summer breeze. She lived with her grandmother, who told her stories of the ancient magic that lay hidden within the heart of Azura.
+
+Luna's grandmother was a wise and knowing woman, who had spent her life studying the ancient arts. She taught Luna how to weave magic into her everyday life, how to talk to the creatures of the forest, and how to listen to the whispers of the trees. Luna devoured her grandmother's teachings, and soon she was able to communicate with the creatures of the forest, and even to sense the subtle energies that flowed through the land.
+
+As Luna grew older, she began to2024-10-31:12:09:54,020 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 709.8012 sec total                 
+Time to first token: 3.9435 sec with parallel prefill.                
+
+      Total throughput: 0.3607 tokens/sec, 2.7727 s/token                 
+First token throughput: 0.2536 tokens/sec, 3.9435 s/token                 
+ Next token throughput: 0.3613 tokens/sec, 2.7681 s/token                     
+2024-10-31:12:09:54,020 INFO     [generate.py:1173] 
+Bandwidth achieved: 5.79 GB/s
+2024-10-31:12:09:54,020 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 7.1e+02 seconds
+
+========================================
+
+Once upon a time, in a land far, far away, there lived a young woman named Sophia. She was born and raised in a small village surrounded by vast fields of wheat and barley. Sophia's life was simple and peaceful, filled with the warmth of sunshine and the songs of birds. She spent her days helping her mother with household chores, learning the art of weaving and cooking, and listening to her father's stories of adventure and bravery.
+One day, while out gathering wild herbs in the nearby forest, Sophia stumbled upon a hidden glade. In the center of the clearing stood an enormous tree, its branches stretching towards the sky like giant arms. The tree seemed to be beckoning to her, and Sophia felt an inexplicable pull towards it.
+As she approached the tree, she noticed a small door carved into its trunk. The door was slightly ajar, and Sophia felt a sudden surge of curiosity. She pushed the door open and stepped inside, finding herself in a cozy room filled with books, strange artifacts, and peculiar contraptions.
+A kind-eyed old man sat in a corner, surrounded by piles of papers and half-finished projects. He looked up at Sophia and smiled, welcoming her to his home. "Ah, young one," he said, "I've been2024-10-31:12:18:24,679 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 510.6589 sec total                 
+Time to first token: 5.9243 sec with parallel prefill.                
+
+      Total throughput: 0.5013 tokens/sec, 1.9948 s/token                 
+First token throughput: 0.1688 tokens/sec, 5.9243 s/token                 
+ Next token throughput: 0.5052 tokens/sec, 1.9794 s/token                     
+2024-10-31:12:18:24,679 INFO     [generate.py:1173] 
+Bandwidth achieved: 8.05 GB/s
+
+========================================
+
+Once upon a time, in a far-off kingdom, there was a beautiful and wise princess named Sophia. Sophia had a unique gift: she could talk to animals. Not just any animals, but all animals, from the tiniest insect to the largest beast. She had always used this gift to help those in need, whether it was a family of rabbits who had lost their home or a wounded bird who needed healing.
+
+One day, a messenger arrived at the castle with a plea for help from the neighboring kingdom. A terrible drought had struck their lands, and their crops were withering away. The kingdom's people were struggling to find food and water, and their animals were suffering as well. The messenger explained that the kingdom's wise old owl, Oracle, believed that the drought was caused by a mischievous band of pixies who had stolen the magical crystal that kept the land fertile.
+
+Sophia knew that she had to act quickly to help the neighboring kingdom. She gathered her trusty animal companions – a brave and loyal dog named Max, a quick-witted and agile cat named Whiskers, and a gentle and wise old badger named Bertha – and set out on a quest to retrieve the stolen crystal.
+
+As they journeyed through the dry and barren lands, Sophia used2024-10-31:12:28:40,480 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 615.7998 sec total                 
+Time to first token: 1.7282 sec with parallel prefill.                
+
+      Total throughput: 0.4157 tokens/sec, 2.4055 s/token                 
+First token throughput: 0.5786 tokens/sec, 1.7282 s/token                 
+ Next token throughput: 0.4153 tokens/sec, 2.4081 s/token                     
+2024-10-31:12:28:40,480 INFO     [generate.py:1173] 
+Bandwidth achieved: 6.68 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 0.43                 
+Average tokens/sec (first token): 0.33                 
+Average tokens/sec (next tokens): 0.43 
+                
+Memory used: 0.00 GB

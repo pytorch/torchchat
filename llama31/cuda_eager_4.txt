@@ -1,0 +1,72 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 8.17 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.44 seconds
+-----------------------------------------------------------
+Once upon a time, not so long ago, a few decades back, there was a huge controversy in the world of science and technology when a new kind of intelligent being was discovered by a team of scientists who had been studying the properties of Artificial Intelligence. The team claimed that they had created a being that could think, learn, and behave like any other human being, but with a difference: this being was not made of flesh and blood, but of metal and wires.
+
+The being, which they called ‘The Code Master’, was said to possess an intelligence that far exceeded that of human beings. It could understand any language, solve complex mathematical problems with ease, and even outsmart the most cunning of predators. Given its vast potential, the Code Master was hailed as a massive breakthrough in the field of AI and it was believed that this new creation could change the face of the world as we know it.
+
+However, there were many who were critical of the team that had created the Code Master. Many scientists believed that2024-10-31:10:04:31,739 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 23.5125 sec total                 
+Time to first token: 0.9370 sec with parallel prefill.                
+
+      Total throughput: 8.5061 tokens/sec, 0.1176 s/token                 
+First token throughput: 1.0672 tokens/sec, 0.9370 s/token                 
+ Next token throughput: 8.8149 tokens/sec, 0.1134 s/token                     
+2024-10-31:10:04:31,739 INFO     [generate.py:1173] 
+Bandwidth achieved: 136.61 GB/s
+2024-10-31:10:04:31,739 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, not so long ago, there was a mythical creature called the Wendigo. A monstrous creature from Native American folklore that embodied the worst traits of humanity: greed, gluttony, and the destruction of nature.
+According to the legend, the Wendigo was an evil spirit that possessed people, especially those who strayed from their traditional way of life. It would take over their minds and bodies, turning them into ravenous, flesh-eating monsters.
+The transformations occurred when there was high demand for animal parts. A huge increase in consumption of animal parts led to an equally large increase in the number of Wendigos. This mythical creature became a real-life monster, a harbinger of doom for the Native American communities.
+It was reported that a certain mining company expanded its operations in the region, and the Native American communities were not allowed to hunt in the same areas. They were forced to buy the same meats that were previously available to them for free. This move fueled the demand for animal parts,2024-10-31:10:04:51,110 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 19.3701 sec total                 
+Time to first token: 0.0850 sec with parallel prefill.                
+
+      Total throughput: 10.3252 tokens/sec, 0.0969 s/token                 
+First token throughput: 11.7710 tokens/sec, 0.0850 s/token                 
+ Next token throughput: 10.3188 tokens/sec, 0.0969 s/token                     
+2024-10-31:10:04:51,110 INFO     [generate.py:1173] 
+Bandwidth achieved: 165.83 GB/s
+
+========================================
+
+Once upon a time, there was a small village surrounded by a dense forest. The villagers lived simple lives, relying on the forest for their livelihood. They would hunt, fish, and gather fruits and herbs from the forest to sell in the nearby town.
+
+One day, a young boy named Jack decided to explore the forest. He had heard stories of a beautiful waterfall that was hidden deep within the forest. Jack packed a small bag, said goodbye to his family, and set off early in the morning.
+
+As he walked deeper into the forest, the trees grew taller and the path grew narrower. Jack had to navigate through thick underbrush and climb over rocks to continue on his journey. The sun was high overhead, and Jack was sweating profusely. He stopped to drink from a small stream that ran through the forest and took a moment to rest.
+
+After a few hours of walking, Jack finally came across a clearing. In the center of the clearing stood a magnificent waterfall. The water cascaded down a rocky cliff2024-10-31:10:05:10,467 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 19.3566 sec total                 
+Time to first token: 0.0840 sec with parallel prefill.                
+
+      Total throughput: 10.3324 tokens/sec, 0.0968 s/token                 
+First token throughput: 11.9049 tokens/sec, 0.0840 s/token                 
+ Next token throughput: 10.3255 tokens/sec, 0.0968 s/token                     
+2024-10-31:10:05:10,467 INFO     [generate.py:1173] 
+Bandwidth achieved: 165.94 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 9.72                 
+Average tokens/sec (first token): 8.25                 
+Average tokens/sec (next tokens): 9.82 
+                
+Memory used: 22.40 GB

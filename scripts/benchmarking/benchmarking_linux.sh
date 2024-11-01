@@ -1,11 +1,11 @@
 
 RUN_CUDA_EAGER=true
-RUN_CUDA_COMPILE=false
-RUN_CUDA_AOTI=false
+RUN_CUDA_COMPILE=true
+RUN_CUDA_AOTI=true
 
 RUN_CPU_EAGER=true
-RUN_CPU_COMPILE=false
-RUN_CPU_AOTI=false
+RUN_CPU_COMPILE=true
+RUN_CPU_AOTI=true
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Check and Set Up Args (model, out_directory) 
@@ -92,7 +92,7 @@ if [ "$RUN_CUDA_COMPILE" = "true" ]; then
   echo "Cuda compile int4"
   generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int4\": {\"groupsize\": 256}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --prompt \"Once upon a time,\" --max-new-tokens 200 --compile --num-samples 3"
   file="cuda_compile_4.txt"
-  formatted_export_and_generate "$file" "$generate_cmd"
+  # formatted_export_and_generate "$file" "$generate_cmd"
 fi
 
 
@@ -161,7 +161,7 @@ if [ "$RUN_CUDA_AOTI" = "true" ]; then
   compile_cmd="python3 torchchat.py export $model --quantize '{\"linear:int4\": {\"groupsize\": 256}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --output-dso-path /tmp/model34.so"
   generate_cmd="python3 torchchat.py generate $model --dso-path /tmp/model34.so --prompt \"Once upon a time,\" --max-new-tokens 200 --device cuda --num-samples 3"
   file="cuda_aoti_4.txt"
-  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
+  # formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
 fi
 
 

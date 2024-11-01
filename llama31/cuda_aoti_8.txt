@@ -1,0 +1,85 @@
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model8.so
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model8.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model8.so
+W1031 13:09:11.729568 2343427 site-packages/torch/_export/__init__.py:225] +============================+
+W1031 13:09:11.730049 2343427 site-packages/torch/_export/__init__.py:226] |     !!!   WARNING   !!!    |
+W1031 13:09:11.730270 2343427 site-packages/torch/_export/__init__.py:227] +============================+
+W1031 13:09:11.730457 2343427 site-packages/torch/_export/__init__.py:228] torch._export.aot_compile() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export()) instead.
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 9.05 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.27 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model8.so
+The generated DSO model can be found at: /tmp/model8.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model8.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 8.06 seconds
+-----------------------------------------------------------
+Once upon a time, in a far-off galaxy, there lived a curious and adventurous star named Nova. Nova loved to explore the cosmos, discovering new worlds and making friends along the way. One day, while wandering through the galaxy, Nova stumbled upon a mysterious and ancient planet called Xylonia.
+Xylonia was a world unlike any other. Its surface was covered in a thick, shimmering mist that reflected the colors of the rainbow. The planet's landscape was a maze of twisting tunnels and caverns, filled with glittering crystals and ancient artifacts. Nova was immediately drawn to Xylonia's mystique and decided to explore the planet further.
+As Nova descended onto Xylonia's surface, a gentle, whispery voice greeted her. "Welcome, Nova, to our world. We have been waiting for you." Nova looked around, trying to locate the source of the voice, but saw no one. The voice seemed to come from all around her, echoing off the crystals and mist.
+Nova asked,2024-10-31:13:13:28,565 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 1.6820 sec total                 
+Time to first token: 0.0441 sec with sequential prefill.                
+
+      Total throughput: 118.9059 tokens/sec, 0.0084 s/token                 
+First token throughput: 22.6700 tokens/sec, 0.0441 s/token                 
+ Next token throughput: 121.4976 tokens/sec, 0.0082 s/token                     
+2024-10-31:13:13:28,565 INFO     [generate.py:1173] 
+Bandwidth achieved: 1909.69 GB/s
+2024-10-31:13:13:28,565 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Sophia. Sophia was a curious and adventurous child, with a heart full of wonder and a mind full of questions. She loved to explore the world around her, to learn about the people and the animals that lived in it, and to discover new and exciting things.
+
+One day, while wandering through the village, Sophia stumbled upon a small, mysterious shop. The sign above the door read "Curios and Wonders," and the windows were filled with a dazzling array of strange and exotic objects. Sophia's curiosity was piqued, and she pushed open the door to venture inside.
+
+The shop was dimly lit, with shelves upon shelves of strange and wonderful objects. There were jars of glowing jellyfish, boxes of sparkling crystals, and shelves of books bound in leather and adorned with strange symbols. Sophia wandered through the shop, marveling at the wonders on display.
+
+As she turned a corner,2024-10-31:13:13:30,216 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 1.6502 sec total                 
+Time to first token: 0.0396 sec with sequential prefill.                
+
+      Total throughput: 121.1948 tokens/sec, 0.0083 s/token                 
+First token throughput: 25.2333 tokens/sec, 0.0396 s/token                 
+ Next token throughput: 123.5560 tokens/sec, 0.0081 s/token                     
+2024-10-31:13:13:30,216 INFO     [generate.py:1173] 
+Bandwidth achieved: 1946.45 GB/s
+
+========================================
+
+Once upon a time, in a far-off land, there was a kingdom ruled by a wise and just king. The king was known for his incredible kindness and generosity, and his people loved him dearly. One day, a severe drought struck the land, and the crops began to wither and die. The people of the kingdom were in dire need of help, and they looked to their king for a solution.
+The king, knowing that the drought was a natural occurrence, decided to call upon a wise old wizard who lived on the outskirts of the kingdom. The wizard was said to possess the power to bring rain and fertility to the land. The king sent a messenger to fetch the wizard, and after some time, the wizard arrived at the palace.
+The wizard, with a twinkle in his eye, looked at the king and said, "Your Majesty, I can indeed bring rain to your parched fields, but it will come at a great cost. You must give me your most precious possession, the magical2024-10-31:13:13:31,870 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 1.6541 sec total                 
+Time to first token: 0.0393 sec with sequential prefill.                
+
+      Total throughput: 120.9098 tokens/sec, 0.0083 s/token                 
+First token throughput: 25.4419 tokens/sec, 0.0393 s/token                 
+ Next token throughput: 123.2336 tokens/sec, 0.0081 s/token                     
+2024-10-31:13:13:31,871 INFO     [generate.py:1173] 
+Bandwidth achieved: 1941.88 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 120.34                 
+Average tokens/sec (first token): 24.45                 
+Average tokens/sec (next tokens): 122.76 
+                
+Memory used: 16.68 GB

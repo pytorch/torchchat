@@ -1,0 +1,70 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 8.13 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.29 seconds
+-----------------------------------------------------------
+Once upon a time, in the heart of the forest, there was a small village surrounded by towering trees and a winding stream. The villagers lived in harmony with nature, and their quiet village was a place of peace and tranquility.
+One day, a young traveler named Sarah stumbled upon the village while on a journey to explore the world. She had heard stories of a mystical place where the air was sweet with the scent of wildflowers and the sky was painted with colors of sapphire and amethyst. She had to see it for herself.
+As she entered the village, the villagers welcomed her with open arms. They offered her a warm meal and a comfortable place to rest. Sarah was enchanted by their kindness and their way of life.
+While resting in the village, Sarah noticed a beautiful wooden cup that hung from the branch of a tree. The cup was made from a single piece of wood and had intricate patterns carved into it. She was drawn to the cup and felt an inexplicable connection to it.
+The villagers2024-10-31:10:13:24,893 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 218.9257 sec total                 
+Time to first token: 3.2711 sec with parallel prefill.                
+
+      Total throughput: 0.9136 tokens/sec, 1.0946 s/token                 
+First token throughput: 0.3057 tokens/sec, 3.2711 s/token                 
+ Next token throughput: 0.9228 tokens/sec, 1.0837 s/token                     
+2024-10-31:10:13:24,894 INFO     [generate.py:1173] 
+Bandwidth achieved: 7.82 GB/s
+2024-10-31:10:13:24,894 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2.2e+02 seconds
+
+========================================
+
+Once upon a time, in a world of make-believe, there lived a group of fairies who had a special gift: the ability to make anyone fall in love at first sight. They would flit about, sprinkling their magical dust wherever they went, and before long, couples would be gazing into each other's eyes, their hearts beating as one.
+But one fairy named Luna was different. She was a bit of a rebel, a nonconformist who didn't believe in the traditional fairy ways. While her friends were busy spreading their love dust, Luna preferred to explore the world beyond the fairy realm. She loved to read about science, philosophy, and history, and she dreamed of one day becoming a great scholar.
+
+One day, while Luna was out on an adventure, she stumbled upon a handsome young man named Finn. He was a stranger in the city, a traveler who had just arrived from a far-off land. Luna was immediately struck by Finn's kind eyes and charming smile, but2024-10-31:10:13:28,773 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 3.8782 sec total                 
+Time to first token: 0.1175 sec with parallel prefill.                
+
+      Total throughput: 51.5703 tokens/sec, 0.0194 s/token                 
+First token throughput: 8.5077 tokens/sec, 0.1175 s/token                 
+ Next token throughput: 52.9163 tokens/sec, 0.0189 s/token                     
+2024-10-31:10:13:28,774 INFO     [generate.py:1173] 
+Bandwidth achieved: 441.38 GB/s
+
+========================================
+
+Once upon a time, there was a young man who was born with a rare genetic condition that made his skin extremely sensitive to sunlight. As a result, he had to live a life of relative seclusion, always covering up and avoiding the sun. Despite this, he had a passion for music and art, and he spent much of his time creating music and drawing.
+One day, he met a beautiful woman who was also an artist, and they fell deeply in love. But as their relationship grew stronger, he began to realize that his sensitive skin was affecting their life together. He couldn't attend outdoor events with her, and he couldn't even go for a walk in the park without burning.
+The woman, who was kind and loving, tried to be understanding and accommodating, but it was clear that she was also frustrated by his limitations. She loved him deeply, but she wanted to be able to share experiences with him, to go on adventures and explore the world together.
+The young man knew that he couldn't2024-10-31:10:13:30,721 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 1.9463 sec total                 
+Time to first token: 0.1368 sec with parallel prefill.                
+
+      Total throughput: 102.7580 tokens/sec, 0.0097 s/token                 
+First token throughput: 7.3107 tokens/sec, 0.1368 s/token                 
+ Next token throughput: 109.9730 tokens/sec, 0.0091 s/token                     
+2024-10-31:10:13:30,722 INFO     [generate.py:1173] 
+Bandwidth achieved: 879.49 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 51.75                 
+Average tokens/sec (first token): 5.37                 
+Average tokens/sec (next tokens): 54.60 
+                
+Memory used: 28.81 GB

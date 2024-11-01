@@ -1,0 +1,70 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 7.98 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of Japan, there lived a young girl named Emiko. Emiko was a kind and gentle soul, with a heart full of love for all living things. She spent her days helping her family with their small farm, where they grew rice, vegetables, and fragrant flowers.
+One day, as Emiko was walking through the village, she stumbled upon a beautiful butterfly perched on a delicate cherry blossom branch. The butterfly's wings were a mesmerizing dance of colors, shimmering in the sunlight like a rainbow. Emiko was enchanted by the butterfly's beauty and felt an inexplicable connection to it.
+As she watched the butterfly, Emiko felt a sudden urge to follow it. The butterfly fluttered away, leading Emiko on a winding path through the village. They passed by the bustling marketplace, where vendors were selling fresh produce and handmade crafts. They passed by the village temple, where monks were chanting prayers and meditating in the cool2024-10-31:10:09:10,913 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 218.5672 sec total                 
+Time to first token: 3.0951 sec with parallel prefill.                
+
+      Total throughput: 0.9151 tokens/sec, 1.0928 s/token                 
+First token throughput: 0.3231 tokens/sec, 3.0951 s/token                 
+ Next token throughput: 0.9236 tokens/sec, 1.0828 s/token                     
+2024-10-31:10:09:10,914 INFO     [generate.py:1173] 
+Bandwidth achieved: 14.70 GB/s
+2024-10-31:10:09:10,914 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2.2e+02 seconds
+
+========================================
+
+Once upon a time, there was a young girl named Luna who loved to read. She would spend hours curled up with a book, getting lost in the stories and worlds of the characters. One day, while browsing through a bookstore, Luna stumbled upon a mysterious novel that caught her eye. The cover was worn and old, but the title, "The Whispering Woods," seemed to whisper secrets to her.
+
+Luna felt an inexplicable pull to the book, as if it was calling her name. She opened the cover and began to read the first chapter. The words transported her to a mystical forest, where ancient trees whispered secrets to each other in the wind. The protagonist, a young woman named Aria, was on a quest to uncover the truth about her past and the mysterious woods that seemed to be connected to her destiny.
+
+As Luna read on, she became completely absorbed in the world of "The Whispering Woods." She felt as though she was walking alongside Aria, exploring the forest and uncovering2024-10-31:10:09:15,609 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 4.6949 sec total                 
+Time to first token: 0.0989 sec with parallel prefill.                
+
+      Total throughput: 42.5992 tokens/sec, 0.0235 s/token                 
+First token throughput: 10.1159 tokens/sec, 0.0989 s/token                 
+ Next token throughput: 43.2979 tokens/sec, 0.0231 s/token                     
+2024-10-31:10:09:15,610 INFO     [generate.py:1173] 
+Bandwidth achieved: 684.17 GB/s
+
+========================================
+
+Once upon a time, in a land far, far away, there lived a brave and fearless knight named Sir Lancelot. He was the best knight in all the land, known for his gallant deeds and his unwavering commitment to justice.
+Sir Lancelot was a skilled swordsman and a master of chivalry. He was a member of King Arthur's Round Table, a group of noble knights who protected the kingdom from danger and defended the weak.
+One day, Sir Lancelot received a message from the king, requesting his presence at a grand tournament. The tournament was to be held in a nearby town, and the king had invited all the greatest knights from across the land to compete for the highest honor.
+Sir Lancelot was eager to participate in the tournament and show off his skills. He spent hours practicing his jousting and sword fighting, determined to emerge victorious.
+As the day of the tournament arrived, Sir Lancelot set off for the town, his armor polished and2024-10-31:10:09:18,313 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 2.7023 sec total                 
+Time to first token: 0.0939 sec with parallel prefill.                
+
+      Total throughput: 74.0103 tokens/sec, 0.0135 s/token                 
+First token throughput: 10.6462 tokens/sec, 0.0939 s/token                 
+ Next token throughput: 76.2920 tokens/sec, 0.0131 s/token                     
+2024-10-31:10:09:18,314 INFO     [generate.py:1173] 
+Bandwidth achieved: 1188.64 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 39.17                 
+Average tokens/sec (first token): 7.03                 
+Average tokens/sec (next tokens): 40.17 
+                
+Memory used: 16.90 GB

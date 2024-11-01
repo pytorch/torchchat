@@ -1,0 +1,89 @@
+python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model16.so
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model16.so
+W1031 13:13:47.296557 2393064 site-packages/torch/_export/__init__.py:225] +============================+
+W1031 13:13:47.297005 2393064 site-packages/torch/_export/__init__.py:226] |     !!!   WARNING   !!!    |
+W1031 13:13:47.297210 2393064 site-packages/torch/_export/__init__.py:227] +============================+
+W1031 13:13:47.297384 2393064 site-packages/torch/_export/__init__.py:228] torch._export.aot_compile() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export()) instead.
+Using device=cpu
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 0.12 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model16.so
+The generated DSO model can be found at: /tmp/model16.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.11 seconds
+-----------------------------------------------------------
+Once upon a time, there was a lovely lady in a small village. She loved nothing more than reading books and cooking delicious dishes. One day, she decided to open a small café in the village square, where she could share her passion for reading and cooking with the community.
+The café was called "A Page and a Plate," and it quickly became the heart of the village. People would come from all around to taste her amazing food and to engage in lively discussions about the latest books they had read.
+The lady, whose name was Sophia, was particularly famous for her signature dish, "Mushroom Risotto with a side of Story." She would cook up a big pot of creamy risotto, loaded with fresh mushrooms, and serve it with a side of a carefully chosen book. The story would match the theme of the dish, and customers would be invited to read it while they ate.
+Sophia's café was a place where people could come to escape the stresses of everyday life, and indulge in some good food and good conversation. It was a place where strangers became friends, and where the love of reading and cooking brought the community together.
+Years went by, and "A Page and a Plate" became a beloved institution in the village. People would bring their children and grandchildren to2024-10-31:13:25:34,978 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 468.4567 sec total                 
+Time to first token: 7.7362 sec with sequential prefill.                
+
+      Total throughput: 0.5465 tokens/sec, 1.8299 s/token                 
+First token throughput: 0.1293 tokens/sec, 7.7362 s/token                 
+ Next token throughput: 0.5535 tokens/sec, 1.8067 s/token                     
+2024-10-31:13:25:34,978 INFO     [generate.py:1173] 
+Bandwidth achieved: 8.78 GB/s
+2024-10-31:13:25:34,978 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a land far, far away, there was a small village nestled in the heart of a dense forest. The villagers lived simple lives, tending to their crops, raising their children, and enjoying the beauty of nature that surrounded them. However, there was one mysterious and ancient tree in the forest that stood out from all the others. This tree was said to have the power to grant wishes to those who approached it with a pure heart and a true intention.
+A young girl named Lily had heard the stories about the magical tree from her grandmother, who had heard them from her grandmother before her. Lily was both fascinated and intimidated by the tales. She had always been curious and felt a deep connection to the natural world, but she had never mustered the courage to approach the tree.
+One day, as she was walking through the forest, Lily found herself near the tree. She stopped and looked up at its towering branches, feeling a mix of excitement and fear. As she stood there, she noticed a small door on the trunk of the tree, which she had never seen before. The door was slightly ajar, as if inviting her to enter.
+Lily's heart was racing as she pushed the door open and stepped inside. The tree was hollow, and a2024-10-31:13:32:17,024 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 402.0455 sec total                 
+Time to first token: 7.4511 sec with sequential prefill.                
+
+      Total throughput: 0.6367 tokens/sec, 1.5705 s/token                 
+First token throughput: 0.1342 tokens/sec, 7.4511 s/token                 
+ Next token throughput: 0.6462 tokens/sec, 1.5474 s/token                     
+2024-10-31:13:32:17,024 INFO     [generate.py:1173] 
+Bandwidth achieved: 10.23 GB/s
+
+========================================
+
+Once upon a time, in a small village surrounded by beautiful mountains, there lived a young girl named Katerina. She was a kind and gentle soul, with a heart full of love for all living things. Katerina lived with her family in a cozy little cottage, surrounded by a lush garden filled with colorful flowers, buzzing bees, and chirping birds.
+
+One sunny afternoon, as Katerina was playing in the garden, she stumbled upon a small, injured bird perched on a nearby branch. The bird's wing was twisted and battered, and it looked up at Katerina with pleading eyes. Without hesitation, Katerina carefully picked up the bird and cradled it in her hands, speaking softly to comfort it.
+
+Katerina's mother, a wise and compassionate woman, saw her daughter's concern for the injured bird and suggested that they take it to the wise old owl, who lived on the other side of the village. The owl was known for his exceptional knowledge of healing and magic.
+
+As they walked through the village, the wind whispering through the trees, Katerina and her mother carefully carried the bird to the owl's dwelling. The owl, with his piercing yellow eyes, greeted them warmly and invited them into his cozy nest.
+
+"Ah,2024-10-31:13:39:51,983 INFO     [generate.py:1162] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 454.9585 sec total                 
+Time to first token: 6.4390 sec with sequential prefill.                
+
+      Total throughput: 0.5627 tokens/sec, 1.7772 s/token                 
+First token throughput: 0.1553 tokens/sec, 6.4390 s/token                 
+ Next token throughput: 0.5685 tokens/sec, 1.7589 s/token                     
+2024-10-31:13:39:51,983 INFO     [generate.py:1173] 
+Bandwidth achieved: 9.04 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 0.58                 
+Average tokens/sec (first token): 0.14                 
+Average tokens/sec (next tokens): 0.59 
+                
+Memory used: 0.00 GB
