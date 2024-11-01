@@ -568,7 +568,7 @@ We provide
 
 ## Community Contributions
 
-We really value our community and the contributions made by our wonderful users. We'll use this section to call out some of these contributions! If you'd like to help out as well, please see the [CONTRIBUTING](CONTRIBUTING.md) guide. Additionally, you're invited to join our community on [Slack](https://pytorch.slack.com/archives/C07U533BM45) for further discussion.
+We really value our community and the contributions made by our wonderful users. We'll use this section to call out some of these contributions! If you'd like to help out as well, please see the [CONTRIBUTING](CONTRIBUTING.md) guide. Additionally, you're invited to join our community on [Slack](https://join.slack.com/share/enQtNzk4MzM0NDE2NTQ4OS01YmRmMjZkM2Q5MjJlZDUxYjU4NDRhN2UzOGRjNWU3MjZmMWVjZjIzMGQyZTA1OGFiN2JmZTQ0MzJkNDVmYmZi) for further discussion.
 
 ## Troubleshooting
 
