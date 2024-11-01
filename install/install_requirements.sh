@@ -47,10 +47,10 @@ fi
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-PYTORCH_NIGHTLY_VERSION=dev20241019
+PYTORCH_NIGHTLY_VERSION=dev20241030
 
 # Nightly version for torchvision
-VISION_NIGHTLY_VERSION=dev20241019
+VISION_NIGHTLY_VERSION=dev20241030
 
 # Nightly version for torchtune
 TUNE_NIGHTLY_VERSION=dev20241010
