@@ -4,61 +4,64 @@ python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize":
 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
 Using device=cuda NVIDIA PG509-210
 Loading model...
-Time to load model: 8.03 seconds
+Time to load model: 8.15 seconds
 Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
 Time to quantize model: 0.29 seconds
 -----------------------------------------------------------
-Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Sophia. Sophia was a curious and adventurous soul, with a heart full of wonder and a mind full of questions. She loved to explore the world around her, and was always seeking out new experiences and knowledge.
-One day, Sophia stumbled upon a mysterious and ancient-looking book hidden away in the village library. The book was bound in a strange, glowing material that seemed to shift and shimmer in the light, and its pages were filled with strange symbols and illustrations that Sophia had never seen before.
-As she opened the book, Sophia was immediately drawn into a world of magic and wonder. The pages came alive before her eyes, and she found herself transported to a fantastical realm filled with talking animals, mythical creatures, and ancient magic.
-Sophia was enchanted by the book and spent hours poring over its pages, learning about the secrets of the ancient world and the magic that lay within. She became convinced2024-10-31:10:02:57,085 INFO     [generate.py:1162] 
+Once upon a time, there was an old man who had a firm belief in the idea that the youth should learn the proper use of tools. He believed that with the proper use of tools, the youth could achieve great things. He was an elderly man with a long white beard and a twinkle in his eye.
+One day, while out for a walk, he came across a young man who was struggling to cut a piece of wood with a dull knife. The young man was grunting and straining, but the knife was not cutting through the wood. The old man approached the young man and said, "What are you doing?"
+The young man looked up and said, "I'm trying to cut this wood, but my knife is dull and it's hard to cut through."
+The old man nodded and said, "Yes, a dull knife is no good for cutting wood. Let me show you how to use a tool properly."
+The old man took a sharp knife from his pocket and handed it to2024-10-31:17:43:51,033 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 199 tokens                 
-Time for inference 1: 29.1114 sec total                 
-Time to first token: 3.2525 sec with parallel prefill.                
+Time for inference 1: 28.1657 sec total                 
+Time to first token: 2.9548 sec with parallel prefill.                
 
-      Total throughput: 6.8702 tokens/sec, 0.1456 s/token                 
-First token throughput: 0.3075 tokens/sec, 3.2525 s/token                 
- Next token throughput: 7.6956 tokens/sec, 0.1299 s/token                     
-2024-10-31:10:02:57,086 INFO     [generate.py:1173] 
-Bandwidth achieved: 58.80 GB/s
-2024-10-31:10:02:57,086 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+      Total throughput: 7.1008 tokens/sec, 0.1408 s/token                 
+First token throughput: 0.3384 tokens/sec, 2.9548 s/token                 
+ Next token throughput: 7.8934 tokens/sec, 0.1267 s/token                     
+2024-10-31:17:43:51,033 INFO     [generate.py:1173] 
+Bandwidth achieved: 60.78 GB/s
+2024-10-31:17:43:51,033 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
 
 ========================================
 
-Once upon a time, in a land far, far away, there was a lovely young girl named Sophia. She lived with her family in a cozy little house surrounded by rolling hills and green pastures. Sophia loved playing outside, exploring the woods, and chasing after butterflies. But most of all, she loved to read. She would spend hours curled up in her favorite chair, lost in the pages of a good book.
-One day, Sophia's teacher, Mrs. Thompson, asked the class if they wanted to participate in a special project. They would be making a time capsule to be buried on the school's grounds. The time capsule would contain items that represented the year they were living in, and it would be opened in 10 years, when Sophia and her classmates would be in high school.
-Sophia was so excited about the project that she asked her parents if they could help her choose some special items to put in the time capsule. She wanted to make sure it was perfect. Her parents, being the2024-10-31:10:03:21,319 INFO     [generate.py:1162] 
+Once upon a time, there was a house on the edge of a river, and a woman named Ruth who lived there. Ruth was a solitary person who preferred the peace and quiet of her home to the hustle and bustle of the world outside. She loved to watch the river flow by, and the way the sunlight danced on the water. She spent her days tending to her garden, reading books, and playing the piano.
+But one day, a stranger came to the house. He was a young man, tall and dark-haired, with piercing blue eyes. Ruth was taken aback by his sudden appearance, and she didn't know what to make of him. The stranger told her that his name was Finn, and that he was a traveler who had been walking for days. He had become lost in the woods, and had been following the sound of the river to find his way back to civilization.
+Ruth was hesitant to invite Finn to stay, but something about him made her feel at ease. She2024-10-31:17:44:16,341 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 199 tokens                 
-Time for inference 2: 24.2331 sec total                 
-Time to first token: 0.1060 sec with parallel prefill.                
+Time for inference 2: 25.3076 sec total                 
+Time to first token: 0.1052 sec with parallel prefill.                
 
-      Total throughput: 8.2532 tokens/sec, 0.1212 s/token                 
-First token throughput: 9.4331 tokens/sec, 0.1060 s/token                 
- Next token throughput: 8.2480 tokens/sec, 0.1212 s/token                     
-2024-10-31:10:03:21,320 INFO     [generate.py:1173] 
-Bandwidth achieved: 70.64 GB/s
+      Total throughput: 7.9028 tokens/sec, 0.1265 s/token                 
+First token throughput: 9.5096 tokens/sec, 0.1052 s/token                 
+ Next token throughput: 7.8961 tokens/sec, 0.1266 s/token                     
+2024-10-31:17:44:16,342 INFO     [generate.py:1173] 
+Bandwidth achieved: 67.64 GB/s
 
 ========================================
 
-Once upon a time, there was a poor village surrounded by mountains. The villagers depended on the mountain water for drinking, farming, and other needs. Despite the beautiful scenery, the villagers were poor and sick. They suffered from scabies, skin rashes, and other skin problems, which led them to believe that the water was contaminated. One day, an old man visited the village and offered to treat the villagers’ water. He claimed that his magical formula could purify the water and cure the villagers’ skin problems. The villagers were desperate and agreed to try his solution. The old man brought a large tank and filled it with the villagers’ water. He then poured in his magical formula, stirred the mixture, and left it to settle. Several days passed, and the villagers saw no improvement in their condition. In fact, their skin problems worsened, and some even developed diarrhea and vomiting. They realized that the old man’s formula did not work and were tricked into paying for an ineffective treatment. The2024-10-31:10:03:45,648 INFO     [generate.py:1162] 
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Sophia. Sophia was a curious and adventurous child, with a mop of curly brown hair and a smile that could light up an entire room. She loved nothing more than exploring the world around her, discovering hidden streams and secret meadows, and making friends with all the creatures she met along the way.
+One day, while wandering through the village, Sophia stumbled upon a small, mysterious shop tucked away on a quiet street. The sign above the door read "Curios and Wonders," and the windows were filled with an assortment of strange and exotic objects that Sophia had never seen before. She pushed open the door and stepped inside, her eyes widening as she took in the wonders that lay before her.
+The shop was dimly lit, with shelves upon shelves of peculiar items that seemed to defy explanation. There were bottles of glowing potions, boxes of strange artifacts, and racks of colorful fabrics that shimmered2024-10-31:17:44:41,056 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 199 tokens                 
-Time for inference 3: 24.3278 sec total                 
-Time to first token: 0.1114 sec with parallel prefill.                
+Time for inference 3: 24.7144 sec total                 
+Time to first token: 0.1135 sec with parallel prefill.                
 
-      Total throughput: 8.2210 tokens/sec, 0.1216 s/token                 
-First token throughput: 8.9786 tokens/sec, 0.1114 s/token                 
- Next token throughput: 8.2176 tokens/sec, 0.1217 s/token                     
-2024-10-31:10:03:45,648 INFO     [generate.py:1173] 
-Bandwidth achieved: 70.36 GB/s
+      Total throughput: 8.0924 tokens/sec, 0.1236 s/token                 
+First token throughput: 8.8114 tokens/sec, 0.1135 s/token                 
+ Next token throughput: 8.0891 tokens/sec, 0.1236 s/token                     
+2024-10-31:17:44:41,057 INFO     [generate.py:1173] 
+Bandwidth achieved: 69.26 GB/s
 
 ========================================
 
 
-      Average tokens/sec (total): 7.78                 
-Average tokens/sec (first token): 6.24                 
-Average tokens/sec (next tokens): 8.05 
+      Average tokens/sec (total): 7.70                 
+Average tokens/sec (first token): 6.22                 
+Average tokens/sec (next tokens): 7.96 
                 
 Memory used: 28.86 GB

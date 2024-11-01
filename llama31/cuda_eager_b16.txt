@@ -4,64 +4,66 @@ python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloa
 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
 Using device=cuda NVIDIA PG509-210
 Loading model...
-Time to load model: 8.49 seconds
+Time to load model: 8.85 seconds
 Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
 Time to quantize model: 0.01 seconds
 -----------------------------------------------------------
-Once upon a time, there was a small village nestled in a valley surrounded by rolling hills. In this village, there lived a young girl named Sophia who had a great passion for animals and the natural world. Sophia spent most of her days exploring the surrounding countryside, learning about the local flora and fauna, and caring for the animals on her family's farm.
-One day, while out on a walk, Sophia stumbled upon a small, injured bird perched on a stone wall. The bird had a broken wing and couldn't fly away. Sophia knew she had to help the bird, so she carefully picked it up and took it back to her farm. She quickly came up with a plan to take care of the bird and nurse it back to health.
-As the days passed, Sophia grew closer to the bird, whom she named Luna. She fed Luna a special diet of seeds and fruits, and even made a special perch for the bird to rest on. Sophia also took the time to learn about the different types of2024-10-31:10:01:21,123 INFO     [generate.py:1162] 
+Once upon a time, in a land far, far away, there was a magical kingdom ruled by a wise and just king. He was loved by all his subjects, who lived in peace and harmony. The kingdom was called Azura, and it was nestled within a beautiful valley surrounded by towering mountains and sparkling waters.
+The king, named Leo, was known for his kindness and compassion. He spent his days walking among his people, learning about their struggles, and helping those in need. He was a master craftsman, and he spent his evenings in the palace workshop, creating beautiful and intricate works of art.
+One day, a young apprentice named Luna arrived at the palace. She was a skilled weaver, and she had been sent by the king to create a special tapestry for the royal palace. Luna was tasked with weaving a story of the kingdom's history, from the founding of Azura to the present day.
+As Luna worked on the tapestry, she began to notice strange occurrences happening around her.2024-10-31:17:42:18,007 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 199 tokens                 
-Time for inference 1: 25.2711 sec total                 
-Time to first token: 3.2980 sec with parallel prefill.                
+Time for inference 1: 25.8239 sec total                 
+Time to first token: 2.9734 sec with parallel prefill.                
 
-      Total throughput: 7.9142 tokens/sec, 0.1264 s/token                 
-First token throughput: 0.3032 tokens/sec, 3.2980 s/token                 
- Next token throughput: 9.0565 tokens/sec, 0.1104 s/token                     
-2024-10-31:10:01:21,123 INFO     [generate.py:1173] 
-Bandwidth achieved: 127.11 GB/s
-2024-10-31:10:01:21,123 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+      Total throughput: 7.7448 tokens/sec, 0.1291 s/token                 
+First token throughput: 0.3363 tokens/sec, 2.9734 s/token                 
+ Next token throughput: 8.7088 tokens/sec, 0.1148 s/token                     
+2024-10-31:17:42:18,007 INFO     [generate.py:1173] 
+Bandwidth achieved: 124.38 GB/s
+2024-10-31:17:42:18,007 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
 
 ========================================
 
-Once upon a time, in a small village surrounded by rolling hills and lush green forests, there lived a young girl named Lily. She was a free spirit, with a heart full of wonder and curiosity. Lily loved to explore the world around her, and her sense of adventure often took her on thrilling journeys through the woods and into the unknown.
-
-One day, while wandering through the forest, Lily stumbled upon a hidden clearing. In the center of the clearing stood an ancient tree, its branches twisted and gnarled with age. The tree seemed to be calling to Lily, and she felt an inexplicable pull towards it. As she drew closer, she noticed that the tree was unlike any she had ever seen before. Its bark was covered in intricate carvings, and its leaves shimmered with a soft, ethereal light.
-
-Lily reached out to touch the carvings, and as she did, she felt a sudden jolt of energy. The air around her began to shimmer and swirl, and the2024-10-31:10:01:42,633 INFO     [generate.py:1162] 
+Once upon a time, the world was a simpler, slower place. For most people, the biggest concern was getting by from day to day. And no matter what the day brought, a good cup of coffee was always a reliable comfort.
+To this day, whenever people talk about coffee, they often reminisce about those early, simpler days. They remember how a simple cup of coffee – with its rich, bold flavors – always seemed to brighten up their day.
+That’s why, when it came time to create a brand-new coffee company, our founders decided to draw inspiration from those memories. They wanted to bring back that same simple comfort that made us love coffee in the first place.
+That’s how “Simple Pleasures” came to be. We’re not just a coffee company – we’re a way to reconnect with a simpler time, when life moved at a slower pace, and a good cup of coffee was the perfect way to start your day.
+At Simple Pleasures, we source only the finest beans2024-10-31:17:42:39,190 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 199 tokens                 
-Time for inference 2: 21.5098 sec total                 
-Time to first token: 0.0944 sec with parallel prefill.                
+Time for inference 2: 21.1825 sec total                 
+Time to first token: 0.0950 sec with parallel prefill.                
 
-      Total throughput: 9.2981 tokens/sec, 0.1075 s/token                 
-First token throughput: 10.5951 tokens/sec, 0.0944 s/token                 
- Next token throughput: 9.2924 tokens/sec, 0.1076 s/token                     
-2024-10-31:10:01:42,634 INFO     [generate.py:1173] 
-Bandwidth achieved: 149.33 GB/s
+      Total throughput: 9.4418 tokens/sec, 0.1059 s/token                 
+First token throughput: 10.5261 tokens/sec, 0.0950 s/token                 
+ Next token throughput: 9.4369 tokens/sec, 0.1060 s/token                     
+2024-10-31:17:42:39,190 INFO     [generate.py:1173] 
+Bandwidth achieved: 151.64 GB/s
 
 ========================================
 
-Once upon a time, in a far-off kingdom, there existed a magical forest, shrouded in mist and mystery. The forest was said to be inhabited by the wisest and most ancient of trees, their bark gnarled and twisted with age. The trees stood as sentinels, guarding the secrets of the forest and whispering ancient knowledge to those who dared to listen.
-In this enchanted realm, a young apprentice named Elara embarked on a perilous quest to unravel the mysteries of the forest. She was a skilled weaver, renowned for her exceptional craftsmanship and her innate ability to sense the intricate patterns that governed the natural world. Elara's journey began with a whispered prophecy from a wise elder: "The balance of the forest is at risk. Seek the ancient one, the Tree of Wisdom, and listen to its whispers. The fate of the kingdom hangs in the balance."
-With a sense of urgency, Elara ventured into the heart of the forest, her footsteps quiet on the moss-covered path2024-10-31:10:02:06,021 INFO     [generate.py:1162] 
+Once upon a time, there was a beautiful flower that bloomed in a field of green. The flower was a lovely shade of purple and was named Luna. Luna was a rare and precious flower, and many people came to see her from far and wide.
+One day, a young girl named Sophia wandered into the field, searching for a bouquet of flowers for her mother's birthday. As she walked through the field, she spotted Luna and gasped in wonder. "Oh, what a lovely flower!" she exclaimed. She couldn't resist picking Luna and adding her to her bouquet.
+As Sophia walked away with Luna, the flower began to feel a pang of sadness. She had grown accustomed to being admired and appreciated in the field, and now she felt like she was leaving all that behind. As she was carried away by Sophia, Luna couldn't help but wonder what would become of her.
+Sophia took Luna to a beautiful garden, where there were many other flowers and plants. Luna was amazed by the diversity of2024-10-31:17:43:00,353 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 199 tokens                 
-Time for inference 3: 23.3870 sec total                 
-Time to first token: 0.0917 sec with parallel prefill.                
+Time for inference 3: 21.1620 sec total                 
+Time to first token: 0.0937 sec with parallel prefill.                
 
-      Total throughput: 8.5518 tokens/sec, 0.1169 s/token                 
-First token throughput: 10.9059 tokens/sec, 0.0917 s/token                 
- Next token throughput: 8.5425 tokens/sec, 0.1171 s/token                     
-2024-10-31:10:02:06,022 INFO     [generate.py:1173] 
-Bandwidth achieved: 137.35 GB/s
+      Total throughput: 9.4509 tokens/sec, 0.1058 s/token                 
+First token throughput: 10.6746 tokens/sec, 0.0937 s/token                 
+ Next token throughput: 9.4455 tokens/sec, 0.1059 s/token                     
+2024-10-31:17:43:00,353 INFO     [generate.py:1173] 
+Bandwidth achieved: 151.79 GB/s
 
 ========================================
 
 
-      Average tokens/sec (total): 8.59                 
-Average tokens/sec (first token): 7.27                 
-Average tokens/sec (next tokens): 8.96 
+      Average tokens/sec (total): 8.88                 
+Average tokens/sec (first token): 7.18                 
+Average tokens/sec (next tokens): 9.20 
                 
 Memory used: 16.68 GB

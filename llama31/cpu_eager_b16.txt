@@ -8,65 +8,67 @@ Time to load model: 0.11 seconds
 Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
 Time to quantize model: 0.01 seconds
 -----------------------------------------------------------
-Once upon a time, there lived a farmer named Jack, who was known throughout the countryside for his exceptional skills in growing the largest and most beautiful pumpkins in the land.
-The villagers would gather at the local market each autumn to marvel at Jack's wondrous creations, but one year, as the harvest season approached, disaster struck. A fierce storm swept through the area, destroying Jack's entire pumpkin patch and rendering him unable to meet the demand of his eager customers.
-Crushed by his failure, Jack became despondent and retreated to his farmhouse, where he spent his days staring blankly at the wall, feeling sorry for himself. That was until his wise old mother, who had been observing her son's misfortune from afar, came to visit him with a knowing glint in her eye.
-"Jack, my dear son," she said, "you have been so caught up in trying to grow the biggest and most perfect pumpkins, that you have forgotten the true meaning of harvest season. It is not about the size or shape of the fruit, but about the joy and nourishment it brings to those who eat it. Remember, the best pumpkins are not the ones that are most beautiful, but the ones that are most useful and delicious."
-With renewed determination, Jack set out2024-10-31:10:27:04,842 INFO     [generate.py:1162] 
+Once upon a time, Google launched a new feature called Google+ Photos which allowed users to store and share unlimited photos and videos without taking up space on their device. The service was later rebranded as Google Photos in 2015. However, since then, the company has been facing stiff competition from other photo storage services like Apple Photos, Amazon Prime Photos, and Microsoft OneDrive.
+The recent rumors suggest that Google might be considering a paid subscription model for Google Photos. This is not the first time such rumors have emerged, but this time, they seem to have some substance to them. According to a report by The Verge, Google is planning to introduce a paid tier for Google Photos, which would offer additional features and storage space.
+The report suggests that the paid tier, dubbed as "Google Photos Plus," would provide users with more storage space, advanced AI-powered editing tools, and other features like automatic photo organization and more. The report also suggests that the paid tier would cost around $10 per month or $100 per year.
+While this move might not be surprising, considering the increased competition in the photo storage space, it raises questions about the future of Google Photos. Will the service continue to be free, or will it be replaced by the paid tier? Only time will tell.
+2024-10-31:18:00:24,357 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 1: 796.4872 sec total                 
-Time to first token: 3.4225 sec with parallel prefill.                
+Time for inference 1: 839.5824 sec total                 
+Time to first token: 3.2895 sec with parallel prefill.                
 
-      Total throughput: 0.3214 tokens/sec, 3.1113 s/token                 
-First token throughput: 0.2922 tokens/sec, 3.4225 s/token                 
- Next token throughput: 0.3215 tokens/sec, 3.1101 s/token                     
-2024-10-31:10:27:04,842 INFO     [generate.py:1173] 
-Bandwidth achieved: 5.16 GB/s
-2024-10-31:10:27:04,842 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+      Total throughput: 0.3049 tokens/sec, 3.2796 s/token                 
+First token throughput: 0.3040 tokens/sec, 3.2895 s/token                 
+ Next token throughput: 0.3049 tokens/sec, 3.2796 s/token                     
+2024-10-31:18:00:24,357 INFO     [generate.py:1173] 
+Bandwidth achieved: 4.90 GB/s
+2024-10-31:18:00:24,357 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
 
 ========================================
 
-Once upon a time, in the sun-kissed land of Tuscany, there was a small, quaint village nestled amidst rolling hills and lush vineyards. The villagers lived simple lives, tending to their farms and vineyards, and enjoying the warm Mediterranean climate. In the heart of this charming village, there stood a beautiful old bakery, where the most delicious bread and pastries were crafted with love and care.
-The bakery was run by a kind-hearted woman named Sophia, who had inherited the bakery from her father. Sophia was renowned throughout the village for her delectable bread and pastries, which were made with the freshest ingredients and a pinch of love. She spent her days kneading dough, whipping up cream, and baking cookies that were as golden as the sun-kissed hills.
-One day, a young traveler named Leo stumbled upon the village while seeking refuge from a fierce storm. Weary and hungry, Leo made his way to the bakery, where he was greeted by Sophia's warm smile and the sweet aroma of freshly baked bread. Sophia welcomed Leo with open arms, offering him a warm cookie and a glass of freshly pressed olive oil.
-As they sat together, Sophia learned about Leo's journey and his love for baking. She saw the excitement in his eyes and2024-10-31:10:43:03,300 INFO     [generate.py:1162] 
+Once upon a time, there was a forest filled with trees, animals, and beautiful flowers. In the center of the forest stood a magnificent tree, known as the Heart Tree. The Heart Tree was the symbol of the forest's unity and harmony. It was said that the tree held the secrets of the forest and its magical powers were so strong that it brought forth life and abundance to the entire forest.
+One day, a young woman named Maya heard about the Heart Tree and its magical powers. She felt an insatiable curiosity and a deep desire to discover the secrets of the tree. Maya left her village and began her journey to find the Heart Tree.
+After many days of walking through the dense forest, Maya finally reached the Heart Tree. The tree was even more magnificent than she had imagined. She could feel its energy radiating all around her. As she approached the tree, she noticed that the tree seemed to be communicating with her.
+Maya was amazed and asked the Heart Tree, "How can I help you?" The tree responded, "I am in danger. Dark forces have invaded our forest, threatening to destroy the balance of nature. I need your help to restore the balance and save our forest."
+Maya was taken aback but decided to accept the challenge. The Heart Tree2024-10-31:18:15:23,013 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 2: 958.4577 sec total                 
-Time to first token: 2.6362 sec with parallel prefill.                
+Time for inference 2: 898.6554 sec total                 
+Time to first token: 5.6060 sec with parallel prefill.                
 
-      Total throughput: 0.2671 tokens/sec, 3.7440 s/token                 
-First token throughput: 0.3793 tokens/sec, 2.6362 s/token                 
- Next token throughput: 0.2668 tokens/sec, 3.7483 s/token                     
-2024-10-31:10:43:03,300 INFO     [generate.py:1173] 
-Bandwidth achieved: 4.29 GB/s
+      Total throughput: 0.2849 tokens/sec, 3.5104 s/token                 
+First token throughput: 0.1784 tokens/sec, 5.6060 s/token                 
+ Next token throughput: 0.2855 tokens/sec, 3.5022 s/token                     
+2024-10-31:18:15:23,013 INFO     [generate.py:1173] 
+Bandwidth achieved: 4.58 GB/s
 
 ========================================
 
-Once upon a time, in a world where smartphones reigned supreme, a clever inventor named Luna created a magical, eco-friendly phone case that could transform the user's mobile device into a fully functional camera, a portable printer, and even a mini-computer.
-The phone case, which Luna called the "WonderCase," was made from a unique, sustainable material that could adapt to different situations, much like a chameleon's skin. It was both stylish and functional, with a sleek design that fit perfectly on any smartphone.
-Luna's friends and family were amazed by her invention, and soon, the news of the WonderCase spread like wildfire through social media. People from all over the world were eager to get their hands on one, and Luna's business took off.
+Once upon a time, in a far-off land, there was a kingdom ruled by a just and fair king. He was loved by all his subjects, and they lived in peace and prosperity under his wise leadership. However, there was one problem: the king's advisor, a sly and power-hungry man, was secretly plotting to overthrow the king and take the throne for himself.
+The advisor, named Malakai, had been manipulating the king's decisions for years, using his cunning and charm to make the king believe that he was doing the right thing. But in reality, Malakai was using the king's authority to gain more power and wealth for himself.
 
-However, not everyone was happy with the WonderCase's success. A rival inventor, a sly and cunning entrepreneur named Nova, grew jealous of Luna's achievement. Nova had been working on a similar project, but hers was made from a cheap, plastic material that was far from eco-friendly. Nova saw the WonderCase as a threat to her own business and decided to sabotage Luna's invention.
+One day, a young apprentice named Elian stumbled upon Malakai's plan while on a mission for the king. Elian was shocked and horrified by what he had discovered, and he knew that he had to act quickly to prevent Malakai's treachery.
 
-Nova began spreading false rumors about the WonderCase, claiming that it was a health hazard and that it would destroy the environment. She also2024-10-31:10:58:29,856 INFO     [generate.py:1162] 
+Elian decided to seek out the help of a wise old wizard named Zorvath, who was known for his incredible knowledge and magical powers. Zorvath was a recluse, living in a remote tower surrounded by a dense forest, but Elian was desperate and knew that he had to try.
+
+As Elian approached the tower2024-10-31:18:29:29,741 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 3: 926.5554 sec total                 
-Time to first token: 2.9649 sec with parallel prefill.                
+Time for inference 3: 846.7280 sec total                 
+Time to first token: 4.0493 sec with parallel prefill.                
 
-      Total throughput: 0.2763 tokens/sec, 3.6194 s/token                 
-First token throughput: 0.3373 tokens/sec, 2.9649 s/token                 
- Next token throughput: 0.2761 tokens/sec, 3.6219 s/token                     
-2024-10-31:10:58:29,856 INFO     [generate.py:1173] 
-Bandwidth achieved: 4.44 GB/s
+      Total throughput: 0.3023 tokens/sec, 3.3075 s/token                 
+First token throughput: 0.2470 tokens/sec, 4.0493 s/token                 
+ Next token throughput: 0.3026 tokens/sec, 3.3046 s/token                     
+2024-10-31:18:29:29,742 INFO     [generate.py:1173] 
+Bandwidth achieved: 4.86 GB/s
 
 ========================================
 
 
-      Average tokens/sec (total): 0.29                 
-Average tokens/sec (first token): 0.34                 
-Average tokens/sec (next tokens): 0.29 
+      Average tokens/sec (total): 0.30                 
+Average tokens/sec (first token): 0.24                 
+Average tokens/sec (next tokens): 0.30 
                 
 Memory used: 0.00 GB

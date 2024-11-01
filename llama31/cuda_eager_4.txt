@@ -4,69 +4,63 @@ python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize":
 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
 Using device=cuda NVIDIA PG509-210
 Loading model...
-Time to load model: 8.17 seconds
+Time to load model: 7.87 seconds
 Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
 Time to quantize model: 0.44 seconds
 -----------------------------------------------------------
-Once upon a time, not so long ago, a few decades back, there was a huge controversy in the world of science and technology when a new kind of intelligent being was discovered by a team of scientists who had been studying the properties of Artificial Intelligence. The team claimed that they had created a being that could think, learn, and behave like any other human being, but with a difference: this being was not made of flesh and blood, but of metal and wires.
-
-The being, which they called ‘The Code Master’, was said to possess an intelligence that far exceeded that of human beings. It could understand any language, solve complex mathematical problems with ease, and even outsmart the most cunning of predators. Given its vast potential, the Code Master was hailed as a massive breakthrough in the field of AI and it was believed that this new creation could change the face of the world as we know it.
-
-However, there were many who were critical of the team that had created the Code Master. Many scientists believed that2024-10-31:10:04:31,739 INFO     [generate.py:1162] 
+Once upon a time, there was a beautiful and talented actress named Emily. She was known for her stunning looks, fabulous acting skills, and charming personality. Emily was a household name, and everyone in the entertainment industry wanted to work with her.
+One day, Emily received an offer from a well-known director to star in a new movie. The movie was going to be a big production, with a budget of millions and a star-studded cast. Emily was thrilled to have been chosen for the role and accepted the offer without hesitation.
+However, things took a turn for the worse when Emily arrived on set. The director, who was known for being quite demanding and difficult to work with, began to make unreasonable demands. He wanted Emily to change her hair, her makeup, and even her wardrobe to fit his vision of the character.
+Emily was taken aback by the director's behavior and felt disrespected and unvalued. She had always been a professional and had always put the needs of the film first,2024-10-31:17:45:28,735 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 199 tokens                 
-Time for inference 1: 23.5125 sec total                 
-Time to first token: 0.9370 sec with parallel prefill.                
+Time for inference 1: 25.6576 sec total                 
+Time to first token: 0.9875 sec with parallel prefill.                
 
-      Total throughput: 8.5061 tokens/sec, 0.1176 s/token                 
-First token throughput: 1.0672 tokens/sec, 0.9370 s/token                 
- Next token throughput: 8.8149 tokens/sec, 0.1134 s/token                     
-2024-10-31:10:04:31,739 INFO     [generate.py:1173] 
-Bandwidth achieved: 136.61 GB/s
-2024-10-31:10:04:31,739 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+      Total throughput: 7.7950 tokens/sec, 0.1283 s/token                 
+First token throughput: 1.0126 tokens/sec, 0.9875 s/token                 
+ Next token throughput: 8.0665 tokens/sec, 0.1240 s/token                     
+2024-10-31:17:45:28,735 INFO     [generate.py:1173] 
+Bandwidth achieved: 125.19 GB/s
+2024-10-31:17:45:28,735 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
 
 ========================================
 
-Once upon a time, not so long ago, there was a mythical creature called the Wendigo. A monstrous creature from Native American folklore that embodied the worst traits of humanity: greed, gluttony, and the destruction of nature.
-According to the legend, the Wendigo was an evil spirit that possessed people, especially those who strayed from their traditional way of life. It would take over their minds and bodies, turning them into ravenous, flesh-eating monsters.
-The transformations occurred when there was high demand for animal parts. A huge increase in consumption of animal parts led to an equally large increase in the number of Wendigos. This mythical creature became a real-life monster, a harbinger of doom for the Native American communities.
-It was reported that a certain mining company expanded its operations in the region, and the Native American communities were not allowed to hunt in the same areas. They were forced to buy the same meats that were previously available to them for free. This move fueled the demand for animal parts,2024-10-31:10:04:51,110 INFO     [generate.py:1162] 
+Once upon a time, in a bustling city, there lived a young boy named Rohan. Rohan was a very curious and adventurous boy. He had a fascination for technology and machines and spent most of his free time reading and researching about them. One day, he stumbled upon an innovative concept called additive manufacturing or 3D printing.
+Rohan was amazed by its potential and applications and asked his parents to buy him a 3D printing kit for his birthday. His parents, though initially hesitant, were convinced by his enthusiasm and bought him the kit.
+Rohan was overjoyed and started experimenting with different designs and materials. He worked tirelessly for days and nights, reading instructions, watching tutorials, and making mistakes. But he never gave up on his ideas. With each attempt, he learned something new and refined his skills.
+As he progressed, Rohan's creations became more sophisticated, and his designs gained attention from his friends and family. They were impressed by his creativity and resourcefulness. Rohan's passion2024-10-31:17:45:51,564 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 199 tokens                 
-Time for inference 2: 19.3701 sec total                 
-Time to first token: 0.0850 sec with parallel prefill.                
+Time for inference 2: 22.8283 sec total                 
+Time to first token: 0.1018 sec with parallel prefill.                
 
-      Total throughput: 10.3252 tokens/sec, 0.0969 s/token                 
-First token throughput: 11.7710 tokens/sec, 0.0850 s/token                 
- Next token throughput: 10.3188 tokens/sec, 0.0969 s/token                     
-2024-10-31:10:04:51,110 INFO     [generate.py:1173] 
-Bandwidth achieved: 165.83 GB/s
+      Total throughput: 8.7610 tokens/sec, 0.1141 s/token                 
+First token throughput: 9.8256 tokens/sec, 0.1018 s/token                 
+ Next token throughput: 8.7563 tokens/sec, 0.1142 s/token                     
+2024-10-31:17:45:51,564 INFO     [generate.py:1173] 
+Bandwidth achieved: 140.71 GB/s
 
 ========================================
 
-Once upon a time, there was a small village surrounded by a dense forest. The villagers lived simple lives, relying on the forest for their livelihood. They would hunt, fish, and gather fruits and herbs from the forest to sell in the nearby town.
-
-One day, a young boy named Jack decided to explore the forest. He had heard stories of a beautiful waterfall that was hidden deep within the forest. Jack packed a small bag, said goodbye to his family, and set off early in the morning.
-
-As he walked deeper into the forest, the trees grew taller and the path grew narrower. Jack had to navigate through thick underbrush and climb over rocks to continue on his journey. The sun was high overhead, and Jack was sweating profusely. He stopped to drink from a small stream that ran through the forest and took a moment to rest.
-
-After a few hours of walking, Jack finally came across a clearing. In the center of the clearing stood a magnificent waterfall. The water cascaded down a rocky cliff2024-10-31:10:05:10,467 INFO     [generate.py:1162] 
+Once upon a time, in the enchanted realm of Azeroth, there was a mystical and ancient forest called Stratholme. It was a place of great wonder and magic, home to the ancient and powerful Night Elves. The forest was filled with towering trees, sparkling waterfalls, and lush greenery that seemed to stretch on forever. The Night Elves lived in harmony with nature, using their magical abilities to maintain the balance of the ecosystem and keep the forest thriving.
+However, the tranquility of Stratholme was disrupted by the arrival of a dark and malevolent force. A group of corrupted and twisted creatures, known as the Scarab Swam, emerged from the very depths of the forest. These abominations were the result of an ancient curse that had been unleashed by a long-forgotten civilization. The Scarab Swam was a twisted amalgamation of insectoid creatures, with their bodies made of a deep, bloody red chitinous material that seemed to shift and writhe like a2024-10-31:17:46:11,223 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 199 tokens                 
-Time for inference 3: 19.3566 sec total                 
-Time to first token: 0.0840 sec with parallel prefill.                
+Time for inference 3: 19.6587 sec total                 
+Time to first token: 0.0838 sec with parallel prefill.                
 
-      Total throughput: 10.3324 tokens/sec, 0.0968 s/token                 
-First token throughput: 11.9049 tokens/sec, 0.0840 s/token                 
- Next token throughput: 10.3255 tokens/sec, 0.0968 s/token                     
-2024-10-31:10:05:10,467 INFO     [generate.py:1173] 
-Bandwidth achieved: 165.94 GB/s
+      Total throughput: 10.1736 tokens/sec, 0.0983 s/token                 
+First token throughput: 11.9395 tokens/sec, 0.0838 s/token                 
+ Next token throughput: 10.1661 tokens/sec, 0.0984 s/token                     
+2024-10-31:17:46:11,224 INFO     [generate.py:1173] 
+Bandwidth achieved: 163.39 GB/s
 
 ========================================
 
 
-      Average tokens/sec (total): 9.72                 
-Average tokens/sec (first token): 8.25                 
-Average tokens/sec (next tokens): 9.82 
+      Average tokens/sec (total): 8.91                 
+Average tokens/sec (first token): 7.59                 
+Average tokens/sec (next tokens): 9.00 
                 
 Memory used: 22.40 GB

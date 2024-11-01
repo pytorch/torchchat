@@ -6,71 +6,67 @@ Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
 Loading model...
 Time to load model: 0.11 seconds
 Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
-Time to quantize model: 48.80 seconds
+Time to quantize model: 45.08 seconds
 -----------------------------------------------------------
-Once upon a time, there was a young girl who lived in a small village surrounded by an enchanted forest. She was known throughout the village as a kind and gentle soul, with a heart full of love for all living things.
-One day, while out gathering wildflowers, the girl came across a beautiful butterfly. Its wings shimmered in the sunlight, and its delicate patterns seemed to dance across its body. The girl was immediately drawn to the butterfly and felt an inexplicable connection to it.
-As she reached out to gently touch the butterfly's wings, she felt a strange sensation wash over her. Suddenly, she was transported to a magical realm, where the butterfly spoke to her in a voice that echoed in her mind.
-"Welcome, dear one," said the butterfly. "I have been sent to guide you on a journey of discovery and growth. Are you ready to embark on this adventure?"
-The girl's eyes widened with excitement as she nodded eagerly. The butterfly fluttered ahead, leading her through a winding path of vibrant flowers and sparkling fountains.
-As they walked, the butterfly told the girl stories of the magical realm, of ancient magic and forgotten lore. The girl listened with wide eyes, drinking in the knowledge like a thirsty plant drinks in the rain.
-But as the journey progressed,2024-10-31:11:09:37,964 INFO     [generate.py:1162] 
+Once upon a time, in a far-off land, there was a beautiful princess named Sophia. She was known throughout the kingdom for her kindness, intelligence, and beauty. One day, a wicked sorcerer named Malakai cast a spell on Sophia, turning her into a beautiful butterfly.
+The sorcerer's spell was so powerful that Sophia was forced to live in the forest, flitting from flower to flower in search of nectar to drink. Despite the magic that had been cast upon her, Sophia remained kind and wise, using her intelligence to outsmart the other creatures in the forest and avoid danger.
+One day, a brave knight named Edward came to the forest seeking adventure. He had heard stories of the beautiful princess who lived among the trees, and he was determined to find her. As he rode his horse through the forest, he saw Sophia flitting from flower to flower, her beautiful wings shimmering in the sunlight.
+Edward was taken aback by Sophia's transformation, but he was drawn to her kind and gentle nature. He dismounted his horse and approached Sophia, speaking softly to her as he tried to communicate with the butterfly.
+Sophia, sensing the knight's good intentions, began to communicate with him through a series of subtle movements and actions. She showed him the beauty of2024-10-31:18:38:16,057 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 1: 605.4464 sec total                 
-Time to first token: 5.1308 sec with parallel prefill.                
+Time for inference 1: 466.8859 sec total                 
+Time to first token: 2.2178 sec with parallel prefill.                
 
-      Total throughput: 0.4228 tokens/sec, 2.3650 s/token                 
-First token throughput: 0.1949 tokens/sec, 5.1308 s/token                 
- Next token throughput: 0.4248 tokens/sec, 2.3542 s/token                     
-2024-10-31:11:09:37,965 INFO     [generate.py:1173] 
-Bandwidth achieved: 3.62 GB/s
-2024-10-31:11:09:37,965 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+      Total throughput: 0.5483 tokens/sec, 1.8238 s/token                 
+First token throughput: 0.4509 tokens/sec, 2.2178 s/token                 
+ Next token throughput: 0.5488 tokens/sec, 1.8222 s/token                     
+2024-10-31:18:38:16,058 INFO     [generate.py:1173] 
+Bandwidth achieved: 4.69 GB/s
+2024-10-31:18:38:16,058 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
 
 ========================================
 
-Once upon a time, in a far-off kingdom, there lived a beautiful princess named Sophia. Sophia was kind, gentle, and loved by all who knew her. She had long, golden hair and sparkling blue eyes that shone like the brightest stars in the night sky.
-One day, a wicked sorcerer cast a spell on the kingdom, causing all the flowers to wither and die. The king, Sophia's father, begged the sorcerer to lift the spell, but he refused, demanding a ransom in exchange for his help.
-Sophia, determined to save her kingdom, decided to embark on a quest to break the sorcerer's spell. She packed a small bag, said goodbye to her parents, and set off into the unknown.
-As she journeyed through the forest, Sophia encountered many dangers, but she remained brave and steadfast. She met a wise old owl who offered her sage advice, a mischievous imp who tried to trick her, and a kind-hearted woodsman who became her loyal companion.
-Together, Sophia and her new friend journeyed deeper into the forest, facing countless challenges and obstacles along the way. They crossed rushing rivers, climbed steep mountains, and navigated treacherous paths.
-Finally, after many days of traveling, they reached the sorcerer's tower2024-10-31:11:20:41,175 INFO     [generate.py:1162] 
+Once upon a time, in a small village nestled in the rolling hills of a far-off land, there lived a young girl named Sophia. Sophia was a curious and adventurous soul, with a heart full of wonder and a mind full of questions. She loved to explore the world around her, learning about the creatures that lived in the village and the plants that grew in the nearby woods.
+One day, while wandering through the woods, Sophia stumbled upon a hidden glade. In the center of the glade stood an enormous tree, its trunk as wide as a house and its branches reaching up towards the sky like giant arms. The tree seemed to be... watching her. Sophia felt a shiver run down her spine as she approached the tree, but she was not afraid. She felt drawn to it, as if it held some secret that she needed to uncover.
+As she reached out to touch the trunk, a low, rumbling voice spoke to her. "Welcome, Sophia," it said. "I have been waiting for you."
+Sophia's eyes widened in surprise, but she stood her ground. "Who are you?" she asked, her voice barely above a whisper.
+"I am the guardian of this forest," the tree replied. "And you, Sophia, are a seeker of truth2024-10-31:18:47:14,555 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 2: 663.2101 sec total                 
-Time to first token: 1.2147 sec with parallel prefill.                
+Time for inference 2: 538.4976 sec total                 
+Time to first token: 1.4638 sec with parallel prefill.                
 
-      Total throughput: 0.3860 tokens/sec, 2.5907 s/token                 
-First token throughput: 0.8232 tokens/sec, 1.2147 s/token                 
- Next token throughput: 0.3852 tokens/sec, 2.5961 s/token                     
-2024-10-31:11:20:41,175 INFO     [generate.py:1173] 
-Bandwidth achieved: 3.30 GB/s
+      Total throughput: 0.4754 tokens/sec, 2.1035 s/token                 
+First token throughput: 0.6832 tokens/sec, 1.4638 s/token                 
+ Next token throughput: 0.4748 tokens/sec, 2.1060 s/token                     
+2024-10-31:18:47:14,556 INFO     [generate.py:1173] 
+Bandwidth achieved: 4.07 GB/s
 
 ========================================
 
-Once upon a time, in the bustling streets of Tokyo, there was a small, quaint café called "Little Tokyo". It was a hidden gem, nestled between a bustling shopping district and a tranquil park. The café was owned by a kind-hearted woman named Yumi, who took great pride in her establishment. She had a passion for baking and coffee, and her café was a labor of love, reflecting her warm and inviting personality.
-
-Every morning, Yumi would wake up before dawn to prepare for the day's customers. She would carefully select the freshest ingredients for her pastries, brew the perfect cup of coffee, and arrange the tables with a touch of elegance. As the sun rose over the city, the café would come alive with the sounds of chatter and the aroma of freshly baked goods.
-
-One day, a young artist named Taro stumbled upon Little Tokyo while searching for inspiration. He had been struggling to find his creative spark, and the café's cozy atmosphere immediately drew him in. Yumi welcomed Taro with a warm smile and offered him a sample of her freshly baked croissants. As he savored the flaky pastry, Taro felt a sense of calm wash over him, and his creative juices began to flow.
-
-Over the next few weeks, Taro became a2024-10-31:11:31:03,783 INFO     [generate.py:1162] 
+Once upon a time, there was a small village nestled in the rolling hills of a lush countryside. The villagers were known for their love of sweets, and their village was famous for its exquisite pastries, cakes, and chocolates.
+One day, a young apprentice named Leo found himself lost in the village's bustling market square. The hustle and bustle of the crowd overwhelmed him, and he became disoriented. He stumbled upon a quaint little bakery, with a sign that read "Madame LaRue's Sweet Delights."
+Leo pushed open the door and stepped inside. The aroma of freshly baked bread and sweet baked goods wafted through the air, enticing him to enter. Madame LaRue, the proprietor, looked up from her work and greeted him warmly.
+"Welcome, young one," she said with a smile. "What brings you to my humble bakery today?"
+Leo explained how he had gotten lost in the market square, and Madame LaRue offered him a warm smile. "You're in luck," she said. "Today is a special day. I'm preparing for the village's annual Sweet Festival, and I could use an extra pair of hands."
+Leo's eyes widened with excitement as Madame LaRue showed him the intricate preparations she was making for the festival.2024-10-31:18:56:07,562 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 3: 622.6076 sec total                 
-Time to first token: 1.1739 sec with parallel prefill.                
+Time for inference 3: 533.0060 sec total                 
+Time to first token: 0.4244 sec with parallel prefill.                
 
-      Total throughput: 0.4112 tokens/sec, 2.4321 s/token                 
-First token throughput: 0.8518 tokens/sec, 1.1739 s/token                 
- Next token throughput: 0.4103 tokens/sec, 2.4370 s/token                     
-2024-10-31:11:31:03,783 INFO     [generate.py:1173] 
-Bandwidth achieved: 3.52 GB/s
+      Total throughput: 0.4803 tokens/sec, 2.0821 s/token                 
+First token throughput: 2.3565 tokens/sec, 0.4244 s/token                 
+ Next token throughput: 0.4788 tokens/sec, 2.0886 s/token                     
+2024-10-31:18:56:07,562 INFO     [generate.py:1173] 
+Bandwidth achieved: 4.11 GB/s
 
 ========================================
 
 
-      Average tokens/sec (total): 0.41                 
-Average tokens/sec (first token): 0.62                 
-Average tokens/sec (next tokens): 0.41 
+      Average tokens/sec (total): 0.50                 
+Average tokens/sec (first token): 1.16                 
+Average tokens/sec (next tokens): 0.50 
                 
 Memory used: 0.00 GB

@@ -8,68 +8,66 @@ Time to load model: 0.11 seconds
 Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
 Time to quantize model: 0.01 seconds
 -----------------------------------------------------------
-Once upon a time, in a land far, far away, there was a magical kingdom known as Azura. Azura was a place of wonder, where the skies were perpetually painted with hues of sapphire and amethyst, and the air was sweet with the scent of enchanted blooms. The kingdom was ruled by a wise and just queen, who wore a crown of crystal and a heart full of love for her people.
-
-In a small village on the outskirts of Azura, there lived a young girl named Luna. Luna was a curious and adventurous child, with eyes that shone like the stars on a clear night and hair that flowed like the golden grasses of the summer breeze. She lived with her grandmother, who told her stories of the ancient magic that lay hidden within the heart of Azura.
-
-Luna's grandmother was a wise and knowing woman, who had spent her life studying the ancient arts. She taught Luna how to weave magic into her everyday life, how to talk to the creatures of the forest, and how to listen to the whispers of the trees. Luna devoured her grandmother's teachings, and soon she was able to communicate with the creatures of the forest, and even to sense the subtle energies that flowed through the land.
-
-As Luna grew older, she began to2024-10-31:12:09:54,020 INFO     [generate.py:1162] 
+Once upon a time, there was a small town nestled in the heart of a beautiful valley. The town was called Willowdale, and it was famous for its stunning natural surroundings, charming architecture, and friendly residents.
+One day, a group of travelers stumbled upon Willowdale while on a journey to explore the surrounding countryside. As they entered the town, they were greeted by the warm smiles of the locals, who welcomed them with open arms.
+The travelers were amazed by the town's picturesque atmosphere, with its cobblestone streets, quaint shops, and vibrant marketplaces. They spent their days exploring the town, marveling at its beauty, and enjoying the hospitality of the residents.
+However, as the days passed, the travelers began to notice something strange. Despite the town's idyllic appearance, they sensed that something was amiss. The residents seemed to be living in a state of suspended animation, as if they were stuck in a perpetual state of sleep.
+The travelers soon discovered that the town was under a mysterious spell, cast by a powerful sorcerer who had been living in the town for centuries. The sorcerer, known as the Wizard of Willowdale, had been using his magic to keep the town frozen in time, preventing it from changing or progressing in any way.
+The travelers,2024-10-31:19:29:33,879 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 1: 709.8012 sec total                 
-Time to first token: 3.9435 sec with parallel prefill.                
+Time for inference 1: 621.9802 sec total                 
+Time to first token: 5.8463 sec with parallel prefill.                
 
-      Total throughput: 0.3607 tokens/sec, 2.7727 s/token                 
-First token throughput: 0.2536 tokens/sec, 3.9435 s/token                 
- Next token throughput: 0.3613 tokens/sec, 2.7681 s/token                     
-2024-10-31:12:09:54,020 INFO     [generate.py:1173] 
-Bandwidth achieved: 5.79 GB/s
-2024-10-31:12:09:54,020 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
-just-in-time compilation time (incl run time): 7.1e+02 seconds
+      Total throughput: 0.4116 tokens/sec, 2.4296 s/token                 
+First token throughput: 0.1710 tokens/sec, 5.8463 s/token                 
+ Next token throughput: 0.4139 tokens/sec, 2.4162 s/token                     
+2024-10-31:19:29:33,879 INFO     [generate.py:1173] 
+Bandwidth achieved: 6.61 GB/s
+2024-10-31:19:29:33,879 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 6.2e+02 seconds
 
 ========================================
 
-Once upon a time, in a land far, far away, there lived a young woman named Sophia. She was born and raised in a small village surrounded by vast fields of wheat and barley. Sophia's life was simple and peaceful, filled with the warmth of sunshine and the songs of birds. She spent her days helping her mother with household chores, learning the art of weaving and cooking, and listening to her father's stories of adventure and bravery.
-One day, while out gathering wild herbs in the nearby forest, Sophia stumbled upon a hidden glade. In the center of the clearing stood an enormous tree, its branches stretching towards the sky like giant arms. The tree seemed to be beckoning to her, and Sophia felt an inexplicable pull towards it.
-As she approached the tree, she noticed a small door carved into its trunk. The door was slightly ajar, and Sophia felt a sudden surge of curiosity. She pushed the door open and stepped inside, finding herself in a cozy room filled with books, strange artifacts, and peculiar contraptions.
-A kind-eyed old man sat in a corner, surrounded by piles of papers and half-finished projects. He looked up at Sophia and smiled, welcoming her to his home. "Ah, young one," he said, "I've been2024-10-31:12:18:24,679 INFO     [generate.py:1162] 
+Once upon a time, there was a beautiful garden filled with vibrant flowers, towering trees, and sparkling fountains. The garden was a place of serenity and peace, where one could escape the stresses of everyday life and connect with nature's wonders.
+One day, a wise and kind gardener, Emma, tended to the garden with love and care. She spent her days pruning the flowers, watering the plants, and whispering words of encouragement to the trees. As she worked, she noticed that the garden seemed to be responding to her presence. The flowers bloomed more vibrantly, the trees grew stronger, and the fountains sang with a sweet, melodic voice.
+But Emma was not content to simply tend to the garden. She wanted to share its beauty with others, and so she created a place where people could come to rest, reflect, and rejuvenate. She built a winding path that led visitors through the garden, past hidden clearings and secret waterfalls. She placed benches and gazebos where people could sit and take in the beauty of their surroundings.
+As the garden flourished under Emma's care, it became a beloved destination for people from all over the community. They would come to stroll through the garden, sit on a bench, and breathe in the sweet sc2024-10-31:19:37:53,479 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 2: 510.6589 sec total                 
-Time to first token: 5.9243 sec with parallel prefill.                
+Time for inference 2: 499.5994 sec total                 
+Time to first token: 4.2353 sec with parallel prefill.                
 
-      Total throughput: 0.5013 tokens/sec, 1.9948 s/token                 
-First token throughput: 0.1688 tokens/sec, 5.9243 s/token                 
- Next token throughput: 0.5052 tokens/sec, 1.9794 s/token                     
-2024-10-31:12:18:24,679 INFO     [generate.py:1173] 
-Bandwidth achieved: 8.05 GB/s
+      Total throughput: 0.5124 tokens/sec, 1.9516 s/token                 
+First token throughput: 0.2361 tokens/sec, 4.2353 s/token                 
+ Next token throughput: 0.5148 tokens/sec, 1.9426 s/token                     
+2024-10-31:19:37:53,479 INFO     [generate.py:1173] 
+Bandwidth achieved: 8.23 GB/s
 
 ========================================
 
-Once upon a time, in a far-off kingdom, there was a beautiful and wise princess named Sophia. Sophia had a unique gift: she could talk to animals. Not just any animals, but all animals, from the tiniest insect to the largest beast. She had always used this gift to help those in need, whether it was a family of rabbits who had lost their home or a wounded bird who needed healing.
+Once upon a time, in a small village nestled in the rolling hills of Provence, there lived a young and ambitious baker named Sophie. Sophie had grown up in the village surrounded by the rich aromas of freshly baked bread and the warmth of the sun-baked earth. She had always been fascinated by the art of baking and had spent countless hours in her father's bakery, learning the secrets of traditional Provençal bread-making.
+As she grew older, Sophie's passion for baking only deepened, and she began to experiment with new recipes and techniques. She would often sneak into the bakery late at night, when her father was asleep, and try out new creations. Her experiments were always a hit with the villagers, who would eagerly await her latest innovations.
 
-One day, a messenger arrived at the castle with a plea for help from the neighboring kingdom. A terrible drought had struck their lands, and their crops were withering away. The kingdom's people were struggling to find food and water, and their animals were suffering as well. The messenger explained that the kingdom's wise old owl, Oracle, believed that the drought was caused by a mischievous band of pixies who had stolen the magical crystal that kept the land fertile.
+One day, Sophie had an idea that would change the course of her life forever. She had been experimenting with a new type of bread that combined the traditional Provençal ingredients of olive oil, herbs, and spices with a hint of sweetness from local honey. The result was a bread that was unlike anything she had ever tasted before - it was crispy on the outside, soft and fluffy on the inside, and infused with the subtle flavors of the Mediterranean.
 
-Sophia knew that she had to act quickly to help the neighboring kingdom. She gathered her trusty animal companions – a brave and loyal dog named Max, a quick-witted and agile cat named Whiskers, and a gentle and wise old badger named Bertha – and set out on a quest to retrieve the stolen crystal.
-
-As they journeyed through the dry and barren lands, Sophia used2024-10-31:12:28:40,480 INFO     [generate.py:1162] 
+Sophie was ecstatic about her creation and knew she had to share it2024-10-31:19:46:51,771 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 3: 615.7998 sec total                 
-Time to first token: 1.7282 sec with parallel prefill.                
+Time for inference 3: 538.2913 sec total                 
+Time to first token: 2.4467 sec with parallel prefill.                
 
-      Total throughput: 0.4157 tokens/sec, 2.4055 s/token                 
-First token throughput: 0.5786 tokens/sec, 1.7282 s/token                 
- Next token throughput: 0.4153 tokens/sec, 2.4081 s/token                     
-2024-10-31:12:28:40,480 INFO     [generate.py:1173] 
-Bandwidth achieved: 6.68 GB/s
+      Total throughput: 0.4756 tokens/sec, 2.1027 s/token                 
+First token throughput: 0.4087 tokens/sec, 2.4467 s/token                 
+ Next token throughput: 0.4759 tokens/sec, 2.1014 s/token                     
+2024-10-31:19:46:51,771 INFO     [generate.py:1173] 
+Bandwidth achieved: 7.64 GB/s
 
 ========================================
 
 
-      Average tokens/sec (total): 0.43                 
-Average tokens/sec (first token): 0.33                 
-Average tokens/sec (next tokens): 0.43 
+      Average tokens/sec (total): 0.47                 
+Average tokens/sec (first token): 0.27                 
+Average tokens/sec (next tokens): 0.47 
                 
 Memory used: 0.00 GB

@@ -2,14 +2,14 @@ python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat1
 python3 torchchat.py generate llama3.1 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model16.so
-W1031 13:13:47.296557 2393064 site-packages/torch/_export/__init__.py:225] +============================+
-W1031 13:13:47.297005 2393064 site-packages/torch/_export/__init__.py:226] |     !!!   WARNING   !!!    |
-W1031 13:13:47.297210 2393064 site-packages/torch/_export/__init__.py:227] +============================+
-W1031 13:13:47.297384 2393064 site-packages/torch/_export/__init__.py:228] torch._export.aot_compile() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export()) instead.
+W1031 20:19:02.163104 1631787 site-packages/torch/_export/__init__.py:225] +============================+
+W1031 20:19:02.163658 1631787 site-packages/torch/_export/__init__.py:226] |     !!!   WARNING   !!!    |
+W1031 20:19:02.163913 1631787 site-packages/torch/_export/__init__.py:227] +============================+
+W1031 20:19:02.164178 1631787 site-packages/torch/_export/__init__.py:228] torch._export.aot_compile() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export()) instead.
 Using device=cpu
 Setting max_seq_length to 300 for DSO export.
 Loading model...
-Time to load model: 0.12 seconds
+Time to load model: 0.14 seconds
 Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
 Time to quantize model: 0.01 seconds
 -----------------------------------------------------------
@@ -21,69 +21,66 @@ Warning: checkpoint path ignored because an exported DSO or PTE path was specifi
 Warning: checkpoint path ignored because an exported DSO or PTE path was specified
 Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
 Loading model...
-Time to load model: 0.11 seconds
+Time to load model: 0.13 seconds
 -----------------------------------------------------------
-Once upon a time, there was a lovely lady in a small village. She loved nothing more than reading books and cooking delicious dishes. One day, she decided to open a small café in the village square, where she could share her passion for reading and cooking with the community.
-The café was called "A Page and a Plate," and it quickly became the heart of the village. People would come from all around to taste her amazing food and to engage in lively discussions about the latest books they had read.
-The lady, whose name was Sophia, was particularly famous for her signature dish, "Mushroom Risotto with a side of Story." She would cook up a big pot of creamy risotto, loaded with fresh mushrooms, and serve it with a side of a carefully chosen book. The story would match the theme of the dish, and customers would be invited to read it while they ate.
-Sophia's café was a place where people could come to escape the stresses of everyday life, and indulge in some good food and good conversation. It was a place where strangers became friends, and where the love of reading and cooking brought the community together.
-Years went by, and "A Page and a Plate" became a beloved institution in the village. People would bring their children and grandchildren to2024-10-31:13:25:34,978 INFO     [generate.py:1162] 
+Once upon a time, there was a lovely girl named Rose. She had long, curly hair the color of rich brown chocolate and sparkling blue eyes like the clearest summer sky. Rose had a heart as sweet as honey and a smile that could light up even the darkest of rooms. She was a kind and gentle soul, loved by all who knew her.
+One day, Rose decided to visit the beautiful and ancient forest that lay just beyond her village. As she wandered through the trees, the sunlight filtering through the leaves above cast dappled patterns on the forest floor, and the scent of wildflowers and fresh earth filled her lungs. The air was filled with the songs of birds and the rustle of small creatures scurrying through the underbrush.
+As Rose walked deeper into the forest, the trees grew taller and the path grew narrower. She began to feel a sense of unease, as if she was being watched by unseen eyes. She quickened her pace, her heart beating faster with every step. Suddenly, a gust of wind blew through the trees, causing the branches to creak and sway. Rose spun around, but she was alone.
+She took a deep breath and continued on her way, telling herself that she was just being silly. But the feeling of being watched persisted2024-10-31:20:29:41,287 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 1: 468.4567 sec total                 
-Time to first token: 7.7362 sec with sequential prefill.                
+Time for inference 1: 489.7810 sec total                 
+Time to first token: 18.8554 sec with sequential prefill.                
 
-      Total throughput: 0.5465 tokens/sec, 1.8299 s/token                 
-First token throughput: 0.1293 tokens/sec, 7.7362 s/token                 
- Next token throughput: 0.5535 tokens/sec, 1.8067 s/token                     
-2024-10-31:13:25:34,978 INFO     [generate.py:1173] 
-Bandwidth achieved: 8.78 GB/s
-2024-10-31:13:25:34,978 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+      Total throughput: 0.5227 tokens/sec, 1.9132 s/token                 
+First token throughput: 0.0530 tokens/sec, 18.8554 s/token                 
+ Next token throughput: 0.5415 tokens/sec, 1.8468 s/token                     
+2024-10-31:20:29:41,287 INFO     [generate.py:1173] 
+Bandwidth achieved: 8.39 GB/s
+2024-10-31:20:29:41,287 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
 
 ========================================
 
-Once upon a time, in a land far, far away, there was a small village nestled in the heart of a dense forest. The villagers lived simple lives, tending to their crops, raising their children, and enjoying the beauty of nature that surrounded them. However, there was one mysterious and ancient tree in the forest that stood out from all the others. This tree was said to have the power to grant wishes to those who approached it with a pure heart and a true intention.
-A young girl named Lily had heard the stories about the magical tree from her grandmother, who had heard them from her grandmother before her. Lily was both fascinated and intimidated by the tales. She had always been curious and felt a deep connection to the natural world, but she had never mustered the courage to approach the tree.
-One day, as she was walking through the forest, Lily found herself near the tree. She stopped and looked up at its towering branches, feeling a mix of excitement and fear. As she stood there, she noticed a small door on the trunk of the tree, which she had never seen before. The door was slightly ajar, as if inviting her to enter.
-Lily's heart was racing as she pushed the door open and stepped inside. The tree was hollow, and a2024-10-31:13:32:17,024 INFO     [generate.py:1162] 
+Once upon a time, in a faraway land, there lived a young man named Jack. Jack was a curious and adventurous soul, always looking for the next big thrill. One day, he stumbled upon an old, mysterious-looking map that promised to lead him to a hidden treasure.
+The map was worn and faded, but Jack could make out the faint outlines of a journey through the dense forest that surrounded their village. Excited by the prospect of finding treasure, Jack set off early the next morning, determined to follow the map to its conclusion.
+As he journeyed deeper into the forest, Jack encountered all sorts of obstacles: rushing streams, steep cliffs, and even a few encounters with wild beasts. But he persevered, undeterred by the dangers that lay ahead.
+After hours of walking, the map led Jack to a clearing, where he spotted a large stone monument in the center. The monument bore an inscription that read: "Beware, traveler, for the treasure you seek is guarded by a fierce dragon."
+Jack hesitated for a moment, wondering if he should turn back. But his thirst for adventure and the promise of treasure kept him moving forward. He approached the monument cautiously, his heart pounding in his chest.
+Suddenly, a loud roar echoed through the clearing, and a2024-10-31:20:36:32,438 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 2: 402.0455 sec total                 
-Time to first token: 7.4511 sec with sequential prefill.                
+Time for inference 2: 411.1508 sec total                 
+Time to first token: 7.3573 sec with sequential prefill.                
 
-      Total throughput: 0.6367 tokens/sec, 1.5705 s/token                 
-First token throughput: 0.1342 tokens/sec, 7.4511 s/token                 
- Next token throughput: 0.6462 tokens/sec, 1.5474 s/token                     
-2024-10-31:13:32:17,024 INFO     [generate.py:1173] 
-Bandwidth achieved: 10.23 GB/s
+      Total throughput: 0.6226 tokens/sec, 1.6061 s/token                 
+First token throughput: 0.1359 tokens/sec, 7.3573 s/token                 
+ Next token throughput: 0.6315 tokens/sec, 1.5835 s/token                     
+2024-10-31:20:36:32,438 INFO     [generate.py:1173] 
+Bandwidth achieved: 10.00 GB/s
 
 ========================================
 
-Once upon a time, in a small village surrounded by beautiful mountains, there lived a young girl named Katerina. She was a kind and gentle soul, with a heart full of love for all living things. Katerina lived with her family in a cozy little cottage, surrounded by a lush garden filled with colorful flowers, buzzing bees, and chirping birds.
-
-One sunny afternoon, as Katerina was playing in the garden, she stumbled upon a small, injured bird perched on a nearby branch. The bird's wing was twisted and battered, and it looked up at Katerina with pleading eyes. Without hesitation, Katerina carefully picked up the bird and cradled it in her hands, speaking softly to comfort it.
-
-Katerina's mother, a wise and compassionate woman, saw her daughter's concern for the injured bird and suggested that they take it to the wise old owl, who lived on the other side of the village. The owl was known for his exceptional knowledge of healing and magic.
-
-As they walked through the village, the wind whispering through the trees, Katerina and her mother carefully carried the bird to the owl's dwelling. The owl, with his piercing yellow eyes, greeted them warmly and invited them into his cozy nest.
-
-"Ah,2024-10-31:13:39:51,983 INFO     [generate.py:1162] 
+Once upon a time, in a world not so different from our own, there was a young man named Jim. Jim was a happy-go-lucky fellow, with a passion for adventure and a heart full of gold. He lived in a small village at the edge of a great forest, where he worked as a blacksmith, hammering away at hot metal to create all sorts of useful items for the villagers.
+One day, as Jim was working at the forge, a wise old wizard named Zorvath appeared at his side. Zorvath was a tall, thin man with a long white beard and piercing blue eyes. He wore a pointed hat and carried a staff that crackled with magical energy.
+"Greetings, young Jim," said Zorvath, his voice low and gravelly. "I have come to offer you a great challenge. Are you up for it?"
+Jim, always eager for adventure, nodded his head enthusiastically. "Yes, of course!" he exclaimed.
+Zorvath smiled, his eyes twinkling with amusement. "Very well," he said. "In the heart of the forest, there is a great dragon that has been terrorizing the villagers. It is a fierce beast, with scales as black as coal and eyes that glow like em2024-10-31:20:43:40,605 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 3: 454.9585 sec total                 
-Time to first token: 6.4390 sec with sequential prefill.                
+Time for inference 3: 428.1664 sec total                 
+Time to first token: 8.7316 sec with sequential prefill.                
 
-      Total throughput: 0.5627 tokens/sec, 1.7772 s/token                 
-First token throughput: 0.1553 tokens/sec, 6.4390 s/token                 
- Next token throughput: 0.5685 tokens/sec, 1.7589 s/token                     
-2024-10-31:13:39:51,983 INFO     [generate.py:1173] 
-Bandwidth achieved: 9.04 GB/s
+      Total throughput: 0.5979 tokens/sec, 1.6725 s/token                 
+First token throughput: 0.1145 tokens/sec, 8.7316 s/token                 
+ Next token throughput: 0.6080 tokens/sec, 1.6448 s/token                     
+2024-10-31:20:43:40,605 INFO     [generate.py:1173] 
+Bandwidth achieved: 9.60 GB/s
 
 ========================================
 
 
       Average tokens/sec (total): 0.58                 
-Average tokens/sec (first token): 0.14                 
+Average tokens/sec (first token): 0.10                 
 Average tokens/sec (next tokens): 0.59 
                 
 Memory used: 0.00 GB

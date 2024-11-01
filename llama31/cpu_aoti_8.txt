@@ -2,16 +2,16 @@ python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0
 python3 torchchat.py generate llama3.1 --dso-path /tmp/model8.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model8.so
-W1031 13:40:56.381460 2582789 site-packages/torch/_export/__init__.py:225] +============================+
-W1031 13:40:56.381941 2582789 site-packages/torch/_export/__init__.py:226] |     !!!   WARNING   !!!    |
-W1031 13:40:56.382172 2582789 site-packages/torch/_export/__init__.py:227] +============================+
-W1031 13:40:56.382364 2582789 site-packages/torch/_export/__init__.py:228] torch._export.aot_compile() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export()) instead.
+W1031 20:44:38.151325 1833740 site-packages/torch/_export/__init__.py:225] +============================+
+W1031 20:44:38.151783 1833740 site-packages/torch/_export/__init__.py:226] |     !!!   WARNING   !!!    |
+W1031 20:44:38.152032 1833740 site-packages/torch/_export/__init__.py:227] +============================+
+W1031 20:44:38.152227 1833740 site-packages/torch/_export/__init__.py:228] torch._export.aot_compile() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export()) instead.
 Using device=cpu
 Setting max_seq_length to 300 for DSO export.
 Loading model...
 Time to load model: 0.11 seconds
 Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
-Time to quantize model: 47.99 seconds
+Time to quantize model: 42.79 seconds
 -----------------------------------------------------------
 Exporting model using AOT Inductor to /tmp/model8.so
 The generated DSO model can be found at: /tmp/model8.so
@@ -23,63 +23,64 @@ Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
 Loading model...
 Time to load model: 0.11 seconds
 -----------------------------------------------------------
-Once upon a time, there was a man who loved to fish. He had been fishing since he was a young boy and had developed a deep connection with the natural world. Over the years, he had learned how to read the water, how to cast a perfect line, and how to wait patiently for the perfect catch.
-One day, as he was sitting on the shore, fishing rod in hand, he noticed a beautiful girl watching him from a distance. She was sitting on a rock, her eyes fixed intently on him, a small smile playing on her lips. The man couldn't help but feel a sense of excitement and curiosity. Who was this girl, and what was she doing here?
-As he continued to fish, he noticed that the girl would occasionally glance at his line and then back at him. He smiled to himself, thinking that she might be waiting for him to catch a fish. But as the minutes ticked by, she didn't seem to be paying much attention to the fish at all. Instead, she seemed to be watching him, studying him, as if trying to figure him out.
-The man began to feel a sense of unease. Who was this girl, and what did she want from him? He tried to focus on his fishing, but he couldn2024-10-31:13:48:17,464 INFO     [generate.py:1162] 
+Once upon a time, there was a city called London. It was known for its rich history, cultural landmarks, and bustling streets. In the heart of the city, there was a small park called Green Park. Green Park was a tranquil oasis in the midst of the busy city, with lush greenery, sparkling fountains, and winding paths.
+One day, a young girl named Sophia wandered into Green Park, searching for a place to escape the chaos of the city. She had heard stories of the park's beauty and magic, and she was determined to experience it for herself.
+As she strolled through the park, Sophia noticed a small, delicate flower blooming amidst the grass. It was a rare and exquisite species, one that she had only read about in books. She felt a sense of wonder and awe as she gazed at the flower, and suddenly, she heard a soft voice whispering in her ear.
+The voice belonged to a tiny, mischievous sprite who lived in the park. The sprite had been watching Sophia from afar, and he was impressed by her curiosity and love for nature. He decided to introduce himself and invite Sophia on a journey through the park, revealing its hidden secrets and magic.
+Sophia was enchanted by the sprite's words and eagerly accepted his invitation2024-10-31:20:52:08,568 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 1: 216.8460 sec total                 
-Time to first token: 7.1199 sec with sequential prefill.                
+Time for inference 1: 315.0856 sec total                 
+Time to first token: 9.9714 sec with sequential prefill.                
 
-      Total throughput: 1.1806 tokens/sec, 0.8471 s/token                 
-First token throughput: 0.1405 tokens/sec, 7.1199 s/token                 
- Next token throughput: 1.2159 tokens/sec, 0.8225 s/token                     
-2024-10-31:13:48:17,464 INFO     [generate.py:1173] 
-Bandwidth achieved: 18.96 GB/s
-2024-10-31:13:48:17,464 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+      Total throughput: 0.8125 tokens/sec, 1.2308 s/token                 
+First token throughput: 0.1003 tokens/sec, 9.9714 s/token                 
+ Next token throughput: 0.8358 tokens/sec, 1.1965 s/token                     
+2024-10-31:20:52:08,568 INFO     [generate.py:1173] 
+Bandwidth achieved: 13.05 GB/s
+2024-10-31:20:52:08,568 INFO     [generate.py:1177] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
 
 ========================================
 
-Once upon a time, in a land far, far away, there was a small village surrounded by vast farmlands and towering mountains. The villagers lived simple lives, relying on the land and their skills to survive. They were known for their kindness, generosity, and strong sense of community.
-Among the villagers was a young girl named Luna. She was a curious and adventurous soul, always eager to explore the world beyond her village. Luna lived with her wise and loving grandmother, who taught her the ways of the world, the secrets of nature, and the importance of respecting the land and its creatures.
-One day, a great drought struck the land, and the crops began to wither and die. The villagers, who had always relied on the land for their livelihood, were in dire straits. Many of them grew worried and fearful, not knowing how they would survive without the bounty of the earth.
-Luna's grandmother, sensing the anxiety of the villagers, called upon Loki, the mischievous trickster god, to guide them through this difficult time. Loki, known for his cunning and magical powers, agreed to help the villagers, but only if they could prove their worthiness to receive his aid.
-Luna, determined to help her community, set out on a journey to find2024-10-31:13:54:50,374 INFO     [generate.py:1162] 
+Once upon a time, in the enchanting realm of the forest, there lived a young girl named Luna. She was a gentle soul with a heart full of kindness and a mind full of wonder. Luna loved nothing more than to explore the forest, discovering new secrets and making friends with the creatures that lived there.
+One day, while wandering through the forest, Luna stumbled upon a hidden glade. The glade was filled with the most vibrant and exotic flowers she had ever seen. There were flowers of every color, shape, and size, and they seemed to dance in the breeze like a troupe of ballerinas.
+As Luna wandered through the glade, she came across a beautiful flower with petals as blue as the night sky. The flower seemed to be calling to her, and she felt an inexplicable connection to it. As she reached out to touch the flower, a soft voice whispered in her ear, "Welcome, Luna. I have been waiting for you."
+Luna was startled, but she felt no fear. Instead, she felt a sense of calm and wonder. "Who are you?" she asked the flower.
+
+"I am the Night Blooming Flower," replied the flower. "I have been watching you, Luna. I have seen your kindness and your love for the2024-10-31:20:57:32,797 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 2: 392.9100 sec total                 
-Time to first token: 1.5681 sec with sequential prefill.                
+Time for inference 2: 324.2287 sec total                 
+Time to first token: 5.3053 sec with sequential prefill.                
 
-      Total throughput: 0.6515 tokens/sec, 1.5348 s/token                 
-First token throughput: 0.6377 tokens/sec, 1.5681 s/token                 
- Next token throughput: 0.6516 tokens/sec, 1.5347 s/token                     
-2024-10-31:13:54:50,375 INFO     [generate.py:1173] 
-Bandwidth achieved: 10.46 GB/s
+      Total throughput: 0.7896 tokens/sec, 1.2665 s/token                 
+First token throughput: 0.1885 tokens/sec, 5.3053 s/token                 
+ Next token throughput: 0.7996 tokens/sec, 1.2507 s/token                     
+2024-10-31:20:57:32,798 INFO     [generate.py:1173] 
+Bandwidth achieved: 12.68 GB/s
 
 ========================================
 
-Once upon a time, there was a young woman named Sarah. She was a happy and optimistic person who always looked on the bright side of life. But one day, she found herself in a situation that no one could have predicted. She was involved in a serious car accident and suffered severe injuries, including a broken leg and a severely damaged spinal cord. As a result of the accident, Sarah became a paraplegic.
-Sarah's world was turned upside down. She was now confined to a wheelchair and faced a long and arduous road to recovery. But despite her physical limitations, Sarah refused to give up. She was determined to maintain her independence and live life on her own terms.
-With the help of her family and friends, Sarah began to adapt to her new circumstances. She learned to navigate her home and community in her wheelchair, and she discovered new ways to enjoy activities that she had previously taken for granted. She also started to pursue new hobbies and interests, such as painting and writing, which helped her to express herself and maintain her sense of identity.
-
-As Sarah navigated her new reality, she encountered many challenges and obstacles. There were times when she felt frustrated, angry, and sad. But she also found moments of joy, love, and inspiration. She discovered the strength2024-10-31:14:00:22,634 INFO     [generate.py:1162] 
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Maria. Maria was a sweet and gentle soul, with a heart full of love and a mind full of wonder. She spent her days exploring the fields and forests surrounding her village, collecting wildflowers and watching the animals play.
+But Maria's life was not without its challenges. Her family was poor, and they struggled to make ends meet. Her parents worked hard to provide for her and her siblings, but it seemed like no matter how much they worked, they were always struggling to get by.
+One day, as Maria was out collecting wildflowers, she stumbled upon a beautiful field of lavender. The flowers were a deep purple color, and they filled the air with the most heavenly scent. Maria was enchanted by the field, and she spent hours there, watching the flowers sway in the breeze and listening to the bees buzz from one bloom to the next.
+As she sat among the lavender, Maria had a thought that would change her life forever. She remembered a story her grandmother used to tell her, about how the villagers used to make beautiful lavender wands to sell at the market. Maria's grandmother had taught her how to make these wands, but she had never had the2024-10-31:21:03:10,345 INFO     [generate.py:1162] 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 3: 332.2597 sec total                 
-Time to first token: 5.1787 sec with sequential prefill.                
+Time for inference 3: 337.5470 sec total                 
+Time to first token: 6.3994 sec with sequential prefill.                
 
-      Total throughput: 0.7705 tokens/sec, 1.2979 s/token                 
-First token throughput: 0.1931 tokens/sec, 5.1787 s/token                 
- Next token throughput: 0.7796 tokens/sec, 1.2827 s/token                     
-2024-10-31:14:00:22,635 INFO     [generate.py:1173] 
-Bandwidth achieved: 12.37 GB/s
+      Total throughput: 0.7584 tokens/sec, 1.3185 s/token                 
+First token throughput: 0.1563 tokens/sec, 6.3994 s/token                 
+ Next token throughput: 0.7700 tokens/sec, 1.2986 s/token                     
+2024-10-31:21:03:10,345 INFO     [generate.py:1173] 
+Bandwidth achieved: 12.18 GB/s
 
 ========================================
 
 
-      Average tokens/sec (total): 0.87                 
-Average tokens/sec (first token): 0.32                 
-Average tokens/sec (next tokens): 0.88 
+      Average tokens/sec (total): 0.79                 
+Average tokens/sec (first token): 0.15                 
+Average tokens/sec (next tokens): 0.80 
                 
 Memory used: 0.00 GB
