@@ -163,6 +163,8 @@ class GeneratorArgs:
             reason = "model compilation for prefill"
         if self.compile:
             reason = "model compilation"
+        if builder_args.aoti_package_path:
+            model_type = "PT2"
         if builder_args.dso_path:
             model_type = "DSO"
         if builder_args.pte_path:
@@ -176,7 +178,10 @@ class GeneratorArgs:
     def from_args(cls, args):
         dso_path = getattr(args, "dso_path", None)
         pte_path = getattr(args, "pte_path", None)
-        sequential_prefill = args.sequential_prefill or bool(dso_path) or bool(pte_path)
+        aoti_package_path = getattr(args, "aoti_package_path", None)
+        sequential_prefill = (
+            args.sequential_prefill or bool(aoti_package_path) or bool(pte_path) or bool(dso_path)
+        )
 
         # Validate that all image prompts exist before expensive model load
         if image_prompts := getattr(args, "image_prompts", None):

@@ -191,6 +191,12 @@ def _add_export_output_path_args(parser) -> None:
         default=None,
         help="Output to the specified AOT Inductor .dso model file",
     )
+    exclusive_parser.add_argument(
+        "--output-aoti-package-path",
+        type=str,
+        default=None,
+        help="Output directory for AOTInductor compiled artifacts",
+    )
 
 
 def _add_export_args(parser) -> None:
@@ -219,6 +225,12 @@ def _add_exported_input_path_args(parser) -> None:
         type=Path,
         default=None,
         help="Use the specified AOT Inductor .dso model file",
+    )
+    exclusive_parser.add_argument(
+        "--aoti-package-path",
+        type=Path,
+        default=None,
+        help="Use the specified directory containing AOT Inductor compiled files",
     )
     exclusive_parser.add_argument(
         "--pte-path",

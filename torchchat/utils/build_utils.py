@@ -6,9 +6,10 @@
 
 from __future__ import annotations
 
-from enum import Enum
 import logging
 import os
+
+from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple
 
@@ -70,34 +71,37 @@ def unpack_packed_weights(
 
 active_builder_args_dso = None
 active_builder_args_pte = None
+active_builder_args_aoti_package = None
 
 
-def set_backend(dso, pte):
+def set_backend(dso, pte, aoti_package):
     global active_builder_args_dso
     global active_builder_args_pte
     active_builder_args_dso = dso
+    active_builder_args_aoti_package = aoti_package
     active_builder_args_pte = pte
 
 
 class _Backend(Enum):
-    AOTI = 0,
+    AOTI = (0,)
     EXECUTORCH = 1
 
 
 def _active_backend() -> _Backend:
     global active_builder_args_dso
+    global active_builder_args_aoti_package
     global active_builder_args_pte
 
     # eager == aoti, which is when backend has not been explicitly set
-    if (not active_builder_args_dso) and not (active_builder_args_pte):
-        return _Backend.AOTI
+    if (not active_builder_args_pte) and (not active_builder_args_aoti_package):
+        return True
 
-    if active_builder_args_pte and active_builder_args_dso:
+    if active_builder_args_pte and active_builder_args_aoti_package:
         raise RuntimeError(
-            "code generation needs to choose different implementations for DSO and PTE path.  Please only use one export option, and call export twice if necessary!"
+            "code generation needs to choose different implementations for AOTI and PTE path.  Please only use one export option, and call export twice if necessary!"
         )
 
-    return _Backend.AOTI if active_builder_args_dso else _Backend.EXECUTORCH
+    return _Backend.AOTI if active_builder_args_pte else _Backend.EXECUTORCH
 
 
 def use_aoti_backend() -> bool:
@@ -115,22 +119,24 @@ precision = None
 
 
 def set_precision(dtype):
-    """set_precision() is a torchchat-internal API that records the dtype we're building the model for.  
-The precision is recorded for future queries by get_precision(), so that when building a model,
-or performing optimizations, we can query the type the user is building the model for. 
-This is an informational value that can be used when we want to know what type to build for (e.g., a kv cache).  
-Changing the `precision` does not change the precision of the model.
-"""
-    
+    """set_precision() is a torchchat-internal API that records the dtype we're building the model for.
+    The precision is recorded for future queries by get_precision(), so that when building a model,
+    or performing optimizations, we can query the type the user is building the model for.
+    This is an informational value that can be used when we want to know what type to build for (e.g., a kv cache).
+    Changing the `precision` does not change the precision of the model.
+    """
+
     global precision
-    assert precision is None, "only set precision once to avoid inconsistent answers during different phases of model build and export"
+    assert (
+        precision is None
+    ), "only set precision once to avoid inconsistent answers during different phases of model build and export"
     precision = dtype
 
 
 def get_precision():
     """get_precision() is a torchchat-internal API that returns the dtype we're building the model for, as specified by the `--dtype` CLI option+,
-or the precision quantizer.
-"""
+    or the precision quantizer.
+    """
     global precision
     # if (and only if) precision has not been set, update it to the default value torch.float32
     if precision is None:
@@ -224,7 +230,7 @@ def canonical_path(path):
 
 
 def state_dict_device(d, device="cpu") -> Dict:
-    return {key : weight.to(device=device) for (key, weight) in d.items()}
+    return {key: weight.to(device=device) for (key, weight) in d.items()}
 
 
 #########################################################################

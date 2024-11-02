@@ -53,6 +53,7 @@ class BuilderArgs:
     gguf_path: Optional[Union[Path, str]] = None
     gguf_kwargs: Optional[Dict[str, Any]] = None
     dso_path: Optional[Union[Path, str]] = None
+    aoti_package_path: Optional[Union[Path, str]] = None
     pte_path: Optional[Union[Path, str]] = None
     device: Optional[str] = None
     precision: torch.dtype = torch.float32
@@ -75,16 +76,19 @@ class BuilderArgs:
             or (self.checkpoint_dir and self.checkpoint_dir.is_dir())
             or (self.gguf_path and self.gguf_path.is_file())
             or (self.dso_path and Path(self.dso_path).is_file())
+            or (self.aoti_package_path and Path(self.aoti_package_path).is_file())
             or (self.pte_path and Path(self.pte_path).is_file())
         ):
             raise RuntimeError(
                 "need to specified a valid checkpoint path, checkpoint dir, gguf path, DSO path, or PTE path"
             )
 
-        if self.dso_path and self.pte_path:
-            raise RuntimeError("specify either DSO path or PTE path, but not both")
+        if self.aoti_package_path and self.pte_path:
+            raise RuntimeError(
+                "specify either AOTI Package path or PTE path, but not more than one"
+            )
 
-        if self.dso_path or self.pte_path:
+        if self.dso_path or self.pte_path or self.aoti_package_path:
             ignored_params = [
                 (self.checkpoint_path, "checkpoint path"),
                 (self.checkpoint_dir, "checkpoint dir"),
@@ -125,6 +129,7 @@ class BuilderArgs:
 
         dso_path = getattr(args, "dso_path", None)
         pte_path = getattr(args, "pte_path", None)
+        aoti_package_path = getattr(args, "aoti_package_path", None)
 
         is_chat_model = False
         if args.is_chat_model:
@@ -135,6 +140,7 @@ class BuilderArgs:
                 checkpoint_dir,
                 dso_path,
                 pte_path,
+                aoti_package_path,
                 args.gguf_path,
             ]:
                 if path is not None:
@@ -149,6 +155,7 @@ class BuilderArgs:
                         is_chat_model = True
 
         output_pte_path = getattr(args, "output_pte_path", None)
+        output_aoti_package_path = getattr(args, "output_aoti_package_path", None)
         output_dso_path = getattr(args, "output_dso_path", None)
         if output_pte_path and args.dtype.startswith("fast"):
             if args.dtype == "fast":
@@ -174,10 +181,13 @@ class BuilderArgs:
             gguf_path=args.gguf_path,
             gguf_kwargs=None,
             dso_path=dso_path,
+            aoti_package_path=aoti_package_path,
             pte_path=pte_path,
             device=args.device,
             precision=dtype,
-            setup_caches=(output_dso_path or output_pte_path),
+            setup_caches=(
+                output_dso_path or output_pte_path or output_aoti_package_path
+            ),
             distributed=distributed,
             pp=pp,
             tp=tp,
@@ -195,6 +205,7 @@ class BuilderArgs:
         speculative_builder_args.checkpoint_path = args.draft_checkpoint_path
         speculative_builder_args.gguf_path = None
         speculative_builder_args.dso_path = None
+        speculative_builder_args.aoti_package_path = None
         speculative_builder_args.pte_path = None
         return speculative_builder_args
 
@@ -511,11 +522,14 @@ def _initialize_model(
     support_tensor_subclass: bool = True,
 ) -> Model:
     print("Loading model...")
-    if builder_args.gguf_path and (builder_args.dso_path or builder_args.pte_path):
+    if builder_args.gguf_path and (
+        builder_args.dso_path or builder_args.pte_path or builder_args.aoti_package_path
+    ):
         print("Setting gguf_kwargs for generate.")
         is_dso = builder_args.dso_path is not None
+        is_aoti_package = builder_args.aoti_package_path is not None
         is_pte = builder_args.pte_path is not None
-        assert not (is_dso and is_pte)
+        assert not (is_dso and is_aoti_package and is_pte)
         assert builder_args.gguf_kwargs is None
         # TODO: make GGUF load independent of backend
         # currently not working because AVX int_mm broken
@@ -562,6 +576,42 @@ def _initialize_model(
             )
         except:
             raise RuntimeError(f"Failed to load AOTI compiled {builder_args.dso_path}")
+
+    elif builder_args.aoti_package_path:
+        if not is_cuda_or_cpu_device(builder_args.device):
+            print(
+                f"Cannot load specified PT2 to {builder_args.device}. Attempting to load model to CPU instead"
+            )
+            builder_args.device = "cpu"
+
+        # assert (
+        #     quantize is None or quantize == "{ }"
+        # ), "quantize not valid for exported PT2 model. Specify quantization during export."
+
+        with measure_time("Time to load model: {time:.02f} seconds"):
+            model = _load_model(builder_args)
+            device_sync(device=builder_args.device)
+
+        try:
+            # Replace model forward with the AOT-compiled forward
+            # This is a hacky way to quickly demo AOTI's capability.
+            # model is still a Python object, and any mutation to its
+            # attributes will NOT be seen on by AOTI-compiled forward
+            # function, e.g. calling model.setup_cache will NOT touch
+            # AOTI compiled and maintained model buffers such as kv_cache.
+            from torch._inductor.package import load_package
+
+            aoti_compiled_model = load_package(
+                str(builder_args.aoti_package_path.absolute())
+            )
+            model.forward = aoti_compiled_model
+            metadata = aoti_compiled_model.get_metadata()
+            builder_args.device = metadata["AOTI_DEVICE_KEY"]
+        except:
+            raise RuntimeError(
+                f"Failed to load AOTI compiled {builder_args.aoti_package_path}"
+            )
+
     elif builder_args.pte_path:
         if not is_cpu_device(builder_args.device):
             print(
