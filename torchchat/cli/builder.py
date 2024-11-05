@@ -632,6 +632,11 @@ def _initialize_model(
             aoti_compiled_model = load_package(
                 str(builder_args.aoti_package_path.absolute())
             )
+
+            def do_nothing(max_batch_size, max_seq_length):
+                pass
+            model.setup_caches = do_nothing
+
             model.forward = aoti_compiled_model
             metadata = aoti_compiled_model.get_metadata()
             builder_args.device = metadata["AOTI_DEVICE_KEY"]
