@@ -150,7 +150,7 @@ def get_precision():
 
 def get_cuda_architecture(device=None):
     device_str = get_device_str(device)
-    if "cuda" is in device_str and torch.cuda.is_available():
+    if "cuda" in device_str and torch.cuda.is_available():
         # Get the compute capability as (major, minor) tuple
         capability = torch.cuda.get_device_capability(device)
         return capability[0], capability[1]
@@ -190,7 +190,7 @@ def name_to_dtype(name, device):
     except KeyError:
         raise RuntimeError(f"unsupported dtype name {name} specified")
         
-    if ("cuda" is in device_str) and (dtype == torch.bfloat16) and (major < 9):
+    if ("cuda" in device_str) and (dtype == torch.bfloat16) and (major < 9):
         raise RuntimeError(f"target device {device_str} does not support the bfloat16 data type")
     return dtype
 
