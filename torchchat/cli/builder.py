@@ -558,19 +558,6 @@ def _initialize_model(
             # attributes will NOT be seen on by AOTI-compiled forward
             # function, e.g. calling model.setup_cache will NOT touch
             # AOTI compiled and maintained model buffers such as kv_cache.
-            # Using cpp runner to run AOTI compiled model is recommended.
-            #
-            # Released the loaded model to free up device memory.
-            # The AOTI-compiled model contains a copy of the model weights.
-            model.model = None
-            import gc
-            gc.collect()
-            torch.cuda.empty_cache()
-
-            def do_nothing(max_batch_size, max_seq_length):
-                pass
-            model.setup_caches = do_nothing
-
             model.forward = torch._export.aot_load(
                 str(builder_args.dso_path.absolute()), builder_args.device
             )
