@@ -177,7 +177,7 @@ def name_to_dtype(name, device):
                 return torch.float16
                 
         # if it's not CUDA, we know it's bfloat16
-        if "cuda" is not in device_str:
+        if "cuda" not in device_str:
             return torch.bfloat16
             
         if major >= 9:
