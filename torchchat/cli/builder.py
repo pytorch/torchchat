@@ -510,6 +510,15 @@ def _load_model(builder_args: BuilderArgs) -> Model:
         model = _load_model_default(builder_args)
     # model = _maybe_parallelize_model(model, builder_args, world_mesh, parallel_dims)
 
+    if builder_args.dso_path or builder_args.aoti_package_path:
+        # AOTI-compoiled model will load its own weights.
+        # Release weights here to avoid OOM
+        import gc
+        if hasattr(model, "model"):
+            model.model = None
+        gc.collect()
+        torch.cuda.empty_cache()
+
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
 
@@ -558,6 +567,12 @@ def _initialize_model(
             # attributes will NOT be seen on by AOTI-compiled forward
             # function, e.g. calling model.setup_cache will NOT touch
             # AOTI compiled and maintained model buffers such as kv_cache.
+            # Using cpp runner to run AOTI compiled model is recommended.
+
+            def do_nothing(max_batch_size, max_seq_length):
+                pass
+            model.setup_caches = do_nothing
+
             model.forward = torch._export.aot_load(
                 str(builder_args.dso_path.absolute()), builder_args.device
             )
