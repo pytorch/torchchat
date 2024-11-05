@@ -270,7 +270,9 @@ class TransformerArgs:
     norm_eps: float = 1e-5
     multiple_of: int = 256
     ffn_dim_multiplier: Optional[int] = None
+    # Select the desired tokenizer. Defaults to sentencepiece
     use_tiktoken: bool = False
+    use_hf_tokenizer: bool = False
     max_seq_length: int = 8192
     rope_scaling: Optional[Dict[str, Any]] = None
     # For pipeline parallel
@@ -327,12 +329,14 @@ class ModelArgs:
     model_type: ModelType
     transformer_args: Dict[str, Dict[str, Any]]
     use_tiktoken: bool
+    use_hf_tokenizer: bool
 
     def __init__(
         self,
         transformer_args: Dict[str, Dict[str, Any]],
         model_type: ModelType = ModelType.TextOnly,
         use_tiktoken: bool = False,
+        use_hf_tokenizer: bool = False,
     ) -> None:
         self._sanity_check(transformer_args, model_type)
 
@@ -341,6 +345,7 @@ class ModelArgs:
 
         # Model-level attributes
         self.use_tiktoken = use_tiktoken
+        self.use_hf_tokenizer = use_hf_tokenizer
 
     def _sanity_check(
         self,
@@ -367,7 +372,8 @@ class ModelArgs:
             }
 
         use_tiktoken = loaded_params.get("use_tiktoken", False)
-        return cls(transformer_args, model_type, use_tiktoken)
+        use_hf_tokenizer = loaded_params.get("use_hf_tokenizer", False)
+        return cls(transformer_args, model_type, use_tiktoken, use_hf_tokenizer)
 
     @classmethod
     def from_table(cls, name: str):
