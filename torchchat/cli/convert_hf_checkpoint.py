@@ -41,7 +41,8 @@ def convert_hf_checkpoint(
 
     # Load the json file containing weight mapping
     model_map_json_matches = [Path(m) for m in glob.glob(str(model_dir / "*.index.json"))]
-    assert len(model_map_json_matches) <= 1, "Found multiple weight mapping files"
+    if "mistral" not in model_name:
+        assert len(model_map_json_matches) <= 1, "Found multiple weight mapping files"
     if len(model_map_json_matches):
         model_map_json = model_map_json_matches[0]
     else:
