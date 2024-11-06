@@ -35,9 +35,14 @@ fi
 # newer version of torch nightly installed later in this script.
 #
 
+#(
+#  set -x
+#  $PIP_EXECUTABLE install -r install/requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cu121
+#)
+
 (
   set -x
-  $PIP_EXECUTABLE install -r install/requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cu121
+  $PIP_EXECUTABLE install -r install/requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/xpu
 )
 
 # Since torchchat often uses main-branch features of pytorch, only the nightly
@@ -47,7 +52,7 @@ fi
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-PYTORCH_NIGHTLY_VERSION=dev20241002
+PYTORCH_NIGHTLY_VERSION=dev20241001
 
 # Nightly version for torchvision
 VISION_NIGHTLY_VERSION=dev20241002
@@ -64,21 +69,21 @@ TUNE_NIGHTLY_VERSION=dev20241010
 # The pip repository that hosts nightly torch packages. cpu by default.
 # If cuda is available, based on presence of nvidia-smi, install the pytorch nightly
 # with cuda for faster execution on cuda GPUs.
-if [[ -x "$(command -v nvidia-smi)" ]];
-then
-  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu121"
-elif [[ -x "$(command -v rocminfo)" ]];
-then
-  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/rocm6.2"
-else
-  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
-fi
-
+#if [[ -x "$(command -v nvidia-smi)" ]];
+#then
+#  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu121"
+#elif [[ -x "$(command -v rocminfo)" ]];
+#then
+#  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/rocm6.2"
+#else
+#  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
+#fi
+TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/xpu"
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
   torch=="2.6.0.${PYTORCH_NIGHTLY_VERSION}"
   torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
-  torchtune=="0.4.0.${TUNE_NIGHTLY_VERSION}"
+  #torchtune=="0.3.0.${TUNE_NIGHTLY_VERSION}"
 )
 
 # Install the requirements. --extra-index-url tells pip to look for package
@@ -87,6 +92,12 @@ REQUIREMENTS_TO_INSTALL=(
   set -x
   $PIP_EXECUTABLE install --extra-index-url "${TORCH_NIGHTLY_URL}" \
     "${REQUIREMENTS_TO_INSTALL[@]}"
+)
+
+(
+  set -x
+  $PIP_EXECUTABLE install --extra-index-url "${TORCH_NIGHTLY_URL}" \
+    torchtune=="0.3.1"
 )
 
 (
