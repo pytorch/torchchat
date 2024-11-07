@@ -267,7 +267,7 @@ class CompletionResponseChunk:
     usage: Optional[UsageStats] = None
 
 
-class OpenAiApiGenerator(Generator):
+class OpenAiApiGenerator(SingleGPUGenerator):
     """A wrapper over the Generator class to interface with the OpenAI API.
 
     Implements endpoints for completion requests, both chunked and non-chunked using the dataclasses
