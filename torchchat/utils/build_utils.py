@@ -11,7 +11,7 @@ import os
 
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import torch
 
@@ -77,31 +77,39 @@ active_builder_args_aoti_package = None
 def set_backend(dso, pte, aoti_package):
     global active_builder_args_dso
     global active_builder_args_pte
+    global active_builder_args_aoti_package
     active_builder_args_dso = dso
     active_builder_args_aoti_package = aoti_package
     active_builder_args_pte = pte
 
 
 class _Backend(Enum):
-    AOTI = (0,)
+    AOTI = 0
     EXECUTORCH = 1
 
 
-def _active_backend() -> _Backend:
+def _active_backend() -> Optional[_Backend]:
     global active_builder_args_dso
     global active_builder_args_aoti_package
     global active_builder_args_pte
 
-    # eager == aoti, which is when backend has not been explicitly set
-    if (not active_builder_args_pte) and (not active_builder_args_aoti_package):
-        return True
+    args = (
+        active_builder_args_dso,
+        active_builder_args_pte,
+        active_builder_args_aoti_package,
+    )
 
-    if active_builder_args_pte and active_builder_args_aoti_package:
+    # Return None, as default
+    if not any(args):
+        return None
+
+    # Catch more than one arg
+    if sum(map(bool, args)) > 1:
         raise RuntimeError(
-            "code generation needs to choose different implementations for AOTI and PTE path.  Please only use one export option, and call export twice if necessary!"
+            "Code generation needs to choose different implementations.  Please only use one export option, and call export twice if necessary!"
         )
 
-    return _Backend.AOTI if active_builder_args_pte else _Backend.EXECUTORCH
+    return _Backend.EXECUTORCH if active_builder_args_pte else _Backend.AOTI
 
 
 def use_aoti_backend() -> bool:
