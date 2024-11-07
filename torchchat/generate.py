@@ -17,6 +17,7 @@ from io import BytesIO
 from os import PathLike
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing_extensions import override
 
 import torch
 import torch._dynamo.config
@@ -214,7 +215,209 @@ class GeneratorArgs:
         )
 
 
-class Generator:
+class Generator(object):
+    """
+    Base class for generators that can be used to generate text samples based on a pre-trained Transformer model and tokenizer.
+    """
+
+    def __init__(
+        self,
+        builder_args: BuilderArgs,
+        tokenizer_args: TokenizerArgs,
+        generator_args: GeneratorArgs,
+    ):
+        self.builder_args = builder_args
+        self.tokenizer_args = tokenizer_args
+        self.generate_args = generator_args
+
+        self.dtype = builder_args.precision
+
+        self.tokenizer = _initialize_tokenizer(self.tokenizer_args)
+
+        # Right now the assumption is only llama3 uses tiktokenizer and it
+        # must use tiktokenizer.
+        # Piggy backing off of this flag then for now to identify llama3
+        # without prompting user.
+        self.is_llama3_model = self.tokenizer_args.is_tiktoken
+        if self.is_llama3_model:
+            self.chat_formatter = Llama3ChatFormatter(self.tokenizer)
+            if generator_args.chat_mode:
+                logging.debug(
+                    "Llama3 model detected in chat mode. Using updated sentence schemas"
+                )
+        else:
+            self.chat_formatter = Llama2ChatFormatter(self.tokenizer)
+
+    @abstractmethod
+    def is_text_only(self) -> bool:
+        """
+        Returns True if the model is text-only, False otherwise.
+        """
+        raise NotImplementedError()
+
+    def _gen_model_input(
+        self,
+        prompt: Union[str | List[Any]],
+        image_prompts: Optional[List[str | Image.Image]] = None,
+        max_new_tokens: Optional[int] = None,
+        max_seq_len: Optional[int] = 2048,
+    ) -> Tuple[torch.Tensor, Optional[Dict[str, Any]]]:
+        """
+        Convert prompt and image prompts into consumable model input args.
+
+        When prompt is a list, the anticipated format is OpenAI API Inspired:
+            [ ..., {"role": message["role"], "content": message["content"]}, ...]
+
+        Args:
+            prompt (Union[str, List[Any]]): Prompt or list of dialog.
+            image_prompts (Optional[List[str | Image.Image]]): List of image prompts. Used only with Llama 3.2 11B.
+            max_new_tokens (Optional[int]): Maximum number of new tokens to generate. Used only with Llama 3.2 11B.
+
+        Returns:
+            Tuple[torch.Tensor, Optional[Dict[str, Any]]]: Encoded prompt and batch config for multimodal models.
+        """
+
+        # Text-Only model
+        if self.is_text_only():
+            # Single String prompt
+            if isinstance(prompt, str):
+                encoded = self.encode_tokens(
+                    prompt, bos=True, device=self.builder_args.device
+                )
+            # List of dialog
+            else:
+                tokens = self.chat_formatter.encode_dialog_prompt(prompt)
+                encoded = torch.tensor(
+                    tokens, dtype=torch.int, device=self.builder_args.device
+                )
+
+            logging.debug(encoded)
+            return encoded, None
+
+        # Llama 3.2 11B
+        assert (
+            image_prompts is None or len(image_prompts) == 1
+        ), "At most one image is supported at the moment"
+
+        if image_prompts and isinstance(image_prompts[0], str):
+            images = [Image.open(image_prompts[0])]
+        else:
+            images = None
+
+        assert (
+            max_new_tokens is not None
+        ), "max_new_tokens must be specified for Flamingo models"
+
+        # Wrap string prompts into a list
+        if isinstance(prompt, str):
+            prompt = [{"role": "user", "content": prompt}]
+
+        image_found = False
+        messages = []
+        for message in prompt:
+            if isinstance(message["content"], str):
+                if not image_found and image_prompts:
+                    messages.append(
+                        Message(
+                            role=message["role"],
+                            content=[
+                                {"type": "image", "content": images[0]},
+                                {"type": "text", "content": message["content"]},
+                            ],
+                        )
+                    )
+                    image_found = True
+                else:
+                    messages.append(Message(**message))
+
+            elif isinstance(message["content"], list):
+                images = None
+                for content_dict in message["content"]:
+                    if content_dict["type"] == "text":
+                        prompt_arg = content_dict["text"]
+                    elif content_dict["type"] == "image_url":
+                        assert (
+                            images is None
+                        ), "At most one image is supported at the moment"
+
+                        base64_decoded = base64.b64decode(
+                            content_dict["image_url"].split(";base64,")[1]
+                        )
+                        images = [Image.open(BytesIO(base64_decoded))]
+                        image_found = True
+
+                is_multimodal = images is not None
+                content = [{"type": "text", "content": prompt_arg}]
+
+                if is_multimodal:
+                    content = [{"type": "image", "content": images[0]}] + content
+
+                messages.append(
+                    Message(
+                        role=message["role"],
+                        content=content,
+                    )
+                )
+
+        messages.append(
+            Message(
+                role="assistant",
+                content="",
+            )
+        )
+
+        transform = llama3_2_vision_transform(str(self.tokenizer_args.tokenizer_path))
+
+        device = torch.device(device=self.builder_args.device)
+
+        with device, set_default_dtype(self.dtype):
+            data = transform({"messages": messages}, inference=True)
+
+            if image_found:
+                batch = padded_collate_tiled_images_and_mask(
+                    [data], pad_direction="left", pad_max_images=1
+                )
+                encoded = batch.pop("tokens").to(device).view(-1)
+                seq_len = encoded.size(0)
+                batch["encoder_mask"] = batch["encoder_mask"][:, :seq_len]
+                batch["encoder_input"]["images"] = batch["encoder_input"]["images"].to(
+                    self.dtype
+                )
+
+            else:
+                encoded = torch.tensor(data["tokens"], device=device).view(-1)
+                seq_len = encoded.size(0)
+                batch = {}
+
+            total_response_length = seq_len + max_new_tokens
+            batch["causal_mask"] = torch.nn.functional.pad(
+                torch.tril(
+                    torch.ones(
+                        size=(total_response_length, total_response_length),
+                        dtype=torch.bool,
+                    )
+                ),
+                (
+                    0,
+                    max_seq_len - total_response_length,
+                    0,
+                    max_seq_len - total_response_length,
+                ),
+                value=0,
+            )
+
+        logging.debug(encoded)
+        return encoded, batch
+
+    def encode_tokens(self, string, bos=True, device="cpu"):
+        tokens = self.tokenizer.encode(string)
+        if bos:
+            tokens = [self.tokenizer.bos_id()] + tokens
+        logging.debug(f"Size after encode_tokens: {len(tokens)}")
+        return torch.tensor(tokens, dtype=torch.int, device=device)
+
+
+class SingleGPUGenerator(Generator):
     """
     Generates text samples based on a pre-trained Transformer model and tokenizer.
     Args:
@@ -237,6 +440,7 @@ class Generator:
         quantize: bool,
         draft_quantize: bool,
     ):
+        super().__init__(builder_args, tokenizer_args, generator_args)
         torch._inductor.config.coordinate_descent_tuning = (
             builder_args.device != "cpu"
         )
@@ -245,12 +449,10 @@ class Generator:
 
         self.builder_args = builder_args
         self.speculative_builder_args = speculative_builder_args
-        self.tokenizer_args = tokenizer_args
         self.profile = profile
         self.quantize = quantize
         self.draft_quantize = draft_quantize
         self.is_torchtune_model = generator_args.is_torchtune_model
-        self.dtype = builder_args.precision
 
         self.rank: Optional[int] = None
 
@@ -273,21 +475,6 @@ class Generator:
             ))
             # fmt: on
         self.system_prompt = generator_args.prompt
-        self.tokenizer = _initialize_tokenizer(self.tokenizer_args)
-
-        # Right now the assumption is only llama3 uses tiktokenizer and it
-        # must use tiktokenizer.
-        # Piggy backing off of this flag then for now to identify llama3
-        # without prompting user.
-        self.is_llama3_model = self.tokenizer_args.is_tiktoken
-        if self.is_llama3_model:
-            self.chat_formatter = Llama3ChatFormatter(self.tokenizer)
-            if generator_args.chat_mode:
-                logging.debug(
-                    "Llama3 model detected in chat mode. Using updated sentence schemas"
-                )
-        else:
-            self.chat_formatter = Llama2ChatFormatter(self.tokenizer)
 
         self.builder_args.setup_caches = False
         self.model = _initialize_model(self.builder_args, self.quantize, self.tokenizer)
@@ -721,13 +908,6 @@ class Generator:
         }
         yield None, generate_stats
 
-    def encode_tokens(self, string, bos=True, device="cpu"):
-        tokens = self.tokenizer.encode(string)
-        if bos:
-            tokens = [self.tokenizer.bos_id()] + tokens
-        logging.debug(f"Size after encode_tokens: {len(tokens)}")
-        return torch.tensor(tokens, dtype=torch.int, device=device)
-
     def _callback(self, x, *, buffer, done_generating):
         # TODO: Refactor this callback to only include basic functionality & remove print statements
         period_id = self.tokenizer.encode(".")[0]
@@ -747,159 +927,6 @@ class Generator:
             buffer.clear()
         # print(, end='', flush=True)
 
-    def _gen_model_input(
-        self,
-        prompt: Union[str | List[Any]],
-        image_prompts: Optional[List[str | Image.Image]] = None,
-        max_new_tokens: Optional[int] = None,
-        max_seq_len: Optional[int] = 2048,
-    ) -> Tuple[torch.Tensor, Optional[Dict[str, Any]]]:
-        """
-        Convert prompt and image prompts into consumable model input args.
-
-        When prompt is a list, the anticipated format is OpenAI API Inspired:
-            [ ..., {"role": message["role"], "content": message["content"]}, ...]
-
-        Args:
-            prompt (Union[str, List[Any]]): Prompt or list of dialog.
-            image_prompts (Optional[List[str | Image.Image]]): List of image prompts. Used only with Llama 3.2 11B.
-            max_new_tokens (Optional[int]): Maximum number of new tokens to generate. Used only with Llama 3.2 11B.
-
-        Returns:
-            Tuple[torch.Tensor, Optional[Dict[str, Any]]]: Encoded prompt and batch config for multimodal models.
-        """
-
-        # Text-Only model
-        if self.model.config.model_type != ModelType.Flamingo:
-            # Single String prompt
-            if isinstance(prompt, str):
-                encoded = self.encode_tokens(
-                    prompt, bos=True, device=self.builder_args.device
-                )
-            # List of dialog
-            else:
-                tokens = self.chat_formatter.encode_dialog_prompt(prompt)
-                encoded = torch.tensor(
-                    tokens, dtype=torch.int, device=self.builder_args.device
-                )
-
-            logging.debug(encoded)
-            return encoded, None
-
-        # Llama 3.2 11B
-        assert (
-            image_prompts is None or len(image_prompts) == 1
-        ), "At most one image is supported at the moment"
-
-        if image_prompts and isinstance(image_prompts[0], str):
-            images = [Image.open(image_prompts[0])]
-        else:
-            images = None
-
-        assert (
-            max_new_tokens is not None
-        ), "max_new_tokens must be specified for Flamingo models"
-
-        # Wrap string prompts into a list
-        if isinstance(prompt, str):
-            prompt = [{"role": "user", "content": prompt}]
-
-        image_found = False
-        messages = []
-        for message in prompt:
-            if isinstance(message["content"], str):
-                if not image_found and image_prompts:
-                    messages.append(
-                        Message(
-                            role=message["role"],
-                            content=[
-                                {"type": "image", "content": images[0]},
-                                {"type": "text", "content": message["content"]},
-                            ],
-                        )
-                    )
-                    image_found = True
-                else:
-                    messages.append(Message(**message))
-
-            elif isinstance(message["content"], list):
-                images = None
-                for content_dict in message["content"]:
-                    if content_dict["type"] == "text":
-                        prompt_arg = content_dict["text"]
-                    elif content_dict["type"] == "image_url":
-                        assert (
-                            images is None
-                        ), "At most one image is supported at the moment"
-
-                        base64_decoded = base64.b64decode(
-                            content_dict["image_url"].split(";base64,")[1]
-                        )
-                        images = [Image.open(BytesIO(base64_decoded))]
-                        image_found = True
-
-                is_multimodal = images is not None
-                content = [{"type": "text", "content": prompt_arg}]
-
-                if is_multimodal:
-                    content = [{"type": "image", "content": images[0]}] + content
-
-                messages.append(
-                    Message(
-                        role=message["role"],
-                        content=content,
-                    )
-                )
-
-        messages.append(
-            Message(
-                role="assistant",
-                content="",
-            )
-        )
-
-        transform = llama3_2_vision_transform(str(self.tokenizer_args.tokenizer_path))
-
-        device = torch.device(device=self.builder_args.device)
-
-        with device, set_default_dtype(self.dtype):
-            data = transform({"messages": messages}, inference=True)
-
-            if image_found:
-                batch = padded_collate_tiled_images_and_mask(
-                    [data], pad_direction="left", pad_max_images=1
-                )
-                encoded = batch.pop("tokens").to(device).view(-1)
-                seq_len = encoded.size(0)
-                batch["encoder_mask"] = batch["encoder_mask"][:, :seq_len]
-                batch["encoder_input"]["images"] = batch["encoder_input"]["images"].to(
-                    self.dtype
-                )
-
-            else:
-                encoded = torch.tensor(data["tokens"], device=device).view(-1)
-                seq_len = encoded.size(0)
-                batch = {}
-
-            total_response_length = seq_len + max_new_tokens
-            batch["causal_mask"] = torch.nn.functional.pad(
-                torch.tril(
-                    torch.ones(
-                        size=(total_response_length, total_response_length),
-                        dtype=torch.bool,
-                    )
-                ),
-                (
-                    0,
-                    max_seq_len - total_response_length,
-                    0,
-                    max_seq_len - total_response_length,
-                ),
-                value=0,
-            )
-
-        logging.debug(encoded)
-        return encoded, batch
 
     def chat(
         self,
@@ -1205,6 +1232,10 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
         )
         if torch.cuda.is_available():
             print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
+    
+    @override
+    def is_text_only(self) -> bool:
+        return self.model.config.model_type != ModelType.Flamingo
 
 
 def _launch_distributed_inference(
@@ -1222,7 +1253,7 @@ def main(args):
     tokenizer_args = TokenizerArgs.from_args(args)
     generator_args = GeneratorArgs.from_args(args)
     if not builder_args.distributed:
-        gen = Generator(
+        gen = SingleGPUGenerator(
             builder_args,
             speculative_builder_args,
             tokenizer_args,

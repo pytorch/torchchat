@@ -282,16 +282,6 @@ def _cleanup():
     dist.destroy_process_group()
 
 
-prompts = [
-    "What is Snow?",
-    # "Can you explain what is the purpose of back propagation in neural networks?",
-    "Who is Santa Claus?",
-    "Where does Santa live?",
-    "Who is Abraham Lincoln?",
-    # "How are models trained?",
-]
-
-
 def main(
     model_name,
     builder_args,
