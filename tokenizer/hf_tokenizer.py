@@ -5,11 +5,12 @@
 # LICENSE file in the root directory of this source tree.
 
 # Standard
-from typing import List, Optional
+from typing import Dict, List, Optional
 import json
 import os
 
 # Third Party
+import jinja2
 from tokenizers import Tokenizer
 
 # Local
@@ -37,6 +38,9 @@ class HFTokenizer(TokenizerBase):
         # Load the tokenizer itself
         self._tokenizer = Tokenizer.from_file(tokenizer_path)
 
+        # Load the chat template if we have a config path
+        self._chat_template: Optional[jinja2.Template] = None
+
         # If available, parse bos/eos tokens from the tokenizer config
         self._bos_id, self._eos_id = None, None
         if tokenizer_config_path is not None:
@@ -48,6 +52,8 @@ class HFTokenizer(TokenizerBase):
                 self._bos_id = self._tokenizer.token_to_id(bos_token)
             if eos_token is not None:
                 self._eos_id = self._tokenizer.token_to_id(eos_token)
+            if chat_template_str := tok_config.get("chat_template"):
+                self._chat_template = jinja2.Template(chat_template_str)
 
         # If no eos/bos tokens found, go looking for them!
         if None in [self._bos_id, self._eos_id]:
@@ -70,6 +76,8 @@ class HFTokenizer(TokenizerBase):
             if len(candidate_toks) == 1:
                 return candidate_toks[0]["id"]
 
+    ## Interface ##
+
     def encode(
         self,
         s: str,
@@ -90,3 +98,21 @@ class HFTokenizer(TokenizerBase):
 
     def eos_id(self) -> int:
         return self._eos_id
+
+    ## Additional Public Methods ##
+
+    def has_chat_template(self) -> bool:
+        return bool(self._chat_template)
+
+    def apply_chat_template(
+        self,
+        dialog: List[Dict[str, str]],
+        add_generation_prompt: bool = False,
+    ) -> str:
+        """If configured with a chat template, apply it to the list of messages
+        """
+        if not self._chat_template:
+            raise ValueError("No chat template configured!")
+        return self._chat_template.render(
+            messages=dialog, add_generation_prompt=add_generation_prompt
+        )
