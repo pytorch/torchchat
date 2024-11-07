@@ -21,6 +21,7 @@ import torch.multiprocessing as mp
 from torchchat.cli.builder import BuilderArgs, TokenizerArgs
 from torchchat.distributed.dist_run import NAME_TO_DISTRIBUTION_AND_DTYPE
 from torchchat.distributed.logging_utils import SingletonLogger
+from torchchat.utils.generator import Generator, GeneratorArgs
 
 logger = SingletonLogger.get_logger()
 
@@ -194,19 +195,19 @@ class Scheduler(object):
         return outputs
 
 
-class DistributedGenerator(object):
+class DistributedGenerator(Generator):
     def __init__(
         self,
         # TODO: switch this to torchchat method
         model_name: str,
         builder_args: BuilderArgs,
         tokenizer_args: TokenizerArgs,
-        # TODO: move GeneratorArgs into a different module
-        generator_args,
+        generator_args: GeneratorArgs,
         profile: Optional[Path],
         quantize: bool,
         draft_quantize: bool,
     ):
+        super().__init__(builder_args, tokenizer_args, generator_args)
         self.model_name = model_name
         self.builder_args = builder_args
         self.generate_args = generator_args
