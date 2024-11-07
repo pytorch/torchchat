@@ -915,13 +915,6 @@ class Generator:
             ]
         )
         if generator_args.compile:
-            if (
-                self.is_speculative and self.builder_args.use_distributed
-            ):  # and ("cuda" in builder_args.device):
-                torch._inductor.config.triton.cudagraph_trees = (
-                    False  # Bug with cudagraph trees in this case
-                )
-
             if self.builder_args.device == "cpu":
                 if generator_args.max_autotune:
                     kwargs = {"mode": "max-autotune"}
@@ -1091,9 +1084,7 @@ class Generator:
 
                 torch._inductor.config.profiler_mark_wrapper_call = True
                 torch._inductor.config.cpp.enable_kernel_profile = True
-            if (i != generator_args.num_samples - 1 or not self.profile) or (
-                self.builder_args.use_distributed and self.rank != 0
-            ):
+            if i != generator_args.num_samples - 1 or not self.profile:
                 import contextlib
 
                 prof = contextlib.nullcontext()
@@ -1136,10 +1127,7 @@ class Generator:
                     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
                 else:
                     print(prof.key_averages().table(sort_by="self_cuda_time_total"))
-                if self.builder_args.use_distributed:
-                    prof.export_chrome_trace(f"{self.profile}_rank_{self.rank}.json")
-                else:
-                    prof.export_chrome_trace(f"{self.profile}.json")
+                prof.export_chrome_trace(f"{self.profile}.json")
 
             if start_pos >= max_seq_length:
                 print(
