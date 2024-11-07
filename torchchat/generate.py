@@ -125,6 +125,15 @@ class Llama2ChatFormatter(_ChatFormatter):
         return tokens
 
 
+class HFTokenizerChatFormatter(_ChatFormatter):
+    """Chat formatter that uses the built-in formatting capabilities of an HF
+    tokenizer instance
+    """
+    def encode_dialog_prompt(self, dialog) -> List[int]:
+        rendered = self.tokenizer.apply_chat_template(dialog, add_generation_prompt=True)
+        return self.tokenizer.encode(rendered)
+
+
 @dataclass
 class GeneratorArgs:
     prompt: Optional[str] = (
@@ -286,6 +295,10 @@ class Generator:
                 logging.debug(
                     "Llama3 model detected in chat mode. Using updated sentence schemas"
                 )
+        elif self.tokenizer_args.is_hf_tokenizer:
+            if not self.tokenizer.has_chat_template():
+                raise ValueError("Tokenizer must have a chat template")
+            self.chat_formatter = HFTokenizerChatFormatter(self.tokenizer)
         else:
             self.chat_formatter = Llama2ChatFormatter(self.tokenizer)
 
