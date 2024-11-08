@@ -534,7 +534,7 @@ def arg_init(args):
         from torchchat.utils.build_utils import get_device_str
 
         if args.device is None:
-            args.dtype = get_device_str(
+            args.device = get_device_str(
                 args.quantize.get("executor", {}).get("accelerator", default_device)
             )
         else:
