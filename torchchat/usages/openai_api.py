@@ -24,7 +24,7 @@ from torchtune.data import Message, padded_collate_tiled_images_and_mask
 from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
 
 from torchchat.cli.download import is_model_downloaded, load_model_configs
-from torchchat.generate import SingleGPUGenerator, GeneratorArgs
+from torchchat.generate import LocalGenerator, GeneratorArgs
 from torchchat.model import FlamingoModel
 
 from torchchat.utils.build_utils import device_sync
@@ -267,7 +267,7 @@ class CompletionResponseChunk:
     usage: Optional[UsageStats] = None
 
 
-class OpenAiApiGenerator(SingleGPUGenerator):
+class OpenAiApiGenerator(LocalGenerator):
     """A wrapper over the Generator class to interface with the OpenAI API.
 
     Implements endpoints for completion requests, both chunked and non-chunked using the dataclasses

@@ -31,7 +31,7 @@ from torchchat.utils.device_info import get_device_info
 from torchchat.utils.generator import Generator, GeneratorArgs, E_INST, B_INST, E_SYS, B_SYS
 
 
-class SingleGPUGenerator(Generator):
+class LocalGenerator(Generator):
     """
     Generates text samples based on a pre-trained Transformer model and tokenizer.
     Args:
@@ -856,7 +856,7 @@ def main(args):
     tokenizer_args = TokenizerArgs.from_args(args)
     generator_args = GeneratorArgs.from_args(args)
     if not builder_args.distributed:
-        gen = SingleGPUGenerator(
+        gen = LocalGenerator(
             builder_args,
             speculative_builder_args,
             tokenizer_args,
