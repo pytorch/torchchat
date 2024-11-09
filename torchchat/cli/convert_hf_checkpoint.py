@@ -11,25 +11,23 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-import torch
-
-from torchchat.model import TransformerArgs
-
 # support running without installing as a package
 wd = Path(__file__).parent.parent
 sys.path.append(str(wd.resolve()))
 sys.path.append(str((wd / "build").resolve()))
 
-from torchchat.model import ModelArgs
 
-
-@torch.inference_mode()
 def convert_hf_checkpoint(
     *,
     model_dir: Optional[Path] = None,
     model_name: Optional[str] = None,
     remove_bin_files: bool = False,
 ) -> None:
+
+    # Local imports to avoid expensive imports
+    from torchchat.model import ModelArgs, TransformerArgs
+    import torch
+
     if model_dir is None:
         model_dir = Path("checkpoints/meta-Transformer/Transformer-2-7b-chat-hf")
     if model_name is None:
@@ -58,10 +56,11 @@ def convert_hf_checkpoint(
         tokenizer_pth = model_dir / "original" / "tokenizer.model"
         if consolidated_pth.is_file() and tokenizer_pth.is_file():
             # Confirm we can load it
-            loaded_result = torch.load(
-                str(consolidated_pth), map_location="cpu", mmap=True, weights_only=True
-            )
-            del loaded_result  # No longer needed
+            with torch.inference_mode():
+                loaded_result = torch.load(
+                    str(consolidated_pth), map_location="cpu", mmap=True, weights_only=True
+                )
+                del loaded_result  # No longer needed
             print(f"Moving checkpoint to {model_dir / 'model.pth'}.")
             os.rename(consolidated_pth, model_dir / "model.pth")
             os.rename(tokenizer_pth, model_dir / "tokenizer.model")
@@ -130,7 +129,8 @@ def convert_hf_checkpoint(
         state_dict = None
         for loader in loaders:
             try:
-                state_dict = loader()
+                with torch.inference_mode():
+                    state_dict = loader()
                 break
             except Exception:
                 continue
@@ -173,7 +173,6 @@ def convert_hf_checkpoint(
             os.remove(file)
 
 
-@torch.inference_mode()
 def convert_hf_checkpoint_to_tune(
     *,
     model_dir: Optional[Path] = None,

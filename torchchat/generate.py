@@ -71,11 +71,11 @@ class Llama3ChatFormatter(_ChatFormatter):
 
     def encode_message(self, message) -> List[int]:
         tokens = self.encode_header(message["role"])
-        if type(message["content"]) is str:
+        if isinstance(message["content"], str):
             tokens.extend(
                 self.tokenizer.encode(message["content"], bos=False, eos=False)
             )
-        elif type(message["content"]) is list:
+        elif isinstance(message["content"], list):
             for content in message["content"]:
                 if content["type"] == "text":
                     tokens.extend(
@@ -163,6 +163,8 @@ class GeneratorArgs:
             reason = "model compilation for prefill"
         if self.compile:
             reason = "model compilation"
+        if builder_args.aoti_package_path:
+            model_type = "PT2"
         if builder_args.dso_path:
             model_type = "DSO"
         if builder_args.pte_path:
@@ -176,7 +178,10 @@ class GeneratorArgs:
     def from_args(cls, args):
         dso_path = getattr(args, "dso_path", None)
         pte_path = getattr(args, "pte_path", None)
-        sequential_prefill = args.sequential_prefill or bool(dso_path) or bool(pte_path)
+        aoti_package_path = getattr(args, "aoti_package_path", None)
+        sequential_prefill = (
+            args.sequential_prefill or bool(aoti_package_path) or bool(pte_path) or bool(dso_path)
+        )
 
         # Validate that all image prompts exist before expensive model load
         if image_prompts := getattr(args, "image_prompts", None):
@@ -185,7 +190,7 @@ class GeneratorArgs:
                 for image_prompt in image_prompts
                 if (not os.path.exists(image_prompt))
             ]
-            if len(non_existent_image_prompts):
+            if non_existent_image_prompts:
                 raise RuntimeError(
                     f"Image prompt {non_existent_image_prompts} does not exist"
                 )
@@ -233,7 +238,7 @@ class Generator:
         draft_quantize: bool,
     ):
         torch._inductor.config.coordinate_descent_tuning = (
-            False if builder_args.device == "cpu" else True
+            builder_args.device != "cpu"
         )
         torch._inductor.config.triton.unique_kernel_names = True
         torch._inductor.config.fx_graph_cache = True  # Experimental feature to reduce compilation times, will be on by default in future
@@ -997,11 +1002,8 @@ class Generator:
                 max_seq_length,
             )
 
-        max_seq_length = (
-            max_seq_length + self.speculative_builder_args.speculate_k + 1
-            if self.draft_model is not None
-            else max_seq_length
-        )
+        if self.draft_model is not None:
+            max_seq_length += self.speculative_builder_args.speculate_k + 1
 
         aggregate_metrics = {
             "tokens_per_sec": [],
