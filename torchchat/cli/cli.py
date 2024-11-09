@@ -168,7 +168,7 @@ def _add_model_config_args(parser, verb: str) -> None:
         type=str,
         default=default_device,
         choices=["fast", "cpu", "cuda", "mps", "xpu"],
-        help="Hardware device to use. Options: cpu, cuda, mps",
+        help="Hardware device to use. Options: cpu, cuda, mps, xpu",
     )
 
 
