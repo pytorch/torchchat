@@ -21,7 +21,7 @@ RegexPreTokenizer::create_regex_(const std::string& pattern) {
   return std::make_unique<re2::RE2>("(" + pattern + ")");
 }
 
-std::vector<std::string> RegexPreTokenizer::pre_tokenize(re2::StringPiece& input) const {
+std::vector<std::string> RegexPreTokenizer::pre_tokenize(re2::StringPiece input) const {
   std::vector<std::string> result;
   std::string piece;
   while (RE2::FindAndConsume(&input, *regex_, &piece)) {
@@ -30,7 +30,7 @@ std::vector<std::string> RegexPreTokenizer::pre_tokenize(re2::StringPiece& input
   return result;
 }
 
-// ByteLevelPreTokenizer /////////////////////////////////////////////
+// ByteLevelPreTokenizer ///////////////////////////////////////////////////////
 
 //////////////////
 // Impl Details //
@@ -55,7 +55,7 @@ ByteLevelPreTokenizer::ByteLevelPreTokenizer(
 {}
 
 std::vector<std::string>
-ByteLevelPreTokenizer::pre_tokenize(re2::StringPiece& input) const {
+ByteLevelPreTokenizer::pre_tokenize(re2::StringPiece input) const {
 
   // Add the prefix space if configured to do so
   std::string input_str(input);

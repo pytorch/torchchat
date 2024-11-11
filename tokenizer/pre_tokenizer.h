@@ -30,8 +30,11 @@ class PreTokenizer {
    * This pre-tokenization may result in sub-pieces that are not contained
    * within the original input, therefore the resulting pieces will be owned by
    * the caller.
+   *
+   * NOTE: Pass by value per best practice
+   *  https://abseil.io/docs/cpp/guides/strings#string_view
    */
-  virtual std::vector<std::string> pre_tokenize(re2::StringPiece& input) const = 0;
+  virtual std::vector<std::string> pre_tokenize(re2::StringPiece input) const = 0;
 };  // end class PreTokenizer
 
 // -- Regex --------------------------------------------------------------------
@@ -48,7 +51,7 @@ class RegexPreTokenizer : public PreTokenizer {
   {}
 
   /** Pre-tokenize with the stored regex */
-  std::vector<std::string> pre_tokenize(re2::StringPiece& input) const;
+  std::vector<std::string> pre_tokenize(re2::StringPiece input) const;
 
  protected:
   static Re2UPtr create_regex_(const std::string& pattern);
@@ -76,8 +79,6 @@ class ByteLevelPreTokenizer : public PreTokenizer {
  public:
 
   /**
-   * Construct with matching rust implementation
-   *
    * @param add_prefix_space: Whether to add a leading space to the first word
    * @param pattern: A user-supplied regex to use for token splitting. If not
    *    provided, it use the standard GPT2 pattern.
@@ -85,7 +86,7 @@ class ByteLevelPreTokenizer : public PreTokenizer {
   ByteLevelPreTokenizer(bool add_prefix_space = true, const std::string& pattern = "");
 
   /** Perform pre-tokenization */
-  std::vector<std::string> pre_tokenize(re2::StringPiece& input) const override;
+  std::vector<std::string> pre_tokenize(re2::StringPiece input) const override;
 
  private:
 
