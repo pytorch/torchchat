@@ -13,7 +13,10 @@ add_library(
     sentencepiece.cpp
     tiktoken.cpp
     tokenizers.cpp
-    pre_tokenizer.cpp)
+    pre_tokenizer.cpp
+    # llama.cpp unicode
+    unicode-data.cpp
+    unicode.cpp)
 
 target_include_directories(
     tokenizer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
