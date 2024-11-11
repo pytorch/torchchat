@@ -25,6 +25,9 @@
 class PreTokenizer {
  public:
 
+  /** Shared pointer type */
+  typedef std::shared_ptr<PreTokenizer> Ptr;
+
   /** Split the input string piece into sub-pieces
    *
    * This pre-tokenization may result in sub-pieces that are not contained
@@ -92,5 +95,25 @@ class ByteLevelPreTokenizer : public PreTokenizer {
 
   const std::string pattern_;
   const bool add_prefix_space_;
+
+};  // end class ByteLevelPreTokenizer
+
+// -- Sequence -----------------------------------------------------------------
+// Used by tokenizers
+// CITE: https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/pre_tokenizers/sequence.rs
+
+class SequencePreTokenizer : public PreTokenizer {
+ public:
+
+  /**
+   * @param pre_tokenizers: The sequence of owned pre-tokenizer objects to use
+   */
+  explicit SequencePreTokenizer(std::vector<PreTokenizer::Ptr> pre_tokenizers);
+
+  /** Perform pre-tokenization */
+  std::vector<std::string> pre_tokenize(re2::StringPiece input) const override;
+
+ private:
+  const std::vector<PreTokenizer::Ptr> pre_tokenizers_;
 
 };  // end class ByteLevelPreTokenizer

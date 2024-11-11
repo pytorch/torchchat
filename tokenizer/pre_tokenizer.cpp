@@ -65,3 +65,24 @@ ByteLevelPreTokenizer::pre_tokenize(re2::StringPiece input) const {
 
   return unicode_regex_split(input_str, {pattern_});
 }
+
+// SequencePreTokenizer ////////////////////////////////////////////////////////
+
+SequencePreTokenizer::SequencePreTokenizer(
+  std::vector<PreTokenizer::Ptr> pre_tokenizers)
+  : pre_tokenizers_(std::move(pre_tokenizers))
+{}
+
+std::vector<std::string> SequencePreTokenizer::pre_tokenize(re2::StringPiece input) const {
+  std::vector<std::string> pieces{std::string(input)};
+  for (const auto& pre_tokenizer : pre_tokenizers_) {
+    std::vector<std::string> new_pieces;
+    for (const auto& piece : pieces) {
+      for (const auto& subpiece : pre_tokenizer->pre_tokenize(piece)) {
+        new_pieces.push_back(subpiece);
+      }
+    }
+    pieces = std::move(new_pieces);
+  }
+  return pieces;
+}

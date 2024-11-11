@@ -24,9 +24,9 @@ void assert_split_match(
 ) {
   re2::StringPiece prompt_view(prompt);
   const auto& got = ptok.pre_tokenize(prompt_view);
-  EXPECT_EQ(got.size(), expected.size());
+  EXPECT_EQ(expected.size(), got.size());
   for (auto i = 0; i < got.size(); ++i) {
-    EXPECT_EQ(got[i], expected[i]);
+    EXPECT_EQ(expected[i], got[i]);
   }
 }
 
@@ -91,5 +91,28 @@ TEST_F(ByteLevelPreTokenizerTest, PreTokenizeNoPrefix) {
     ptok,
     "Hello World",
     {"Hello", "ĠWorld"}
+  );
+}
+
+TEST_F(ByteLevelPreTokenizerTest, PreTokenizeCustomRegex) {
+  ByteLevelPreTokenizer ptok(false, R"(o)");
+  assert_split_match(
+    ptok,
+    "Hello World",
+    {"Hell", "o", "ĠW", "o", "rld"}
+  );
+}
+
+// SequencePreTokenizer ////////////////////////////////////////////////////////
+class SequencePreTokenizerTest : public ::testing::Test {};
+
+TEST_F(SequencePreTokenizerTest, PreTokenizeDigitAndByteLevel) {
+  PreTokenizer::Ptr dptok(new DigitsPreTokenizer(true));
+  PreTokenizer::Ptr bptok(new ByteLevelPreTokenizer(false));
+  SequencePreTokenizer ptok({dptok, bptok});
+  assert_split_match(
+    ptok,
+    "The number 1 then 234 then 5.",
+    {"The", "Ġnumber", "Ġ", "1", "Ġthen", "Ġ", "2", "3", "4", "Ġthen", "Ġ", "5", "."}
   );
 }
