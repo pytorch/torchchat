@@ -17,11 +17,11 @@ RegexPreTokenizer::create_regex_(const std::string& pattern) {
   return std::make_unique<re2::RE2>("(" + pattern + ")");
 }
 
-std::vector<re2::StringPiece> RegexPreTokenizer::pre_tokenize(re2::StringPiece& input) const {
-  std::vector<re2::StringPiece> result;
-  re2::StringPiece piece;
+std::vector<std::string> RegexPreTokenizer::pre_tokenize(re2::StringPiece& input) const {
+  std::vector<std::string> result;
+  std::string piece;
   while (RE2::FindAndConsume(&input, *regex_, &piece)) {
-    result.emplace_back(std::move(piece));
+    result.emplace_back(piece);
   }
   return result;
 }

@@ -25,8 +25,13 @@
 class PreTokenizer {
  public:
 
-  /** Split the input string piece into sub-pieces */
-  virtual std::vector<re2::StringPiece> pre_tokenize(re2::StringPiece& input) const = 0;
+  /** Split the input string piece into sub-pieces
+   *
+   * This pre-tokenization may result in sub-pieces that are not contained
+   * within the original input, therefore the resulting pieces will be owned by
+   * the caller.
+   */
+  virtual std::vector<std::string> pre_tokenize(re2::StringPiece& input) const = 0;
 };  // end class PreTokenizer
 
 
@@ -58,7 +63,7 @@ class RegexPreTokenizer : public PreTokenizer {
   {}
 
   /** Pre-tokenize with the stored regex */
-  std::vector<re2::StringPiece> pre_tokenize(re2::StringPiece& input) const;
+  std::vector<std::string> pre_tokenize(re2::StringPiece& input) const;
 
  protected:
   static Re2UPtr create_regex_(const std::string& pattern);
