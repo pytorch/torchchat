@@ -34,21 +34,6 @@ class PreTokenizer {
   virtual std::vector<std::string> pre_tokenize(re2::StringPiece& input) const = 0;
 };  // end class PreTokenizer
 
-
-/**
- * Base class for all decoders with a single virtual method to decode from the
- * token IDs back to a string
- */
-class TokenDecoder {
- public:
-
-  /** Common type for token IDs */
-  typedef uint64_t TokenId;
-
-  /** Decode the sequence of token IDs back to a string */
-  virtual std::string decode(const std::vector<uint8_t>& input) const = 0;
-};  // end class TokenDecoder
-
 // -- Regex --------------------------------------------------------------------
 // Used for general-purpose single-regex pre tokenization (e.g. tiktoken)
 // CITE: https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/pre_tokenizers/split.rs
@@ -68,7 +53,6 @@ class RegexPreTokenizer : public PreTokenizer {
  protected:
   static Re2UPtr create_regex_(const std::string& pattern);
 
- private:
   Re2UPtr regex_;
 
 };  // end class RegexPreTokenizer
@@ -87,3 +71,25 @@ class DigitsPreTokenizer : public RegexPreTokenizer {
 // -- ByteLevel ----------------------------------------------------------------
 // Used by tokenizers
 // CITE: https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/pre_tokenizers/byte_level.rs
+
+class ByteLevelPreTokenizer : public PreTokenizer {
+ public:
+
+  /**
+   * Construct with matching rust implementation
+   *
+   * @param add_prefix_space: Whether to add a leading space to the first word
+   * @param pattern: A user-supplied regex to use for token splitting. If not
+   *    provided, it use the standard GPT2 pattern.
+   */
+  ByteLevelPreTokenizer(bool add_prefix_space = true, const std::string& pattern = "");
+
+  /** Perform pre-tokenization */
+  std::vector<std::string> pre_tokenize(re2::StringPiece& input) const override;
+
+ private:
+
+  const std::string pattern_;
+  const bool add_prefix_space_;
+
+};  // end class ByteLevelPreTokenizer
