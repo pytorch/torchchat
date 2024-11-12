@@ -378,8 +378,8 @@ jobs:
 
         echo "::group::Run inference with quantize file"
         if [ $(uname -s) == Darwin ]; then
-          python3 torchchat.py export --output-dso-path /tmp/model.so --quantize torchchat/quant_config/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
-             python3 torchchat.py generate --dso-path /tmp/model.so --checkpoint "./checkpoints/${REPO_NAME}/model.pth"~
+          python3 torchchat.py export --output-aoti-package-path /tmp/model.pt2 --quantize torchchat/quant_config/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+             python3 torchchat.py generate --aoti-package-path /tmp/model.pt2 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"~
         fi
         echo "::endgroup::"
 
@@ -1023,8 +1023,8 @@ jobs:
 
           for dtype in fp32 fp16 bf16 fast fast16; do
             echo "Running export + runner with dtype=$dtype"
-            python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --dtype $dtype --output-dso-path /tmp/model.so
-            ./cmake-out/aoti_run /tmp/model.so -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}"
+            python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --dtype $dtype --output-aoti-package-path /tmp/model.pt2
+            ./cmake-out/aoti_run /tmp/model.pt2 -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}"
           done
 
           echo "Tests complete."
@@ -1118,8 +1118,8 @@ jobs:
           python torchchat.py export stories110M --output-pte-path ./model.pte --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
           ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
           echo "Export and run AOTI (C++ runner)"
-          python torchchat.py export stories110M --output-dso-path ./model.so --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
-          ./cmake-out/aoti_run ./model.so -z ./tokenizer.model -t 0 -i "${PRMT}"
+          python torchchat.py export stories110M --output-aoti-package-path ./model.pt2 --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
+          ./cmake-out/aoti_run ./model.pt2 -z ./tokenizer.model -t 0 -i "${PRMT}"
           echo "Generate AOTI"
-          python torchchat.py generate stories110M --dso-path ./model.so --prompt "${PRMT}"
+          python torchchat.py generate stories110M --aoti-package-path ./model.pt2 --prompt "${PRMT}"
           echo "Tests complete."

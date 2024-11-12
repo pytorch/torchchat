@@ -24,16 +24,6 @@ import torch._inductor.config
 
 from PIL import Image
 
-from torchchat.cli.builder import (
-    _initialize_model,
-    _initialize_tokenizer,
-    BuilderArgs,
-    TokenizerArgs,
-)
-from torchchat.model import Model, ModelType
-from torchchat.utils.build_utils import device_sync, set_precision
-from torchchat.utils.device_info import get_device_info
-
 # torchtune model definition dependencies
 from torchtune.data import Message, padded_collate_tiled_images_and_mask
 
@@ -42,6 +32,17 @@ from torchtune.models.llama3 import llama3_tokenizer
 
 from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
 from torchtune.training import set_default_dtype
+
+from torchchat.cli.builder import (
+    _initialize_model,
+    _initialize_tokenizer,
+    BuilderArgs,
+    TokenizerArgs,
+)
+from torchchat.distributed.generate import DistributedGenerator
+from torchchat.model import Model, ModelType
+from torchchat.utils.build_utils import device_sync, set_precision
+from torchchat.utils.device_info import get_device_info
 
 
 class _ChatFormatter(ABC):
@@ -70,11 +71,11 @@ class Llama3ChatFormatter(_ChatFormatter):
 
     def encode_message(self, message) -> List[int]:
         tokens = self.encode_header(message["role"])
-        if type(message["content"]) is str:
+        if isinstance(message["content"], str):
             tokens.extend(
                 self.tokenizer.encode(message["content"], bos=False, eos=False)
             )
-        elif type(message["content"]) is list:
+        elif isinstance(message["content"], list):
             for content in message["content"]:
                 if content["type"] == "text":
                     tokens.extend(
@@ -162,6 +163,8 @@ class GeneratorArgs:
             reason = "model compilation for prefill"
         if self.compile:
             reason = "model compilation"
+        if builder_args.aoti_package_path:
+            model_type = "PT2"
         if builder_args.dso_path:
             model_type = "DSO"
         if builder_args.pte_path:
@@ -175,7 +178,10 @@ class GeneratorArgs:
     def from_args(cls, args):
         dso_path = getattr(args, "dso_path", None)
         pte_path = getattr(args, "pte_path", None)
-        sequential_prefill = args.sequential_prefill or bool(dso_path) or bool(pte_path)
+        aoti_package_path = getattr(args, "aoti_package_path", None)
+        sequential_prefill = (
+            args.sequential_prefill or bool(aoti_package_path) or bool(pte_path) or bool(dso_path)
+        )
 
         # Validate that all image prompts exist before expensive model load
         if image_prompts := getattr(args, "image_prompts", None):
@@ -184,7 +190,7 @@ class GeneratorArgs:
                 for image_prompt in image_prompts
                 if (not os.path.exists(image_prompt))
             ]
-            if len(non_existent_image_prompts):
+            if non_existent_image_prompts:
                 raise RuntimeError(
                     f"Image prompt {non_existent_image_prompts} does not exist"
                 )
@@ -232,7 +238,7 @@ class Generator:
         draft_quantize: bool,
     ):
         torch._inductor.config.coordinate_descent_tuning = (
-            False if builder_args.device == "cpu" else True
+            builder_args.device != "cpu"
         )
         torch._inductor.config.triton.unique_kernel_names = True
         torch._inductor.config.fx_graph_cache = True  # Experimental feature to reduce compilation times, will be on by default in future
@@ -246,23 +252,13 @@ class Generator:
         self.is_torchtune_model = generator_args.is_torchtune_model
         self.dtype = builder_args.precision
 
-        # global print
-        #    from tp import maybe_init_dist
-        #    rank = maybe_init_dist()
-        # use_distributed = False
         self.rank: Optional[int] = None
-        #    if use_distributed:
-        #        if rank != 0:
-        #            # only print on rank 0
-        #            print = lambda *args, **kwargs: None
 
         print(
             f"Using device={self.builder_args.device} {get_device_info(self.builder_args.device)}"
         )
         set_precision(self.builder_args.precision)
-        if builder_args.use_distributed:
-            device = torch.device(f"cuda:{int(os.environ['LOCAL_RANK'])}")
-            torch.cuda.set_device(device)
+
         self.is_speculative = self.speculative_builder_args.checkpoint_path is not None
 
         if generator_args.chat_mode and not self.builder_args.is_chat_model:
@@ -1006,11 +1002,8 @@ class Generator:
                 max_seq_length,
             )
 
-        max_seq_length = (
-            max_seq_length + self.speculative_builder_args.speculate_k + 1
-            if self.draft_model is not None
-            else max_seq_length
-        )
+        if self.draft_model is not None:
+            max_seq_length += self.speculative_builder_args.speculate_k + 1
 
         aggregate_metrics = {
             "tokens_per_sec": [],
@@ -1164,13 +1157,9 @@ class Generator:
                 print(
                     f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds"
                 )
-                aggregate_metrics["tokens_per_sec_jit_compile"] = tokens_sec
-                # Don't continue here.... because we need to report and reset
-                # continue
-            else:
-                aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-                aggregate_metrics["first_token_per_sec"].append(first_token_sec)
-                aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
+            aggregate_metrics["tokens_per_sec"].append(tokens_sec)
+            aggregate_metrics["first_token_per_sec"].append(first_token_sec)
+            aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
 
             logging.info(
                 f"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\
@@ -1218,21 +1207,49 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
             print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
 
+def _launch_distributed_inference(
+    builder_args: BuilderArgs,
+):
+    from torch.distributed import launcher
+    from torch.distributed.elastic.utils.distributed import get_free_port
+
+    print("Launching distributed inference within generator")
+
+
 def main(args):
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
     generator_args = GeneratorArgs.from_args(args)
-    gen = Generator(
-        builder_args,
-        speculative_builder_args,
-        tokenizer_args,
-        generator_args,
-        args.profile,
-        args.quantize,
-        args.draft_quantize,
-    )
-    if torch.cuda.is_available():
-        torch.cuda.reset_peak_memory_stats()
-    for _ in gen.chat(generator_args):
-        pass
+    if not builder_args.distributed:
+        gen = Generator(
+            builder_args,
+            speculative_builder_args,
+            tokenizer_args,
+            generator_args,
+            args.profile,
+            args.quantize,
+            args.draft_quantize,
+        )
+        if torch.cuda.is_available():
+            torch.cuda.reset_peak_memory_stats()
+
+        for _ in gen.chat(generator_args):
+            pass
+    else:
+        dist_gen = DistributedGenerator(
+            args.model,
+            builder_args,
+            tokenizer_args,
+            generator_args,
+            args.profile,
+            args.quantize,
+            args.draft_quantize,
+        )
+
+        response = ""
+        for output in dist_gen.generate(generator_args.prompt):
+            response += output.text
+
+        print(f"Model output: {response}")
+        dist_gen.shutdown()

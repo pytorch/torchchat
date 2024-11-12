@@ -6,24 +6,38 @@
 
 from __future__ import annotations
 
-from enum import Enum
 import logging
 import os
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple
 
-import torch
+from enum import Enum
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
 
 ##########################################################################
 ###                       unpack packed weights                        ###
 
 
+class _LazyImportTorch:
+    """This is a wrapper around the import of torch that only performs the
+    import when an actual attribute is needed off of torch.
+    """
+    @staticmethod
+    def __getattribute__(name: str) -> Any:
+        import torch
+        return getattr(torch, name)
+
+
+# Alias torch to the lazy import
+torch = _LazyImportTorch()
+
+
 def unpack_packed_weights(
     packed_weights: Dict[str, Any],
     packed_linear: Callable,
-    input_dtype: torch.dtype,
+    input_dtype: "torch.dtype",
     unpacked_dims: Tuple,
-) -> torch.Tensor:
+) -> "torch.Tensor":
     """Given a packed weight matrix `packed_weights`, a Callable
     implementing a packed linear function for the packed format, and the
     unpacked dimensions of the weights, recreate the unpacked weight
@@ -70,34 +84,45 @@ def unpack_packed_weights(
 
 active_builder_args_dso = None
 active_builder_args_pte = None
+active_builder_args_aoti_package = None
 
 
-def set_backend(dso, pte):
+def set_backend(dso, pte, aoti_package):
     global active_builder_args_dso
     global active_builder_args_pte
+    global active_builder_args_aoti_package
     active_builder_args_dso = dso
+    active_builder_args_aoti_package = aoti_package
     active_builder_args_pte = pte
 
 
 class _Backend(Enum):
-    AOTI = 0,
+    AOTI = 0
     EXECUTORCH = 1
 
 
-def _active_backend() -> _Backend:
+def _active_backend() -> Optional[_Backend]:
     global active_builder_args_dso
+    global active_builder_args_aoti_package
     global active_builder_args_pte
 
-    # eager == aoti, which is when backend has not been explicitly set
-    if (not active_builder_args_dso) and not (active_builder_args_pte):
-        return _Backend.AOTI
+    args = (
+        active_builder_args_dso,
+        active_builder_args_pte,
+        active_builder_args_aoti_package,
+    )
 
-    if active_builder_args_pte and active_builder_args_dso:
+    # Return None, as default
+    if not any(args):
+        return None
+
+    # Catch more than one arg
+    if sum(map(bool, args)) > 1:
         raise RuntimeError(
-            "code generation needs to choose different implementations for DSO and PTE path.  Please only use one export option, and call export twice if necessary!"
+            "Code generation needs to choose different implementations.  Please only use one export option, and call export twice if necessary!"
         )
 
-    return _Backend.AOTI if active_builder_args_dso else _Backend.EXECUTORCH
+    return _Backend.EXECUTORCH if active_builder_args_pte else _Backend.AOTI
 
 
 def use_aoti_backend() -> bool:
@@ -111,16 +136,32 @@ def use_et_backend() -> bool:
 ##########################################################################
 ###          set and get target precision for this model               ###
 
-precision = torch.float32
+precision = None
 
 
 def set_precision(dtype):
+    """set_precision() is a torchchat-internal API that records the dtype we're building the model for.
+    The precision is recorded for future queries by get_precision(), so that when building a model,
+    or performing optimizations, we can query the type the user is building the model for.
+    This is an informational value that can be used when we want to know what type to build for (e.g., a kv cache).
+    Changing the `precision` does not change the precision of the model.
+    """
+
     global precision
+    assert (
+        precision is None
+    ), "only set precision once to avoid inconsistent answers during different phases of model build and export"
     precision = dtype
 
 
 def get_precision():
+    """get_precision() is a torchchat-internal API that returns the dtype we're building the model for, as specified by the `--dtype` CLI option+,
+    or the precision quantizer.
+    """
     global precision
+    # if (and only if) precision has not been set, update it to the default value torch.float32
+    if precision is None:
+        precision = torch.float32
     return precision
 
 
@@ -141,26 +182,27 @@ def name_to_dtype(name, device):
         return torch.bfloat16
 
     try:
-        return name_to_dtype_dict[name]
+        return _name_to_dtype_dict[name]()
     except KeyError:
         raise RuntimeError(f"unsupported dtype name {name} specified")
 
 
 def allowable_dtype_names() -> List[str]:
-    return name_to_dtype_dict.keys()
+    return _name_to_dtype_dict.keys()
 
 
-name_to_dtype_dict = {
-    "fp32": torch.float,
-    "fp16": torch.float16,
-    "bf16": torch.bfloat16,
-    "float": torch.float,
-    "half": torch.float16,
-    "float32": torch.float,
-    "float16": torch.float16,
-    "bfloat16": torch.bfloat16,
-    "fast": None,
-    "fast16": None,
+# NOTE: values are wrapped in lambdas to avoid proactive imports for torch
+_name_to_dtype_dict = {
+    "fp32": lambda: torch.float,
+    "fp16": lambda: torch.float16,
+    "bf16": lambda: torch.bfloat16,
+    "float": lambda: torch.float,
+    "half": lambda: torch.float16,
+    "float32": lambda: torch.float,
+    "float16": lambda: torch.float16,
+    "bfloat16": lambda: torch.bfloat16,
+    "fast": lambda: None,
+    "fast16": lambda: None,
 }
 
 
@@ -210,7 +252,7 @@ def canonical_path(path):
 
 
 def state_dict_device(d, device="cpu") -> Dict:
-    return {key : weight.to(device=device) for (key, weight) in d.items()}
+    return {key: weight.to(device=device) for (key, weight) in d.items()}
 
 
 #########################################################################
