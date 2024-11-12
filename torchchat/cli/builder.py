@@ -402,6 +402,7 @@ def _load_checkpoint(builder_args: BuilderArgs):
                     os.path.join(builder_args.checkpoint_dir, cp_name),
                     map_location=builder_args.device,
                     mmap=True,
+                    weights_only=False,
                 )
             )
         checkpoint = {}
