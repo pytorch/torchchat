@@ -78,11 +78,11 @@ def export_for_server(
             dynamic_shapes=dynamic_shapes,
             options=options,
         )
-        
+
         if package:
             from torch._inductor.package import package_aoti
             path = package_aoti(output_path, path)
-    
+
     print(f"The generated packaged model can be found at: {path}")
     return path
 
@@ -382,7 +382,7 @@ def main(args):
 
         if builder_args.max_seq_length is None:
             if (
-                output_dso_path is not None
+                (output_dso_path is not None or output_aoti_package_path is not None)
                 and not builder_args.dynamic_shapes
             ):
                 print("Setting max_seq_length to 300 for DSO export.")
