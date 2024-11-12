@@ -320,7 +320,7 @@ using json = nlohmann::json;
 // -------------------------private method end-------------------------------
 // -------------------------public method start-------------------------------
 
-TokenizersTokenizer::TokenizersTokenizer() : Tokenizer() {}
+TokenizersTokenizer::TokenizersTokenizer() : Tiktoken() {}
 
 void TokenizersTokenizer::load(const std::string& path) {
 
@@ -362,11 +362,11 @@ void TokenizersTokenizer::load(const std::string& path) {
     for (auto it = special_tokens.begin(); it != special_tokens.end(); ++it) {
       const std::string token = it->at("content");
       const uint64_t token_id = it->at("id");
-      if (!_special_token_encoder.emplace(token, token_id).second) {
+      if (!special_token_encoder_.emplace(token, token_id).second) {
         fprintf(stderr, "duplicate special token: %s\n", token.c_str());
         exit(EXIT_FAILURE);
       }
-      if (!_special_token_decoder.emplace(token_id, token).second) {
+      if (!special_token_decoder_.emplace(token_id, token).second) {
         fprintf(stderr, "duplicate special token id: %llu\n", token_id);
         exit(EXIT_FAILURE);
       }
@@ -383,12 +383,12 @@ void TokenizersTokenizer::load(const std::string& path) {
       const std::string token = entry.key();
       const uint64_t token_id = entry.value();
       // Skip adding special tokens to the standard encoder/decoder
-      if (_special_token_decoder.find(token_id) == _special_token_decoder.end()) {
-        if (!_encoder.emplace(token, token_id).second) {
+      if (special_token_decoder_.find(token_id) == special_token_decoder_.end()) {
+        if (!encoder_.emplace(token, token_id).second) {
           fprintf(stderr, "duplicate token: %s\n", token.c_str());
           exit(EXIT_FAILURE);
         }
-        if (!_decoder.emplace(token_id, token).second) {
+        if (!decoder_.emplace(token_id, token).second) {
           fprintf(stderr, "duplicate token id: %llu\n", token_id);
           exit(EXIT_FAILURE);
         }
@@ -400,7 +400,39 @@ void TokenizersTokenizer::load(const std::string& path) {
   }
 
   // Set the vocab size to include special tokens
-  vocab_size_ = _encoder.size() + _special_token_encoder.size();
+  vocab_size_ = encoder_.size() + special_token_encoder_.size();
+
+  // Parse out the regexes for the pre-tokenizer
+  try {
+    const auto& pre_tokenizer = parsed_json.at("pre_tokenizer");
+    const std::string pt_type = pre_tokenizer.at("type");
+    if (pt_type == "Sequence") {
+      for (const auto& entry : pre_tokenizer.at("pretokenizers")) {
+        const std::string entry_type = entry.at("type");
+        std::string regex;
+        if (entry_type == "Split") {
+          regex = entry.at("Regex");
+        } else if (entry_type == "Digits") {
+          regex = "\\p{N}";
+        } else if (entry_type == "ByteLevel") {
+          //HACK! This should be better.....
+          regex =  "'s|'t|'re|'ve|'m|'ll|'d| ?\\p{L}+| ?\\p{N}+| ?[^\\s\\p{L}\\p{N}]+";
+        } else {
+          fprintf(stderr, "Unknown pre-tokenizer type: %s\n", entry_type.c_str());
+          exit(EXIT_FAILURE);
+        }
+
+        // Build the regex and add it to the list
+        regexes_.push_back(_create_regex(regex));
+      }
+    } else {
+      fprintf(stderr, "Unknown pre-tokenizer type: %s\n", pt_type.c_str());
+      exit(EXIT_FAILURE);
+    }
+  } catch (const json::out_of_range& e) {
+    fprintf(stderr, "Could not parse pre_tokenizer: %s\n", e.what());
+    exit(EXIT_FAILURE);
+  }
 
   // TODO: Do we need to parse the merges?
 
@@ -427,13 +459,13 @@ void TokenizersTokenizer::load(const std::string& path) {
     try {
       const std::string bos_token = parsed_json.at("bos_token");
       const std::string eos_token = parsed_json.at("eos_token");
-      const auto& bos_it = _special_token_encoder.find(bos_token);
-      const auto& eos_it = _special_token_encoder.find(eos_token);
-      if (bos_it == _special_token_encoder.end()) {
+      const auto& bos_it = special_token_encoder_.find(bos_token);
+      const auto& eos_it = special_token_encoder_.find(eos_token);
+      if (bos_it == special_token_encoder_.end()) {
         fprintf(stderr, "BOS token %s not in special tokens\n", bos_token.c_str());
         exit(EXIT_FAILURE);
       }
-      if (eos_it == _special_token_encoder.end()) {
+      if (eos_it == special_token_encoder_.end()) {
         fprintf(stderr, "EOS token %s not in special tokens\n", eos_token.c_str());
         exit(EXIT_FAILURE);
       }
@@ -452,7 +484,7 @@ void TokenizersTokenizer::load(const std::string& path) {
   else {
     std::vector<std::string> bos_candidates;
     std::vector<std::string> eos_candidates;
-    for (const auto& token : _special_token_encoder) {
+    for (const auto& token : special_token_encoder_) {
       if (
         token.first.find("bos") != std::string::npos ||
         token.first.find("begin") != std::string::npos
@@ -490,11 +522,11 @@ void TokenizersTokenizer::load(const std::string& path) {
     bool eos_found = false;
     if (bos_candidates.size() == 1) {
       bos_found = true;
-      bos_tok_ = _special_token_encoder[bos_candidates[0]];
+      bos_tok_ = special_token_encoder_[bos_candidates[0]];
     }
     if (eos_candidates.size() == 1) {
       eos_found = true;
-      eos_tok_ = _special_token_encoder[eos_candidates[0]];
+      eos_tok_ = special_token_encoder_[eos_candidates[0]];
     }
 
     // Make them the same if only one found
