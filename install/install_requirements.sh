@@ -19,14 +19,14 @@ fi
 echo "Using python executable: $PYTHON_EXECUTABLE"
 
 PYTHON_SYS_VERSION="$($PYTHON_EXECUTABLE -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")"
-# Check python version. Expect 3.10.x or 3.11.x
+# Check python version. Expect 3.10.x to 3.12.x. Note 3.13 may work, but no guarantees
 if ! $PYTHON_EXECUTABLE -c "
 import sys
-if sys.version_info < (3, 10) or sys.version_info >= (3, 12):
+if sys.version_info < (3, 10) or sys.version_info >= (3, 13):
     sys.exit(1)
 ";
 then
-  echo "Python version must be 3.10.x or 3.11.x. Detected version: $PYTHON_SYS_VERSION"
+  echo "Python version must be between 3.10.x and 3.12.x. Detected version: $PYTHON_SYS_VERSION"
   exit 1
 fi
 
