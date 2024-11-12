@@ -118,21 +118,19 @@ class Tiktoken : public Tokenizer {
     return special_tokens;
   }
 
-  template <typename T>
   std::pair<std::optional<std::string>, re2::StringPiece>
   _split_with_allowed_special_token(
       re2::StringPiece& input,
-      const T& allowed_special) const;
+      const Encoder& allowed_special) const;
 
   void _encode(
       re2::StringPiece& input,
       std::vector<uint64_t>& ret,
       uint64_t& last_piece_token_len) const;
 
-  template <typename T>
   std::pair<std::vector<uint64_t>, uint64_t> _encode_with_special_token(
       const std::string& text,
-      const T& allowed_special) const;
+      const Encoder& allowed_special) const;
 
   // Removed negative lookahead \s+(?!\S) since it's not supported by RE2.
   const std::string _pattern =

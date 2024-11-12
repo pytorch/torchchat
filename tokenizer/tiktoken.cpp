@@ -242,11 +242,10 @@ static std::vector<uint64_t> _byte_pair_encode(
 // ------------------------------Util end------------------------------------
 // -------------------------private method start-------------------------------
 
-template <typename T>
 std::pair<std::optional<std::string>, re2::StringPiece>
 Tiktoken::_split_with_allowed_special_token(
     re2::StringPiece& input,
-    const T& allowed_special) const {
+    const Encoder& allowed_special) const {
   if (!_special_token_regex) {
     return std::make_pair(std::nullopt, input);
   }
@@ -293,10 +292,9 @@ void Tiktoken::_encode(
   }
 }
 
-template <typename T>
 std::pair<std::vector<uint64_t>, uint64_t> Tiktoken::_encode_with_special_token(
     const std::string& text,
-    const T& allowed_special) const {
+    const Encoder& allowed_special) const {
   std::vector<uint64_t> tokens;
   uint64_t last_piece_token_len = 0;
   re2::StringPiece input(text);
