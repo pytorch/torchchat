@@ -215,6 +215,7 @@ class TokenizerArgs:
     tokenizer_path: Optional[Union[Path, str]] = None
     is_sentencepiece: bool = False
     is_tiktoken: bool = False
+    is_hf_tokenizer: bool = False
     t: Optional[Any] = None
 
     def __post_init__(self):
@@ -224,6 +225,7 @@ class TokenizerArgs:
             self.t = TiktokenTokenizer(model_path=str(self.tokenizer_path))
             self.is_tiktoken = True
             self.is_sentencepiece = False
+            self.is_hf_tokenizer = False
             return
         except:
             pass
@@ -234,12 +236,25 @@ class TokenizerArgs:
             self.t = SentencePieceProcessor(model_file=str(self.tokenizer_path))
             self.is_tiktoken = False
             self.is_sentencepiece = True
+            self.is_hf_tokenizer = False
+            return
+        except:
+            pass
+
+        try:
+            from tokenizer.hf_tokenizer import HFTokenizer
+
+            self.t = HFTokenizer(str(self.tokenizer_path))
+            self.is_tiktoken = False
+            self.is_sentencepiece = False
+            self.is_hf_tokenizer = True
             return
         except:
             pass
 
         self.is_tiktoken = False
         self.is_sentencepiece = False
+        self.is_hf_tokenizer = False
         self.t = None
         return
 
@@ -251,16 +266,27 @@ class TokenizerArgs:
         if model is None:
             return
 
-        if self.is_tiktoken == self.is_sentencepiece:
+        if sum([self.is_tiktoken, self.is_hf_tokenizer, self.is_sentencepiece]) != 1:
             raise RuntimeError(f"no tokenizer was found at {self.tokenizer_path}")
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
+        is_hf_tokenizer = self.is_hf_tokenizer
         use_tiktoken = model.config.use_tiktoken
+        use_hf_tokenizer = model.config.use_hf_tokenizer
+        use_sentencepiece = not (use_tiktoken or use_hf_tokenizer)
 
-        if not (is_tiktoken == use_tiktoken) or not (is_sentencepiece != use_tiktoken):
+        if (
+            (is_tiktoken and not use_tiktoken) or
+            (is_hf_tokenizer and not use_hf_tokenizer) or
+            (is_sentencepiece and not use_sentencepiece)
+        ):
             raise RuntimeError(
-                f"model-specified tokenizer ({tokenizer_setting_to_name(use_tiktoken)}) does not match provided tokenizer ({tokenizer_setting_to_name(is_tiktoken)}) for {model_description}"
+                "model-specified tokenizer ({}) does not match provided tokenizer ({}) for {}".format(
+                    tokenizer_setting_to_name(use_tiktoken, use_hf_tokenizer),
+                    tokenizer_setting_to_name(is_tiktoken, is_hf_tokenizer),
+                    model_description,
+                )
             )
 
         return
@@ -510,6 +536,15 @@ def _load_model(builder_args: BuilderArgs) -> Model:
         model = _load_model_default(builder_args)
     # model = _maybe_parallelize_model(model, builder_args, world_mesh, parallel_dims)
 
+    if builder_args.dso_path or builder_args.aoti_package_path:
+        # AOTI-compoiled model will load its own weights.
+        # Release weights here to avoid OOM
+        import gc
+        if hasattr(model, "model"):
+            model.model = None
+        gc.collect()
+        torch.cuda.empty_cache()
+
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
 
@@ -558,6 +593,12 @@ def _initialize_model(
             # attributes will NOT be seen on by AOTI-compiled forward
             # function, e.g. calling model.setup_cache will NOT touch
             # AOTI compiled and maintained model buffers such as kv_cache.
+            # Using cpp runner to run AOTI compiled model is recommended.
+
+            def do_nothing(max_batch_size, max_seq_length):
+                pass
+            model.setup_caches = do_nothing
+
             model.forward = torch._export.aot_load(
                 str(builder_args.dso_path.absolute()), builder_args.device
             )
@@ -591,6 +632,11 @@ def _initialize_model(
             aoti_compiled_model = load_package(
                 str(builder_args.aoti_package_path.absolute())
             )
+
+            def do_nothing(max_batch_size, max_seq_length):
+                pass
+            model.setup_caches = do_nothing
+
             model.forward = aoti_compiled_model
             metadata = aoti_compiled_model.get_metadata()
             builder_args.device = metadata["AOTI_DEVICE_KEY"]
@@ -655,5 +701,9 @@ def _initialize_model(
     return model
 
 
-def tokenizer_setting_to_name(tiktoken: bool = False) -> str:
-    return "TikToken" if tiktoken else "SentencePiece"
+def tokenizer_setting_to_name(tiktoken: bool, tokenizers: bool) -> str:
+    if tiktoken:
+        return "TikToken"
+    if tokenizers:
+        return "Tokenizers"
+    return "SentencePiece"

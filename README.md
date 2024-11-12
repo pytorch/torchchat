@@ -575,7 +575,7 @@ We really value our community and the contributions made by our wonderful users.
 
 To connect with us and other community members, we invite you to join our Slack community by filling out this [form](https://docs.google.com/forms/d/e/1FAIpQLSeADnUNW36fjKjYzyHDOzEB_abKQE9b6gqqW9NXse6O0MWh0A/viewform). Once you've joined, you can:
 * Head to the `#torchchat-general` channel for general questions, discussion, and community support.
-* Join the `#torchchat-contribution` channel if you're interested in contributing directly to project development.
+* Join the `#torchchat-contributors` channel if you're interested in contributing directly to project development.
 
 Looking forward to discussing with you about torchchat future!
 

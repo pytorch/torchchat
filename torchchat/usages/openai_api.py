@@ -388,6 +388,8 @@ class OpenAiApiGenerator(Generator):
 
         device_sync(device=self.builder_args.device)
 
+        buffer = []
+        ILLEGAL_CHAR = '\ufffd'
         # Process each token, metrics tuple yielded by Generator.generate.
         for y, _ in self.generate(
             model=self.model,
@@ -413,10 +415,15 @@ class OpenAiApiGenerator(Generator):
                 break
 
             y = y.view(-1)
+            buffer.append(y.item())
             # Decode the torch.Tensor token to a string and append to the buffer. Separate the sequences with a period token.
             content = "".join(
-                self.tokenizer.decode([self.tokenizer.encode(".")[0]] + y.tolist())[1:]
+                self.tokenizer.decode([self.tokenizer.encode(".")[0]] + buffer)[1:]
             )
+            # Skip content while illegal characters appear.
+            if ILLEGAL_CHAR in content:
+                continue
+            buffer.clear()
 
             # Package the sequence into a CompletionChunkResponse and yield it.
             chunk_delta = ChunkDelta(

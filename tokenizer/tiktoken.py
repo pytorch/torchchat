@@ -23,6 +23,8 @@ from typing import (
 import tiktoken
 from tiktoken.load import load_tiktoken_bpe
 
+from .base import TokenizerBase
+
 
 logger = getLogger(__name__)
 
@@ -38,7 +40,7 @@ class Message(TypedDict):
 Dialog = Sequence[Message]
 
 
-class Tokenizer:
+class Tokenizer(TokenizerBase):
     """
     tokenizing and encoding/decoding text using the Tiktoken tokenizer.
     """

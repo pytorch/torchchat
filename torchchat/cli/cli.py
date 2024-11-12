@@ -5,20 +5,16 @@
 # LICENSE file in the root directory of this source tree.
 
 import argparse
+import importlib.metadata
 import json
 import logging
 import os
 import sys
 from pathlib import Path
 
-import torch
-
-from torchchat.cli.download import download_and_convert, is_model_downloaded
-
 from torchchat.utils.build_utils import (
     allowable_dtype_names,
     allowable_params_table,
-    get_device_str,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -42,6 +38,9 @@ KNOWN_VERBS = GENERATION_VERBS + ["eval", "export"] + INVENTORY_VERBS
 
 # Handle CLI arguments that are common to a majority of subcommands.
 def check_args(args, verb: str) -> None:
+    # Local import to avoid unnecessary expensive imports
+    from torchchat.cli.download import download_and_convert, is_model_downloaded
+
     # Handle model download. Skip this for download, since it has slightly
     # different semantics.
     if (
@@ -498,9 +497,10 @@ def _add_speculative_execution_args(parser) -> None:
 
 
 def arg_init(args):
-    if not (torch.__version__ > "2.3"):
+    torch_version = importlib.metadata.version("torch")
+    if not torch_version or (torch_version <= "2.3"):
         raise RuntimeError(
-            f"You are using PyTorch {torch.__version__}. At this time, torchchat uses the latest PyTorch technology with high-performance kernels only available in PyTorch nightly until the PyTorch 2.4 release"
+            f"You are using PyTorch {torch_version}. At this time, torchchat uses the latest PyTorch technology with high-performance kernels only available in PyTorch nightly until the PyTorch 2.4 release"
         )
 
     if sys.version_info.major != 3 or sys.version_info.minor < 10:
@@ -521,6 +521,9 @@ def arg_init(args):
             raise RuntimeError("Device not supported by ExecuTorch")
         args.device = "cpu"
     else:
+        # Localized import to minimize expensive imports
+        from torchchat.utils.build_utils import get_device_str
+
         args.device = get_device_str(
             args.quantize.get("executor", {}).get("accelerator", args.device)
         )
@@ -534,5 +537,8 @@ def arg_init(args):
             vars(args)["compile_prefill"] = False
 
     if hasattr(args, "seed") and args.seed:
+        # Localized import to minimize expensive imports
+        import torch
+
         torch.manual_seed(args.seed)
     return args
