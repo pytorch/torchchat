@@ -12,7 +12,7 @@ add_library(
     tokenizer.h
     sentencepiece.cpp
     tiktoken.cpp
-    tokenizers.cpp
+    hf_tokenizers.cpp
     pre_tokenizer.cpp
     # llama.cpp unicode
     unicode-data.cpp

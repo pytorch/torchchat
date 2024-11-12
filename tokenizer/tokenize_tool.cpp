@@ -26,7 +26,7 @@ std::string help(char* argv[]) {
     ss << "Types:\n" << std::endl;
     ss << "* sentencepiece: SPTokenizer" << std::endl;
     ss << "* tiktoken: Tiktoken" << std::endl;
-    ss << "* tokenizers: TokenizersTokenizer" << std::endl;
+    ss << "* hf_tokenizers: HFTokenizer" << std::endl;
     return ss.str();
 }
 
@@ -56,8 +56,8 @@ int main(int argc, char* argv[]) {
     tok_ptr.reset(new SPTokenizer());
   } else if (tokenizer_type == "tiktoken") {
     tok_ptr.reset(new Tiktoken());
-  } else if (tokenizer_type == "tokenizers") {
-    tok_ptr.reset(new TokenizersTokenizer());
+  } else if (tokenizer_type == "hf_tokenizers") {
+    tok_ptr.reset(new HFTokenizer());
   } else {
     std::stringstream ss;
     ss << "ERROR: Invalid tokenizer type: " << tokenizer_type << std::endl << std::endl;

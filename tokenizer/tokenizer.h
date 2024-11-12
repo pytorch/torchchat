@@ -152,21 +152,21 @@ class Tiktoken : public Tokenizer {
 };
 
 
-// ----------------------- Tokenizers -----------------------
+// ----------------------- HF Tokenizers -----------------------
 // Used by many Huggingface models. Adapted from a combination of the original
 // rust implementation (https://github.com/huggingface/tokenizers/tree/main)
 // and the corresponding support in llama.cpp
 // (https://github.com/ggerganov/llama.cpp)
 
-class TokenizersTokenizer : public Tiktoken {
+class HFTokenizer : public Tiktoken {
  public:
   /*-- Public Interface --*/
 
   /**
    * Default initialize with no loaded data
    */
-  explicit TokenizersTokenizer();
-  ~TokenizersTokenizer() {};
+  explicit HFTokenizer();
+  ~HFTokenizer() {};
 
   /**
    * Load the model data into the
