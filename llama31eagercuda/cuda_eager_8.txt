@@ -1,0 +1,67 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 8.02 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.27 seconds
+-----------------------------------------------------------
+Once upon a time, there was a young boy named Benny who lived in a small village surrounded by a vast forest. Benny loved to explore the forest, and one day, he stumbled upon a hidden glade. In the center of the glade stood an enormous tree, its trunk as wide as a house and its branches reaching up towards the sky like giant arms. The tree was unlike any Benny had ever seen before, for it sparkled with a soft, ethereal glow.
+As Benny approached the tree, he noticed that the glow was coming from tiny, shimmering lights embedded in the bark. The lights pulsed and danced, casting a mesmerizing pattern on the ground around the tree. Benny felt drawn to the tree, as if it was calling to him. He reached out a hand to touch the trunk, and as he did, he felt a strange sensation, like a jolt of electricity.
+Suddenly, the tree began to speak to Benny in a low, rumbling voice. "Welcome, young2024-11-06:10:10:21,707 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 31.7138 sec total                 
+Time to first token: 3.2789 sec with parallel prefill.                
+
+      Total throughput: 6.3064 tokens/sec, 0.1586 s/token                 
+First token throughput: 0.3050 tokens/sec, 3.2789 s/token                 
+ Next token throughput: 6.9984 tokens/sec, 0.1429 s/token                     
+2024-11-06:10:10:21,708 INFO     [generate.py:1178] 
+Bandwidth achieved: 53.98 GB/s
+2024-11-06:10:10:21,708 INFO     [generate.py:1182] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, I was a 30-something stressed-out working mother of two. Just trying to make ends meet, juggle work and family life, and keep my sanity intact. My family was used to me cooking meals in a pressure cooker – my trusty Instant Pot. But one day, I decided to try something new: a slow cooker. And, oh boy, did it change my life!
+I was hesitant at first, thinking I didn't have the time or patience for slow cooking. But, desperate for a break from the daily grind, I decided to give it a shot. And, as it turned out, it was a game-changer! I could just toss everything in the pot, leave it alone, and come home to a perfectly cooked meal. No more slaving away in the kitchen all day, no more worrying about dinner, no more stress!
+Over the next few months, I discovered the joys of slow cooking. I made chili, stews, roasts, and2024-11-06:10:10:46,422 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 24.7135 sec total                 
+Time to first token: 0.1181 sec with parallel prefill.                
+
+      Total throughput: 8.0928 tokens/sec, 0.1236 s/token                 
+First token throughput: 8.4681 tokens/sec, 0.1181 s/token                 
+ Next token throughput: 8.0910 tokens/sec, 0.1236 s/token                     
+2024-11-06:10:10:46,422 INFO     [generate.py:1178] 
+Bandwidth achieved: 69.26 GB/s
+
+========================================
+
+Once upon a time, there lived a young man named John. He was a bit of an oddity in his town, as he was known for his incredible love of music. While everyone else in town would spend their evenings watching TV or playing video games, John would be out practicing his guitar or singing in the shower.
+One day, John decided that he wanted to share his music with the world. He began to play at local bars and restaurants, but no matter how hard he tried, he just couldn't seem to get noticed.
+The townspeople would politely clap along to John's songs, but they would never stay for the whole performance. They would often leave early, citing various excuses, such as work the next day or an early bedtime.
+John was heartbroken. He had given up so much to pursue his music, and it seemed like no one was even listening.
+One evening, as John was packing up his guitar and getting ready to leave, an old man approached him. The old man was dressed2024-11-06:10:11:11,564 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 25.1422 sec total                 
+Time to first token: 0.1052 sec with parallel prefill.                
+
+      Total throughput: 7.9547 tokens/sec, 0.1257 s/token                 
+First token throughput: 9.5048 tokens/sec, 0.1052 s/token                 
+ Next token throughput: 7.9482 tokens/sec, 0.1258 s/token                     
+2024-11-06:10:11:11,565 INFO     [generate.py:1178] 
+Bandwidth achieved: 68.08 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 7.45                 
+Average tokens/sec (first token): 6.09                 
+Average tokens/sec (next tokens): 7.68 
+                
+Memory used: 28.86 GB

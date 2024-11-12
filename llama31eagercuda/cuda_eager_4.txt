@@ -1,0 +1,68 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 7.99 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.46 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village surrounded by rolling hills and green pastures, there lived a young girl named Lily. Lily was a kind and gentle soul, with a heart full of love for all living things. She spent her days tending to her family's garden, helping with the household chores, and exploring the surrounding countryside.
+One day, while out picking wildflowers for her mother, Lily stumbled upon a small, injured bird. The bird had fallen from a tree during a fierce storm and was lying in the grass, panting and whimpering in pain. Lily immediately knew what she had to do – she carefully picked up the bird, cradling it gently in her hands, and took it back to her home to nurse it back to health.
+Over the next few weeks, Lily spent all her free time caring for the bird, feeding it, bathing it, and nursing it back to full strength. As she worked, she talked to the bird and told it stories, confided in it2024-11-06:10:11:59,144 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 24.7841 sec total                 
+Time to first token: 1.0204 sec with parallel prefill.                
+
+      Total throughput: 8.0697 tokens/sec, 0.1239 s/token                 
+First token throughput: 0.9800 tokens/sec, 1.0204 s/token                 
+ Next token throughput: 8.3741 tokens/sec, 0.1194 s/token                     
+2024-11-06:10:11:59,145 INFO     [generate.py:1178] 
+Bandwidth achieved: 129.60 GB/s
+2024-11-06:10:11:59,145 INFO     [generate.py:1182] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, there was a charming young man who fell in love with a beautiful woman named Emma. Emma was a ravishing beauty, with blue eyes that sparkled like diamonds and long, golden hair that cascaded down her back like a waterfall. She was intelligent, witty, and possessed a heart of gold, and the young man was hopelessly smitten.
+The young man was aware that Emma was already engaged to be married to a much older man named Jack. Jack was a wealthy businessman who owned a large estate in the countryside, and he was known for his ruthless ambition and his disdain for the young and the weak. But the young man didn't let that deter him from his desire to be with Emma. He convinced himself that Jack was not a good man, and that Emma deserved to be with someone who loved and respected her for who she was.
+As the wedding day approached, the young man became increasingly desperate to win Emma away from Jack. He thought up all sorts of schemes and plans to2024-11-06:10:12:25,002 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 25.8571 sec total                 
+Time to first token: 0.0872 sec with parallel prefill.                
+
+      Total throughput: 7.7348 tokens/sec, 0.1293 s/token                 
+First token throughput: 11.4713 tokens/sec, 0.0872 s/token                 
+ Next token throughput: 7.7222 tokens/sec, 0.1295 s/token                     
+2024-11-06:10:12:25,003 INFO     [generate.py:1178] 
+Bandwidth achieved: 124.23 GB/s
+
+========================================
+
+Once upon a time, a young man named Peter was living in a small village surrounded by a dense forest. He had always been fascinated by the stories of his grandfather, who had been a great hunter and explorer.
+One day, Peter decided to follow in his grandfather's footsteps and venture into the forest. He packed a small bag, said goodbye to his family, and set off into the unknown.
+As he walked deeper into the forest, Peter encountered many obstacles. He had to cross rushing rivers, climb steep hills, and navigate through thick underbrush. But he persevered, driven by his curiosity and sense of adventure.
+After many hours of walking, Peter came across a clearing. In the center of the clearing stood an enormous tree, its trunk as wide as a house and its branches stretching up towards the sky.
+Peter approached the tree, feeling a sense of awe and wonder. He had never seen anything like it before. As he reached out to touch the trunk, he heard a voice behind him.
+"Welcome2024-11-06:10:12:45,103 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 20.0996 sec total                 
+Time to first token: 0.0841 sec with parallel prefill.                
+
+      Total throughput: 9.9505 tokens/sec, 0.1005 s/token                 
+First token throughput: 11.8883 tokens/sec, 0.0841 s/token                 
+ Next token throughput: 9.9423 tokens/sec, 0.1006 s/token                     
+2024-11-06:10:12:45,103 INFO     [generate.py:1178] 
+Bandwidth achieved: 159.81 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 8.58                 
+Average tokens/sec (first token): 8.11                 
+Average tokens/sec (next tokens): 8.68 
+                
+Memory used: 22.40 GB

@@ -1,0 +1,304 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+2024-11-06:13:42:02,602 INFO     [GPTQ.py:693] linear: model.layers.0.attention.wq, in=4096, out=4096
+2024-11-06:13:42:02,908 INFO     [GPTQ.py:693] linear: model.layers.0.attention.wk, in=4096, out=1024
+2024-11-06:13:42:03,047 INFO     [GPTQ.py:693] linear: model.layers.0.attention.wv, in=4096, out=1024
+2024-11-06:13:42:03,191 INFO     [GPTQ.py:693] linear: model.layers.0.attention.wo, in=4096, out=4096
+2024-11-06:13:42:03,504 INFO     [GPTQ.py:693] linear: model.layers.0.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:03,908 INFO     [GPTQ.py:693] linear: model.layers.0.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:04,288 INFO     [GPTQ.py:693] linear: model.layers.0.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:04,683 INFO     [GPTQ.py:693] linear: model.layers.1.attention.wq, in=4096, out=4096
+2024-11-06:13:42:04,992 INFO     [GPTQ.py:693] linear: model.layers.1.attention.wk, in=4096, out=1024
+2024-11-06:13:42:05,144 INFO     [GPTQ.py:693] linear: model.layers.1.attention.wv, in=4096, out=1024
+2024-11-06:13:42:05,273 INFO     [GPTQ.py:693] linear: model.layers.1.attention.wo, in=4096, out=4096
+2024-11-06:13:42:05,586 INFO     [GPTQ.py:693] linear: model.layers.1.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:06,009 INFO     [GPTQ.py:693] linear: model.layers.1.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:06,423 INFO     [GPTQ.py:693] linear: model.layers.1.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:06,832 INFO     [GPTQ.py:693] linear: model.layers.2.attention.wq, in=4096, out=4096
+2024-11-06:13:42:07,133 INFO     [GPTQ.py:693] linear: model.layers.2.attention.wk, in=4096, out=1024
+2024-11-06:13:42:07,267 INFO     [GPTQ.py:693] linear: model.layers.2.attention.wv, in=4096, out=1024
+2024-11-06:13:42:07,403 INFO     [GPTQ.py:693] linear: model.layers.2.attention.wo, in=4096, out=4096
+2024-11-06:13:42:07,679 INFO     [GPTQ.py:693] linear: model.layers.2.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:08,058 INFO     [GPTQ.py:693] linear: model.layers.2.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:08,503 INFO     [GPTQ.py:693] linear: model.layers.2.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:09,015 INFO     [GPTQ.py:693] linear: model.layers.3.attention.wq, in=4096, out=4096
+2024-11-06:13:42:09,405 INFO     [GPTQ.py:693] linear: model.layers.3.attention.wk, in=4096, out=1024
+2024-11-06:13:42:09,621 INFO     [GPTQ.py:693] linear: model.layers.3.attention.wv, in=4096, out=1024
+2024-11-06:13:42:09,830 INFO     [GPTQ.py:693] linear: model.layers.3.attention.wo, in=4096, out=4096
+2024-11-06:13:42:10,224 INFO     [GPTQ.py:693] linear: model.layers.3.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:10,769 INFO     [GPTQ.py:693] linear: model.layers.3.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:11,283 INFO     [GPTQ.py:693] linear: model.layers.3.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:11,764 INFO     [GPTQ.py:693] linear: model.layers.4.attention.wq, in=4096, out=4096
+2024-11-06:13:42:12,174 INFO     [GPTQ.py:693] linear: model.layers.4.attention.wk, in=4096, out=1024
+2024-11-06:13:42:12,383 INFO     [GPTQ.py:693] linear: model.layers.4.attention.wv, in=4096, out=1024
+2024-11-06:13:42:12,564 INFO     [GPTQ.py:693] linear: model.layers.4.attention.wo, in=4096, out=4096
+2024-11-06:13:42:12,952 INFO     [GPTQ.py:693] linear: model.layers.4.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:13,349 INFO     [GPTQ.py:693] linear: model.layers.4.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:13,756 INFO     [GPTQ.py:693] linear: model.layers.4.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:14,149 INFO     [GPTQ.py:693] linear: model.layers.5.attention.wq, in=4096, out=4096
+2024-11-06:13:42:14,473 INFO     [GPTQ.py:693] linear: model.layers.5.attention.wk, in=4096, out=1024
+2024-11-06:13:42:14,606 INFO     [GPTQ.py:693] linear: model.layers.5.attention.wv, in=4096, out=1024
+2024-11-06:13:42:14,728 INFO     [GPTQ.py:693] linear: model.layers.5.attention.wo, in=4096, out=4096
+2024-11-06:13:42:15,042 INFO     [GPTQ.py:693] linear: model.layers.5.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:15,409 INFO     [GPTQ.py:693] linear: model.layers.5.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:15,839 INFO     [GPTQ.py:693] linear: model.layers.5.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:16,287 INFO     [GPTQ.py:693] linear: model.layers.6.attention.wq, in=4096, out=4096
+2024-11-06:13:42:16,602 INFO     [GPTQ.py:693] linear: model.layers.6.attention.wk, in=4096, out=1024
+2024-11-06:13:42:16,731 INFO     [GPTQ.py:693] linear: model.layers.6.attention.wv, in=4096, out=1024
+2024-11-06:13:42:16,862 INFO     [GPTQ.py:693] linear: model.layers.6.attention.wo, in=4096, out=4096
+2024-11-06:13:42:16,998 INFO     [GPTQ.py:693] linear: model.layers.6.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:17,407 INFO     [GPTQ.py:693] linear: model.layers.6.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:17,783 INFO     [GPTQ.py:693] linear: model.layers.6.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:18,211 INFO     [GPTQ.py:693] linear: model.layers.7.attention.wq, in=4096, out=4096
+2024-11-06:13:42:18,519 INFO     [GPTQ.py:693] linear: model.layers.7.attention.wk, in=4096, out=1024
+2024-11-06:13:42:18,641 INFO     [GPTQ.py:693] linear: model.layers.7.attention.wv, in=4096, out=1024
+2024-11-06:13:42:18,687 INFO     [GPTQ.py:693] linear: model.layers.7.attention.wo, in=4096, out=4096
+2024-11-06:13:42:18,961 INFO     [GPTQ.py:693] linear: model.layers.7.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:19,407 INFO     [GPTQ.py:693] linear: model.layers.7.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:19,858 INFO     [GPTQ.py:693] linear: model.layers.7.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:20,291 INFO     [GPTQ.py:693] linear: model.layers.8.attention.wq, in=4096, out=4096
+2024-11-06:13:42:20,847 INFO     [GPTQ.py:693] linear: model.layers.8.attention.wk, in=4096, out=1024
+2024-11-06:13:42:20,882 INFO     [GPTQ.py:693] linear: model.layers.8.attention.wv, in=4096, out=1024
+2024-11-06:13:42:20,887 INFO     [GPTQ.py:693] linear: model.layers.8.attention.wo, in=4096, out=4096
+2024-11-06:13:42:20,989 INFO     [GPTQ.py:693] linear: model.layers.8.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:21,256 INFO     [GPTQ.py:693] linear: model.layers.8.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:21,763 INFO     [GPTQ.py:693] linear: model.layers.8.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:22,282 INFO     [GPTQ.py:693] linear: model.layers.9.attention.wq, in=4096, out=4096
+2024-11-06:13:42:22,633 INFO     [GPTQ.py:693] linear: model.layers.9.attention.wk, in=4096, out=1024
+2024-11-06:13:42:22,784 INFO     [GPTQ.py:693] linear: model.layers.9.attention.wv, in=4096, out=1024
+2024-11-06:13:42:22,936 INFO     [GPTQ.py:693] linear: model.layers.9.attention.wo, in=4096, out=4096
+2024-11-06:13:42:23,289 INFO     [GPTQ.py:693] linear: model.layers.9.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:23,819 INFO     [GPTQ.py:693] linear: model.layers.9.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:24,337 INFO     [GPTQ.py:693] linear: model.layers.9.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:24,871 INFO     [GPTQ.py:693] linear: model.layers.10.attention.wq, in=4096, out=4096
+2024-11-06:13:42:25,232 INFO     [GPTQ.py:693] linear: model.layers.10.attention.wk, in=4096, out=1024
+2024-11-06:13:42:25,398 INFO     [GPTQ.py:693] linear: model.layers.10.attention.wv, in=4096, out=1024
+2024-11-06:13:42:25,547 INFO     [GPTQ.py:693] linear: model.layers.10.attention.wo, in=4096, out=4096
+2024-11-06:13:42:25,884 INFO     [GPTQ.py:693] linear: model.layers.10.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:26,395 INFO     [GPTQ.py:693] linear: model.layers.10.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:26,924 INFO     [GPTQ.py:693] linear: model.layers.10.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:27,436 INFO     [GPTQ.py:693] linear: model.layers.11.attention.wq, in=4096, out=4096
+2024-11-06:13:42:27,779 INFO     [GPTQ.py:693] linear: model.layers.11.attention.wk, in=4096, out=1024
+2024-11-06:13:42:27,927 INFO     [GPTQ.py:693] linear: model.layers.11.attention.wv, in=4096, out=1024
+2024-11-06:13:42:28,072 INFO     [GPTQ.py:693] linear: model.layers.11.attention.wo, in=4096, out=4096
+2024-11-06:13:42:28,415 INFO     [GPTQ.py:693] linear: model.layers.11.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:28,888 INFO     [GPTQ.py:693] linear: model.layers.11.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:29,374 INFO     [GPTQ.py:693] linear: model.layers.11.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:29,692 INFO     [GPTQ.py:693] linear: model.layers.12.attention.wq, in=4096, out=4096
+2024-11-06:13:42:29,827 INFO     [GPTQ.py:693] linear: model.layers.12.attention.wk, in=4096, out=1024
+2024-11-06:13:42:29,835 INFO     [GPTQ.py:693] linear: model.layers.12.attention.wv, in=4096, out=1024
+2024-11-06:13:42:29,918 INFO     [GPTQ.py:693] linear: model.layers.12.attention.wo, in=4096, out=4096
+2024-11-06:13:42:30,142 INFO     [GPTQ.py:693] linear: model.layers.12.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:30,472 INFO     [GPTQ.py:693] linear: model.layers.12.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:30,896 INFO     [GPTQ.py:693] linear: model.layers.12.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:31,361 INFO     [GPTQ.py:693] linear: model.layers.13.attention.wq, in=4096, out=4096
+2024-11-06:13:42:31,694 INFO     [GPTQ.py:693] linear: model.layers.13.attention.wk, in=4096, out=1024
+2024-11-06:13:42:31,814 INFO     [GPTQ.py:693] linear: model.layers.13.attention.wv, in=4096, out=1024
+2024-11-06:13:42:31,940 INFO     [GPTQ.py:693] linear: model.layers.13.attention.wo, in=4096, out=4096
+2024-11-06:13:42:32,183 INFO     [GPTQ.py:693] linear: model.layers.13.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:32,482 INFO     [GPTQ.py:693] linear: model.layers.13.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:32,841 INFO     [GPTQ.py:693] linear: model.layers.13.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:33,270 INFO     [GPTQ.py:693] linear: model.layers.14.attention.wq, in=4096, out=4096
+2024-11-06:13:42:33,507 INFO     [GPTQ.py:693] linear: model.layers.14.attention.wk, in=4096, out=1024
+2024-11-06:13:42:33,519 INFO     [GPTQ.py:693] linear: model.layers.14.attention.wv, in=4096, out=1024
+2024-11-06:13:42:33,531 INFO     [GPTQ.py:693] linear: model.layers.14.attention.wo, in=4096, out=4096
+2024-11-06:13:42:33,646 INFO     [GPTQ.py:693] linear: model.layers.14.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:33,869 INFO     [GPTQ.py:693] linear: model.layers.14.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:34,125 INFO     [GPTQ.py:693] linear: model.layers.14.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:34,376 INFO     [GPTQ.py:693] linear: model.layers.15.attention.wq, in=4096, out=4096
+2024-11-06:13:42:34,472 INFO     [GPTQ.py:693] linear: model.layers.15.attention.wk, in=4096, out=1024
+2024-11-06:13:42:34,594 INFO     [GPTQ.py:693] linear: model.layers.15.attention.wv, in=4096, out=1024
+2024-11-06:13:42:34,615 INFO     [GPTQ.py:693] linear: model.layers.15.attention.wo, in=4096, out=4096
+2024-11-06:13:42:34,740 INFO     [GPTQ.py:693] linear: model.layers.15.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:34,960 INFO     [GPTQ.py:693] linear: model.layers.15.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:35,228 INFO     [GPTQ.py:693] linear: model.layers.15.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:35,556 INFO     [GPTQ.py:693] linear: model.layers.16.attention.wq, in=4096, out=4096
+2024-11-06:13:42:35,652 INFO     [GPTQ.py:693] linear: model.layers.16.attention.wk, in=4096, out=1024
+2024-11-06:13:42:35,658 INFO     [GPTQ.py:693] linear: model.layers.16.attention.wv, in=4096, out=1024
+2024-11-06:13:42:35,663 INFO     [GPTQ.py:693] linear: model.layers.16.attention.wo, in=4096, out=4096
+2024-11-06:13:42:35,801 INFO     [GPTQ.py:693] linear: model.layers.16.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:36,128 INFO     [GPTQ.py:693] linear: model.layers.16.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:36,523 INFO     [GPTQ.py:693] linear: model.layers.16.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:36,806 INFO     [GPTQ.py:693] linear: model.layers.17.attention.wq, in=4096, out=4096
+2024-11-06:13:42:36,860 INFO     [GPTQ.py:693] linear: model.layers.17.attention.wk, in=4096, out=1024
+2024-11-06:13:42:36,881 INFO     [GPTQ.py:693] linear: model.layers.17.attention.wv, in=4096, out=1024
+2024-11-06:13:42:36,890 INFO     [GPTQ.py:693] linear: model.layers.17.attention.wo, in=4096, out=4096
+2024-11-06:13:42:37,048 INFO     [GPTQ.py:693] linear: model.layers.17.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:37,473 INFO     [GPTQ.py:693] linear: model.layers.17.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:37,790 INFO     [GPTQ.py:693] linear: model.layers.17.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:38,032 INFO     [GPTQ.py:693] linear: model.layers.18.attention.wq, in=4096, out=4096
+2024-11-06:13:42:38,127 INFO     [GPTQ.py:693] linear: model.layers.18.attention.wk, in=4096, out=1024
+2024-11-06:13:42:38,184 INFO     [GPTQ.py:693] linear: model.layers.18.attention.wv, in=4096, out=1024
+2024-11-06:13:42:38,260 INFO     [GPTQ.py:693] linear: model.layers.18.attention.wo, in=4096, out=4096
+2024-11-06:13:42:38,387 INFO     [GPTQ.py:693] linear: model.layers.18.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:38,662 INFO     [GPTQ.py:693] linear: model.layers.18.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:38,865 INFO     [GPTQ.py:693] linear: model.layers.18.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:39,048 INFO     [GPTQ.py:693] linear: model.layers.19.attention.wq, in=4096, out=4096
+2024-11-06:13:42:39,156 INFO     [GPTQ.py:693] linear: model.layers.19.attention.wk, in=4096, out=1024
+2024-11-06:13:42:39,161 INFO     [GPTQ.py:693] linear: model.layers.19.attention.wv, in=4096, out=1024
+2024-11-06:13:42:39,164 INFO     [GPTQ.py:693] linear: model.layers.19.attention.wo, in=4096, out=4096
+2024-11-06:13:42:39,287 INFO     [GPTQ.py:693] linear: model.layers.19.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:39,543 INFO     [GPTQ.py:693] linear: model.layers.19.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:39,925 INFO     [GPTQ.py:693] linear: model.layers.19.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:40,162 INFO     [GPTQ.py:693] linear: model.layers.20.attention.wq, in=4096, out=4096
+2024-11-06:13:42:40,263 INFO     [GPTQ.py:693] linear: model.layers.20.attention.wk, in=4096, out=1024
+2024-11-06:13:42:40,274 INFO     [GPTQ.py:693] linear: model.layers.20.attention.wv, in=4096, out=1024
+2024-11-06:13:42:40,279 INFO     [GPTQ.py:693] linear: model.layers.20.attention.wo, in=4096, out=4096
+2024-11-06:13:42:40,389 INFO     [GPTQ.py:693] linear: model.layers.20.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:40,730 INFO     [GPTQ.py:693] linear: model.layers.20.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:40,924 INFO     [GPTQ.py:693] linear: model.layers.20.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:41,166 INFO     [GPTQ.py:693] linear: model.layers.21.attention.wq, in=4096, out=4096
+2024-11-06:13:42:41,318 INFO     [GPTQ.py:693] linear: model.layers.21.attention.wk, in=4096, out=1024
+2024-11-06:13:42:41,452 INFO     [GPTQ.py:693] linear: model.layers.21.attention.wv, in=4096, out=1024
+2024-11-06:13:42:41,523 INFO     [GPTQ.py:693] linear: model.layers.21.attention.wo, in=4096, out=4096
+2024-11-06:13:42:41,614 INFO     [GPTQ.py:693] linear: model.layers.21.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:41,872 INFO     [GPTQ.py:693] linear: model.layers.21.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:42,248 INFO     [GPTQ.py:693] linear: model.layers.21.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:42,634 INFO     [GPTQ.py:693] linear: model.layers.22.attention.wq, in=4096, out=4096
+2024-11-06:13:42:42,875 INFO     [GPTQ.py:693] linear: model.layers.22.attention.wk, in=4096, out=1024
+2024-11-06:13:42:42,886 INFO     [GPTQ.py:693] linear: model.layers.22.attention.wv, in=4096, out=1024
+2024-11-06:13:42:42,894 INFO     [GPTQ.py:693] linear: model.layers.22.attention.wo, in=4096, out=4096
+2024-11-06:13:42:43,010 INFO     [GPTQ.py:693] linear: model.layers.22.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:43,277 INFO     [GPTQ.py:693] linear: model.layers.22.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:43,636 INFO     [GPTQ.py:693] linear: model.layers.22.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:43,881 INFO     [GPTQ.py:693] linear: model.layers.23.attention.wq, in=4096, out=4096
+2024-11-06:13:42:44,080 INFO     [GPTQ.py:693] linear: model.layers.23.attention.wk, in=4096, out=1024
+2024-11-06:13:42:44,168 INFO     [GPTQ.py:693] linear: model.layers.23.attention.wv, in=4096, out=1024
+2024-11-06:13:42:44,278 INFO     [GPTQ.py:693] linear: model.layers.23.attention.wo, in=4096, out=4096
+2024-11-06:13:42:44,440 INFO     [GPTQ.py:693] linear: model.layers.23.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:44,879 INFO     [GPTQ.py:693] linear: model.layers.23.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:45,242 INFO     [GPTQ.py:693] linear: model.layers.23.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:45,670 INFO     [GPTQ.py:693] linear: model.layers.24.attention.wq, in=4096, out=4096
+2024-11-06:13:42:45,768 INFO     [GPTQ.py:693] linear: model.layers.24.attention.wk, in=4096, out=1024
+2024-11-06:13:42:45,775 INFO     [GPTQ.py:693] linear: model.layers.24.attention.wv, in=4096, out=1024
+2024-11-06:13:42:45,782 INFO     [GPTQ.py:693] linear: model.layers.24.attention.wo, in=4096, out=4096
+2024-11-06:13:42:45,849 INFO     [GPTQ.py:693] linear: model.layers.24.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:46,105 INFO     [GPTQ.py:693] linear: model.layers.24.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:46,412 INFO     [GPTQ.py:693] linear: model.layers.24.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:46,767 INFO     [GPTQ.py:693] linear: model.layers.25.attention.wq, in=4096, out=4096
+2024-11-06:13:42:46,935 INFO     [GPTQ.py:693] linear: model.layers.25.attention.wk, in=4096, out=1024
+2024-11-06:13:42:46,943 INFO     [GPTQ.py:693] linear: model.layers.25.attention.wv, in=4096, out=1024
+2024-11-06:13:42:46,949 INFO     [GPTQ.py:693] linear: model.layers.25.attention.wo, in=4096, out=4096
+2024-11-06:13:42:47,077 INFO     [GPTQ.py:693] linear: model.layers.25.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:47,438 INFO     [GPTQ.py:693] linear: model.layers.25.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:47,807 INFO     [GPTQ.py:693] linear: model.layers.25.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:48,016 INFO     [GPTQ.py:693] linear: model.layers.26.attention.wq, in=4096, out=4096
+2024-11-06:13:42:48,254 INFO     [GPTQ.py:693] linear: model.layers.26.attention.wk, in=4096, out=1024
+2024-11-06:13:42:48,345 INFO     [GPTQ.py:693] linear: model.layers.26.attention.wv, in=4096, out=1024
+2024-11-06:13:42:48,471 INFO     [GPTQ.py:693] linear: model.layers.26.attention.wo, in=4096, out=4096
+2024-11-06:13:42:48,643 INFO     [GPTQ.py:693] linear: model.layers.26.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:48,876 INFO     [GPTQ.py:693] linear: model.layers.26.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:49,125 INFO     [GPTQ.py:693] linear: model.layers.26.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:49,365 INFO     [GPTQ.py:693] linear: model.layers.27.attention.wq, in=4096, out=4096
+2024-11-06:13:42:49,560 INFO     [GPTQ.py:693] linear: model.layers.27.attention.wk, in=4096, out=1024
+2024-11-06:13:42:49,611 INFO     [GPTQ.py:693] linear: model.layers.27.attention.wv, in=4096, out=1024
+2024-11-06:13:42:49,615 INFO     [GPTQ.py:693] linear: model.layers.27.attention.wo, in=4096, out=4096
+2024-11-06:13:42:49,707 INFO     [GPTQ.py:693] linear: model.layers.27.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:49,940 INFO     [GPTQ.py:693] linear: model.layers.27.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:50,092 INFO     [GPTQ.py:693] linear: model.layers.27.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:50,257 INFO     [GPTQ.py:693] linear: model.layers.28.attention.wq, in=4096, out=4096
+2024-11-06:13:42:50,313 INFO     [GPTQ.py:693] linear: model.layers.28.attention.wk, in=4096, out=1024
+2024-11-06:13:42:50,321 INFO     [GPTQ.py:693] linear: model.layers.28.attention.wv, in=4096, out=1024
+2024-11-06:13:42:50,326 INFO     [GPTQ.py:693] linear: model.layers.28.attention.wo, in=4096, out=4096
+2024-11-06:13:42:50,419 INFO     [GPTQ.py:693] linear: model.layers.28.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:50,776 INFO     [GPTQ.py:693] linear: model.layers.28.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:51,157 INFO     [GPTQ.py:693] linear: model.layers.28.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:51,548 INFO     [GPTQ.py:693] linear: model.layers.29.attention.wq, in=4096, out=4096
+2024-11-06:13:42:51,847 INFO     [GPTQ.py:693] linear: model.layers.29.attention.wk, in=4096, out=1024
+2024-11-06:13:42:51,970 INFO     [GPTQ.py:693] linear: model.layers.29.attention.wv, in=4096, out=1024
+2024-11-06:13:42:52,101 INFO     [GPTQ.py:693] linear: model.layers.29.attention.wo, in=4096, out=4096
+2024-11-06:13:42:52,380 INFO     [GPTQ.py:693] linear: model.layers.29.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:52,675 INFO     [GPTQ.py:693] linear: model.layers.29.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:52,898 INFO     [GPTQ.py:693] linear: model.layers.29.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:53,176 INFO     [GPTQ.py:693] linear: model.layers.30.attention.wq, in=4096, out=4096
+2024-11-06:13:42:53,488 INFO     [GPTQ.py:693] linear: model.layers.30.attention.wk, in=4096, out=1024
+2024-11-06:13:42:53,606 INFO     [GPTQ.py:693] linear: model.layers.30.attention.wv, in=4096, out=1024
+2024-11-06:13:42:53,610 INFO     [GPTQ.py:693] linear: model.layers.30.attention.wo, in=4096, out=4096
+2024-11-06:13:42:53,733 INFO     [GPTQ.py:693] linear: model.layers.30.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:53,906 INFO     [GPTQ.py:693] linear: model.layers.30.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:54,132 INFO     [GPTQ.py:693] linear: model.layers.30.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:54,390 INFO     [GPTQ.py:693] linear: model.layers.31.attention.wq, in=4096, out=4096
+2024-11-06:13:42:54,557 INFO     [GPTQ.py:693] linear: model.layers.31.attention.wk, in=4096, out=1024
+2024-11-06:13:42:54,567 INFO     [GPTQ.py:693] linear: model.layers.31.attention.wv, in=4096, out=1024
+2024-11-06:13:42:54,573 INFO     [GPTQ.py:693] linear: model.layers.31.attention.wo, in=4096, out=4096
+2024-11-06:13:42:54,704 INFO     [GPTQ.py:693] linear: model.layers.31.feed_forward.w1, in=4096, out=14336
+2024-11-06:13:42:54,970 INFO     [GPTQ.py:693] linear: model.layers.31.feed_forward.w2, in=14336, out=4096
+2024-11-06:13:42:55,155 INFO     [GPTQ.py:693] linear: model.layers.31.feed_forward.w3, in=4096, out=14336
+2024-11-06:13:42:55,367 INFO     [GPTQ.py:693] linear: model.output, in=4096, out=128256
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.10 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 57.32 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village surrounded by rolling hills and lush forests, there lived a young girl named Lily. Lily was a kind and gentle soul, loved by all who knew her. She had long, curly brown hair and bright green eyes that sparkled with kindness.
+
+Lily lived with her mother, a skilled healer who spent most of her days tending to the village's sick and injured residents. Lily often accompanied her mother on her rounds, learning the art of healing and helping her mother care for the villagers.
+
+One day, while out on a walk with her mother, Lily stumbled upon a hidden path she had never seen before. The path was overgrown with weeds and vines, and it seemed to lead deep into the heart of the forest. Lily's curiosity was piqued, and she begged her mother to let her explore the path.
+
+Her mother, sensing something was amiss, hesitated at first. But Lily's excitement was contagious, and soon she was convinced that it would be a good idea for Lily to follow the path. "Be careful, dear," her mother said, "and don't stray from the path. The forest can be treacherous, even for someone as skilled as you."
+
+Lily nodded, promising to be careful, and set2024-11-06:13:47:08,397 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 248.4688 sec total                 
+Time to first token: 1.6524 sec with parallel prefill.                
+
+      Total throughput: 1.0303 tokens/sec, 0.9706 s/token                 
+First token throughput: 0.6052 tokens/sec, 1.6524 s/token                 
+ Next token throughput: 1.0332 tokens/sec, 0.9679 s/token                     
+2024-11-06:13:47:08,398 INFO     [generate.py:1178] 
+Bandwidth achieved: 5.07 GB/s
+2024-11-06:13:47:08,398 INFO     [generate.py:1182] *** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2.5e+02 seconds
+
+========================================
+
+Once upon a time, there was a little girl named Lily who lived in a small village surrounded by rolling hills and verdant meadows. Lily loved to explore the outdoors, and every summer, she would take long walks through the countryside with her grandmother, who taught her all about the wildflowers that bloomed in the fields. Her grandmother told her that wildflowers were a sign of hope and beauty, and that they needed to be protected and preserved so they could continue to bloom in future generations.
+Lily grew up with a deep love and appreciation for nature, and as she grew older, she became passionate about taking care of the land. She spent every free moment helping her grandmother tend to the garden and protecting the wildflowers that grew in the surrounding meadows.
+One day, when Lily was in her early twenties, a big development company came to the village proposing to build a new housing complex on a nearby hillside. The villagers were excited at the prospect of new homes and jobs, but Lily saw it as a threat to the beautiful meadows and wildflowers that her grandmother had always loved.
+Lily knew that she had to act, so she spoke up at the village meeting and expressed her concerns. She told the villagers that the development would not only destroy the meadows and wildflowers2024-11-06:13:49:17,083 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 128.6848 sec total                 
+Time to first token: 0.9387 sec with parallel prefill.                
+
+      Total throughput: 1.9894 tokens/sec, 0.5027 s/token                 
+First token throughput: 1.0653 tokens/sec, 0.9387 s/token                 
+ Next token throughput: 1.9961 tokens/sec, 0.5010 s/token                     
+2024-11-06:13:49:17,083 INFO     [generate.py:1178] 
+Bandwidth achieved: 9.79 GB/s
+
+========================================
+
+Once upon a time, in a picturesque village, there lived a young boy named Jack. Jack was a curious and adventurous boy who loved exploring the world around him. He spent most of his days wandering through the fields and forests, collecting leaves, rocks, and other interesting things he found.
+
+One day, while wandering through a particularly dense thicket, Jack stumbled upon a small, intricately carved wooden box. The box was beautifully crafted, with intricate patterns and symbols etched into its surface. Jack was immediately drawn to the box and decided that he would keep it as his own.
+
+As he continued to explore the thicket, Jack stumbled upon an old, worn-out book lying on the ground. The book was bound in a faded leather that was cracked and worn, but Jack could tell that it was old and valuable. He picked up the book and began to flip through its pages.
+
+The pages were yellowed and crackling, but they contained beautiful drawings and illustrations that seemed to be pointing to a specific destination. Jack became convinced that the book was pointing him to a hidden treasure. His curiosity and excitement grew, and he decided to follow the book's instructions.
+
+The book led Jack through the forest, pointing him to various landmarks and symbols that he had to follow. Along the way, Jack2024-11-06:13:52:36,644 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 199.5607 sec total                 
+Time to first token: 1.7966 sec with parallel prefill.                
+
+      Total throughput: 1.2828 tokens/sec, 0.7795 s/token                 
+First token throughput: 0.5566 tokens/sec, 1.7966 s/token                 
+ Next token throughput: 1.2894 tokens/sec, 0.7755 s/token                     
+2024-11-06:13:52:36,644 INFO     [generate.py:1178] 
+Bandwidth achieved: 6.31 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 1.43                 
+Average tokens/sec (first token): 0.74                 
+Average tokens/sec (next tokens): 1.44 
+                
+Memory used: 0.00 GB

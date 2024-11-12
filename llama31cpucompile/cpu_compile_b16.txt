@@ -1,0 +1,78 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.11 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in a far-off land, there was a beautiful kingdom ruled by a just and fair king. The kingdom was prosperous and peaceful, with its people living in harmony with one another.
+One day, a poor traveler arrived in the kingdom, seeking shelter and rest. He was a weary old man, with a worn-out cloak and a staff in his hand. The king, seeing the traveler's condition, invited him to the palace and treated him with kindness and respect.
+The traveler was amazed by the king's generosity and asked him, "Your Majesty, how is it that your kingdom is so prosperous and peaceful? What is the secret to your success?"
+The king smiled and said, "My dear traveler, our kingdom's prosperity and peace are due to the fact that we value compassion, empathy, and kindness. We treat everyone with respect and dignity, regardless of their background or social status."
+The traveler was intrigued by the king's words and asked, "How do you ensure that your people live in harmony with one another?"
+The king replied, "We have a unique system called 'The Three Circles.' Each circle represents a different aspect of our society: the outer circle represents our community, the middle circle represents our economy, and the inner circle represents our government.
+"2024-11-06:13:17:50,374 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 333.5643 sec total                 
+Time to first token: 3.6396 sec with parallel prefill.                
+
+      Total throughput: 0.7675 tokens/sec, 1.3030 s/token                 
+First token throughput: 0.2748 tokens/sec, 3.6396 s/token                 
+ Next token throughput: 0.7729 tokens/sec, 1.2938 s/token                     
+2024-11-06:13:17:50,374 INFO     [generate.py:1178] 
+Bandwidth achieved: 12.33 GB/s
+2024-11-06:13:17:50,374 INFO     [generate.py:1182] *** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 3.3e+02 seconds
+
+========================================
+
+Once upon a time, in a far-off land, there was a beautiful and peaceful place called the Forest of Fables. It was a place where stories came to life, and mythical creatures roamed free. The forest was home to a wise and kind wizard named Oracle, who possessed the power to weave tales into reality.
+One day, a young girl named Lily stumbled upon the Forest of Fables while wandering through the woods. She had heard stories about the magical place, but never believed they were true. As she entered the forest, she was immediately struck by its beauty and tranquility.
+Lily wandered deeper into the forest, marveling at the towering trees, sparkling streams, and vibrant wildflowers. She soon came across a clearing, where she found Oracle sitting on a throne-like chair, surrounded by a halo of soft, golden light.
+Oracle, sensing Lily's presence, turned to face her. "Welcome, young one," he said in a warm, gentle voice. "I have been expecting you. You have a story to tell, one that only the Forest of Fables can bring to life."
+Lily, intrigued by the wizard's words, told him her tale. It was a story of adventure, courage, and friendship, set in a world of her own imagination.2024-11-06:13:23:32,435 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 342.0613 sec total                 
+Time to first token: 1.6591 sec with parallel prefill.                
+
+      Total throughput: 0.7484 tokens/sec, 1.3362 s/token                 
+First token throughput: 0.6027 tokens/sec, 1.6591 s/token                 
+ Next token throughput: 0.7491 tokens/sec, 1.3349 s/token                     
+2024-11-06:13:23:32,436 INFO     [generate.py:1178] 
+Bandwidth achieved: 12.02 GB/s
+
+========================================
+
+Once upon a time, there was a group of friends who were always looking for something exciting to do. They had tried just about every activity under the sun - hiking, rock climbing, swimming, and even indoor skydiving! But no matter what they did, they always seemed to come back to the same old routine.
+
+One day, while browsing through a social media platform, they stumbled upon an intriguing post from a group of friends who claimed to have the most epic adventure ever. According to their post, they had gone on a treasure hunt, following a series of cryptic clues and puzzles that led them to a hidden treasure deep in the wilderness.
+
+The group of friends were immediately captivated by the idea and decided to take on the challenge themselves. They spent hours scouring the social media platform for more information, trying to decipher the clues and piece together the mystery.
+
+Finally, after weeks of research and planning, they were ready to set out on their own adventure. Armed with nothing but a map, a compass, and a determination to uncover the truth, they embarked on a journey that would take them through dense forests, across raging rivers, and over treacherous terrain.
+
+As they traversed the wilderness, they encountered numerous obstacles and challenges. They got lost in the dense forest, fell2024-11-06:13:28:25,352 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 292.9158 sec total                 
+Time to first token: 1.0177 sec with parallel prefill.                
+
+      Total throughput: 0.8740 tokens/sec, 1.1442 s/token                 
+First token throughput: 0.9827 tokens/sec, 1.0177 s/token                 
+ Next token throughput: 0.8736 tokens/sec, 1.1447 s/token                     
+2024-11-06:13:28:25,352 INFO     [generate.py:1178] 
+Bandwidth achieved: 14.04 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 0.80                 
+Average tokens/sec (first token): 0.62                 
+Average tokens/sec (next tokens): 0.80 
+                
+Memory used: 0.00 GB

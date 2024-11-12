@@ -1,0 +1,95 @@
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model8.so
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model8.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model8.so
+W1106 14:12:30.980765 315256 site-packages/torch/_export/__init__.py:225] +============================+
+W1106 14:12:30.981344 315256 site-packages/torch/_export/__init__.py:226] |     !!!   WARNING   !!!    |
+W1106 14:12:30.981556 315256 site-packages/torch/_export/__init__.py:227] +============================+
+W1106 14:12:30.981733 315256 site-packages/torch/_export/__init__.py:228] torch._export.aot_compile() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export()) instead.
+Using device=cpu
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 0.15 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 44.35 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model8.so
+WARNING!! The path of compiling a dso is deprecated. Please use --output-aoti-package-path to create a .pt2 artifact instead.
+The generated packaged model can be found at: /tmp/model8.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model8.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.11 seconds
+-----------------------------------------------------------
+Once upon a time, I had a little trouble with my roof. I noticed that there was a spot where water was leaking, and I had to figure out how to fix it. After some research, I decided that the best course of action would be to call a professional roofer.
+I made a list of the things that I was looking for in a roofer, so that I could compare them later. I wanted someone who had a good reputation, experience with repairs like the one I needed, and a reasonable price. I also wanted someone who would show up on time and do the work efficiently.
+I started by asking my neighbors and friends if they knew of any good roofers. They all gave me some recommendations, but I wanted to do my own research so that I could make an informed decision. I looked up reviews online, checked their licenses and certifications, and even checked their social media to see what kind of response they had received from previous customers.
+After narrowing down my list, I contacted the top three roofers on my list to ask a few questions and see if they were a good fit. I asked about their experience, their process for fixing the leak, and their pricing. I also asked for references and to see their licenses and certifications.
+Once I had all2024-11-06:14:19:22,173 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 184.7776 sec total                 
+Time to first token: 6.1555 sec with sequential prefill.                
+
+      Total throughput: 1.3854 tokens/sec, 0.7218 s/token                 
+First token throughput: 0.1625 tokens/sec, 6.1555 s/token                 
+ Next token throughput: 1.4276 tokens/sec, 0.7005 s/token                     
+2024-11-06:14:19:22,174 INFO     [generate.py:1178] 
+Bandwidth achieved: 22.25 GB/s
+2024-11-06:14:19:22,174 INFO     [generate.py:1182] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a small village nestled in the rolling hills of Tuscany, there was a young baker named Leo. Leo was known throughout the village for his delectable pastries and bread, which he baked with love and care in his small wooden shop. Every morning, the sweet aroma of freshly baked goods wafted through the streets, enticing the villagers to come and sample his latest creations.
+
+Leo was a bit of a traditionalist when it came to baking. He believed in using only the finest ingredients, sourced locally whenever possible, and his recipes were often passed down through generations of his family. His bread, in particular, was a staple of the village, with its crusty exterior and soft, fluffy interior.
+
+One day, a young traveler named Sophia stumbled upon Leo's bakery while wandering through the village. She had been on the road for days, and the smell of fresh bread and pastries was like a siren's call to her hungry belly. Leo, noticing Sophia's arrival, quickly wrapped up a few of his best creations and presented them to her with a warm smile.
+
+"Try these," he said, his eyes twinkling with pride. "They're my latest creations. I think you'll find them quite delicious."
+
+Sophia took a bite of2024-11-06:14:22:54,651 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 212.4770 sec total                 
+Time to first token: 3.1635 sec with sequential prefill.                
+
+      Total throughput: 1.2048 tokens/sec, 0.8300 s/token                 
+First token throughput: 0.3161 tokens/sec, 3.1635 s/token                 
+ Next token throughput: 1.2183 tokens/sec, 0.8208 s/token                     
+2024-11-06:14:22:54,651 INFO     [generate.py:1178] 
+Bandwidth achieved: 19.35 GB/s
+
+========================================
+
+Once upon a time, in the land of Azura, there was a beautiful and wise sorceress named Lyra. She lived in a tower made of crystal, surrounded by a lush forest filled with magic.
+
+Lyra was famous for her incredible healing powers, and people from all over Azura would come to seek her help. She used her magic to cure even the most deadly diseases and injuries, and her kindness and compassion made her beloved by all.
+
+One day, a young prince named Finn arrived at Lyra's tower, seeking her help. His kingdom was plagued by a terrible curse that had afflicted all the crops, causing widespread famine and poverty. The prince hoped that Lyra's magic could break the curse and restore the land to its former glory.
+
+Lyra, sensing the prince's desperation, agreed to help him. She spent many hours studying the problem, pouring over ancient tomes and seeking advice from the wise old trees of the forest. Finally, after many days of research, she discovered the source of the curse: a wicked sorcerer who had cast a spell from a nearby cave.
+
+Without hesitation, Lyra packed a small bag and set off with Finn to the cave. They journeyed through treacherous mountains and dark forests, facing many dangers along the way. But2024-11-06:14:25:39,480 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 164.8287 sec total                 
+Time to first token: 7.8807 sec with sequential prefill.                
+
+      Total throughput: 1.5531 tokens/sec, 0.6439 s/token                 
+First token throughput: 0.1269 tokens/sec, 7.8807 s/token                 
+ Next token throughput: 1.6247 tokens/sec, 0.6155 s/token                     
+2024-11-06:14:25:39,480 INFO     [generate.py:1178] 
+Bandwidth achieved: 24.94 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 1.38                 
+Average tokens/sec (first token): 0.20                 
+Average tokens/sec (next tokens): 1.42 
+                
+Memory used: 0.00 GB

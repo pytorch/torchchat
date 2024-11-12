@@ -1,0 +1,70 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.12 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, there was a beautiful and charming young woman named Sophia. She lived in a small village surrounded by green hills and a sparkling river. Sophia was known for her kindness, intelligence, and her love of reading. She spent most of her days reading books from the village library, exploring the woods, and helping her neighbors.
+One day, a handsome and mysterious stranger appeared in the village. He was tall, dark-haired, and wore a long, black coat that seemed to be a perfect fit for him. Sophia was immediately drawn to him, but she couldn’t help feeling a sense of unease. There was something about him that didn’t seem quite right.
+As the stranger began to interact with the villagers, Sophia noticed that he seemed to be watching her, even when she wasn’t aware of it. She tried to brush it off as mere curiosity, but the feeling persisted. She couldn’t help but wonder what his true intentions were.
+One evening, Sophia decided to approach the stranger and strike up a conversation. She found him sitting by the river, staring out at the stars. She sat down beside him, trying to appear nonchalant.
+“Hello,” she said, trying to sound friendly. “I couldn’t help but notice you’re new around here. What brings2024-11-06:10:43:58,635 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 588.1682 sec total                 
+Time to first token: 6.2976 sec with parallel prefill.                
+
+      Total throughput: 0.4352 tokens/sec, 2.2975 s/token                 
+First token throughput: 0.1588 tokens/sec, 6.2976 s/token                 
+ Next token throughput: 0.4382 tokens/sec, 2.2818 s/token                     
+2024-11-06:10:43:58,635 INFO     [generate.py:1178] 
+Bandwidth achieved: 6.99 GB/s
+2024-11-06:10:43:58,636 INFO     [generate.py:1182] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a far-off land, there lived a little rabbit named Benny. Benny was a curious and adventurous rabbit, always eager to explore the great outdoors. One day, while hopping through the forest, Benny stumbled upon a hidden clearing surrounded by tall trees and filled with the most vibrant flowers he had ever seen. In the center of the clearing stood an enormous toadstool, its cap a deep shade of crimson and its stem as thick as a tree trunk.
+As Benny approached the toadstool, he noticed that it seemed to be emitting a faint glow. The light was soft and warm, and it seemed to be calling to Benny in a way that was both soothing and irresistible. Without hesitation, Benny hopped closer to investigate the source of the glow. As he reached the toadstool, he felt a strange sensation wash over him, as if he were being drawn into the very heart of the fungus.
+As he was drawn deeper into the toadstool, Benny found himself in a small, cozy room filled with rows of shelves containing all manner of strange and wondrous objects. There were books with covers that shimmered like the moon, crystals that sang sweet melodies, and small bottles of mysterious liquids that seemed to shift and change color as Benny watched2024-11-06:10:54:34,751 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 636.1152 sec total                 
+Time to first token: 1.8829 sec with parallel prefill.                
+
+      Total throughput: 0.4024 tokens/sec, 2.4848 s/token                 
+First token throughput: 0.5311 tokens/sec, 1.8829 s/token                 
+ Next token throughput: 0.4021 tokens/sec, 2.4872 s/token                     
+2024-11-06:10:54:34,751 INFO     [generate.py:1178] 
+Bandwidth achieved: 6.46 GB/s
+
+========================================
+
+Once upon a time, in a land far, far away, there was a magical kingdom with a grand and wondrous palace at its heart. The palace was said to be inhabited by a beautiful and kind-hearted princess, who was loved by all the inhabitants of the kingdom.
+The princess, whose name was Rose, was a just and fair ruler, and she spent her days helping those in need and listening to the problems of her people. The kingdom prospered under her wise leadership, and the people lived in peace and happiness.
+One day, a wicked sorceress cast a spell on the kingdom, causing the once-green fields to wither and die, and the rivers to run dry. The people of the kingdom were in despair, and they didn't know what to do.
+Rose, determined to save her kingdom, decided to embark on a perilous journey to find the source of the sorceress's power and break the spell. She packed a small bag and set off, accompanied by her trusted advisors and a brave knight named Sir Edward.
+As they journeyed deeper into the kingdom, they encountered all manner of obstacles, including dark forests, treacherous mountains, and ferocious beasts. But Rose, with her bravery and kindness, was able to overcome them all.
+Finally, after2024-11-06:11:04:05,894 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 571.1425 sec total                 
+Time to first token: 2.1309 sec with parallel prefill.                
+
+      Total throughput: 0.4482 tokens/sec, 2.2310 s/token                 
+First token throughput: 0.4693 tokens/sec, 2.1309 s/token                 
+ Next token throughput: 0.4481 tokens/sec, 2.2314 s/token                     
+2024-11-06:11:04:05,894 INFO     [generate.py:1178] 
+Bandwidth achieved: 7.20 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 0.43                 
+Average tokens/sec (first token): 0.39                 
+Average tokens/sec (next tokens): 0.43 
+                
+Memory used: 0.00 GB

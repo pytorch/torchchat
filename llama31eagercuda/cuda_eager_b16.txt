@@ -1,0 +1,67 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 9.33 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, I was introduced to a special type of tea called Pu-erh tea. The first sip of this tea left me puzzled, with a mix of emotions - confusion, curiosity, and intrigue. I had to know more about this unique tea that left a lingering aftertaste and an air of mystery. Little did I know that I was starting to embark on a journey to discover the enchanting world of Pu-erh tea.
+Pu-erh tea, also spelled Pu'er or Puer, is a type of fermented tea that originated in Yunnan, China. Unlike other teas, which are typically steamed or pan-fried, Pu-erh tea is made from the leaves and stems of the Camellia sinensis plant, which are allowed to undergo a natural process of fermentation. This unique process involves microbial fermentation, which breaks down the tea's complex compounds, creating a distinct flavor profile and aroma.
+One of the fascinating aspects of Pu-erh tea is its2024-11-06:10:08:41,897 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 25.8319 sec total                 
+Time to first token: 3.6994 sec with parallel prefill.                
+
+      Total throughput: 7.7424 tokens/sec, 0.1292 s/token                 
+First token throughput: 0.2703 tokens/sec, 3.6994 s/token                 
+ Next token throughput: 8.9913 tokens/sec, 0.1112 s/token                     
+2024-11-06:10:08:41,898 INFO     [generate.py:1178] 
+Bandwidth achieved: 124.35 GB/s
+2024-11-06:10:08:41,898 INFO     [generate.py:1182] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Sophie. Sophie was a curious and adventurous child, forever drawn to the mysterious and unknown. She spent most of her days exploring the surrounding woods, chasing after butterflies, and listening to the whispers of the wind.
+But Sophie had a secret: she had a magical gift. She could communicate with animals, and not just any animals – the most magical creatures of all, the faeries.
+Every night, Sophie would sneak out of her bedroom window and make her way to the old oak tree that stood tall in the center of the forest. It was there that she would meet her faerie friend, Luna. Luna was a tiny, mischievous faerie with wings as delicate as a butterfly and hair as bright as the moon.
+One night, Sophie and Luna were playing a game of hide-and-seek among the trees when they stumbled upon an ancient, magical spring. The water was crystal clear,2024-11-06:10:09:03,845 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 21.9469 sec total                 
+Time to first token: 0.0948 sec with parallel prefill.                
+
+      Total throughput: 9.1129 tokens/sec, 0.1097 s/token                 
+First token throughput: 10.5468 tokens/sec, 0.0948 s/token                 
+ Next token throughput: 9.1067 tokens/sec, 0.1098 s/token                     
+2024-11-06:10:09:03,846 INFO     [generate.py:1178] 
+Bandwidth achieved: 146.36 GB/s
+
+========================================
+
+Once upon a time, in a land far, far away, there was a beautiful and vibrant kingdom called the "Land of Dreams". This enchanting realm was filled with rolling hills, sparkling lakes, and lush forests, teeming with life and magic.
+At the heart of the kingdom was a magnificent castle, built by the wise and just King Everwood. The castle was a marvel of architecture, with towers that seemed to touch the sky and walls that shone like gold in the sunlight. Inside, the king and his loyal subjects lived in harmony, surrounded by wonders and marvels beyond their wildest dreams.
+The king's daughter, Princess Luna, was a kind and gentle soul, loved by all who knew her. She had hair as silver as the moon and eyes as blue as the clearest summer sky. She was known throughout the kingdom for her compassion, intelligence, and kindness to all living things.
+One day, a terrible curse was cast upon the kingdom by a dark sorcerer named Malakai.2024-11-06:10:09:28,967 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 25.1208 sec total                 
+Time to first token: 0.1087 sec with parallel prefill.                
+
+      Total throughput: 7.9615 tokens/sec, 0.1256 s/token                 
+First token throughput: 9.1979 tokens/sec, 0.1087 s/token                 
+ Next token throughput: 7.9562 tokens/sec, 0.1257 s/token                     
+2024-11-06:10:09:28,967 INFO     [generate.py:1178] 
+Bandwidth achieved: 127.87 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 8.27                 
+Average tokens/sec (first token): 6.67                 
+Average tokens/sec (next tokens): 8.68 
+                
+Memory used: 16.68 GB

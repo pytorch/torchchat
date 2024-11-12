@@ -1,0 +1,71 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.12 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 41.66 seconds
+-----------------------------------------------------------
+Once upon a time, in a far-off land, there was a magical kingdom where flowers bloomed in every color of the rainbow. Among these flowers was a rare and exquisite bloom known as the Moonflower. Its petals shimmered like the night sky, and its scent was as sweet as the songs of the nightingales.
+In this enchanted realm, a young girl named Luna was known for her extraordinary gift – she could communicate with flowers. With a mere touch of her hand, the blooms would reveal their deepest secrets and desires. Luna would often wander through the kingdom, listening to the whispers of the flowers, learning about their lives, and sharing their stories with the others.
+One day, a beautiful Moonflower bloomed in the heart of the kingdom. Its petals glowed with an ethereal light, and its fragrance was like nothing anyone had ever smelled before. Luna was immediately drawn to the Moonflower, feeling an inexplicable connection to its gentle beauty. She reached out to touch its petals, and as her hand made contact, the Moonflower shared with her a hidden truth.
+Luna listened, entranced, as the Moonflower revealed that it was not just a simple bloom but a guardian of the kingdom's secrets. The Moonflower had been watching over the kingdom for centuries, keeping2024-11-06:13:35:07,977 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 345.6572 sec total                 
+Time to first token: 2.9719 sec with parallel prefill.                
+
+      Total throughput: 0.7406 tokens/sec, 1.3502 s/token                 
+First token throughput: 0.3365 tokens/sec, 2.9719 s/token                 
+ Next token throughput: 0.7441 tokens/sec, 1.3439 s/token                     
+2024-11-06:13:35:07,977 INFO     [generate.py:1178] 
+Bandwidth achieved: 6.34 GB/s
+2024-11-06:13:35:07,977 INFO     [generate.py:1182] *** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 3.5e+02 seconds
+
+========================================
+
+Once upon a time, I used to be fit. I could run for hours, do back-to-back workouts, and never get tired. But that was years ago, before life got in the way. Now, I find myself struggling to get out of bed in the morning, let alone exercise regularly.
+It's not that I don't want to be fit; it's just that the thought of exerting myself physically is exhausting. My body aches with every step, my breath comes in ragged gasps, and I'm left feeling defeated and demotivated.
+But I know I'm not alone in this struggle. Many of us have busy lives, juggling work, family, and social obligations, leaving little time or energy for exercise. And yet, exercise is something we know we need to do, not just for our physical health but also for our mental well-being.
+So, how can we make exercise a habit again, even when it feels like the last thing we want to do? Here are some tips that have helped me, and might just help you too:
+
+1.  **Start small**: Don't try to tackle too much at once. Begin with short, manageable sessions, like 10 or 15 minutes a day. As you build up your endurance, you2024-11-06:13:38:32,601 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 204.6234 sec total                 
+Time to first token: 2.6298 sec with parallel prefill.                
+
+      Total throughput: 1.2511 tokens/sec, 0.7993 s/token                 
+First token throughput: 0.3803 tokens/sec, 2.6298 s/token                 
+ Next token throughput: 1.2624 tokens/sec, 0.7921 s/token                     
+2024-11-06:13:38:32,601 INFO     [generate.py:1178] 
+Bandwidth achieved: 10.71 GB/s
+
+========================================
+
+Once upon a time, in a small village nestled in the rolling hills of Provence, there lived a young girl named Sophie. Sophie was a curious and adventurous child, with a heart full of wonder and a mind full of questions. She loved to explore the world around her, to learn about the people and the plants and the animals that lived in her village and beyond.
+Sophie's greatest passion, however, was cooking. She loved to help her mother in the kitchen, to learn the secrets of traditional Provençal cuisine, and to experiment with new recipes and flavors. There was something about the combination of love, care, and creativity that went into cooking that spoke to Sophie's very soul.
+One day, Sophie's mother announced that she had a special request from the village elder. The elder, a wise and kind man named Monsieur LeFleur, had asked Sophie's mother to create a traditional Provençal dish for the village's annual harvest festival. Sophie's mother, being a skilled cook, had agreed to take on the task, but she knew that she needed Sophie's help to make it happen.
+Together, Sophie and her mother set to work, gathering ingredients from the local market and preparing the various components of the dish. They spent hours chopping and saut2024-11-06:13:41:41,317 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 188.7160 sec total                 
+Time to first token: 1.4216 sec with parallel prefill.                
+
+      Total throughput: 1.3565 tokens/sec, 0.7372 s/token                 
+First token throughput: 0.7034 tokens/sec, 1.4216 s/token                 
+ Next token throughput: 1.3615 tokens/sec, 0.7345 s/token                     
+2024-11-06:13:41:41,318 INFO     [generate.py:1178] 
+Bandwidth achieved: 11.61 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 1.12                 
+Average tokens/sec (first token): 0.47                 
+Average tokens/sec (next tokens): 1.12 
+                
+Memory used: 0.00 GB

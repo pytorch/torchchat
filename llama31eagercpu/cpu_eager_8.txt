@@ -1,0 +1,71 @@
+
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.11 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 34.05 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of Tuscany, there lived a young woman named Sophia. Sophia was a talented artist, known throughout the village for her breathtaking paintings of the surrounding countryside. She had a way of capturing the light and color of the rolling hills, the cypress trees, and the medieval stone buildings, that seemed to come alive on her canvas.
+One day, a mysterious stranger arrived in the village. He was tall, with piercing blue eyes and jet-black hair that fell to his shoulders. He wore a long, black coat with a silver pin on the lapel, shaped like an owl. Sophia was immediately drawn to the stranger, and she found herself wondering about him, and what had brought him to their quiet village.
+As the stranger walked through the village, he seemed to be looking for something, or someone. He would pause in front of a particular shop, or a certain house, and then move on. Sophia noticed that he was always drawn to the old, abandoned church on the outskirts of the village. She wondered what secrets it held, and why the stranger seemed so fascinated by it.
+Sophia decided to follow the stranger, to see where he would lead her. She trailed behind him, careful not to be seen,2024-11-06:11:10:51,171 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 358.2438 sec total                 
+Time to first token: 0.7383 sec with parallel prefill.                
+
+      Total throughput: 0.7146 tokens/sec, 1.3994 s/token                 
+First token throughput: 1.3544 tokens/sec, 0.7383 s/token                 
+ Next token throughput: 0.7133 tokens/sec, 1.4020 s/token                     
+2024-11-06:11:10:51,172 INFO     [generate.py:1178] 
+Bandwidth achieved: 6.12 GB/s
+2024-11-06:11:10:51,172 INFO     [generate.py:1182] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a village nestled in the rolling hills of Tuscany, there lived a young woman named Sophia. Sophia was a curious and adventurous soul, with a heart full of wonder and a mind full of questions. She lived in a small stone cottage on the outskirts of the village, surrounded by vineyards and olive groves that seemed to stretch on forever.
+One day, as Sophia was tending to her family's vineyard, she stumbled upon an ancient tome hidden away in the dusty attic of her cottage. The book was bound in worn leather and adorned with strange symbols that seemed to shimmer and glow in the fading light of day. As Sophia carefully opened the book, she was struck by the musty smell that wafted out, like the scent of old memories and forgotten stories.
+As she began to read the yellowed pages, Sophia discovered that the book was a collection of tales from the village's history, passed down through generations of storytellers. The stories spoke of magic and wonder, of love and loss, of heroes and villains, and of the deep connection between the villagers and the land they called home.
+Sophia was captivated by the stories, and she spent every spare moment reading the book and learning about the village's rich heritage. She became particularly2024-11-06:11:16:40,588 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 349.4160 sec total                 
+Time to first token: 0.8692 sec with parallel prefill.                
+
+      Total throughput: 0.7327 tokens/sec, 1.3649 s/token                 
+First token throughput: 1.1505 tokens/sec, 0.8692 s/token                 
+ Next token throughput: 0.7316 tokens/sec, 1.3669 s/token                     
+2024-11-06:11:16:40,588 INFO     [generate.py:1178] 
+Bandwidth achieved: 6.27 GB/s
+
+========================================
+
+Once upon a time, in a land far, far away, there was a beautiful kingdom called Azura. Azura was a place of breathtaking landscapes, where crystal-clear waters flowed through lush green forests, and towering mountains pierced the sky. The kingdom was ruled by a wise and just king, who was loved by all his subjects. The king had a beautiful daughter named Sophia, who was kind and gentle, with a heart full of love for all living things.
+
+Sophia was a skilled healer, known throughout the kingdom for her ability to cure even the most grievous of wounds. She spent most of her days tending to the sick and the injured, always seeking new ways to help those in need. Her compassion and empathy were legendary, and her smile could light up even the darkest of rooms.
+
+One day, a terrible curse was cast upon the kingdom. A wicked sorcerer, named Malakai, had grown jealous of the king's wisdom and the people's love for him. Malakai sought to destroy Azura and rule over its ashes. He conjured a dark and malevolent force that spread rapidly throughout the kingdom, causing chaos and destruction wherever it went.
+
+The people of Azura were terrified, and the king was at a loss for how to stop the curse. Sophia2024-11-06:11:22:34,951 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 354.3623 sec total                 
+Time to first token: 2.3226 sec with parallel prefill.                
+
+      Total throughput: 0.7224 tokens/sec, 1.3842 s/token                 
+First token throughput: 0.4306 tokens/sec, 2.3226 s/token                 
+ Next token throughput: 0.7243 tokens/sec, 1.3805 s/token                     
+2024-11-06:11:22:34,951 INFO     [generate.py:1178] 
+Bandwidth achieved: 6.18 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 0.72                 
+Average tokens/sec (first token): 0.98                 
+Average tokens/sec (next tokens): 0.72 
+                
+Memory used: 0.00 GB

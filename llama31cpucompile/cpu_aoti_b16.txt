@@ -1,0 +1,87 @@
+python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model16.so
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-dso-path /tmp/model16.so
+W1106 13:52:57.843293 143336 site-packages/torch/_export/__init__.py:225] +============================+
+W1106 13:52:57.843763 143336 site-packages/torch/_export/__init__.py:226] |     !!!   WARNING   !!!    |
+W1106 13:52:57.843988 143336 site-packages/torch/_export/__init__.py:227] +============================+
+W1106 13:52:57.844178 143336 site-packages/torch/_export/__init__.py:228] torch._export.aot_compile() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export()) instead.
+Using device=cpu
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 0.11 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model16.so
+WARNING!! The path of compiling a dso is deprecated. Please use --output-aoti-package-path to create a .pt2 artifact instead.
+The generated packaged model can be found at: /tmp/model16.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py generate llama3.1 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.11 seconds
+-----------------------------------------------------------
+Once upon a time, a new restaurant opened in a small coastal town. The chef, a young and ambitious woman named Maria, had a dream of creating a unique dining experience for the townspeople and visitors alike. She spent months perfecting her recipes, experimenting with local ingredients, and designing a cozy and inviting atmosphere.
+As the restaurant's opening day approached, Maria and her team worked tirelessly to ensure everything was perfect. The menu featured a range of delicious dishes, from fresh seafood to homemade pasta, all made with love and care. The restaurant's decor was a charming blend of rustic and modern elements, with reclaimed wood accents, vintage nautical items, and colorful artwork adorning the walls.
+On the day of the grand opening, the restaurant was buzzing with excitement. Local food bloggers and critics arrived to review the establishment, along with a few lucky patrons who had secured reservations weeks in advance. Maria's team worked like a well-oiled machine, delivering course after course of mouthwatering dishes to the delighted diners.
+However, just as things were going smoothly, a surprise guest arrived – a renowned food critic from a major city, known for their scathing reviews. The critic, a tall, imposing figure with a stern expression, was seated at a prime table near the window, and Maria2024-11-06:14:00:22,589 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 282.9526 sec total                 
+Time to first token: 11.4820 sec with sequential prefill.                
+
+      Total throughput: 0.9047 tokens/sec, 1.1053 s/token                 
+First token throughput: 0.0871 tokens/sec, 11.4820 s/token                 
+ Next token throughput: 0.9393 tokens/sec, 1.0646 s/token                     
+2024-11-06:14:00:22,590 INFO     [generate.py:1178] 
+Bandwidth achieved: 14.53 GB/s
+2024-11-06:14:00:22,590 INFO     [generate.py:1182] *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a small village nestled in the rolling hills of Tuscany, there was a little girl named Luna. Luna was a curious and adventurous child, with a mop of curly brown hair and eyes that sparkled like the stars on a clear night. She loved nothing more than to explore the countryside, discovering hidden streams, secret meadows, and ancient ruins.
+One day, while wandering through the village, Luna stumbled upon a small, mysterious shop tucked away between a bakery and a butcher. The sign above the door read "Curios and Wonders," and the windows were filled with an assortment of strange and fascinating objects. Luna's curiosity was piqued, and she pushed open the door to venture inside.
+The shop was dimly lit, with shelves stretching up to the ceiling and filled with all manner of curious items. There were rare books, antique clockwork machines, and strange, glowing orbs that seemed to pulse with an otherworldly energy. Luna wandered the aisles, running her fingers over the various objects, feeling as though she had stumbled into a treasure trove.
+As she explored the shop, Luna came across a small, leather-bound book. The cover was old and worn, with strange symbols etched into the leather. She opened the book,2024-11-06:14:04:38,120 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 255.5295 sec total                 
+Time to first token: 4.5655 sec with sequential prefill.                
+
+      Total throughput: 1.0018 tokens/sec, 0.9982 s/token                 
+First token throughput: 0.2190 tokens/sec, 4.5655 s/token                 
+ Next token throughput: 1.0161 tokens/sec, 0.9842 s/token                     
+2024-11-06:14:04:38,120 INFO     [generate.py:1178] 
+Bandwidth achieved: 16.09 GB/s
+
+========================================
+
+Once upon a time, in the land of pure imagination, there lived one of the most iconic and beloved characters in the world of fantasy: Willy Wonka. Willy Wonka was a brilliant and eccentric chocolatier who ruled over a magical kingdom of candy with an iron fist and a heart of gold. He was known for his whimsical inventions, his outrageous fashion sense, and his unwavering dedication to the art of creating the most scrumptious and wondrous confections the world had ever seen.
+
+Willy Wonka's world was a place of pure wonder, where lollipops grew on trees, and chocolate rivers flowed like the sweetest of dreams. It was a place where the impossible became possible, and the boundaries between reality and fantasy blurred like the colors of a rainbow.
+
+But Willy Wonka's world was not without its secrets and mysteries. Behind the scenes, the chocolatier was a master of disguise, a weaver of illusions, and a keeper of secrets. He was a man with a plan, and his plan was to find the perfect candidates to inherit his legendary chocolate factory.
+
+And so, Willy Wonka set out to find his worthy successors, inviting a group of five lucky children to take a tour of his mysterious and magical world.2024-11-06:14:11:30,618 INFO     [generate.py:1167] 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 412.4975 sec total                 
+Time to first token: 4.2212 sec with sequential prefill.                
+
+      Total throughput: 0.6206 tokens/sec, 1.6113 s/token                 
+First token throughput: 0.2369 tokens/sec, 4.2212 s/token                 
+ Next token throughput: 0.6246 tokens/sec, 1.6011 s/token                     
+2024-11-06:14:11:30,618 INFO     [generate.py:1178] 
+Bandwidth achieved: 9.97 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 0.84                 
+Average tokens/sec (first token): 0.18                 
+Average tokens/sec (next tokens): 0.86 
+                
+Memory used: 0.00 GB
