@@ -8,10 +8,64 @@
 #include "pre_tokenizer.h"
 
 // Standard
+#include <algorithm>
+#include <iterator>
 #include <utility>
 
 // Local
 #include "unicode.h"
+
+// PreTokenizerConfig //////////////////////////////////////////////////////////
+
+PreTokenizerConfig::PreTokenizerConfig(std::string type)
+  : type(std::move(type))
+{}
+
+PreTokenizer::Ptr PreTokenizerConfig::create() const {
+  // NOTE: These types must line up with the type strings found in the
+  //  tokenizers library
+  //  https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/pre_tokenizers/mod.rs#L73
+  if (type == "Regex") {
+    if (!pattern) {
+      throw std::runtime_error("Missing pattern for PreTokenizer of type Regex");
+    }
+    return PreTokenizer::Ptr(new RegexPreTokenizer(*pattern));
+  }
+  if (type == "Digits") {
+    if (individual_digits) {
+      return PreTokenizer::Ptr(new DigitsPreTokenizer(*individual_digits));
+    }
+    return PreTokenizer::Ptr(new DigitsPreTokenizer());
+  }
+  if (type == "ByteLevel") {
+    if (add_prefix_space && pattern) {
+      return PreTokenizer::Ptr(new ByteLevelPreTokenizer(*add_prefix_space, *pattern));
+    }
+    if (add_prefix_space) {
+      return PreTokenizer::Ptr(new ByteLevelPreTokenizer(*add_prefix_space));
+    }
+    if (pattern) {
+      return PreTokenizer::Ptr(new ByteLevelPreTokenizer(*pattern));
+    }
+    return PreTokenizer::Ptr(new ByteLevelPreTokenizer());
+  }
+  if (type == "Sequence") {
+    if (!pretokenizers or pretokenizers->empty()) {
+      throw std::runtime_error("Missing pretokenizers for PreTokenizer of type Sequence");
+    }
+    std::vector<PreTokenizer::Ptr> pretoks;
+    std::transform(
+      pretokenizers->begin(),
+      pretokenizers->end(),
+      std::back_inserter(pretoks),
+      [](const PreTokenizerConfig& cfg) {
+        return cfg.create();
+      }
+    );
+    return PreTokenizer::Ptr(new SequencePreTokenizer(pretoks));
+  }
+  throw std::runtime_error("Unsupported PreTokenizer type: " + type);
+}
 
 // RegexPreTokenizer ///////////////////////////////////////////////////////////
 

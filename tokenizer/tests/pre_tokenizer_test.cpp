@@ -116,3 +116,43 @@ TEST_F(SequencePreTokenizerTest, PreTokenizeDigitAndByteLevel) {
     {"The", "Ġnumber", "Ġ", "1", "Ġthen", "Ġ", "2", "3", "4", "Ġthen", "Ġ", "5", "."}
   );
 }
+
+// PreTokenizerConfig //////////////////////////////////////////////////////////
+//
+// NOTE: When adding a new pre-tokenizer or changing arguments, add it to these
+//  tests!
+class PreTokenizerConfigTest : public ::testing::Test {};
+
+TEST_F(PreTokenizerConfigTest, AllTypesSuccess) {
+  // Regex
+  PreTokenizerConfig("Regex").set_pattern(R"(o)").create();
+
+  // Digits
+  PreTokenizerConfig("Digits").create();
+  PreTokenizerConfig("Digits").set_individual_digits(true).create();
+  PreTokenizerConfig("Digits").set_individual_digits(false).create();
+
+  // ByteLevel
+  PreTokenizerConfig("ByteLevel").create();
+  PreTokenizerConfig("ByteLevel").set_pattern(R"(o)").create();
+  PreTokenizerConfig("ByteLevel").set_add_prefix_space(true).create();
+  PreTokenizerConfig("ByteLevel").set_add_prefix_space(false).set_pattern(R"(o)").create();
+
+  // Sequence
+  PreTokenizerConfig("Sequence").set_pretokenizers({
+    PreTokenizerConfig("Digits"), PreTokenizerConfig("ByteLevel")
+  }).create();
+}
+
+TEST_F(PreTokenizerConfigTest, AllTypesFailureCases) {
+  // Regex
+  EXPECT_THROW(PreTokenizerConfig("Regex").create(), std::runtime_error);
+
+  // Sequence
+  EXPECT_THROW(PreTokenizerConfig("Sequence").create(), std::runtime_error);
+  EXPECT_THROW(PreTokenizerConfig("Sequence").set_pretokenizers({}).create(), std::runtime_error);
+  EXPECT_THROW(PreTokenizerConfig("Sequence").set_pretokenizers({PreTokenizerConfig("Regex")}).create(), std::runtime_error);
+
+  // Unsupported
+  EXPECT_THROW(PreTokenizerConfig("Unsupported").create(), std::runtime_error);
+}

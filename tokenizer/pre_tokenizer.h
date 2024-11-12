@@ -9,12 +9,12 @@
 
 // Standard
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
 // Third Party
 #include <re2/re2.h>
-
 
 // -- Bases --------------------------------------------------------------------
 
@@ -39,6 +39,82 @@ class PreTokenizer {
    */
   virtual std::vector<std::string> pre_tokenize(re2::StringPiece input) const = 0;
 };  // end class PreTokenizer
+
+// -- Factory ------------------------------------------------------------------
+
+// Helper macro to standardize addition of config member fields
+#define CONFIG_MEMBER(type, name) \
+  std::optional<type> name; \
+  PreTokenizerConfig& set_##name(type arg) { \
+    this->name = std::move(arg); \
+    return *this; \
+  }
+
+/**
+ * Factory and config class for creating a new PreTokenizer
+ *
+ * This class is the central method for instantiating a PreTokenizer instance.
+ * It contains the common construction logic and config parameter names for all
+ * pre tokenizer constructor args.
+ *
+ * NOTE: When adding a new pre tokenizer, you must ensure its arguments are
+ *  added to this class and it's constructor is added in the implementation!
+ *
+ * Usage Example:
+ *
+ * const auto pre_tokenizer = PreTokenizerConfig("Sequence").set_pretokenizers(
+ *   {PreTokenizerConfig("Digits"), PreTokenizerConfig("ByteLevel")}
+ * );
+ * const auto pre_tokenized = pre_tokenizer->pre_tokenize("Hello World!");
+ */
+class PreTokenizerConfig {
+ public:
+
+  /*------------------------*/
+  /* Public mutable members */
+  /*------------------------*/
+
+  /**
+   * The Type name string matching from tokenizers
+   * https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/pre_tokenizers/mod.rs#L73
+   */
+  const std::string type;
+
+  /**
+   * Used by: RegexPreTokenizer, ByteLevelPreTokenizer
+   */
+  CONFIG_MEMBER(std::string, pattern)
+
+  /**
+   * Used by: DigitsPreTokenizer
+   */
+  CONFIG_MEMBER(bool, individual_digits)
+
+  /**
+   * Used by: ByteLevelPreTokenizer
+   */
+  CONFIG_MEMBER(bool, add_prefix_space)
+
+  /**
+   * Used by: SequencePreTokenizer
+   */
+  CONFIG_MEMBER(std::vector<PreTokenizerConfig>, pretokenizers)
+
+  /*----------------*/
+  /* Public methods */
+  /*----------------*/
+
+  /**
+   * Construct with the type
+   */
+  explicit PreTokenizerConfig(std::string type);
+
+  /**
+   * Construct the pre tokenizer instance from the member data
+   */
+  PreTokenizer::Ptr create() const;
+
+};  // end class PreTokenizerConfig
 
 // -- Regex --------------------------------------------------------------------
 // Used for general-purpose single-regex pre tokenization (e.g. tiktoken)
@@ -69,7 +145,7 @@ class RegexPreTokenizer : public PreTokenizer {
 
 class DigitsPreTokenizer : public RegexPreTokenizer {
  public:
-  explicit DigitsPreTokenizer(bool individual_digits)
+  explicit DigitsPreTokenizer(bool individual_digits = false)
     : RegexPreTokenizer(individual_digits ? R"([^\p{N}]+|\p{N})" : R"([^\p{N}]+|[\p{N}]+)")
   {}
 };  // end class DigitsPreTokenizer
@@ -87,6 +163,7 @@ class ByteLevelPreTokenizer : public PreTokenizer {
    *    provided, it use the standard GPT2 pattern.
    */
   ByteLevelPreTokenizer(bool add_prefix_space = true, const std::string& pattern = "");
+  explicit ByteLevelPreTokenizer(const std::string& pattern) : ByteLevelPreTokenizer(true, pattern) {}
 
   /** Perform pre-tokenization */
   std::vector<std::string> pre_tokenize(re2::StringPiece input) const override;
