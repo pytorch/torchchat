@@ -591,6 +591,7 @@ class Generator:
             Dict[str, Any]
         ] = None,  # List of Image prompt tensors for multimodal models
         start_pos: int = 0,
+        skip_cache_setup: bool = False,
         draft_model: Model,
         speculate_k: Optional[int] = 8,
         sequential_prefill=True,
@@ -613,7 +614,7 @@ class Generator:
         prompt_length = prompt.size(0)
         max_new_tokens = min(max_new_tokens, max_seq_length - start_pos - prompt_length)
         # set up caches only if first inference
-        if start_pos == 0:
+        if start_pos == 0 and not skip_cache_setup:
             model = model.to(device=device)
             with torch.device(device):
                 if (
@@ -1020,6 +1021,7 @@ class Generator:
         )
         for i in range(num_samples):
             device_sync(device=self.builder_args.device)
+            is_first_sample: bool = i == 0
             if generator_args.chat_mode:
                 prompt = input("User: ")
                 if prompt == "/bye":
@@ -1045,7 +1047,7 @@ class Generator:
                             ]
                         )
                         self.system_prompt = None
-                    elif i == 0:
+                    elif is_first_sample:
                         encoded = self.chat_formatter.encode_dialog_prompt(
                             [{"role": "user", "content": prompt}]
                         )
@@ -1116,6 +1118,7 @@ class Generator:
                     top_k=generator_args.top_k,
                     sequential_prefill=generator_args.sequential_prefill,
                     start_pos=start_pos,
+                    skip_cache_setup=not is_first_sample,
                     max_seq_length=max_seq_length,
                 )
                 for token_tensor, metrics in generator_func:
@@ -1125,7 +1128,7 @@ class Generator:
                     if metrics is not None:
                         aggregate_metrics.update(metrics)
                     yield token_tensor, metrics
-            jit_compile = (i == 0) and (
+            jit_compile = is_first_sample and (
                 generator_args.compile or generator_args.compile_prefill
             )
             compilation_time = time.perf_counter() - t0
