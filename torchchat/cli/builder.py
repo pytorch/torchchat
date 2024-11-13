@@ -16,12 +16,6 @@ import torch._dynamo.config
 import torch._inductor.config
 import torch.nn as nn
 
-from torch.distributed.device_mesh import DeviceMesh
-from torch.distributed.elastic.multiprocessing.errors import record
-from torch.distributed.elastic.utils.distributed import get_free_port
-
-from torchchat.distributed import launch_distributed, ParallelDims, parallelize_llama
-
 from torchchat.model import Model, ModelArgs, ModelType
 
 from torchchat.model_config.model_config import resolve_model_config
@@ -464,77 +458,20 @@ def _load_model_default(builder_args: BuilderArgs) -> Model:
     return model
 
 
-def _maybe_init_distributed(
-    builder_args: BuilderArgs,
-) -> Tuple[Optional[DeviceMesh], Optional[ParallelDims]]:
-    """
-    Initialize distributed related setups if the user specified
-    using distributed inference. If not, this is a no-op.
-
-    Args:
-        builder_args (:class:`BuilderArgs`):
-            Command args for model building.
-    Returns:
-        Tuple[Optional[DeviceMesh], Optional[ParallelDims]]:
-            - The first element is an optional DeviceMesh object,
-            which which describes the mesh topology of devices for the DTensor.
-            - The second element is an optional ParallelDims object,
-            which represents the parallel dimensions configuration.
-    """
-    if not builder_args.use_distributed:
-        return None, None
-    dist_config = "llama3_8B.toml"  # TODO - integrate with chat cmd line
-
-    world_mesh, parallel_dims = launch_distributed(dist_config)
-
-    assert (
-        world_mesh is not None and parallel_dims is not None
-    ), f"failed to launch distributed using {dist_config}"
-
-    return world_mesh, parallel_dims
-
-
-def _maybe_parallelize_model(
-    model: nn.Module,
-    builder_args: BuilderArgs,
-    world_mesh: DeviceMesh,
-    parallel_dims: ParallelDims,
-) -> nn.Module:
-    """
-    We parallelize the module and load the distributed checkpoint to the model
-    if the user specifies using distributed inference. If not, this is a no-op.
-
-    Args:
-        model (:class:`nn.Module`):
-            Module to be parallelized.
-        builder_args (:class:`BuilderArgs`):
-            Command args for model building.
-        world_mesh (:class:`DeviceMesh`):
-            Object which describes the mesh topology
-            of devices for the DTensor.
-        parallel_dims (:class:`ParallelDims`):
-            Object which represents the parallel dimensions configuration.
-    Returns:
-        A :class:`nn.Module` object which is parallelized and checkpoint loaded
-        if the user specifies using distributed inference.
-    """
-    if world_mesh is None:
-        return model
-    assert parallel_dims is not None
-    print("Applying model parallel to model ...")
-    parallelize_llama(model, world_mesh, parallel_dims)
-    return load_checkpoints_to_model(model, builder_args, world_mesh)
-
-
 def _load_model(builder_args: BuilderArgs) -> Model:
-    # world_mesh, parallel_dims = _maybe_init_distributed(builder_args)
     if builder_args.gguf_path:
         model = _load_model_gguf(builder_args)
-    # elif builder_args.use_distributed:
-    #    model = _init_model_on_meta_device(builder_args)
     else:
         model = _load_model_default(builder_args)
-    # model = _maybe_parallelize_model(model, builder_args, world_mesh, parallel_dims)
+
+    if builder_args.dso_path or builder_args.aoti_package_path:
+        # AOTI-compoiled model will load its own weights.
+        # Release weights here to avoid OOM
+        import gc
+        if hasattr(model, "model"):
+            model.model = None
+        gc.collect()
+        torch.cuda.empty_cache()
 
     model = model.to(device=builder_args.device, dtype=builder_args.precision)
     return model.eval()
@@ -584,6 +521,12 @@ def _initialize_model(
             # attributes will NOT be seen on by AOTI-compiled forward
             # function, e.g. calling model.setup_cache will NOT touch
             # AOTI compiled and maintained model buffers such as kv_cache.
+            # Using cpp runner to run AOTI compiled model is recommended.
+
+            def do_nothing(max_batch_size, max_seq_length):
+                pass
+            model.setup_caches = do_nothing
+
             model.forward = torch._export.aot_load(
                 str(builder_args.dso_path.absolute()), builder_args.device
             )
@@ -617,6 +560,11 @@ def _initialize_model(
             aoti_compiled_model = load_package(
                 str(builder_args.aoti_package_path.absolute())
             )
+
+            def do_nothing(max_batch_size, max_seq_length):
+                pass
+            model.setup_caches = do_nothing
+
             model.forward = aoti_compiled_model
             metadata = aoti_compiled_model.get_metadata()
             builder_args.device = metadata["AOTI_DEVICE_KEY"]

@@ -9,25 +9,40 @@ set -eou pipefail
 
 # Install required python dependencies for developing
 # Dependencies are defined in .pyproject.toml
-PYTHON_EXECUTABLE=${PYTHON_EXECUTABLE:-python}
-if [[ -z ${CONDA_DEFAULT_ENV:-} ]] || [[ ${CONDA_DEFAULT_ENV:-} == "base" ]] || [[ ! -x "$(command -v python)" ]];
+if [ -z "${PYTHON_EXECUTABLE:-}" ];
 then
-  PYTHON_EXECUTABLE=python3
+  if [[ -z ${CONDA_DEFAULT_ENV:-} ]] || [[ ${CONDA_DEFAULT_ENV:-} == "base" ]] || [[ ! -x "$(command -v python)" ]];
+  then
+    PYTHON_EXECUTABLE=python3
+  else
+    PYTHON_EXECUTABLE=python
+  fi
 fi
+echo "Using python executable: $PYTHON_EXECUTABLE"
 
-# Check python version. Expect 3.10.x or 3.11.x
-printf "import sys\nif sys.version_info.major != 3 or sys.version_info.minor < 10 :\n\tprint('Please use Python >=3.10');sys.exit(1)\n" | $PYTHON_EXECUTABLE
-if [[ $? -ne 0 ]]
+PYTHON_SYS_VERSION="$($PYTHON_EXECUTABLE -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")"
+# Check python version. Expect at least 3.10.x
+if ! $PYTHON_EXECUTABLE -c "
+import sys
+if sys.version_info < (3, 10):
+    sys.exit(1)
+";
 then
+  echo "Python version must be at least 3.10.x. Detected version: $PYTHON_SYS_VERSION"
   exit 1
 fi
 
 if [[ "$PYTHON_EXECUTABLE" == "python" ]];
 then
   PIP_EXECUTABLE=pip
-else
+elif [[ "$PYTHON_EXECUTABLE" == "python3" ]];
+then
   PIP_EXECUTABLE=pip3
+else
+  PIP_EXECUTABLE=pip${PYTHON_SYS_VERSION}
 fi
+
+echo "Using pip executable: $PIP_EXECUTABLE"
 
 #
 # First install requirements in install/requirements.txt. Older torch may be

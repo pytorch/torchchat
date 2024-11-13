@@ -71,11 +71,11 @@ class Llama3ChatFormatter(_ChatFormatter):
 
     def encode_message(self, message) -> List[int]:
         tokens = self.encode_header(message["role"])
-        if type(message["content"]) is str:
+        if isinstance(message["content"], str):
             tokens.extend(
                 self.tokenizer.encode(message["content"], bos=False, eos=False)
             )
-        elif type(message["content"]) is list:
+        elif isinstance(message["content"], list):
             for content in message["content"]:
                 if content["type"] == "text":
                     tokens.extend(
@@ -190,7 +190,7 @@ class GeneratorArgs:
                 for image_prompt in image_prompts
                 if (not os.path.exists(image_prompt))
             ]
-            if len(non_existent_image_prompts):
+            if non_existent_image_prompts:
                 raise RuntimeError(
                     f"Image prompt {non_existent_image_prompts} does not exist"
                 )
@@ -238,7 +238,7 @@ class Generator:
         draft_quantize: bool,
     ):
         torch._inductor.config.coordinate_descent_tuning = (
-            False if builder_args.device == "cpu" else True
+            builder_args.device != "cpu"
         )
         torch._inductor.config.triton.unique_kernel_names = True
         torch._inductor.config.fx_graph_cache = True  # Experimental feature to reduce compilation times, will be on by default in future
@@ -591,6 +591,7 @@ class Generator:
             Dict[str, Any]
         ] = None,  # List of Image prompt tensors for multimodal models
         start_pos: int = 0,
+        skip_cache_setup: bool = False,
         draft_model: Model,
         speculate_k: Optional[int] = 8,
         sequential_prefill=True,
@@ -614,26 +615,27 @@ class Generator:
         max_new_tokens = min(max_new_tokens, max_seq_length - start_pos - prompt_length)
         # set up caches only if first inference
         if start_pos == 0:
-            model = model.to(device=device)
-            with torch.device(device):
-                if (
-                    self.is_torchtune_model
-                    or self.model.config.model_type == ModelType.Flamingo
-                ):
-                    # 6404 is one-gpu affordable max_seq_length for single image input
-                    model.setup_caches(
-                        batch_size=1,
-                        dtype=self.dtype,
-                        encoder_max_seq_len=6404,
-                        decoder_max_seq_len=max_seq_length,
-                    )
-                else:
-                    model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
-                if is_speculative and draft_model is not model:
-                    draft_model.setup_caches(
-                        max_batch_size=1,
-                        max_seq_length=max_seq_length,
-                    )
+            if not skip_cache_setup:
+                model = model.to(device=device)
+                with torch.device(device):
+                    if (
+                        self.is_torchtune_model
+                        or self.model.config.model_type == ModelType.Flamingo
+                    ):
+                        # 6404 is one-gpu affordable max_seq_length for single image input
+                        model.setup_caches(
+                            batch_size=1,
+                            dtype=self.dtype,
+                            encoder_max_seq_len=6404,
+                            decoder_max_seq_len=max_seq_length,
+                        )
+                    else:
+                        model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+                    if is_speculative and draft_model is not model:
+                        draft_model.setup_caches(
+                            max_batch_size=1,
+                            max_seq_length=max_seq_length,
+                        )
             if model.config.model_type == ModelType.Flamingo:
                 model.reset_caches()
 
@@ -915,13 +917,6 @@ class Generator:
             ]
         )
         if generator_args.compile:
-            if (
-                self.is_speculative and self.builder_args.use_distributed
-            ):  # and ("cuda" in builder_args.device):
-                torch._inductor.config.triton.cudagraph_trees = (
-                    False  # Bug with cudagraph trees in this case
-                )
-
             if self.builder_args.device == "cpu":
                 if generator_args.max_autotune:
                     kwargs = {"mode": "max-autotune"}
@@ -1002,11 +997,8 @@ class Generator:
                 max_seq_length,
             )
 
-        max_seq_length = (
-            max_seq_length + self.speculative_builder_args.speculate_k + 1
-            if self.draft_model is not None
-            else max_seq_length
-        )
+        if self.draft_model is not None:
+            max_seq_length += self.speculative_builder_args.speculate_k + 1
 
         aggregate_metrics = {
             "tokens_per_sec": [],
@@ -1023,6 +1015,7 @@ class Generator:
         )
         for i in range(num_samples):
             device_sync(device=self.builder_args.device)
+            is_first_sample: bool = i == 0
             if generator_args.chat_mode:
                 prompt = input("User: ")
                 if prompt == "/bye":
@@ -1048,7 +1041,7 @@ class Generator:
                             ]
                         )
                         self.system_prompt = None
-                    elif i == 0:
+                    elif is_first_sample:
                         encoded = self.chat_formatter.encode_dialog_prompt(
                             [{"role": "user", "content": prompt}]
                         )
@@ -1094,9 +1087,7 @@ class Generator:
 
                 torch._inductor.config.profiler_mark_wrapper_call = True
                 torch._inductor.config.cpp.enable_kernel_profile = True
-            if (i != generator_args.num_samples - 1 or not self.profile) or (
-                self.builder_args.use_distributed and self.rank != 0
-            ):
+            if i != generator_args.num_samples - 1 or not self.profile:
                 import contextlib
 
                 prof = contextlib.nullcontext()
@@ -1119,6 +1110,7 @@ class Generator:
                     top_k=generator_args.top_k,
                     sequential_prefill=generator_args.sequential_prefill,
                     start_pos=start_pos,
+                    skip_cache_setup=not is_first_sample,
                     max_seq_length=max_seq_length,
                 )
                 for token_tensor, metrics in generator_func:
@@ -1128,7 +1120,7 @@ class Generator:
                     if metrics is not None:
                         aggregate_metrics.update(metrics)
                     yield token_tensor, metrics
-            jit_compile = (i == 0) and (
+            jit_compile = is_first_sample and (
                 generator_args.compile or generator_args.compile_prefill
             )
             compilation_time = time.perf_counter() - t0
@@ -1139,10 +1131,7 @@ class Generator:
                     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
                 else:
                     print(prof.key_averages().table(sort_by="self_cuda_time_total"))
-                if self.builder_args.use_distributed:
-                    prof.export_chrome_trace(f"{self.profile}_rank_{self.rank}.json")
-                else:
-                    prof.export_chrome_trace(f"{self.profile}.json")
+                prof.export_chrome_trace(f"{self.profile}.json")
 
             if start_pos >= max_seq_length:
                 print(

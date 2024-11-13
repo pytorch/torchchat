@@ -13,18 +13,31 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-import torch
 
 ##########################################################################
 ###                       unpack packed weights                        ###
 
 
+class _LazyImportTorch:
+    """This is a wrapper around the import of torch that only performs the
+    import when an actual attribute is needed off of torch.
+    """
+    @staticmethod
+    def __getattribute__(name: str) -> Any:
+        import torch
+        return getattr(torch, name)
+
+
+# Alias torch to the lazy import
+torch = _LazyImportTorch()
+
+
 def unpack_packed_weights(
     packed_weights: Dict[str, Any],
     packed_linear: Callable,
-    input_dtype: torch.dtype,
+    input_dtype: "torch.dtype",
     unpacked_dims: Tuple,
-) -> torch.Tensor:
+) -> "torch.Tensor":
     """Given a packed weight matrix `packed_weights`, a Callable
     implementing a packed linear function for the packed format, and the
     unpacked dimensions of the weights, recreate the unpacked weight
@@ -169,26 +182,27 @@ def name_to_dtype(name, device):
         return torch.bfloat16
 
     try:
-        return name_to_dtype_dict[name]
+        return _name_to_dtype_dict[name]()
     except KeyError:
         raise RuntimeError(f"unsupported dtype name {name} specified")
 
 
 def allowable_dtype_names() -> List[str]:
-    return name_to_dtype_dict.keys()
+    return _name_to_dtype_dict.keys()
 
 
-name_to_dtype_dict = {
-    "fp32": torch.float,
-    "fp16": torch.float16,
-    "bf16": torch.bfloat16,
-    "float": torch.float,
-    "half": torch.float16,
-    "float32": torch.float,
-    "float16": torch.float16,
-    "bfloat16": torch.bfloat16,
-    "fast": None,
-    "fast16": None,
+# NOTE: values are wrapped in lambdas to avoid proactive imports for torch
+_name_to_dtype_dict = {
+    "fp32": lambda: torch.float,
+    "fp16": lambda: torch.float16,
+    "bf16": lambda: torch.bfloat16,
+    "float": lambda: torch.float,
+    "half": lambda: torch.float16,
+    "float32": lambda: torch.float,
+    "float16": lambda: torch.float16,
+    "bfloat16": lambda: torch.bfloat16,
+    "fast": lambda: None,
+    "fast16": lambda: None,
 }
 
 
