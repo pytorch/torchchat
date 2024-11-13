@@ -94,7 +94,7 @@ class ConcateFusion(nn.Module):
         self.encoder = encoder
         self.decoder = decoder
 
-        # esclate the embedding layer outside decoder llava model need to fuse
+        # escalate the embedding layer outside decoder llava model need to fuse
         # the text and image embedding together before passing to decoder.
         self.tok_embeddings = getattr(self.decoder, token_embedding_name)
 
