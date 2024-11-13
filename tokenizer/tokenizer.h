@@ -80,15 +80,48 @@ class SPTokenizer : public Tokenizer {
 
 // ----------------------- Tiktoken -----------------------
 // Used by OpenAI, adapted from https://github.com/sewenew/tokenizer
+//
+// The main changes from the upstream implementation are to split out the core
+// of the BPE logic into a base class that both Tiktoken and HFTokenizer can
+// inherit from.
 
 using Encoder = std::unordered_map<std::string, uint64_t>;
 using Decoder = std::unordered_map<uint64_t, std::string>;
 using Re2UPtr = std::unique_ptr<re2::RE2>;
 
-class Tiktoken : public Tokenizer {
+class BPETokenizerBase : public Tokenizer {
+ protected:
+
+  explicit BPETokenizerBase() {};
+  virtual ~BPETokenizerBase() {};
+
+  std::pair<std::optional<std::string>, re2::StringPiece>
+  split_with_allowed_special_token_(
+      re2::StringPiece& input,
+      const Encoder& allowed_special) const;
+
+  std::pair<std::vector<uint64_t>, uint64_t> encode_with_special_token_(
+      const std::string& text,
+      const Encoder& allowed_special) const;
+
+  // Protected members that can be overloaded by other BPE tokenizers
+  Re2UPtr special_token_regex_;
+  Encoder encoder_;
+  Encoder special_token_encoder_;
+  Decoder decoder_;
+  Decoder special_token_decoder_;
+
+ private:
+  virtual void _encode(
+      re2::StringPiece& input,
+      std::vector<uint64_t>& ret,
+      uint64_t& last_piece_token_len) const = 0;
+};
+
+class Tiktoken : public BPETokenizerBase {
  public:
   explicit Tiktoken();
-  ~Tiktoken(){};
+  ~Tiktoken() override {};
 
   void load(const std::string& tokenizer_path) override;
 
@@ -118,35 +151,16 @@ class Tiktoken : public Tokenizer {
     return special_tokens;
   }
 
-  std::pair<std::optional<std::string>, re2::StringPiece>
-  _split_with_allowed_special_token(
-      re2::StringPiece& input,
-      const Encoder& allowed_special) const;
-
   void _encode(
       re2::StringPiece& input,
       std::vector<uint64_t>& ret,
-      uint64_t& last_piece_token_len) const;
-
-  std::pair<std::vector<uint64_t>, uint64_t> _encode_with_special_token(
-      const std::string& text,
-      const Encoder& allowed_special) const;
+      uint64_t& last_piece_token_len) const override;
 
   // Removed negative lookahead \s+(?!\S) since it's not supported by RE2.
   const std::string _pattern =
       R"((?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+)";
 
-  // Private members tht cannot be overloaded by other BPE tokenizers
-  Re2UPtr _special_token_regex;
-
- protected:
-
-  // Protected members that can be overloaded by other BPE tokenizers
-  Encoder encoder_;
-  Encoder special_token_encoder_;
-  Decoder decoder_;
-  Decoder special_token_decoder_;
-  std::vector<Re2UPtr> regexes_;
+  Re2UPtr _regex;
 };
 
 

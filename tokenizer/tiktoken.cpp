@@ -240,20 +240,20 @@ static std::vector<uint64_t> _byte_pair_encode(
       });
 }
 // ------------------------------Util end------------------------------------
-// -------------------------private method start-------------------------------
+// -------------------------protected method start---------------------------
 
 std::pair<std::optional<std::string>, re2::StringPiece>
-Tiktoken::_split_with_allowed_special_token(
+BPETokenizerBase::split_with_allowed_special_token_(
     re2::StringPiece& input,
     const Encoder& allowed_special) const {
-  if (!_special_token_regex) {
+  if (!special_token_regex_) {
     return std::make_pair(std::nullopt, input);
   }
 
   auto start = input.begin();
   std::string special;
   while (true) {
-    if (!re2::RE2::FindAndConsume(&input, *_special_token_regex, &special)) {
+    if (!re2::RE2::FindAndConsume(&input, *special_token_regex_, &special)) {
       // No special token.
       break;
     }
@@ -269,30 +269,7 @@ Tiktoken::_split_with_allowed_special_token(
   return std::make_pair(std::nullopt, input);
 }
 
-void Tiktoken::_encode(
-    re2::StringPiece& input,
-    std::vector<uint64_t>& ret,
-    uint64_t& last_piece_token_len) const {
-  std::string piece;
-  assert(regexes_.size());
-  for (const auto& regex : regexes_) {
-    assert(regex);
-    while (re2::RE2::FindAndConsume(&input, *regex, &piece)) {
-      auto iter = encoder_.find(piece);
-      if (iter != encoder_.end()) {
-        last_piece_token_len = 1;
-        ret.push_back(iter->second);
-        continue;
-      }
-      auto tokens = _byte_pair_encode(piece, encoder_);
-
-      last_piece_token_len = tokens.size();
-      ret.insert(ret.end(), tokens.begin(), tokens.end());
-    }
-  }
-}
-
-std::pair<std::vector<uint64_t>, uint64_t> Tiktoken::_encode_with_special_token(
+std::pair<std::vector<uint64_t>, uint64_t> BPETokenizerBase::encode_with_special_token_(
     const std::string& text,
     const Encoder& allowed_special) const {
   std::vector<uint64_t> tokens;
@@ -300,7 +277,7 @@ std::pair<std::vector<uint64_t>, uint64_t> Tiktoken::_encode_with_special_token(
   re2::StringPiece input(text);
   while (true) {
     auto [special, sub_input] =
-        _split_with_allowed_special_token(input, allowed_special);
+        split_with_allowed_special_token_(input, allowed_special);
 
     _encode(sub_input, tokens, last_piece_token_len);
 
@@ -328,10 +305,33 @@ std::pair<std::vector<uint64_t>, uint64_t> Tiktoken::_encode_with_special_token(
   return std::make_pair(tokens, last_piece_token_len);
 }
 
+// -------------------------protected method end-------------------------------
+// -------------------------private method start-------------------------------
+
+void Tiktoken::_encode(
+    re2::StringPiece& input,
+    std::vector<uint64_t>& ret,
+    uint64_t& last_piece_token_len) const {
+  std::string piece;
+  assert(_regex);
+  while (re2::RE2::FindAndConsume(&input, *_regex, &piece)) {
+    auto iter = encoder_.find(piece);
+    if (iter != encoder_.end()) {
+      last_piece_token_len = 1;
+      ret.push_back(iter->second);
+      continue;
+    }
+    auto tokens = _byte_pair_encode(piece, encoder_);
+
+    last_piece_token_len = tokens.size();
+    ret.insert(ret.end(), tokens.begin(), tokens.end());
+  }
+}
+
 // -------------------------private method end-------------------------------
 // -------------------------public method start-------------------------------
 
-Tiktoken::Tiktoken() : Tokenizer() {}
+Tiktoken::Tiktoken() : BPETokenizerBase() {}
 
 void Tiktoken::load(const std::string& path) {
   encoder_ = _load_encoder(path);
@@ -340,8 +340,8 @@ void Tiktoken::load(const std::string& path) {
   decoder_ = _build_decoder(encoder_);
   special_token_decoder_ = _build_decoder(special_token_encoder_);
 
-  regexes_.push_back(_create_regex(_pattern));
-  _special_token_regex = _build_special_token_regex(special_token_encoder_);
+  _regex = _create_regex(_pattern);
+  special_token_regex_ = _build_special_token_regex(special_token_encoder_);
 
   // initialize vocab_size, bos_tok, eos_tok
   vocab_size_ = encoder_.size() + special_token_encoder_.size();
@@ -355,7 +355,7 @@ Tiktoken::encode(const std::string& text, int8_t bos, int8_t eos) const {
   if (!initialized_) {
     exit(EXIT_FAILURE);
   }
-  auto res = _encode_with_special_token(text, special_token_encoder_).first;
+  auto res = encode_with_special_token_(text, special_token_encoder_).first;
   for (auto i = 0; i < bos; ++i) {
     res.insert(res.begin(), bos_tok_);
   }
