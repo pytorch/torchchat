@@ -60,7 +60,7 @@ echo "Using pip executable: $PIP_EXECUTABLE"
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-PYTORCH_NIGHTLY_VERSION=dev20241112
+PYTORCH_NIGHTLY_VERSION=dev20241113
 
 # Nightly version for torchvision
 VISION_NIGHTLY_VERSION=dev20241112
