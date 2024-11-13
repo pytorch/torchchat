@@ -614,27 +614,28 @@ class Generator:
         prompt_length = prompt.size(0)
         max_new_tokens = min(max_new_tokens, max_seq_length - start_pos - prompt_length)
         # set up caches only if first inference
-        if start_pos == 0 and not skip_cache_setup:
-            model = model.to(device=device)
-            with torch.device(device):
-                if (
-                    self.is_torchtune_model
-                    or self.model.config.model_type == ModelType.Flamingo
-                ):
-                    # 6404 is one-gpu affordable max_seq_length for single image input
-                    model.setup_caches(
-                        batch_size=1,
-                        dtype=self.dtype,
-                        encoder_max_seq_len=6404,
-                        decoder_max_seq_len=max_seq_length,
-                    )
-                else:
-                    model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
-                if is_speculative and draft_model is not model:
-                    draft_model.setup_caches(
-                        max_batch_size=1,
-                        max_seq_length=max_seq_length,
-                    )
+        if start_pos == 0:
+            if not skip_cache_setup:
+                model = model.to(device=device)
+                with torch.device(device):
+                    if (
+                        self.is_torchtune_model
+                        or self.model.config.model_type == ModelType.Flamingo
+                    ):
+                        # 6404 is one-gpu affordable max_seq_length for single image input
+                        model.setup_caches(
+                            batch_size=1,
+                            dtype=self.dtype,
+                            encoder_max_seq_len=6404,
+                            decoder_max_seq_len=max_seq_length,
+                        )
+                    else:
+                        model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+                    if is_speculative and draft_model is not model:
+                        draft_model.setup_caches(
+                            max_batch_size=1,
+                            max_seq_length=max_seq_length,
+                        )
             if model.config.model_type == ModelType.Flamingo:
                 model.reset_caches()
 
