@@ -110,6 +110,8 @@ def _download_direct(
 def download_and_convert(
     model: str, models_dir: Path, hf_token: Optional[str] = None
 ) -> None:
+    if model is None:
+        raise ValueError("'download' command needs a model name or alias.")
     model_config = resolve_model_config(model)
     model_dir = models_dir / model_config.name
 
@@ -234,4 +236,8 @@ def where_main(args) -> None:
 
 # Subcommand to download model artifacts.
 def download_main(args) -> None:
-    download_and_convert(args.model, args.model_directory, args.hf_token)
+    try:
+        download_and_convert(args.model, args.model_directory, args.hf_token)
+    except ValueError as e:
+        print(e, file=sys.stderr)
+        sys.exit(1)
