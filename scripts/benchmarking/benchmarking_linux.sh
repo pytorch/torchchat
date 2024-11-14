@@ -59,9 +59,9 @@ function formatted_export_and_generate {
   # Generate using the Model
   echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" >> $file
   echo $generate_cmd | tee -a $file
-    if [ $DRY_RUN -eq 0 ]; then
-      eval $generate_cmd &>> $file
-    fi
+  if [ $DRY_RUN -eq 0 ]; then
+    eval $generate_cmd &>> $file
+  fi
   echo
 }
 
