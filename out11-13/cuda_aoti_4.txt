@@ -1,0 +1,90 @@
+python3 torchchat.py export llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model34.so
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --dso-path /tmp/model34.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model34.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.6.0.dev20241002+cu121 available.
+W1113 19:08:58.782895 2627700 site-packages/torch/_export/__init__.py:225] +============================+
+W1113 19:08:58.783380 2627700 site-packages/torch/_export/__init__.py:226] |     !!!   WARNING   !!!    |
+W1113 19:08:58.783589 2627700 site-packages/torch/_export/__init__.py:227] +============================+
+W1113 19:08:58.783773 2627700 site-packages/torch/_export/__init__.py:228] torch._export.aot_compile() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export()) instead.
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 6.89 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.57 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model34.so
+WARNING!! The path of compiling a dso is deprecated. Please use --output-aoti-package-path to create a .pt2 artifact instead.
+The generated packaged model can be found at: /tmp/model34.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --dso-path /tmp/model34.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+PyTorch version 2.6.0.dev20241002+cu121 available.
+lm_eval is not installed, GPTQ may not be usable
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 7.42 seconds
+-----------------------------------------------------------
+Once upon a time, in a far-off kingdom, there lived a beautiful and kind-hearted princess named Sophia. She had long, golden hair and sparkling blue eyes that shone like the stars in the night sky. Sophia was loved by all the people in the kingdom, and she was especially loved by the little children who would often run to her side whenever she rode her white horse through the castle gates.
+
+Sophia's father, the king, was a just and fair ruler who loved his daughter dearly. He had always wanted to see Sophia married to a man of his choice, but Sophia had other ideas. She dreamed of marrying for love, not for any title or wealth. One day, while out riding her horse, Sophia met a handsome stranger who was traveling through the kingdom. His name was Jack, and he was a brave and adventurous knight who had come to the kingdom to participate in a grand tournament.
+
+As Sophia and Jack spent more time together, they fell deeply in love. They would secretly meet in the
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 1.5557 sec total                 
+Time to first token: 0.1863 sec with sequential prefill.                
+
+      Total throughput: 128.5611 tokens/sec, 0.0078 s/token                 
+First token throughput: 5.3670 tokens/sec, 0.1863 s/token                 
+ Next token throughput: 145.3239 tokens/sec, 0.0069 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a land far, far away, there was a beautiful princess named Sophia. She lived in a grand castle with her loving father, the king. Sophia had long, golden hair and sparkling blue eyes that shone like the stars in the night sky. Her smile could light up the darkest of rooms and fill the hearts of all who saw her with joy.
+
+One day, while Sophia was out for a walk in the castle gardens, she stumbled upon a mysterious and handsome stranger. He was dressed in dark, tattered clothes and wore a look of great sadness on his face. Sophia couldn't help but be drawn to the stranger's charisma, and she found herself talking to him for hours without even realizing it.
+
+As they talked, Sophia learned that the stranger's name was Max. He was a brave and loyal knight who had fought many battles to protect his kingdom from harm. Despite his tough exterior, Max had a gentle soul and a deep love for life. Sophia was enchanted by his charming
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 1.3792 sec total                 
+Time to first token: 0.0347 sec with sequential prefill.                
+
+      Total throughput: 145.0126 tokens/sec, 0.0069 s/token                 
+First token throughput: 28.7934 tokens/sec, 0.0347 s/token                 
+ Next token throughput: 148.0148 tokens/sec, 0.0068 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+
+========================================
+
+Once upon a time, in a small village near the sea, there was a beautiful temple dedicated to the goddess of the wind. The villagers believed that the goddess had the power to bring them bountiful harvests, good weather, and safe passage through the stormy sea. Every year, the villagers would offer prayers and make offerings to the goddess, hoping to receive her blessings.
+One day, a young girl named Maria wandered into the temple, feeling lost and alone. She had just lost her mother, and her father had gone off to war, leaving her behind. Feeling desperate for comfort, Maria cried out to the goddess, pleading for her help and guidance.
+The goddess, moved by Maria’s tears and prayers, decided to reveal herself to the girl. But instead of appearing in her usual form, which was that of a gentle breeze or a calm sea, the goddess transformed herself into a creature that was completely unexpected: a majestic dragon. Its scales shone like gold in the sunlight, and its eyes burned
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 1.3823 sec total                 
+Time to first token: 0.0346 sec with sequential prefill.                
+
+      Total throughput: 144.6879 tokens/sec, 0.0069 s/token                 
+First token throughput: 28.8834 tokens/sec, 0.0346 s/token                 
+ Next token throughput: 147.6630 tokens/sec, 0.0068 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 139.42                 
+Average tokens/sec (first token): 21.01                 
+Average tokens/sec (next tokens): 147.00 
+                
+Memory used: 0.06 GB

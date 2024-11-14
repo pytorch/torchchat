@@ -1,0 +1,71 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241002+cu121 available.
+lm_eval is not installed, GPTQ may not be usable
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.11 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, there was a small chapel nestled in the heart of a quiet village. The chapel was dedicated to Saint Bridget, a patron saint of Ireland and a symbol of faith, hope, and perseverance. The villagers would often gather at the chapel to pray, reflect, and seek guidance from their beloved saint.
+One day, a young woman named Aisling (pronounced Ash-ling) arrived in the village. She was a skilled artist and had been traveling the countryside, seeking inspiration for her paintings. As she walked through the village, she stumbled upon the charming chapel and felt an overwhelming sense of peace and calm. Aisling was drawn to the chapel's simple beauty and the aura of serenity that surrounded it.
+Without hesitation, Aisling entered the chapel and sat down on a pew, taking in the peaceful atmosphere. As she gazed around the chapel, she noticed a beautiful stained-glass window depicting Saint Bridget. The window was a masterpiece, with vibrant colors and intricate details that seemed to dance in the light. Aisling was captivated by the window and felt an inexplicable connection to the saint.
+Over the next few days, Aisling returned to the chapel every morning, sitting in front of the stained-glass window, lost in thought
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 127.8033 sec total                 
+Time to first token: 0.4994 sec with parallel prefill.                
+
+      Total throughput: 2.0031 tokens/sec, 0.4992 s/token                 
+First token throughput: 2.0023 tokens/sec, 0.4994 s/token                 
+ Next token throughput: 2.0031 tokens/sec, 0.4992 s/token                     
+
+Bandwidth achieved: 32.17 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 1.3e+02 seconds
+
+========================================
+
+Once upon a time, there was a handsome young prince who fell in love with a lovely princess from a neighboring kingdom. They were in love, but their families didn’t approve of their relationship due to their different customs and traditions. The prince wanted to marry the princess, but his parents, the king and queen, thought she was beneath their royal status.
+The princess was from a humble background and didn’t have the wealth or prestige that the royal family desired for their son. They feared that marrying her would bring shame and embarrassment to their kingdom. The prince was heartbroken and felt trapped between his love for the princess and his duty to obey his parents.
+One day, the prince decided to take matters into his own hands. He came up with a plan to disguise himself and visit the princess in secret, to be with her and convince her to run away with him to a remote island where they could live happily ever after. The princess was hesitant at first, but eventually agreed to join him on his wild adventure.
+As they sailed across the ocean, they encountered many obstacles and challenges. They faced fierce storms, hungry sea monsters, and even a wicked witch who tried to cast a spell on them. But through it all, the prince and the princess relied on each other and their love for each other
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 70.7476 sec total                 
+Time to first token: 0.4502 sec with parallel prefill.                
+
+      Total throughput: 3.6185 tokens/sec, 0.2764 s/token                 
+First token throughput: 2.2214 tokens/sec, 0.4502 s/token                 
+ Next token throughput: 3.6274 tokens/sec, 0.2757 s/token                     
+
+Bandwidth achieved: 58.11 GB/s
+
+========================================
+
+Once upon a time, in a land far, far away, there was a very special book. This book was unlike any other, for it was said to have the power to change the reader's life. It was a book that would take the reader on a journey, a journey that would reveal secrets and mysteries, and give the reader a new perspective on the world. The book was known as the "Book of Wonder".
+The Book of Wonder was said to be hidden away, guarded by powerful forces that would not let anyone find it easily. But one day, a brave and curious adventurer named Max set out to find the book. He had heard stories of its power and was determined to read its pages and unlock its secrets.
+Max traveled through mountains and valleys, crossed rivers and forests, and braved many dangers on his journey. He met many people along the way, some of whom tried to help him, while others tried to stop him. But Max was not deterred. He was driven by a burning desire to find the book and unlock its secrets.
+Finally, after many days of travel, Max came to a great mountain, where he was told that the Book of Wonder was hidden. The mountain was guarded by a fierce dragon, who breathed fire and had scales as black as coal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 69.1671 sec total                 
+Time to first token: 0.3802 sec with parallel prefill.                
+
+      Total throughput: 3.7012 tokens/sec, 0.2702 s/token                 
+First token throughput: 2.6300 tokens/sec, 0.3802 s/token                 
+ Next token throughput: 3.7071 tokens/sec, 0.2698 s/token                     
+
+Bandwidth achieved: 59.44 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 3.11                 
+Average tokens/sec (first token): 2.28                 
+Average tokens/sec (next tokens): 3.11 
+                
+Memory used: 0.00 GB

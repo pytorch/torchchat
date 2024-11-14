@@ -1,0 +1,71 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+PyTorch version 2.6.0.dev20241002+cu121 available.
+lm_eval is not installed, GPTQ may not be usable
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.13 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 27.99 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of Provence, there lived a young girl named Colette. Colette was a lovely child with long, curly brown hair and bright, sparkling blue eyes. She loved nothing more than spending her days exploring the countryside, playing with the local animals, and helping her mother in the family's small bakery.
+Colette's mother was the most skilled baker in all of Provence, famous for her delicious pastries, bread, and cakes. The villagers would often come from far and wide to taste her creations, and Colette loved to watch her mother work her magic in the kitchen.
+One day, while out exploring, Colette stumbled upon a hidden garden deep in the woods. The garden was filled with the most beautiful and unusual flowers she had ever seen, and a small clearing in the center of the garden was filled with a variety of colorful stones and gemstones. Colette was enchanted by the garden and spent hours exploring its secrets and marveling at its beauty.
+As she wandered through the garden, Colette came across a small, delicate fairy perched on a toadstool. The fairy introduced herself as Luna, and told Colette that she was a guardian of the garden. Luna revealed to Colette that the
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 55.6736 sec total                 
+Time to first token: 0.3617 sec with parallel prefill.                
+
+      Total throughput: 4.5982 tokens/sec, 0.2175 s/token                 
+First token throughput: 2.7650 tokens/sec, 0.3617 s/token                 
+ Next token throughput: 4.6102 tokens/sec, 0.2169 s/token                     
+
+Bandwidth achieved: 39.36 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a far-off kingdom, there lived a beautiful Princess Ariana. She was loved by all the people in the kingdom for her kindness, generosity, and beauty. The Princess was known to be very kind to the poor and the needy, and she would often sneak out of the castle at night to help those in need.
+One day, the King, the Princess's father, called a grand feast to celebrate the Princess's 18th birthday. The whole kingdom was invited, and the castle was filled with guests from all over the land. The Princess was thrilled to be surrounded by so many people she loved and admired.
+As the night wore on, the Princess noticed a young man watching her from across the room. He was tall, handsome, and had piercing blue eyes that seemed to see right through her. The Princess felt a strange sensation in her heart, as if she had known this young man before, but she couldn't quite place him.
+The young man, whose name was Prince Leon, had been watching the Princess with great interest. He had heard stories about her kindness and compassion, and he was determined to get to know her better. As the night wore on, Prince Leon mustered up the courage to approach the Princess.
+As they started talking, the
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 49.9579 sec total                 
+Time to first token: 0.2771 sec with parallel prefill.                
+
+      Total throughput: 5.1243 tokens/sec, 0.1951 s/token                 
+First token throughput: 3.6087 tokens/sec, 0.2771 s/token                 
+ Next token throughput: 5.1328 tokens/sec, 0.1948 s/token                     
+
+Bandwidth achieved: 43.86 GB/s
+
+========================================
+
+Once upon a time, there was a small village nestled in the heart of a dense forest. The villagers lived simple lives, relying on the land for their livelihood. They hunted, farmed, and gathered food to sustain themselves. However, as time passed, the villagers began to notice a change in the forest. The trees grew taller and closer together, making it increasingly difficult to navigate. The air grew thick with an eerie mist, and the sounds of the forest became distorted and unsettling.
+The villagers tried to adapt, but their attempts only seemed to make things worse. They felled more trees to clear a path, but the underbrush grew back stronger and faster. They built shelters to protect themselves from the elements, but the mist seeped in, dampening their spirits. The villagers began to feel trapped and suffocated by the changing forest.
+One brave villager, a young woman named Aria, decided to explore the heart of the forest in search of answers. She packed a small bag, grabbed a sturdy bow and quiver of arrows, and set off into the unknown. As she walked, the trees seemed to close in around her, their branches tangling above her head like skeletal fingers.
+Aria pushed on, undeterred by the eerie atmosphere. She had always
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 49.5937 sec total                 
+Time to first token: 0.3189 sec with parallel prefill.                
+
+      Total throughput: 5.1619 tokens/sec, 0.1937 s/token                 
+First token throughput: 3.1354 tokens/sec, 0.3189 s/token                 
+ Next token throughput: 5.1751 tokens/sec, 0.1932 s/token                     
+
+Bandwidth achieved: 44.18 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 4.96                 
+Average tokens/sec (first token): 3.17                 
+Average tokens/sec (next tokens): 4.97 
+                
+Memory used: 0.00 GB

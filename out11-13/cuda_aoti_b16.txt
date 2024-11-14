@@ -1,0 +1,87 @@
+python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model16.so
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model16.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.6.0.dev20241002+cu121 available.
+W1113 18:59:30.245352 2499244 site-packages/torch/_export/__init__.py:225] +============================+
+W1113 18:59:30.245873 2499244 site-packages/torch/_export/__init__.py:226] |     !!!   WARNING   !!!    |
+W1113 18:59:30.246104 2499244 site-packages/torch/_export/__init__.py:227] +============================+
+W1113 18:59:30.246289 2499244 site-packages/torch/_export/__init__.py:228] torch._export.aot_compile() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export()) instead.
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 6.20 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model16.so
+WARNING!! The path of compiling a dso is deprecated. Please use --output-aoti-package-path to create a .pt2 artifact instead.
+The generated packaged model can be found at: /tmp/model16.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+PyTorch version 2.6.0.dev20241002+cu121 available.
+lm_eval is not installed, GPTQ may not be usable
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Warning: checkpoint path ignored because an exported DSO or PTE path was specified
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 8.24 seconds
+-----------------------------------------------------------
+Once upon a time, in the 17th century, there existed a man named Giovanni Alfonso Borelli. Although little known in popular culture, Borelli is actually the father of biomechanics, the study of human movement. Who knew something as complex as the human body could be broken down to such basic principles? Just like Newton’s laws of motion, Borelli’s work laid the ground for people to understand how the human body moves and works.
+In Borelli’s time, people were fascinated by the movements of insects, like beetles and grasshoppers. They were amazed by the seemingly impossible feats that these insects performed, like jumping incredible distances. Borelli was particularly intrigued by these creatures and decided to study them. He spent years observing, measuring, and experimenting on insects to try to understand their movements and how they were able to accomplish such feats.
+Borelli’s work was groundbreaking in many ways. For the first time, people began to understand the principles of movement
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 2.5755 sec total                 
+Time to first token: 0.2050 sec with sequential prefill.                
+
+      Total throughput: 77.6552 tokens/sec, 0.0129 s/token                 
+First token throughput: 4.8771 tokens/sec, 0.2050 s/token                 
+ Next token throughput: 83.9504 tokens/sec, 0.0119 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in the bustling city of Mbarara, Uganda, there existed a group of vibrant young people known as the Mbarara Young Adults Group. This energetic and ambitious team was passionate about making a positive impact in their community. Among them was a young woman named Doreen, who was determined to make a difference in her own unique way.
+Doreen had always been fascinated by the potential of art to bring people together and to tell stories that needed to be told. She saw how art could be a powerful tool for social change, and she wanted to use it to address the issues that she saw affecting her community.
+One of the biggest challenges facing Mbarara was the growing problem of deforestation and environmental degradation. The once-thriving forests were dwindling at an alarming rate, and the community was feeling the effects. Doreen knew she had to act, but she wasn't sure how.
+That's when she stumbled upon the idea of using art to raise awareness about the
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 2.4590 sec total                 
+Time to first token: 0.0586 sec with sequential prefill.                
+
+      Total throughput: 81.3347 tokens/sec, 0.0123 s/token                 
+First token throughput: 17.0775 tokens/sec, 0.0586 s/token                 
+ Next token throughput: 82.9023 tokens/sec, 0.0121 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+
+========================================
+
+Once upon a time, in a land of wonder, there existed a kingdom where animals could talk and live in harmony with humans. In the heart of this kingdom, there was a beautiful garden filled with lush greenery, vibrant flowers, and towering trees that seemed to stretch up to the sky. Among the many creatures that called this garden home were a group of rabbits who were renowned for their wisdom and kind hearts.
+These rabbits, led by a wise and gentle leader named Professor Fluffers, spent their days tending to the garden, learning from the other creatures, and sharing their knowledge with anyone who sought it. They were known throughout the kingdom as the wisest and most compassionate rabbits in all the land.
+One day, a young rabbit named Benny heard a faint cry for help coming from a nearby thicket. Without hesitation, Benny hopped towards the source of the sound, his big brown eyes scanning the area for any sign of distress. As he approached the thicket, he saw a small bird perched on
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 2.4666 sec total                 
+Time to first token: 0.0590 sec with sequential prefill.                
+
+      Total throughput: 81.0837 tokens/sec, 0.0123 s/token                 
+First token throughput: 16.9516 tokens/sec, 0.0590 s/token                 
+ Next token throughput: 82.6551 tokens/sec, 0.0121 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 80.02                 
+Average tokens/sec (first token): 12.97                 
+Average tokens/sec (next tokens): 83.17 
+                
+Memory used: 0.05 GB

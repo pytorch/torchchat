@@ -1,21 +1,21 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Customize what is being run 
+# Customize what is being run
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 DRY_RUN=0
 
-RUN_CUDA_EAGER=1
-RUN_CUDA_COMPILE=1
-RUN_CUDA_AOTI=1
-RUN_CUDA_AOTI_PT2=1
+RUN_CUDA_EAGER=0
+RUN_CUDA_COMPILE=0
+RUN_CUDA_AOTI=0
+RUN_CUDA_AOTI_PT2=0
 
-RUN_CPU_EAGER=1
-RUN_CPU_COMPILE=1
+RUN_CPU_EAGER=0
+RUN_CPU_COMPILE=0
 RUN_CPU_AOTI=1
 RUN_CPU_AOTI_PT2=1
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Check and Set Up Args (model, out_directory) 
+# Check and Set Up Args (model, out_directory)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $# -ne 2 ]; then
   echo "Please provide (1) model and (2) directory as positional arguments"
@@ -29,7 +29,7 @@ mkdir -p $dir
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Helpers 
+# Helpers
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Env Variables for Running Commands
@@ -52,7 +52,7 @@ function formatted_export_and_generate {
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" >> $file
     echo "$compile_cmd" | tee -a $file
     if [ $DRY_RUN -eq 0 ]; then
-      eval $compile_cmd &>> $file 
+      eval $compile_cmd &>> $file
     fi
   fi
 
@@ -69,18 +69,18 @@ function formatted_export_and_generate {
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Cuda eager
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 
+
 if [ $RUN_CUDA_EAGER -eq 1 ]; then
   echo "Cuda eager b16"
   generate_cmd="python3 torchchat.py generate $model --quantize '{\"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --prompt \"Once upon a time,\" --max-new-tokens 200 --num-samples 3"
   file="cuda_eager_b16.txt"
   formatted_export_and_generate "$file" "$generate_cmd"
-  
+
   echo "Cuda eager int8"
-  generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --prompt \"Once upon a time,\" --max-new-tokens 200 --num-samples 3" 
+  generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --prompt \"Once upon a time,\" --max-new-tokens 200 --num-samples 3"
   file="cuda_eager_8.txt"
   formatted_export_and_generate "$file" "$generate_cmd"
-  
+
   echo "Cuda eager int4"
   generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int4\": {\"groupsize\": 256}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --prompt \"Once upon a time,\" --max-new-tokens 200 --num-samples 3"
   file="cuda_eager_4.txt"
@@ -97,12 +97,12 @@ if [ $RUN_CUDA_COMPILE -eq 1 ]; then
   generate_cmd="python3 torchchat.py generate $model --quantize '{\"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --prompt \"Once upon a time,\" --max-new-tokens 200 --compile --num-samples 3"
   file="cuda_compile_b16.txt"
   formatted_export_and_generate "$file" "$generate_cmd"
-  
+
   echo "Cuda compile int8"
-  generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --prompt \"Once upon a time,\" --max-new-tokens 200 --compile --num-samples 3" 
+  generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --prompt \"Once upon a time,\" --max-new-tokens 200 --compile --num-samples 3"
   file="cuda_compile_8.txt"
   formatted_export_and_generate "$file" "$generate_cmd"
-  
+
   echo "Cuda compile int4"
   generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int4\": {\"groupsize\": 256}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --prompt \"Once upon a time,\" --max-new-tokens 200 --compile --num-samples 3"
   file="cuda_compile_4.txt"
@@ -111,7 +111,7 @@ fi
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# CPU eager 
+# CPU eager
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 if [ $RUN_CPU_EAGER -eq 1 ]; then
@@ -119,12 +119,12 @@ if [ $RUN_CPU_EAGER -eq 1 ]; then
   generate_cmd="python3 torchchat.py generate $model --quantize '{\"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --prompt \"Once upon a time,\" --max-new-tokens 256 --num-samples 3"
   file="cpu_eager_b16.txt"
   formatted_export_and_generate "$file" "$generate_cmd"
-  
+
   echo "CPU eager int8"
-  generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --prompt \"Once upon a time,\" --max-new-tokens 256 --num-samples 3" 
+  generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --prompt \"Once upon a time,\" --max-new-tokens 256 --num-samples 3"
   file="cpu_eager_8.txt"
   formatted_export_and_generate "$file" "$generate_cmd"
-  
+
   echo "CPU eager int4"
   generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int4\": {\"groupsize\": 256}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --prompt \"Once upon a time,\" --max-new-tokens 256 --num-samples 3"
   file="cpu_eager_4.txt"
@@ -141,12 +141,12 @@ if [ $RUN_CPU_COMPILE -eq 1 ]; then
   generate_cmd="python3 torchchat.py generate $model --quantize '{\"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --prompt \"Once upon a time,\" --max-new-tokens 256 --compile --num-samples 3"
   file="cpu_compile_b16.txt"
   formatted_export_and_generate "$file" "$generate_cmd"
-  
+
   echo "CPU compile int8"
-  generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --prompt \"Once upon a time,\" --max-new-tokens 256 --compile --num-samples 3" 
+  generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --prompt \"Once upon a time,\" --max-new-tokens 256 --compile --num-samples 3"
   file="cpu_compile_8.txt"
   formatted_export_and_generate "$file" "$generate_cmd"
-  
+
   echo "CPU compile int4"
   generate_cmd="python3 torchchat.py generate $model --quantize '{\"linear:int4\": {\"groupsize\": 256}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --prompt \"Once upon a time,\" --max-new-tokens 256 --compile --num-samples 3"
   file="cpu_compile_4.txt"
@@ -160,22 +160,22 @@ fi
 
 if [ $RUN_CUDA_AOTI -eq 1 ]; then
   echo "Cuda aoti b16"
-  compile_cmd="python3 torchchat.py export $model --quantize '{\"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --output-dso-path /tmp/model16.so" 
-  generate_cmd="python3 torchchat.py generate $model --dso-path /tmp/model16.so --prompt \"Once upon a time,\" --max-new-tokens 200 --device cuda --num-samples 3" 
+  compile_cmd="python3 torchchat.py export $model --quantize '{\"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --output-dso-path /tmp/model16.so"
+  generate_cmd="python3 torchchat.py generate $model --dso-path /tmp/model16.so --prompt \"Once upon a time,\" --max-new-tokens 200 --device cuda --num-samples 3"
   file="cuda_aoti_b16.txt"
-  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
-  
+  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd"
+
   echo "Cuda aoti int8"
   compile_cmd="python3 torchchat.py export $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --output-dso-path /tmp/model8.so"
   generate_cmd="python3 torchchat.py generate $model --dso-path /tmp/model8.so --prompt \"Once upon a time,\" --max-new-tokens 200 --device cuda --num-samples 3"
   file="cuda_aoti_8.txt"
-  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
-  
+  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd"
+
   echo "Cuda aoti int4"
   compile_cmd="python3 torchchat.py export $model --quantize '{\"linear:int4\": {\"groupsize\": 256}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --output-dso-path /tmp/model34.so"
   generate_cmd="python3 torchchat.py generate $model --dso-path /tmp/model34.so --prompt \"Once upon a time,\" --max-new-tokens 200 --device cuda --num-samples 3"
   file="cuda_aoti_4.txt"
-  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
+  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd"
 fi
 
 
@@ -185,22 +185,22 @@ fi
 
 if [ $RUN_CUDA_AOTI_PT2 -eq 1 ]; then
   echo "Cuda aoti PT2 b16"
-  compile_cmd="python3 torchchat.py export $model --quantize '{\"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --output-aoti-package-path /tmp/model16.pt2" 
-  generate_cmd="python3 torchchat.py generate $model --aoti-package-path /tmp/model16.pt2 --prompt \"Once upon a time,\" --max-new-tokens 200 --device cuda --num-samples 3" 
+  compile_cmd="python3 torchchat.py export $model --quantize '{\"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --output-aoti-package-path /tmp/model16.pt2"
+  generate_cmd="python3 torchchat.py generate $model --aoti-package-path /tmp/model16.pt2 --prompt \"Once upon a time,\" --max-new-tokens 200 --device cuda --num-samples 3"
   file="cuda_aoti_pt2_b16.txt"
-  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
-  
+  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd"
+
   echo "Cuda aoti PT2 int8"
   compile_cmd="python3 torchchat.py export $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --output-aoti-package-path /tmp/model8.pt2"
   generate_cmd="python3 torchchat.py generate $model --aoti-package-path /tmp/model8.pt2 --prompt \"Once upon a time,\" --max-new-tokens 200 --device cuda --num-samples 3"
   file="cuda_aoti_pt2_8.txt"
-  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
-  
+  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd"
+
   echo "Cuda aoti PT2 int4"
   compile_cmd="python3 torchchat.py export $model --quantize '{\"linear:int4\": {\"groupsize\": 256}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cuda\"}}' --output-aoti-package-path /tmp/model34.pt2"
   generate_cmd="python3 torchchat.py generate $model --aoti-package-path /tmp/model34.pt2 --prompt \"Once upon a time,\" --max-new-tokens 200 --device cuda --num-samples 3"
   file="cuda_aoti_pt2_4.txt"
-  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
+  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd"
 fi
 
 
@@ -210,22 +210,22 @@ fi
 
 if [ $RUN_CPU_AOTI -eq 1 ]; then
   echo "CPU aoti b16"
-  compile_cmd="python3 torchchat.py export $model --quantize '{\"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --output-dso-path /tmp/model16.so" 
-  generate_cmd="python3 torchchat.py generate $model --dso-path /tmp/model16.so --prompt \"Once upon a time,\" --max-new-tokens 256 --device cpu --num-samples 3" 
+  compile_cmd="python3 torchchat.py export $model --quantize '{\"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --output-dso-path /tmp/model16.so"
+  generate_cmd="python3 torchchat.py generate $model --dso-path /tmp/model16.so --prompt \"Once upon a time,\" --max-new-tokens 256 --device cpu --num-samples 3"
   file="cpu_aoti_b16.txt"
-  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
-  
+  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd"
+
   echo "CPU aoti int8"
   compile_cmd="python3 torchchat.py export $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --output-dso-path /tmp/model8.so"
   generate_cmd="python3 torchchat.py generate $model --dso-path /tmp/model8.so --prompt \"Once upon a time,\" --max-new-tokens 256 --device cpu --num-samples 3"
   file="cpu_aoti_8.txt"
-  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
-  
+  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd"
+
   echo "CPU aoti int4"
   compile_cmd="python3 torchchat.py export $model --quantize '{\"linear:int4\": {\"groupsize\": 256}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --output-dso-path /tmp/model34.so"
   generate_cmd="python3 torchchat.py generate $model --dso-path /tmp/model34.so --prompt \"Once upon a time,\" --max-new-tokens 256 --device cpu --num-samples 3"
   file="cpu_aoti_4.txt"
-  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
+  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd"
 fi
 
 
@@ -235,20 +235,20 @@ fi
 
 if [ $RUN_CPU_AOTI_PT2 -eq 1 ]; then
   echo "CPU aoti PT2 b16"
-  compile_cmd="python3 torchchat.py export $model --quantize '{\"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --output-pt2-package-path /tmp/model16.pt2" 
-  generate_cmd="python3 torchchat.py generate $model --pt2-package-path /tmp/model16.pt2 --prompt \"Once upon a time,\" --max-new-tokens 256 --device cpu --num-samples 3" 
-  file="cpu_aoti_b16.txt"
-  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
-  
+  compile_cmd="python3 torchchat.py export $model --quantize '{\"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --output-aoti-package-path /tmp/model16.pt2"
+  generate_cmd="python3 torchchat.py generate $model --aoti-package-path /tmp/model16.pt2 --prompt \"Once upon a time,\" --max-new-tokens 256 --device cpu --num-samples 3"
+  file="cpu_aoti_pt2_b16.txt"
+  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd"
+
   echo "CPU aoti PT2 int8"
-  compile_cmd="python3 torchchat.py export $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --output-pt2-package-path /tmp/model8.pt2"
-  generate_cmd="python3 torchchat.py generate $model --pt2-package-path /tmp/model8.pt2 --prompt \"Once upon a time,\" --max-new-tokens 256 --device cpu --num-samples 3"
-  file="cpu_aoti_8.txt"
-  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
-  
+  compile_cmd="python3 torchchat.py export $model --quantize '{\"linear:int8\": {\"groupsize\": 0}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --output-aoti-package-path /tmp/model8.pt2"
+  generate_cmd="python3 torchchat.py generate $model --aoti-package-path /tmp/model8.pt2 --prompt \"Once upon a time,\" --max-new-tokens 256 --device cpu --num-samples 3"
+  file="cpu_aoti_pt2_8.txt"
+  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd"
+
   echo "CPU aoti PT2 int4"
-  compile_cmd="python3 torchchat.py export $model --quantize '{\"linear:int4\": {\"groupsize\": 256}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --output-pt2-package-path /tmp/model34.pt2"
-  generate_cmd="python3 torchchat.py generate $model --pt2-package-path /tmp/model34.pt2 --prompt \"Once upon a time,\" --max-new-tokens 256 --device cpu --num-samples 3"
-  file="cpu_aoti_4.txt"
-  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd" 
+  compile_cmd="python3 torchchat.py export $model --quantize '{\"linear:int4\": {\"groupsize\": 256}, \"precision\": {\"dtype\":\"bfloat16\"}, \"executor\":{\"accelerator\":\"cpu\"}}' --output-aoti-package-path /tmp/model34.pt2"
+  generate_cmd="python3 torchchat.py generate $model --aoti-package-path /tmp/model34.pt2 --prompt \"Once upon a time,\" --max-new-tokens 256 --device cpu --num-samples 3"
+  file="cpu_aoti_pt2_4.txt"
+  formatted_export_and_generate "$file" "$generate_cmd" "$compile_cmd"
 fi

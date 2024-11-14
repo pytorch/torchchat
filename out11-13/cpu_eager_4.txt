@@ -1,0 +1,297 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+PyTorch version 2.6.0.dev20241002+cu121 available.
+lm_eval is not installed, GPTQ may not be usable
+linear: model.layers.0.attention.wq, in=4096, out=4096
+linear: model.layers.0.attention.wk, in=4096, out=1024
+linear: model.layers.0.attention.wv, in=4096, out=1024
+linear: model.layers.0.attention.wo, in=4096, out=4096
+linear: model.layers.0.feed_forward.w1, in=4096, out=14336
+linear: model.layers.0.feed_forward.w2, in=14336, out=4096
+linear: model.layers.0.feed_forward.w3, in=4096, out=14336
+linear: model.layers.1.attention.wq, in=4096, out=4096
+linear: model.layers.1.attention.wk, in=4096, out=1024
+linear: model.layers.1.attention.wv, in=4096, out=1024
+linear: model.layers.1.attention.wo, in=4096, out=4096
+linear: model.layers.1.feed_forward.w1, in=4096, out=14336
+linear: model.layers.1.feed_forward.w2, in=14336, out=4096
+linear: model.layers.1.feed_forward.w3, in=4096, out=14336
+linear: model.layers.2.attention.wq, in=4096, out=4096
+linear: model.layers.2.attention.wk, in=4096, out=1024
+linear: model.layers.2.attention.wv, in=4096, out=1024
+linear: model.layers.2.attention.wo, in=4096, out=4096
+linear: model.layers.2.feed_forward.w1, in=4096, out=14336
+linear: model.layers.2.feed_forward.w2, in=14336, out=4096
+linear: model.layers.2.feed_forward.w3, in=4096, out=14336
+linear: model.layers.3.attention.wq, in=4096, out=4096
+linear: model.layers.3.attention.wk, in=4096, out=1024
+linear: model.layers.3.attention.wv, in=4096, out=1024
+linear: model.layers.3.attention.wo, in=4096, out=4096
+linear: model.layers.3.feed_forward.w1, in=4096, out=14336
+linear: model.layers.3.feed_forward.w2, in=14336, out=4096
+linear: model.layers.3.feed_forward.w3, in=4096, out=14336
+linear: model.layers.4.attention.wq, in=4096, out=4096
+linear: model.layers.4.attention.wk, in=4096, out=1024
+linear: model.layers.4.attention.wv, in=4096, out=1024
+linear: model.layers.4.attention.wo, in=4096, out=4096
+linear: model.layers.4.feed_forward.w1, in=4096, out=14336
+linear: model.layers.4.feed_forward.w2, in=14336, out=4096
+linear: model.layers.4.feed_forward.w3, in=4096, out=14336
+linear: model.layers.5.attention.wq, in=4096, out=4096
+linear: model.layers.5.attention.wk, in=4096, out=1024
+linear: model.layers.5.attention.wv, in=4096, out=1024
+linear: model.layers.5.attention.wo, in=4096, out=4096
+linear: model.layers.5.feed_forward.w1, in=4096, out=14336
+linear: model.layers.5.feed_forward.w2, in=14336, out=4096
+linear: model.layers.5.feed_forward.w3, in=4096, out=14336
+linear: model.layers.6.attention.wq, in=4096, out=4096
+linear: model.layers.6.attention.wk, in=4096, out=1024
+linear: model.layers.6.attention.wv, in=4096, out=1024
+linear: model.layers.6.attention.wo, in=4096, out=4096
+linear: model.layers.6.feed_forward.w1, in=4096, out=14336
+linear: model.layers.6.feed_forward.w2, in=14336, out=4096
+linear: model.layers.6.feed_forward.w3, in=4096, out=14336
+linear: model.layers.7.attention.wq, in=4096, out=4096
+linear: model.layers.7.attention.wk, in=4096, out=1024
+linear: model.layers.7.attention.wv, in=4096, out=1024
+linear: model.layers.7.attention.wo, in=4096, out=4096
+linear: model.layers.7.feed_forward.w1, in=4096, out=14336
+linear: model.layers.7.feed_forward.w2, in=14336, out=4096
+linear: model.layers.7.feed_forward.w3, in=4096, out=14336
+linear: model.layers.8.attention.wq, in=4096, out=4096
+linear: model.layers.8.attention.wk, in=4096, out=1024
+linear: model.layers.8.attention.wv, in=4096, out=1024
+linear: model.layers.8.attention.wo, in=4096, out=4096
+linear: model.layers.8.feed_forward.w1, in=4096, out=14336
+linear: model.layers.8.feed_forward.w2, in=14336, out=4096
+linear: model.layers.8.feed_forward.w3, in=4096, out=14336
+linear: model.layers.9.attention.wq, in=4096, out=4096
+linear: model.layers.9.attention.wk, in=4096, out=1024
+linear: model.layers.9.attention.wv, in=4096, out=1024
+linear: model.layers.9.attention.wo, in=4096, out=4096
+linear: model.layers.9.feed_forward.w1, in=4096, out=14336
+linear: model.layers.9.feed_forward.w2, in=14336, out=4096
+linear: model.layers.9.feed_forward.w3, in=4096, out=14336
+linear: model.layers.10.attention.wq, in=4096, out=4096
+linear: model.layers.10.attention.wk, in=4096, out=1024
+linear: model.layers.10.attention.wv, in=4096, out=1024
+linear: model.layers.10.attention.wo, in=4096, out=4096
+linear: model.layers.10.feed_forward.w1, in=4096, out=14336
+linear: model.layers.10.feed_forward.w2, in=14336, out=4096
+linear: model.layers.10.feed_forward.w3, in=4096, out=14336
+linear: model.layers.11.attention.wq, in=4096, out=4096
+linear: model.layers.11.attention.wk, in=4096, out=1024
+linear: model.layers.11.attention.wv, in=4096, out=1024
+linear: model.layers.11.attention.wo, in=4096, out=4096
+linear: model.layers.11.feed_forward.w1, in=4096, out=14336
+linear: model.layers.11.feed_forward.w2, in=14336, out=4096
+linear: model.layers.11.feed_forward.w3, in=4096, out=14336
+linear: model.layers.12.attention.wq, in=4096, out=4096
+linear: model.layers.12.attention.wk, in=4096, out=1024
+linear: model.layers.12.attention.wv, in=4096, out=1024
+linear: model.layers.12.attention.wo, in=4096, out=4096
+linear: model.layers.12.feed_forward.w1, in=4096, out=14336
+linear: model.layers.12.feed_forward.w2, in=14336, out=4096
+linear: model.layers.12.feed_forward.w3, in=4096, out=14336
+linear: model.layers.13.attention.wq, in=4096, out=4096
+linear: model.layers.13.attention.wk, in=4096, out=1024
+linear: model.layers.13.attention.wv, in=4096, out=1024
+linear: model.layers.13.attention.wo, in=4096, out=4096
+linear: model.layers.13.feed_forward.w1, in=4096, out=14336
+linear: model.layers.13.feed_forward.w2, in=14336, out=4096
+linear: model.layers.13.feed_forward.w3, in=4096, out=14336
+linear: model.layers.14.attention.wq, in=4096, out=4096
+linear: model.layers.14.attention.wk, in=4096, out=1024
+linear: model.layers.14.attention.wv, in=4096, out=1024
+linear: model.layers.14.attention.wo, in=4096, out=4096
+linear: model.layers.14.feed_forward.w1, in=4096, out=14336
+linear: model.layers.14.feed_forward.w2, in=14336, out=4096
+linear: model.layers.14.feed_forward.w3, in=4096, out=14336
+linear: model.layers.15.attention.wq, in=4096, out=4096
+linear: model.layers.15.attention.wk, in=4096, out=1024
+linear: model.layers.15.attention.wv, in=4096, out=1024
+linear: model.layers.15.attention.wo, in=4096, out=4096
+linear: model.layers.15.feed_forward.w1, in=4096, out=14336
+linear: model.layers.15.feed_forward.w2, in=14336, out=4096
+linear: model.layers.15.feed_forward.w3, in=4096, out=14336
+linear: model.layers.16.attention.wq, in=4096, out=4096
+linear: model.layers.16.attention.wk, in=4096, out=1024
+linear: model.layers.16.attention.wv, in=4096, out=1024
+linear: model.layers.16.attention.wo, in=4096, out=4096
+linear: model.layers.16.feed_forward.w1, in=4096, out=14336
+linear: model.layers.16.feed_forward.w2, in=14336, out=4096
+linear: model.layers.16.feed_forward.w3, in=4096, out=14336
+linear: model.layers.17.attention.wq, in=4096, out=4096
+linear: model.layers.17.attention.wk, in=4096, out=1024
+linear: model.layers.17.attention.wv, in=4096, out=1024
+linear: model.layers.17.attention.wo, in=4096, out=4096
+linear: model.layers.17.feed_forward.w1, in=4096, out=14336
+linear: model.layers.17.feed_forward.w2, in=14336, out=4096
+linear: model.layers.17.feed_forward.w3, in=4096, out=14336
+linear: model.layers.18.attention.wq, in=4096, out=4096
+linear: model.layers.18.attention.wk, in=4096, out=1024
+linear: model.layers.18.attention.wv, in=4096, out=1024
+linear: model.layers.18.attention.wo, in=4096, out=4096
+linear: model.layers.18.feed_forward.w1, in=4096, out=14336
+linear: model.layers.18.feed_forward.w2, in=14336, out=4096
+linear: model.layers.18.feed_forward.w3, in=4096, out=14336
+linear: model.layers.19.attention.wq, in=4096, out=4096
+linear: model.layers.19.attention.wk, in=4096, out=1024
+linear: model.layers.19.attention.wv, in=4096, out=1024
+linear: model.layers.19.attention.wo, in=4096, out=4096
+linear: model.layers.19.feed_forward.w1, in=4096, out=14336
+linear: model.layers.19.feed_forward.w2, in=14336, out=4096
+linear: model.layers.19.feed_forward.w3, in=4096, out=14336
+linear: model.layers.20.attention.wq, in=4096, out=4096
+linear: model.layers.20.attention.wk, in=4096, out=1024
+linear: model.layers.20.attention.wv, in=4096, out=1024
+linear: model.layers.20.attention.wo, in=4096, out=4096
+linear: model.layers.20.feed_forward.w1, in=4096, out=14336
+linear: model.layers.20.feed_forward.w2, in=14336, out=4096
+linear: model.layers.20.feed_forward.w3, in=4096, out=14336
+linear: model.layers.21.attention.wq, in=4096, out=4096
+linear: model.layers.21.attention.wk, in=4096, out=1024
+linear: model.layers.21.attention.wv, in=4096, out=1024
+linear: model.layers.21.attention.wo, in=4096, out=4096
+linear: model.layers.21.feed_forward.w1, in=4096, out=14336
+linear: model.layers.21.feed_forward.w2, in=14336, out=4096
+linear: model.layers.21.feed_forward.w3, in=4096, out=14336
+linear: model.layers.22.attention.wq, in=4096, out=4096
+linear: model.layers.22.attention.wk, in=4096, out=1024
+linear: model.layers.22.attention.wv, in=4096, out=1024
+linear: model.layers.22.attention.wo, in=4096, out=4096
+linear: model.layers.22.feed_forward.w1, in=4096, out=14336
+linear: model.layers.22.feed_forward.w2, in=14336, out=4096
+linear: model.layers.22.feed_forward.w3, in=4096, out=14336
+linear: model.layers.23.attention.wq, in=4096, out=4096
+linear: model.layers.23.attention.wk, in=4096, out=1024
+linear: model.layers.23.attention.wv, in=4096, out=1024
+linear: model.layers.23.attention.wo, in=4096, out=4096
+linear: model.layers.23.feed_forward.w1, in=4096, out=14336
+linear: model.layers.23.feed_forward.w2, in=14336, out=4096
+linear: model.layers.23.feed_forward.w3, in=4096, out=14336
+linear: model.layers.24.attention.wq, in=4096, out=4096
+linear: model.layers.24.attention.wk, in=4096, out=1024
+linear: model.layers.24.attention.wv, in=4096, out=1024
+linear: model.layers.24.attention.wo, in=4096, out=4096
+linear: model.layers.24.feed_forward.w1, in=4096, out=14336
+linear: model.layers.24.feed_forward.w2, in=14336, out=4096
+linear: model.layers.24.feed_forward.w3, in=4096, out=14336
+linear: model.layers.25.attention.wq, in=4096, out=4096
+linear: model.layers.25.attention.wk, in=4096, out=1024
+linear: model.layers.25.attention.wv, in=4096, out=1024
+linear: model.layers.25.attention.wo, in=4096, out=4096
+linear: model.layers.25.feed_forward.w1, in=4096, out=14336
+linear: model.layers.25.feed_forward.w2, in=14336, out=4096
+linear: model.layers.25.feed_forward.w3, in=4096, out=14336
+linear: model.layers.26.attention.wq, in=4096, out=4096
+linear: model.layers.26.attention.wk, in=4096, out=1024
+linear: model.layers.26.attention.wv, in=4096, out=1024
+linear: model.layers.26.attention.wo, in=4096, out=4096
+linear: model.layers.26.feed_forward.w1, in=4096, out=14336
+linear: model.layers.26.feed_forward.w2, in=14336, out=4096
+linear: model.layers.26.feed_forward.w3, in=4096, out=14336
+linear: model.layers.27.attention.wq, in=4096, out=4096
+linear: model.layers.27.attention.wk, in=4096, out=1024
+linear: model.layers.27.attention.wv, in=4096, out=1024
+linear: model.layers.27.attention.wo, in=4096, out=4096
+linear: model.layers.27.feed_forward.w1, in=4096, out=14336
+linear: model.layers.27.feed_forward.w2, in=14336, out=4096
+linear: model.layers.27.feed_forward.w3, in=4096, out=14336
+linear: model.layers.28.attention.wq, in=4096, out=4096
+linear: model.layers.28.attention.wk, in=4096, out=1024
+linear: model.layers.28.attention.wv, in=4096, out=1024
+linear: model.layers.28.attention.wo, in=4096, out=4096
+linear: model.layers.28.feed_forward.w1, in=4096, out=14336
+linear: model.layers.28.feed_forward.w2, in=14336, out=4096
+linear: model.layers.28.feed_forward.w3, in=4096, out=14336
+linear: model.layers.29.attention.wq, in=4096, out=4096
+linear: model.layers.29.attention.wk, in=4096, out=1024
+linear: model.layers.29.attention.wv, in=4096, out=1024
+linear: model.layers.29.attention.wo, in=4096, out=4096
+linear: model.layers.29.feed_forward.w1, in=4096, out=14336
+linear: model.layers.29.feed_forward.w2, in=14336, out=4096
+linear: model.layers.29.feed_forward.w3, in=4096, out=14336
+linear: model.layers.30.attention.wq, in=4096, out=4096
+linear: model.layers.30.attention.wk, in=4096, out=1024
+linear: model.layers.30.attention.wv, in=4096, out=1024
+linear: model.layers.30.attention.wo, in=4096, out=4096
+linear: model.layers.30.feed_forward.w1, in=4096, out=14336
+linear: model.layers.30.feed_forward.w2, in=14336, out=4096
+linear: model.layers.30.feed_forward.w3, in=4096, out=14336
+linear: model.layers.31.attention.wq, in=4096, out=4096
+linear: model.layers.31.attention.wk, in=4096, out=1024
+linear: model.layers.31.attention.wv, in=4096, out=1024
+linear: model.layers.31.attention.wo, in=4096, out=4096
+linear: model.layers.31.feed_forward.w1, in=4096, out=14336
+linear: model.layers.31.feed_forward.w2, in=14336, out=4096
+linear: model.layers.31.feed_forward.w3, in=4096, out=14336
+linear: model.output, in=4096, out=128256
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.11 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 24.81 seconds
+-----------------------------------------------------------
+Once upon a time, when the earth was still young and weak, the five elements – earth, water, fire, air, and ether – were in constant conflict, disturbing the natural balance of the world.
+The five elements had been given to the earth as a gift by a wise and powerful god who had created the universe. The god had instructed the elements to live in harmony with each other, so that the world would be filled with peace and balance.
+However, the five elements were not as obedient as the god had hoped. Each of them was confident in its own power and believed that it should be the dominant force in the world. Earth was proud of its solid foundation and stability. Water was arrogant about its ability to flow and change shape. Fire was convinced of its own strength and power to burn and destroy. Air was restless and impatient, always in motion and quick to anger. Ether, the mysterious and invisible element, was the most misunderstood of all and was often seen as a distant and unfeeling presence.
+As a result of their disagreements and conflicts, the five elements were causing the earth to suffer. The earth was in turmoil, with earthquakes shaking its foundations, floods sweeping through its lands, and storms raging across its skies.
+The wise and powerful god who had created the universe
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 36.5819 sec total                 
+Time to first token: 0.2626 sec with parallel prefill.                
+
+      Total throughput: 6.9980 tokens/sec, 0.1429 s/token                 
+First token throughput: 3.8083 tokens/sec, 0.2626 s/token                 
+ Next token throughput: 7.0211 tokens/sec, 0.1424 s/token                     
+
+Bandwidth achieved: 34.44 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, there were three little pigs who had just moved into a new house. They were excited to make new friends and have a great time, but things didn't quite go as planned.
+The first little pig was a bit of a worrywart. He was always thinking about the worst-case scenario and was convinced that the big bad wolf was going to come and eat them up. He decided to build his house out of sticks, thinking that it would be easy to build and that it would protect them from the wolf.
+The second little pig was a bit of a free spirit. He didn't want to spend too much time or money on his house, so he decided to build his house out of straw. He thought that it would be quick and easy to build, and that he could always just move to a new place if the big bad wolf came.
+The third little pig was a bit of a planner. He had done his research and had decided that he would build his house out of bricks. He spent a lot of time and money on the design and construction of his house, thinking that it would be the safest and most durable option.
+One day, the big bad wolf came to visit the three little pigs. He was big and scary, and the little pigs knew that
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 35.7851 sec total                 
+Time to first token: 0.2562 sec with parallel prefill.                
+
+      Total throughput: 7.1538 tokens/sec, 0.1398 s/token                 
+First token throughput: 3.9027 tokens/sec, 0.2562 s/token                 
+ Next token throughput: 7.1773 tokens/sec, 0.1393 s/token                     
+
+Bandwidth achieved: 35.20 GB/s
+
+========================================
+
+Once upon a time, in a small village, there lived a beautiful princess named Cinderella. She had been forced to live with her wicked stepmother and stepsisters, who made her do all the household chores. Despite their cruel treatment, Cinderella remained kind and gentle, and was loved by all in the village.
+One day, the King invited all the eligible maidens in the land to a grand ball, in hopes of finding a suitable wife for his son, the handsome Prince Charming. Cinderella's stepmother and stepsisters were overjoyed at the prospect of meeting the Prince and became busy, making dresses for themselves, but Cinderella was left with nothing to wear.
+Just when Cinderella thought all hope was lost, her fairy godmother appeared and, with a wave of her wand, transformed a pumpkin in the courtyard into a magnificent coach, complete with four white horses and a coachman. Cinderella was dressed in a beautiful gown, complete with a sparkling tiara and a pair of glass slippers. With a final wish, Cinderella was sent off to the ball, where she danced with Prince Charming and won his heart.
+However, when the clock struck midnight, Cinderella had to leave abruptly, leaving behind one of her glass slippers. The Prince searched far
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 37.7394 sec total                 
+Time to first token: 0.2473 sec with parallel prefill.                
+
+      Total throughput: 6.7834 tokens/sec, 0.1474 s/token                 
+First token throughput: 4.0434 tokens/sec, 0.2473 s/token                 
+ Next token throughput: 6.8014 tokens/sec, 0.1470 s/token                     
+
+Bandwidth achieved: 33.38 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 6.98                 
+Average tokens/sec (first token): 3.92                 
+Average tokens/sec (next tokens): 7.00 
+                
+Memory used: 0.00 GB
