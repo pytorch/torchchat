@@ -8,11 +8,13 @@
 
 // Third Party
 #include <gtest/gtest.h>
+#include <nlohmann/json.hpp>
 #include <re2/re2.h>
 
 // Local
 #include "pre_tokenizer.h"
 
+using json = nlohmann::json;
 
 // Helpers /////////////////////////////////////////////////////////////////////
 
@@ -125,7 +127,7 @@ class PreTokenizerConfigTest : public ::testing::Test {};
 
 TEST_F(PreTokenizerConfigTest, AllTypesSuccess) {
   // Regex
-  PreTokenizerConfig("Regex").set_pattern(R"(o)").create();
+  PreTokenizerConfig("Split").set_pattern(R"(o)").create();
 
   // Digits
   PreTokenizerConfig("Digits").create();
@@ -146,13 +148,60 @@ TEST_F(PreTokenizerConfigTest, AllTypesSuccess) {
 
 TEST_F(PreTokenizerConfigTest, AllTypesFailureCases) {
   // Regex
-  EXPECT_THROW(PreTokenizerConfig("Regex").create(), std::runtime_error);
+  EXPECT_THROW(PreTokenizerConfig("Split").create(), std::runtime_error);
 
   // Sequence
   EXPECT_THROW(PreTokenizerConfig("Sequence").create(), std::runtime_error);
   EXPECT_THROW(PreTokenizerConfig("Sequence").set_pretokenizers({}).create(), std::runtime_error);
-  EXPECT_THROW(PreTokenizerConfig("Sequence").set_pretokenizers({PreTokenizerConfig("Regex")}).create(), std::runtime_error);
+  EXPECT_THROW(PreTokenizerConfig("Sequence").set_pretokenizers({PreTokenizerConfig("Split")}).create(), std::runtime_error);
 
   // Unsupported
   EXPECT_THROW(PreTokenizerConfig("Unsupported").create(), std::runtime_error);
+}
+
+TEST_F(PreTokenizerConfigTest, ParseJson) {
+  PreTokenizerConfig config;
+  const auto ptok = config.parse_json(json{
+    {"type", "Sequence"},
+    {"pretokenizers", json{
+      json{
+        {"type", "Digits"},
+        {"individual_digits", true},
+      },
+      json{
+        {"type", "ByteLevel"},
+        {"add_prefix_space", false},
+      },
+    }},
+  }).create();
+  assert_split_match(
+    *ptok,
+    "The number 1 then 234 then 5.",
+    {"The", "Ġnumber", "Ġ", "1", "Ġthen", "Ġ", "2", "3", "4", "Ġthen", "Ġ", "5", "."}
+  );
+}
+
+TEST_F(PreTokenizerConfigTest, ParseJsonOptionalKey) {
+  PreTokenizerConfig config;
+  const auto ptok = config.parse_json(json{
+    {"type", "Digits"},
+  }).create();
+  assert_split_match(
+    *ptok,
+    "The number 1 then 234 then 5.",
+    {"The number ", "1", " then ", "234", " then ", "5", "."}
+  );
+}
+
+TEST_F(PreTokenizerConfigTest, Split) {
+  PreTokenizerConfig config;
+  const auto ptok = config.parse_json(json{
+    {"type", "Split"},
+    {"pattern", R"((?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+)"},
+  }).create();
+  assert_split_match(
+    *ptok,
+    "Hello World",
+    {"Hello", " World"}
+  );
 }

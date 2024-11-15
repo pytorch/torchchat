@@ -14,6 +14,7 @@
 #include <vector>
 
 // Third Party
+#include <nlohmann/json.hpp>
 #include <re2/re2.h>
 
 // -- Bases --------------------------------------------------------------------
@@ -78,7 +79,7 @@ class PreTokenizerConfig {
    * The Type name string matching from tokenizers
    * https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/pre_tokenizers/mod.rs#L73
    */
-  const std::string type;
+  std::string type;
 
   /**
    * Used by: RegexPreTokenizer, ByteLevelPreTokenizer
@@ -107,18 +108,27 @@ class PreTokenizerConfig {
   /**
    * Construct with the type
    */
-  explicit PreTokenizerConfig(std::string type);
+  explicit PreTokenizerConfig(std::string type = "");
 
   /**
    * Construct the pre tokenizer instance from the member data
    */
   PreTokenizer::Ptr create() const;
 
+  /**
+   * Populate from a json config file
+   */
+  PreTokenizerConfig& parse_json(const nlohmann::json& json_config);
+
 };  // end class PreTokenizerConfig
 
 // -- Regex --------------------------------------------------------------------
-// Used for general-purpose single-regex pre tokenization (e.g. tiktoken)
+// Used for general-purpose single-regex pre tokenization
 // CITE: https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/pre_tokenizers/split.rs
+//
+// TODO: Support for "behavior" and "invert" options
+//  https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/tokenizer/normalizer.rs#L82
+//  https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/tokenizer/pattern.rs#L128
 
 class RegexPreTokenizer : public PreTokenizer {
  public:

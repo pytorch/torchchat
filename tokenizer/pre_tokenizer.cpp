@@ -12,8 +12,13 @@
 #include <iterator>
 #include <utility>
 
+// Third Party
+#include <nlohmann/json.hpp>
+
 // Local
 #include "unicode.h"
+
+using json = nlohmann::json;
 
 // PreTokenizerConfig //////////////////////////////////////////////////////////
 
@@ -25,9 +30,9 @@ PreTokenizer::Ptr PreTokenizerConfig::create() const {
   // NOTE: These types must line up with the type strings found in the
   //  tokenizers library
   //  https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/pre_tokenizers/mod.rs#L73
-  if (type == "Regex") {
+  if (type == "Split") {
     if (!pattern) {
-      throw std::runtime_error("Missing pattern for PreTokenizer of type Regex");
+      throw std::runtime_error("Missing pattern for PreTokenizer of type Split");
     }
     return PreTokenizer::Ptr(new RegexPreTokenizer(*pattern));
   }
@@ -65,6 +70,32 @@ PreTokenizer::Ptr PreTokenizerConfig::create() const {
     return PreTokenizer::Ptr(new SequencePreTokenizer(pretoks));
   }
   throw std::runtime_error("Unsupported PreTokenizer type: " + type);
+}
+
+PreTokenizerConfig& PreTokenizerConfig::parse_json(const json& json_config) {
+  type = json_config.at("type");
+  if (type == "Split") {
+    try {
+      pattern = json_config.at("pattern");
+    } catch(json::out_of_range&) {}
+  } else if (type == "Digits") {
+    try {
+      individual_digits = json_config.at("individual_digits");
+    } catch(json::out_of_range&) {}
+  } else if (type == "ByteLevel") {
+    try {
+      add_prefix_space = json_config.at("add_prefix_space");
+    } catch(json::out_of_range&) {}
+    // TODO: trim_offsets, use_regex
+  } else if (type == "Sequence") {
+    pretokenizers = std::vector<PreTokenizerConfig>();
+    for (const auto& entry : json_config.at("pretokenizers")) {
+      pretokenizers->push_back(PreTokenizerConfig().parse_json(entry));
+    }
+  } else {
+    throw std::runtime_error("Unsupported PreTokenizer type: " + type);
+  }
+  return *this;
 }
 
 // RegexPreTokenizer ///////////////////////////////////////////////////////////
