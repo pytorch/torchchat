@@ -1149,9 +1149,11 @@ class Generator:
                 print(
                     f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds"
                 )
-            aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-            aggregate_metrics["first_token_per_sec"].append(first_token_sec)
-            aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
+            else:
+                # aggregate_metrics will not append when is jit_compile, which will affect the average numbers.
+                aggregate_metrics["tokens_per_sec"].append(tokens_sec)
+                aggregate_metrics["first_token_per_sec"].append(first_token_sec)
+                aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
 
             logging.info(
                 f"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\
