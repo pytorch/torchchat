@@ -14,6 +14,7 @@ add_library(
     tiktoken.cpp
     hf_tokenizers.cpp
     pre_tokenizer.cpp
+    token_decoder.cpp
     # llama.cpp unicode
     unicode-data.cpp
     unicode.cpp)
