@@ -25,6 +25,7 @@
 
 #include "pre_tokenizer.h"
 #include "sentencepiece_processor.h"
+#include "token_decoder.h"
 
 class Tokenizer {
  public:
@@ -125,10 +126,15 @@ class BPETokenizerBase : public Tokenizer {
   Decoder special_token_decoder_;
 
  private:
+
   virtual void _encode(
-      re2::StringPiece& input,
-      std::vector<uint64_t>& ret,
-      uint64_t& last_piece_token_len) const = 0;
+    re2::StringPiece& input,
+    std::vector<uint64_t>& ret,
+    uint64_t& last_piece_token_len) const = 0;
+
+  virtual void _decode(
+    re2::StringPiece input,
+    std::string& ret) const = 0;
 };
 
 class Tiktoken : public BPETokenizerBase {
@@ -160,9 +166,13 @@ class Tiktoken : public BPETokenizerBase {
   }
 
   void _encode(
-      re2::StringPiece& input,
-      std::vector<uint64_t>& ret,
-      uint64_t& last_piece_token_len) const override;
+    re2::StringPiece& input,
+    std::vector<uint64_t>& ret,
+    uint64_t& last_piece_token_len) const override;
+
+  void _decode(
+    re2::StringPiece input,
+    std::string& ret) const override;
 
   // Removed negative lookahead \s+(?!\S) since it's not supported by RE2.
   const std::string _pattern =
@@ -194,10 +204,16 @@ class HFTokenizer : public BPETokenizerBase {
   void load(const std::string& tokenizer_path) override;
 
  private:
+
   void _encode(
     re2::StringPiece& input,
     std::vector<uint64_t>& ret,
     uint64_t& last_piece_token_len) const override;
 
+  void _decode(
+    re2::StringPiece input,
+    std::string& ret) const override;
+
   PreTokenizer::Ptr _pretokenizer;
+  TokenDecoder::Ptr _decoder;
 };

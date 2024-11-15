@@ -114,6 +114,13 @@ void HFTokenizer::load(const std::string& path) {
     exit(EXIT_FAILURE);
   }
 
+  // Set up the decoder (optional)
+  try {
+    _decoder = TokenDecoderConfig().parse_json(parsed_json.at("decoder")).create();
+  } catch (const json::out_of_range& e) {
+    // No decoder specified
+  }
+
   // TODO: Do we need to parse the merges?
 
   // If a tokenizer config file is found, parse it to look up the eos/bos tokens
@@ -239,5 +246,16 @@ void HFTokenizer::_encode(
 
     last_piece_token_len = tokens.size();
     ret.insert(ret.end(), tokens.begin(), tokens.end());
+  }
+}
+
+void HFTokenizer::_decode(
+  re2::StringPiece input,
+  std::string& ret
+) const {
+  if (_decoder) {
+    ret += _decoder->decode(input);
+  } else {
+    ret += input;
   }
 }

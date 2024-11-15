@@ -329,6 +329,12 @@ void Tiktoken::_encode(
   }
 }
 
+void Tiktoken::_decode(
+  re2::StringPiece input,
+  std::string& ret) const {
+  ret += input;
+}
+
 // -------------------------private method end-------------------------------
 // -------------------------public method start-------------------------------
 
@@ -386,8 +392,9 @@ std::string BPETokenizerBase::decode(uint64_t prev, uint64_t cur) const {
       exit(EXIT_FAILURE);
     }
   }
-  ret += token_bytes;
+  _decode(token_bytes, ret);
 
   return ret;
 }
+
 // -------------------------public method end-------------------------------
