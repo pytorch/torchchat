@@ -213,32 +213,6 @@ static std::vector<uint64_t> _byte_pair_merge(
   return out;
 }
 
-static std::vector<uint64_t> _byte_pair_encode(
-    const std::string& piece,
-    const Encoder& encoder) {
-  if (piece.size() == 1) {
-    auto iter = encoder.find(piece);
-    if (iter != encoder.end()) {
-      return std::vector<uint64_t>({iter->second});
-    } else {
-      // TODO: is it possible?
-      return {};
-    }
-  }
-
-  return _byte_pair_merge(
-      piece, encoder, [&piece, &encoder](uint64_t start, uint64_t stop) {
-        std::string key = piece.substr(start, stop - start);
-        auto iter = encoder.find(key);
-        if (iter != encoder.end()) {
-          return iter->second;
-        } else {
-          // TODO: what if key does not exist? Should we return `unknown`?
-          // assert(false); // ??
-          return uint64_t(0);
-        }
-      });
-}
 // ------------------------------Util end------------------------------------
 // -------------------------protected method start---------------------------
 
@@ -305,6 +279,33 @@ std::pair<std::vector<uint64_t>, uint64_t> BPETokenizerBase::encode_with_special
   return std::make_pair(tokens, last_piece_token_len);
 }
 
+std::vector<uint64_t> BPETokenizerBase::byte_pair_encode_(
+  const std::string& piece,
+  const Encoder& encoder) const {
+  if (piece.size() == 1) {
+    auto iter = encoder.find(piece);
+    if (iter != encoder.end()) {
+      return std::vector<uint64_t>({iter->second});
+    } else {
+      // TODO: is it possible?
+      return {};
+    }
+  }
+
+  return _byte_pair_merge(
+    piece, encoder, [&piece, &encoder](uint64_t start, uint64_t stop) {
+      std::string key = piece.substr(start, stop - start);
+      auto iter = encoder.find(key);
+      if (iter != encoder.end()) {
+        return iter->second;
+      } else {
+        // TODO: what if key does not exist? Should we return `unknown`?
+        // assert(false); // ??
+        return uint64_t(0);
+      }
+    });
+}
+
 // -------------------------protected method end-------------------------------
 // -------------------------private method start-------------------------------
 
@@ -321,7 +322,7 @@ void Tiktoken::_encode(
       ret.push_back(iter->second);
       continue;
     }
-    auto tokens = _byte_pair_encode(piece, encoder_);
+    auto tokens = byte_pair_encode_(piece, encoder_);
 
     last_piece_token_len = tokens.size();
     ret.insert(ret.end(), tokens.begin(), tokens.end());
@@ -351,7 +352,7 @@ void Tiktoken::load(const std::string& path) {
 }
 
 std::vector<uint64_t>
-Tiktoken::encode(const std::string& text, int8_t bos, int8_t eos) const {
+BPETokenizerBase::encode(const std::string& text, int8_t bos, int8_t eos) const {
   if (!initialized_) {
     exit(EXIT_FAILURE);
   }
@@ -365,7 +366,7 @@ Tiktoken::encode(const std::string& text, int8_t bos, int8_t eos) const {
   return res;
 }
 
-std::string Tiktoken::decode(uint64_t prev, uint64_t cur) const {
+std::string BPETokenizerBase::decode(uint64_t prev, uint64_t cur) const {
   (void)prev;
   if (!initialized_) {
     exit(EXIT_FAILURE);

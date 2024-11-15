@@ -26,8 +26,6 @@ using json = nlohmann::json;
 // -------------------------private method end-------------------------------
 // -------------------------public method start-------------------------------
 
-HFTokenizer::HFTokenizer() : Tiktoken() {}
-
 void HFTokenizer::load(const std::string& path) {
 
   // If this is a directory, look for tokenizer.json and tokenizer_config.json
@@ -108,34 +106,9 @@ void HFTokenizer::load(const std::string& path) {
   // Set the vocab size to include special tokens
   vocab_size_ = encoder_.size() + special_token_encoder_.size();
 
-  // Parse out the regexes for the pre-tokenizer
+  // Set up the pre-tokenizer
   try {
-    const auto& pre_tokenizer = parsed_json.at("pre_tokenizer");
-    const std::string pt_type = pre_tokenizer.at("type");
-    if (pt_type == "Sequence") {
-      for (const auto& entry : pre_tokenizer.at("pretokenizers")) {
-        const std::string entry_type = entry.at("type");
-        std::string regex;
-        if (entry_type == "Split") {
-          regex = entry.at("Regex");
-        } else if (entry_type == "Digits") {
-          regex = "\\p{N}";
-        } else if (entry_type == "ByteLevel") {
-          //HACK! This should be better.....
-          regex =  "'s|'t|'re|'ve|'m|'ll|'d| ?\\p{L}+| ?\\p{N}+| ?[^\\s\\p{L}\\p{N}]+";
-        } else {
-          fprintf(stderr, "Unknown pre-tokenizer type: %s\n", entry_type.c_str());
-          exit(EXIT_FAILURE);
-        }
-
-        //DEBUG -- Disable for now to compile
-        // // Build the regex and add it to the list
-        // regexes_.push_back(_create_regex(regex));
-      }
-    } else {
-      fprintf(stderr, "Unknown pre-tokenizer type: %s\n", pt_type.c_str());
-      exit(EXIT_FAILURE);
-    }
+    _pretokenizer = PreTokenizerConfig().parse_json(parsed_json.at("pre_tokenizer")).create();
   } catch (const json::out_of_range& e) {
     fprintf(stderr, "Could not parse pre_tokenizer: %s\n", e.what());
     exit(EXIT_FAILURE);
@@ -247,50 +220,24 @@ void HFTokenizer::load(const std::string& path) {
   // Mark initialized once everything is done
   initialized_ = true;
 }
+// -------------------------public method end-----------------------------------
+// -------------------------private method start--------------------------------
 
-// std::vector<uint64_t>
-// HFTokenizer::encode(const std::string& text, int8_t bos, int8_t eos) const {
-//   // if (!initialized_) {
-//   //   exit(EXIT_FAILURE);
-//   // }
-//   // auto res = _encode_with_special_token(text, _special_token_encoder).first;
-//   // for (auto i = 0; i < bos; ++i) {
-//   //   res.insert(res.begin(), bos_tok_);
-//   // }
-//   // for (auto i = 0; i < eos; ++i) {
-//   //   res.push_back(eos_tok_);
-//   // }
-//   // return res;
+void HFTokenizer::_encode(
+  re2::StringPiece& input,
+  std::vector<uint64_t>& ret,
+  uint64_t& last_piece_token_len
+) const {
+  for (const auto& piece : _pretokenizer->pre_tokenize(input)) {
+    auto iter = encoder_.find(piece);
+    if (iter != encoder_.end()) {
+      last_piece_token_len = 1;
+      ret.push_back(iter->second);
+      continue;
+    }
+    auto tokens = byte_pair_encode_(piece, encoder_);
 
-//   //DEBUG
-//   return {};
-// }
-
-// std::string HFTokenizer::decode(uint64_t prev, uint64_t cur) const {
-//   // (void)prev;
-//   // if (!initialized_) {
-//   //   exit(EXIT_FAILURE);
-//   // }
-//   // std::string ret;
-
-//   // std::string token_bytes;
-//   // auto iter = _decoder.find(cur);
-//   // if (iter != _decoder.end()) {
-//   //   token_bytes = iter->second;
-//   // } else {
-//   //   iter = _special_token_decoder.find(cur);
-//   //   if (iter != _special_token_decoder.end()) {
-//   //     token_bytes = iter->second;
-//   //   } else {
-//   //     fprintf(stderr, "unknown token: %" PRIu64 "\n", cur);
-//   //     exit(EXIT_FAILURE);
-//   //   }
-//   // }
-//   // ret += token_bytes;
-
-//   // return ret;
-
-//   //DEBUG
-//   return "";
-// }
-// -------------------------public method end-------------------------------
+    last_piece_token_len = tokens.size();
+    ret.insert(ret.end(), tokens.begin(), tokens.end());
+  }
+}

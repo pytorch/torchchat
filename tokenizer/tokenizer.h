@@ -22,6 +22,8 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include "pre_tokenizer.h"
 #include "sentencepiece_processor.h"
 
 class Tokenizer {
@@ -90,10 +92,17 @@ using Decoder = std::unordered_map<uint64_t, std::string>;
 using Re2UPtr = std::unique_ptr<re2::RE2>;
 
 class BPETokenizerBase : public Tokenizer {
+ public:
+
+  std::vector<uint64_t>
+  encode(const std::string& input, int8_t bos, int8_t eos) const override;
+
+  std::string decode(uint64_t prev_token, uint64_t token) const override;
+
  protected:
 
-  explicit BPETokenizerBase() {};
-  virtual ~BPETokenizerBase() {};
+  explicit BPETokenizerBase() {}
+  virtual ~BPETokenizerBase() {}
 
   std::pair<std::optional<std::string>, re2::StringPiece>
   split_with_allowed_special_token_(
@@ -103,6 +112,10 @@ class BPETokenizerBase : public Tokenizer {
   std::pair<std::vector<uint64_t>, uint64_t> encode_with_special_token_(
       const std::string& text,
       const Encoder& allowed_special) const;
+
+  std::vector<uint64_t> byte_pair_encode_(
+    const std::string& piece,
+    const Encoder& encoder) const;
 
   // Protected members that can be overloaded by other BPE tokenizers
   Re2UPtr special_token_regex_;
@@ -124,11 +137,6 @@ class Tiktoken : public BPETokenizerBase {
   ~Tiktoken() override {};
 
   void load(const std::string& tokenizer_path) override;
-
-  std::vector<uint64_t>
-  encode(const std::string& input, int8_t bos, int8_t eos) const override;
-
-  std::string decode(uint64_t prev_token, uint64_t token) const override;
 
  private:
   static inline const Encoder _get_special_tokens(ssize_t num_base_tokens) {
@@ -170,18 +178,26 @@ class Tiktoken : public BPETokenizerBase {
 // and the corresponding support in llama.cpp
 // (https://github.com/ggerganov/llama.cpp)
 
-class HFTokenizer : public Tiktoken {
+class HFTokenizer : public BPETokenizerBase {
  public:
   /*-- Public Interface --*/
 
   /**
    * Default initialize with no loaded data
    */
-  explicit HFTokenizer();
-  ~HFTokenizer() {};
+  explicit HFTokenizer() {}
+  ~HFTokenizer() {}
 
   /**
    * Load the model data into the
    */
   void load(const std::string& tokenizer_path) override;
+
+ private:
+  void _encode(
+    re2::StringPiece& input,
+    std::vector<uint64_t>& ret,
+    uint64_t& last_piece_token_len) const override;
+
+  PreTokenizer::Ptr _pretokenizer;
 };
