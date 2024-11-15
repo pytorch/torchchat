@@ -17,7 +17,7 @@
 #include <nlohmann/json.hpp>
 #include <re2/re2.h>
 
-// -- Bases --------------------------------------------------------------------
+// -- Base ---------------------------------------------------------------------
 
 /**
  * Base class for all pre-tokenizers with a single virtual method to split the
