@@ -4,30 +4,60 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+import atexit
 import json
 
 import logging
 
 logger = logging.getLogger(__name__)
 
+from contextlib import nullcontext
 from dataclasses import asdict
+from functools import partial
+from os import environ
 from typing import Dict, List, Union
 
 import torch
+import torch.distributed as dist
+import torch.multiprocessing as mp
+from concurrent import futures
 from flask import Flask, request, Response
 
 from torchchat.cli.builder import BuilderArgs, TokenizerArgs
+from torchchat.distributed.utils import setup_env
 from torchchat.generate import GeneratorArgs
 
 from torchchat.usages.openai_api import (
     CompletionRequest,
     get_model_info_list,
-    OpenAiApiGenerator,
+    create_openai_api_generator,
     retrieve_model_info,
 )
 
 OPENAI_API_VERSION = "v1"
 
+
+def run_worker(
+    args,
+    rank,
+    queue,
+    ):
+    """
+    This function creates and executes a generator 
+    """
+    gen = initialize_generator(args)
+    
+    while True:
+        try:
+            req = queue.get()
+        except KeyboardInterrupt:
+            break
+
+        if req == "stop":
+            break
+        
+        for _ in gen.chunked_completion(req):
+            pass
 
 def create_app(args):  # noqa: C901
     """
@@ -35,7 +65,32 @@ def create_app(args):  # noqa: C901
     """
     app = Flask(__name__)
 
-    gen: OpenAiApiGenerator = initialize_generator(args)
+    builder_args = BuilderArgs.from_args(args)
+    procs = []
+    if builder_args.distributed:
+        world_size = builder_args.tp * builder_args.pp
+        mp_context = mp.get_context('spawn')
+        queue = mp_context.Queue()
+    else:
+        world_size = 1
+        queue = None
+
+    
+    if builder_args.distributed:
+        for i in range(1, world_size):
+            fn = partial(run_worker, args, i, queue)
+            mp_context = mp.get_context('spawn')
+            procs.append(mp_context.Process(target=setup_env, args=(world_size, i, fn)))
+            procs[-1].start()
+
+        environ["MASTER_ADDR"] = "localhost"
+        environ["MASTER_PORT"] = "29500"
+        environ["RDZV_BACKEND"] = "c10d"
+        environ["WORLD_SIZE"] = str(world_size)
+        environ["RANK"] = str(0)
+        environ["LOCALRANK"] = str(0)
+
+    gen = initialize_generator(args)
 
     def _del_none(d: Union[Dict, List]) -> Union[Dict, List]:
         """Recursively delete None values from a dictionary."""
@@ -69,6 +124,10 @@ def create_app(args):  # noqa: C901
 
         if req.stream:
 
+            if builder_args.distributed:
+                for _ in range(world_size-1):
+                    queue.put(req)
+
             def chunk_processor(chunked_completion_generator):
                 """Inline function for postprocessing CompletionResponseChunk objects.
 
@@ -86,8 +145,11 @@ def create_app(args):  # noqa: C901
             )
             return resp
         else:
+            if builder_args.distributed:
+                for _ in range(world_size-1):
+                    queue.put(req)
+
             response = gen.sync_completion(req)
-            print(response.choices[0].message.content)
 
             return json.dumps(_del_none(asdict(response)))
 
@@ -102,15 +164,17 @@ def create_app(args):  # noqa: C901
         else:
             return "Model not found", 404
 
-    return app
+    return app, (procs, queue)
 
 
-def initialize_generator(args) -> OpenAiApiGenerator:
+def initialize_generator(args) -> type:
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
     generator_args = GeneratorArgs.from_args(args)
     generator_args.chat_mode = False
+
+    OpenAiApiGenerator = create_openai_api_generator(builder_args.distributed)
 
     return OpenAiApiGenerator(
         builder_args=builder_args,
@@ -124,5 +188,19 @@ def initialize_generator(args) -> OpenAiApiGenerator:
 
 
 def main(args):
-    app = create_app(args)
+    app, (procs, queue) = create_app(args)
+
+    def shutdown_worker():
+        while not queue.empty():
+            queue.get(block=False)
+        for p in procs:
+            queue.put("stop")
+        for p in procs:
+            p.join(timeout=0.5)
+        for p in procs:
+            if p.is_alive():
+                p.kill()
+
+    atexit.register(shutdown_worker)
+
     app.run()
