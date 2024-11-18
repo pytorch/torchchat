@@ -1207,7 +1207,8 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
             or torch.isnan(torch.tensor(avg_next_tokens_sec))
         ):
             print(
-                f"\n      Average tokens/sec (total): {avg_tokens_sec:.2f} \
+                f"\nWarning: The averages were calculated with the compile sample excluded. \
+                \n      Average tokens/sec (total): {avg_tokens_sec:.2f} \
                 \nAverage tokens/sec (first token): {avg_first_token_sec:.2f} \
                 \nAverage tokens/sec (next tokens): {avg_next_tokens_sec:.2f} \n\
                 "
