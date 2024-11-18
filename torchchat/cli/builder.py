@@ -64,6 +64,7 @@ class BuilderArgs:
     pp: int = 1
     tp: int = 1
     chpt_from: str = "hf"
+    distribution_path: Optional[str] = None
     is_chat_model: bool = False
     prefill_possible: bool = False
     dynamic_shapes: bool = False
@@ -128,6 +129,8 @@ class BuilderArgs:
             params_table = (
                 model_config.transformer_params_key or model_config.name.split("/")[-1]
             )
+
+            distribution_path = model_config.distribution_path
 
         dso_path = getattr(args, "dso_path", None)
         pte_path = getattr(args, "pte_path", None)
@@ -194,6 +197,7 @@ class BuilderArgs:
             pp=pp,
             tp=tp,
             chpt_from=chpt_from,
+            distribution_path=distribution_path,
             is_chat_model=is_chat_model,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),
@@ -607,23 +611,6 @@ def _initialize_model(
         except Exception:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
     elif builder_args.distributed:
-        # Using params_table to identify the model to load, for example "Meta-Llama-3.1-8B".
-        #TODO This is a hacky way to please the distributed loading api and needs to be replaced
-        NAME_TO_DISTRIBUTION = {
-            "Meta-Llama-3-8B": "meta-llama/Meta-Llama-3-8B-Instruct", 
-            "Meta-Llama-3.1-8B": "meta-llama/Meta-Llama-3.1-8B-Instruct",
-            "Meta-Llama-3-70B": "meta-llama/Meta-Llama-3-70B-Instruct",
-            "Meta-Llama-3.1-70B": "meta-llama/Meta-Llama-3.1-70B-Instruct",
-
-        }
-        # TODO: Use information in builder_args directly to build model and load weights
-        assert builder_args.params_table
-        try:
-            distribution = NAME_TO_DISTRIBUTION[builder_args.params_table]
-        except KeyError as e:
-            print(f"Unknown params_table: {builder_args.params_table}. Suported model names are: llama3.1, llama3, llama2-7b-chat")
-            raise e
-
         pp_degree = builder_args.pp
         tp_degree = builder_args.tp
 
@@ -687,7 +674,7 @@ def _initialize_model(
         # Load weights
         logger.info(f"Loading weights for {pp_rank=} on {device=}")
         with CUDATrackTime() as timer:
-            load_model_weights(model, distribution, device, config, builder_args.chpt_from)
+            load_model_weights(model, builder_args.distribution_path, device, config, builder_args.chpt_from)
 
         logger.info(
             f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
