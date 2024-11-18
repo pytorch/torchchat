@@ -91,3 +91,23 @@ if [ "$1" == "evaluation" ]; then
         echo "*******************************************"
         bash -x ./run-evaluation.sh
 fi
+
+if [ "$1" == "multimodal" ]; then
+
+   # Expecting that this might fail this test as-is, because 
+   # it's the first on-pr test depending on githib secrets for access with HF token access
+
+        echo "::group::Create script to run multimodal"
+        python3 torchchat/utils/scripts/updown.py --file docs/multimodal.md > ./run-multimodal.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-multimodal.sh
+        echo "::endgroup::"
+
+        echo "::group::Run multimodal"
+        echo "*******************************************"
+        cat ./run-multimodal.sh
+        echo "*******************************************"
+        bash -x ./run-multimodal.sh
+        echo "::endgroup::"
+fi
