@@ -116,6 +116,7 @@ class BuilderArgs:
 
         checkpoint_path = args.checkpoint_path
         params_table = args.params_table
+        distribution_path = None
         if args.model:  # Using a named, well-known model
             model_config = resolve_model_config(args.model)
 
