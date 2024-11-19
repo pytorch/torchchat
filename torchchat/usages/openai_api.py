@@ -13,7 +13,7 @@ from abc import ABC
 from dataclasses import dataclass
 from io import BytesIO
 from pwd import getpwuid
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Type
 
 import torch
 
@@ -486,18 +486,13 @@ class OpenAiApiGeneratorMixin:
         pass
 
 
-def create_openai_api_generator(distributed):
+def create_openai_api_generator(distributed: bool) -> Type:
     """
     Factory method to create an OpenAiApiGenerator
     """
 
-    if distributed:
-        # Base class order matters to make sure OpenAiApiGeneratorMixin overrides methods in DistributedGenerator and Generator
-        return type('OpenAiApiGenerator', (OpenAiApiGeneratorMixin, DistributedGenerator), {})
-    else:
-        return type('OpenAiApiGenerator', (OpenAiApiGeneratorMixin, LocalGenerator), {})
-
-
+    # Base class order matters to make sure OpenAiApiGeneratorMixin overrides methods in DistributedGenerator and Generator
+    return type('OpenAiApiGenerator', (OpenAiApiGeneratorMixin, DistributedGenerator if distributed else LocalGenerator), {})
 
 
 """

@@ -67,14 +67,11 @@ def create_app(args):  # noqa: C901
 
     builder_args = BuilderArgs.from_args(args)
     procs = []
+    queue = None
     if builder_args.distributed:
         world_size = builder_args.tp * builder_args.pp
         mp_context = mp.get_context('spawn')
         queue = mp_context.Queue()
-    else:
-        world_size = 1
-        queue = None
-
     
     if builder_args.distributed:
         for i in range(1, world_size):
