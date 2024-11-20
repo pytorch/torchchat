@@ -21,6 +21,8 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
 default_device = os.getenv("TORCHCHAT_DEVICE", "fast")
+default_dtype = os.getenv("TORCHCHAT_PRECISION", "fast")
+
 default_model_dir = Path(
     os.getenv("TORCHCHAT_MODELDIR", "~/.torchchat/model-cache")
 ).expanduser()
@@ -149,9 +151,9 @@ def _add_model_config_args(parser, verb: str) -> None:
 
     model_config_parser.add_argument(
         "--dtype",
-        default="fast",
+        default=None,
         choices=allowable_dtype_names(),
-        help="Override the dtype of the model (default is the checkpoint dtype). Options: bf16, fp16, fp32, fast16, fast",
+        help="Override the dtype of the model. Options: bf16, fp16, fp32, fast16, fast",
     )
     model_config_parser.add_argument(
         "--quantize",
@@ -165,9 +167,9 @@ def _add_model_config_args(parser, verb: str) -> None:
     model_config_parser.add_argument(
         "--device",
         type=str,
-        default=default_device,
+        default=None,
         choices=["fast", "cpu", "cuda", "mps"],
-        help="Hardware device to use. Options: cpu, cuda, mps",
+        help="Hardware device to use. Options: fast, cpu, cuda, mps",
     )
 
 
@@ -513,20 +515,34 @@ def arg_init(args):
     if isinstance(args.quantize, str):
         args.quantize = json.loads(args.quantize)
 
-    # if we specify dtype in quantization recipe, replicate it as args.dtype
-    args.dtype = args.quantize.get("precision", {}).get("dtype", args.dtype)
+    # if we specify dtype in quantization recipe, allow args.dtype top override if specified
+    if args.dtype is None:
+        args.dtype = args.quantize.get("precision", {}).get("dtype", default_dtype)
+    else:
+        precision_handler = args.quantize.get("precision", None)
+        if precision_handler:
+            if precision_handler["dtype"] != args.dtype:
+                print('overriding json-specified dtype {precision_handler["dtype"]} with cli dtype {args.dtype}')
+                precision_handler["dtype"] = args.dtype
 
     if getattr(args, "output_pte_path", None):
-        if args.device not in ["cpu", "fast"]:
+        if args.device not in [None, "cpu", "fast"]:
             raise RuntimeError("Device not supported by ExecuTorch")
         args.device = "cpu"
     else:
         # Localized import to minimize expensive imports
         from torchchat.utils.build_utils import get_device_str
 
-        args.device = get_device_str(
-            args.quantize.get("executor", {}).get("accelerator", args.device)
-        )
+        if args.device is None:
+            args.device = get_device_str(
+                args.quantize.get("executor", {}).get("accelerator", default_device)
+            )
+        else:
+            args.device = get_device_str(args.device)
+            executor_handler = args.quantize.get("executor", None)
+            if executor_handler and executor_handler["accelerator"] != args.device:
+                print(f'overriding json-specified device {executor_handler["accelerator"]} with cli device {args.device}')
+                executor_handler["accelerator"] = args.device
 
     if "mps" in args.device:
         if getattr(args, "compile", False) or getattr(args, "compile_prefill", False):

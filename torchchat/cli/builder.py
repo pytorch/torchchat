@@ -16,12 +16,6 @@ import torch._dynamo.config
 import torch._inductor.config
 import torch.nn as nn
 
-from torch.distributed.device_mesh import DeviceMesh
-from torch.distributed.elastic.multiprocessing.errors import record
-from torch.distributed.elastic.utils.distributed import get_free_port
-
-from torchchat.distributed import launch_distributed, ParallelDims, parallelize_llama
-
 from torchchat.model import Model, ModelArgs, ModelType
 
 from torchchat.model_config.model_config import resolve_model_config
@@ -80,7 +74,7 @@ class BuilderArgs:
             or (self.pte_path and Path(self.pte_path).is_file())
         ):
             raise RuntimeError(
-                "need to specified a valid checkpoint path, checkpoint dir, gguf path, DSO path, or PTE path"
+                "need to specify a valid checkpoint path, checkpoint dir, gguf path, DSO path, AOTI PACKAGE or PTE path"
             )
 
         if self.aoti_package_path and self.pte_path:
@@ -97,7 +91,7 @@ class BuilderArgs:
             for param, param_msg in ignored_params:
                 if param:
                     print(
-                        f"Warning: {param_msg} ignored because an exported DSO or PTE path was specified"
+                        f"Warning: {param_msg} ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument"
                     )
         else:
             self.prefill_possible = True
@@ -464,77 +458,11 @@ def _load_model_default(builder_args: BuilderArgs) -> Model:
     return model
 
 
-def _maybe_init_distributed(
-    builder_args: BuilderArgs,
-) -> Tuple[Optional[DeviceMesh], Optional[ParallelDims]]:
-    """
-    Initialize distributed related setups if the user specified
-    using distributed inference. If not, this is a no-op.
-
-    Args:
-        builder_args (:class:`BuilderArgs`):
-            Command args for model building.
-    Returns:
-        Tuple[Optional[DeviceMesh], Optional[ParallelDims]]:
-            - The first element is an optional DeviceMesh object,
-            which which describes the mesh topology of devices for the DTensor.
-            - The second element is an optional ParallelDims object,
-            which represents the parallel dimensions configuration.
-    """
-    if not builder_args.use_distributed:
-        return None, None
-    dist_config = "llama3_8B.toml"  # TODO - integrate with chat cmd line
-
-    world_mesh, parallel_dims = launch_distributed(dist_config)
-
-    assert (
-        world_mesh is not None and parallel_dims is not None
-    ), f"failed to launch distributed using {dist_config}"
-
-    return world_mesh, parallel_dims
-
-
-def _maybe_parallelize_model(
-    model: nn.Module,
-    builder_args: BuilderArgs,
-    world_mesh: DeviceMesh,
-    parallel_dims: ParallelDims,
-) -> nn.Module:
-    """
-    We parallelize the module and load the distributed checkpoint to the model
-    if the user specifies using distributed inference. If not, this is a no-op.
-
-    Args:
-        model (:class:`nn.Module`):
-            Module to be parallelized.
-        builder_args (:class:`BuilderArgs`):
-            Command args for model building.
-        world_mesh (:class:`DeviceMesh`):
-            Object which describes the mesh topology
-            of devices for the DTensor.
-        parallel_dims (:class:`ParallelDims`):
-            Object which represents the parallel dimensions configuration.
-    Returns:
-        A :class:`nn.Module` object which is parallelized and checkpoint loaded
-        if the user specifies using distributed inference.
-    """
-    if world_mesh is None:
-        return model
-    assert parallel_dims is not None
-    print("Applying model parallel to model ...")
-    parallelize_llama(model, world_mesh, parallel_dims)
-    return load_checkpoints_to_model(model, builder_args, world_mesh)
-
-
 def _load_model(builder_args: BuilderArgs) -> Model:
-    # world_mesh, parallel_dims = _maybe_init_distributed(builder_args)
     if builder_args.gguf_path:
         model = _load_model_gguf(builder_args)
-    # elif builder_args.use_distributed:
-    #    model = _init_model_on_meta_device(builder_args)
     else:
         model = _load_model_default(builder_args)
-    # model = _maybe_parallelize_model(model, builder_args, world_mesh, parallel_dims)
 
     if builder_args.dso_path or builder_args.aoti_package_path:
         # AOTI-compoiled model will load its own weights.

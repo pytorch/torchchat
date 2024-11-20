@@ -591,6 +591,7 @@ class Generator:
             Dict[str, Any]
         ] = None,  # List of Image prompt tensors for multimodal models
         start_pos: int = 0,
+        skip_cache_setup: bool = False,
         draft_model: Model,
         speculate_k: Optional[int] = 8,
         sequential_prefill=True,
@@ -614,26 +615,27 @@ class Generator:
         max_new_tokens = min(max_new_tokens, max_seq_length - start_pos - prompt_length)
         # set up caches only if first inference
         if start_pos == 0:
-            model = model.to(device=device)
-            with torch.device(device):
-                if (
-                    self.is_torchtune_model
-                    or self.model.config.model_type == ModelType.Flamingo
-                ):
-                    # 6404 is one-gpu affordable max_seq_length for single image input
-                    model.setup_caches(
-                        batch_size=1,
-                        dtype=self.dtype,
-                        encoder_max_seq_len=6404,
-                        decoder_max_seq_len=max_seq_length,
-                    )
-                else:
-                    model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
-                if is_speculative and draft_model is not model:
-                    draft_model.setup_caches(
-                        max_batch_size=1,
-                        max_seq_length=max_seq_length,
-                    )
+            if not skip_cache_setup:
+                model = model.to(device=device)
+                with torch.device(device):
+                    if (
+                        self.is_torchtune_model
+                        or self.model.config.model_type == ModelType.Flamingo
+                    ):
+                        # 6404 is one-gpu affordable max_seq_length for single image input
+                        model.setup_caches(
+                            batch_size=1,
+                            dtype=self.dtype,
+                            encoder_max_seq_len=6404,
+                            decoder_max_seq_len=max_seq_length,
+                        )
+                    else:
+                        model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+                    if is_speculative and draft_model is not model:
+                        draft_model.setup_caches(
+                            max_batch_size=1,
+                            max_seq_length=max_seq_length,
+                        )
             if model.config.model_type == ModelType.Flamingo:
                 model.reset_caches()
 
@@ -915,13 +917,6 @@ class Generator:
             ]
         )
         if generator_args.compile:
-            if (
-                self.is_speculative and self.builder_args.use_distributed
-            ):  # and ("cuda" in builder_args.device):
-                torch._inductor.config.triton.cudagraph_trees = (
-                    False  # Bug with cudagraph trees in this case
-                )
-
             if self.builder_args.device == "cpu":
                 if generator_args.max_autotune:
                     kwargs = {"mode": "max-autotune"}
@@ -1020,6 +1015,7 @@ class Generator:
         )
         for i in range(num_samples):
             device_sync(device=self.builder_args.device)
+            is_first_sample: bool = i == 0
             if generator_args.chat_mode:
                 prompt = input("User: ")
                 if prompt == "/bye":
@@ -1045,7 +1041,7 @@ class Generator:
                             ]
                         )
                         self.system_prompt = None
-                    elif i == 0:
+                    elif is_first_sample:
                         encoded = self.chat_formatter.encode_dialog_prompt(
                             [{"role": "user", "content": prompt}]
                         )
@@ -1091,9 +1087,7 @@ class Generator:
 
                 torch._inductor.config.profiler_mark_wrapper_call = True
                 torch._inductor.config.cpp.enable_kernel_profile = True
-            if (i != generator_args.num_samples - 1 or not self.profile) or (
-                self.builder_args.use_distributed and self.rank != 0
-            ):
+            if i != generator_args.num_samples - 1 or not self.profile:
                 import contextlib
 
                 prof = contextlib.nullcontext()
@@ -1116,6 +1110,7 @@ class Generator:
                     top_k=generator_args.top_k,
                     sequential_prefill=generator_args.sequential_prefill,
                     start_pos=start_pos,
+                    skip_cache_setup=not is_first_sample,
                     max_seq_length=max_seq_length,
                 )
                 for token_tensor, metrics in generator_func:
@@ -1125,7 +1120,7 @@ class Generator:
                     if metrics is not None:
                         aggregate_metrics.update(metrics)
                     yield token_tensor, metrics
-            jit_compile = (i == 0) and (
+            jit_compile = is_first_sample and (
                 generator_args.compile or generator_args.compile_prefill
             )
             compilation_time = time.perf_counter() - t0
@@ -1136,10 +1131,7 @@ class Generator:
                     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
                 else:
                     print(prof.key_averages().table(sort_by="self_cuda_time_total"))
-                if self.builder_args.use_distributed:
-                    prof.export_chrome_trace(f"{self.profile}_rank_{self.rank}.json")
-                else:
-                    prof.export_chrome_trace(f"{self.profile}.json")
+                prof.export_chrome_trace(f"{self.profile}.json")
 
             if start_pos >= max_seq_length:
                 print(
@@ -1157,9 +1149,11 @@ class Generator:
                 print(
                     f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds"
                 )
-            aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-            aggregate_metrics["first_token_per_sec"].append(first_token_sec)
-            aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
+            else:
+                # aggregate_metrics will not append when is jit_compile, which will affect the average numbers.
+                aggregate_metrics["tokens_per_sec"].append(tokens_sec)
+                aggregate_metrics["first_token_per_sec"].append(first_token_sec)
+                aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
 
             logging.info(
                 f"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\
@@ -1197,12 +1191,28 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
                 f"Mean Accepted: {sum([idx * i for idx, i in enumerate(counts_aggregated)])/sum(counts_aggregated)}"
             )
 
-        print(
-            f"\n      Average tokens/sec (total): {torch.mean(torch.tensor(aggregate_metrics['tokens_per_sec'])).item():.2f} \
-                \nAverage tokens/sec (first token): {torch.mean(torch.tensor(aggregate_metrics['first_token_per_sec'])).item():.2f} \
-                \nAverage tokens/sec (next tokens): {torch.mean(torch.tensor(aggregate_metrics['next_tokens_per_sec'])).item():.2f} \n\
+        avg_tokens_sec = torch.mean(
+            torch.tensor(aggregate_metrics["tokens_per_sec"])
+        ).item()
+        avg_first_token_sec = torch.mean(
+            torch.tensor(aggregate_metrics["first_token_per_sec"])
+        ).item()
+        avg_next_tokens_sec = torch.mean(
+            torch.tensor(aggregate_metrics["next_tokens_per_sec"])
+        ).item()
+
+        if not (
+            torch.isnan(torch.tensor(avg_tokens_sec))
+            or torch.isnan(torch.tensor(avg_first_token_sec))
+            or torch.isnan(torch.tensor(avg_next_tokens_sec))
+        ):
+            print(
+                f"\nWarning: Excluding compile in calculations \
+                \n      Average tokens/sec (total): {avg_tokens_sec:.2f} \
+                \nAverage tokens/sec (first token): {avg_first_token_sec:.2f} \
+                \nAverage tokens/sec (next tokens): {avg_next_tokens_sec:.2f} \n\
                 "
-        )
+            )
         if torch.cuda.is_available():
             print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
