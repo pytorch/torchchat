@@ -45,6 +45,9 @@ from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
 
 
+logger = logging.getLogger(__name__)
+
+
 class _ChatFormatter(ABC):
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
@@ -292,7 +295,7 @@ class Generator:
         if self.is_llama3_model:
             self.chat_formatter = Llama3ChatFormatter(self.tokenizer)
             if generator_args.chat_mode:
-                logging.debug(
+                logger.debug(
                     "Llama3 model detected in chat mode. Using updated sentence schemas"
                 )
         elif self.tokenizer_args.is_hf_tokenizer:
@@ -354,10 +357,12 @@ class Generator:
         temperature: float = 0,
         top_k: Optional[int] = None,
     ):
+        logits = logits[0, -1]
+        logger.debug("Logits: %s", logits)
         if temperature == 0 and not need_probs:
-            _, idx_next = torch.topk(logits[0, -1], k=1, dim=-1)
+            _, idx_next = torch.topk(logits, k=1, dim=-1)
             return (idx_next, None)
-        probs = self.logits_to_probs(logits[0, -1], temperature, top_k)
+        probs = self.logits_to_probs(logits, temperature, top_k)
         idx_next = self.multinomial_sample_one_no_sync(probs)
         return idx_next, probs
 
@@ -371,7 +376,7 @@ class Generator:
         sequential_prefill=True,
         **sampling_kwargs,
     ) -> torch.Tensor:
-        # logging.debug(f"x: {x}, input_pos: {input_pos}")
+        logger.debug("x: %s, input_pos: %s", x, input_pos)
         width = x.size(1)
         assert input_pos.size(0) == width
 
@@ -407,7 +412,7 @@ class Generator:
         elif sequential_prefill:
             for i in range(width):
                 x_sliced, ip_sliced = x[:, i].view(-1, 1), input_pos[i].view(-1)
-                # logging.debug(f"<sliced> x: {x_sliced}, input_pos: {ip_sliced}")
+                logger.debug("<sliced> x: %s, input_pos: %s", x_sliced, ip_sliced)
                 logits = model(x_sliced, ip_sliced)  # (x[:, i], input_pos[i])da
         else:
             # input_pos: [B, S]
@@ -740,7 +745,7 @@ class Generator:
         tokens = self.tokenizer.encode(string)
         if bos:
             tokens = [self.tokenizer.bos_id()] + tokens
-        logging.debug(f"Size after encode_tokens: {len(tokens)}")
+        logger.debug("Size after encode_tokens: %d", len(tokens))
         return torch.tensor(tokens, dtype=torch.int, device=device)
 
     def _callback(self, x, *, buffer, done_generating):
@@ -798,7 +803,7 @@ class Generator:
                     tokens, dtype=torch.int, device=self.builder_args.device
                 )
 
-            logging.debug(encoded)
+            logger.debug(encoded)
             return encoded, None
 
         # Llama 3.2 11B
@@ -913,7 +918,7 @@ class Generator:
                 value=0,
             )
 
-        logging.debug(encoded)
+        logger.debug(encoded)
         return encoded, batch
 
     def chat(
@@ -1244,6 +1249,7 @@ def main(args):
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
     generator_args = GeneratorArgs.from_args(args)
+    logger.debug("GeneratorArgs: %s", generator_args)
     if not builder_args.distributed:
         gen = Generator(
             builder_args,
