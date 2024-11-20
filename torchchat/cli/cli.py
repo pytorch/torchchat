@@ -540,10 +540,9 @@ def arg_init(args):
         else:
             args.device = get_device_str(args.device)
             executor_handler = args.quantize.get("executor", None)
-            if executor_handler:
-                if executor_handler["accelerator"] != args.device:
-                    print(f'overriding json-specified device {executor_handler["accelerator"]} with cli device {args.device}')
-                    executor_handler["accelerator"] = args.device
+            if executor_handler and executor_handler["accelerator"] != args.device:
+                print(f'overriding json-specified device {executor_handler["accelerator"]} with cli device {args.device}')
+                executor_handler["accelerator"] = args.device
 
     if "mps" in args.device:
         if getattr(args, "compile", False) or getattr(args, "compile_prefill", False):
