@@ -4,6 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 import json
+import logging
 import os
 import warnings
 from abc import ABC, abstractmethod
@@ -47,6 +48,8 @@ from torchtune.modules.model_fusion import DeepFusionModel
 from torchchat.utils.build_utils import find_multiple, get_precision
 
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
+
+logger = logging.getLogger(__name__)
 
 
 class QuickGELUActivation(nn.Module):
@@ -477,7 +480,9 @@ class Model(ABC, nn.Module):
         for name, module_class in recipe.modules.items():
             config_args = self.config.transformer_args[name]
             if module_class == Transformer:
-                modules[name] = module_class(TransformerArgs.from_params(config_args))
+                transformer_args = TransformerArgs.from_params(config_args)
+                logger.debug("Transformer Args: %s", transformer_args)
+                modules[name] = module_class(transformer_args)
             else:
                 modules[name] = module_class(**config_args)
 
