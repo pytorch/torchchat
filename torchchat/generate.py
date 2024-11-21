@@ -47,14 +47,39 @@ from torchchat.utils.device_info import get_device_info
 
 logger = logging.getLogger(__name__)
 
+## Chat Formatters #############################################################
 
 class _ChatFormatter(ABC):
+
+    # Messages can arrive as a standard dict with "role" and "content" as
+    # strings, or where "content" is a list of objects with "text" fields.
+    MESSAGE_TYPE = Dict[str, Union[str, List[Dict[str, str]]]]
+
+    # A dialog is a sequence of messages
+    DIALOG_TYPE = List[MESSAGE_TYPE]
+
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
 
     @abstractmethod
-    def encode_dialog_prompt(self, dialog) -> List[int]:
-        raise NotImplementedError()
+    def encode_dialog_prompt(
+        self,
+        dialog: DIALOG_TYPE,
+        add_generation_prompt: bool,
+    ) -> List[int]:
+        """Encode a sequence of messages into a sequence of token IDs, including
+        the chat template
+
+        Args:
+            dialog (DIALOG_TYPE): The sequence of dialog messages to encode.
+                This will be the additional messages on top of those that have
+                already been processed.
+            add_generation_prompt (bool): Whether to include a generation prompt
+                at the end of the encoded sequence.
+
+        Returns:
+            List[int]: A list of token IDs representing the encoded prompt.
+        """
 
 
 class Llama3ChatFormatter(_ChatFormatter):
@@ -64,7 +89,7 @@ class Llama3ChatFormatter(_ChatFormatter):
 
     """
 
-    def encode_header(self, role) -> List[int]:
+    def _encode_header(self, role) -> List[int]:
         tokens = []
         tokens.append(self.tokenizer.special_tokens["<|start_header_id|>"])
         tokens.extend(self.tokenizer.encode(role, bos=False, eos=False))
@@ -72,8 +97,8 @@ class Llama3ChatFormatter(_ChatFormatter):
         tokens.extend(self.tokenizer.encode("\n\n", bos=False, eos=False))
         return tokens
 
-    def encode_message(self, message) -> List[int]:
-        tokens = self.encode_header(message["role"])
+    def _encode_message(self, message: _ChatFormatter.MESSAGE_TYPE) -> List[int]:
+        tokens = self._encode_header(message["role"])
         if isinstance(message["content"], str):
             tokens.extend(
                 self.tokenizer.encode(message["content"], bos=False, eos=False)
@@ -88,54 +113,79 @@ class Llama3ChatFormatter(_ChatFormatter):
         tokens.append(self.tokenizer.special_tokens["<|eot_id|>"])
         return tokens
 
-    def encode_dialog_prompt(self, dialog) -> List[int]:
+    def encode_dialog_prompt(
+        self,
+        dialog: _ChatFormatter.DIALOG_TYPE,
+        add_generation_prompt: bool,
+    ) -> List[int]:
         tokens = []
         tokens.append(self.tokenizer.special_tokens["<|begin_of_text|>"])
         for message in dialog:
-            tokens.extend(self.encode_message(message))
+            tokens.extend(self._encode_message(message))
         # Add the start of an assistant message for the model to complete.
-        tokens.extend(self.encode_header("assistant"))  # Pass role directly as a string
+        if add_generation_prompt:
+            tokens.extend(self._encode_header("assistant"))  # Pass role directly as a string
         return tokens
-
-
-B_INST, E_INST = "[INST]", "[/INST]"
-B_SYS, E_SYS = "<<SYS>>", "<</SYS>>"
 
 
 class Llama2ChatFormatter(_ChatFormatter):
-    def encode_dialog_prompt(self, dialog) -> List[int]:
-        tokens = self.tokenizer.encode(f"{B_INST} ")
-        first_message = True  # Bool to handle placing the B_INST token. Behavior is weird - the system prompt should have the B_INST, but not the first user message. All following user messages *should* have it. Also, if there is no system prompt, then the user message should have it.
+    """
+    Chat formatting for Llama2
+    CITE: https://www.llama.com/docs/model-cards-and-prompt-formats/meta-llama-2/
+    """
+
+    B_INST, E_INST = "[INST] ", " [/INST]"
+    B_SYS, E_SYS = "<<SYS>>\n", "\n<</SYS>>\n\n"
+
+    @staticmethod
+    def _get_content_str(message: _ChatFormatter.MESSAGE_TYPE) -> str:
+        if isinstance(message["content"], list):
+            return message["content"][0]["text"]
+        return message["content"]
+
+    def encode_dialog_prompt(
+        self,
+        dialog: _ChatFormatter.DIALOG_TYPE,
+        add_generation_prompt: bool, # UNUSED
+    ) -> List[int]:
+        new_turn = True
+        tokens = []
         for message in dialog:
-            if isinstance(message["content"], list):
-                content = message["content"][0]["text"]
+            if new_turn:
+                tokens += self.tokenizer.encode(f"{self.tokenizer.bos}{self.B_INST}")
+            content = self._get_content_str(message).strip()
+            role = message["role"]
+            if role == "system":
+                tokens += self.tokenizer.encode(f"{self.B_SYS}{content}{self.E_SYS}")
+                new_turn = False
+            elif role == "user":
+                tokens += self.tokenizer.encode(f"{content}{self.E_INST}")
+                new_turn = False
+            elif role == "assistant":
+                tokens += self.tokenizer.encode(f" {content} {self.tokenizer.eos}\n")
+                new_turn = True
             else:
-                content = message["content"]
-            content = content.strip()
-            if message["role"] == "system":
-                encoded = self.tokenizer.encode(f"{B_SYS}\n{content}\n{E_SYS}")
-                first_message = False
-            elif message["role"] == "user":
-                encoded = [self.tokenizer.bos_id()] + self.tokenizer.encode(
-                    f"{B_INST if first_message else ''} {content} {E_INST} "
-                )
-                first_message = True
-            elif message["role"] == "assistant":
-                encoded = self.tokenizer.encode(f"{content}\n\n") + [
-                    self.tokenizer.eos_id()
-                ]
-            tokens += encoded
+                raise ValueError("Invalid role in dialog.")
         return tokens
+
 
 
 class HFTokenizerChatFormatter(_ChatFormatter):
     """Chat formatter that uses the built-in formatting capabilities of an HF
     tokenizer instance
     """
-    def encode_dialog_prompt(self, dialog) -> List[int]:
-        rendered = self.tokenizer.apply_chat_template(dialog, add_generation_prompt=True)
+    def encode_dialog_prompt(
+        self,
+        dialog: _ChatFormatter.DIALOG_TYPE,
+        add_generation_prompt: bool,
+    ) -> List[int]:
+        rendered = self.tokenizer.apply_chat_template(
+            dialog, add_generation_prompt=add_generation_prompt
+        )
+        logger.debug("Formatted chat prompt:\n%s", rendered)
         return self.tokenizer.encode(rendered)
 
+## Generation ##################################################################
 
 @dataclass
 class GeneratorArgs:
@@ -1040,38 +1090,21 @@ class Generator:
                 if prompt == "/bye":
                     print("Exiting Chat.\n")
                     break
-                if not self.is_llama3_model:
-                    if self.system_prompt:
-                        prompt = f"{B_INST} {B_SYS}\n{self.system_prompt.strip()}\n{E_SYS}\n\n{prompt.strip()} {E_INST}"
-                        self.system_prompt = (
-                            None  # can only provide system prompt on first interaction
-                        )
-                    else:
-                        prompt = f"{B_INST} {prompt.strip()} {E_INST}"
-                    encoded = self.encode_tokens(
-                        prompt, bos=self.model.config.tokenizer_prepend_bos, device=self.builder_args.device
+
+                # Encode the additional messages added in this dialog turn. If
+                # this is the first turn, that includes any system prompt.
+                messages_to_encode = []
+                if is_first_sample and self.system_prompt:
+                    messages_to_encode.append(
+                        {"role": "system", "content": self.system_prompt}
                     )
-                else:
-                    if self.system_prompt:
-                        encoded = self.chat_formatter.encode_dialog_prompt(
-                            [
-                                {"role": "system", "content": self.system_prompt},
-                                {"role": "user", "content": prompt},
-                            ]
-                        )
-                        self.system_prompt = None
-                    elif is_first_sample:
-                        encoded = self.chat_formatter.encode_dialog_prompt(
-                            [{"role": "user", "content": prompt}]
-                        )
-                    else:
-                        encoded = self.chat_formatter.encode_message(
-                            {"role": "user", "content": prompt}
-                        )
-                        encoded.extend(self.chat_formatter.encode_header("assistant"))
-                    encoded = torch.tensor(
-                        encoded, dtype=torch.int, device=self.builder_args.device
-                    )
+                messages_to_encode.append({"role": "system", "content": prompt})
+                encoded = self.chat_formatter.encode_dialog_prompt(
+                    messages_to_encode, add_generation_prompt=True,
+                )
+                encoded = torch.tensor(
+                    encoded, dtype=torch.int, device=self.builder_args.device
+                )
                 if encoded.size(0) + start_pos > max_seq_length:
                     print(
                         "This prompt would take us past the max_seq_length. Ending Conversation."
