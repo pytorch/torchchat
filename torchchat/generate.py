@@ -746,6 +746,7 @@ class Generator:
         if bos:
             tokens = [self.tokenizer.bos_id()] + tokens
         logger.debug("Size after encode_tokens: %d", len(tokens))
+        logger.debug("Token IDs: %s", tokens)
         return torch.tensor(tokens, dtype=torch.int, device=device)
 
     def _callback(self, x, *, buffer, done_generating):
@@ -794,7 +795,7 @@ class Generator:
             # Single String prompt
             if isinstance(prompt, str):
                 encoded = self.encode_tokens(
-                    prompt, bos=True, device=self.builder_args.device
+                    prompt, bos=self.model.config.tokenizer_prepend_bos, device=self.builder_args.device
                 )
             # List of dialog
             else:
@@ -1048,7 +1049,7 @@ class Generator:
                     else:
                         prompt = f"{B_INST} {prompt.strip()} {E_INST}"
                     encoded = self.encode_tokens(
-                        prompt, bos=True, device=self.builder_args.device
+                        prompt, bos=self.model.config.tokenizer_prepend_bos, device=self.builder_args.device
                     )
                 else:
                     if self.system_prompt:
