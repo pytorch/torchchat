@@ -178,5 +178,12 @@
         "distribution_path": "ibm-granite/granite-8b-code-instruct-128k",
         "transformer_params_key": "Granite-8B-Code",
         "tokenizer_file": "tokenizer.json"
+    },
+    "ibm-granite/granite-3.0-2b-instruct": {
+        "aliases": ["granite3-2b"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "ibm-granite/granite-3.0-2b-instruct",
+        "transformer_params_key": "Granite-3.0-2B-Instruct",
+        "tokenizer_file": "tokenizer.json"
     }
 }

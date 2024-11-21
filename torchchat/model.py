@@ -287,6 +287,11 @@ class TransformerArgs:
     feed_forward_bias: bool = False
     # Whether or not to tie the input word embeddings to the output
     tie_word_embeddings: bool = False
+    # Granite architecture multipliers
+    embedding_multiplier: Optional[float] = None
+    attention_multiplier: Optional[float] = None
+    residual_multiplier: Optional[float] = None
+    logits_scaling: Optional[float] = None
 
     def __post_init__(self):
         if self.n_local_heads == -1:
