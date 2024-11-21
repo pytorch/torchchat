@@ -110,7 +110,7 @@ class Llama3ChatFormatter(_ChatFormatter):
                         self.tokenizer.encode(content["text"], bos=False, eos=False)
                     )
 
-        tokens.append(self.tokenizer.special_tokens["<|eot_id|>"])
+        tokens.append(self.tokenizer.special_tokens["<|eot_id|>\n"])
         return tokens
 
     def encode_dialog_prompt(
@@ -123,8 +123,8 @@ class Llama3ChatFormatter(_ChatFormatter):
         for message in dialog:
             tokens.extend(self._encode_message(message))
         # Add the start of an assistant message for the model to complete.
-        if add_generation_prompt:
-            tokens.extend(self._encode_header("assistant"))  # Pass role directly as a string
+        if add_generation_prompt and dialog and dialog[-1]["role"] != "assistant":
+            tokens.extend(self._encode_header("assistant")) # Pass role directly as a string
         return tokens
 
 
