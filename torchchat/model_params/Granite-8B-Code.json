@@ -8,6 +8,7 @@
     "rope_base": 10000000,
     "vocab_size": 49152,
     "use_hf_tokenizer": true,
+    "tokenizer_prepend_bos": false,
     "norm_eps": 0.00001,
     "rope_scaling": null,
     "attention_bias": true,
