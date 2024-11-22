@@ -74,7 +74,7 @@ class BuilderArgs:
             or (self.pte_path and Path(self.pte_path).is_file())
         ):
             raise RuntimeError(
-                "need to specified a valid checkpoint path, checkpoint dir, gguf path, DSO path, or PTE path"
+                "need to specify a valid checkpoint path, checkpoint dir, gguf path, DSO path, AOTI PACKAGE or PTE path"
             )
 
         if self.aoti_package_path and self.pte_path:
@@ -91,7 +91,7 @@ class BuilderArgs:
             for param, param_msg in ignored_params:
                 if param:
                     print(
-                        f"Warning: {param_msg} ignored because an exported DSO or PTE path was specified"
+                        f"Warning: {param_msg} ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument"
                     )
         else:
             self.prefill_possible = True
