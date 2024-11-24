@@ -481,7 +481,7 @@ in a python-free environment with AOT Inductor and ExecuTorch.
 | Hardware | OS | Eager | Eager + Compile | AOT Compile | ET Runtime |
 |-----|------|-----|-----|-----|-----|
 | x86 | Linux | ✅ |  ✅ |  ✅ |  ✅ |
-| aarch64 | Linux | n/t | n/t | n/t | n/t |
+| aarch64 | Linux | ✅ | ✅ | ✅ | n/t |
 | aarch64 | macOS | ✅ |  ✅ |  ✅ |  ✅ |
 | AMD GPU | Linux |  ✅ |  ✅ |  ✅ | ❌|
 | Nvidia GPU | Linux | ✅ |  ✅ |  ✅ | ❌|
@@ -492,7 +492,7 @@ in a python-free environment with AOT Inductor and ExecuTorch.
 | Mobile GPU (Vulkan) | Android |  ❌|❌|❌| ✅ |
 | CoreML | iOS |  ❌|❌|❌| ✅ |
 | Hexagon DSP | Android | ❌|❌|❌| ✅ |
-| Raspberry Pi 4/5 | Raspbian | n/t | n/t | n/t | ✅ |
+| Raspberry Pi 4/5 | Raspbian | ✅ | ✅ | ✅ | ✅ |
 | Raspberry Pi 4/5 | Android | ❌ | ❌ | ❌ | n/t |
 | ARM 32b (up to v7) | any | ❌|❌|❌|❌|
 
