@@ -45,7 +45,18 @@ from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
 
 
-logger = logging.getLogger(__name__)
+# NOTE: Logging disabled by default here due to conflicts with torch._dynamo
+class NoOpLogger:
+    def __no_op(self, *_, **__):
+        pass
+    def __getattr__(self, name):
+        return self.__no_op
+
+
+logger = (
+    NoOpLogger() if os.getenv("LOG_LEVEL") is None
+    else logging.getLogger(__name__)
+)
 
 ## Chat Formatters #############################################################
 
