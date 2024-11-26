@@ -16,14 +16,14 @@ The 'llama runner' is a native standalone application capable of
 running a model exported and compiled ahead-of-time with either
 Executorch (ET) or AOT Inductor (AOTI). Which model format to use
 depends on your requirements and preferences.  Executorch models are
-optimized for portability across a range of decices, including mobile
+optimized for portability across a range of devices, including mobile
 and edge devices.  AOT Inductor models are optimized for a particular
 target architecture, which may result in better performance and
 efficiency.
 
 Building the runners is straightforward with the included cmake build
 files and is covered in the next sections.  We will showcase the
-runners using ~~stories15M~~ llama2 7B and llama3.
+runners using  llama2 7B and llama3.
 
 ## What can you do with torchchat's llama runner for native execution?
 
@@ -160,7 +160,7 @@ and native execution environments, respectively.
 
 After exporting a model, you will want to verify that the model
 delivers output of high quality, and works as expected.  Both can be
-achieved with the Python environment.  All torchchat Python comands
+achieved with the Python environment.  All torchchat Python commands
 can work with exported models.  Instead of loading the model from a
 checkpoint or GGUF file, use the `--dso-path model.so` and
 `--pte-path model.pte` for loading both types of exported models. This
