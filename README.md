@@ -332,7 +332,7 @@ torchchat/utils/scripts/build_native.sh aoti
 
 Then run the compiled executable, with the pt2.
 ```bash
-cmake-out/aoti_run exportedModels/llama3_1_artifacts.pt2 -z `python3 torchchat.py where llama3.1`/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/aoti_run exportedModels/llama3_1_artifacts.pt2 -z `python3 torchchat.py where llama3.1`/tokenizer.model -i "Once upon a time"
 ```
 
 ## Mobile Execution
