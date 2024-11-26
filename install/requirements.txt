@@ -9,6 +9,10 @@ gguf
 # Tiktoken tokenizer for Llama 3 and other advanced models
 tiktoken
 
+# Tokenizers and jinja2 for other non-llama models that use HF tokenizers
+tokenizers
+jinja2
+
 # Miscellaneous
 snakeviz
 sentencepiece
