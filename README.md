@@ -666,6 +666,6 @@ awesome libraries and tools you've built around local LLM inference.
 
 torchchat is released under the [BSD 3 license](LICENSE). (Additional
 code in this distribution is covered by the MIT and Apache Open Source
-licenses.) However you may have other legal obligations that govern
+licenses.) However, you may have other legal obligations that govern
 your use of content, such as the terms of service for third-party
 models.
