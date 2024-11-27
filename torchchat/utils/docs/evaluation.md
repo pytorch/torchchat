@@ -5,7 +5,8 @@
 # Evaluation Features
 
 [shell default]: ./install/install_requirements.sh
-
+[shell default]: export TORCHCHAT_ROOT=${PWD}
+[shell default]: ./torchchat/utils/scripts/install_et.sh
 
 Torchchat provides evaluation functionality for your language model on
 a variety of tasks using the
