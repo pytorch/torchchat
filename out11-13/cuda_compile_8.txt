@@ -1,0 +1,71 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241002+cu121 available.
+lm_eval is not installed, GPTQ may not be usable
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 4.98 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.40 seconds
+-----------------------------------------------------------
+Once upon a time, there was a small village nestled in a green valley. In the heart of the village, there stood a magnificent temple dedicated to the god of wisdom. The villagers believed that the god would bestow wisdom, knowledge, and intelligence upon those who sought his blessings.
+One day, a young scholar named Kaito decided to embark on a journey to the temple to seek the blessings of the god. Kaito was a brilliant mind, but he felt that he lacked the wisdom and insight to solve the complex problems that plagued his village.
+As Kaito approached the temple, he noticed that the gates were closed, and a sign was posted that read: "Only those who answer the three riddles of the temple are granted access to the god." Kaito, being a clever and resourceful individual, decided to take on the challenge.
+The first riddle of the temple was: "What can be broken, but never held? What can be given, but never sold?" Kait
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 200.7354 sec total                 
+Time to first token: 1.4366 sec with parallel prefill.                
+
+      Total throughput: 0.9963 tokens/sec, 1.0037 s/token                 
+First token throughput: 0.6961 tokens/sec, 1.4366 s/token                 
+ Next token throughput: 0.9985 tokens/sec, 1.0015 s/token                     
+
+Bandwidth achieved: 8.53 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2e+02 seconds
+
+========================================
+
+Once upon a time, in a small town in the Midwest, there stood a beautiful Victorian-era mansion that had been converted into a bed and breakfast. The mansion, named Willowbrook, was famous for its stunning gardens, elegant decor, and warm hospitality.
+The inn was run by a kind-hearted couple, Emma and Jack, who took great pride in ensuring that their guests felt like royalty during their stay. They offered delicious homemade breakfasts, refreshing afternoon tea, and comfortable accommodations that made everyone feel at home.
+One sunny afternoon, a young woman named Sophia arrived at Willowbrook, eager to escape the chaos of her busy city life. She had heard about the inn from a friend and was excited to experience the tranquility and charm that it offered.
+As Sophia checked in, Emma greeted her with a warm smile and showed her to her cozy room on the second floor. The room was decorated with vintage furniture and a plush rug, and Sophia couldn't help but feel a sense of relaxation wash over her as she settled into
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 3.8433 sec total                 
+Time to first token: 0.1103 sec with parallel prefill.                
+
+      Total throughput: 52.0383 tokens/sec, 0.0192 s/token                 
+First token throughput: 9.0651 tokens/sec, 0.1103 s/token                 
+ Next token throughput: 53.3082 tokens/sec, 0.0188 s/token                     
+
+Bandwidth achieved: 445.39 GB/s
+
+========================================
+
+Once upon a time, in a far-off kingdom, there lived a young prince named Leo. Leo was a kind and gentle soul, loved by all who knew him. He had a special gift – the ability to communicate with animals.
+One day, a great drought struck the land, and the crops began to wither and die. The king and queen called upon the wise old wizard, Zephyr, to help them find a solution to the problem.
+Zephyr, with his long white beard and piercing blue eyes, listened carefully to the king and queen's plea. He thought for a moment, and then said, "I know of a magical spring, hidden deep within the nearby forest, which is said to have the power to bring life-giving water to our parched lands. But the spring is guarded by a fierce dragon, and only one with the heart of a true hero can pass its tests and claim the water."
+The king and queen looked at each other nervously, but Leo, with
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 2.1448 sec total                 
+Time to first token: 0.1163 sec with parallel prefill.                
+
+      Total throughput: 93.2491 tokens/sec, 0.0107 s/token                 
+First token throughput: 8.5964 tokens/sec, 0.1163 s/token                 
+ Next token throughput: 98.1037 tokens/sec, 0.0102 s/token                     
+
+Bandwidth achieved: 798.11 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 48.76                 
+Average tokens/sec (first token): 6.12                 
+Average tokens/sec (next tokens): 50.80 
+                
+Memory used: 28.81 GB

@@ -1,0 +1,72 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241002+cu121 available.
+lm_eval is not installed, GPTQ may not be usable
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 7.06 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.52 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the heart of a dense forest, there lived a group of rabbits who were known for their exceptional skill in gardening and agriculture. They spent their days tending to their beautiful gardens, planting seeds, watering them, and watching them grow into beautiful flowers and delicious fruits and vegetables.
+One of the most skilled rabbit gardeners was Benny, a wise and experienced rabbit who had been tending to his garden for years. Benny was known for his ability to make even the most reluctant plants grow and thrive.
+One day, a young rabbit named Lily approached Benny with a problem. Lily had just moved to the village and had been tasked with taking care of her family's garden. However, she had never had any experience with gardening before, and was struggling to keep her plants alive.
+Benny, seeing an opportunity to pass on his knowledge, took Lily under his wing and started teaching her the basics of gardening. He showed her how to plant seeds, water them, and prune
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 86.7239 sec total                 
+Time to first token: 1.2020 sec with parallel prefill.                
+
+      Total throughput: 2.3062 tokens/sec, 0.4336 s/token                 
+First token throughput: 0.8320 tokens/sec, 1.2020 s/token                 
+ Next token throughput: 2.3269 tokens/sec, 0.4298 s/token                     
+
+Bandwidth achieved: 37.04 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 8.7e+01 seconds
+
+========================================
+
+Once upon a time, in a small village nestled in the heart of a dense forest, there lived a young boy named Rahul. Rahul was an inquisitive and adventurous boy who loved nothing more than exploring the surrounding woods. He would often wander off into the forest, collecting leaves, watching animals, and dreaming of all the wonders that lay hidden within the trees.
+
+One day, while on one of his exploratory adventures, Rahul stumbled upon an old, mysterious-looking door hidden behind a thick veil of foliage. The door was made of solid oak, with intricate carvings of vines and flowers etched into its surface. It looked as though it hadn't been opened in years, and a thick layer of dust coated its hinges.
+
+Rahul's curiosity was piqued, and he felt an overwhelming urge to open the door and see what lay beyond. He wiped away the dust, examined the door carefully, and then, with a sense of trepidation, he turned the rusty handle and pushed the door
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 2.6233 sec total                 
+Time to first token: 0.0879 sec with parallel prefill.                
+
+      Total throughput: 76.2397 tokens/sec, 0.0131 s/token                 
+First token throughput: 11.3728 tokens/sec, 0.0879 s/token                 
+ Next token throughput: 78.4893 tokens/sec, 0.0127 s/token                     
+
+Bandwidth achieved: 1224.45 GB/s
+
+========================================
+
+Once upon a time, in a small village nestled in the mountains, there lived a young girl named Akira. She was a curious and adventurous child, always eager to explore the outdoors and learn about the world around her. One day, while wandering through the forest, Akira stumbled upon a strange and beautiful bird with shimmering blue feathers.
+The bird, who introduced herself as Luna, was a magical creature with the power to communicate with animals. She possessed a deep understanding of the natural world and could sense the emotions and needs of all living beings.
+Akira was immediately drawn to Luna's wisdom and kindness and asked her to teach her about the magical world of animals. Luna, seeing the potential in Akira, agreed to take her under her wing, and together they set out on a journey to explore the depths of the forest.
+As they wandered deeper into the woods, Luna introduced Akira to a wise old badger named Kaito, who taught her about the ancient art of healing and the importance of
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 2.0535 sec total                 
+Time to first token: 0.0871 sec with parallel prefill.                
+
+      Total throughput: 97.3961 tokens/sec, 0.0103 s/token                 
+First token throughput: 11.4860 tokens/sec, 0.0871 s/token                 
+ Next token throughput: 101.1998 tokens/sec, 0.0099 s/token                     
+
+Bandwidth achieved: 1564.23 GB/s
+
+========================================
+
+
+      Average tokens/sec (total): 58.65                 
+Average tokens/sec (first token): 7.90                 
+Average tokens/sec (next tokens): 60.67 
+                
+Memory used: 22.35 GB
