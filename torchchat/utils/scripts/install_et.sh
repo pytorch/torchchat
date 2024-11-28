@@ -13,10 +13,8 @@ if [ "${ET_BUILD_DIR}" == "" ]; then
   ET_BUILD_DIR="et-build"
 fi
 
-ENABLE_ET_PYBIND="${1:-true}"
-
 pushd ${TORCHCHAT_ROOT}
 find_cmake_prefix_path
 clone_executorch
-install_executorch_libs $ENABLE_ET_PYBIND
+install_executorch_libs
 popd

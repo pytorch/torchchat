@@ -41,7 +41,7 @@ def export_for_server(
     package: bool = True,
 ) -> str:
     """
-    Export the model using AOT Compile to get a .dso for server use cases.
+    Export the model using AOT Compile to get a .pt2 for server use cases.
 
     Args:
         model: The model to be exported.
@@ -50,6 +50,7 @@ def export_for_server(
     Returns:
         The path to the exported model.
     """
+
     if dynamic_shapes:
         example_inputs = (
             torch.tensor([[1, 9038, 2501, 263, 931]], dtype=torch.int, device=device),
