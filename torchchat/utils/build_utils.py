@@ -231,6 +231,8 @@ def find_multiple(n: int, k: int) -> int:
 def device_sync(device="cpu"):
     if "cuda" in device:
         torch.cuda.synchronize(device)
+    elif "xpu" in device:
+        torch.xpu.synchronize(device)
     elif ("cpu" in device) or ("mps" in device):
         pass
     else:
@@ -279,7 +281,8 @@ def get_device_str(device) -> str:
         device = (
             "cuda"
             if torch.cuda.is_available()
-            else "mps" if is_mps_available() else "cpu"
+            else "mps" if is_mps_available()
+            else "xpu" if torch.xpu.is_available()  else "cpu"
         )
         return device
     else:
@@ -291,7 +294,8 @@ def get_device(device) -> str:
         device = (
             "cuda"
             if torch.cuda.is_available()
-            else "mps" if is_mps_available() else "cpu"
+            else "mps" if is_mps_available()
+            else "xpu" if torch.xpu.is_available()  else "cpu"
         )
     return torch.device(device)
 

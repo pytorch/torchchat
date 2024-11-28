@@ -62,7 +62,12 @@ echo "Using pip executable: $PIP_EXECUTABLE"
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-PYTORCH_NIGHTLY_VERSION=dev20241002
+if [[ -x "$(command -v xpu-smi)" ]];
+then
+  PYTORCH_NIGHTLY_VERSION=dev20241001
+else
+  PYTORCH_NIGHTLY_VERSION=dev20241002
+fi
 
 # Nightly version for torchvision
 VISION_NIGHTLY_VERSION=dev20241002
@@ -85,16 +90,28 @@ then
 elif [[ -x "$(command -v rocminfo)" ]];
 then
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/rocm6.2"
+elif [[ -x "$(command -v xpu-smi)" ]];
+then
+  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/xpu"
 else
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
 fi
 
 # pip packages needed by exir.
-REQUIREMENTS_TO_INSTALL=(
-  torch=="2.6.0.${PYTORCH_NIGHTLY_VERSION}"
-  torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
-  torchtune=="0.4.0.${TUNE_NIGHTLY_VERSION}"
-)
+if [[ -x "$(command -v xpu-smi)" ]];
+then
+  REQUIREMENTS_TO_INSTALL=(
+    torch=="2.6.0.${PYTORCH_NIGHTLY_VERSION}"
+    torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
+    torchtune=="0.3.1"
+  )
+else
+  REQUIREMENTS_TO_INSTALL=(
+    torch=="2.6.0.${PYTORCH_NIGHTLY_VERSION}"
+    torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
+    torchtune=="0.4.0.${TUNE_NIGHTLY_VERSION}"
+  )
+fi
 
 # Install the requirements. --extra-index-url tells pip to look for package
 # versions on the provided URL if they aren't available on the default URL.
