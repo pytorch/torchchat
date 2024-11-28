@@ -150,6 +150,12 @@ def _add_model_config_args(parser, verb: str) -> None:
         )
 
     model_config_parser.add_argument(
+        "--state-dict-path",
+        type=str,
+        default=None,
+        help="Model state dict to load (if path exists) or write out to (if path doesn't exist). Supercedes --quantize arg.",
+    )
+    model_config_parser.add_argument(
         "--dtype",
         default=None,
         choices=allowable_dtype_names(),
