@@ -378,6 +378,11 @@ def _add_generation_args(parser, verb: str) -> None:
         action="store_true",
         help="Whether to use max-autotune.",
     )
+    generator_parser.add_argument(
+        "--reasoning",
+        action="store_true",
+        help="[Experiment]: Whether to use multi-turn reasoning.",
+    )
 
 
 # Add CLI Args specific to Model Evaluation

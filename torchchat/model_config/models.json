@@ -107,6 +107,12 @@
         "distribution_path": "meta-llama/Llama-3.2-11B-Vision-Instruct",
         "transformer_params_key": "Llama-3.2-11B-Vision"
     },
+    "Xkev/Llama-3.2V-11B-cot": {
+        "aliases": ["Llama-3.2V-11B-cot", "Llama-3.2V-11B-Vision-cot", "Llama-3.2-mm-cot"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "meta-llama/Llama-3.2-11B-Vision-Instruct",
+        "transformer_params_key": "Llama-3.2-11B-Vision"
+    },
     "meta-llama/CodeLlama-7b-Python-hf": {
         "aliases": ["codellama", "codellama-7b"],
         "distribution_channel": "HuggingFaceSnapshot",

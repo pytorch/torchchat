@@ -83,6 +83,7 @@ def _download_hf_snapshot(
     if model_config.name in {
         "meta-llama/Llama-3.2-11B-Vision-Instruct",
         "meta-llama/Llama-3.2-11B-Vision",
+        "Xkev/Llama-3.2V-11B-cot",
     }:
         print(f"Converting {model_config.name} to torchtune format...", file=sys.stderr)
         convert_hf_checkpoint_to_tune(
