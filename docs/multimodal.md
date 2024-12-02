@@ -41,6 +41,9 @@ python3 torchchat.py server llama3.2-11B
 ```
 [skip default]: end
 
+[shell default]: python3 torchchat.py server llama3.2-11B & server_pid=$!
+
+
 In another terminal, query the server using `curl`. This query might take a few minutes to respond.
 
 <details>
@@ -50,7 +53,6 @@ Setting `stream` to "true" in the request emits a response in chunks. If `stream
 
 **Example Input + Output**
 
-[skip default]: begin
 ```
 curl http://127.0.0.1:5000/v1/chat/completions \
   -H "Content-Type: application/json" \
@@ -74,11 +76,13 @@ curl http://127.0.0.1:5000/v1/chat/completions \
     "max_tokens": 300
   }'
 ```
-
+[skip default]: begin
 ```
 {"id": "chatcmpl-cb7b39af-a22e-4f71-94a8-17753fa0d00c", "choices": [{"message": {"role": "assistant", "content": "The image depicts a simple black and white cartoon-style drawing of an animal face. It features a profile view, complete with two ears, expressive eyes, and a partial snout. The animal looks to the left, with its eye and mouth implied, suggesting that the drawn face might belong to a rabbit, dog, or pig. The graphic face has a bold black outline and a smaller, solid black nose. A small circle, forming part of the face, has a white background with two black quirkly short and long curved lines forming an outline of what was likely a mouth, complete with two teeth. The presence of the curve lines give the impression that the animal is smiling or speaking. Grey and black shadows behind the right ear and mouth suggest that this face is looking left and upwards. Given the prominent outline of the head and the outline of the nose, it appears that the depicted face is most likely from the side profile of a pig, although the ears make it seem like a dog and the shape of the nose makes it seem like a rabbit. Overall, it seems that this image, possibly part of a character illustration, is conveying a playful or expressive mood through its design and positioning."}, "finish_reason": "stop"}], "created": 1727487574, "model": "llama3.2", "system_fingerprint": "cpu_torch.float16", "object": "chat.completion"}%
 ```
 [skip default]: end
+
+[shell default]: kill ${server_pid}
 
 </details>
 
