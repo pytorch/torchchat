@@ -62,10 +62,10 @@ echo "Using pip executable: $PIP_EXECUTABLE"
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-PYTORCH_NIGHTLY_VERSION=dev20241118
+PYTORCH_NIGHTLY_VERSION=dev20241201
 
 # Nightly version for torchvision
-VISION_NIGHTLY_VERSION=dev20241114
+VISION_NIGHTLY_VERSION=dev20241201
 
 # Nightly version for torchtune
 TUNE_NIGHTLY_VERSION=dev20241010
@@ -92,6 +92,7 @@ fi
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
   torch=="2.6.0.${PYTORCH_NIGHTLY_VERSION}"
+  torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
   torchtune=="0.4.0.${TUNE_NIGHTLY_VERSION}"
 )
 
@@ -103,16 +104,11 @@ REQUIREMENTS_TO_INSTALL=(
     "${REQUIREMENTS_TO_INSTALL[@]}"
 )
 
-# Workaround until torchvision nightly is gets bumped
+# For torchao need to install from github since nightly build doesn't have macos build.
+# TODO: Remove this and install nightly build, once it supports macos
 (
   set -x
-  $PIP_EXECUTABLE install --no-deps --extra-index-url "${TORCH_NIGHTLY_URL}" \
-    torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
-)
-
-(
-  set -x
-  $PIP_EXECUTABLE install torchao=="0.5.0"
+  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@a558f7e90012d61cd636bb2068e027cc0062e5ca
 )
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
