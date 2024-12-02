@@ -108,7 +108,7 @@ REQUIREMENTS_TO_INSTALL=(
 # TODO: Remove this and install nightly build, once it supports macos
 (
   set -x
-  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@a558f7e90012d61cd636bb2068e027cc0062e5ca
+  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@2f97b0955953fa1a46594a27f0df2bc48d93e79d
 )
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
