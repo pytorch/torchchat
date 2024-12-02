@@ -68,7 +68,7 @@ PYTORCH_NIGHTLY_VERSION=dev20241126
 VISION_NIGHTLY_VERSION=dev20241126
 
 # Nightly version for torchtune
-TUNE_NIGHTLY_VERSION=dev20241010
+TUNE_NIGHTLY_VERSION=dev20241126
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 (
