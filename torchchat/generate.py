@@ -1156,9 +1156,11 @@ class LocalGenerator:
                 print(
                     f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds"
                 )
-            aggregate_metrics["tokens_per_sec"].append(tokens_sec)
-            aggregate_metrics["first_token_per_sec"].append(first_token_sec)
-            aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
+            else:
+                # aggregate_metrics will not append when is jit_compile, which will affect the average numbers.
+                aggregate_metrics["tokens_per_sec"].append(tokens_sec)
+                aggregate_metrics["first_token_per_sec"].append(first_token_sec)
+                aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
 
             logger.info(
                 f"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\
@@ -1212,7 +1214,8 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
             or torch.isnan(torch.tensor(avg_next_tokens_sec))
         ):
             print(
-                f"\n      Average tokens/sec (total): {avg_tokens_sec:.2f} \
+                f"\nWarning: Excluding compile in calculations \
+                \n      Average tokens/sec (total): {avg_tokens_sec:.2f} \
                 \nAverage tokens/sec (first token): {avg_first_token_sec:.2f} \
                 \nAverage tokens/sec (next tokens): {avg_next_tokens_sec:.2f} \n\
                 "
