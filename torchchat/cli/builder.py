@@ -373,6 +373,8 @@ def _load_model_gguf(builder_args: BuilderArgs) -> Model:
         kwargs = {}
     else:
         kwargs = builder_args.gguf_kwargs
+
+    kwargs.setdefault("device", builder_args.device)
     model = Model.from_gguf(builder_args.gguf_path, **kwargs)
     return model
 
