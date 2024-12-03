@@ -215,7 +215,7 @@ jobs:
           set -eux
           PYTHONPATH="${PWD}" python .ci/scripts/gather_test_models.py --event "pull_request" --backend "gpu"
   test-gpu-compile:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-compile (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
@@ -250,7 +250,7 @@ jobs:
         echo "::endgroup::"
 
   test-gpu-aoti-bfloat16:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-aoti-bfloat16 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
@@ -291,7 +291,7 @@ jobs:
         echo "::endgroup::"
 
   test-gpu-aoti-float32:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-aoti-float32 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
@@ -337,7 +337,7 @@ jobs:
         echo "::endgroup::"
 
   test-gpu-aoti-float16:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-aoti-float16 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
@@ -384,7 +384,7 @@ jobs:
         echo "::endgroup::"
 
   test-gpu-eval-sanity-check:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-eval-sanity-check (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
@@ -1031,7 +1031,7 @@ jobs:
           echo "Tests complete."
 
   test-build-runner-et-android:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.4xlarge
       script: |

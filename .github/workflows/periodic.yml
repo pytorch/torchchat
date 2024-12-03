@@ -108,7 +108,7 @@ jobs:
           set -eux
           PYTHONPATH="${PWD}" python .ci/scripts/gather_test_models.py --event "periodic" --backend "gpu"
   test-gpu:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     secrets: inherit

@@ -10,7 +10,7 @@ on:
 
 jobs:
   test-readme:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     secrets: inherit
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
@@ -44,7 +44,7 @@ jobs:
 
 
   test-quantization-any:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       secrets: inherit
@@ -76,7 +76,7 @@ jobs:
         echo "::endgroup::"
 
   test-gguf-any:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     secrets: inherit
     with:
       runner: linux.g5.4xlarge.nvidia.gpu

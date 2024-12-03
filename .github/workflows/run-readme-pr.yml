@@ -9,7 +9,7 @@ on:
 
 jobs:
   test-readme-any:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
@@ -33,7 +33,7 @@ jobs:
         echo "::endgroup::"
 
   test-readme-cpu:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
@@ -57,7 +57,7 @@ jobs:
         echo "::endgroup::"
 
   test-quantization-any:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
@@ -81,7 +81,7 @@ jobs:
         echo "::endgroup::"
 
   test-quantization-cpu:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
@@ -100,7 +100,7 @@ jobs:
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
 
   test-gguf-any:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
@@ -124,7 +124,7 @@ jobs:
         echo "::endgroup::"
 
   test-gguf-cpu:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
@@ -149,7 +149,7 @@ jobs:
 
 
   test-advanced-any:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
@@ -174,7 +174,7 @@ jobs:
 
 
   test-advanced-cpu:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
@@ -198,7 +198,7 @@ jobs:
         echo "::endgroup::"
 
   test-evaluation-any:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
@@ -222,7 +222,7 @@ jobs:
         echo "::endgroup::"
 
   test-evaluation-cpu:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
@@ -246,7 +246,7 @@ jobs:
         echo "::endgroup::"
 
   test-multimodal-any:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
@@ -270,7 +270,7 @@ jobs:
         echo "::endgroup::"
 
   test-multimodal-cpu:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
