@@ -59,7 +59,7 @@ for valid `bitwidth` and `groupsize` values.
 | linear with dynamic activations (symmetric) | `'{"linear:a8w4dq" : {"groupsize" : <groupsize>}}'`|
 | embedding | `'{"embedding": {"bitwidth": <bitwidth>, "groupsize":<groupsize>}}'` |
 
-See the available quantization schemes [here](https://github.com/pytorch/torchchat/blob/main/torchchat/utils/quantize.py#L1260-L1266).
+See the available quantization schemes [here](https://github.com/pytorch/torchchat/blob/b809b69e03f8f4b75a4b27b0778f0d3695ce94c2/torchchat/utils/quantize.py#L887-L894).
 
 In addition to quantization, the [accelerator](model_customization.md#device)
 and [precision](model_customization.md#model-precision) can also be specified.
