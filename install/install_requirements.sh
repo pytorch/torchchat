@@ -65,7 +65,7 @@ echo "Using pip executable: $PIP_EXECUTABLE"
 PYTORCH_NIGHTLY_VERSION=dev20241202
 
 # Nightly version for torchvision
-VISION_NIGHTLY_VERSION=dev20241202
+VISION_NIGHTLY_VERSION=dev20241126
 
 # Nightly version for torchtune
 TUNE_NIGHTLY_VERSION=dev20241126
@@ -92,7 +92,6 @@ fi
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
   torch=="2.6.0.${PYTORCH_NIGHTLY_VERSION}"
-  torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
   torchtune=="0.5.0.${TUNE_NIGHTLY_VERSION}"
 )
 
@@ -102,6 +101,13 @@ REQUIREMENTS_TO_INSTALL=(
   set -x
   $PIP_EXECUTABLE install --extra-index-url "${TORCH_NIGHTLY_URL}" \
     "${REQUIREMENTS_TO_INSTALL[@]}"
+)
+
+# Workaround until torchvision nightly gets bumped
+(
+  set -x
+  $PIP_EXECUTABLE install --no-deps --extra-index-url "${TORCH_NIGHTLY_URL}" \
+    torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
 )
 
 # For torchao need to install from github since nightly build doesn't have macos build.
