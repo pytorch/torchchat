@@ -62,13 +62,13 @@ echo "Using pip executable: $PIP_EXECUTABLE"
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-PYTORCH_NIGHTLY_VERSION=dev20241030
+PYTORCH_NIGHTLY_VERSION=dev20241113
 
 # Nightly version for torchvision
-VISION_NIGHTLY_VERSION=dev20241030
+VISION_NIGHTLY_VERSION=dev20241113
 
 # Nightly version for torchtune
-TUNE_NIGHTLY_VERSION=dev20241010
+TUNE_NIGHTLY_VERSION=dev20241126
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 (
@@ -81,7 +81,7 @@ TUNE_NIGHTLY_VERSION=dev20241010
 # with cuda for faster execution on cuda GPUs.
 if [[ -x "$(command -v nvidia-smi)" ]];
 then
-  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu121"
+  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu124"
 elif [[ -x "$(command -v rocminfo)" ]];
 then
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/rocm6.2"
@@ -93,7 +93,7 @@ fi
 REQUIREMENTS_TO_INSTALL=(
   torch=="2.6.0.${PYTORCH_NIGHTLY_VERSION}"
   torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
-  torchtune=="0.4.0.${TUNE_NIGHTLY_VERSION}"
+  torchtune=="0.5.0.${TUNE_NIGHTLY_VERSION}"
 )
 
 # Install the requirements. --extra-index-url tells pip to look for package
@@ -106,7 +106,7 @@ REQUIREMENTS_TO_INSTALL=(
 
 (
   set -x
-  $PIP_EXECUTABLE install torchao=="0.5.0"
+  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@2f97b0955953fa1a46594a27f0df2bc48d93e79d
 )
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
