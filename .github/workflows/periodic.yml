@@ -119,7 +119,7 @@ jobs:
       secrets-env: "HF_TOKEN_PERIODIC"
       runner: ${{ matrix.runner }}
       gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      gpu-arch-version: "12.4"
       script: |
         echo "::group::Print machine info"
         nvidia-smi

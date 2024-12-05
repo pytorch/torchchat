@@ -14,7 +14,7 @@ jobs:
       runner: linux.g5.4xlarge.nvidia.gpu
       secrets-env: "HF_TOKEN_PERIODIC"
       gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      gpu-arch-version: "12.4"
       timeout: 60
       script: |
         echo "::group::Print machine info"
