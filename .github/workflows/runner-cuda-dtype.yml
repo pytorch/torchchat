@@ -21,12 +21,6 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
-
         echo "::group::Download checkpoints"
         # Install requirements
 

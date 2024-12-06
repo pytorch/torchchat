@@ -266,11 +266,6 @@ jobs:
         nvidia-smi
         echo "::endgroup::"
 
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
         echo "::group::Install required packages"
         ./install/install_requirements.sh cuda
         pip3 list
@@ -304,11 +299,6 @@ jobs:
       script: |
         echo "::group::Print machine info"
         nvidia-smi
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         echo "::group::Install required packages"
@@ -352,11 +342,6 @@ jobs:
         nvidia-smi
         echo "::endgroup::"
 
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
         echo "::group::Install required packages"
         ./install/install_requirements.sh cuda
         pip list
@@ -397,11 +382,6 @@ jobs:
       script: |
         echo "::group::Print machine info"
         nvidia-smi
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         echo "::group::Install required packages"

@@ -20,11 +20,6 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
         .ci/scripts/run-docs readme
 
         echo "::group::Completion"
@@ -42,11 +37,6 @@ jobs:
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
@@ -68,11 +58,6 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
         .ci/scripts/run-docs quantization
 
         echo "::group::Completion"
@@ -92,11 +77,6 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
 
   test-gguf-any:
@@ -109,11 +89,6 @@ jobs:
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         .ci/scripts/run-docs gguf
@@ -133,11 +108,6 @@ jobs:
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs gguf
@@ -160,11 +130,6 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
         .ci/scripts/run-docs advanced
 
         echo "::group::Completion"
@@ -183,11 +148,6 @@ jobs:
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
@@ -209,11 +169,6 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
         .ci/scripts/run-docs evaluation
 
         echo "::group::Completion"
@@ -231,11 +186,6 @@ jobs:
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs evaluation
@@ -257,11 +207,6 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
         .ci/scripts/run-docs multimodal
 
         echo "::group::Completion"
@@ -279,11 +224,6 @@ jobs:
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs multimodal

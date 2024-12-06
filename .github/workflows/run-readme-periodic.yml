@@ -23,11 +23,6 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
         echo "::group::Create script to run README"
         python3 torchchat/utils/scripts/updown.py --create-sections --file README.md > ./run-readme.sh
         # for good measure, if something happened to updown processor,
@@ -56,11 +51,6 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
         echo "::group::Create script to run quantization"
         python3 torchchat/utils/scripts/updown.py --create-sections --file docs/quantization.md > ./run-quantization.sh
         # for good measure, if something happened to updown processor,
@@ -87,11 +77,6 @@ jobs:
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
-        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         echo "::group::Create script to run gguf"
