@@ -21,8 +21,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        yum install -y  devtoolset-11-binutils
+        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         .ci/scripts/run-docs readme
@@ -45,8 +45,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        yum install -y  devtoolset-11-binutils
+        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
@@ -69,8 +69,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        yum install -y  devtoolset-11-binutils
+        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         .ci/scripts/run-docs quantization
@@ -93,8 +93,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        yum install -y  devtoolset-11-binutils
+        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
@@ -112,8 +112,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        yum install -y  devtoolset-11-binutils
+        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         .ci/scripts/run-docs gguf
@@ -136,8 +136,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        yum install -y  devtoolset-11-binutils
+        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs gguf
@@ -161,8 +161,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        yum install -y  devtoolset-11-binutils
+        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         .ci/scripts/run-docs advanced
@@ -186,8 +186,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        yum install -y  devtoolset-11-binutils
+        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
@@ -210,8 +210,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        yum install -y  devtoolset-11-binutils
+        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         .ci/scripts/run-docs evaluation
@@ -234,8 +234,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        yum install -y  devtoolset-11-binutils
+        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs evaluation
@@ -258,8 +258,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        yum install -y  devtoolset-11-binutils
+        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         .ci/scripts/run-docs multimodal
@@ -282,8 +282,8 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
+        yum install -y  devtoolset-11-binutils
+        export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs multimodal
