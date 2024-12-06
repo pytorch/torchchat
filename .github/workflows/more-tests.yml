@@ -21,7 +21,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-11-binutils
+        yum install -y  devtoolset-11-toolchain
         export PATH=/opt/rh/devtoolset-11/root/usr/bin/:$PATH
         echo "::endgroup::"
 
