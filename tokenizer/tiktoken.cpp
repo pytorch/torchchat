@@ -213,48 +213,21 @@ static std::vector<uint64_t> _byte_pair_merge(
   return out;
 }
 
-static std::vector<uint64_t> _byte_pair_encode(
-    const std::string& piece,
-    const Encoder& encoder) {
-  if (piece.size() == 1) {
-    auto iter = encoder.find(piece);
-    if (iter != encoder.end()) {
-      return std::vector<uint64_t>({iter->second});
-    } else {
-      // TODO: is it possible?
-      return {};
-    }
-  }
-
-  return _byte_pair_merge(
-      piece, encoder, [&piece, &encoder](uint64_t start, uint64_t stop) {
-        std::string key = piece.substr(start, stop - start);
-        auto iter = encoder.find(key);
-        if (iter != encoder.end()) {
-          return iter->second;
-        } else {
-          // TODO: what if key does not exist? Should we return `unknown`?
-          // assert(false); // ??
-          return uint64_t(0);
-        }
-      });
-}
 // ------------------------------Util end------------------------------------
-// -------------------------private method start-------------------------------
+// -------------------------protected method start---------------------------
 
-template <typename T>
 std::pair<std::optional<std::string>, re2::StringPiece>
-Tiktoken::_split_with_allowed_special_token(
+BPETokenizerBase::split_with_allowed_special_token_(
     re2::StringPiece& input,
-    const T& allowed_special) {
-  if (!_special_token_regex) {
+    const Encoder& allowed_special) const {
+  if (!special_token_regex_) {
     return std::make_pair(std::nullopt, input);
   }
 
   auto start = input.begin();
   std::string special;
   while (true) {
-    if (!re2::RE2::FindAndConsume(&input, *_special_token_regex, &special)) {
+    if (!re2::RE2::FindAndConsume(&input, *special_token_regex_, &special)) {
       // No special token.
       break;
     }
@@ -270,42 +243,22 @@ Tiktoken::_split_with_allowed_special_token(
   return std::make_pair(std::nullopt, input);
 }
 
-void Tiktoken::_encode(
-    re2::StringPiece& input,
-    std::vector<uint64_t>& ret,
-    uint64_t& last_piece_token_len) {
-  std::string piece;
-  assert(_regex);
-  while (re2::RE2::FindAndConsume(&input, *_regex, &piece)) {
-    auto iter = _encoder.find(piece);
-    if (iter != _encoder.end()) {
-      last_piece_token_len = 1;
-      ret.push_back(iter->second);
-      continue;
-    }
-    auto tokens = _byte_pair_encode(piece, _encoder);
-    last_piece_token_len = tokens.size();
-    ret.insert(ret.end(), tokens.begin(), tokens.end());
-  }
-}
-
-template <typename T>
-std::pair<std::vector<uint64_t>, uint64_t> Tiktoken::_encode_with_special_token(
+std::pair<std::vector<uint64_t>, uint64_t> BPETokenizerBase::encode_with_special_token_(
     const std::string& text,
-    const T& allowed_special) {
+    const Encoder& allowed_special) const {
   std::vector<uint64_t> tokens;
   uint64_t last_piece_token_len = 0;
   re2::StringPiece input(text);
   while (true) {
     auto [special, sub_input] =
-        _split_with_allowed_special_token(input, allowed_special);
+        split_with_allowed_special_token_(input, allowed_special);
 
     _encode(sub_input, tokens, last_piece_token_len);
 
     if (special) {
       uint64_t token = 0;
       try {
-        token = _special_token_encoder.at(*special);
+        token = special_token_encoder_.at(*special);
       } catch (const std::out_of_range&) {
         // Should never go here, since special pattern includes all special
         // chars.
@@ -326,34 +279,90 @@ std::pair<std::vector<uint64_t>, uint64_t> Tiktoken::_encode_with_special_token(
   return std::make_pair(tokens, last_piece_token_len);
 }
 
+std::vector<uint64_t> BPETokenizerBase::byte_pair_encode_(
+  const std::string& piece,
+  const Encoder& encoder) const {
+  if (piece.size() == 1) {
+    auto iter = encoder.find(piece);
+    if (iter != encoder.end()) {
+      return std::vector<uint64_t>({iter->second});
+    } else {
+      // TODO: is it possible?
+      return {};
+    }
+  }
+
+  return _byte_pair_merge(
+    piece, encoder, [&piece, &encoder](uint64_t start, uint64_t stop) {
+      std::string key = piece.substr(start, stop - start);
+      auto iter = encoder.find(key);
+      if (iter != encoder.end()) {
+        return iter->second;
+      } else {
+        // TODO: what if key does not exist? Should we return `unknown`?
+        // assert(false); // ??
+        return uint64_t(0);
+      }
+    });
+}
+
+// -------------------------protected method end-------------------------------
+// -------------------------private method start-------------------------------
+
+void Tiktoken::_encode(
+    re2::StringPiece& input,
+    std::vector<uint64_t>& ret,
+    uint64_t& last_piece_token_len) const {
+  std::string piece;
+  assert(_regex);
+  while (re2::RE2::FindAndConsume(&input, *_regex, &piece)) {
+    auto iter = encoder_.find(piece);
+    if (iter != encoder_.end()) {
+      last_piece_token_len = 1;
+      ret.push_back(iter->second);
+      continue;
+    }
+    auto tokens = byte_pair_encode_(piece, encoder_);
+
+    last_piece_token_len = tokens.size();
+    ret.insert(ret.end(), tokens.begin(), tokens.end());
+  }
+}
+
+void Tiktoken::_decode(
+  re2::StringPiece input,
+  std::string& ret) const {
+  ret += input;
+}
+
 // -------------------------private method end-------------------------------
 // -------------------------public method start-------------------------------
 
-Tiktoken::Tiktoken() : Tokenizer() {}
+Tiktoken::Tiktoken() : BPETokenizerBase() {}
 
 void Tiktoken::load(const std::string& path) {
-  _encoder = _load_encoder(path);
-  _special_token_encoder = _get_special_tokens(_encoder.size());
+  encoder_ = _load_encoder(path);
+  special_token_encoder_ = _get_special_tokens(encoder_.size());
 
-  _decoder = _build_decoder(_encoder);
-  _special_token_decoder = _build_decoder(_special_token_encoder);
+  decoder_ = _build_decoder(encoder_);
+  special_token_decoder_ = _build_decoder(special_token_encoder_);
 
   _regex = _create_regex(_pattern);
-  _special_token_regex = _build_special_token_regex(_special_token_encoder);
+  special_token_regex_ = _build_special_token_regex(special_token_encoder_);
 
   // initialize vocab_size, bos_tok, eos_tok
-  vocab_size_ = _encoder.size() + _special_token_encoder.size();
-  bos_tok_ = _encoder.size(); // hardcoded (see _get_special_tokens)
-  eos_tok_ = _encoder.size() + 1; // hardcoded (see _get_special_tokens)
+  vocab_size_ = encoder_.size() + special_token_encoder_.size();
+  bos_tok_ = encoder_.size(); // hardcoded (see _get_special_tokens)
+  eos_tok_ = encoder_.size() + 1; // hardcoded (see _get_special_tokens)
   initialized_ = true;
 }
 
 std::vector<uint64_t>
-Tiktoken::encode(const std::string& text, int8_t bos, int8_t eos) {
+BPETokenizerBase::encode(const std::string& text, int8_t bos, int8_t eos) const {
   if (!initialized_) {
     exit(EXIT_FAILURE);
   }
-  auto res = _encode_with_special_token(text, _special_token_encoder).first;
+  auto res = encode_with_special_token_(text, special_token_encoder_).first;
   for (auto i = 0; i < bos; ++i) {
     res.insert(res.begin(), bos_tok_);
   }
@@ -363,7 +372,7 @@ Tiktoken::encode(const std::string& text, int8_t bos, int8_t eos) {
   return res;
 }
 
-std::string Tiktoken::decode(uint64_t prev, uint64_t cur) {
+std::string BPETokenizerBase::decode(uint64_t prev, uint64_t cur) const {
   (void)prev;
   if (!initialized_) {
     exit(EXIT_FAILURE);
@@ -371,20 +380,21 @@ std::string Tiktoken::decode(uint64_t prev, uint64_t cur) {
   std::string ret;
 
   std::string token_bytes;
-  auto iter = _decoder.find(cur);
-  if (iter != _decoder.end()) {
+  auto iter = decoder_.find(cur);
+  if (iter != decoder_.end()) {
     token_bytes = iter->second;
   } else {
-    iter = _special_token_decoder.find(cur);
-    if (iter != _special_token_decoder.end()) {
+    iter = special_token_decoder_.find(cur);
+    if (iter != special_token_decoder_.end()) {
       token_bytes = iter->second;
     } else {
       fprintf(stderr, "unknown token: %" PRIu64 "\n", cur);
       exit(EXIT_FAILURE);
     }
   }
-  ret += token_bytes;
+  _decode(token_bytes, ret);
 
   return ret;
 }
+
 // -------------------------public method end-------------------------------

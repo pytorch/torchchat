@@ -58,7 +58,7 @@ SPTokenizer::~SPTokenizer() {}
  * @return std::string A pointer to the string representation of the
  * token.
  */
-std::string SPTokenizer::decode(uint64_t prev_token, uint64_t token) {
+std::string SPTokenizer::decode(uint64_t prev_token, uint64_t token) const {
   if (!initialized_) {
     fprintf(stderr, "Tokenizer not initialized\n");
     exit(EXIT_FAILURE);
@@ -94,7 +94,7 @@ std::string SPTokenizer::decode(uint64_t prev_token, uint64_t token) {
  * @return std::vector<uint64_t>
  */
 std::vector<uint64_t>
-SPTokenizer::encode(const std::string& text, int8_t bos, int8_t eos) {
+SPTokenizer::encode(const std::string& text, int8_t bos, int8_t eos) const {
   if (!initialized_) {
     fprintf(stderr, "Tokenizer not initialized\n");
     exit(EXIT_FAILURE);

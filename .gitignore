@@ -18,6 +18,7 @@ torchao-build/*
 runner-et/cmake-out/*
 runner-aoti/cmake-out/*
 cmake-out/
+build/
 
 # Example project Android Studio ignore
 torchchat/edge/android/torchchat/.idea/*

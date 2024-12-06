@@ -22,7 +22,10 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include "pre_tokenizer.h"
 #include "sentencepiece_processor.h"
+#include "token_decoder.h"
 
 class Tokenizer {
  public:
@@ -32,9 +35,9 @@ class Tokenizer {
   virtual void load(const std::string& tokenizer_path) = 0;
 
   virtual std::vector<uint64_t>
-  encode(const std::string& input, int8_t bos, int8_t eos) = 0;
+  encode(const std::string& input, int8_t bos, int8_t eos) const = 0;
 
-  virtual std::string decode(uint64_t prev_token, uint64_t token) = 0;
+  virtual std::string decode(uint64_t prev_token, uint64_t token) const = 0;
 
   // getters
   int32_t vocab_size() const {
@@ -70,9 +73,9 @@ class SPTokenizer : public Tokenizer {
   void load(const std::string& tokenizer_path) override;
 
   std::vector<uint64_t> encode(const std::string& input, int8_t bos, int8_t eos)
-      override;
+      const override;
 
-  std::string decode(uint64_t prev_token, uint64_t token) override;
+  std::string decode(uint64_t prev_token, uint64_t token) const override;
 
  private:
   std::unique_ptr<sentencepiece::SentencePieceProcessor> _processor;
@@ -80,22 +83,66 @@ class SPTokenizer : public Tokenizer {
 
 // ----------------------- Tiktoken -----------------------
 // Used by OpenAI, adapted from https://github.com/sewenew/tokenizer
+//
+// The main changes from the upstream implementation are to split out the core
+// of the BPE logic into a base class that both Tiktoken and HFTokenizer can
+// inherit from.
 
 using Encoder = std::unordered_map<std::string, uint64_t>;
 using Decoder = std::unordered_map<uint64_t, std::string>;
 using Re2UPtr = std::unique_ptr<re2::RE2>;
 
-class Tiktoken : public Tokenizer {
+class BPETokenizerBase : public Tokenizer {
  public:
-  explicit Tiktoken();
-  ~Tiktoken(){};
-
-  void load(const std::string& tokenizer_path);
 
   std::vector<uint64_t>
-  encode(const std::string& input, int8_t bos, int8_t eos);
+  encode(const std::string& input, int8_t bos, int8_t eos) const override;
 
-  std::string decode(uint64_t prev_token, uint64_t token);
+  std::string decode(uint64_t prev_token, uint64_t token) const override;
+
+ protected:
+
+  explicit BPETokenizerBase() {}
+  virtual ~BPETokenizerBase() {}
+
+  std::pair<std::optional<std::string>, re2::StringPiece>
+  split_with_allowed_special_token_(
+      re2::StringPiece& input,
+      const Encoder& allowed_special) const;
+
+  std::pair<std::vector<uint64_t>, uint64_t> encode_with_special_token_(
+      const std::string& text,
+      const Encoder& allowed_special) const;
+
+  std::vector<uint64_t> byte_pair_encode_(
+    const std::string& piece,
+    const Encoder& encoder) const;
+
+  // Protected members that can be overloaded by other BPE tokenizers
+  Re2UPtr special_token_regex_;
+  Encoder encoder_;
+  Encoder special_token_encoder_;
+  Decoder decoder_;
+  Decoder special_token_decoder_;
+
+ private:
+
+  virtual void _encode(
+    re2::StringPiece& input,
+    std::vector<uint64_t>& ret,
+    uint64_t& last_piece_token_len) const = 0;
+
+  virtual void _decode(
+    re2::StringPiece input,
+    std::string& ret) const = 0;
+};
+
+class Tiktoken : public BPETokenizerBase {
+ public:
+  explicit Tiktoken();
+  ~Tiktoken() override {};
+
+  void load(const std::string& tokenizer_path) override;
 
  private:
   static inline const Encoder _get_special_tokens(ssize_t num_base_tokens) {
@@ -118,30 +165,55 @@ class Tiktoken : public Tokenizer {
     return special_tokens;
   }
 
-  template <typename T>
-  std::pair<std::optional<std::string>, re2::StringPiece>
-  _split_with_allowed_special_token(
-      re2::StringPiece& input,
-      const T& allowed_special);
-
   void _encode(
-      re2::StringPiece& input,
-      std::vector<uint64_t>& ret,
-      uint64_t& last_piece_token_len);
+    re2::StringPiece& input,
+    std::vector<uint64_t>& ret,
+    uint64_t& last_piece_token_len) const override;
 
-  template <typename T>
-  std::pair<std::vector<uint64_t>, uint64_t> _encode_with_special_token(
-      const std::string& text,
-      const T& allowed_special);
+  void _decode(
+    re2::StringPiece input,
+    std::string& ret) const override;
 
   // Removed negative lookahead \s+(?!\S) since it's not supported by RE2.
   const std::string _pattern =
       R"((?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+)";
-  Encoder _encoder;
-  Encoder _special_token_encoder;
-  Decoder _decoder;
-  Decoder _special_token_decoder;
 
   Re2UPtr _regex;
-  Re2UPtr _special_token_regex;
+};
+
+
+// ----------------------- HF Tokenizers -----------------------
+// Used by many Huggingface models. Adapted from a combination of the original
+// rust implementation (https://github.com/huggingface/tokenizers/tree/main)
+// and the corresponding support in llama.cpp
+// (https://github.com/ggerganov/llama.cpp)
+
+class HFTokenizer : public BPETokenizerBase {
+ public:
+  /*-- Public Interface --*/
+
+  /**
+   * Default initialize with no loaded data
+   */
+  explicit HFTokenizer() {}
+  ~HFTokenizer() {}
+
+  /**
+   * Load the model data into the
+   */
+  void load(const std::string& tokenizer_path) override;
+
+ private:
+
+  void _encode(
+    re2::StringPiece& input,
+    std::vector<uint64_t>& ret,
+    uint64_t& last_piece_token_len) const override;
+
+  void _decode(
+    re2::StringPiece input,
+    std::string& ret) const override;
+
+  PreTokenizer::Ptr _pretokenizer;
+  TokenDecoder::Ptr _decoder;
 };
