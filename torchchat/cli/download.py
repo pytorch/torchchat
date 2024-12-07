@@ -35,11 +35,12 @@ def _download_hf_snapshot(
         model_info = model_info(model_config.distribution_path, token=hf_token)
         model_fnames = [f.rfilename for f in model_info.siblings]
 
-        # Check the model config for preference between safetensors and pth
+        # Check the model config for preference between safetensors and pth/bin
         has_pth = any(f.endswith(".pth") for f in model_fnames)
+        has_bin = any(f.endswith(".bin") for f in model_fnames)
         has_safetensors = any(f.endswith(".safetensors") for f in model_fnames)
 
-        # If told to prefer safetensors, ignore pth files
+        # If told to prefer safetensors, ignore pth/bin files
         if model_config.prefer_safetensors:
             if not has_safetensors:
                 print(
@@ -47,10 +48,10 @@ def _download_hf_snapshot(
                     file=sys.stderr,
                 )
                 exit(1)
-            ignore_patterns = "*.pth"
+            ignore_patterns = ["*.pth", "*.bin"]
 
         # If the model has both, prefer pth files over safetensors
-        elif has_pth and has_safetensors:
+        elif (has_pth or has_bin) and has_safetensors:
             ignore_patterns = "*safetensors*"
 
         # Otherwise, download everything
