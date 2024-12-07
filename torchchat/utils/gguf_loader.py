@@ -122,21 +122,7 @@ def linear_int4(input, weight_int4pack, scales_and_zeros, out_features, groupsiz
             input.dtype
         )  # cast back to input.dtype
     else:
-        # copied from https://github.com/pytorch/pytorch/blob/0052943bee624c06d8c36a371efdf7b56972ad9e/torch/_meta_registrations.py#L3308
-        def meta__weight_int4pack_mm(x, w, q_group_size, q_scale_and_zeros):
-            torch._check(x.dim() == 2, lambda: "x must be a 2D tensor")
-            torch._check(w.dim() == 4, lambda: "w must be a 4D tensor")
-            torch._check(
-                x.dtype in [torch.float32, torch.float16, torch.bfloat16],
-                lambda: f"expected x to be f32/f16/bf16, got {x.dtype}",
-            )
-            torch._check(
-                w.dtype is torch.int32,
-                lambda: f"expected w to be int32, got {w.dtype}",
-            )
-            return x.new_empty(x.size(0), w.size(0) * 8, dtype=x.dtype)
-
-        c = meta__weight_int4pack_mm(
+        c = torch.ops.aten._weight_int4pack_mm_for_cpu(
             input,
             weight_int4pack,
             groupsize,
@@ -626,27 +612,10 @@ def load_model_and_state_dict(
                 q_uint8 = (q[::, ::2] << 4 | q[::, 1::2]).to(torch.uint8)
 
                 if torch.device(device).type == "cpu":
-                    # Copied from https://github.com/pytorch/pytorch/blob/0052943bee624c06d8c36a371efdf7b56972ad9e/torch/_meta_registrations.py#L3273
-                    def meta__convert_weight_to_int4pack(w, inner_k_tiles):
-                        torch._check(w.dim() == 2, lambda: "w must be a 2D tensor")
-                        torch._check(
-                            w.dtype is torch.uint8,
-                            lambda: f"expected w to be uint8, got {w.dtype}",
+                    weight_int4pack = (
+                        torch.ops.aten._convert_weight_to_int4pack_for_cpu(
+                            q, inner_k_tiles
                         )
-                        n = w.size(0)
-                        k = w.size(1) * 2  # w is [n][k / 2] uint8
-                        return w.new_empty(
-                            (
-                                n // 8,
-                                k // (inner_k_tiles * 16),
-                                32,
-                                inner_k_tiles // 2,
-                            ),
-                            dtype=torch.int32,
-                        )
-
-                    weight_int4pack = meta__convert_weight_to_int4pack(
-                        q_uint8, inner_k_tiles
                     )
                 else:
                     weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
