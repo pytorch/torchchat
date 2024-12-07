@@ -19,6 +19,10 @@ runner-et/cmake-out/*
 runner-aoti/cmake-out/*
 cmake-out/
 
+# Example project Android Studio ignore
+torchchat/edge/android/torchchat/.idea/*
+
+
 # pte files
 *.pte
 

@@ -18,10 +18,10 @@ Torchchat is currently in a pre-release state and under extensive development.
 [shell default]: TORCHCHAT_ROOT=${PWD} ./torchchat/utils/scripts/install_et.sh
 
 
-This is the advanced users guide, if you're looking to get started
+This is the advanced users' guide, if you're looking to get started
 with LLMs, please refer to the README at the root directory of the
 torchchat distro.  This is an advanced user guide, so we will have
-many more concepts and options to discuss and taking advantage of them
+many more concepts and options to discuss and take advantage of them
 may take some effort.
 
 We welcome community contributions of all kinds.  If you find
@@ -41,7 +41,7 @@ While we strive to support a broad range of models, we can't test them
 all. We classify supported models as tested ✅, work in progress 🚧 or
 some restrictions ❹.
 
-We invite community contributions of new model suport and test results!
+We invite community contributions of new model support and test results!
 
 | Model | Tested | Eager | torch.compile | AOT Inductor | ExecuTorch | Fits on Mobile |
 |-----|--------|-------|-----|-----|-----|-----|
@@ -86,7 +86,7 @@ Server C++ runtime | n/a | run.cpp model.pte | ✅ |
 Mobile C++ runtime | n/a | app model.pte | ✅ |
 Mobile C++ runtime | n/a | app + AOTI | 🚧 |
 
-**Getting help:** Each command implements the --help option to give addititonal information about available options:
+**Getting help:** Each command implements the --help option to give additional information about available options:
 
 [skip default]: begin
 ```
@@ -96,8 +96,8 @@ python3 torchchat.py [ export | generate | chat | eval | ... ] --help
 
 Exported models can be loaded back into torchchat for chat or text
 generation, letting you experiment with the exported model and valid
-model quality. The python interface is the same in all cases and is
-used for testing nad test harnesses too.
+model quality. The Python interface is the same in all cases and is
+used for testing and test harnesses, too.
 
 Torchchat comes with server C++ runtimes to execute AOT Inductor and
 ExecuTorch models. A mobile C++ runtimes allow you to deploy
@@ -115,7 +115,7 @@ Some common models are recognized by torchchat based on their filename
 through `Model.from_name()` to perform a fuzzy match against a
 table of known model architectures. Alternatively, you can specify the
 index into that table with the option `--params-table ${INDEX}` where
-the index is the lookup key key in the [the list of known
+the index is the lookup key in the [the list of known
 pconfigurations](https://github.com/pytorch/torchchat/tree/main/torchchat/model_params)
 For example, for the stories15M model, this would be expressed as
 `--params-table stories15M`. (We use the model constructor
@@ -237,7 +237,7 @@ which chooses the best 16-bit floating point type.
 
 The virtual device fast and virtual floating point data types fast and
 fast16 are best used for eager/torch.compiled execution.  For export,
-specify the your device choice for the target system with --device for
+specify your device choice for the target system with --device for
 AOTI-exported DSO models, and using ExecuTorch delegate selection for
 ExecuTorch-exported PTE models.
 
@@ -250,8 +250,7 @@ python3 torchchat.py generate [--compile] --checkpoint-path ${MODEL_PATH} --prom
 To improve performance, you can compile the model with `--compile`
 trading off the time to first token processed with time per token.  To
 improve performance further, you may also compile the prefill with
-`--compile_prefill`. This will increase further compilation times though. The
-`--compile-prefill` option is not compatible with `--prefill-prefill`.
+`--compile-prefill`. This will increase further compilation times though. 
 
 Parallel prefill is not yet supported by exported models, and may be
 supported in a future release.
@@ -265,7 +264,7 @@ the introductory README.
 In addition to running eval on models in eager mode and JIT-compiled
 mode with `torch.compile()`, you can also load dso and pte models back
 into the PyTorch to evaluate the accuracy of exported model objects
-(e.g., after applying quantization or other traqnsformations to
+(e.g., after applying quantization or other transformations to
 improve speed or reduce model size).
 
 Loading exported models back into a Python-based Pytorch allows you to
@@ -297,14 +296,14 @@ for ExecuTorch.)
 
 We export the stories15M model with the following command for
 execution with the ExecuTorch runtime (and enabling execution on a
-wide range of community and vendor supported backends):
+wide range of community and vendor-supported backends):
 
 ```
 python3 torchchat.py export --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_NAME}.pte
 ```
 
 Alternatively, we may generate a native instruction stream binary
-using AOT Inductor for CPU oor GPUs (the latter using Triton for
+using AOT Inductor for CPU or GPUs (the latter using Triton for
 optimizations such as operator fusion):
 
 ```
@@ -319,10 +318,10 @@ the exported model artifact back into a model container with a
 compatible API surface for the `model.forward()` function.  This
 enables users to test, evaluate and exercise the exported model
 artifact with familiar interfaces, and in conjunction with
-pre-exiisting Python model unit tests and common environments such as
+pre-existing Python model unit tests and common environments such as
 Jupyter notebooks and/or Google colab.
 
-Here is how to load an exported model into the python environment on the example of using an exported model with `generate.oy`.
+Here is how to load an exported model into the Python environment using an exported model with the `generate` command.
 
 ```
 python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --pte-path ${MODEL_NAME}.pte --device cpu --prompt "Once upon a time"
@@ -452,7 +451,7 @@ strategies:
 You can find instructions for quantizing models in
 [docs/quantization.md](file:///./quantization.md).  Advantageously,
 quantization is available in eager mode as well as during export,
-enabling you to do an early exploration of your quantization setttings
+enabling you to do an early exploration of your quantization settings
 in eager mode.  However, final accuracy should always be confirmed on
 the actual execution target, since all targets have different build
 processes, compilers, and kernel implementations with potentially
@@ -464,9 +463,8 @@ significant impact on accuracy.
 
 ## Native (Stand-Alone) Execution of Exported Models
 
-Refer to the [README](README.md] for an introduction toNative
-execution on servers, desktops and laptops is described under
-[runner-build.md].  Mobile and Edge executipon for Android and iOS are
+Refer to the [README](README.md] for an introduction to native
+execution on servers, desktops, and laptops.  Mobile and Edge execution for Android and iOS are
 described under [torchchat/edge/docs/Android.md] and [torchchat/edge/docs/iOS.md], respectively.
 
 
@@ -475,7 +473,7 @@ described under [torchchat/edge/docs/Android.md] and [torchchat/edge/docs/iOS.md
 
 PyTorch and ExecuTorch support a broad range of devices for running
 PyTorch with python (using either eager or eager + `torch.compile`) or
-in a python-free environment with AOT Inductor and ExecuTorch.
+in a Python-free environment with AOT Inductor and ExecuTorch.
 
 
 | Hardware | OS | Eager | Eager + Compile | AOT Compile | ET Runtime |
@@ -497,58 +495,6 @@ in a python-free environment with AOT Inductor and ExecuTorch.
 | ARM 32b (up to v7) | any | ❌|❌|❌|❌|
 
 *Key*: n/t -- not tested
-
-
-## Runtime performance with Llama 7B, in tokens per second (4b quantization)
-
-| Hardware | OS | eager | eager + compile | AOT compile | ET Runtime |
-|-----|------|-----|-----|-----|-----|
-| x86 | Linux | ? | ? | ? | ? |
-| x86 | macOS | ? | ? | ? | ? |
-| aarch64 | Linux | ? | ? | ? | ? |
-| aarch64 | macOS | ? | ? | ? | ? |
-| AMD GPU | Linux | ? | ? | ? | ? |
-| Nvidia GPU | Linux | ? | ? | ? | ? |
-| MPS | macOS | ? | ? | ? | ? |
-| MPS | iOS | ? | ? | ? | ? |
-| aarch64 | Android | ? | ? | ? | ? |
-| Mobile GPU (Vulkan) | Android | ? | ? | ? | ? |
-| CoreML | iOS | | ? | ? | ? | ? |
-| Hexagon DSP | Android | | ? | ? | ? | ? |
-| Raspberry Pi 4/5 | Raspbian | ? | ? | ? | ? |
-| Raspberry Pi 4/5 | Android | ? | ? | ? | ? |
-| ARM 32b (up to v7) | any | | ? | ? | ? | ? |
-
-
-## Runtime performance with Llama3, in tokens per second (4b quantization)
-
-| Hardware | OS | eager | eager + compile | AOT compile | ET Runtime |
-|-----|------|-----|-----|-----|-----|
-| x86 | Linux | ? | ? | ? | ? |
-| x86 | macOS | ? | ? | ? | ? |
-| aarch64 | Linux | ? | ? | ? | ? |
-| aarch64 | macOS | ? | ? | ? | ? |
-| AMD GPU | Linux | ? | ? | ? | ? |
-| Nvidia GPU | Linux | ? | ? | ? | ? |
-| MPS | macOS | ? | ? | ? | ? |
-| MPS | iOS | ? | ? | ? | ? |
-| aarch64 | Android | ? | ? | ? | ? |
-| Mobile GPU (Vulkan) | Android | ? | ? | ? | ? |
-| CoreML | iOS | | ? | ? | ? | ? |
-| Hexagon DSP | Android | | ? | ? | ? | ? |
-| Raspberry Pi 4/5 | Raspbian | ? | ? | ? | ? |
-| Raspberry Pi 4/5 | Android | ? | ? | ? | ? |
-| ARM 32b (up to v7) | any | | ? | ? | ? | ? |
-
-
-
-
-# CONTRIBUTING to torchchat
-
-We welcome any feature requests, bug reports, or pull requests from
-the community. See the [CONTRIBUTING](CONTRIBUTING.md) for
-instructions how to contribute to torchchat.
-
 
 
 # LICENSE
