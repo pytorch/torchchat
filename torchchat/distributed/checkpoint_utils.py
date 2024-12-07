@@ -17,6 +17,7 @@ from pathlib import Path
 from torch.distributed._tensor import DTensor
 from torchchat.distributed.dtensor_utils import convert_to_dtensor
 from torchchat.cli.builder import BuilderArgs, _load_checkpoint
+from torchchat.model import ModelArgs
 
 
 _DEFAULT_SAFETENSOR_FILE_NAME = "model.safetensors.index.json"
@@ -450,3 +451,34 @@ def load_weights_from_torchchat_format(stage_module, distribution, device, model
     # Fill state dict into stage module
     stage_module.load_state_dict(stage_state_dict, strict=False, assign=True)
     logger.info(f"Successfully loaded {len(updated_states)} weights into stage module")
+
+
+def load_model_weights(
+    stage_module: torch.nn.Module,
+    distribution: str,
+    device: torch.device,
+    model_config: ModelArgs,
+    chpt_from: str,
+):
+    """Load the weights from the safetensor file(s) into the model stage.
+    Model config is needed b/c we permute wq and wk weights based on attn heads.
+
+    Args:
+        stage_module (torch.nn.Module): The model stage to load the weights into.
+        distribution (str): The distribution name, e.g. "meta-llama/Meta-Llama-3-8B-Instruct".
+        device (torch.device): The device to load the weights onto.
+        model_config (ModelArgs): The model config.
+        chpt_from (str): The checkpoint format to load the weights from, e.g. "torchchat" or "hf".
+    """
+    if chpt_from == "hf":
+        # This format stands for: index file + multiple binary files
+        load_weights_from_hf_format(stage_module, distribution, device, model_config)
+    elif chpt_from == "torchchat":
+        # This format stands for:
+        # single binary file, OR
+        # multiple binary files without index files.
+        load_weights_from_torchchat_format(
+            stage_module, distribution, device, model_config
+        )
+    else:
+        raise ValueError(f"Unknown checkpoint format: {chpt_from}")
