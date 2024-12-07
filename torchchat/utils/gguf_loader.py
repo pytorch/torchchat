@@ -122,7 +122,7 @@ def linear_int4(input, weight_int4pack, scales_and_zeros, out_features, groupsiz
             input.dtype
         )  # cast back to input.dtype
     else:
-        c = torch.ops.aten._weight_int4pack_mm(
+        c = torch.ops.aten._weight_int4pack_mm_for_cpu(
             input,
             weight_int4pack,
             groupsize,
@@ -570,6 +570,7 @@ def load_model_and_state_dict(
     load_state_dict: bool = True,
     load_as_quantized: bool = True,
     inner_k_tiles=8,
+    device="cpu",
 ) -> torch.nn.Module:
     """
     Parses the GGUF file and returns an nn.Module on meta device along with a state_dict
@@ -609,9 +610,17 @@ def load_model_and_state_dict(
                 q, s, z = Q4_0.unpack(t)
                 scales_and_zeros = pack_scales_and_zeros(s, z)
                 q_uint8 = (q[::, ::2] << 4 | q[::, 1::2]).to(torch.uint8)
-                weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
-                    q_uint8, inner_k_tiles
-                )
+
+                if torch.device(device).type == "cpu":
+                    weight_int4pack = (
+                        torch.ops.aten._convert_weight_to_int4pack_for_cpu(
+                            q, inner_k_tiles
+                        )
+                    )
+                else:
+                    weight_int4pack = torch.ops.aten._convert_weight_to_int4pack(
+                        q_uint8, inner_k_tiles
+                    )
                 state_dict[f"{fqn}.weight"] = weight_int4pack
                 state_dict[f"{fqn}.scales_and_zeros"] = scales_and_zeros
 
