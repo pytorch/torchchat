@@ -942,7 +942,7 @@ jobs:
           path: |
             ./et-build
             ./torchchat/utils/scripts
-          key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}-${{ hashFiles('**/install_et.sh') }}
+          key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}-${{ hashFiles('**/install_et.sh', '**/build_native.sh') }}
       - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
         continue-on-error: true
         run: |
@@ -1053,7 +1053,7 @@ jobs:
 
           # Pull submodules (re2, abseil) for Tiktoken
           git submodule sync
-          git submodule update --init
+          git submodule update --init --recursive
           ./runner/build_android.sh
           echo "Tests complete."
 
