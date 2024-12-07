@@ -64,7 +64,7 @@ fi
 
 
 pushd ${TORCHCHAT_ROOT}
-git submodule update --init
+git submodule update --init --recursive
 git submodule sync
 if [[ "$TARGET" == "et" ]]; then
   if [ ! -d "${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install" ]; then
