@@ -75,9 +75,6 @@ if [ "$1" == "advanced" ]; then
 fi
 
 if [ "$1" == "evaluation" ]; then
-
-    exit 0
-
         echo "::group::Create script to run evaluation"
         python3 torchchat/utils/scripts/updown.py --file torchchat/utils/docs/evaluation.md --replace 'llama3:stories15M,-l 3:-l 2' --suppress huggingface-cli,HF_TOKEN > ./run-evaluation.sh
         # for good measure, if something happened to updown processor,
