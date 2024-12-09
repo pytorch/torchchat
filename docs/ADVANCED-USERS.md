@@ -249,6 +249,8 @@ To improve performance, you can compile the model with `--compile`
 trading off the time to first token processed with time per token.  To
 improve performance further, you may also compile the prefill with
 `--compile-prefill`. This will increase further compilation times though. 
+For CPU, you can use `--max-autotune` to further improve the performance
+with `--compile` and `compile-prefill`. See [`max-autotune on CPU tutorial`](https://pytorch.org/tutorials/prototype/max_autotune_on_CPU_tutorial.html).
 
 Parallel prefill is not yet supported by exported models, and may be
 supported in a future release.
