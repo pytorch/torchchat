@@ -62,13 +62,13 @@ echo "Using pip executable: $PIP_EXECUTABLE"
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-PYTORCH_NIGHTLY_VERSION=dev20241010
+PYTORCH_NIGHTLY_VERSION=dev20241013
 
 # Nightly version for torchvision
-VISION_NIGHTLY_VERSION=dev20241010
+VISION_NIGHTLY_VERSION=dev20241013
 
 # Nightly version for torchtune
-TUNE_NIGHTLY_VERSION=dev20241010
+TUNE_NIGHTLY_VERSION=dev20241013
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 (
