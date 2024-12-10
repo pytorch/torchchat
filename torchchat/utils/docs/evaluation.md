@@ -4,8 +4,13 @@
 
 # Evaluation Features
 
+<!--
+
 [shell default]: ./install/install_requirements.sh
 
+[shell default]: TORCHCHAT_ROOT=${PWD} ./torchchat/utils/scripts/install_et.sh
+
+-->
 
 Torchchat provides evaluation functionality for your language model on
 a variety of tasks using the
@@ -14,7 +19,7 @@ library.
 
 ## Usage
 
-The evaluation mode of `torchchat.py` script can be used to evaluate your language model on various tasks available in the `lm_eval` library such as "wikitext". You can specify the task(s) you want to evaluate using the `--tasks` option, and limit the evaluation using the `--limit` option. If no task is specified, it will default to evaluating on "wikitext".
+The evaluation mode of `torchchat.py` script can be used to evaluate your language model on various tasks available in the `lm_eval` library such as "wikitext". You can specify the task(s) you want to evaluate using the `--tasks` option, and limit the evaluation using the `--limit` option. If no task is specified, the task will default to evaluating on "wikitext".
 
 **Examples**
 

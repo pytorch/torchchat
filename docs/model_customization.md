@@ -34,6 +34,9 @@ prefill with `--compile_prefill`.
 
 To learn more about compilation, check out: https://pytorch.org/get-started/pytorch-2.0/
 
+For CPU, you can use `--max-autotune` to further improve the performance with `--compile` and `compile-prefill`.
+
+See [`max-autotune on CPU tutorial`](https://pytorch.org/tutorials/prototype/max_autotune_on_CPU_tutorial.html).
 
 ## Model Precision
 
