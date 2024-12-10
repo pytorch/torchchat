@@ -463,7 +463,7 @@ significant impact on accuracy.
 
 ## Native (Stand-Alone) Execution of Exported Models
 
-Refer to the [README](README.md] for an introduction to native
+Refer to the [README](README.md) for an introduction to native
 execution on servers, desktops, and laptops.  Mobile and Edge execution for Android and iOS are
 described under [torchchat/edge/docs/Android.md] and [torchchat/edge/docs/iOS.md], respectively.
 
