@@ -41,7 +41,7 @@ python3 torchchat.py eval stories15M --compile --tasks wikitext hellaswag
 ```
 
 **exported PTE**
-Running an exported model as PTE
+Running an exported model with ExecuTorch (as PTE)
 ```
 python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 python3 torchchat.py eval stories15M --pte-path stories15M.pte
@@ -53,10 +53,10 @@ python3 torchchat.py eval stories15M --pte-path stories15M.pte --tasks wikitext 
 ```
 
 **exported AOTI**
-Running an exported model as PTE
+Running an exported model with AOT Inductor (DSO model)
 ```
 python3 torchchat.py export stories15M --dtype fast16 --output-dso-path stories15M.so
-python3 torchchat.py eval stories15M --dtype fast16 --pte-path stories15M.so
+python3 torchchat.py eval stories15M --dtype fast16 --dso-path stories15M.so
 ```
 
 Running multiple tasks and calling eval.py directly (with AOTI):
