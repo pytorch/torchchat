@@ -23,7 +23,7 @@ The evaluation mode of `torchchat.py` script can be used to evaluate your langua
 
 ## Examples
 
-**Python**
+### Python
 
 Running wikitext for 10 iterations
 ```
@@ -40,7 +40,8 @@ Running multiple tasks and calling eval.py directly (with torch.compile):
 python3 torchchat.py eval stories15M --compile --tasks wikitext hellaswag
 ```
 
-**exported PTE**
+### exported PTE
+
 Running an exported model with ExecuTorch (as PTE)
 ```
 python3 torchchat.py export stories15M --output-pte-path stories15M.pte
@@ -52,7 +53,8 @@ Running multiple tasks and calling eval.py directly (with PTE):
 python3 torchchat.py eval stories15M --pte-path stories15M.pte --tasks wikitext hellaswag
 ```
 
-**exported AOTI**
+### exported AOTI
+
 Running an exported model with AOT Inductor (DSO model)
 ```
 python3 torchchat.py export stories15M --dtype fast16 --output-dso-path stories15M.so
