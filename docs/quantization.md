@@ -196,6 +196,31 @@ Note: only the ExecuTorch C++ runner in torchchat when built using the instructi
 ./cmake-out/et_run llama3_1.pte -z $HOME/.torchchat/model-cache/meta-llama/Meta-Llama-3.1-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time,"
 ```
 
+## Experimental TorchAO MPS lowbit kernels
+
+WARNING: These kernels only work on devices with Apple Silicon.
+
+### Use
+
+#### linear:fpaxw
+The quantization scheme linear:fpaxw quantizes only the weights in a groupwise manner with a specified bitwidth and groupsize.
+It takes arguments bitwidth (1, 2, 3, 4, 5, 6, 7) and groupsize (32, 64, 128, 256).
+
+### Setup
+To use linear:fpaxw, you must set up the torchao mps experimental kernels. These will only work on device with Apple Silicon.
+
+From the torchchat root directory, run
+```
+sh torchchat/utils/scripts/build_torchao_ops.sh mps
+```
+
+### Examples
+
+#### Eager mode
+```
+python3 torchchat.py generate stories110M --device mps --dtype float32 --quantize '{"linear:fpaxw": {"bitwidth": 4, "groupsize": 256}}' --prompt "Once upon a time," --num-samples 5
+```
+
 ## Quantization Profiles
 
 Four [sample profiles](https://github.com/pytorch/torchchat/tree/main/torchchat/quant_config/) are included with the torchchat distribution: `cuda.json`, `desktop.json`, `mobile.json`, `pi5.json`

@@ -178,21 +178,35 @@ clone_torchao() {
 
   git clone https://github.com/pytorch/ao.git
   cd ao
-  git checkout $(cat ${TORCHCHAT_ROOT}/install/.pins/torchao-pin.txt)
+  # The next two lines will be removed before landing this PR
+  # Instead, the torcha-pin.txt will be updated once ao PR #1322 lands
+  git fetch origin pull/1322/head:pr-1322
+  git checkout pr-1322
+  # git checkout $(cat ${TORCHCHAT_ROOT}/install/.pins/torchao-pin.txt)
 
   popd
 }
 
 install_torchao_aten_ops() {
-  echo "Building torchao custom ops for ATen"
-  pushd ${TORCHCHAT_ROOT}/torchao-build/src/ao/torchao/experimental
+  local device=${1:-cpu}
+
+  if [[ "$device" == "cpu" ]]; then
+    echo "Building torchao custom ops for ATen"
+    pushd ${TORCHCHAT_ROOT}/torchao-build/src/ao/torchao/experimental
+  elif [[ "$device" == "mps" ]]; then
+    echo "Building torchao mps custom ops for ATen"
+    pushd ${TORCHCHAT_ROOT}/torchao-build/src/ao/torchao/experimental/ops/mps
+  else
+    echo "Invalid argument: $device. Valid values are 'cpu' or 'mps'." >&2
+    return 1
+  fi
 
   CMAKE_OUT_DIR=${TORCHCHAT_ROOT}/torchao-build/cmake-out
   cmake -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
     -DCMAKE_INSTALL_PREFIX=${CMAKE_OUT_DIR} \
     -DCMAKE_BUILD_TYPE="Release" \
     -S . \
-    -B ${CMAKE_OUT_DIR} -G Ninja
+    -B ${CMAKE_OUT_DIR}
   cmake --build  ${CMAKE_OUT_DIR} --target install --config Release
 
   popd
