@@ -231,7 +231,7 @@ python3 torchchat.py server llama3.1
 ```
 [skip default]: end
 
-[shell default]: python3 torchchat.py server llama3.1 & server_pid=$!
+[shell default]: python3 torchchat.py server llama3.1 & server_pid=$! ; sleep 90 # wait for server to be ready to accept requests
 
 In another terminal, query the server using `curl`. Depending on the model configuration, this query might take a few minutes to respond.
 
