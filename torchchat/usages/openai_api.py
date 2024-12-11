@@ -13,7 +13,7 @@ from abc import ABC
 from dataclasses import dataclass
 from io import BytesIO
 from pwd import getpwuid
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Type
 
 import torch
 
@@ -24,7 +24,7 @@ from torchtune.data import Message, padded_collate_tiled_images_and_mask
 from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
 
 from torchchat.cli.download import is_model_downloaded, load_model_configs
-from torchchat.generate import Generator, GeneratorArgs
+from torchchat.generate import LocalGenerator, DistributedGenerator, GeneratorArgs
 from torchchat.model import FlamingoModel
 
 from torchchat.utils.build_utils import device_sync
@@ -267,7 +267,7 @@ class CompletionResponseChunk:
     usage: Optional[UsageStats] = None
 
 
-class OpenAiApiGenerator(Generator):
+class OpenAiApiGeneratorMixin:
     """A wrapper over the Generator class to interface with the OpenAI API.
 
     Implements endpoints for completion requests, both chunked and non-chunked using the dataclasses
@@ -484,6 +484,15 @@ class OpenAiApiGenerator(Generator):
 
     def _callback(self, x, *, buffer, done_generating):
         pass
+
+
+def create_openai_api_generator(distributed: bool) -> Type:
+    """
+    Factory method to create an OpenAiApiGenerator
+    """
+
+    # Base class order matters to make sure OpenAiApiGeneratorMixin overrides methods in DistributedGenerator and Generator
+    return type('OpenAiApiGenerator', (OpenAiApiGeneratorMixin, DistributedGenerator if distributed else LocalGenerator), {})
 
 
 """

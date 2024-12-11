@@ -6,14 +6,14 @@
 
 import itertools
 import os
+import time
 from dataclasses import dataclass
 from datetime import timedelta
-import time
+from os import environ
 from typing import Optional
 
 
 import torch
-
 
 from torchchat.distributed.logging_utils import SingletonLogger
 logger = SingletonLogger.get_logger()
@@ -257,3 +257,13 @@ class GPUMemoryMonitor:
             f"with {self.device_capacity_gib:.2f}GiB memory"
         )
         return device_info
+
+def setup_env(world_size: int, rank: int, target: callable, *args, **kwargs):
+    environ["MASTER_ADDR"] = "localhost"
+    environ["MASTER_PORT"] = "29500"
+    environ["RDZV_BACKEND"] = "c10d"
+    environ["WORLD_SIZE"] = str(world_size)
+    environ["RANK"] = str(rank)
+    environ["LOCALRANK"] = str(rank)
+
+    return target(*args, **kwargs)
