@@ -139,44 +139,33 @@ def test_llama2_chat_formatter(messages, expected):
         # single user message (no system prompt)
         (MSGS_NO_SYS, f"""<|begin_of_text|><|start_header_id|>user<|end_header_id|>
 
-{USER1}<|eot_id|>
-"""),
+{USER1}<|eot_id|>"""),
         # sys, usr
         (MSGS_SYS_USR, f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
-{SYSTEM_PROMPT}<|eot_id|>
-<|start_header_id|>user<|end_header_id|>
+{SYSTEM_PROMPT}<|eot_id|><|start_header_id|>user<|end_header_id|>
 
-{USER1}<|eot_id|>
-"""),
+{USER1}<|eot_id|>"""),
         # sys, usr, asst
         (MSGS_SYS_USR_ASST, f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
-{SYSTEM_PROMPT}<|eot_id|>
-<|start_header_id|>user<|end_header_id|>
+{SYSTEM_PROMPT}<|eot_id|><|start_header_id|>user<|end_header_id|>
 
-{USER1}<|eot_id|>
-<|start_header_id|>assistant<|end_header_id|>
+{USER1}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
-{ASSISTANT1}<|eot_id|>
-"""),
+{ASSISTANT1}<|eot_id|>"""),
         # sys, usr, asst, usr, asst
         (MSGS_MULTI_TURN, f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
-{SYSTEM_PROMPT}<|eot_id|>
-<|start_header_id|>user<|end_header_id|>
+{SYSTEM_PROMPT}<|eot_id|><|start_header_id|>user<|end_header_id|>
 
-{USER1}<|eot_id|>
-<|start_header_id|>assistant<|end_header_id|>
+{USER1}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
-{ASSISTANT1}<|eot_id|>
-<|start_header_id|>user<|end_header_id|>
+{ASSISTANT1}<|eot_id|><|start_header_id|>user<|end_header_id|>
 
-{USER2}<|eot_id|>
-<|start_header_id|>assistant<|end_header_id|>
+{USER2}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
-{ASSISTANT2}<|eot_id|>
-"""),
+{ASSISTANT2}<|eot_id|>"""),
     ]
 )
 @pytest.mark.parametrize("add_generation_prompt", [True, False])
