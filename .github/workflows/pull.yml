@@ -215,7 +215,7 @@ jobs:
           set -eux
           PYTHONPATH="${PWD}" python .ci/scripts/gather_test_models.py --event "pull_request" --backend "gpu"
   test-gpu-compile:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-compile (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
@@ -224,7 +224,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      gpu-arch-version: "12.4"
       script: |
         echo "::group::Print machine info"
         nvidia-smi
@@ -250,7 +250,7 @@ jobs:
         echo "::endgroup::"
 
   test-gpu-aoti-bfloat16:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-aoti-bfloat16 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
@@ -259,16 +259,11 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      gpu-arch-version: "12.4"
       timeout: 60
       script: |
         echo "::group::Print machine info"
         nvidia-smi
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         echo "::group::Install required packages"
@@ -291,7 +286,7 @@ jobs:
         echo "::endgroup::"
 
   test-gpu-aoti-float32:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-aoti-float32 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
@@ -300,15 +295,10 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      gpu-arch-version: "12.4"
       script: |
         echo "::group::Print machine info"
         nvidia-smi
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         echo "::group::Install required packages"
@@ -337,7 +327,7 @@ jobs:
         echo "::endgroup::"
 
   test-gpu-aoti-float16:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-aoti-float16 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
@@ -346,15 +336,10 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      gpu-arch-version: "12.4"
       script: |
         echo "::group::Print machine info"
         nvidia-smi
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         echo "::group::Install required packages"
@@ -384,7 +369,7 @@ jobs:
         echo "::endgroup::"
 
   test-gpu-eval-sanity-check:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-eval-sanity-check (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
     strategy:
@@ -393,15 +378,10 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      gpu-arch-version: "12.4"
       script: |
         echo "::group::Print machine info"
         nvidia-smi
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         echo "::group::Install required packages"
@@ -1031,7 +1011,7 @@ jobs:
           echo "Tests complete."
 
   test-build-runner-et-android:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.4xlarge
       script: |
