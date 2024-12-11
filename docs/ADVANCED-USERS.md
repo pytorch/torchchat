@@ -1,15 +1,12 @@
 > [!WARNING]
 > Files in this directory may be outdated, incomplete, scratch notes, or a WIP. torchchat provides no guarantees on these files as references. Please refer to the root README for stable features and documentation.
 
-# Torchchat is still in pre-release!
-
-
-Torchchat is currently in a pre-release state and under extensive development.
-
 
 # The Lost Manual: torchchat
 
 [**Introduction**](#introduction) | [**Installation**](#installation) | [**Get Started**](#get-started) | [**Download**](#download) | [**Chat**](#chat) | [**Generate**](#generate) | [**Eval**](#eval) | [**Export**](#export) | [**Supported Systems**](#supported-systems) | [**Contributing**](#contributing) | [**License**](#license)
+
+<!--
 
 [shell default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}" huggingface-cli login
 
@@ -17,6 +14,7 @@ Torchchat is currently in a pre-release state and under extensive development.
 
 [shell default]: TORCHCHAT_ROOT=${PWD} ./torchchat/utils/scripts/install_et.sh
 
+-->
 
 This is the advanced users' guide, if you're looking to get started
 with LLMs, please refer to the README at the root directory of the
@@ -251,6 +249,8 @@ To improve performance, you can compile the model with `--compile`
 trading off the time to first token processed with time per token.  To
 improve performance further, you may also compile the prefill with
 `--compile-prefill`. This will increase further compilation times though. 
+For CPU, you can use `--max-autotune` to further improve the performance
+with `--compile` and `compile-prefill`. See [`max-autotune on CPU tutorial`](https://pytorch.org/tutorials/prototype/max_autotune_on_CPU_tutorial.html).
 
 Parallel prefill is not yet supported by exported models, and may be
 supported in a future release.
@@ -463,7 +463,7 @@ significant impact on accuracy.
 
 ## Native (Stand-Alone) Execution of Exported Models
 
-Refer to the [README](README.md] for an introduction to native
+Refer to the [README](README.md) for an introduction to native
 execution on servers, desktops, and laptops.  Mobile and Edge execution for Android and iOS are
 described under [torchchat/edge/docs/Android.md] and [torchchat/edge/docs/iOS.md], respectively.
 
