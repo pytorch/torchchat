@@ -121,7 +121,7 @@ class Llama3ChatFormatter(_ChatFormatter):
                         self.tokenizer.encode(content["text"], bos=False, eos=False)
                     )
 
-        tokens.append(self.tokenizer.special_tokens["<|eot_id|>\n"])
+        tokens.append(self.tokenizer.special_tokens["<|eot_id|>"])
         return tokens
 
     def encode_dialog_prompt(
