@@ -64,16 +64,16 @@ echo "Using pip executable: $PIP_EXECUTABLE"
 # package versions.
 if [[ -x "$(command -v xpu-smi)" ]];
 then
-  PYTORCH_NIGHTLY_VERSION=dev20241001
+  PYTORCH_NIGHTLY_VERSION=dev20241012
 else
-  PYTORCH_NIGHTLY_VERSION=dev20241002
+  PYTORCH_NIGHTLY_VERSION=dev20241013
 fi
 
 # Nightly version for torchvision
-VISION_NIGHTLY_VERSION=dev20241002
+VISION_NIGHTLY_VERSION=dev20241013
 
 # Nightly version for torchtune
-TUNE_NIGHTLY_VERSION=dev20241010
+TUNE_NIGHTLY_VERSION=dev20241013
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 (

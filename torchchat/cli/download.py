@@ -35,11 +35,12 @@ def _download_hf_snapshot(
         model_info = model_info(model_config.distribution_path, token=hf_token)
         model_fnames = [f.rfilename for f in model_info.siblings]
 
-        # Check the model config for preference between safetensors and pth
+        # Check the model config for preference between safetensors and pth/bin
         has_pth = any(f.endswith(".pth") for f in model_fnames)
+        has_bin = any(f.endswith(".bin") for f in model_fnames)
         has_safetensors = any(f.endswith(".safetensors") for f in model_fnames)
 
-        # If told to prefer safetensors, ignore pth files
+        # If told to prefer safetensors, ignore pth/bin files
         if model_config.prefer_safetensors:
             if not has_safetensors:
                 print(
@@ -47,10 +48,10 @@ def _download_hf_snapshot(
                     file=sys.stderr,
                 )
                 exit(1)
-            ignore_patterns = "*.pth"
+            ignore_patterns = ["*.pth", "*.bin"]
 
         # If the model has both, prefer pth files over safetensors
-        elif has_pth and has_safetensors:
+        elif (has_pth or has_bin) and has_safetensors:
             ignore_patterns = "*safetensors*"
 
         # Otherwise, download everything
@@ -110,6 +111,8 @@ def _download_direct(
 def download_and_convert(
     model: str, models_dir: Path, hf_token: Optional[str] = None
 ) -> None:
+    if model is None:
+        raise ValueError("'download' command needs a model name or alias.")
     model_config = resolve_model_config(model)
     model_dir = models_dir / model_config.name
 
@@ -234,4 +237,8 @@ def where_main(args) -> None:
 
 # Subcommand to download model artifacts.
 def download_main(args) -> None:
-    download_and_convert(args.model, args.model_directory, args.hf_token)
+    try:
+        download_and_convert(args.model, args.model_directory, args.hf_token)
+    except ValueError as e:
+        print(e, file=sys.stderr)
+        sys.exit(1)
