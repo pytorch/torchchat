@@ -92,7 +92,7 @@ fi
 # pip packages needed by exir.
 REQUIREMENTS_TO_INSTALL=(
   torch=="2.6.0.${PYTORCH_NIGHTLY_VERSION}"
-  torchvision=="0.20.0.${VISION_NIGHTLY_VERSION}"
+  torchvision=="0.22.0.${VISION_NIGHTLY_VERSION}"
   torchtune=="0.5.0.${TUNE_NIGHTLY_VERSION}"
 )
 
