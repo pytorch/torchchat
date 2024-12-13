@@ -942,7 +942,7 @@ jobs:
           path: |
             ./et-build
             ./torchchat/utils/scripts
-          key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}-${{ hashFiles('**/install_et.sh', '**/build_native.sh') }}
+          key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}-${{ hashFiles('**/install_et.sh') }}
       - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
         continue-on-error: true
         run: |
@@ -1053,7 +1053,7 @@ jobs:
 
           # Pull submodules (re2, abseil) for Tiktoken
           git submodule sync
-          git submodule update --init --recursive
+          git submodule update --init
           ./runner/build_android.sh
           echo "Tests complete."
 
@@ -1124,3 +1124,41 @@ jobs:
           echo "Generate AOTI"
           python torchchat.py generate stories110M --aoti-package-path ./model.pt2 --prompt "${PRMT}"
           echo "Tests complete."
+
+  test-torchao-experimental-mps:
+    strategy:
+      matrix:
+        runner: [macos-m1-stable]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.11
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Install torchchat
+        run: |
+          echo "Intalling pip3 packages"
+          ./install/install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Install torchao-ops-mps
+        id: install-torchao-ops-mps
+        run: |
+          bash torchchat/utils/scripts/build_torchao_ops.sh mps
+      - name: Run inference
+        run: |
+          python torchchat.py download stories110M
+          export PRMT="Once upon a time in a land far away"
+          echo "Generate eager"
+          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}" --device mps --dtype float32 --quantize '{"linear:afpwx": {"bitwidth": 3, "groupsize": 32}}'
