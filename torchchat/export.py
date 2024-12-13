@@ -122,7 +122,7 @@ try:
     from executorch.exir.tracer import Value
 
     from torch._export import capture_pre_autograd_graph
-    from torch.export import export_for_training, ExportedProgram
+    from torch.export import export, export_for_training, ExportedProgram
 
     from torchchat.model import apply_rotary_emb, Attention
     from torchchat.utils.build_utils import get_precision

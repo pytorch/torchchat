@@ -21,22 +21,49 @@ library.
 
 The evaluation mode of `torchchat.py` script can be used to evaluate your language model on various tasks available in the `lm_eval` library such as "wikitext". You can specify the task(s) you want to evaluate using the `--tasks` option, and limit the evaluation using the `--limit` option. If no task is specified, the task will default to evaluating on "wikitext".
 
-**Examples**
+## Examples
+
+### Evaluation example with model in Python
 
 Running wikitext for 10 iterations
 ```
 python3 torchchat.py eval stories15M --tasks wikitext --limit 10
 ```
 
-Running an exported model
+Running wikitext with torch.compile for 10 iterations
+```
+python3 torchchat.py eval stories15M --compile --tasks wikitext --limit 10
+```
+
+Running multiple tasks and calling eval.py directly (with torch.compile):
+```
+python3 torchchat.py eval stories15M --compile --tasks wikitext hellaswag
+```
+
+### Evaluation with model exported to PTE with ExecuTorch
+
+Running an exported model with ExecuTorch (as PTE)
 ```
 python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 python3 torchchat.py eval stories15M --pte-path stories15M.pte
 ```
 
-Running multiple tasks and calling eval.py directly:
+Running multiple tasks and calling eval.py directly (with PTE):
 ```
 python3 torchchat.py eval stories15M --pte-path stories15M.pte --tasks wikitext hellaswag
+```
+
+### Evaluation with model exported to DSO with AOT Inductor (AOTI)
+
+Running an exported model with AOT Inductor (DSO model)
+```
+python3 torchchat.py export stories15M --dtype fast16 --output-dso-path stories15M.so
+python3 torchchat.py eval stories15M --dtype fast16 --dso-path stories15M.so
+```
+
+Running multiple tasks and calling eval.py directly (with AOTI):
+```
+python3 torchchat.py eval stories15M --dso-path stories15M.so --tasks wikitext hellaswag
 ```
 
 For more information and a list of tasks/metrics see [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness).
