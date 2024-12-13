@@ -142,6 +142,11 @@ def quantize_model(
                     )
                     set_precision(torch.float32)
 
+            if quantizer == "linear:afpwx" and device != "mps":
+                raise RuntimeError(
+                    "linear:afpwx quantization can only run on mps device!"
+                )
+
             # We set global precision from quantize options if it is specified at cli.py:485
             # so the precision returned by get_precision() is always the authoritative precision/dtype in torchchat
             precision = get_precision()
@@ -813,10 +818,12 @@ try:
     from torchao_experimental_quant_api import (
         Int8DynActIntxWeightLinearQuantizer,
         IntxWeightEmbeddingQuantizer,
+        UIntxWeightOnlyLinearQuantizer,
     )
 
     quantizer_class_dict["linear:a8wxdq"] = Int8DynActIntxWeightLinearQuantizer
     quantizer_class_dict["embedding:wx"] = IntxWeightEmbeddingQuantizer
+    quantizer_class_dict["linear:afpwx"] = UIntxWeightOnlyLinearQuantizer
 
     # Try loading custom op
     try:
@@ -826,20 +833,16 @@ try:
         libs = list(filter(lambda l: (l.endswith("so") or l.endswith("dylib")), libs))
         torch.ops.load_library(libs[0])
     except Exception as e:
-        print("Failed to torchao ops library with error: ", e)
-        print("Slow fallback kernels will be used.")
+        print(
+            "Unabled to load torchao cpu ops library. Slow fallback kernels will be used."
+        )
+
+    try:
+        libname = "libtorchao_ops_mps_aten.dylib"
+        libpath = f"{torchao_build_path}/cmake-out/lib/{libname}"
+        torch.ops.load_library(libpath)
+    except Exception as e:
+        print("Unabled to load torchao mps ops library.")
 
 except Exception as e:
-
-    class ErrorHandler(QuantHandler):
-        def __init__(
-            self, model: Optional[nn.Module] = None, device="cpu", precision=None
-        ):
-            global torchao_experimental_load_error
-            raise Exception(
-                f"Note: Failed to load torchao experimental quantizer with error: {torchao_experimental_load_error}"
-            )
-
-    torchao_experimental_load_error = e
-    quantizer_class_dict["linear:a8wxdq"] = ErrorHandler
-    quantizer_class_dict["embedding:wx"] = ErrorHandler
+    print("Unabled to import torchao experimental quant_api with error: ", e)
