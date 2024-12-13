@@ -184,8 +184,18 @@ clone_torchao() {
 }
 
 install_torchao_aten_ops() {
-  echo "Building torchao custom ops for ATen"
-  pushd ${TORCHCHAT_ROOT}/torchao-build/src/ao/torchao/experimental
+  local device=${1:-cpu}
+
+  if [[ "$device" == "cpu" ]]; then
+    echo "Building torchao custom ops for ATen"
+    pushd ${TORCHCHAT_ROOT}/torchao-build/src/ao/torchao/experimental
+  elif [[ "$device" == "mps" ]]; then
+    echo "Building torchao mps custom ops for ATen"
+    pushd ${TORCHCHAT_ROOT}/torchao-build/src/ao/torchao/experimental/ops/mps
+  else
+    echo "Invalid argument: $device. Valid values are 'cpu' or 'mps'." >&2
+    return 1
+  fi
 
   CMAKE_OUT_DIR=${TORCHCHAT_ROOT}/torchao-build/cmake-out
   cmake -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
