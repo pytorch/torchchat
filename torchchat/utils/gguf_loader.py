@@ -25,7 +25,6 @@ from torchchat.utils.quantize import (
 )
 
 from torchao.dtypes.utils import is_device
-from torchao.utils import TORCH_VERSION_AT_LEAST_2_6
 
 
 logger: logging.Logger = logging.getLogger(__name__)
@@ -125,20 +124,13 @@ def linear_int4(input, weight_int4pack, scales_and_zeros, out_features, groupsiz
             input.dtype
         )  # cast back to input.dtype
     else:
-        if TORCH_VERSION_AT_LEAST_2_6:
-            c = torch.ops.aten._weight_int4pack_mm_for_cpu(
-                input,
-                weight_int4pack,
-                groupsize,
-                scales_and_zeros,
-            )
-        else:
-            c = torch.ops.aten._weight_int4pack_mm(
-                input,
-                weight_int4pack,
-                groupsize,
-                scales_and_zeros,
-            )
+        c = torch.ops.aten._weight_int4pack_mm_for_cpu(
+            input,
+            weight_int4pack,
+            groupsize,
+            scales_and_zeros,
+        )
+
     new_shape = origin_input_size[:-1] + (out_features,)
     c = c.reshape(new_shape)
     return c
@@ -597,6 +589,7 @@ def load_model_and_state_dict(
     load_state_dict: bool = True,
     load_as_quantized: bool = True,
     inner_k_tiles=8,
+    device="cpu",
 ) -> torch.nn.Module:
     """
     Parses the GGUF file and returns an nn.Module on meta device along with a state_dict
@@ -635,7 +628,7 @@ def load_model_and_state_dict(
             if load_state_dict:
                 q, s, z = Q4_0.unpack(t)
                 scales_and_zeros = pack_scales_and_zeros(s, z)
-                if is_device(q.device.type, "cpu") and TORCH_VERSION_AT_LEAST_2_6:
+                if is_device(q.device.type, "cpu"):
                     weight_int4pack = torch.ops.aten._convert_weight_to_int4pack_for_cpu(
                         q, inner_k_tiles
                     )
