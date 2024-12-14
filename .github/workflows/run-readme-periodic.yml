@@ -10,22 +10,17 @@ on:
 
 jobs:
   test-readme:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     secrets: inherit
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       secrets-env: "HF_TOKEN_PERIODIC"
       gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      gpu-arch-version: "12.4"
       timeout: 60
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         echo "::group::Create script to run README"
@@ -44,21 +39,16 @@ jobs:
 
 
   test-quantization-any:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       secrets: inherit
       gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      gpu-arch-version: "12.4"
       timeout: 60
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         echo "::group::Create script to run quantization"
@@ -76,22 +66,17 @@ jobs:
         echo "::endgroup::"
 
   test-gguf-any:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     secrets: inherit
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       secrets-env: "HF_TOKEN_PERIODIC"
       gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      gpu-arch-version: "12.4"
       timeout: 60
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         echo "::group::Create script to run gguf"
