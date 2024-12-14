@@ -237,7 +237,7 @@ class WeightOnlyInt4Linear(torch.nn.Module):
         weight_int32, scales_and_zeros = group_quantize_tensor(
             weight_bf16, n_bit=4, groupsize=groupsize
         )
-        if is_device(weight_int32.device.type, "cpu") and TORCH_VERSION_AT_LEAST_2_6:
+        if is_device(weight_int32.device.type, "cpu"):
             weight_int4pack = torch.ops.aten._convert_weight_to_int4pack_for_cpu(
                 weight_int32, inner_k_tiles
             )
