@@ -260,7 +260,7 @@ class LocalGenerator:
         self.draft_quantize = draft_quantize
         self.is_torchtune_model = generator_args.is_torchtune_model
         self.dtype = builder_args.precision
-        self.get_user_input = input
+        self.get_user_input : Callable = input
 
         self.rank: Optional[int] = None
 
@@ -921,6 +921,8 @@ class LocalGenerator:
             ]
         )
         if self.builder_args.distributed:
+            # During distributed inference the model gets sharded among the ranks
+            # So we need to all reduce the model size to get the total model size
             model_size = torch.tensor(model_size, dtype=torch.int64, device=self.device)
             dist.all_reduce(model_size)
             model_size = model_size.item()
@@ -1257,7 +1259,7 @@ class DistributedGenerator(LocalGenerator):
             dist.broadcast_object_list(text)
             return text[0]
 
-        self.get_user_input = distributed_input
+        self.get_user_input: Callable = distributed_input
 
         if builder_args.pp > 1:
             self.seqlen_prefill = 1024  # sequence length for prefill stage
