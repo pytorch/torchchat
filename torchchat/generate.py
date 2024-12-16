@@ -1287,7 +1287,7 @@ class DistributedGenerator(LocalGenerator):
         dist.destroy_process_group()
 
     # Helper function to get example inputs and outputs for the stages.
-    def get_example_ins_outs(self, batch_size:int , seqlen: int) -> Tuple[torch.Tensor, torch.Tensor]:
+    def get_example_ins_outs(self, batch_size: int , seqlen: int) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         This function generates example inputs and outputs for the prefill and decode stages.
 
@@ -1308,9 +1308,7 @@ class DistributedGenerator(LocalGenerator):
         example_outputs = (logits if self.pp_rank == self.last_pp_rank else activation,)
         return example_inputs, example_outputs
 
-    def create_prefill_stage(
-        self,
-        ):
+    def create_prefill_stage(self):
         """
         Creates a pipeline stage for prefilling.
 
@@ -1340,9 +1338,7 @@ class DistributedGenerator(LocalGenerator):
         prefiller = ScheduleGPipe(prefill_stage, 1)
         return prefiller
 
-    def create_decode_stage(
-        self,
-        ):
+    def create_decode_stage(self):
         """
         Creates a decode stage for the pipeline parallelism.
 
@@ -1422,24 +1418,22 @@ class DistributedGenerator(LocalGenerator):
         else:  # middle pp ranks
             self.prefiller.step(**kwargs)
 
-        new_token = torch.zeros(1, 1, device=self.device, dtype=torch.int64)
-
         if self.pp_rank == self.last_pp_rank:
             new_token = self.sample(logits[:,:prompt_length], need_probs=False, **sampling_kwargs)[0]
-
-        
-        if self.pp_rank == self.last_pp_rank and self.pp_rank != self.first_pp_rank:
-            dist.send(
-                new_token,
-                dst=self.first_pp_rank_global_id,
-                group=self.pp_group,
-            )
-        elif self.pp_rank == self.first_pp_rank and self.pp_rank != self.last_pp_rank:
-            dist.recv(
-                new_token,
-                src=self.last_pp_rank_global_id,
-                group=self.pp_group,
-            )
+            if self.pp_rank != self.first_pp_rank:
+                dist.send(
+                    new_token,
+                    dst=self.first_pp_rank_global_id,
+                    group=self.pp_group,
+                )
+        else:
+            new_token = torch.zeros(1, 1, device=self.device, dtype=torch.int64)
+            if self.pp_rank == self.first_pp_rank:
+                dist.recv(
+                    new_token,
+                    src=self.last_pp_rank_global_id,
+                    group=self.pp_group,
+                )
 
         return new_token
 
@@ -1485,7 +1479,7 @@ class DistributedGenerator(LocalGenerator):
 
         # Decode the output
         if self.pp_rank == self.last_pp_rank:
-            new_token, next_prob = self.sample(logits, need_probs=need_probs, **sampling_kwargs)
+            new_token, _ = self.sample(logits, need_probs=need_probs, **sampling_kwargs)
         else:
             new_token = torch.zeros(1, 1, device=self.device, dtype=torch.int64)
 
