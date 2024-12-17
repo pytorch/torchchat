@@ -1484,23 +1484,22 @@ class DistributedGenerator(LocalGenerator):
         # Decode the output
         if self.pp_rank == self.last_pp_rank:
             new_token, _ = self.sample(logits, need_probs=need_probs, **sampling_kwargs)
+            if self.pp_rank != self.first_pp_rank:
+                dist.send(
+                    new_token,
+                    dst=self.first_pp_rank_global_id,
+                    group=self.pp_group,
+                )
         else:
             new_token = torch.zeros(1, 1, device=self.device, dtype=torch.int64)
-
-        if self.pp_rank == self.last_pp_rank and self.pp_rank != self.first_pp_rank:
-            dist.send(
-                new_token,
-                dst=self.first_pp_rank_global_id,
-                group=self.pp_group,
-            )
-        elif self.pp_rank == self.first_pp_rank and self.pp_rank != self.last_pp_rank:
-            dist.recv(
-                new_token,
-                src=self.last_pp_rank_global_id,
-                group=self.pp_group,
-            )
-            #TODO: Why do we get 2d tensor here?
-            new_token=new_token[0]
+            if self.pp_rank == self.first_pp_rank:
+                dist.recv(
+                    new_token,
+                    src=self.last_pp_rank_global_id,
+                    group=self.pp_group,
+                )
+                #TODO: Why do we get 2d tensor here?
+                new_token=new_token[0]
         return new_token, None
 
     def sample(
