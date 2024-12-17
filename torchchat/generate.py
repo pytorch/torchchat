@@ -1237,6 +1237,9 @@ class DistributedGenerator(LocalGenerator):
         quantize: bool,
         draft_quantize: bool,
         ):
+        
+        is_speculative = speculative_builder_args.checkpoint_path is not None
+        assert is_speculative == False, "Distributed inference with pp > 1 does not support speculative inference yet."
         super().__init__(
             builder_args,
             speculative_builder_args,
@@ -1449,8 +1452,9 @@ class DistributedGenerator(LocalGenerator):
         """
         Decodes a single token.
 
+        # TODO: implement speculative decoding with pp>1
         Returns:
-            Tuple[torch.Tensor, Optional[torch.Tensor]]: A tuple containing the decoded token and its probability.
+            Tuple[torch.Tensor, None]: A tuple containing the decoded token and None.
         """
         if self.builder_args.pp == 1:
             return super().decode_one_token(
@@ -1511,9 +1515,7 @@ class DistributedGenerator(LocalGenerator):
             return (idx_next, None)
         probs = self.logits_to_probs(logits[0, -1], temperature, top_k)
         idx_next = self.multinomial_sample_one_no_sync(probs)
-        if self.builder_args.pp == 1:
-            dist.broadcast(idx_next, src=0)
-            dist.broadcast(probs, src=0)
+        
         return idx_next, probs
 
 
