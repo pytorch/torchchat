@@ -1094,6 +1094,7 @@ class Generator:
             else:
                 torch.profiler._utils._init_for_cuda_graphs()
                 prof = torch.profiler.profile()
+            print("prof is: ", prof)
             t0 = time.perf_counter()
             num_tokens_generated = 0
             with prof:
@@ -1129,8 +1130,10 @@ class Generator:
             if hasattr(prof, "export_chrome_trace"):
                 if self.builder_args.device == "cpu":
                     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
-                else:
+                elif self.builder_args.device == "cuda":
                     print(prof.key_averages().table(sort_by="self_cuda_time_total"))
+                else:
+                    print(prof.key_averages().table(sort_by="self_xpu_time_total"))
                 prof.export_chrome_trace(f"{self.profile}.json")
 
             if start_pos >= max_seq_length:
