@@ -45,7 +45,7 @@ from torchchat.cli.builder import (
 )
 from torchchat.distributed.utils import (
     Color as color,
-    setup_env,
+    run_in_dist_env,
 )
 from torchchat.model import Model, ModelType
 from torchchat.utils.build_utils import device_sync, set_precision
@@ -1565,9 +1565,9 @@ def main(args):
         with futures.ProcessPoolExecutor(max_workers=world_size-1, mp_context=ctx) as executor:
             for i in range(1,world_size):
                 fn = partial(run_generator, args, i)
-                executor.submit(setup_env, world_size, i, fn)
+                executor.submit(run_in_dist_env, world_size, i, fn)
             #Starting rank 0
             fn = partial(run_generator, args, 0)
-            setup_env(world_size, 0, fn)
+            run_in_dist_env(world_size, 0, fn)
     else:
         run_generator(args)

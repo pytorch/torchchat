@@ -258,7 +258,7 @@ class GPUMemoryMonitor:
         )
         return device_info
 
-def setup_env(world_size: int, rank: int, target: callable, *args, **kwargs):
+def run_in_dist_env(world_size: int, rank: int, target: callable):
     environ["MASTER_ADDR"] = "localhost"
     environ["MASTER_PORT"] = "29500"
     environ["RDZV_BACKEND"] = "c10d"
@@ -266,4 +266,4 @@ def setup_env(world_size: int, rank: int, target: callable, *args, **kwargs):
     environ["RANK"] = str(rank)
     environ["LOCALRANK"] = str(rank)
 
-    return target(*args, **kwargs)
+    return target()
