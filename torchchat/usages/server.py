@@ -24,7 +24,7 @@ from concurrent import futures
 from flask import Flask, request, Response
 
 from torchchat.cli.builder import BuilderArgs, TokenizerArgs
-from torchchat.distributed.utils import setup_env
+from torchchat.distributed.utils import run_in_dist_env
 from torchchat.generate import GeneratorArgs
 
 from torchchat.usages.openai_api import (
@@ -73,11 +73,10 @@ def create_app(args):  # noqa: C901
         mp_context = mp.get_context('spawn')
         queue = mp_context.Queue()
     
-    if builder_args.distributed:
         for i in range(1, world_size):
             fn = partial(run_worker, args, i, queue)
             mp_context = mp.get_context('spawn')
-            procs.append(mp_context.Process(target=setup_env, args=(world_size, i, fn)))
+            procs.append(mp_context.Process(target=run_in_dist_env, args=(world_size, i, fn)))
             procs[-1].start()
 
         environ["MASTER_ADDR"] = "localhost"
