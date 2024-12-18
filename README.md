@@ -45,16 +45,16 @@ aliases.
 
 | Model | Mobile Friendly | Notes |
 |------------------|---|---------------------|
-|[meta-llama/Meta-Llama-3.2-3B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct)|✅|Tuned for `chat` . Alias to `llama3.2-3b`.|
+|[meta-llama/Meta-Llama-3.2-3B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct)|✅|Tuned for `chat`. Alias to `llama3.2-3b`.|
 |[meta-llama/Meta-Llama-3.2-3B](https://huggingface.co/meta-llama/Llama-3.2-3B)|✅|Best for `generate`. Alias to `llama3.2-3b-base`.|
-|[meta-llama/Llama-Guard-3-1B](https://huggingface.co/meta-llama/Llama-Guard-3-1B)|✅|Tuned for classification . Alias to `llama3-1b-guard`.|
-|[meta-llama/Meta-Llama-3.2-1B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-1B-Instruct)|✅|Tuned for `chat` . Alias to `llama3.2-1b`.|
+|[meta-llama/Llama-Guard-3-1B](https://huggingface.co/meta-llama/Llama-Guard-3-1B)|✅|Tuned for classification. Alias to `llama3-1b-guard`.|
+|[meta-llama/Meta-Llama-3.2-1B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-1B-Instruct)|✅|Tuned for `chat`. Alias to `llama3.2-1b`.|
 |[meta-llama/Meta-Llama-3.2-1B](https://huggingface.co/meta-llama/Llama-3.2-1B)|✅|Best for `generate`. Alias to `llama3.2-1b-base`.|
-|[meta-llama/Llama-3.2-11B-Vision-Instruct](https://huggingface.co/meta-llama/Llama-3.2-11B-Vision-Instruct)||Multimodal (Image + Text). Tuned for `chat` . Alias to `llama3.2-11B`.|
-|[meta-llama/Llama-3.2-11B-Vision](https://huggingface.co/meta-llama/Llama-3.2-11B-Vision)||Multimodal (Image + Text). Tuned for `generate` . Alias to `llama3.2-11B-base`.|
-|[meta-llama/Meta-Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3.1`.|
+|[meta-llama/Llama-3.2-11B-Vision-Instruct](https://huggingface.co/meta-llama/Llama-3.2-11B-Vision-Instruct)||Multimodal (Image + Text). Tuned for `chat`. Alias to `llama3.2-11B`.|
+|[meta-llama/Llama-3.2-11B-Vision](https://huggingface.co/meta-llama/Llama-3.2-11B-Vision)||Multimodal (Image + Text). Tuned for `generate`. Alias to `llama3.2-11B-base`.|
+|[meta-llama/Meta-Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct)|✅|Tuned for `chat`. Alias to `llama3.1`.|
 |[meta-llama/Meta-Llama-3.1-8B](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B)|✅|Best for `generate`. Alias to `llama3.1-base`.|
-|[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅|Tuned for `chat` . Alias to `llama3`.|
+|[meta-llama/Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)|✅|Tuned for `chat`. Alias to `llama3`.|
 |[meta-llama/Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B)|✅|Best for `generate`. Alias to `llama3-base`.|
 |[meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf)|✅|Tuned for `chat`. Alias to `llama2`.|
 |[meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-13b-chat-hf)||Tuned for `chat`. Alias to `llama2-13b-chat`.|
@@ -231,6 +231,8 @@ python3 torchchat.py server llama3.1
 ```
 [skip default]: end
 
+[shell default]: python3 torchchat.py server llama3.1 & server_pid=$! ; sleep 90 # wait for server to be ready to accept requests
+
 In another terminal, query the server using `curl`. Depending on the model configuration, this query might take a few minutes to respond.
 
 > [!NOTE]
@@ -243,8 +245,6 @@ In another terminal, query the server using `curl`. Depending on the model confi
 Setting `stream` to "true" in the request emits a response in chunks. If `stream` is unset or not "true", then the client will await the full response from the server.
 
 **Example Input + Output**
-
-[skip default]: begin
 
 ```
 curl http://127.0.0.1:5000/v1/chat/completions \
@@ -265,12 +265,14 @@ curl http://127.0.0.1:5000/v1/chat/completions \
     ]
   }'
 ```
+[skip default]: begin
 ```
 {"response":" I'm a software developer with a passion for building innovative and user-friendly applications. I have experience in developing web and mobile applications using various technologies such as Java, Python, and JavaScript. I'm always looking for new challenges and opportunities to learn and grow as a developer.\n\nIn my free time, I enjoy reading books on computer science and programming, as well as experimenting with new technologies and techniques. I'm also interested in machine learning and artificial intelligence, and I'm always looking for ways to apply these concepts to real-world problems.\n\nI'm excited to be a part of the developer community and to have the opportunity to share my knowledge and experience with others. I'm always happy to help with any questions or problems you may have, and I'm looking forward to learning from you as well.\n\nThank you for visiting my profile! I hope you find my information helpful and interesting. If you have any questions or would like to discuss any topics, please feel free to reach out to me. I"}
 ```
 
 [skip default]: end
 
+[shell default]: kill ${server_pid}
 
 </details>
 
@@ -664,6 +666,6 @@ awesome libraries and tools you've built around local LLM inference.
 
 torchchat is released under the [BSD 3 license](LICENSE). (Additional
 code in this distribution is covered by the MIT and Apache Open Source
-licenses.) However you may have other legal obligations that govern
+licenses.) However, you may have other legal obligations that govern
 your use of content, such as the terms of service for third-party
 models.
