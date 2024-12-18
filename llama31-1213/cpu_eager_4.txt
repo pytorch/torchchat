@@ -2,8 +2,7 @@
 OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
-PyTorch version 2.6.0.dev20241002+cu121 available.
-lm_eval is not installed, GPTQ may not be usable
+PyTorch version 2.6.0.dev20241213+cu124 available.
 linear: model.layers.0.attention.wq, in=4096, out=4096
 linear: model.layers.0.attention.wk, in=4096, out=1024
 linear: model.layers.0.attention.wv, in=4096, out=1024
@@ -229,69 +228,71 @@ linear: model.layers.31.feed_forward.w1, in=4096, out=14336
 linear: model.layers.31.feed_forward.w2, in=14336, out=4096
 linear: model.layers.31.feed_forward.w3, in=4096, out=14336
 linear: model.output, in=4096, out=128256
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
 Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
 Loading model...
-Time to load model: 0.11 seconds
+Time to load model: 0.12 seconds
 Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
-Time to quantize model: 24.81 seconds
+Time to quantize model: 16.83 seconds
 -----------------------------------------------------------
-Once upon a time, when the earth was still young and weak, the five elements – earth, water, fire, air, and ether – were in constant conflict, disturbing the natural balance of the world.
-The five elements had been given to the earth as a gift by a wise and powerful god who had created the universe. The god had instructed the elements to live in harmony with each other, so that the world would be filled with peace and balance.
-However, the five elements were not as obedient as the god had hoped. Each of them was confident in its own power and believed that it should be the dominant force in the world. Earth was proud of its solid foundation and stability. Water was arrogant about its ability to flow and change shape. Fire was convinced of its own strength and power to burn and destroy. Air was restless and impatient, always in motion and quick to anger. Ether, the mysterious and invisible element, was the most misunderstood of all and was often seen as a distant and unfeeling presence.
-As a result of their disagreements and conflicts, the five elements were causing the earth to suffer. The earth was in turmoil, with earthquakes shaking its foundations, floods sweeping through its lands, and storms raging across its skies.
-The wise and powerful god who had created the universe
+Once upon a time, in a small village nestled in the heart of a mystical forest, there lived a young girl named Lily. Lily was a gentle soul with a heart full of love for all living things. She spent most of her days exploring the forest, learning about the creatures that lived there, and helping those in need.
+One day, while out on a walk, Lily stumbled upon a small, delicate fairy who was struggling to free herself from a spider's web. Without hesitation, Lily gently touched the fairy and whispered words of encouragement, releasing the fairy from the web.
+The fairy, grateful for Lily's kindness, thanked her and flew off into the trees. But before she disappeared, she promised Lily that she would return and repay her kindness in a most unexpected way.
+Days turned into weeks, and weeks turned into months. Lily continued to explore the forest, helping those in need and spreading joy wherever she went. And then, one evening, as the sun began to set, the fairy reappeared.
+This time, she was not alone. A magnificent dragon, with scales that shone like gold and eyes that burned with kindness, stood beside her. The fairy introduced the dragon as her friend and protector, and told Lily that he had been watching her from afar, impressed by her self
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 1: 36.5819 sec total                 
-Time to first token: 0.2626 sec with parallel prefill.                
+Time for inference 1: 38.3536 sec total                 
+Time to first token: 0.2855 sec with parallel prefill.                
 
-      Total throughput: 6.9980 tokens/sec, 0.1429 s/token                 
-First token throughput: 3.8083 tokens/sec, 0.2626 s/token                 
- Next token throughput: 7.0211 tokens/sec, 0.1424 s/token                     
+      Total throughput: 6.6747 tokens/sec, 0.1498 s/token                 
+First token throughput: 3.5024 tokens/sec, 0.2855 s/token                 
+ Next token throughput: 6.6985 tokens/sec, 0.1493 s/token                     
 
-Bandwidth achieved: 34.44 GB/s
+Bandwidth achieved: 32.84 GB/s
 *** This first iteration will include cold start effects for dynamic import, hardware caches. ***
 
 ========================================
 
-Once upon a time, there were three little pigs who had just moved into a new house. They were excited to make new friends and have a great time, but things didn't quite go as planned.
-The first little pig was a bit of a worrywart. He was always thinking about the worst-case scenario and was convinced that the big bad wolf was going to come and eat them up. He decided to build his house out of sticks, thinking that it would be easy to build and that it would protect them from the wolf.
-The second little pig was a bit of a free spirit. He didn't want to spend too much time or money on his house, so he decided to build his house out of straw. He thought that it would be quick and easy to build, and that he could always just move to a new place if the big bad wolf came.
-The third little pig was a bit of a planner. He had done his research and had decided that he would build his house out of bricks. He spent a lot of time and money on the design and construction of his house, thinking that it would be the safest and most durable option.
-One day, the big bad wolf came to visit the three little pigs. He was big and scary, and the little pigs knew that
+Once upon a time, in a far-off kingdom, there was a beautiful princess named Sophia. Sophia had long, flowing hair, sparkling blue eyes, and a heart as kind as the morning sun. She lived in a magnificent castle surrounded by rolling green hills and sparkling rivers.
+Princess Sophia was loved by all, and everyone in the kingdom adored her. She spent her days playing with the castle's little animals, gardening in the castle's beautiful gardens, and helping the poor people of the kingdom. She loved nothing more than bringing joy to others and spreading happiness around her.
+One day, a wicked sorcerer cast a cruel spell on Princess Sophia, changing her into a beautiful swan. The sorcerer laughed with glee, thinking that he had defeated the kind princess. But, he did not know that being a swan was not the end of Princess Sophia's kindness and courage. The swan flew high up in the sky, feeling the wind beneath her wings.
+The people of the kingdom were heartbroken when they saw the princess changed into a swan. They cried, "Oh, poor Princess Sophia! What have we done to deserve this cruel fate?"
+However, Princess Sophia, the swan, saw it differently. She was free to fly wherever she wanted and explore the kingdom
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 2: 35.7851 sec total                 
+Time for inference 2: 36.5991 sec total                 
 Time to first token: 0.2562 sec with parallel prefill.                
 
-      Total throughput: 7.1538 tokens/sec, 0.1398 s/token                 
-First token throughput: 3.9027 tokens/sec, 0.2562 s/token                 
- Next token throughput: 7.1773 tokens/sec, 0.1393 s/token                     
+      Total throughput: 6.9947 tokens/sec, 0.1430 s/token                 
+First token throughput: 3.9026 tokens/sec, 0.2562 s/token                 
+ Next token throughput: 7.0165 tokens/sec, 0.1425 s/token                     
 
-Bandwidth achieved: 35.20 GB/s
+Bandwidth achieved: 34.42 GB/s
 
 ========================================
 
-Once upon a time, in a small village, there lived a beautiful princess named Cinderella. She had been forced to live with her wicked stepmother and stepsisters, who made her do all the household chores. Despite their cruel treatment, Cinderella remained kind and gentle, and was loved by all in the village.
-One day, the King invited all the eligible maidens in the land to a grand ball, in hopes of finding a suitable wife for his son, the handsome Prince Charming. Cinderella's stepmother and stepsisters were overjoyed at the prospect of meeting the Prince and became busy, making dresses for themselves, but Cinderella was left with nothing to wear.
-Just when Cinderella thought all hope was lost, her fairy godmother appeared and, with a wave of her wand, transformed a pumpkin in the courtyard into a magnificent coach, complete with four white horses and a coachman. Cinderella was dressed in a beautiful gown, complete with a sparkling tiara and a pair of glass slippers. With a final wish, Cinderella was sent off to the ball, where she danced with Prince Charming and won his heart.
-However, when the clock struck midnight, Cinderella had to leave abruptly, leaving behind one of her glass slippers. The Prince searched far
+Once upon a time, when King Pravardhan was the ruler of Ayodhya, a Brahmin named Manu was living a simple life. His wife, Jayanti, was a woman of great faith and devotion. Manu was the only son of his parents, who had passed away at a very young age. His grandmother, Renuka, had taken care of him since then.
+The king, Pravardhan, had a great desire to conquer the surrounding kingdoms and expand his empire. He had sent a messenger to the king of Videha, who was his rival, asking him to hand over his kingdom or face the consequences.
+The king of Videha, who was a just and wise ruler, was not willing to give up his kingdom. He thought that the king of Ayodhya was not fit for the task of expansion.
+The king of Videha sent a reply to the messenger, saying that he would not give up his kingdom, no matter what King Pravardhan threatened. Manu, who was at home listening to the conversation between his grandmother, Renuka, and a visiting priest, overheard the conversation about King Pravardhan's ambitions. At the time, King Pravardhan had put a condition in front of the king
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 3: 37.7394 sec total                 
-Time to first token: 0.2473 sec with parallel prefill.                
+Time for inference 3: 35.4345 sec total                 
+Time to first token: 0.2590 sec with parallel prefill.                
 
-      Total throughput: 6.7834 tokens/sec, 0.1474 s/token                 
-First token throughput: 4.0434 tokens/sec, 0.2473 s/token                 
- Next token throughput: 6.8014 tokens/sec, 0.1470 s/token                     
+      Total throughput: 7.2246 tokens/sec, 0.1384 s/token                 
+First token throughput: 3.8609 tokens/sec, 0.2590 s/token                 
+ Next token throughput: 7.2494 tokens/sec, 0.1379 s/token                     
 
-Bandwidth achieved: 33.38 GB/s
+Bandwidth achieved: 35.55 GB/s
 
 ========================================
 
 
-      Average tokens/sec (total): 6.98                 
-Average tokens/sec (first token): 3.92                 
-Average tokens/sec (next tokens): 7.00 
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 6.96                 
+Average tokens/sec (first token): 3.76                 
+Average tokens/sec (next tokens): 6.99 
                 
 Memory used: 0.00 GB

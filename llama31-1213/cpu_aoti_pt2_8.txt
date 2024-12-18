@@ -1,0 +1,236 @@
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-aoti-package-path /tmp/model8.pt2
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --aoti-package-path /tmp/model8.pt2 --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-aoti-package-path /tmp/model8.pt2
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.6.0.dev20241213+cu124 available.
+W1217 20:51:40.934506 1391160 site-packages/torch/_export/__init__.py:276] +============================+
+W1217 20:51:40.936002 1391160 site-packages/torch/_export/__init__.py:277] |     !!!   WARNING   !!!    |
+W1217 20:51:40.936321 1391160 site-packages/torch/_export/__init__.py:278] +============================+
+W1217 20:51:40.936525 1391160 site-packages/torch/_export/__init__.py:279] torch._export.aot_compile()/torch._export.aot_load() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export())/torch._inductor.aoti_load_package() instead.
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_2(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:740:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+  740 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_7(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:1276:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 1276 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_12(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:1782:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 1782 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_17(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:2294:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 2294 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_22(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:2794:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 2794 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_27(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:3306:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 3306 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_32(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:3806:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 3806 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_37(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:4318:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 4318 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_42(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:4818:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 4818 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_47(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:5330:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 5330 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_52(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:5830:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 5830 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_57(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:6342:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 6342 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_62(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:6842:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 6842 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_67(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:7354:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 7354 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_72(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:7854:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 7854 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_77(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:8366:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 8366 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_82(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:8866:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 8866 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_87(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:9378:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 9378 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_92(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:9878:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 9878 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_97(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:10390:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+10390 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_102(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:10890:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+10890 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_107(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:11402:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+11402 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_112(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:11902:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+11902 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_117(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:12414:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+12414 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_122(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:12914:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+12914 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_127(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:13426:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+13426 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_132(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:13926:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+13926 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_137(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:14438:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+14438 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_142(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:14938:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+14938 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_147(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:15450:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+15450 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_152(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:15950:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+15950 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp: In function ‘void cpp_fused__safe_softmax__to_copy_add_bmm_index_index_put_scalar_tensor_stack_where_157(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/clwlk6qr5j5pkuourbuvzm7ziqe63ybjruymcu3j2i7zqv4pikg6/coqx5t3xg3mwdv4mepirm6vycnfxqanf6fs447wrpj7jtflo3wwr.cpp:16462:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+16462 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cpu
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 0.11 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 53.11 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model8.pt2
+The generated packaged model can be found at: /tmp/model8.pt2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --aoti-package-path /tmp/model8.pt2 --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+PyTorch version 2.6.0.dev20241213+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Warning: checkpoint path ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument
+Warning: checkpoint path ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.49 seconds
+-----------------------------------------------------------
+Once upon a time, a small town in the heart of the American Midwest was faced with a crisis. A massive tornado had ravaged the town, leaving behind a trail of destruction and debris. The residents were left to pick up the pieces and rebuild their lives.
+As the townspeople began to survey the damage, they noticed something peculiar. Amidst the rubble, a small, delicate flower had managed to grow. It was a tiny, yet resilient bloom, that seemed to defy the odds and thrive in the midst of devastation.
+The flower quickly became a symbol of hope and resilience for the town. It reminded them that even in the darkest of times, there is always the possibility for growth and renewal.
+As the townspeople began to rebuild, they made a decision to create a memorial garden in honor of the flower. They designed a beautiful garden, filled with a variety of flowers, trees, and shrubs, that would serve as a reminder of the power of resilience and hope.
+The garden became a beacon of inspiration for the community, a place where people could come to reflect and find solace. It was a testament to the human spirit, and the ability to overcome even the most daunting challenges.
+Years went by, and the garden continued to flourish. It became a popular destination for tourists and
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 966.5080 sec total                 
+Time to first token: 25.7696 sec with sequential prefill.                
+
+      Total throughput: 0.2649 tokens/sec, 3.7754 s/token                 
+First token throughput: 0.0388 tokens/sec, 25.7696 s/token                 
+ Next token throughput: 0.2711 tokens/sec, 3.6892 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, there was a little boy named Max who sat on a couch and went on a journey.
+Another boy named Samuel sat on the same couch and had the same journey.
+A third boy named Thomas also sat on the same couch and went on the same journey.
+On this journey, they met a dragon who breathed fire.
+They met a fairy who wore wings.
+They met a king who wore a crown.
+Each boy, Max and Samuel and Thomas, saw and experienced the same things on this journey.
+Each boy, however, saw and experienced it in a different way.
+Max saw the dragon as big and scary.
+Samuel saw the dragon as small and friendly.
+Thomas saw the dragon as a reflection of himself.
+The fairy was a reminder to Samuel of his mother.
+The king was a symbol of power for Max.
+The king was a reminder to Thomas of his father.
+In this story, each boy has a unique perspective and experience despite the fact that they are in the same place at the same time.
+This story illustrates that truth is not absolute, but rather subjective.
+It is dependent on the individual's unique perspective and experiences.
+Our experiences shape our perspectives and our perspectives shape our understanding of the world.
+This story also illustrates the concept of perception and how it influences our understanding
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 402.3418 sec total                 
+Time to first token: 29.8217 sec with sequential prefill.                
+
+      Total throughput: 0.6363 tokens/sec, 1.5716 s/token                 
+First token throughput: 0.0335 tokens/sec, 29.8217 s/token                 
+ Next token throughput: 0.6845 tokens/sec, 1.4609 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+
+========================================
+
+Once upon a time, there was a tiny village nestled in the rolling hills of the countryside. The villagers lived simple lives, working the land and tending to their animals. But one day, a wise old man came to the village, carrying a small wooden box. He announced that he had within it a magical stone, one that would grant the village prosperity and good fortune.
+The villagers were skeptical at first, but the old man showed them the stone, which glowed with a soft, pulsing light. He told them that the stone had the power to make their crops grow bigger and stronger, their animals healthier, and their lives more abundant.
+The villagers were amazed, and they begged the old man to give them the stone. But he refused, saying that the stone's power was not to be taken lightly and that they would have to prove themselves worthy of its gift.
+The villagers were determined to prove themselves worthy, and they set to work, tilling the soil, planting seeds, and tending to their animals. They worked tirelessly, day and night, and slowly but surely, their efforts began to pay off. Their crops began to grow, their animals grew stronger and healthier, and the village began to flourish.
+But as the villagers' success grew, so did their greed.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 268.2427 sec total                 
+Time to first token: 2.1756 sec with sequential prefill.                
+
+      Total throughput: 0.9544 tokens/sec, 1.0478 s/token                 
+First token throughput: 0.4597 tokens/sec, 2.1756 s/token                 
+ Next token throughput: 0.9584 tokens/sec, 1.0434 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 0.62                 
+Average tokens/sec (first token): 0.18                 
+Average tokens/sec (next tokens): 0.64 
+                
+Memory used: 0.00 GB

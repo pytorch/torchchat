@@ -1,0 +1,74 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+PyTorch version 2.6.0.dev20241213+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.12 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 28.01 seconds
+-----------------------------------------------------------
+Once upon a time, there was a young man named Max. Max was an avid hiker. He loved nothing more than setting out on a new trail, exploring the great outdoors, and taking in the breathtaking views. One day, Max decided to tackle the infamous "Devil's Backbone" trail, a notorious path known for its steep incline and treacherous terrain.
+As he made his way up the mountain, Max felt a sense of accomplishment and pride in his physical abilities. However, as the sun began to set, casting a golden glow over the landscape, Max realized he had underestimated the trail's difficulty. The terrain grew increasingly treacherous, with loose rocks and steep drop-offs making every step a challenging one.
+Despite his growing fatigue, Max persisted, determined to reach the summit. As he climbed higher, the air grew thinner, and Max began to feel lightheaded. He knew he had to slow down and pace himself, but his desire to reach the top was too strong.
+
+Just as Max was starting to flag, he spotted a group of hikers huddled together, taking a break and sipping water from their canteens. Max made his way over to them, grateful for the rest and refreshment. As he sat down alongside the group, one
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 60.2183 sec total                 
+Time to first token: 0.4795 sec with parallel prefill.                
+
+      Total throughput: 4.2512 tokens/sec, 0.2352 s/token                 
+First token throughput: 2.0856 tokens/sec, 0.4795 s/token                 
+ Next token throughput: 4.2686 tokens/sec, 0.2343 s/token                     
+
+Bandwidth achieved: 36.39 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, there was a young woman named Hannah who lived in a small village surrounded by a dense forest. She was a skilled baker and ran a small bakery in the village, where she spent her days baking delicious bread, pastries, and cakes.
+One day, a mysterious stranger arrived in the village, carrying a large, ornate box. He introduced himself as a traveling merchant and said he had come to the village to sell his wares. However, Hannah noticed that the stranger seemed out of place, and she couldn’t shake the feeling that he was hiding something.
+As the days passed, strange occurrences began to happen in the village. People would report seeing the merchant lurking around their homes at night, and some even claimed to have seen him talking to the spirits of the forest. The villagers grew increasingly uneasy, and they began to whisper among themselves about the merchant’s true intentions.
+Hannah, being the curious and brave soul that she was, decided to investigate the merchant further. She started by asking him questions, trying to get to the bottom of the strange happenings in the village. However, the merchant seemed evasive and secretive, and Hannah couldn’t get any concrete answers out of him.
+Determined to uncover the truth, Hannah decided to sneak into the merchant’s
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 54.9780 sec total                 
+Time to first token: 0.3048 sec with parallel prefill.                
+
+      Total throughput: 4.6564 tokens/sec, 0.2148 s/token                 
+First token throughput: 3.2805 tokens/sec, 0.3048 s/token                 
+ Next token throughput: 4.6641 tokens/sec, 0.2144 s/token                     
+
+Bandwidth achieved: 39.85 GB/s
+
+========================================
+
+Once upon a time, a small village nestled in the heart of a vast and mysterious forest. The villagers lived simple lives, relying on the forest for their food, shelter, and livelihood. They knew the forest like the back of their hand, but they also knew that it held many secrets and dangers.
+One day, a young boy named Kaito wandered into the forest, searching for a rare herb to help his ailing mother. As he ventured deeper into the woods, the trees seemed to grow taller and the shadows darker. Kaito felt a sense of unease, but he pressed on, his determination driving him forward.
+Suddenly, a faint glow appeared in the distance. Kaito's curiosity got the better of him, and he approached the light cautiously. As he drew closer, he saw a beautiful fairy perched on a toadstool, surrounded by a halo of soft, ethereal light.
+The fairy's wings sparkled like diamonds, and her hair shone with a soft, golden glow. She gazed at Kaito with kind, ancient eyes and spoke in a voice that was both melodious and mysterious.
+"Greetings, young one," she said. "I have been waiting for you. My name is Lyra, and I am the guardian
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 48.1160 sec total                 
+Time to first token: 0.3134 sec with parallel prefill.                
+
+      Total throughput: 5.3205 tokens/sec, 0.1880 s/token                 
+First token throughput: 3.1909 tokens/sec, 0.3134 s/token                 
+ Next token throughput: 5.3344 tokens/sec, 0.1875 s/token                     
+
+Bandwidth achieved: 45.54 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 4.74                 
+Average tokens/sec (first token): 2.85                 
+Average tokens/sec (next tokens): 4.76 
+                
+Memory used: 0.00 GB

@@ -2,8 +2,7 @@
 OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
-PyTorch version 2.6.0.dev20241002+cu121 available.
-lm_eval is not installed, GPTQ may not be usable
+PyTorch version 2.6.0.dev20241213+cu124 available.
 linear: model.layers.0.attention.wq, in=4096, out=4096
 linear: model.layers.0.attention.wk, in=4096, out=1024
 linear: model.layers.0.attention.wv, in=4096, out=1024
@@ -229,76 +228,72 @@ linear: model.layers.31.feed_forward.w1, in=4096, out=14336
 linear: model.layers.31.feed_forward.w2, in=14336, out=4096
 linear: model.layers.31.feed_forward.w3, in=4096, out=14336
 linear: model.output, in=4096, out=128256
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
 Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
 Loading model...
-Time to load model: 0.11 seconds
+Time to load model: 0.12 seconds
 Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
-Time to quantize model: 19.87 seconds
+Time to quantize model: 22.19 seconds
 -----------------------------------------------------------
-Once upon a time, there was a beautiful and serene lake surrounded by lush green forests. The people of the town that bordered the lake spent their days fishing, boating, and picnicking on its peaceful shores. But as time went on, the lake began to change. Algae blooms spread across its surface, a thick layer of green and brown that obscured its once crystal clear waters. Fish and wildlife began to disappear, and the people of the town noticed a pungent smell that hung in the air like a constant reminder of the lake's decline.
-The townspeople were heartbroken, but they didn't know how to restore the lake to its former glory. That was until a wise old man named John stepped forward with a solution. John was an environmental scientist who had spent years studying the lake and its ecosystem. He knew that the problem was not just with the algae itself, but with the lack of oxygen in the water. The algae was growing too quickly, consuming too much of the lake's oxygen and suffocating the very life that the lake needed to thrive.
-
-With the help of the townspeople, John set up a system of artificial aeration and oxygen infusion. They installed pumps and aerators to increase oxygen levels and decrease the algae growth. They also planted new aquatic
+Once upon a time, there was a young boy named Tom who loved playing outside in the warm sunshine. One day, while he was playing in his backyard, he stumbled upon a small clearing surrounded by tall trees and colorful flowers. In the center of the clearing stood an enormous tree with branches that seemed to stretch up to the sky.
+Tom had never seen a tree like this before, and he felt drawn to it as if by magic. He approached the tree cautiously, feeling the soft bark beneath his fingers, and looked up at its towering height. Suddenly, a gentle voice spoke to him, echoing in his mind.
+“Welcome, little one,” said the voice. “I have been waiting for you. My name is Oakley, and I am an enchanted tree with a special gift for those who approach me with kindness and respect.”
+Tom was amazed and a bit scared, but he managed to stammer out a greeting. Oakley told him that he had been watching Tom for a while and was impressed by his kind heart and curious nature. The tree explained that he had the power to grant wishes to those who treated him with love and respect.
+Overjoyed, Tom asked Oakley how he could use this gift. Oakley responded that he would give him three wishes, but warned him
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 1: 86.2208 sec total                 
-Time to first token: 0.2791 sec with parallel prefill.                
+Time for inference 1: 60.0837 sec total                 
+Time to first token: 0.3077 sec with parallel prefill.                
 
-      Total throughput: 2.9691 tokens/sec, 0.3368 s/token                 
-First token throughput: 3.5824 tokens/sec, 0.2791 s/token                 
- Next token throughput: 2.9671 tokens/sec, 0.3370 s/token                     
+      Total throughput: 4.2607 tokens/sec, 0.2347 s/token                 
+First token throughput: 3.2504 tokens/sec, 0.3077 s/token                 
+ Next token throughput: 4.2659 tokens/sec, 0.2344 s/token                     
 
-Bandwidth achieved: 14.61 GB/s
+Bandwidth achieved: 20.97 GB/s
 *** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
-just-in-time compilation time (incl run time): 8.6e+01 seconds
+just-in-time compilation time (incl run time): 6e+01 seconds
 
 ========================================
 
-Once upon a time, there was a little girl named Lily who lived in a small village surrounded by rolling hills, green forests, and sparkling streams. Lily loved to explore the outdoors, and she spent most of her free time playing in the woods, climbing trees, and chasing after butterflies.
-
-One sunny afternoon, Lily decided to go on a picnic with her family. They packed a basket with sandwiches, fruits, and cheese, and set off towards a nearby meadow that Lily's father had shown her the day before.
-
-The meadow was a beautiful spot with a picturesque lake in the center, surrounded by tall trees and colorful wildflowers. Lily and her family arranged a picnic blanket under a big oak tree and began to eat their lunch.
-
-As they were eating, Lily's father pointed out a small wooden boat that was tied to a branch of a nearby willow tree. The boat looked old and worn, but it seemed sturdy enough.
-
-“Should we take a ride on the boat, Papa?” Lily asked, her eyes shining with excitement.
-
-Her father nodded, and soon they were all sitting in the boat, paddling gently across the lake's calm waters. The sun was shining, the air was filled with the sweet scent of blooming flowers, and Lily felt as happy as she could be
+Once upon a time, in a small village surrounded by rolling green hills and sparkling crystal streams, there lived a young boy named Leo. He was a curious and adventurous boy, always eager to explore the world around him. Leo loved nothing more than spending his days outdoors, whether it was climbing trees, chasing after butterflies, or simply lying in the sun and watching the clouds drift lazily by.
+One day, as Leo was wandering through the village, he stumbled upon an old, mysterious-looking shop. The sign above the door read "Curios and Wonders," and the windows were filled with strange and exotic treasures. Leo's curiosity was piqued, and he pushed open the door to venture inside.
+The shop was dimly lit, the air thick with the scent of old books and dust. Shelves lined the walls, packed tightly with all manner of strange and wonderful objects. Leo wandered the aisles, his eyes widening as he took in the endless wonders on display. There were antique clocks, shimmering gemstones, and even a taxidermied eagle perched atop a shelf, its glassy eyes seeming to stare right through him.
+As Leo explored the shop, he stumbled upon a small, leather-bound book with a strange symbol etched into the cover. The symbol seemed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 2: 21.5097 sec total                 
-Time to first token: 0.3739 sec with parallel prefill.                
+Time for inference 2: 25.8322 sec total                 
+Time to first token: 0.3133 sec with parallel prefill.                
 
-      Total throughput: 11.9016 tokens/sec, 0.0840 s/token                 
-First token throughput: 2.6747 tokens/sec, 0.3739 s/token                 
- Next token throughput: 12.0648 tokens/sec, 0.0829 s/token                     
+      Total throughput: 9.9101 tokens/sec, 0.1009 s/token                 
+First token throughput: 3.1921 tokens/sec, 0.3133 s/token                 
+ Next token throughput: 9.9926 tokens/sec, 0.1001 s/token                     
 
-Bandwidth achieved: 58.57 GB/s
+Bandwidth achieved: 48.77 GB/s
 
 ========================================
 
-Once upon a time, the City of London was not a member of the European Union (EU), but it was part of the European Exchange Rate Mechanism (ERM). This was part of a broader strategy by the UK government to keep the pound sterling as a widely-traded currency while still being part of the EU.
-But why was the City of London so keen to remain an outsider among the EU's economic systems?
-According to a recent book by the British economist Ruchir Sharma, the answer is quite straightforward: the banking industry in the City of London is largely a non-exchange based system. In most other European countries, the banking system is completely based on the exchange of money, as is the case with most of the retail banking systems across the world.
-In the City of London, however, the banking industry is largely based on the non-exchange system, which is commonly known as the offshore banking system. In this system, there are no exchange operations, no foreign currency transactions, no cross-border payments, and no capital controls.
-The offshore banking system of the City of London is essentially a system of foreign exchange management. This has led to a huge industry of currency brokers and traders who work for banks and other financial institutions. They deal with large volumes of international currency transactions, including
+Once upon a time, there was a small village surrounded by vast fields of wheat, and a winding river that flowed gently through the heart of the village. The villagers lived simple lives, working hard from dawn till dusk, and enjoying the beauty of nature around them.
+One day, a wise old man named Ravi came to the village. He was known for his wisdom and knowledge, and the people of the village looked up to him with great respect. Ravi had a special gift – he could see into the future.
+The villagers would often gather around him, asking for his guidance on various matters. Ravi would listen carefully, and then offer words of wisdom that would help them make informed decisions.
+One day, a young village girl named Rohini came to Ravi with a problem. She was in love with a boy named Bhargav, but Bhargav’s family was very poor, and Rohini’s parents wanted her to marry a wealthy man named Vikram. Rohini was torn between her love for Bhargav and her obligations to her family.
+Ravi listened to Rohini’s story and then looked into the future. He saw a picture of Bhargav, a brilliant scientist, working on a new invention that would change the world. He saw Rohini, a
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
 Generated 255 tokens                 
-Time for inference 3: 19.6361 sec total                 
-Time to first token: 0.2698 sec with parallel prefill.                
+Time for inference 3: 23.7908 sec total                 
+Time to first token: 0.3015 sec with parallel prefill.                
 
-      Total throughput: 13.0372 tokens/sec, 0.0767 s/token                 
-First token throughput: 3.7066 tokens/sec, 0.2698 s/token                 
- Next token throughput: 13.1672 tokens/sec, 0.0759 s/token                     
+      Total throughput: 10.7605 tokens/sec, 0.0929 s/token                 
+First token throughput: 3.3173 tokens/sec, 0.3015 s/token                 
+ Next token throughput: 10.8560 tokens/sec, 0.0921 s/token                     
 
-Bandwidth achieved: 64.15 GB/s
+Bandwidth achieved: 52.95 GB/s
 
 ========================================
 
 
-      Average tokens/sec (total): 9.30                 
-Average tokens/sec (first token): 3.32                 
-Average tokens/sec (next tokens): 9.40 
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 10.34                 
+Average tokens/sec (first token): 3.25                 
+Average tokens/sec (next tokens): 10.42 
                 
 Memory used: 0.00 GB

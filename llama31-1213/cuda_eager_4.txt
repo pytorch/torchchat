@@ -1,0 +1,73 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+PyTorch version 2.6.0.dev20241213+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 5.77 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.58 seconds
+-----------------------------------------------------------
+Once upon a time, there was a young man who wanted to learn how to play the guitar. He had always been fascinated by the sounds and rhythms of the instrument and wanted to be able to play it himself. So, he went out and bought himself a guitar and started practicing every day.
+At first, it was tough. His fingers would hurt and his hands would cramp. He would get frustrated when he couldn't get the chords right or when the strings would buzz. But he didn't give up. He kept practicing, and slowly but surely, he started to get better.
+As he got more confident, he started to play with other people, joining a band or playing at open mic nights. He even started to write his own music, and people began to take notice of his talent.
+He became known as a skilled guitarist, and people would come from all over to hear him play. He would play at weddings and parties, and even landed a record deal with a big music label.
+The once young
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 19.6881 sec total                 
+Time to first token: 0.3371 sec with parallel prefill.                
+
+      Total throughput: 10.1584 tokens/sec, 0.0984 s/token                 
+First token throughput: 2.9664 tokens/sec, 0.3371 s/token                 
+ Next token throughput: 10.2837 tokens/sec, 0.0972 s/token                     
+
+Bandwidth achieved: 163.15 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a small village surrounded by rolling hills and lush green forests, there lived a young girl named Lily. She was a kind and gentle soul, with a heart full of love for all living things. Lily lived with her grandmother, who was a wise and respected woman in the village. Together, they tended to a beautiful garden filled with vibrant flowers, sweet-smelling herbs, and juicy fruits.
+
+One day, while Lily was out collecting wildflowers, she stumbled upon a tiny, furry creature with big brown eyes. The creature, who introduced himself as Finn, was a lost and scared little rabbit. Lily immediately took pity on him and decided to take him home, where her grandmother welcomed him with open arms.
+
+As the days went by, Lily and her grandmother took care of Finn, feeding him nutritious food and giving him a warm and cozy place to sleep. They soon discovered that Finn had a remarkable talent – he could sense and detect even the slightest changes in his surroundings, from the sweetest
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 19.7267 sec total                 
+Time to first token: 0.0860 sec with parallel prefill.                
+
+      Total throughput: 10.1386 tokens/sec, 0.0986 s/token                 
+First token throughput: 11.6323 tokens/sec, 0.0860 s/token                 
+ Next token throughput: 10.1320 tokens/sec, 0.0987 s/token                     
+
+Bandwidth achieved: 162.83 GB/s
+
+========================================
+
+Once upon a time, in a small village surrounded by vast fields of wheat and barley, there lived a young girl named Sophia. Sophia was known throughout the village for her incredible beauty and her extraordinary talent as a singer. She had a voice that could calm the savage beast and lift the spirits of even the most downtrodden person.
+One day, a grand procession came to the village, led by the King himself, who was known for his fairness and kindness. The villagers were overjoyed and gathered in large numbers to catch a glimpse of their monarch.
+As the procession marched through the village, Sophia stood on the edge of the crowd, her eyes fixed on the regal figure of the King. She was awestruck by his grandeur and majesty. The King, too, noticed her and was struck by her beauty and poise. He ordered his guards to bring the girl closer to him.
+As Sophia approached the King, she bowed low and greeted him with the traditional village customs. The King,
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 19.5912 sec total                 
+Time to first token: 0.0945 sec with parallel prefill.                
+
+      Total throughput: 10.2087 tokens/sec, 0.0980 s/token                 
+First token throughput: 10.5812 tokens/sec, 0.0945 s/token                 
+ Next token throughput: 10.2069 tokens/sec, 0.0980 s/token                     
+
+Bandwidth achieved: 163.96 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 10.17                 
+Average tokens/sec (first token): 8.39                 
+Average tokens/sec (next tokens): 10.21 
+                
+Memory used: 24.80 GB

@@ -1,0 +1,72 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+PyTorch version 2.6.0.dev20241213+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 6.09 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in a galaxy far, far away, there existed a magical place called the Forest of Dreams. This enchanted land was home to a magnificent, ancient tree known as the Tree of Wisdom.
+As the sun set, and the stars began to twinkle, the Tree of Wisdom would transform into a magnificent sight to behold. Its trunk would shimmer with a soft, ethereal glow, and its branches would stretch out like a canopy of sparkling diamonds, reaching for the stars.
+Within the forest, there lived a young adventurer named Luna. Luna was a curious and brave soul, with a heart full of wonder and a mind full of questions. She was determined to find the Tree of Wisdom, to unlock its secrets, and to gain the wisdom that it held.
+One evening, Luna set out on her journey, following the winding paths and glistening streams of the Forest of Dreams. As she wandered deeper into the forest, the shadows grew darker, and the silence grew thicker, like a heavy mist.
+L
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 14.0259 sec total                 
+Time to first token: 0.6336 sec with parallel prefill.                
+
+      Total throughput: 14.2593 tokens/sec, 0.0701 s/token                 
+First token throughput: 1.5783 tokens/sec, 0.6336 s/token                 
+ Next token throughput: 14.8593 tokens/sec, 0.0673 s/token                     
+
+Bandwidth achieved: 229.01 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, at the end of the last Ice Age, a strange object fell from the sky to the earth in the modern-day state of Nebraska, USA. The object was a metallic meteorite, known as the Sutter's Mill meteorite, which weighed over 1,000 kilograms (2,200 pounds) and was heavily shaped by its passage through the atmosphere.
+The meteorite was one of the most significant meteorites discovered in history, containing a large quantity of extraterrestrial material, including tiny fragments of the sun's photosphere, the surface of the sun and other celestial objects.
+Although the meteorite itself was not radioactive, it contained a small amount of noble gas such as Krypton, which was trapped inside the rocky fragments of the meteorite. Scientists were able to analyze the Krypton to learn more about the age of the meteorite, which turned out to be approximately 6.2 million years old.
+The analysis of the meteorite revealed that it was a fragment of the largest
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 12.6627 sec total                 
+Time to first token: 0.0586 sec with parallel prefill.                
+
+      Total throughput: 15.7945 tokens/sec, 0.0633 s/token                 
+First token throughput: 17.0624 tokens/sec, 0.0586 s/token                 
+ Next token throughput: 15.7886 tokens/sec, 0.0633 s/token                     
+
+Bandwidth achieved: 253.67 GB/s
+
+========================================
+
+Once upon a time, a young girl named Sophia lived in a small village surrounded by vast fields and dense forests. She was a curious and adventurous child, always eager to explore the world around her. One day, while wandering through the forest, Sophia stumbled upon a mysterious and magical garden. The garden was filled with beautiful flowers, sparkling fountains, and towering trees that seemed to stretch up to the sky.
+As Sophia explored the garden, she came across a talking tree named Oakley. Oakley was an ancient and wise tree, with a deep understanding of the natural world. He welcomed Sophia to the garden and offered to show her the secrets and wonders that lay within.
+Together, Sophia and Oakley explored the garden, discovering hidden paths, sparkling waterfalls, and secret glades. Along the way, Oakley taught Sophia about the magic of the natural world, from the way the trees communicated with each other through their roots, to the way the flowers bloomed in response to the changing seasons.
+As the sun
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 12.2806 sec total                 
+Time to first token: 0.0539 sec with parallel prefill.                
+
+      Total throughput: 16.2858 tokens/sec, 0.0614 s/token                 
+First token throughput: 18.5675 tokens/sec, 0.0539 s/token                 
+ Next token throughput: 16.2758 tokens/sec, 0.0614 s/token                     
+
+Bandwidth achieved: 261.56 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 15.45                 
+Average tokens/sec (first token): 12.40                 
+Average tokens/sec (next tokens): 15.64 
+                
+Memory used: 16.68 GB
