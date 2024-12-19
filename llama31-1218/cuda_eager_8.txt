@@ -1,0 +1,70 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 6.10 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.42 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Lily. Lily was a curious and adventurous child, always eager to explore the world around her. She loved nothing more than to wander through the village, discovering new sights, sounds, and smells.
+One day, while out exploring, Lily stumbled upon a small, mysterious shop tucked away on a quiet street. The sign above the door read "Curios and Wonders," and the windows were filled with all manner of strange and fascinating objects.
+Lily's curiosity was piqued, and she pushed open the door to reveal a dimly lit interior filled with rows upon rows of shelves, each one packed with an assortment of peculiar items. There were vintage toys, antique furniture, and even what appeared to be a taxidermied owl perched on a shelf, watching her every move.
+As she wandered deeper into the shop, Lily came across a small, glass-fronted cabinet filled with an
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 16.5574 sec total                 
+Time to first token: 0.5756 sec with parallel prefill.                
+
+      Total throughput: 12.0792 tokens/sec, 0.0828 s/token                 
+First token throughput: 1.7373 tokens/sec, 0.5756 s/token                 
+ Next token throughput: 12.4517 tokens/sec, 0.0803 s/token                     
+
+Bandwidth achieved: 103.38 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, I had the pleasure of photographing the newlywed couple, Ashley and Drew for their engagement session in downtown Boise. It was a beautiful day filled with laughter, exploring, and capturing some amazing moments between these two. Their love for each other shines through in every photo we took that day. I love how their personalities and quirkiness came through, and I was so happy to be a part of their special moments.
+Ashley and Drew were a blast to work with. They had such a great dynamic and natural chemistry. From the moment we started shooting, they both had a infectious energy that made the whole experience so enjoyable. They laughed, joked, and even did a little jig or two, which made my job so much easier. It was clear that they have found their partner in crime and that their love for each other is the real deal.
+One of my favorite parts of the session was when we were walking through the city streets and they stumbled upon a quirky little shop with a vintage
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 16.1635 sec total                 
+Time to first token: 0.0700 sec with parallel prefill.                
+
+      Total throughput: 12.3736 tokens/sec, 0.0808 s/token                 
+First token throughput: 14.2776 tokens/sec, 0.0700 s/token                 
+ Next token throughput: 12.3653 tokens/sec, 0.0809 s/token                     
+
+Bandwidth achieved: 105.90 GB/s
+
+========================================
+
+Once upon a time, in a world not so different from our own, there was a small village nestled in the mountains. The villagers lived simple lives, farming, hunting, and trading among themselves. They were a tight-knit community, looking out for one another and relying on each other's skills to survive.
+One day, a stranger arrived in the village. He was tall, dark-haired, and had piercing green eyes that seemed to see right through you. He wore a long, black coat with a hood that cast a shadow over his face, making him look mysterious and otherworldly.
+At first, the villagers were wary of the stranger. They didn't know where he came from or what his intentions were. But as he began to help them with their daily tasks, they started to feel more at ease around him.
+The stranger, who introduced himself as Eryndor Thorne, was an expert hunter and tracker. He helped the villagers catch their prey, fix their traps, and even taught them
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 16.0147 sec total                 
+Time to first token: 0.0755 sec with parallel prefill.                
+
+      Total throughput: 12.4886 tokens/sec, 0.0801 s/token                 
+First token throughput: 13.2400 tokens/sec, 0.0755 s/token                 
+ Next token throughput: 12.4850 tokens/sec, 0.0801 s/token                     
+
+Bandwidth achieved: 106.89 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 12.31                 
+Average tokens/sec (first token): 9.75                 
+Average tokens/sec (next tokens): 12.43 
+                
+Memory used: 28.86 GB
