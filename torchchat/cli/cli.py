@@ -17,7 +17,15 @@ from torchchat.utils.build_utils import (
     allowable_params_table,
 )
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+_log_level_env = os.getenv("LOG_LEVEL", "INFO")
+try:
+    _log_level = getattr(logging, _log_level_env.upper())
+except AttributeError:
+    print(f"Invalid log level: {_log_level_env}", file=sys.stderr)
+    _log_level = logging.INFO
+
+
+logging.basicConfig(level=_log_level, format="%(message)s")
 logger = logging.getLogger(__name__)
 
 default_device = os.getenv("TORCHCHAT_DEVICE", "fast")
