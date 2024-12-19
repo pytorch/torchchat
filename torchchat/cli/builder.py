@@ -14,10 +14,17 @@ from typing import Any, Dict, Optional, Tuple, Union
 import torch
 import torch._dynamo.config
 import torch._inductor.config
-import torch.nn as nn
+import torch.distributed as dist
 
-from torchchat.model import Model, ModelArgs, ModelType
+from torchchat.distributed.utils import(
+    Color as color,
+    CUDATrackTime,
+    init_distributed,
+    GPUMemoryMonitor,
+)
+from torchchat.distributed.logging_utils import SingletonLogger
 
+from torchchat.model import Model, ModelArgs, ModelType, Transformer, TransformerArgs
 from torchchat.model_config.model_config import resolve_model_config
 from torchchat.utils.build_utils import (
     device_sync,
@@ -27,6 +34,7 @@ from torchchat.utils.build_utils import (
 )
 from torchchat.utils.measure_time import measure_time
 from torchchat.utils.quantize import quantize_model
+
 
 from torchtune.models.convert_weights import meta_to_tune
 
@@ -56,6 +64,7 @@ class BuilderArgs:
     pp: int = 1
     tp: int = 1
     chpt_from: str = "hf"
+    distribution_path: Optional[str] = None
     is_chat_model: bool = False
     prefill_possible: bool = False
     dynamic_shapes: bool = False
@@ -107,6 +116,7 @@ class BuilderArgs:
 
         checkpoint_path = args.checkpoint_path
         params_table = args.params_table
+        distribution_path = None
         if args.model:  # Using a named, well-known model
             model_config = resolve_model_config(args.model)
 
@@ -120,6 +130,8 @@ class BuilderArgs:
             params_table = (
                 model_config.transformer_params_key or model_config.name.split("/")[-1]
             )
+
+            distribution_path = model_config.distribution_path
 
         dso_path = getattr(args, "dso_path", None)
         pte_path = getattr(args, "pte_path", None)
@@ -186,6 +198,7 @@ class BuilderArgs:
             pp=pp,
             tp=tp,
             chpt_from=chpt_from,
+            distribution_path=distribution_path,
             is_chat_model=is_chat_model,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),
@@ -601,6 +614,100 @@ def _initialize_model(
             model = PTEModel(config, builder_args.pte_path)
         except Exception:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
+    elif builder_args.distributed:
+        pp_degree = builder_args.pp
+        tp_degree = builder_args.tp
+
+        init_distributed()
+        rank = dist.get_rank()
+        torch.cuda.set_device(rank % torch.cuda.device_count())
+
+        logger = SingletonLogger.get_logger()
+
+        gpu_memory_monitor = GPUMemoryMonitor("cuda")
+        logger.info(f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}")
+
+        # Model-level config
+        if builder_args.params_table:
+            model_config = ModelArgs.from_table(builder_args.params_table)
+        else:
+            raise NotImplementedError()
+        # Transformer-level config
+        config = TransformerArgs.from_params(model_config.transformer_args["text"])
+        logger.info(f"Transformer Config: {config}")
+
+        #TODO: Move into head of file after solving circular import
+        from torchchat.distributed.checkpoint_utils import (
+            load_model_weights,
+            )
+
+        # Validate pipeline degree
+        assert config.n_layers % pp_degree == 0
+
+        # Create device mesh
+        device_mesh = dist.init_device_mesh(
+            "cuda",
+            (pp_degree, tp_degree),
+            mesh_dim_names=("pp", "tp")
+            )
+        tp_mesh = device_mesh["tp"]
+        pp_mesh = device_mesh["pp"]
+        logger.info(f"Created device mesh: {device_mesh}\n{tp_mesh=}, {pp_mesh=}")
+
+        pp_rank = pp_mesh.get_local_rank()
+        logger.info(f"{pp_degree=}, {tp_degree=}")
+
+        # Assuming same number of GPUs per node
+        device = torch.device(f"cuda:{rank % torch.cuda.device_count()}")
+
+        # Fill in PP configs
+        config.stage_idx = pp_rank
+        config.n_stages = pp_degree
+
+        with torch.device("meta"):
+            # TODO: we should create model instead of Transformer
+            model = Transformer(config)
+
+        # Distribute model on TP mesh
+        # (Surprisingly, this works even though model is on meta device and mesh is of
+        # cuda devices)
+        model.distribute(tp_mesh)
+        if rank == 0:
+            logger.info(f"Model: {model}")
+
+        # Load weights
+        logger.info(f"Loading weights for {pp_rank=} on {device=}")
+        with CUDATrackTime() as timer:
+            load_model_weights(model, builder_args.distribution_path, device, config, builder_args.chpt_from)
+
+        logger.info(
+            f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
+        )
+
+        # Setup KV caches (after model distribution)
+        # The number of cache lanes is the same as the maximum number of
+        # micro-batches that can be "in flight" in parallel -- imagine each
+        # micro-batch takes 1 "pipeline lane," they need distinct KV cache spaces.
+        # When decoding is done for certain micro-batches, we can reuse the KV cache
+        # lanes.
+        # TODO: bump up the lane count
+        pipeline_lanes = 1
+        seqlen_prefill=1024
+        with device:
+            model.setup_caches(1, seqlen_prefill, cache_lanes=pipeline_lanes)
+
+        # info on stage size and params
+        # stage_size = get_module_size(model)
+        # stage_size_formatted = bytes_to_readable(stage_size)
+        # stage_num_params = get_num_params(model)
+        # logger.info(
+        #     f"Stage {rank} has {color.blue}{stage_num_params} params{color.reset}, Size: {color.blue}{stage_size_formatted}{color.reset}"
+        # )
+        model.eval()
+
+        model.text_transformer_args = None
+        model.config.model_type = model_config.model_type
+        model.device_mesh = device_mesh
     else:
         with measure_time("Time to load model: {time:.02f} seconds"):
             model = _load_model(builder_args)
