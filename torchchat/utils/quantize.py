@@ -63,10 +63,10 @@ import inspect
 def get_named_parameters(func: Callable) -> List[str]:
     # Get the signature of the function
     signature = inspect.signature(func)
-    
+
     # Extract the parameters from the signature
     parameters = signature.parameters
-    
+
     # Filter and return named parameters
     named_params = [
         name for name, param in parameters.items()
@@ -80,8 +80,8 @@ def validate_args(named_params: List[str], q_kwargs: Dict[str, Any], quantizer: 
             print(f"Specification for quantizer {quantizer} has extraneous key {key}. Ignoring.")
             del q_kwargs[key]
     return q_kwargs
-    
-            
+
+
 #########################################################################
 ###                  torchchat quantization API                       ###
 
@@ -116,15 +116,18 @@ def quantize_model(
                 if not support_tensor_subclass:
                     unwrap_tensor_subclass(model)
                 continue
-            
+
             if quantizer in ["linear:a8wxdq", "embedding:wx"]:
                 # These quantizers require float32 input weights.  Note that after quantization,
                 # the weights will no longer be float32, but lowbit integers
                 if get_precision() != torch.float32:
                     print(f"Quantizer {quantizer} requires float32 inputs, but received {get_precision()}.  Changing dtype to float32.  Note that after quantization, the weights will be lowbit integers, not float32.")
                     set_precision(torch.float32)
-                
-            # We set global precision from quantize options if it is specified at cli.py:485 
+
+            if quantizer == "linear:afpwx" and device != "mps":
+                raise RuntimeError("linear:afpwx quantization can only run on mps device!")
+
+            # We set global precision from quantize options if it is specified at cli.py:485
             # so the precision returned by get_precision() is always the authoritative precision/dtype in torchchat
             precision = get_precision()
 
@@ -915,10 +918,12 @@ try:
     from torchao_experimental_quant_api import (
         Int8DynActIntxWeightLinearQuantizer,
         IntxWeightEmbeddingQuantizer,
+        UIntxWeightOnlyLinearQuantizer,
     )
 
     quantizer_class_dict["linear:a8wxdq"] = Int8DynActIntxWeightLinearQuantizer
     quantizer_class_dict["embedding:wx"] = IntxWeightEmbeddingQuantizer
+    quantizer_class_dict["linear:afpwx"] = UIntxWeightOnlyLinearQuantizer
 
     # Try loading custom op
     try:
@@ -927,16 +932,17 @@ try:
         libs = glob.glob(f"{torchao_build_path}/cmake-out/lib/libtorchao_ops_aten.*")
         libs = list(filter(lambda l: (l.endswith("so") or l.endswith("dylib")), libs))
         torch.ops.load_library(libs[0])
+        print("Loaded torchao cpu ops.")
     except Exception as e:
-        print("Failed to torchao ops library with error: ", e)
-        print("Slow fallback kernels will be used.")
+        print("Unabled to load torchao cpu ops library. Slow fallback kernels will be used.")
+
+    try:
+        libname = "libtorchao_ops_mps_aten.dylib"
+        libpath = f"{torchao_build_path}/cmake-out/lib/{libname}"
+        torch.ops.load_library(libpath)
+        print("Loaded torchao mps ops.")
+    except Exception as e:
+        print("Unabled to load torchao mps ops library.")
 
 except Exception as e:
-    class ErrorHandler(QuantHandler):
-        def __init__(self, model: Optional[nn.Module]=None, device="cpu", precision=None):
-            global torchao_experimental_load_error
-            raise Exception(f"Note: Failed to load torchao experimental quantizer with error: {torchao_experimental_load_error}")
-            
-    torchao_experimental_load_error = e
-    quantizer_class_dict["linear:a8wxdq"] = ErrorHandler
-    quantizer_class_dict["embedding:wx"] = ErrorHandler
+    print("Unabled to import torchao experimental quant_api with error: ", e)
