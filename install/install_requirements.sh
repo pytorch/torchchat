@@ -44,17 +44,6 @@ fi
 
 echo "Using pip executable: $PIP_EXECUTABLE"
 
-#
-# First install requirements in install/requirements.txt. Older torch may be
-# installed from the dependency of other models. It will be overridden by
-# newer version of torch nightly installed later in this script.
-#
-
-(
-  set -x
-  $PIP_EXECUTABLE install -r install/requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cu121
-)
-
 # Since torchchat often uses main-branch features of pytorch, only the nightly
 # pip versions will have the required features. The PYTORCH_NIGHTLY_VERSION value should
 # agree with the third-party/pytorch pinned submodule commit.
@@ -94,6 +83,16 @@ REQUIREMENTS_TO_INSTALL=(
   torch=="2.6.0.${PYTORCH_NIGHTLY_VERSION}"
   torchvision=="0.22.0.${VISION_NIGHTLY_VERSION}"
   torchtune=="0.5.0.${TUNE_NIGHTLY_VERSION}"
+)
+
+#
+# First install requirements in install/requirements.txt. Older torch may be
+# installed from the dependency of other models. It will be overridden by
+# newer version of torch nightly installed later in this script.
+#
+(
+  set -x
+  $PIP_EXECUTABLE install -r install/requirements.txt --extra-index-url "${TORCH_NIGHTLY_URL}"
 )
 
 # Install the requirements. --extra-index-url tells pip to look for package
