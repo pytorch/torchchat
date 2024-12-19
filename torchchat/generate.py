@@ -1229,7 +1229,7 @@ class LocalGenerator:
                 aggregate_metrics["first_token_per_sec"].append(first_token_sec)
                 aggregate_metrics["next_tokens_per_sec"].append(next_tokens_sec)
 
-            logger.info(
+            logging.info(
                 f"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\
                 \nGenerated {num_tokens_generated} tokens \
                 \nTime for inference {i + 1}: {t:.04f} sec total \
@@ -1240,11 +1240,11 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
                 \n Next token throughput: {next_tokens_sec:.04f} tokens/sec, {1 / next_tokens_sec:.04f} s/token \
                     "
             )
-            logger.info(
+            logging.info(
                 f"\nBandwidth achieved: {model_size * tokens_sec / 1e9:.02f} GB/s"
             )
             if i == 0:
-                logger.info(
+                logging.info(
                     f"*** This first iteration will include cold start effects for dynamic import, hardware caches{', JIT compilation' if jit_compile else ''}. ***"
                 )
             print("\n========================================\n")
