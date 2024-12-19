@@ -728,6 +728,10 @@ class Transformer(nn.Module):
         if self.tok_embeddings:
             x = self.tok_embeddings(x)
 
+            # For Granite architectures
+            if self.config.embedding_multiplier:
+                x = x * self.config.embedding_multiplier
+
         for _, layer in self.layers.items():
             x = layer(x, input_pos, freqs_cis, mask, cache_lane=cache_lane)
 
@@ -735,6 +739,9 @@ class Transformer(nn.Module):
             x = self.norm(x)
         if self.output:
             x = self.output(x)
+        # For granite architectures
+        if self.config.logits_scaling:
+            x = x / self.config.logits_scaling
         # print(f"output shape: {x.shape}")
         return x
 
@@ -746,6 +753,12 @@ class TransformerBlock(nn.Module):
         self.feed_forward = FeedForward(config)
         self.ffn_norm = RMSNorm(config.dim, config.norm_eps)
         self.attention_norm = RMSNorm(config.dim, config.norm_eps)
+        # None for llama architecture, set for granite architectures
+        self.residual_multiplier = (
+            config.residual_multiplier
+            if config.residual_multiplier is not None
+            else 1.0
+        )
 
     def distribute(self, device_mesh: DeviceMesh):
         self.attention.distribute(device_mesh)
@@ -756,8 +769,8 @@ class TransformerBlock(nn.Module):
     ) -> Tensor:
         h = x + self.attention(
             self.attention_norm(x), freqs_cis, mask, input_pos, cache_lane=cache_lane
-        )
-        out = h + self.feed_forward(self.ffn_norm(h))
+        ) * self.residual_multiplier
+        out = h + self.feed_forward(self.ffn_norm(h)) * self.residual_multiplier
         return out
 
 
@@ -784,6 +797,7 @@ class Attention(nn.Module):
         self.head_dim = config.head_dim
         self.n_local_heads = config.n_local_heads
         self.dim = config.dim
+        self.attention_scale = config.attention_multiplier
         self._register_load_state_dict_pre_hook(self.load_hook)
 
     def setup_cache(self, max_batch_size, max_seq_length, cache_lanes: int = 1):
@@ -880,7 +894,16 @@ class Attention(nn.Module):
 
         k = k.repeat_interleave(self.n_heads // self.n_local_heads, dim=1)
         v = v.repeat_interleave(self.n_heads // self.n_local_heads, dim=1)
-        y = F.scaled_dot_product_attention(q, k, v, attn_mask=mask, dropout_p=0.0)
+        y = F.scaled_dot_product_attention(
+            query=q,
+            key=k,
+            value=v,
+            attn_mask=mask,
+            dropout_p=0.0,
+            # This is None (default) for llama architecture and set for granite
+            # architectures
+            scale=self.attention_scale,
+        )
 
         # -1 = self.dim
         y = y.transpose(1, 2).contiguous().view(bsz, seqlen, -1)
