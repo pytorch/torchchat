@@ -1,0 +1,73 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 8.50 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of rural France, there lived a young girl named Sophie. Sophie was a curious and adventurous child, with a passion for exploring the world around her.
+One day, while wandering through the village, Sophie stumbled upon a beautiful, old-fashioned clock shop. The sign above the door read "Monsieur LeFleur's Clocks," and the windows were filled with all sorts of fascinating timekeeping devices.
+Sophie's eyes widened as she pushed open the door and stepped inside. The shop was dimly lit, with soft candles flickering on the shelves, casting a warm glow over the intricate clockwork mechanisms on display.
+Monsieur LeFleur, the shop's owner, looked up from his workbench and smiled at Sophie. "Bonjour, mademoiselle," he said, his voice warm and welcoming. "Welcome to my humble shop. How may I assist you today?"
+Sophie's eyes scanned the shelves, taking in the
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 12.8346 sec total                 
+Time to first token: 0.4995 sec with parallel prefill.                
+
+      Total throughput: 15.5829 tokens/sec, 0.0642 s/token                 
+First token throughput: 2.0019 tokens/sec, 0.4995 s/token                 
+ Next token throughput: 16.1329 tokens/sec, 0.0620 s/token                     
+
+Bandwidth achieved: 250.27 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, there was a magical kingdom hidden deep within a dense forest. This kingdom was ruled by a wise and just king who loved his people deeply. However, a dark force had begun to spread across the land, threatening to destroy everything the king had worked to build.
+The king knew that he needed to find a way to defeat this dark force, but he was faced with a problem. He had a daughter, a beautiful and brave princess, who had grown up with the knowledge of how to harness her magical powers. However, the king was afraid to let his daughter go on a quest to defeat the dark force, as he did not want to put her in harm's way.
+One day, a wise old wizard came to the kingdom and offered to help the king defeat the dark force. The wizard told the king that he had a plan, but it would require the king to let his daughter go on a quest. The king was hesitant, but the wizard assured him that his daughter was the only
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 12.3767 sec total                 
+Time to first token: 0.0551 sec with parallel prefill.                
+
+      Total throughput: 16.1593 tokens/sec, 0.0619 s/token                 
+First token throughput: 18.1489 tokens/sec, 0.0551 s/token                 
+ Next token throughput: 16.1504 tokens/sec, 0.0619 s/token                     
+
+Bandwidth achieved: 259.53 GB/s
+
+========================================
+
+Once upon a time, in the quaint town of Willow Creek, there lived a young girl named Emily. Emily was a curious and adventurous child, with a heart full of wonder and a mind full of questions. She loved to explore the world around her, and her favorite thing to do was to wander through the woods that surrounded her town.
+One day, as Emily was walking through the woods, she stumbled upon a hidden path she had never seen before. The path was overgrown with weeds and vines, and it looked like it hadn’t been traveled in a long time. But something about it drew Emily in, and she felt compelled to follow it.
+
+As she made her way down the path, the trees grew closer together, and the air grew thick with the scent of damp earth and decaying leaves. Emily felt a shiver run down her spine, but she pressed on, her curiosity getting the better of her.
+
+The path twisted and turned, leading Emily deeper and deeper into the woods. She began to feel
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 13.2078 sec total                 
+Time to first token: 0.0775 sec with parallel prefill.                
+
+      Total throughput: 15.1426 tokens/sec, 0.0660 s/token                 
+First token throughput: 12.8965 tokens/sec, 0.0775 s/token                 
+ Next token throughput: 15.1559 tokens/sec, 0.0660 s/token                     
+
+Bandwidth achieved: 243.20 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 15.63                 
+Average tokens/sec (first token): 11.02                 
+Average tokens/sec (next tokens): 15.81 
+                
+Memory used: 16.68 GB

@@ -1,0 +1,72 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 6.13 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.53 seconds
+-----------------------------------------------------------
+Once upon a time, there was a beautiful village surrounded by dense forests and rolling hills. The villagers lived in harmony with nature, respecting the land and its resources. They built their homes with natural materials, planted trees and flowers, and worked in the fields from dawn till dusk.
+One day, a young boy named Kaito wandered into the forest, curious about the strange sounds and sights. He had heard stories of a magical spring that bubbled out of the earth, but couldn't find it anywhere. His friends teased him for being too lazy, too slow, or too weak to find it.
+Kaito wouldn't give up. He kept exploring until the sun began to set, and even as the stars started to twinkle in the sky. He followed his instincts and sense of smell, through the forest, until he stumbled upon a small clearing. At its center stood an enormous tree, its branches like giant arms embracing the sky.
+In the tree's trunk was a small entrance, guarded by a wise
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 257.7957 sec total                 
+Time to first token: 0.3057 sec with parallel prefill.                
+
+      Total throughput: 0.7758 tokens/sec, 1.2890 s/token                 
+First token throughput: 3.2709 tokens/sec, 0.3057 s/token                 
+ Next token throughput: 0.7728 tokens/sec, 1.2939 s/token                     
+
+Bandwidth achieved: 12.46 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2.6e+02 seconds
+
+========================================
+
+Once upon a time, there was a young girl named Lily. She was a shy and quiet child who rarely spoke up in class or in front of her family. Her mother, a kind and patient woman, tried to encourage Lily to be more outgoing and talkative, but Lily just couldn’t seem to muster up the courage.
+One day, Lily’s teacher, Mrs. Johnson, announced that the class would be putting on a school play. Lily was intrigued by the idea and decided to sign up. Mrs. Johnson was thrilled and began to assign roles to the students.
+Lily was surprised to find out that she was chosen to play the lead role in the play. She was hesitant at first, but with Mrs. Johnson’s encouragement, she began to practice her lines and rehearse her performance.
+As the big night approached, Lily became more and more anxious. She was afraid of making mistakes and feared that everyone would laugh at her. Mrs. Johnson saw Lily’s distress and took her aside for a talk.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 5.3577 sec total                 
+Time to first token: 0.0916 sec with parallel prefill.                
+
+      Total throughput: 37.3294 tokens/sec, 0.0268 s/token                 
+First token throughput: 10.9147 tokens/sec, 0.0916 s/token                 
+ Next token throughput: 37.7889 tokens/sec, 0.0265 s/token                     
+
+Bandwidth achieved: 599.53 GB/s
+
+========================================
+
+Once upon a time, there were three friends, Alex, Ben and Charlie. They were all high school students, and they decided to have a road trip to Las Vegas one summer. The trip was planned to be a 5-day long journey of fun and excitement.
+Day 1: The group set off in the morning from their hometown in a car, with snacks, music, and a map to guide them. The temperature was hot, but they were excited to start their adventure. They drove for 6 hours before reaching their first stop, the Grand Canyon. They spent the day exploring the Canyon, taking pictures and gazing at the majestic beauty. In the evening, they headed to their hotel, and had a dinner of burgers and french fries.
+Day 2: The next morning, they started driving to Las Vegas, a 4-hour drive from their previous night’s hotel. On their way, they stopped at a rest stop where a group of musicians were performing. The trio enjoyed the music and even
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 3.4664 sec total                 
+Time to first token: 0.0975 sec with parallel prefill.                
+
+      Total throughput: 57.6975 tokens/sec, 0.0173 s/token                 
+First token throughput: 10.2556 tokens/sec, 0.0975 s/token                 
+ Next token throughput: 59.0707 tokens/sec, 0.0169 s/token                     
+
+Bandwidth achieved: 926.65 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 47.51                 
+Average tokens/sec (first token): 10.59                 
+Average tokens/sec (next tokens): 48.43 
+                
+Memory used: 24.75 GB

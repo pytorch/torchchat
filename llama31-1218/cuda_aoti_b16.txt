@@ -1,0 +1,119 @@
+python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model16.so
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model16.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.6.0.dev20241218+cu124 available.
+W1218 20:23:42.332001 1605281 site-packages/torch/_export/__init__.py:276] +============================+
+W1218 20:23:42.332482 1605281 site-packages/torch/_export/__init__.py:277] |     !!!   WARNING   !!!    |
+W1218 20:23:42.332674 1605281 site-packages/torch/_export/__init__.py:278] +============================+
+W1218 20:23:42.332856 1605281 site-packages/torch/_export/__init__.py:279] torch._export.aot_compile()/torch._export.aot_load() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export())/torch._inductor.aoti_load_package() instead.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 5.94 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model16.so
+WARNING!! The path of compiling a dso is deprecated. Please use --output-aoti-package-path to create a .pt2 artifact instead.
+The generated packaged model can be found at: /tmp/model16.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --dso-path /tmp/model16.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+W1218 20:27:40.073230 1629167 site-packages/torch/_export/__init__.py:276] +============================+
+W1218 20:27:40.073839 1629167 site-packages/torch/_export/__init__.py:277] |     !!!   WARNING   !!!    |
+W1218 20:27:40.074088 1629167 site-packages/torch/_export/__init__.py:278] +============================+
+W1218 20:27:40.074266 1629167 site-packages/torch/_export/__init__.py:279] torch._export.aot_compile()/torch._export.aot_load() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export())/torch._inductor.aoti_load_package() instead.
+[W1218 20:27:45.772529049 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4473] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:45.772695184 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4480] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:45.783607451 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4473] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:45.783685681 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4480] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:45.794621353 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4473] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:45.794706872 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4480] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:45.816522690 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4473] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:45.816643669 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4480] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Warning: checkpoint path ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument
+Warning: checkpoint path ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 7.25 seconds
+-----------------------------------------------------------
+Once upon a time, there was a beautiful and enchanting forest called Luminaria. In the heart of Luminaria, there was a magnificent tree that stood tall and proud. Its name was Elyria, and it was said to be the wisest and most ancient tree in all the land.
+Elyria was a majestic sight to behold, with leaves that shimmered like silver and a trunk that glowed with a soft, ethereal light. Its branches stretched up towards the sky, as if trying to reach the heavens themselves. Beneath its boughs, a soft, golden mist hovered, imbuing the air with an otherworldly scent.
+For centuries, creatures of all kinds flocked to Elyria, seeking the ancient tree's counsel and wisdom. The creatures would gather at the base of the tree, and Elyria would share its knowledge with them, offering guidance and insight into the mysteries of the universe.
+One day, a young traveler named Aria stumbled upon Lumin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 2.5453 sec total                 
+Time to first token: 0.2054 sec with sequential prefill.                
+
+      Total throughput: 78.5767 tokens/sec, 0.0127 s/token                 
+First token throughput: 4.8692 tokens/sec, 0.2054 s/token                 
+ Next token throughput: 85.0461 tokens/sec, 0.0118 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+[W1218 20:27:47.304206808 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4473] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:47.304334246 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4480] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:47.315306955 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4473] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:47.315432286 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4480] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:47.326418049 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4473] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:47.326525337 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4480] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:47.348440330 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4473] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:47.348548073 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4480] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+
+========================================
+
+Once upon a time, in the countryside of Finland, there was a small village surrounded by vast forests and the occasional lake. In this village, there lived a young woman named Aki. She was a skilled craftsman and artisan, known for her beautiful hand-woven baskets and intricate wood carvings. Aki lived a simple life, relying on the natural resources of the forest to create her wares.
+
+One day, a wealthy merchant named Olaf arrived in the village. He was a sharp business owner, and he had heard about Aki's exceptional craftsmanship. Olaf was impressed by Aki's baskets, which were sturdy, beautiful, and perfect for carrying goods. He approached Aki with a proposal: he wanted to buy all of her baskets and sell them in the cities, making a handsome profit.
+
+Aki was hesitant at first, but Olaf convinced her to sell her baskets to him. He promised her a good price and guaranteed that she would be famous throughout the land for her exceptional craftsmanship
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 2.3927 sec total                 
+Time to first token: 0.0583 sec with sequential prefill.                
+
+      Total throughput: 83.5881 tokens/sec, 0.0120 s/token                 
+First token throughput: 17.1515 tokens/sec, 0.0583 s/token                 
+ Next token throughput: 85.2474 tokens/sec, 0.0117 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+[W1218 20:27:49.697225030 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4473] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:49.697339594 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4480] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:49.708285795 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4473] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:49.708372136 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4480] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:49.719316352 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4473] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:49.719465824 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4480] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:49.741387533 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4473] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:27:49.741522441 co6zzpgebfaztbdh6pt7cko6cjwmho5p7smhnx5ua2dr23o4uxyi.cpp:4480] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+
+========================================
+
+Once upon a time, in the midst of a bustling metropolis, there was a small, quirky bookstore called "The Book Nook." The store was run by a kind-hearted owner named Emily, who was passionate about books and people. She spent her days surrounded by shelves upon shelves of novels, poetry collections, and children's books, each one lovingly placed to spark the imagination of her customers. The Book Nook was a cozy haven, where people could escape the hustle and bustle of city life and get lost in the world of stories.
+One rainy afternoon, a young girl named Lily wandered into The Book Nook, shaking the rain from her umbrella and seeking refuge from the downpour. Her eyes widened as she stepped inside, taking in the warm glow of the store and the enticing aroma of old books. Emily, noticing Lily's curiosity, greeted her with a warm smile and invited her to explore the shelves.
+As Lily browsed, she stumbled upon a peculiar book with a strange cover and a title
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 2.3978 sec total                 
+Time to first token: 0.0585 sec with sequential prefill.                
+
+      Total throughput: 83.4093 tokens/sec, 0.0120 s/token                 
+First token throughput: 17.0928 tokens/sec, 0.0585 s/token                 
+ Next token throughput: 85.0679 tokens/sec, 0.0118 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 81.86                 
+Average tokens/sec (first token): 13.04                 
+Average tokens/sec (next tokens): 85.12 
+                
+Memory used: 0.05 GB
