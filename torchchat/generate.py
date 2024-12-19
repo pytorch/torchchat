@@ -3,13 +3,15 @@
 
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
-import argparse
 import base64
+import contextlib
 import itertools
 import logging
 import os
 import textwrap
 import time
+from concurrent import futures
+from functools import partial
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -21,6 +23,9 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 import torch
 import torch._dynamo.config
 import torch._inductor.config
+import torch.distributed as dist
+import torch.multiprocessing as mp
+from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 
 from PIL import Image
 
@@ -28,7 +33,6 @@ from PIL import Image
 from torchtune.data import Message, padded_collate_tiled_images_and_mask
 
 from torchtune.generation import sample as tune_sample
-from torchtune.models.llama3 import llama3_tokenizer
 
 from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
 from torchtune.training import set_default_dtype
@@ -39,10 +43,15 @@ from torchchat.cli.builder import (
     BuilderArgs,
     TokenizerArgs,
 )
-from torchchat.distributed.generate import DistributedGenerator
+from torchchat.distributed.utils import (
+    Color as color,
+    run_in_dist_env,
+)
 from torchchat.model import Model, ModelType
 from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
+
+logger = logging.getLogger(__name__)
 
 
 # NOTE: Logging disabled by default here due to conflicts with torch._dynamo
@@ -76,7 +85,7 @@ class _ChatFormatter(ABC):
     def encode_dialog_prompt(
         self,
         dialog: DIALOG_TYPE,
-        add_generation_prompt: bool,
+        add_generation_prompt: bool = True,
     ) -> List[int]:
         """Encode a sequence of messages into a sequence of token IDs, including
         the chat template
@@ -127,7 +136,7 @@ class Llama3ChatFormatter(_ChatFormatter):
     def encode_dialog_prompt(
         self,
         dialog: _ChatFormatter.DIALOG_TYPE,
-        add_generation_prompt: bool,
+        add_generation_prompt: bool = True,
     ) -> List[int]:
         tokens = []
         tokens.append(self.tokenizer.special_tokens["<|begin_of_text|>"])
@@ -157,7 +166,7 @@ class Llama2ChatFormatter(_ChatFormatter):
     def encode_dialog_prompt(
         self,
         dialog: _ChatFormatter.DIALOG_TYPE,
-        add_generation_prompt: bool, # UNUSED
+        add_generation_prompt: bool = True, # UNUSED
     ) -> List[int]:
         new_turn = True
         tokens = []
@@ -188,7 +197,7 @@ class HFTokenizerChatFormatter(_ChatFormatter):
     def encode_dialog_prompt(
         self,
         dialog: _ChatFormatter.DIALOG_TYPE,
-        add_generation_prompt: bool,
+        add_generation_prompt: bool = True,
     ) -> List[int]:
         rendered = self.tokenizer.apply_chat_template(
             dialog, add_generation_prompt=add_generation_prompt
@@ -287,7 +296,7 @@ class GeneratorArgs:
         )
 
 
-class Generator:
+class LocalGenerator:
     """
     Generates text samples based on a pre-trained Transformer model and tokenizer.
     Args:
@@ -324,6 +333,7 @@ class Generator:
         self.draft_quantize = draft_quantize
         self.is_torchtune_model = generator_args.is_torchtune_model
         self.dtype = builder_args.precision
+        self.get_user_input : Callable = input
 
         self.rank: Optional[int] = None
 
@@ -478,9 +488,7 @@ class Generator:
         else:
             # input_pos: [B, S]
             logits = model(x, input_pos)
-            # print(f"logits {logits.shape}")
 
-        # print(f"x: {x},\n  input_pos: {input_pos}\n")
         return self.sample(logits, need_probs=False, **sampling_kwargs)[0]
 
     def decode_one_token(
@@ -504,7 +512,6 @@ class Generator:
             )[:, -1:]
         else:
             logits = model(x, input_pos)
-        # print(f"x: {x},\n  input_pos: {input_pos}\n")
         return self.sample(logits, need_probs=need_probs, **sampling_kwargs)
 
     """
@@ -827,7 +834,6 @@ class Generator:
         if len(buffer) == 4 or done_generating:
             print("".join(buffer), end="", flush=True)
             buffer.clear()
-        # print(, end='', flush=True)
 
     def _gen_model_input(
         self,
@@ -996,6 +1002,13 @@ class Generator:
                 for p in itertools.chain(self.model.parameters(), self.model.buffers())
             ]
         )
+        if self.builder_args.distributed:
+            # During distributed inference the model gets sharded among the ranks
+            # So we need to all reduce the model size to get the total model size
+            model_size = torch.tensor(model_size, dtype=torch.int64, device=self.device)
+            dist.all_reduce(model_size)
+            model_size = model_size.item()
+
         if generator_args.compile:
             if self.builder_args.device == "cpu":
                 if generator_args.max_autotune:
@@ -1054,11 +1067,11 @@ class Generator:
             print(
                 f"Entering Chat Mode. Will continue chatting back and forth with the language model until the models max context length of {max_seq_length} tokens is hit or until the user says /bye"
             )
-            get_system_prompt = input(
+            get_system_prompt = self.get_user_input(
                 "Do you want to enter a system prompt? Enter y for yes and anything else for no. \n"
             )
             if get_system_prompt == "y" or get_system_prompt == "Y":
-                self.system_prompt = input("What is your system prompt? \n")
+                self.system_prompt = self.get_user_input("What is your system prompt? \n")
 
         # `is_torchtune_model` is a misnomer since it doesn't capture all
         # torchtune models (i.e. Flamingo)
@@ -1097,7 +1110,7 @@ class Generator:
             device_sync(device=self.builder_args.device)
             is_first_sample: bool = i == 0
             if generator_args.chat_mode:
-                prompt = input("User: ")
+                prompt = self.get_user_input("User: ")
                 if prompt == "/bye":
                     print("Exiting Chat.\n")
                     break
@@ -1151,8 +1164,6 @@ class Generator:
                 torch._inductor.config.profiler_mark_wrapper_call = True
                 torch._inductor.config.cpp.enable_kernel_profile = True
             if i != generator_args.num_samples - 1 or not self.profile:
-                import contextlib
-
                 prof = contextlib.nullcontext()
             else:
                 torch.profiler._utils._init_for_cuda_graphs()
@@ -1280,22 +1291,319 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
             print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
 
 
-def _launch_distributed_inference(
-    builder_args: BuilderArgs,
-):
-    from torch.distributed import launcher
-    from torch.distributed.elastic.utils.distributed import get_free_port
+class DistributedGenerator(LocalGenerator):
+    def __init__(
+        self,
+        builder_args: BuilderArgs,
+        speculative_builder_args: BuilderArgs,
+        tokenizer_args: TokenizerArgs,
+        generator_args: GeneratorArgs,
+        profile: Optional[Path],
+        quantize: bool,
+        draft_quantize: bool,
+        ):
+        
+        is_speculative = speculative_builder_args.checkpoint_path is not None
+        assert is_speculative == False, "Distributed inference with pp > 1 does not support speculative inference yet."
+        super().__init__(
+            builder_args,
+            speculative_builder_args,
+            tokenizer_args,
+            generator_args,
+            profile,
+            quantize,
+            draft_quantize,
+        )
+        self.rank = dist.get_rank()
+        # Assuming same number of GPUs per node
+        self.device = torch.device(f"cuda:{self.rank % torch.cuda.device_count()}")
 
-    print("Launching distributed inference within generator")
+        def distributed_input(prompt: str) -> str:
+            if dist.get_rank() == 0:
+                text = [input(prompt)]
+            else:
+                text = [None]
+            
+            dist.broadcast_object_list(text)
+            return text[0]
+
+        self.get_user_input: Callable = distributed_input
+
+        if builder_args.pp > 1:
+            self.seqlen_prefill = 1024  # sequence length for prefill stage
+
+            logger.warn(f"{color.yellow}Pipeline parallelism is still experimental and might be slow{color.reset}")
+            pp_mesh = self.model.device_mesh["pp"]
+
+            self.pp_rank = pp_mesh.get_local_rank()
+            self.pp_group = pp_mesh.get_group()
+
+            self.pp_degree = pp_mesh.size()
+
+            # Convenience variables
+            self.first_pp_rank = 0
+            self.last_pp_rank = self.pp_degree - 1
 
 
-def main(args):
+            self.first_pp_rank_global_id = dist.get_global_rank(self.pp_group, self.first_pp_rank)
+            self.last_pp_rank_global_id = dist.get_global_rank(self.pp_group, self.last_pp_rank)
+
+            self.prefiller = self.create_prefill_stage()
+            self.decoder = self.create_decode_stage()
+
+    def __del__(self):
+        dist.destroy_process_group()
+
+    # Helper function to get example inputs and outputs for the stages.
+    def get_example_ins_outs(self, batch_size: int , seqlen: int) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        This function generates example inputs and outputs for the prefill and decode stages.
+
+        Returns:
+            Tuple[torch.Tensor, torch.Tensor]: A tuple containing the example inputs and outputs.
+        """
+        model_dtype = torch.bfloat16
+        mb_ids = torch.randint(
+            0, self.model.config.vocab_size, (batch_size, seqlen), device=self.device
+        )
+        activation = torch.rand(
+            batch_size, seqlen, self.model.config.dim, device=self.device, dtype=model_dtype
+        )
+        logits = torch.rand(
+            batch_size, seqlen, self.model.config.vocab_size, device=self.device, dtype=model_dtype
+        )
+        example_inputs = (mb_ids if self.pp_rank == self.first_pp_rank else activation,)
+        example_outputs = (logits if self.pp_rank == self.last_pp_rank else activation,)
+        return example_inputs, example_outputs
+
+    def create_prefill_stage(self):
+        """
+        Creates a pipeline stage for prefilling.
+
+        Returns:
+            PipelineStage: The created pipeline stage.
+        """
+        batch_size = 1
+
+        # Create prefill stage
+        logger.debug(f"Creating pipeline stage for prefill {self.pp_rank=}, {self.pp_degree=}")
+        example_inputs, example_outputs = self.get_example_ins_outs(batch_size, self.seqlen_prefill)
+        prefill_stage = PipelineStage(
+            self.model,
+            self.pp_rank,
+            self.pp_degree,
+            self.device,
+            input_args=example_inputs,
+            output_args=example_outputs,
+            group=self.pp_group,
+        )
+
+        # Create schedule
+        # Number of micro-batches for the schedule is 1, because each step() call we
+        # only push 1 micro-batch into the pipeline. But we can continuously push
+        # new micro-batches into the pipeline as they arrive, achieving same
+        # pipelining effect.
+        prefiller = ScheduleGPipe(prefill_stage, 1)
+        return prefiller
+
+    def create_decode_stage(self):
+        """
+        Creates a decode stage for the pipeline parallelism.
+
+        Returns:
+            ScheduleGPipe: The decode stage.
+        """
+        # seqlen = 1 now
+        seqlen_decode = 1
+        batch_size = 1
+
+        # Create decode stage
+        # logger.info(f"Creating pipeline stage for decode {self.pp_rank=}, {self.pp_degree=}")
+        example_inputs, example_outputs = self.get_example_ins_outs(batch_size, seqlen_decode)
+        decode_stage = PipelineStage(
+            self.model,
+            self.pp_rank,
+            self.pp_degree,
+            self.device,
+            input_args=example_inputs,
+            output_args=example_outputs,
+            group=self.pp_group,
+        )
+        # create schedule
+        decoder = ScheduleGPipe(decode_stage, 1)
+
+        return decoder
+
+    def prefill(
+        self,
+        model: Model,
+        x: torch.Tensor,
+        input_pos: torch.Tensor,
+        batch: Optional[Dict[str, Any]] = None,  # Inputs for multimodal models
+        *,
+        sequential_prefill=True,
+        **sampling_kwargs,
+    ) -> torch.Tensor:
+        """
+        This function is used to prefill the model with a given prompt. For pipeline parallelism we need to pad the input.
+
+        Returns:
+            torch.Tensor: The prefilled tensor.
+        """
+        if self.builder_args.pp == 1:
+            return super().prefill(
+                model,
+                x,
+                input_pos,
+                batch,
+                sequential_prefill=sequential_prefill,
+                **sampling_kwargs,
+            )
+
+        pad_token_id = self.tokenizer.pad_id if self.tokenizer.pad_id is not None else self.tokenizer.eos_id
+        prompt_length = x.size(1)
+
+        padded_seq = torch.full(
+            (1, self.seqlen_prefill), pad_token_id, dtype=torch.int64, device=self.device
+            )
+        padded_seq[:,:prompt_length] = x
+        input_pos = torch.arange(
+            self.seqlen_prefill,
+            device=self.device,
+            dtype=torch.int,
+            )
+
+        # Prefill phase
+        # Run context input through pipeline
+        # TODO: we need to pass `input_pos` and `cache_lane` to each stage.
+        lane = 0
+        kwargs = {"input_pos": input_pos, "cache_lane": lane}
+        
+        if self.pp_rank == self.first_pp_rank:
+            logits = self.prefiller.step(padded_seq, **kwargs)
+        elif self.pp_rank == self.last_pp_rank:
+            logits = self.prefiller.step(**kwargs)
+        else:  # middle pp ranks
+            self.prefiller.step(**kwargs)
+
+        if self.pp_rank == self.last_pp_rank:
+            new_token = self.sample(logits[:,:prompt_length], need_probs=False, **sampling_kwargs)[0]
+            if self.pp_rank != self.first_pp_rank:
+                dist.send(
+                    new_token,
+                    dst=self.first_pp_rank_global_id,
+                    group=self.pp_group,
+                )
+        else:
+            new_token = torch.zeros(1, 1, device=self.device, dtype=torch.int64)
+            if self.pp_rank == self.first_pp_rank:
+                dist.recv(
+                    new_token,
+                    src=self.last_pp_rank_global_id,
+                    group=self.pp_group,
+                )
+
+        return new_token
+
+    def decode_one_token(
+        self,
+        model: Model,
+        x: torch.Tensor,
+        input_pos: torch.Tensor,
+        need_probs: bool,
+        batch: Optional[Dict[str, Any]] = None,  # Inputs for multimodal models
+        **sampling_kwargs,
+    ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+        """
+        Decodes a single token.
+
+        # TODO: implement speculative decoding with pp>1
+        Returns:
+            Tuple[torch.Tensor, None]: A tuple containing the decoded token and None.
+        """
+        if self.builder_args.pp == 1:
+            return super().decode_one_token(
+                model,
+                x,
+                input_pos,
+                need_probs,
+                batch=batch,
+                **sampling_kwargs,
+            )
+
+        # input_pos: [B, 1]
+        assert input_pos.shape[-1] == 1
+
+        new_token = x.view(1, -1)
+
+        lane = 0
+        kwargs = {"input_pos": input_pos, "cache_lane": lane}
+        # Run data through pipeline
+        if self.pp_rank == self.first_pp_rank:
+            logits = self.decoder.step(new_token, **kwargs)
+        elif self.pp_rank == self.last_pp_rank:
+            logits = self.decoder.step(**kwargs)
+        else:  # middle pp ranks
+            self.decoder.step(**kwargs)
+
+        # Decode the output
+        if self.pp_rank == self.last_pp_rank:
+            new_token, _ = self.sample(logits, need_probs=need_probs, **sampling_kwargs)
+            if self.pp_rank != self.first_pp_rank:
+                dist.send(
+                    new_token,
+                    dst=self.first_pp_rank_global_id,
+                    group=self.pp_group,
+                )
+        else:
+            new_token = torch.zeros(1, 1, device=self.device, dtype=torch.int64)
+            if self.pp_rank == self.first_pp_rank:
+                dist.recv(
+                    new_token,
+                    src=self.last_pp_rank_global_id,
+                    group=self.pp_group,
+                )
+                #TODO: Why do we get 2d tensor here?
+                new_token=new_token[0]
+        return new_token, None
+
+    def sample(
+        self,
+        logits,
+        need_probs: bool,
+        temperature: float = 0,
+        top_k: Optional[int] = None,
+    ):
+        if temperature == 0 and not need_probs:
+            _, idx_next = torch.topk(logits[0, -1], k=1, dim=-1)
+            return (idx_next, None)
+        probs = self.logits_to_probs(logits[0, -1], temperature, top_k)
+        idx_next = self.multinomial_sample_one_no_sync(probs)
+        
+        return idx_next, probs
+
+
+def run_generator(
+    args,
+    rank: Optional[int] =None
+    ):
+    """
+    This function creates and executes a generator 
+    """
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
-    generator_args = GeneratorArgs.from_args(args)
-    logger.debug("GeneratorArgs: %s", generator_args)
-    if not builder_args.distributed:
+    generator_args = GeneratorArgs.from_args(args)    
+    #Setup rank 1 and up to suppress log messages and print messages
+    if builder_args.distributed and rank != 0:
+        logger.setLevel(logging.CRITICAL)
+        context = contextlib.redirect_stdout(None)
+    else:
+        context = contextlib.nullcontext()
+
+    with context:
+        Generator = DistributedGenerator if builder_args.distributed else LocalGenerator
+        logger.debug("GeneratorArgs: %s", generator_args)
         gen = Generator(
             builder_args,
             speculative_builder_args,
@@ -1310,20 +1618,20 @@ def main(args):
 
         for _ in gen.chat(generator_args):
             pass
+
+def main(args):
+    builder_args = BuilderArgs.from_args(args)
+    
+    if builder_args.distributed:
+        world_size = builder_args.tp * builder_args.pp
+
+        ctx = mp.get_context('spawn')
+        with futures.ProcessPoolExecutor(max_workers=world_size-1, mp_context=ctx) as executor:
+            for i in range(1,world_size):
+                fn = partial(run_generator, args, i)
+                executor.submit(run_in_dist_env, world_size, i, fn)
+            #Starting rank 0
+            fn = partial(run_generator, args, 0)
+            run_in_dist_env(world_size, 0, fn)
     else:
-        dist_gen = DistributedGenerator(
-            args.model,
-            builder_args,
-            tokenizer_args,
-            generator_args,
-            args.profile,
-            args.quantize,
-            args.draft_quantize,
-        )
-
-        response = ""
-        for output in dist_gen.generate(generator_args.prompt):
-            response += output.text
-
-        print(f"Model output: {response}")
-        dist_gen.shutdown()
+        run_generator(args)
