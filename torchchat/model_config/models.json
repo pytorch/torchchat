@@ -180,10 +180,31 @@
         "tokenizer_file": "tokenizer.json"
     },
     "ibm-granite/granite-3.0-2b-instruct": {
-        "aliases": ["granite3-2b"],
+        "aliases": ["granite3-2b", "granite3"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "ibm-granite/granite-3.0-2b-instruct",
         "transformer_params_key": "Granite-3.0-2B-Instruct",
+        "tokenizer_file": "tokenizer.json"
+    },
+    "ibm-granite/granite-3.0-8b-instruct": {
+        "aliases": ["granite3-8b"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "ibm-granite/granite-3.0-8b-instruct",
+        "transformer_params_key": "Granite-3.0-8B-Instruct",
+        "tokenizer_file": "tokenizer.json"
+    },
+    "ibm-granite/granite-3.1-2b-instruct": {
+        "aliases": ["granite3.1-2b", "granite3.1"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "ibm-granite/granite-3.1-2b-instruct",
+        "transformer_params_key": "Granite-3.1-2B-Instruct",
+        "tokenizer_file": "tokenizer.json"
+    },
+    "ibm-granite/granite-3.1-8b-instruct": {
+        "aliases": ["granite3.1-8b"],
+        "distribution_channel": "HuggingFaceSnapshot",
+        "distribution_path": "ibm-granite/granite-3.1-8b-instruct",
+        "transformer_params_key": "Granite-3.1-8B-Instruct",
         "tokenizer_file": "tokenizer.json"
     }
 }
