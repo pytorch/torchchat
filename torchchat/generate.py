@@ -949,7 +949,7 @@ class Generator:
 
             if image_found:
                 batch = padded_collate_tiled_images_and_mask(
-                    [data], pad_direction="left", pad_max_images=1
+                    [data], pad_direction="left", pad_max_images=1, pad_max_tiles=transform.max_num_tiles
                 )
                 encoded = batch.pop("tokens").to(device).view(-1)
                 seq_len = encoded.size(0)
