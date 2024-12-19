@@ -85,7 +85,7 @@ class _ChatFormatter(ABC):
     def encode_dialog_prompt(
         self,
         dialog: DIALOG_TYPE,
-        add_generation_prompt: bool,
+        add_generation_prompt: bool = True,
     ) -> List[int]:
         """Encode a sequence of messages into a sequence of token IDs, including
         the chat template
@@ -136,7 +136,7 @@ class Llama3ChatFormatter(_ChatFormatter):
     def encode_dialog_prompt(
         self,
         dialog: _ChatFormatter.DIALOG_TYPE,
-        add_generation_prompt: bool,
+        add_generation_prompt: bool = True,
     ) -> List[int]:
         tokens = []
         tokens.append(self.tokenizer.special_tokens["<|begin_of_text|>"])
@@ -166,7 +166,7 @@ class Llama2ChatFormatter(_ChatFormatter):
     def encode_dialog_prompt(
         self,
         dialog: _ChatFormatter.DIALOG_TYPE,
-        add_generation_prompt: bool, # UNUSED
+        add_generation_prompt: bool = True, # UNUSED
     ) -> List[int]:
         new_turn = True
         tokens = []
@@ -197,7 +197,7 @@ class HFTokenizerChatFormatter(_ChatFormatter):
     def encode_dialog_prompt(
         self,
         dialog: _ChatFormatter.DIALOG_TYPE,
-        add_generation_prompt: bool,
+        add_generation_prompt: bool = True,
     ) -> List[int]:
         rendered = self.tokenizer.apply_chat_template(
             dialog, add_generation_prompt=add_generation_prompt
