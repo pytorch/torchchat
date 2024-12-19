@@ -4,6 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 import json
+import logging
 import os
 import warnings
 from abc import ABC, abstractmethod
@@ -47,6 +48,8 @@ from torchtune.modules.model_fusion import DeepFusionModel
 from torchchat.utils.build_utils import find_multiple, get_precision
 
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
+
+logger = logging.getLogger(__name__)
 
 
 class QuickGELUActivation(nn.Module):
@@ -273,6 +276,7 @@ class TransformerArgs:
     # Select the desired tokenizer. Defaults to sentencepiece
     use_tiktoken: bool = False
     use_hf_tokenizer: bool = False
+    tokenizer_prepend_bos: bool = True
     max_seq_length: int = 8192
     rope_scaling: Optional[Dict[str, Any]] = None
     # For pipeline parallel
@@ -330,6 +334,7 @@ class ModelArgs:
     transformer_args: Dict[str, Dict[str, Any]]
     use_tiktoken: bool
     use_hf_tokenizer: bool
+    tokenizer_prepend_bos: bool
 
     def __init__(
         self,
@@ -337,6 +342,7 @@ class ModelArgs:
         model_type: ModelType = ModelType.TextOnly,
         use_tiktoken: bool = False,
         use_hf_tokenizer: bool = False,
+        tokenizer_prepend_bos: bool = True,
     ) -> None:
         self._sanity_check(transformer_args, model_type)
 
@@ -346,6 +352,7 @@ class ModelArgs:
         # Model-level attributes
         self.use_tiktoken = use_tiktoken
         self.use_hf_tokenizer = use_hf_tokenizer
+        self.tokenizer_prepend_bos = tokenizer_prepend_bos
 
     def _sanity_check(
         self,
@@ -373,7 +380,14 @@ class ModelArgs:
 
         use_tiktoken = loaded_params.get("use_tiktoken", False)
         use_hf_tokenizer = loaded_params.get("use_hf_tokenizer", False)
-        return cls(transformer_args, model_type, use_tiktoken, use_hf_tokenizer)
+        tokenizer_prepend_bos = loaded_params.get("tokenizer_prepend_bos", True)
+        return cls(
+            transformer_args=transformer_args,
+            model_type=model_type,
+            use_tiktoken=use_tiktoken,
+            use_hf_tokenizer=use_hf_tokenizer,
+            tokenizer_prepend_bos=tokenizer_prepend_bos,
+        )
 
     @classmethod
     def from_table(cls, name: str):
@@ -477,7 +491,9 @@ class Model(ABC, nn.Module):
         for name, module_class in recipe.modules.items():
             config_args = self.config.transformer_args[name]
             if module_class == Transformer:
-                modules[name] = module_class(TransformerArgs.from_params(config_args))
+                transformer_args = TransformerArgs.from_params(config_args)
+                logger.debug("Transformer Args: %s", transformer_args)
+                modules[name] = module_class(transformer_args)
             else:
                 modules[name] = module_class(**config_args)
 
