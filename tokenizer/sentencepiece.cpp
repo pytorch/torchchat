@@ -38,7 +38,7 @@ void SPTokenizer::load(const std::string& tokenizer_path) {
   // read in the file
   const auto status = _processor->Load(tokenizer_path);
   if (!status.ok()) {
-    fprintf(stderr, "couldn't load %s\n. If this tokenizer artifact is for llama3, please pass `-l 3`.", tokenizer_path.c_str());
+    fprintf(stderr, "Could not load `%s`.\n If this tokenizer artifact is for llama3, please pass `-l 3`.", tokenizer_path.c_str());
     exit(EXIT_FAILURE);
   }
   // load vocab_size, bos_tok, eos_tok
