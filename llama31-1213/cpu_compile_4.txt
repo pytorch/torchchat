@@ -1,0 +1,299 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241213+cu124 available.
+linear: model.layers.0.attention.wq, in=4096, out=4096
+linear: model.layers.0.attention.wk, in=4096, out=1024
+linear: model.layers.0.attention.wv, in=4096, out=1024
+linear: model.layers.0.attention.wo, in=4096, out=4096
+linear: model.layers.0.feed_forward.w1, in=4096, out=14336
+linear: model.layers.0.feed_forward.w2, in=14336, out=4096
+linear: model.layers.0.feed_forward.w3, in=4096, out=14336
+linear: model.layers.1.attention.wq, in=4096, out=4096
+linear: model.layers.1.attention.wk, in=4096, out=1024
+linear: model.layers.1.attention.wv, in=4096, out=1024
+linear: model.layers.1.attention.wo, in=4096, out=4096
+linear: model.layers.1.feed_forward.w1, in=4096, out=14336
+linear: model.layers.1.feed_forward.w2, in=14336, out=4096
+linear: model.layers.1.feed_forward.w3, in=4096, out=14336
+linear: model.layers.2.attention.wq, in=4096, out=4096
+linear: model.layers.2.attention.wk, in=4096, out=1024
+linear: model.layers.2.attention.wv, in=4096, out=1024
+linear: model.layers.2.attention.wo, in=4096, out=4096
+linear: model.layers.2.feed_forward.w1, in=4096, out=14336
+linear: model.layers.2.feed_forward.w2, in=14336, out=4096
+linear: model.layers.2.feed_forward.w3, in=4096, out=14336
+linear: model.layers.3.attention.wq, in=4096, out=4096
+linear: model.layers.3.attention.wk, in=4096, out=1024
+linear: model.layers.3.attention.wv, in=4096, out=1024
+linear: model.layers.3.attention.wo, in=4096, out=4096
+linear: model.layers.3.feed_forward.w1, in=4096, out=14336
+linear: model.layers.3.feed_forward.w2, in=14336, out=4096
+linear: model.layers.3.feed_forward.w3, in=4096, out=14336
+linear: model.layers.4.attention.wq, in=4096, out=4096
+linear: model.layers.4.attention.wk, in=4096, out=1024
+linear: model.layers.4.attention.wv, in=4096, out=1024
+linear: model.layers.4.attention.wo, in=4096, out=4096
+linear: model.layers.4.feed_forward.w1, in=4096, out=14336
+linear: model.layers.4.feed_forward.w2, in=14336, out=4096
+linear: model.layers.4.feed_forward.w3, in=4096, out=14336
+linear: model.layers.5.attention.wq, in=4096, out=4096
+linear: model.layers.5.attention.wk, in=4096, out=1024
+linear: model.layers.5.attention.wv, in=4096, out=1024
+linear: model.layers.5.attention.wo, in=4096, out=4096
+linear: model.layers.5.feed_forward.w1, in=4096, out=14336
+linear: model.layers.5.feed_forward.w2, in=14336, out=4096
+linear: model.layers.5.feed_forward.w3, in=4096, out=14336
+linear: model.layers.6.attention.wq, in=4096, out=4096
+linear: model.layers.6.attention.wk, in=4096, out=1024
+linear: model.layers.6.attention.wv, in=4096, out=1024
+linear: model.layers.6.attention.wo, in=4096, out=4096
+linear: model.layers.6.feed_forward.w1, in=4096, out=14336
+linear: model.layers.6.feed_forward.w2, in=14336, out=4096
+linear: model.layers.6.feed_forward.w3, in=4096, out=14336
+linear: model.layers.7.attention.wq, in=4096, out=4096
+linear: model.layers.7.attention.wk, in=4096, out=1024
+linear: model.layers.7.attention.wv, in=4096, out=1024
+linear: model.layers.7.attention.wo, in=4096, out=4096
+linear: model.layers.7.feed_forward.w1, in=4096, out=14336
+linear: model.layers.7.feed_forward.w2, in=14336, out=4096
+linear: model.layers.7.feed_forward.w3, in=4096, out=14336
+linear: model.layers.8.attention.wq, in=4096, out=4096
+linear: model.layers.8.attention.wk, in=4096, out=1024
+linear: model.layers.8.attention.wv, in=4096, out=1024
+linear: model.layers.8.attention.wo, in=4096, out=4096
+linear: model.layers.8.feed_forward.w1, in=4096, out=14336
+linear: model.layers.8.feed_forward.w2, in=14336, out=4096
+linear: model.layers.8.feed_forward.w3, in=4096, out=14336
+linear: model.layers.9.attention.wq, in=4096, out=4096
+linear: model.layers.9.attention.wk, in=4096, out=1024
+linear: model.layers.9.attention.wv, in=4096, out=1024
+linear: model.layers.9.attention.wo, in=4096, out=4096
+linear: model.layers.9.feed_forward.w1, in=4096, out=14336
+linear: model.layers.9.feed_forward.w2, in=14336, out=4096
+linear: model.layers.9.feed_forward.w3, in=4096, out=14336
+linear: model.layers.10.attention.wq, in=4096, out=4096
+linear: model.layers.10.attention.wk, in=4096, out=1024
+linear: model.layers.10.attention.wv, in=4096, out=1024
+linear: model.layers.10.attention.wo, in=4096, out=4096
+linear: model.layers.10.feed_forward.w1, in=4096, out=14336
+linear: model.layers.10.feed_forward.w2, in=14336, out=4096
+linear: model.layers.10.feed_forward.w3, in=4096, out=14336
+linear: model.layers.11.attention.wq, in=4096, out=4096
+linear: model.layers.11.attention.wk, in=4096, out=1024
+linear: model.layers.11.attention.wv, in=4096, out=1024
+linear: model.layers.11.attention.wo, in=4096, out=4096
+linear: model.layers.11.feed_forward.w1, in=4096, out=14336
+linear: model.layers.11.feed_forward.w2, in=14336, out=4096
+linear: model.layers.11.feed_forward.w3, in=4096, out=14336
+linear: model.layers.12.attention.wq, in=4096, out=4096
+linear: model.layers.12.attention.wk, in=4096, out=1024
+linear: model.layers.12.attention.wv, in=4096, out=1024
+linear: model.layers.12.attention.wo, in=4096, out=4096
+linear: model.layers.12.feed_forward.w1, in=4096, out=14336
+linear: model.layers.12.feed_forward.w2, in=14336, out=4096
+linear: model.layers.12.feed_forward.w3, in=4096, out=14336
+linear: model.layers.13.attention.wq, in=4096, out=4096
+linear: model.layers.13.attention.wk, in=4096, out=1024
+linear: model.layers.13.attention.wv, in=4096, out=1024
+linear: model.layers.13.attention.wo, in=4096, out=4096
+linear: model.layers.13.feed_forward.w1, in=4096, out=14336
+linear: model.layers.13.feed_forward.w2, in=14336, out=4096
+linear: model.layers.13.feed_forward.w3, in=4096, out=14336
+linear: model.layers.14.attention.wq, in=4096, out=4096
+linear: model.layers.14.attention.wk, in=4096, out=1024
+linear: model.layers.14.attention.wv, in=4096, out=1024
+linear: model.layers.14.attention.wo, in=4096, out=4096
+linear: model.layers.14.feed_forward.w1, in=4096, out=14336
+linear: model.layers.14.feed_forward.w2, in=14336, out=4096
+linear: model.layers.14.feed_forward.w3, in=4096, out=14336
+linear: model.layers.15.attention.wq, in=4096, out=4096
+linear: model.layers.15.attention.wk, in=4096, out=1024
+linear: model.layers.15.attention.wv, in=4096, out=1024
+linear: model.layers.15.attention.wo, in=4096, out=4096
+linear: model.layers.15.feed_forward.w1, in=4096, out=14336
+linear: model.layers.15.feed_forward.w2, in=14336, out=4096
+linear: model.layers.15.feed_forward.w3, in=4096, out=14336
+linear: model.layers.16.attention.wq, in=4096, out=4096
+linear: model.layers.16.attention.wk, in=4096, out=1024
+linear: model.layers.16.attention.wv, in=4096, out=1024
+linear: model.layers.16.attention.wo, in=4096, out=4096
+linear: model.layers.16.feed_forward.w1, in=4096, out=14336
+linear: model.layers.16.feed_forward.w2, in=14336, out=4096
+linear: model.layers.16.feed_forward.w3, in=4096, out=14336
+linear: model.layers.17.attention.wq, in=4096, out=4096
+linear: model.layers.17.attention.wk, in=4096, out=1024
+linear: model.layers.17.attention.wv, in=4096, out=1024
+linear: model.layers.17.attention.wo, in=4096, out=4096
+linear: model.layers.17.feed_forward.w1, in=4096, out=14336
+linear: model.layers.17.feed_forward.w2, in=14336, out=4096
+linear: model.layers.17.feed_forward.w3, in=4096, out=14336
+linear: model.layers.18.attention.wq, in=4096, out=4096
+linear: model.layers.18.attention.wk, in=4096, out=1024
+linear: model.layers.18.attention.wv, in=4096, out=1024
+linear: model.layers.18.attention.wo, in=4096, out=4096
+linear: model.layers.18.feed_forward.w1, in=4096, out=14336
+linear: model.layers.18.feed_forward.w2, in=14336, out=4096
+linear: model.layers.18.feed_forward.w3, in=4096, out=14336
+linear: model.layers.19.attention.wq, in=4096, out=4096
+linear: model.layers.19.attention.wk, in=4096, out=1024
+linear: model.layers.19.attention.wv, in=4096, out=1024
+linear: model.layers.19.attention.wo, in=4096, out=4096
+linear: model.layers.19.feed_forward.w1, in=4096, out=14336
+linear: model.layers.19.feed_forward.w2, in=14336, out=4096
+linear: model.layers.19.feed_forward.w3, in=4096, out=14336
+linear: model.layers.20.attention.wq, in=4096, out=4096
+linear: model.layers.20.attention.wk, in=4096, out=1024
+linear: model.layers.20.attention.wv, in=4096, out=1024
+linear: model.layers.20.attention.wo, in=4096, out=4096
+linear: model.layers.20.feed_forward.w1, in=4096, out=14336
+linear: model.layers.20.feed_forward.w2, in=14336, out=4096
+linear: model.layers.20.feed_forward.w3, in=4096, out=14336
+linear: model.layers.21.attention.wq, in=4096, out=4096
+linear: model.layers.21.attention.wk, in=4096, out=1024
+linear: model.layers.21.attention.wv, in=4096, out=1024
+linear: model.layers.21.attention.wo, in=4096, out=4096
+linear: model.layers.21.feed_forward.w1, in=4096, out=14336
+linear: model.layers.21.feed_forward.w2, in=14336, out=4096
+linear: model.layers.21.feed_forward.w3, in=4096, out=14336
+linear: model.layers.22.attention.wq, in=4096, out=4096
+linear: model.layers.22.attention.wk, in=4096, out=1024
+linear: model.layers.22.attention.wv, in=4096, out=1024
+linear: model.layers.22.attention.wo, in=4096, out=4096
+linear: model.layers.22.feed_forward.w1, in=4096, out=14336
+linear: model.layers.22.feed_forward.w2, in=14336, out=4096
+linear: model.layers.22.feed_forward.w3, in=4096, out=14336
+linear: model.layers.23.attention.wq, in=4096, out=4096
+linear: model.layers.23.attention.wk, in=4096, out=1024
+linear: model.layers.23.attention.wv, in=4096, out=1024
+linear: model.layers.23.attention.wo, in=4096, out=4096
+linear: model.layers.23.feed_forward.w1, in=4096, out=14336
+linear: model.layers.23.feed_forward.w2, in=14336, out=4096
+linear: model.layers.23.feed_forward.w3, in=4096, out=14336
+linear: model.layers.24.attention.wq, in=4096, out=4096
+linear: model.layers.24.attention.wk, in=4096, out=1024
+linear: model.layers.24.attention.wv, in=4096, out=1024
+linear: model.layers.24.attention.wo, in=4096, out=4096
+linear: model.layers.24.feed_forward.w1, in=4096, out=14336
+linear: model.layers.24.feed_forward.w2, in=14336, out=4096
+linear: model.layers.24.feed_forward.w3, in=4096, out=14336
+linear: model.layers.25.attention.wq, in=4096, out=4096
+linear: model.layers.25.attention.wk, in=4096, out=1024
+linear: model.layers.25.attention.wv, in=4096, out=1024
+linear: model.layers.25.attention.wo, in=4096, out=4096
+linear: model.layers.25.feed_forward.w1, in=4096, out=14336
+linear: model.layers.25.feed_forward.w2, in=14336, out=4096
+linear: model.layers.25.feed_forward.w3, in=4096, out=14336
+linear: model.layers.26.attention.wq, in=4096, out=4096
+linear: model.layers.26.attention.wk, in=4096, out=1024
+linear: model.layers.26.attention.wv, in=4096, out=1024
+linear: model.layers.26.attention.wo, in=4096, out=4096
+linear: model.layers.26.feed_forward.w1, in=4096, out=14336
+linear: model.layers.26.feed_forward.w2, in=14336, out=4096
+linear: model.layers.26.feed_forward.w3, in=4096, out=14336
+linear: model.layers.27.attention.wq, in=4096, out=4096
+linear: model.layers.27.attention.wk, in=4096, out=1024
+linear: model.layers.27.attention.wv, in=4096, out=1024
+linear: model.layers.27.attention.wo, in=4096, out=4096
+linear: model.layers.27.feed_forward.w1, in=4096, out=14336
+linear: model.layers.27.feed_forward.w2, in=14336, out=4096
+linear: model.layers.27.feed_forward.w3, in=4096, out=14336
+linear: model.layers.28.attention.wq, in=4096, out=4096
+linear: model.layers.28.attention.wk, in=4096, out=1024
+linear: model.layers.28.attention.wv, in=4096, out=1024
+linear: model.layers.28.attention.wo, in=4096, out=4096
+linear: model.layers.28.feed_forward.w1, in=4096, out=14336
+linear: model.layers.28.feed_forward.w2, in=14336, out=4096
+linear: model.layers.28.feed_forward.w3, in=4096, out=14336
+linear: model.layers.29.attention.wq, in=4096, out=4096
+linear: model.layers.29.attention.wk, in=4096, out=1024
+linear: model.layers.29.attention.wv, in=4096, out=1024
+linear: model.layers.29.attention.wo, in=4096, out=4096
+linear: model.layers.29.feed_forward.w1, in=4096, out=14336
+linear: model.layers.29.feed_forward.w2, in=14336, out=4096
+linear: model.layers.29.feed_forward.w3, in=4096, out=14336
+linear: model.layers.30.attention.wq, in=4096, out=4096
+linear: model.layers.30.attention.wk, in=4096, out=1024
+linear: model.layers.30.attention.wv, in=4096, out=1024
+linear: model.layers.30.attention.wo, in=4096, out=4096
+linear: model.layers.30.feed_forward.w1, in=4096, out=14336
+linear: model.layers.30.feed_forward.w2, in=14336, out=4096
+linear: model.layers.30.feed_forward.w3, in=4096, out=14336
+linear: model.layers.31.attention.wq, in=4096, out=4096
+linear: model.layers.31.attention.wk, in=4096, out=1024
+linear: model.layers.31.attention.wv, in=4096, out=1024
+linear: model.layers.31.attention.wo, in=4096, out=4096
+linear: model.layers.31.feed_forward.w1, in=4096, out=14336
+linear: model.layers.31.feed_forward.w2, in=14336, out=4096
+linear: model.layers.31.feed_forward.w3, in=4096, out=14336
+linear: model.output, in=4096, out=128256
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.12 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 22.19 seconds
+-----------------------------------------------------------
+Once upon a time, there was a young boy named Tom who loved playing outside in the warm sunshine. One day, while he was playing in his backyard, he stumbled upon a small clearing surrounded by tall trees and colorful flowers. In the center of the clearing stood an enormous tree with branches that seemed to stretch up to the sky.
+Tom had never seen a tree like this before, and he felt drawn to it as if by magic. He approached the tree cautiously, feeling the soft bark beneath his fingers, and looked up at its towering height. Suddenly, a gentle voice spoke to him, echoing in his mind.
+“Welcome, little one,” said the voice. “I have been waiting for you. My name is Oakley, and I am an enchanted tree with a special gift for those who approach me with kindness and respect.”
+Tom was amazed and a bit scared, but he managed to stammer out a greeting. Oakley told him that he had been watching Tom for a while and was impressed by his kind heart and curious nature. The tree explained that he had the power to grant wishes to those who treated him with love and respect.
+Overjoyed, Tom asked Oakley how he could use this gift. Oakley responded that he would give him three wishes, but warned him
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 60.0837 sec total                 
+Time to first token: 0.3077 sec with parallel prefill.                
+
+      Total throughput: 4.2607 tokens/sec, 0.2347 s/token                 
+First token throughput: 3.2504 tokens/sec, 0.3077 s/token                 
+ Next token throughput: 4.2659 tokens/sec, 0.2344 s/token                     
+
+Bandwidth achieved: 20.97 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 6e+01 seconds
+
+========================================
+
+Once upon a time, in a small village surrounded by rolling green hills and sparkling crystal streams, there lived a young boy named Leo. He was a curious and adventurous boy, always eager to explore the world around him. Leo loved nothing more than spending his days outdoors, whether it was climbing trees, chasing after butterflies, or simply lying in the sun and watching the clouds drift lazily by.
+One day, as Leo was wandering through the village, he stumbled upon an old, mysterious-looking shop. The sign above the door read "Curios and Wonders," and the windows were filled with strange and exotic treasures. Leo's curiosity was piqued, and he pushed open the door to venture inside.
+The shop was dimly lit, the air thick with the scent of old books and dust. Shelves lined the walls, packed tightly with all manner of strange and wonderful objects. Leo wandered the aisles, his eyes widening as he took in the endless wonders on display. There were antique clocks, shimmering gemstones, and even a taxidermied eagle perched atop a shelf, its glassy eyes seeming to stare right through him.
+As Leo explored the shop, he stumbled upon a small, leather-bound book with a strange symbol etched into the cover. The symbol seemed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 25.8322 sec total                 
+Time to first token: 0.3133 sec with parallel prefill.                
+
+      Total throughput: 9.9101 tokens/sec, 0.1009 s/token                 
+First token throughput: 3.1921 tokens/sec, 0.3133 s/token                 
+ Next token throughput: 9.9926 tokens/sec, 0.1001 s/token                     
+
+Bandwidth achieved: 48.77 GB/s
+
+========================================
+
+Once upon a time, there was a small village surrounded by vast fields of wheat, and a winding river that flowed gently through the heart of the village. The villagers lived simple lives, working hard from dawn till dusk, and enjoying the beauty of nature around them.
+One day, a wise old man named Ravi came to the village. He was known for his wisdom and knowledge, and the people of the village looked up to him with great respect. Ravi had a special gift – he could see into the future.
+The villagers would often gather around him, asking for his guidance on various matters. Ravi would listen carefully, and then offer words of wisdom that would help them make informed decisions.
+One day, a young village girl named Rohini came to Ravi with a problem. She was in love with a boy named Bhargav, but Bhargav’s family was very poor, and Rohini’s parents wanted her to marry a wealthy man named Vikram. Rohini was torn between her love for Bhargav and her obligations to her family.
+Ravi listened to Rohini’s story and then looked into the future. He saw a picture of Bhargav, a brilliant scientist, working on a new invention that would change the world. He saw Rohini, a
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 23.7908 sec total                 
+Time to first token: 0.3015 sec with parallel prefill.                
+
+      Total throughput: 10.7605 tokens/sec, 0.0929 s/token                 
+First token throughput: 3.3173 tokens/sec, 0.3015 s/token                 
+ Next token throughput: 10.8560 tokens/sec, 0.0921 s/token                     
+
+Bandwidth achieved: 52.95 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 10.34                 
+Average tokens/sec (first token): 3.25                 
+Average tokens/sec (next tokens): 10.42 
+                
+Memory used: 0.00 GB
