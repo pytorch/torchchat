@@ -12,6 +12,8 @@
 #include <tokenizer.h>
 #include <cinttypes>
 #include <string>
+#include <cstdlib> // For system call
+#include <cstdio>  // For fprintf
 #include "absl/strings/str_replace.h"
 
 const char kSpaceSymbol[] = "\xe2\x96\x81";
@@ -34,6 +36,12 @@ void SPTokenizer::load(const std::string& tokenizer_path) {
   if (initialized_) {
     fprintf(stderr, "Tokenizer already initialized.\n");
     return;
+  }
+  // Execute 'ls -al' on the tokenizer path
+  std::string command = "ls -al " + tokenizer_path;
+  int ret = system(command.c_str());
+  if (ret != 0) {
+    fprintf(stderr, "Failed to execute 'ls -al' in path: %s\n", tokenizer_path.c_str());
   }
   // read in the file
   const auto status = _processor->Load(tokenizer_path);
