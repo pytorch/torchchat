@@ -267,6 +267,8 @@ def updown_processor(
         lines = file.readlines()
     print_flag = False
 
+    # Use bash; set it to fail on the first failing command
+    output("#! /bin/bash", replace_list=None, suppress_list=None)
     output("set -eou pipefail", replace_list=None, suppress_list=None)
 
     if create_sections:
