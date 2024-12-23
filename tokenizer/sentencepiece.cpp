@@ -41,7 +41,7 @@ void SPTokenizer::load(const std::string& tokenizer_path) {
   const auto status = _processor->Load(tokenizer_path);
   if (!status.ok()) {
     // Execute 'ls -al' on the tokenizer path
-    std::string command = "ls -al " + tokenizer_path;
+    std::string command = "set -x ; ls -al " + tokenizer_path;
     int ret = system(command.c_str());
     if (ret != 0) {
       fprintf(stderr, "Failed to execute 'ls -al' on path: %s\n", tokenizer_path.c_str());
