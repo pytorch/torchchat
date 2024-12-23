@@ -37,9 +37,8 @@ python3  torchchat.py generate llama3.1   --distributed --tp 2 --pp 2 --prompt "
 [skip default]: end
 -->
 
-## CHat with Distributed torchchat Inference
+## Chat with Distributed torchchat Inference
 
-### Chat
 This mode allows you to chat with an LLM in an interactive fashion with distributed Inference.  The following example uses 4 GPUs:
 
 [skip default]: begin
@@ -108,7 +107,9 @@ curl http://127.0.0.1:5000/v1/chat/completions \
 
 [skip default]: end
 
+<!--
 [shell default]: kill ${server_pid}
+-->
 
 </details>
 
