@@ -21,7 +21,7 @@ source .venv/bin/activate
 
 [shell default]: ./install/install_requirements.sh
 
-##Enabling Distributed torchchat Inference
+## Enabling Distributed torchchat Inference
 
 To enable distributed inference, use the option `--distributed`.  In addition, `--tp <num>` and `--pp <num>` 
 allow users to specify the types of parallelism to use.
