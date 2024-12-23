@@ -934,7 +934,7 @@ try:
         torch.ops.load_library(libs[0])
         print("Loaded torchao cpu ops.")
     except Exception as e:
-        print("Unabled to load torchao cpu ops library. Slow fallback kernels will be used.")
+        print("Unable to load torchao cpu ops library. Slow fallback kernels will be used.")
 
     try:
         libname = "libtorchao_ops_mps_aten.dylib"
@@ -942,7 +942,7 @@ try:
         torch.ops.load_library(libpath)
         print("Loaded torchao mps ops.")
     except Exception as e:
-        print("Unabled to load torchao mps ops library.")
+        print("Unable to load torchao mps ops library.")
 
 except Exception as e:
     print("Unabled to import torchao experimental quant_api with error: ", e)
