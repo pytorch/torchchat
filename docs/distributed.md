@@ -24,7 +24,7 @@ source .venv/bin/activate
 ## Enabling Distributed torchchat Inference
 
 To enable distributed inference, use the option `--distributed`.  In addition, `--tp <num>` and `--pp <num>` 
-allow users to specify the types of parallelism to use.
+allow users to specify the types of parallelism to use (where tp refers to tensor parallelism and pp to pipeline parallelism).
 
 <!--
 [skip default]: begin
