@@ -21,21 +21,30 @@ source .venv/bin/activate
 
 [shell default]: ./install/install_requirements.sh
 
+## Download Weights
+Most models use Hugging Face as the distribution channel, so you will need to create a Hugging Face account. Create a Hugging Face user access token as documented here with the write role.
+
+Log into Hugging Face:
+
+[prefix default]: HF_TOKEN="${SECRET_HF_TOKEN_PERIODIC}"
+
+```
+huggingface-cli login
+```
+
 ## Enabling Distributed torchchat Inference
 
 To enable distributed inference, use the option `--distributed`.  In addition, `--tp <num>` and `--pp <num>` 
 allow users to specify the types of parallelism to use (where tp refers to tensor parallelism and pp to pipeline parallelism).
 
-<!--
-[skip default]: begin
-## Generate output (requires testing and review by mreso)
+
+## Generate Output with Distributed torchchat Inference
 
 To generate output using distributed inference with 4 GPUs, you can use:
 ```
-python3  torchchat.py generate llama3.1   --distributed --tp 2 --pp 2 --prompt "write me a story about a boy and his bear"
+python3 torchchat.py generate llama3.1 --distributed --tp 2 --pp 2 --prompt "write me a story about a boy and his bear"
 ```
-[skip default]: end
--->
+
 
 ## Chat with Distributed torchchat Inference
 
@@ -43,7 +52,7 @@ This mode allows you to chat with an LLM in an interactive fashion with distribu
 
 [skip default]: begin
 ```bash
-python3 torchchat.py chat llama3.1  --max-new-tokens 10  --distributed --tp 2 --pp 2
+python3 torchchat.py chat llama3.1 --max-new-tokens 10  --distributed --tp 2 --pp 2
 ```
 [skip default]: end
 
