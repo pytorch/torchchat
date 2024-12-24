@@ -1,6 +1,6 @@
 # Distributed Inference with torchchat
 
-torchchat suports distributed inference for large language models (LLMs) on GPUs seamlessly. 
+torchchat supports distributed inference for large language models (LLMs) on GPUs seamlessly. 
 At present, torchchat supports distributed inference using Python only.
 
 ## Installation
