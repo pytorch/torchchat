@@ -35,7 +35,7 @@ huggingface-cli login
 ## Enabling Distributed torchchat Inference
 
 To enable distributed inference, use the option `--distributed`.  In addition, `--tp <num>` and `--pp <num>` 
-allow users to specify the types of parallelism to use (where tp refers to tensor parallelism and pp to pipeline parallelism).
+allow users to specify the types of parallelism to use where tp refers to tensor parallelism and pp to pipeline parallelism.
 
 
 ## Generate Output with Distributed torchchat Inference
@@ -52,7 +52,7 @@ This mode allows you to chat with an LLM in an interactive fashion with distribu
 
 [skip default]: begin
 ```bash
-python3 torchchat.py chat llama3.1 --max-new-tokens 10  --distributed --tp 2 --pp 2
+python3 torchchat.py chat llama3.1 --max-new-tokens 10 --distributed --tp 2 --pp 2
 ```
 [skip default]: end
 
@@ -69,7 +69,7 @@ In one terminal, start the server to run with 4 GPUs:
 [skip default]: begin
 
 ```bash
-python3 torchchat.py server llama3.1   --distributed --tp 2 --pp 2
+python3 torchchat.py server llama3.1 --distributed --tp 2 --pp 2
 ```
 [skip default]: end
 
