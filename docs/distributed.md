@@ -21,7 +21,7 @@ source .venv/bin/activate
 
 [shell default]: ./install/install_requirements.sh
 
-## Download Weights
+## Login to HF for Downloading Weights
 Most models use Hugging Face as the distribution channel, so you will need to create a Hugging Face account. Create a Hugging Face user access token as documented here with the write role.
 
 Log into Hugging Face:
