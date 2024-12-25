@@ -23,7 +23,7 @@ The evaluation mode of `torchchat.py` script can be used to evaluate your langua
 
 ## Examples
 
-### Evaluation example with model in Python
+### Evaluation example with model in Python environment
 
 Running wikitext for 10 iterations
 ```
@@ -42,26 +42,36 @@ python3 torchchat.py eval stories15M --compile --tasks wikitext hellaswag
 
 ### Evaluation with model exported to PTE with ExecuTorch
 
-Running an exported model with ExecuTorch (as PTE)
+Running an exported model with ExecuTorch (as PTE).  Advantageously, because we can 
+load an exported PTE model back into the Python environment with torchchat,
+we can run evaluation on the exported model!
 ```
 python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 python3 torchchat.py eval stories15M --pte-path stories15M.pte
 ```
 
-Running multiple tasks and calling eval.py directly (with PTE):
+Running multiple tasks directly (with PTE):
 ```
+python3 torchchat.py eval stories15M --pte-path stories15M.pte --tasks wikitext hellaswag
+```
+
+Now let's evaluate the effect of quantization on evaluation results:
+```
+python3 torchchat.py export stories15M --output-pte-path stories15M.pte --quantize torchchat/quant_config/mobile.json
 python3 torchchat.py eval stories15M --pte-path stories15M.pte --tasks wikitext hellaswag
 ```
 
 ### Evaluation with model exported to DSO with AOT Inductor (AOTI)
 
-Running an exported model with AOT Inductor (DSO model)
+Running an exported model with AOT Inductor (DSO model).  Advantageously, because we can 
+load an exported PTE model back into the Python environment with torchchat,
+we can run evaluation on the exported model!
 ```
 python3 torchchat.py export stories15M --dtype fast16 --output-dso-path stories15M.so
 python3 torchchat.py eval stories15M --dtype fast16 --dso-path stories15M.so
 ```
 
-Running multiple tasks and calling eval.py directly (with AOTI):
+Running multiple tasks directly (with AOTI):
 ```
 python3 torchchat.py eval stories15M --dso-path stories15M.so --tasks wikitext hellaswag
 ```
