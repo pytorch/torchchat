@@ -55,11 +55,13 @@ Running multiple tasks directly by creating a PTE mobile model:
 python3 torchchat.py eval stories15M --pte-path stories15M.pte --tasks wikitext hellaswag
 ```
 
-Now let's evaluate the effect of quantization on evaluation results:
+Now let's evaluate the effect of quantization on evaluation results by exporting with quantization using `--quantize` and an exemplary quantization configuration:
 ```
 python3 torchchat.py export stories15M --output-pte-path stories15M.pte --quantize torchchat/quant_config/mobile.json
 python3 torchchat.py eval stories15M --pte-path stories15M.pte --tasks wikitext hellaswag
 ```
+
+Now try your own export options to explore different trade-offs between model size, evaluation speed and accuracy using model quantization!
 
 ### Evaluation with model exported to DSO with AOT Inductor (AOTI)
 
