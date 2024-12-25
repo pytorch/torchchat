@@ -35,9 +35,9 @@ Running wikitext with torch.compile for 10 iterations
 python3 torchchat.py eval stories15M --compile --tasks wikitext --limit 10
 ```
 
-Running multiple tasks and calling eval.py directly (with torch.compile):
+Running multiple tasks with torch.compile for evaluation and prefill:
 ```
-python3 torchchat.py eval stories15M --compile --tasks wikitext hellaswag
+python3 torchchat.py eval stories15M --compile --compile-prefill --tasks wikitext hellaswag
 ```
 
 ### Evaluation with model exported to PTE with ExecuTorch
@@ -50,7 +50,7 @@ python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 python3 torchchat.py eval stories15M --pte-path stories15M.pte
 ```
 
-Running multiple tasks directly (with PTE):
+Running multiple tasks directly by creating a PTE mobile model:
 ```
 python3 torchchat.py eval stories15M --pte-path stories15M.pte --tasks wikitext hellaswag
 ```
@@ -71,7 +71,7 @@ python3 torchchat.py export stories15M --dtype fast16 --output-dso-path stories1
 python3 torchchat.py eval stories15M --dtype fast16 --dso-path stories15M.so
 ```
 
-Running multiple tasks directly (with AOTI):
+Running multiple tasks with AOTI:
 ```
 python3 torchchat.py eval stories15M --dso-path stories15M.so --tasks wikitext hellaswag
 ```
