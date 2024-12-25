@@ -32,8 +32,6 @@ LICENSE file in the root directory of this source tree.
 
 #ifdef __AOTI_MODEL__
 #include <torch/csrc/inductor/aoti_package/model_package_loader.h>
-torch::Device aoti_device(torch::kCPU);
-
 #else // __ET_MODEL__
 #include <executorch/extension/module/module.h>
 #include <executorch/extension/tensor/tensor_ptr.h>
@@ -89,9 +87,11 @@ typedef struct {
 typedef struct {
   Config config; // the hyperparameters of the architecture (the blueprint)
   RunState state; // buffers for the "wave" of activations in the forward pass
+  std::unordered_map<std::string, std::string> metadata;
 
 #ifdef __AOTI_MODEL__
   torch::inductor::AOTIModelPackageLoader* runner;
+  
 #else // __ET_MODEL__
   Module* runner;
 #endif
@@ -130,19 +130,9 @@ void read_checkpoint(char* checkpoint, Config* config) {
 
 void build_transformer(
     Transformer* t,
-    char* model_path,
-    int vocab_size,
-    int seq_len) {
-  // read in the Config and the Weights from the model
-  // read_checkpoint(model_path, &t->config);
-  // allocate the RunState buffers
-  t->config.vocab_size = vocab_size;
-  t->config.seq_len = seq_len;
-  malloc_run_state(&t->state, &t->config);
-
+    char* model_path) {
 #ifdef __AOTI_MODEL__
   t->runner = new torch::inductor::AOTIModelPackageLoader(model_path);
-  aoti_device = t->runner->get_metadata()["AOTI_DEVICE_KEY"] == "cpu" ? torch::Device(torch::kCPU) : torch::Device(torch::kCUDA);
 #else //__ET_MODEL__
   t->runner = new Module(
       /* path to PTE model */ model_path,
@@ -194,6 +184,9 @@ float* forward(Transformer* transformer, int token, int pos) {
   torch::Tensor token_tensor =
       torch::from_blob(token_buffer, {1, 1}, torch::kLong);
   torch::Tensor pos_tensor = torch::from_blob(pos_buffer, {1}, torch::kLong);
+  torch::Device aoti_device = transformer->runner->get_metadata()["AOTI_DEVICE_KEY"] == "cpu"
+    ? torch::Device(torch::kCPU)
+    : torch::Device(torch::kCUDA);
   std::vector<torch::Tensor> inputs{
       token_tensor.to(aoti_device), pos_tensor.to(aoti_device)};
 
@@ -895,36 +888,30 @@ int main(int argc, char* argv[]) {
       system_prompt = argv[i + 1];
     } else if (argv[i][1] == 'l') {
       llama_ver = atoi(argv[i + 1]);
-#ifdef __AOTI_MODEL__
-    } else if (argv[i][1] == 'd') {
-#ifdef USE_CUDA
-      if (strcasecmp(argv[i + 1], "CUDA") == 0) {
-        aoti_device = torch::Device(torch::kCUDA);
-      } else
-#endif
-          if (strcasecmp(argv[i + 1], "CPU") == 0) {
-        aoti_device = torch::Device(torch::kCPU);
-      } else {
-        fprintf(stderr, "Unknown device %s", argv[i + 1]);
-        exit(1);
-      }
-#endif
     } else {
       error_usage();
     }
   }
 
+  if (model_path == NULL) {
+    fprintf(stderr, "No model_path provided.");
+    error_usage();
+  }
+  
+  Transformer transformer;
+  build_transformer(&transformer, model_path);
+
+#ifdef __AOTI_MODEL__
+  ModelType model_type = get_model_type(std::stoi(transformer.runner->get_metadata()["tokenizer_type"]));
+#else // __ET_MODEL__
   ModelType model_type = get_model_type(llama_ver);
+#endif
+
   if (model_type == UNKNOWN_MODEL) {
     fprintf(
         stderr,
         "Unknown model type passed by -l argument.  Received l=%d.",
         llama_ver);
-    error_usage();
-  }
-
-  if (model_path == NULL) {
-    fprintf(stderr, "No model_path provided.");
     error_usage();
   }
 
@@ -950,8 +937,12 @@ int main(int argc, char* argv[]) {
     vocab_size = tokenizer->vocab_size();
   }
 
-  Transformer transformer;
-  build_transformer(&transformer, model_path, vocab_size, steps);
+  // read in the Config and the Weights from the model
+  // read_checkpoint(model_path, &t->config);
+  // allocate the RunState buffers
+  transformer.config.vocab_size = vocab_size;
+  transformer.config.seq_len = steps;
+  malloc_run_state(&transformer.state, &transformer.config);
 
   Sampler sampler;
   build_sampler(&sampler, vocab_size, temperature, topp, rng_seed);
