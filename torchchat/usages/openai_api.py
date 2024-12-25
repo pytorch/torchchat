@@ -180,7 +180,10 @@ class CompletionRequest:
     user: Optional[str] = None  # unimplemented
 
     def __post_init__(self):
-        self.stream = bool(self.stream)
+        if isinstance(self.stream, str):
+            self.stream = self.stream.lower() != "false"
+        else:
+            self.stream = bool(self.stream)
 
 
 @dataclass
