@@ -69,12 +69,12 @@ aliases.
 |[tinyllamas/stories42M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories42M`.|
 |[tinyllamas/stories110M](https://huggingface.co/karpathy/tinyllamas/tree/main)|✅|Toy model for `generate`. Alias to `stories110M`.|
 |[openlm-research/open_llama_7b](https://huggingface.co/openlm-research/open_llama_7b)|✅|Best for `generate`. Alias to `open-llama`.|
-| [ibm-granite/granite-3b-code-instruct-128k](https://huggingface.co/ibm-granite/granite-3b-code-instruct-128k) ||✅|| Alias to `granite-code` and `granite-code-3b`.|
-| [ibm-granite/granite-8b-code-instruct-128k](https://huggingface.co/ibm-granite/granite-8b-code-instruct-128k) ||✅|| Alias to `granite-code-8b`.|
-| [ibm-granite/granite-3.0-2b-instruct](https://huggingface.co/ibm-granite/granite-3.0-2b-instruct) ||✅|| Alias to `granite3-2b` and `granite3`.|
-| [ibm-granite/granite-3.0-8b-instruct](https://huggingface.co/ibm-granite/granite-3.0-8b-instruct) ||✅|| Alias to `granite3-8b`.|
-| [ibm-granite/granite-3.1-2b-instruct](https://huggingface.co/ibm-granite/granite-3.1-2b-instruct) ||✅|| Alias to `granite3.1-2b` and `granite3.1`.|
-| [ibm-granite/granite-3.1-8b-instruct](https://huggingface.co/ibm-granite/granite-3.1-8b-instruct) ||✅|| Alias to `granite3.1-8b`.|
+| [ibm-granite/granite-3b-code-instruct-128k](https://huggingface.co/ibm-granite/granite-3b-code-instruct-128k) |✅| Alias to `granite-code` and `granite-code-3b`.|
+| [ibm-granite/granite-8b-code-instruct-128k](https://huggingface.co/ibm-granite/granite-8b-code-instruct-128k) |✅| Alias to `granite-code-8b`.|
+| [ibm-granite/granite-3.0-2b-instruct](https://huggingface.co/ibm-granite/granite-3.0-2b-instruct) |✅| Alias to `granite3-2b` and `granite3`.|
+| [ibm-granite/granite-3.0-8b-instruct](https://huggingface.co/ibm-granite/granite-3.0-8b-instruct) |✅| Alias to `granite3-8b`.|
+| [ibm-granite/granite-3.1-2b-instruct](https://huggingface.co/ibm-granite/granite-3.1-2b-instruct) |✅| Alias to `granite3.1-2b` and `granite3.1`.|
+| [ibm-granite/granite-3.1-8b-instruct](https://huggingface.co/ibm-granite/granite-3.1-8b-instruct) |✅| Alias to `granite3.1-8b`.|
 
 
 ## Installation
