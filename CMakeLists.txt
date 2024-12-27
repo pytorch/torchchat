@@ -22,6 +22,6 @@ endif()
 # include aoti_run executable
 include(runner/aoti.cmake)
 if(TARGET aoti_run)
-    target_link_libraries(aoti_run tokenizers)
+    target_link_libraries(aoti_run PUBLIC tokenizers)
     target_include_directories(aoti_run PUBLIC runner/third-party/tokenizers/include)
 endif()
