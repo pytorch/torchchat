@@ -42,15 +42,15 @@ python3 torchchat.py eval stories15M --compile --compile-prefill --tasks wikitex
 
 ### Evaluation with model exported to PTE with ExecuTorch
 
-Running an exported model with ExecuTorch (as PTE).  Advantageously, because we can 
+Running an exported model with ExecuTorch (as PTE).  Advantageously, because you can 
 load an exported PTE model back into the Python environment with torchchat,
-we can run evaluation on the exported model!
+you can run evaluation on the exported model!
 ```
 python3 torchchat.py export stories15M --output-pte-path stories15M.pte
 python3 torchchat.py eval stories15M --pte-path stories15M.pte
 ```
 
-Running multiple tasks directly by creating a PTE mobile model:
+Running multiple tasks directly on the created PTE mobile model:
 ```
 python3 torchchat.py eval stories15M --pte-path stories15M.pte --tasks wikitext hellaswag
 ```
@@ -65,9 +65,9 @@ Now try your own export options to explore different trade-offs between model si
 
 ### Evaluation with model exported to DSO with AOT Inductor (AOTI)
 
-Running an exported model with AOT Inductor (DSO model).  Advantageously, because we can 
-load an exported PTE model back into the Python environment with torchchat,
-we can run evaluation on the exported model!
+Running an exported model with AOT Inductor (DSO model).  Advantageously, because you can 
+load an exported DSO model back into the Python environment with torchchat,
+you can run evaluation on the exported model!
 ```
 python3 torchchat.py export stories15M --dtype fast16 --output-dso-path stories15M.so
 python3 torchchat.py eval stories15M --dtype fast16 --dso-path stories15M.so
