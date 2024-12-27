@@ -77,12 +77,6 @@ aliases.
 | [ibm-granite/granite-3.1-8b-instruct](https://huggingface.co/ibm-granite/granite-3.1-8b-instruct) ||✅|| Alias to `granite3.1-8b`.|
 
 
-
-
-
-
-
-
 ## Installation
 The following steps require that you have [Python 3.10](https://www.python.org/downloads/release/python-3100/) installed.
 
