@@ -25,7 +25,7 @@ if(Torch_FOUND)
         target_compile_options(aoti_run PUBLIC -DUSE_CUDA)
     endif()
     target_include_directories(aoti_run PRIVATE ${TORCHCHAT_ROOT}/runner)
-    target_link_libraries(aoti_run PUBLIC "${TORCH_LIBRARIES}" m)
+    target_link_libraries(aoti_run "${TORCH_LIBRARIES}" m)
     set_property(TARGET aoti_run PROPERTY CXX_STANDARD 17)
 endif()
 
