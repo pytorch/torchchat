@@ -96,6 +96,7 @@ def _load_checkpoints_from_storage(
         checkpoint_path,
         map_location=builder_args.device,
         mmap=True,
+        weights_only=False,
     )
 
 
