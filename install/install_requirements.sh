@@ -44,17 +44,6 @@ fi
 
 echo "Using pip executable: $PIP_EXECUTABLE"
 
-#
-# First install requirements in install/requirements.txt. Older torch may be
-# installed from the dependency of other models. It will be overridden by
-# newer version of torch nightly installed later in this script.
-#
-
-(
-  set -x
-  $PIP_EXECUTABLE install -r install/requirements.txt --extra-index-url https://download.pytorch.org/whl/nightly/cu121
-)
-
 # Since torchchat often uses main-branch features of pytorch, only the nightly
 # pip versions will have the required features. The PYTORCH_NIGHTLY_VERSION value should
 # agree with the third-party/pytorch pinned submodule commit.
@@ -62,19 +51,18 @@ echo "Using pip executable: $PIP_EXECUTABLE"
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-<<<<<<< HEAD
 if [[ -x "$(command -v xpu-smi)" ]];
 then
-  PYTORCH_NIGHTLY_VERSION=dev20241212
+  PYTORCH_NIGHTLY_VERSION=dev20241217
 else
-  PYTORCH_NIGHTLY_VERSION=dev20241213
+  PYTORCH_NIGHTLY_VERSION=dev20241218
 fi
 
 # Nightly version for torchvision
-VISION_NIGHTLY_VERSION=dev20241213
+VISION_NIGHTLY_VERSION=dev20241218
 
 # Nightly version for torchtune
-TUNE_NIGHTLY_VERSION=dev20241126
+TUNE_NIGHTLY_VERSION=dev20241218
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 (
@@ -99,7 +87,6 @@ else
 fi
 
 # pip packages needed by exir.
-<<<<<<< HEAD
 if [[ -x "$(command -v xpu-smi)" ]];
 then
   REQUIREMENTS_TO_INSTALL=(
@@ -114,6 +101,16 @@ else
     torchtune=="0.5.0.${TUNE_NIGHTLY_VERSION}"
   )
 fi
+
+#
+# First install requirements in install/requirements.txt. Older torch may be
+# installed from the dependency of other models. It will be overridden by
+# newer version of torch nightly installed later in this script.
+#
+(
+  set -x
+  $PIP_EXECUTABLE install -r install/requirements.txt --extra-index-url "${TORCH_NIGHTLY_URL}"
+)
 
 # Install the requirements. --extra-index-url tells pip to look for package
 # versions on the provided URL if they aren't available on the default URL.

@@ -4,6 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 import json
+import logging
 import os
 import warnings
 from abc import ABC, abstractmethod
@@ -47,6 +48,8 @@ from torchtune.modules.model_fusion import DeepFusionModel
 from torchchat.utils.build_utils import find_multiple, get_precision
 
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
+
+logger = logging.getLogger(__name__)
 
 
 class QuickGELUActivation(nn.Module):
@@ -273,6 +276,7 @@ class TransformerArgs:
     # Select the desired tokenizer. Defaults to sentencepiece
     use_tiktoken: bool = False
     use_hf_tokenizer: bool = False
+    tokenizer_prepend_bos: bool = True
     max_seq_length: int = 8192
     rope_scaling: Optional[Dict[str, Any]] = None
     # For pipeline parallel
@@ -283,6 +287,11 @@ class TransformerArgs:
     feed_forward_bias: bool = False
     # Whether or not to tie the input word embeddings to the output
     tie_word_embeddings: bool = False
+    # Granite architecture multipliers
+    embedding_multiplier: Optional[float] = None
+    attention_multiplier: Optional[float] = None
+    residual_multiplier: Optional[float] = None
+    logits_scaling: Optional[float] = None
 
     def __post_init__(self):
         if self.n_local_heads == -1:
@@ -330,6 +339,7 @@ class ModelArgs:
     transformer_args: Dict[str, Dict[str, Any]]
     use_tiktoken: bool
     use_hf_tokenizer: bool
+    tokenizer_prepend_bos: bool
 
     def __init__(
         self,
@@ -337,6 +347,7 @@ class ModelArgs:
         model_type: ModelType = ModelType.TextOnly,
         use_tiktoken: bool = False,
         use_hf_tokenizer: bool = False,
+        tokenizer_prepend_bos: bool = True,
     ) -> None:
         self._sanity_check(transformer_args, model_type)
 
@@ -346,6 +357,7 @@ class ModelArgs:
         # Model-level attributes
         self.use_tiktoken = use_tiktoken
         self.use_hf_tokenizer = use_hf_tokenizer
+        self.tokenizer_prepend_bos = tokenizer_prepend_bos
 
     def _sanity_check(
         self,
@@ -373,7 +385,14 @@ class ModelArgs:
 
         use_tiktoken = loaded_params.get("use_tiktoken", False)
         use_hf_tokenizer = loaded_params.get("use_hf_tokenizer", False)
-        return cls(transformer_args, model_type, use_tiktoken, use_hf_tokenizer)
+        tokenizer_prepend_bos = loaded_params.get("tokenizer_prepend_bos", True)
+        return cls(
+            transformer_args=transformer_args,
+            model_type=model_type,
+            use_tiktoken=use_tiktoken,
+            use_hf_tokenizer=use_hf_tokenizer,
+            tokenizer_prepend_bos=tokenizer_prepend_bos,
+        )
 
     @classmethod
     def from_table(cls, name: str):
@@ -477,7 +496,9 @@ class Model(ABC, nn.Module):
         for name, module_class in recipe.modules.items():
             config_args = self.config.transformer_args[name]
             if module_class == Transformer:
-                modules[name] = module_class(TransformerArgs.from_params(config_args))
+                transformer_args = TransformerArgs.from_params(config_args)
+                logger.debug("Transformer Args: %s", transformer_args)
+                modules[name] = module_class(transformer_args)
             else:
                 modules[name] = module_class(**config_args)
 
@@ -707,6 +728,10 @@ class Transformer(nn.Module):
         if self.tok_embeddings:
             x = self.tok_embeddings(x)
 
+            # For Granite architectures
+            if self.config.embedding_multiplier:
+                x = x * self.config.embedding_multiplier
+
         for _, layer in self.layers.items():
             x = layer(x, input_pos, freqs_cis, mask, cache_lane=cache_lane)
 
@@ -714,6 +739,9 @@ class Transformer(nn.Module):
             x = self.norm(x)
         if self.output:
             x = self.output(x)
+        # For granite architectures
+        if self.config.logits_scaling:
+            x = x / self.config.logits_scaling
         # print(f"output shape: {x.shape}")
         return x
 
@@ -725,6 +753,12 @@ class TransformerBlock(nn.Module):
         self.feed_forward = FeedForward(config)
         self.ffn_norm = RMSNorm(config.dim, config.norm_eps)
         self.attention_norm = RMSNorm(config.dim, config.norm_eps)
+        # None for llama architecture, set for granite architectures
+        self.residual_multiplier = (
+            config.residual_multiplier
+            if config.residual_multiplier is not None
+            else 1.0
+        )
 
     def distribute(self, device_mesh: DeviceMesh):
         self.attention.distribute(device_mesh)
@@ -735,8 +769,8 @@ class TransformerBlock(nn.Module):
     ) -> Tensor:
         h = x + self.attention(
             self.attention_norm(x), freqs_cis, mask, input_pos, cache_lane=cache_lane
-        )
-        out = h + self.feed_forward(self.ffn_norm(h))
+        ) * self.residual_multiplier
+        out = h + self.feed_forward(self.ffn_norm(h)) * self.residual_multiplier
         return out
 
 
@@ -763,6 +797,7 @@ class Attention(nn.Module):
         self.head_dim = config.head_dim
         self.n_local_heads = config.n_local_heads
         self.dim = config.dim
+        self.attention_scale = config.attention_multiplier
         self._register_load_state_dict_pre_hook(self.load_hook)
 
     def setup_cache(self, max_batch_size, max_seq_length, cache_lanes: int = 1):
@@ -859,7 +894,16 @@ class Attention(nn.Module):
 
         k = k.repeat_interleave(self.n_heads // self.n_local_heads, dim=1)
         v = v.repeat_interleave(self.n_heads // self.n_local_heads, dim=1)
-        y = F.scaled_dot_product_attention(q, k, v, attn_mask=mask, dropout_p=0.0)
+        y = F.scaled_dot_product_attention(
+            query=q,
+            key=k,
+            value=v,
+            attn_mask=mask,
+            dropout_p=0.0,
+            # This is None (default) for llama architecture and set for granite
+            # architectures
+            scale=self.attention_scale,
+        )
 
         # -1 = self.dim
         y = y.transpose(1, 2).contiguous().view(bsz, seqlen, -1)

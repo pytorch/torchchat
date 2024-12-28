@@ -142,7 +142,7 @@ To use linear:a8wxdq and embedding:wx, you must set up the torchao experimental 
 
 From the torchchat root directory, run
 ```
-sh torchchat/utils/scripts/build_torchao_ops.sh
+bash torchchat/utils/scripts/build_torchao_ops.sh
 ```
 
 This should take about 10 seconds to complete.
@@ -150,14 +150,14 @@ This should take about 10 seconds to complete.
 Note: if you want to use the new kernels in the AOTI and C++ runners, you must pass the flag link_torchao_ops when running the scripts the build the runners.
 
 ```
-sh torchchat/utils/scripts/build_native.sh aoti link_torchao_ops
+bash torchchat/utils/scripts/build_native.sh aoti link_torchao_ops
 ```
 
 ```
-sh torchchat/utils/scripts/build_native.sh et link_torchao_ops
+bash torchchat/utils/scripts/build_native.sh et link_torchao_ops
 ```
 
-Note before running `sh torchchat/utils/scripts/build_native.sh et link_torchao_ops`, you must first install executorch with `sh torchchat/utils/scripts/install_et.sh` if you have not done so already.
+Note before running `bash torchchat/utils/scripts/build_native.sh et link_torchao_ops`, you must first install executorch with `bash torchchat/utils/scripts/install_et.sh` if you have not done so already.
 
 ### Examples
 
@@ -212,7 +212,7 @@ Currently, torchchat can only run them on Eager mode.
 
 From the torchchat root directory, run
 ```
-sh torchchat/utils/scripts/build_torchao_ops.sh mps
+bash torchchat/utils/scripts/build_torchao_ops.sh mps
 ```
 
 ### Examples

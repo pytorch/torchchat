@@ -1,0 +1,20 @@
+{
+    "attention_multiplier": 0.0078125,
+    "embedding_multiplier": 12.0,
+    "dim": 4096,
+    "block_size": 12800,
+    "hidden_dim": 12800,
+    "logits_scaling": 16.0,
+    "n_heads": 32,
+    "n_layers": 40,
+    "n_local_heads": 8,
+    "residual_multiplier": 0.22,
+    "norm_eps": 1e-05,
+    "rope_base": 10000,
+    "tie_word_embeddings": true,
+    "vocab_size": 49155,
+    "use_hf_tokenizer": true,
+    "tokenizer_prepend_bos": false,
+    "attention_bias": false,
+    "feed_forward_bias": false
+}
