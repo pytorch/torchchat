@@ -1122,7 +1122,7 @@ class LocalGenerator:
                     messages_to_encode.append(
                         {"role": "system", "content": self.system_prompt}
                     )
-                messages_to_encode.append({"role": "system", "content": prompt})
+                messages_to_encode.append({"role": "user", "content": prompt})
                 encoded = self.chat_formatter.encode_dialog_prompt(
                     messages_to_encode, add_generation_prompt=True,
                 )
