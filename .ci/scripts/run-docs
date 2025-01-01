@@ -40,6 +40,11 @@ case "$1" in
     filepath="docs/distributed.md"
     parameters=""  # Clear parameters
     ;;
+  "local")
+    filepath="docs/local-model.md"
+    parameters=""  # Clear parameters
+    ;;
+
   *)
     echo "Unknown option: $1"
     exit 1
