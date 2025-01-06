@@ -125,3 +125,20 @@ if [ "$1" == "native" ]; then
         bash -x ./run-native.sh
         echo "::endgroup::"
 fi
+
+if [ "$1" == "distributed" ]; then
+
+        echo "::group::Create script to run distributed"
+        python3 torchchat/utils/scripts/updown.py --file docs/distributed.md > ./run-distributed.sh
+        # for good measure, if something happened to updown processor,
+        # and it did not error out, fail with an exit 1
+        echo "exit 1" >> ./run-distributed.sh
+        echo "::endgroup::"
+
+        echo "::group::Run distributed"
+        echo "*******************************************"
+        cat ./run-distributed.sh
+        echo "*******************************************"
+        bash -x ./run-distributed.sh
+        echo "::endgroup::"
+fi
