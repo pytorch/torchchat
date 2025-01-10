@@ -30,7 +30,7 @@ torchchat is a small codebase showcasing the ability to run large language model
 - PyTorch-native execution with performance
 - Supports popular hardware and OS
   - Linux (x86)
-  - Mac OS (M1/M2/M3)
+  - macOS 12.3+ (Mac with Apple Silicon)
   - Android (Devices that support XNNPACK)
   - iOS 17+ and 8+ Gb of RAM (iPhone 15 Pro+ or iPad with Apple Silicon)
 - Multiple data types including: float32, float16, bfloat16
