@@ -8,10 +8,10 @@ import os
 from typing import Optional
 
 import torch
+import torch._inductor
 import torch.nn as nn
 
 from torch.export import Dim
-import torch._inductor
 
 from torchchat.cli.builder import (
     _initialize_model,
@@ -68,20 +68,24 @@ def export_for_server(
 
     with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]):
         metadata = {}  # TODO: put more metadata here
-        options = {"aot_inductor.package": package, "aot_inductor.metadata": metadata}
+        options = {"aot_inductor.metadata": metadata}
         if not package:
             options = {"aot_inductor.output_path": output_path}
 
-        path = torch._export.aot_compile(
+        ep = torch.export.export(
             model,
             example_inputs,
             dynamic_shapes=dynamic_shapes,
-            options=options,
         )
 
         if package:
-            from torch._inductor.package import package_aoti
-            path = package_aoti(output_path, path)
+            path = torch._inductor.aoti_compile_and_package(
+                ep, package_path=output_path, inductor_configs=options
+            )
+        else:
+            path = torch._inductor.aot_compile(
+                ep.module(), example_inputs, options=options
+            )
 
     print(f"The generated packaged model can be found at: {path}")
     return path
