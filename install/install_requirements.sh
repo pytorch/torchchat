@@ -51,18 +51,13 @@ echo "Using pip executable: $PIP_EXECUTABLE"
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-if [[ -x "$(command -v xpu-smi)" ]];
-then
-  PYTORCH_NIGHTLY_VERSION=dev20250110
-else
-  PYTORCH_NIGHTLY_VERSION=dev20241218
-fi
+PYTORCH_NIGHTLY_VERSION=dev20241218
 
 # Nightly version for torchvision
-VISION_NIGHTLY_VERSION=dev20250111
+VISION_NIGHTLY_VERSION=dev20241218
 
 # Nightly version for torchtune
-TUNE_NIGHTLY_VERSION=dev20250105
+TUNE_NIGHTLY_VERSION=dev20241218
 
 # Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
 (
@@ -90,9 +85,9 @@ fi
 if [[ -x "$(command -v xpu-smi)" ]];
 then
   REQUIREMENTS_TO_INSTALL=(
-    torch=="2.7.0.${PYTORCH_NIGHTLY_VERSION}"
+    torch=="2.6.0.${PYTORCH_NIGHTLY_VERSION}"
     torchvision=="0.22.0.${VISION_NIGHTLY_VERSION}"
-   # torchtune=="0.4.0"
+    torchtune=="0.4.0"
   )
 else
   REQUIREMENTS_TO_INSTALL=(
@@ -122,28 +117,10 @@ fi
 
 # For torchao need to install from github since nightly build doesn't have macos build.
 # TODO: Remove this and install nightly build, once it supports macos
-if [[ -x "$(command -v xpu-smi)" ]];
-then
-  # install torchao nightly for xpu
-  (
-    set -x
-    $PIP_EXECUTABLE install --extra-index-url "${TORCH_NIGHTLY_URL}" torchao=="0.8.0.dev20250110"
-  )
-else
-  (
-    set -x
-    $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@2f97b0955953fa1a46594a27f0df2bc48d93e79d
-  )
-fi
-
-# install torchtune from source for xpu
-if [[ -x "$(command -v xpu-smi)" ]];
-then
-  (
-    set -x
-    $PIP_EXECUTABLE install git+https://github.com/pytorch/torchtune
-  )
-fi
+(
+  set -x
+  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@2f97b0955953fa1a46594a27f0df2bc48d93e79d
+)
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   (
