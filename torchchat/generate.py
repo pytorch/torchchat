@@ -1168,7 +1168,6 @@ class LocalGenerator:
             else:
                 torch.profiler._utils._init_for_cuda_graphs()
                 prof = torch.profiler.profile()
-            print("prof is: ", prof)
             t0 = time.perf_counter()
             num_tokens_generated = 0
             with prof:
