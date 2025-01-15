@@ -222,7 +222,7 @@ try:
             return self.wo(output)
 
     def replace_attention_with_custom_sdpa_attention(module: nn.Module):
-        from executorch.extension.llm.custom_ops import sdpa_with_kv_cache  # noqa
+        from executorch.extension.llm.custom_ops import custom_ops  # noqa
 
         for name, child in module.named_children():
             if isinstance(child, Attention):
