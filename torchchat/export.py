@@ -125,7 +125,6 @@ try:
     )
     from executorch.exir.tracer import Value
 
-    from torch._export import capture_pre_autograd_graph
     from torch.export import export, export_for_training, ExportedProgram
 
     from torchchat.model import apply_rotary_emb, Attention
@@ -316,7 +315,7 @@ try:
         with torch.nn.attention.sdpa_kernel(
             [torch.nn.attention.SDPBackend.MATH]
         ), torch.no_grad():
-            m = capture_pre_autograd_graph(model, input, dynamic_shapes=dynamic_shapes)
+            m = export_for_training(model, input, dynamic_shapes=dynamic_shapes)
 
             edge_manager = export_to_edge(
                 m,
