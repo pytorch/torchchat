@@ -120,13 +120,15 @@ python3 torchchat.py generate llama3 --pte-path llama3.pte  --prompt "Hello my n
 
 ## Experimental TorchAO lowbit kernels
 
-WARNING: These kernels only work on devices with ARM CPUs, for example on Mac computers with Apple Silicon.
+If you are on a Mac with Apple Silicon, we have 1-8 quantization available for embedding and linear layers, backed by CPU and MPS kernels.
+
+The CPU kernels are installed automatically by the torchchat install script and can be used out of the box.  To use the MPS kernels, follow the setup instructions below.
 
 ### Use
 
 #### linear:a8wxdq
 The quantization scheme linear:a8wxdq dynamically quantizes activations to 8 bits, and quantizes the weights in a groupwise manner with a specified bitwidth and groupsize.
-It takes arguments bitwidth (1, 2, 3, 4, 5, 6, 7), groupsize, and has_weight_zeros (true, false).
+It takes arguments bitwidth (1, 2, 3, 4, 5, 6, 7, 8), groupsize (-1 if channelwise desired), and has_weight_zeros (true, false).
 The argument has_weight_zeros indicates whether the weights are quantized with scales only (has_weight_zeros: false) or with both scales and zeros (has_weight_zeros: true).
 Roughly speaking, {bitwidth: 4, groupsize: 32, has_weight_zeros: false} is similar to GGML's Q4_0 quantization scheme.
 
@@ -138,7 +140,9 @@ The quantization scheme embedding:wx quantizes embeddings in a groupwise manner 
 You should expect high performance on ARM CPU if groupsize is divisible by 32.  With other platforms and argument choices, a slow fallback kernel will be used.  You will see warnings about this during quantization.
 
 ### Setup
-To use linear:a8wxdq and embedding:wx, you must set up the torchao experimental kernels.  These will only work on devices with ARM CPUs, for example on Mac computers with Apple Silicon.
+If you are using the torchao ops from python, they are available out of the box on a Mac with Apple Silicon, and you can skip these setup steps.
+
+If you plan to use the kernels from the AOTI/ExecuTorch C++ runners, follow the setup steps below.
 
 From the torchchat root directory, run
 ```
@@ -147,7 +151,7 @@ bash torchchat/utils/scripts/build_torchao_ops.sh
 
 This should take about 10 seconds to complete.
 
-Note: if you want to use the new kernels in the AOTI and C++ runners, you must pass the flag link_torchao_ops when running the scripts the build the runners.
+When building the AOTI and C++ runners, you must pass the flag link_torchao_ops when running the scripts the build the runners.
 
 ```
 bash torchchat/utils/scripts/build_native.sh aoti link_torchao_ops
@@ -175,8 +179,8 @@ OMP_NUM_THREADS=6 python3 torchchat.py generate llama3.1 --device cpu --dtype fl
 
 #### AOTI
 ```
-OMP_NUM_THREADS=6 python torchchat.py export llama3.1 --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}' --output-dso llama3_1.so
-OMP_NUM_THREADS=6 python3 torchchat.py generate llama3.1 --dso-path llama3_1.so --prompt "Once upon a time,"  --num-samples 5
+OMP_NUM_THREADS=6 python torchchat.py export llama3.1 --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}' --output-aoti-package-path llama3_1.pt2
+OMP_NUM_THREADS=6 python3 torchchat.py generate llama3.1 --aoti-package-path llama3_1.pt2 --prompt "Once upon a time,"  --num-samples 5
 ```
 
 If you built the AOTI runner with link_torchao_ops as discussed in the setup section, you can also use the C++ runner:
