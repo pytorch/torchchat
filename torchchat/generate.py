@@ -1291,6 +1291,9 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
             )
         if torch.cuda.is_available():
             print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
+        if torch.xpu.is_available():
+            print(f"Memory used: {torch.xpu.max_memory_reserved() / 1e9:.02f} GB")
+
 
 
 class DistributedGenerator(LocalGenerator):
@@ -1617,6 +1620,8 @@ def run_generator(
         )
         if torch.cuda.is_available():
             torch.cuda.reset_peak_memory_stats()
+        if torch.xpu.is_available():
+            torch.xpu.reset_peak_memory_stats()
 
         for _ in gen.chat(generator_args):
             pass
