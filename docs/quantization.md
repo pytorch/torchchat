@@ -140,7 +140,7 @@ The quantization scheme embedding:wx quantizes embeddings in a groupwise manner 
 You should expect high performance on ARM CPU if groupsize is divisible by 32.  With other platforms and argument choices, a slow fallback kernel will be used.  You will see warnings about this during quantization.
 
 ### Setup
-If you are using the torchao ops from python, they are available out of the box on a Mac with Apple Silicon, and you can skip these setup steps.
+If you are using the torchao ops from python (i.e not with a C++ runner), they are available out of the box on a Mac with Apple Silicon, and you can skip these setup steps.
 
 If you plan to use the kernels from the AOTI/ExecuTorch C++ runners, follow the setup steps below.
 
