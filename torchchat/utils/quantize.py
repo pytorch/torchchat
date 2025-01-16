@@ -137,9 +137,7 @@ def quantize_model(
                 group_size = q_kwargs["groupsize"]
                 bit_width = q_kwargs["bitwidth"]
                 has_weight_zeros = q_kwargs["has_weight_zeros"]
-                granularity = PerRow()
-                if group_size != -1:
-                    granularity = PerGroup(group_size)
+                granularity = PerRow() if group_size == -1 else PerGroup(group_size) 
                 weight_dtype = getattr(torch, f"int{bit_width}")
 
                 try:
