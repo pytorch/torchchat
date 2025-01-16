@@ -315,7 +315,7 @@ try:
         with torch.nn.attention.sdpa_kernel(
             [torch.nn.attention.SDPBackend.MATH]
         ), torch.no_grad():
-            m = export_for_training(model, input, dynamic_shapes=dynamic_shapes)
+            m = export_for_training(model, input, dynamic_shapes=dynamic_shapes).module()
 
             edge_manager = export_to_edge(
                 m,
