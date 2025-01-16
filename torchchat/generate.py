@@ -1187,7 +1187,8 @@ class LocalGenerator:
                     skip_cache_setup=not is_first_sample,
                     max_seq_length=max_seq_length,
                 )
-                start_pos += encoded.size(0)
+                if generator_args.chat_mode:
+                    start_pos += encoded.size(0)
                 for token_tensor, metrics in generator_func:
                     if token_tensor is not None:
                         start_pos += token_tensor.size(0)
