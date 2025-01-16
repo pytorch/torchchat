@@ -968,8 +968,7 @@ try:
         torchao_experimental_quant_api
     )
     from torchao_experimental_quant_api import (
-        UIntxWeightOnlyLinearQuantizer,
-    )
+        from torchao_experimental_quant_api import UIntxWeightOnlyLinearQuantizer
     quantizer_class_dict["linear:afpwx"] = UIntxWeightOnlyLinearQuantizer
 
     # Try loading custom op
