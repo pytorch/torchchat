@@ -215,6 +215,9 @@ jobs:
           set -eux
           PYTHONPATH="${PWD}" python .ci/scripts/gather_test_models.py --event "pull_request" --backend "gpu"
   test-gpu-compile:
+    permissions:
+      id-token: write
+      contents: read
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-compile (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
@@ -250,6 +253,9 @@ jobs:
         echo "::endgroup::"
 
   test-gpu-aoti-bfloat16:
+    permissions:
+      id-token: write
+      contents: read
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-aoti-bfloat16 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
@@ -286,6 +292,9 @@ jobs:
         echo "::endgroup::"
 
   test-gpu-aoti-float32:
+    permissions:
+      id-token: write
+      contents: read
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-aoti-float32 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
@@ -327,6 +336,9 @@ jobs:
         echo "::endgroup::"
 
   test-gpu-aoti-float16:
+    permissions:
+      id-token: write
+      contents: read
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-aoti-float16 (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
@@ -369,6 +381,9 @@ jobs:
         echo "::endgroup::"
 
   test-gpu-eval-sanity-check:
+    permissions:
+      id-token: write
+      contents: read
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     name: test-gpu-eval-sanity-check (${{ matrix.platform }}, ${{ matrix.model_name }})
     needs: gather-models-gpu
@@ -1011,6 +1026,9 @@ jobs:
           echo "Tests complete."
 
   test-build-runner-et-android:
+    permissions:
+      id-token: write
+      contents: read
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.4xlarge
