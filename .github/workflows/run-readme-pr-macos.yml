@@ -144,7 +144,7 @@ jobs:
           echo "*******************************************"
           echo "::endgroup::"
 
-  test-advanced-macos:
+  test-eval-macos:
     runs-on: macos-14-xlarge
     steps:
       - name: Checkout code
