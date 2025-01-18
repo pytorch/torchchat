@@ -121,7 +121,7 @@ def quantize_model(
         else:
             ao_quant = True
             # Use tensor subclass API for int4 weight only.
-            if device == "cuda" and quantizer == "linear:int4":
+            if (device == "cuda" or device == "xpu") and quantizer == "linear:int4":
                 quantize_(model, int4_weight_only(q_kwargs["groupsize"]))
             elif quantizer == "linear:int8":
                 print("quantizer is linear int8")
