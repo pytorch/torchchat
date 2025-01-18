@@ -29,6 +29,31 @@ default_device = "cpu"
 
 
 """
+Export Snapshot
+"""
+
+
+def export_snapshot(
+    model: nn.Module,
+    device: Optional[str] = None,
+    output_path: str = "model-snapshot.tc",
+) -> str:
+    """
+    Export the model as snapshot.
+
+    Args:
+        model: The model to be exported.
+        device: The device to run the model on.
+        output_path: The path to save the exported model.
+    Returns:
+        The path to the exported model.
+    """
+    assert output_path.endswith(".tc"), "use .tc extension for snapshots"
+    torch.save(model, output_path)
+    return output_path
+
+
+"""
 Export for Server
 """
 
@@ -66,7 +91,7 @@ def export_for_server(
         )
         dynamic_shapes = None
 
-    with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]):
+    with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.FLASH_ATTENTION ]):
         metadata = {}  # TODO: put more metadata here
         options = {"aot_inductor.package": package, "aot_inductor.metadata": metadata}
         if not package:
@@ -359,6 +384,7 @@ def main(args):
 
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
+    output_snapshot_path = args.output_snapshot_path
     output_aoti_package_path = args.output_aoti_package_path
 
     if output_pte_path and builder_args.device != "cpu":
@@ -366,7 +392,7 @@ def main(args):
             f"Warning! ExecuTorch export target is controlled by export recipe, not device setting. Ignoring device={builder_args.device} setting."
         )
         builder_args.device = "cpu"
-    elif "mps" in builder_args.device:
+    elif (output_pte_path or output_dso_path or output_aoti_package_path) and "mps" in builder_args.device:
         print("Warning! Device MPS not supported for export. Exporting for device CPU.")
         builder_args.device = "cpu"
 
@@ -402,6 +428,7 @@ def main(args):
         model_to_pte = model
         model_to_dso = model
         model_to_aoti_package = model
+        model_to_snapshot = model
     else:
         if output_pte_path:
             _set_gguf_kwargs(builder_args, is_et=True, context="export")
@@ -421,6 +448,15 @@ def main(args):
             model_to_dso = model_to_aoti_package
             _unset_gguf_kwargs(builder_args)
 
+        if output_snapshot_path:
+            _set_gguf_kwargs(builder_args, is_et=False, context="export")
+            model_to_snapshot = _initialize_model(
+                builder_args,
+                quantize,
+                support_tensor_subclass=False,
+            )
+            _unset_gguf_kwargs(builder_args)
+ 
     with torch.no_grad():
         if output_pte_path:
             output_pte_path = str(os.path.abspath(output_pte_path))
@@ -454,3 +490,13 @@ def main(args):
                 builder_args.dynamic_shapes,
                 package=True,
             )
+
+        if output_snapshot_path:
+            output_snapshot_path = str(os.path.abspath(output_snapshot_path))
+            print(f"Exporting model using Snapshot to {output_snapshot_path}")
+            export_snapshot(
+                model_to_snapshot,
+                builder_args.device,
+                output_snapshot_path,
+            )
+

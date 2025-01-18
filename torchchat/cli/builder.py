@@ -56,6 +56,7 @@ class BuilderArgs:
     gguf_kwargs: Optional[Dict[str, Any]] = None
     dso_path: Optional[Union[Path, str]] = None
     aoti_package_path: Optional[Union[Path, str]] = None
+    snapshot_path: Optional[Union[Path, str]] = None
     pte_path: Optional[Union[Path, str]] = None
     device: Optional[str] = None
     precision: torch.dtype = torch.float32
@@ -81,6 +82,7 @@ class BuilderArgs:
             or (self.dso_path and Path(self.dso_path).is_file())
             or (self.aoti_package_path and Path(self.aoti_package_path).is_file())
             or (self.pte_path and Path(self.pte_path).is_file())
+            or (self.snapshot_path and Path(self.snapshot_path).is_file())
         ):
             raise RuntimeError(
                 "need to specify a valid checkpoint path, checkpoint dir, gguf path, DSO path, AOTI PACKAGE or PTE path"
@@ -136,6 +138,7 @@ class BuilderArgs:
         dso_path = getattr(args, "dso_path", None)
         pte_path = getattr(args, "pte_path", None)
         aoti_package_path = getattr(args, "aoti_package_path", None)
+        snapshot_path = getattr(args, "snapshot_path", None)
 
         is_chat_model = False
         if args.is_chat_model:
@@ -163,6 +166,7 @@ class BuilderArgs:
         output_pte_path = getattr(args, "output_pte_path", None)
         output_aoti_package_path = getattr(args, "output_aoti_package_path", None)
         output_dso_path = getattr(args, "output_dso_path", None)
+        output_snapshot_path = getattr(args, "output_snapshot_path", None)
         if output_pte_path and args.dtype.startswith("fast"):
             if args.dtype == "fast":
                 # As per Kimish, float32 should be faster on ET XNNPACK
@@ -189,6 +193,7 @@ class BuilderArgs:
             dso_path=dso_path,
             aoti_package_path=aoti_package_path,
             pte_path=pte_path,
+            snapshot_path=snapshot_path,
             device=args.device,
             precision=dtype,
             setup_caches=(
@@ -614,6 +619,33 @@ def _initialize_model(
             model = PTEModel(config, builder_args.pte_path)
         except Exception:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
+    elif builder_args.snapshot_path:
+        # Resolve ModelArgs for constructing the PTEModel
+        # If a manual params_path is provided, use that
+        if builder_args.params_path:
+            config: ModelArgs = ModelArgs.from_params(builder_args.params_path)
+        else:
+            # TODO: Instead of loading the whole model, refactor to call a
+            # helper that generate just model.config
+            with measure_time("Time to load model: {time:.02f} seconds"):
+                model = _load_model(builder_args)
+                device_sync(device=builder_args.device)
+                config = model.config
+                model = None
+        try:
+            model = torch.load(builder_args.snapshot_path, weights_only=False)
+        except Exception:
+            raise RuntimeError(f"Failed to load torchchat snapshot {builder_args.snapshot_path}")
+        # _active_backend() does not allow DSO & AOTI to be true. 
+        # Choose either.
+        set_backend (dso=True, pte=False, aoti_package=False)
+        if (model.config != config):
+            raise RuntimeError("loaded model architecture mismatch")
+        ##        
+        ## import all libraries with custom kernels ans custom operators
+        ## that quantize may be pulling in
+        ##
+
     elif builder_args.distributed:
         pp_degree = builder_args.pp
         tp_degree = builder_args.tp
