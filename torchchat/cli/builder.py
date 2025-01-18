@@ -638,6 +638,7 @@ def _initialize_model(
             raise RuntimeError(f"Failed to load torchchat snapshot {builder_args.snapshot_path}")
         # _active_backend() does not allow DSO & AOTI to be true. 
         # Choose either.
+        from torchchat.utils.build_utils import set_backend
         set_backend (dso=True, pte=False, aoti_package=False)
         if (model.config != config):
             raise RuntimeError("loaded model architecture mismatch")
