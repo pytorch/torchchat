@@ -9,6 +9,9 @@ on:
 
 jobs:
   test-runner-aot-cuda:
+    permissions:
+      id-token: write
+      contents: read
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
@@ -52,7 +55,7 @@ jobs:
 
             python torchchat.py export --checkpoint-path ${MODEL_DIR}/stories15M.pt --output-aoti-package-path /tmp/model.pt2
 
-            ./cmake-out/aoti_run /tmp/model.pt2 -d CUDA -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}"
+            ./cmake-out/aoti_run /tmp/model.pt2 -z ${MODEL_DIR}/tokenizer.model -i "${PROMPT}"
 
         done
 
