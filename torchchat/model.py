@@ -1062,5 +1062,6 @@ try:
         def setup_caches(self, max_batch_size, max_seq_length):
             pass
 
-except:
+except Exception as e:
+    print(f"Warning: PTEModel (ExecuTorch not available with exception: {e}")
     pass
