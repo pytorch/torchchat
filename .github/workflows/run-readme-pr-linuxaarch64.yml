@@ -11,7 +11,7 @@ jobs:
   test-readme-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
-      runner: linux.arm64.2xlarge
+      runner: linux.arm64.m7g.4xlarge
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
       timeout: 60
@@ -35,7 +35,7 @@ jobs:
   test-quantization-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
-      runner: linux.arm64.2xlarge
+      runner: linux.arm64.m7g.4xlarge
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
       timeout: 60
@@ -54,7 +54,7 @@ jobs:
   test-gguf-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
-      runner: linux.arm64.2xlarge
+      runner: linux.arm64.m7g.4xlarge
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
       timeout: 60
@@ -78,7 +78,7 @@ jobs:
   test-advanced-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
-      runner: linux.arm64.2xlarge
+      runner: linux.arm64.m7g.4xlarge
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
       timeout: 60
@@ -102,7 +102,7 @@ jobs:
   test-evaluation-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
-      runner: linux.arm64.2xlarge
+      runner: linux.arm64.m7g.4xlarge
       gpu-arch-type: cuda
       gpu-arch-version: "12.1"
       timeout: 60
