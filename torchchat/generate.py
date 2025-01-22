@@ -685,7 +685,7 @@ class LocalGenerator:
         sequential_prefill=True,
         callback=lambda x: x,
         max_seq_length: int,
-        attention_backend: str = "math",
+        attention_backend: SDPBackend = torch.nn.attention.SDPBackend.MATH,
         seed: Optional[int] = None,
         **sampling_kwargs,
     ) -> torch.Tensor:
