@@ -1063,5 +1063,5 @@ try:
             pass
 
 except Exception as e:
-    print(f"Warning: PTEModel (ExecuTorch not available with exception: {e}")
+    print(f"Warning: PTEModel (ExecuTorch) not available with exception: {e}")
     pass
