@@ -1025,7 +1025,7 @@ try:
     # For quantized_decomposed ops
     from executorch.kernels import quantized  # no-qa
     # For llama::sdpa_with_kv_cache.out, preprocess ops
-    from executorch.extension.llm.custom_ops import sdpa_with_kv_cache  # no-qa
+    from executorch.extension.llm.custom_ops import custom_ops  # no-qa
 
     class PTEModel(nn.Module):
         def __init__(self, config, path) -> None:
