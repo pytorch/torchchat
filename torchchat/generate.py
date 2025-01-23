@@ -685,7 +685,7 @@ class LocalGenerator:
         sequential_prefill=True,
         callback=lambda x: x,
         max_seq_length: int,
-        attention_backend: str = "math",
+        attention_backend: SDPBackend = torch.nn.attention.SDPBackend.MATH,
         seed: Optional[int] = None,
         **sampling_kwargs,
     ) -> torch.Tensor:
@@ -1126,7 +1126,7 @@ class LocalGenerator:
                     messages_to_encode.append(
                         {"role": "system", "content": self.system_prompt}
                     )
-                messages_to_encode.append({"role": "system", "content": prompt})
+                messages_to_encode.append({"role": "user", "content": prompt})
                 encoded = self.chat_formatter.encode_dialog_prompt(
                     messages_to_encode, add_generation_prompt=True,
                 )
