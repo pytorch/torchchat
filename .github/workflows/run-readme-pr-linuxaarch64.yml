@@ -13,7 +13,7 @@ jobs:
     with:
       runner: linux.arm64.m7g.4xlarge
       docker-image: "pytorch/manylinuxaarch64-builder:cuda12.6-main"
-      gpu-arch-type: cuda
+      gpu-arch-type: cuda-aarch64
       gpu-arch-version: "12.6"
       timeout: 60
       script: |
@@ -38,7 +38,7 @@ jobs:
     with:
       runner: linux.arm64.m7g.4xlarge
       docker-image: "pytorch/manylinuxaarch64-builder:cuda12.6-main"
-      gpu-arch-type: cuda
+      gpu-arch-type: cuda-aarch64
       gpu-arch-version: "12.6"
       timeout: 60
       script: |
@@ -58,7 +58,7 @@ jobs:
     with:
       runner: linux.arm64.m7g.4xlarge
       docker-image: "pytorch/manylinuxaarch64-builder:cuda12.6-main"
-      gpu-arch-type: cuda
+      gpu-arch-type: cuda-aarch64
       gpu-arch-version: "12.6"
       timeout: 60
       script: |
@@ -83,7 +83,7 @@ jobs:
     with:
       runner: linux.arm64.m7g.4xlarge
       docker-image: "pytorch/manylinuxaarch64-builder:cuda12.6-main"
-      gpu-arch-type: cuda
+      gpu-arch-type: cuda-aarch64
       gpu-arch-version: "12.6"
       timeout: 60
       script: |
@@ -108,7 +108,7 @@ jobs:
     with:
       runner: linux.arm64.m7g.4xlarge
       docker-image: "pytorch/manylinuxaarch64-builder:cuda12.6-main"
-      gpu-arch-type: cuda
+      gpu-arch-type: cuda-aarch64
       gpu-arch-version: "12.6"
       timeout: 60
       script: |
