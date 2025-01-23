@@ -51,19 +51,13 @@ echo "Using pip executable: $PIP_EXECUTABLE"
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-PYTORCH_NIGHTLY_VERSION=dev20241218
+PYTORCH_NIGHTLY_VERSION=dev20250119
 
 # Nightly version for torchvision
-VISION_NIGHTLY_VERSION=dev20241218
+VISION_NIGHTLY_VERSION=dev20250119
 
 # Nightly version for torchtune
-TUNE_NIGHTLY_VERSION=dev20241218
-
-# Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
-(
-  set -x
-  $PIP_EXECUTABLE uninstall -y triton
-)
+TUNE_NIGHTLY_VERSION=dev20250119
 
 # The pip repository that hosts nightly torch packages. cpu by default.
 # If cuda is available, based on presence of nvidia-smi, install the pytorch nightly
@@ -74,16 +68,28 @@ then
 elif [[ -x "$(command -v rocminfo)" ]];
 then
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/rocm6.2"
+elif [[ -x "$(command -v xpu-smi)" ]];
+then
+  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/xpu"
 else
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
 fi
 
 # pip packages needed by exir.
-REQUIREMENTS_TO_INSTALL=(
-  torch=="2.6.0.${PYTORCH_NIGHTLY_VERSION}"
-  torchvision=="0.22.0.${VISION_NIGHTLY_VERSION}"
-  torchtune=="0.5.0.${TUNE_NIGHTLY_VERSION}"
-)
+if [[ -x "$(command -v xpu-smi)" ]];
+then
+  REQUIREMENTS_TO_INSTALL=(
+    torch=="2.7.0.${PYTORCH_NIGHTLY_VERSION}"
+    torchvision=="0.22.0.${VISION_NIGHTLY_VERSION}"
+    torchtune=="0.6.0"
+  )
+else
+  REQUIREMENTS_TO_INSTALL=(
+    torch=="2.7.0.${PYTORCH_NIGHTLY_VERSION}"
+    torchvision=="0.22.0.${VISION_NIGHTLY_VERSION}"
+    torchtune=="0.6.0.${TUNE_NIGHTLY_VERSION}"
+  )
+fi
 
 #
 # First install requirements in install/requirements.txt. Older torch may be
@@ -93,6 +99,12 @@ REQUIREMENTS_TO_INSTALL=(
 (
   set -x
   $PIP_EXECUTABLE install -r install/requirements.txt --extra-index-url "${TORCH_NIGHTLY_URL}"
+)
+
+# Uninstall triton, as nightly will depend on pytorch-triton, which is one and the same
+(
+  set -x
+  $PIP_EXECUTABLE uninstall -y triton
 )
 
 # Install the requirements. --extra-index-url tells pip to look for package
@@ -116,8 +128,6 @@ if [[ -x "$(command -v nvidia-smi)" ]]; then
     $PYTHON_EXECUTABLE torchchat/utils/scripts/patch_triton.py
   )
 fi
-
-
 (
   set -x
   $PIP_EXECUTABLE install evaluate=="0.4.3" lm-eval=="0.4.2" psutil=="6.0.0"

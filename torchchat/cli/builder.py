@@ -69,10 +69,16 @@ class BuilderArgs:
     prefill_possible: bool = False
     dynamic_shapes: bool = False
     max_seq_length: Optional[int] = None
+    attention_backend: str = "math"
 
     def __post_init__(self):
         if self.device is None:
-            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+            if torch.cuda.is_available():
+                self.device = "cuda"
+            elif torch.xpu.is_available():
+                self.device = "xpu"
+            else:
+                self.device = "cpu"
 
         if not (
             (self.checkpoint_path and self.checkpoint_path.is_file())
@@ -178,6 +184,17 @@ class BuilderArgs:
         pp = getattr(args, "pp", 1)
         tp = getattr(args, "tp", 1)
         chpt_from = getattr(args, "chpt_from", "hf")
+        sdp_backend_dict = {
+            'math': torch.nn.attention.SDPBackend.MATH,
+            'flash_attention': torch.nn.attention.SDPBackend.FLASH_ATTENTION,
+            'efficient_attention': torch.nn.attention.SDPBackend.EFFICIENT_ATTENTION,
+            'cudnn_attention': torch.nn.attention.SDPBackend.CUDNN_ATTENTION,
+        }
+        attention_backend = sdp_backend_dict[args.attention_backend]
+        if args.device == "cpu" and (args.attention_backend == "efficient_attention"
+                                     or args.attention_backend == "cudnn_attention"):
+            print(f"Warning: {args.attention_backend} is not supported on CPU. Using math instead.")
+            attention_backend = torch.nn.attention.SDPBackend.MATH
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
@@ -202,6 +219,7 @@ class BuilderArgs:
             is_chat_model=is_chat_model,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),
+            attention_backend=attention_backend,
         )
 
     @classmethod

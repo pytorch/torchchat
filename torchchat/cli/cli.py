@@ -176,8 +176,15 @@ def _add_model_config_args(parser, verb: str) -> None:
         "--device",
         type=str,
         default=None,
-        choices=["fast", "cpu", "cuda", "mps"],
-        help="Hardware device to use. Options: fast, cpu, cuda, mps",
+        choices=["fast", "cpu", "cuda", "mps", "xpu"],
+        help="Hardware device to use. Options: fast, cpu, cuda, mps, xpu",
+    )
+    model_config_parser.add_argument(
+        "--attention-backend",
+        type=str,
+        default="math",
+        choices=["math", "flash_attention", "efficient_attention", "cudnn_attention"],
+        help="SDPBackend to use. Options: MATH, FLASH_ATTENTION, EFFICIENT_ATTENTION, CUDNN_ATTENTION",
     )
 
 
