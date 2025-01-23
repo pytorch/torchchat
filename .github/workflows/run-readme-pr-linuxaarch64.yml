@@ -9,20 +9,18 @@ on:
 
 jobs:
   test-readme-cpu:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
-      runner: linux-aarch64
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      runner: linux.arm64.2xlarge
+      docker-image: "pytorch/manylinux2_28_aarch64-builder:cpu-aarch64-main"
+      gpu-arch-type: cpu-aarch64
       timeout: 60
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
@@ -33,39 +31,35 @@ jobs:
         echo "::endgroup::"
 
   test-quantization-cpu:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
-      runner: linux-aarch64
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      runner: linux.arm64.2xlarge
+      docker-image: "pytorch/manylinux2_28_aarch64-builder:cpu-aarch64-main"
+      gpu-arch-type: cpu-aarch64
       timeout: 60
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
 
   test-gguf-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
-      runner: linux-aarch64
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      runner: linux.arm64.2xlarge
+      docker-image: "pytorch/manylinux2_28_aarch64-builder:cpu-aarch64-main"
+      gpu-arch-type: cpu-aarch64
       timeout: 60
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs gguf
@@ -77,19 +71,17 @@ jobs:
 
   test-advanced-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
-      runner: linux-aarch64
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      runner: linux.arm64.2xlarge
+      docker-image: "pytorch/manylinux2_28_aarch64-builder:cpu-aarch64-main"
+      gpu-arch-type: cpu-aarch64
       timeout: 60
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
@@ -101,19 +93,17 @@ jobs:
 
   test-evaluation-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
-      runner: linux-aarch64
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
+      runner: linux.arm64.2xlarge
+      docker-image: "pytorch/manylinux2_28_aarch64-builder:cpu-aarch64-main"
+      gpu-arch-type: cpu-aarch64
       timeout: 60
       script: |
         echo "::group::Print machine info"
         uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs evaluation
