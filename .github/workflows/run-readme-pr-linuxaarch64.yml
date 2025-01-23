@@ -9,10 +9,10 @@ on:
 
 jobs:
   test-readme-cpu:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
       runner: linux.arm64.m7g.4xlarge
-      docker-image: "pytorch/manylinuxaarch64-builder:cuda12.6-main"
+      docker-image: "pytorch/manylinux2_28_aarch64-builder:cuda12.6"
       gpu-arch-type: cuda-aarch64
       gpu-arch-version: "12.6"
       timeout: 60
@@ -34,11 +34,11 @@ jobs:
         echo "::endgroup::"
 
   test-quantization-cpu:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     with:
-      runner: linux.arm64.m7g.4xlarge
-      docker-image: "pytorch/manylinuxaarch64-builder:cuda12.6-main"
-      gpu-arch-type: cuda-aarch64
+      runner: linux.arm64.2xlarge
+      docker-image: "pytorch/manylinux2_28_aarch64-builder:cpu-aarch64-main"
+      gpu-arch-type: cpu-aarch64
       gpu-arch-version: "12.6"
       timeout: 60
       script: |
@@ -56,9 +56,9 @@ jobs:
   test-gguf-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
     with:
-      runner: linux.arm64.m7g.4xlarge
-      docker-image: "pytorch/manylinuxaarch64-builder:cuda12.6-main"
-      gpu-arch-type: cuda-aarch64
+      runner: linux.arm64.2xlarge
+      docker-image: "manylinuxaarch64-builder:cpu-aarch64-main"
+      gpu-arch-type: cpu-aarch64
       gpu-arch-version: "12.6"
       timeout: 60
       script: |
