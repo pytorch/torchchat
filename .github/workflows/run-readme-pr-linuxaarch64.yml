@@ -10,6 +10,9 @@ on:
 jobs:
   test-readme-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
       runner: linux.arm64.m7g.4xlarge
       docker-image: "pytorch/manylinux2_28_aarch64-builder:cuda12.6"
@@ -35,6 +38,9 @@ jobs:
 
   test-quantization-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
       runner: linux.arm64.2xlarge
       docker-image: "pytorch/manylinux2_28_aarch64-builder:cpu-aarch64-main"
