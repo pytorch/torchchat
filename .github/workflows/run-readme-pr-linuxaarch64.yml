@@ -50,11 +50,6 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
 
   test-gguf-cpu:
