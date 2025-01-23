@@ -1044,10 +1044,10 @@ jobs:
 
           export TORCHCHAT_ROOT=${PWD}
           pushd /tmp
-          wget https://dl.google.com/android/repository/android-ndk-r26c-linux.zip
-          unzip android-ndk-r26c-linux.zip
+          wget https://dl.google.com/android/repository/android-ndk-r27c-linux.zip
+          unzip android-ndk-r27c-linux.zip
           popd
-          export ANDROID_NDK=/tmp/android-ndk-r26c
+          export ANDROID_NDK=/tmp/android-ndk-r27c
 
           # Pull submodules (re2, abseil) for Tiktoken
           git submodule sync
