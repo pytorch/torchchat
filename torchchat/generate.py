@@ -26,6 +26,7 @@ import torch._inductor.config
 import torch.distributed as dist
 import torch.multiprocessing as mp
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
+from torch._C import _SDPBackend as SDPBackend
 
 from PIL import Image
 
@@ -531,6 +532,7 @@ class LocalGenerator:
         callback=lambda _: _,
         eos_token_id: int = 2,
         eot_id: Optional[int] = None,
+        attention_backend: SDPBackend = torch.nn.attention.SDPBackend.MATH,
         **sampling_kwargs,
     ):
         new_tokens, new_probs = [], []
@@ -539,7 +541,7 @@ class LocalGenerator:
             num_new_tokens - 1
         ):  # -1 to save space to run an EoS if dont generate it naturally
             # Actually better for Inductor to codegen attention here
-            with torch.nn.attention.sdpa_kernel([torch.nn.attention.SDPBackend.MATH]):
+            with torch.nn.attention.sdpa_kernel([attention_backend]):
 
                 out_token = cur_token.clone()
                 next_token, next_prob = self.decode_one_token(
@@ -683,6 +685,7 @@ class LocalGenerator:
         sequential_prefill=True,
         callback=lambda x: x,
         max_seq_length: int,
+        attention_backend: SDPBackend = torch.nn.attention.SDPBackend.MATH,
         seed: Optional[int] = None,
         **sampling_kwargs,
     ) -> torch.Tensor:
@@ -799,6 +802,7 @@ class LocalGenerator:
                     if self.is_llama3_model
                     else None
                 ),
+                attention_backend=attention_backend,
                 **sampling_kwargs,
             ):
                 generated_tokens.append(generated_token.view(-1))
@@ -1122,7 +1126,7 @@ class LocalGenerator:
                     messages_to_encode.append(
                         {"role": "system", "content": self.system_prompt}
                     )
-                messages_to_encode.append({"role": "system", "content": prompt})
+                messages_to_encode.append({"role": "user", "content": prompt})
                 encoded = self.chat_formatter.encode_dialog_prompt(
                     messages_to_encode, add_generation_prompt=True,
                 )
@@ -1186,6 +1190,7 @@ class LocalGenerator:
                     start_pos=start_pos,
                     skip_cache_setup=not is_first_sample,
                     max_seq_length=max_seq_length,
+                    attention_backend=self.builder_args.attention_backend,
                 )
                 for token_tensor, metrics in generator_func:
                     if token_tensor is not None:
@@ -1203,8 +1208,10 @@ class LocalGenerator:
             if hasattr(prof, "export_chrome_trace"):
                 if self.builder_args.device == "cpu":
                     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
-                else:
+                elif self.builder_args.device == "cuda":
                     print(prof.key_averages().table(sort_by="self_cuda_time_total"))
+                else:
+                    print(prof.key_averages().table(sort_by="self_xpu_time_total"))
                 prof.export_chrome_trace(f"{self.profile}.json")
 
             if start_pos >= max_seq_length:
@@ -1289,6 +1296,9 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
             )
         if torch.cuda.is_available():
             print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
+        if torch.xpu.is_available():
+            print(f"Memory used: {torch.xpu.max_memory_reserved() / 1e9:.02f} GB")
+
 
 
 class DistributedGenerator(LocalGenerator):
@@ -1615,6 +1625,8 @@ def run_generator(
         )
         if torch.cuda.is_available():
             torch.cuda.reset_peak_memory_stats()
+        if torch.xpu.is_available():
+            torch.xpu.reset_peak_memory_stats()
 
         for _ in gen.chat(generator_args):
             pass
