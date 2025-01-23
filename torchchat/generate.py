@@ -576,6 +576,7 @@ class LocalGenerator:
                         **sampling_kwargs,
                     )
                     input_pos += 1
+                    yield cur_token.clone(), next_prob.clone()
                     break
 
         if not encountered_eos:
