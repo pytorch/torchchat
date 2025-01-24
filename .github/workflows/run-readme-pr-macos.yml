@@ -143,3 +143,106 @@ jobs:
           echo "tests complete"
           echo "*******************************************"
           echo "::endgroup::"
+
+  test-eval-macos:
+    runs-on: macos-14-xlarge
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.11'
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
+      - name: Run script
+        run: |
+          set -x
+          # NS: Remove previous installation  of torch first
+          # as this script does not isntall anything into conda env but rather as system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
+
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+          echo "::endgroup::"
+
+          .ci/scripts/run-docs evaluation
+
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"   
+
+  test-multimodal-macos:
+    runs-on: macos-14-xlarge
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.11'
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
+      - name: Run script
+        run: |
+          set -x
+          # NS: Remove previous installation  of torch first
+          # as this script does not isntall anything into conda env but rather as system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
+
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+          echo "::endgroup::"
+
+          .ci/scripts/run-docs multimodal
+
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"
+
+  test-native-macos:
+    runs-on: macos-14-xlarge
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.11'
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
+      - name: Run script
+        run: |
+          set -x
+          # NS: Remove previous installation  of torch first
+          # as this script does not isntall anything into conda env but rather as system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
+
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+          echo "::endgroup::"
+
+          .ci/scripts/run-docs native
+
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"
+  
