@@ -589,9 +589,8 @@ def _initialize_model(
             # attributes will NOT be seen on by AOTI-compiled forward
             # function, e.g. calling model.setup_cache will NOT touch
             # AOTI compiled and maintained model buffers such as kv_cache.
-            from torch._inductor.package import load_package
 
-            aoti_compiled_model = load_package(
+            aoti_compiled_model = torch._inductor.aoti_load_package(
                 str(builder_args.aoti_package_path.absolute())
             )
 
