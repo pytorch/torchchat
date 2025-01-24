@@ -19,6 +19,7 @@ jobs:
       gpu-arch-version: "12.4"
       timeout: 60
       script: |
+        set -xeou pipefail
         echo "::group::Print machine info"
         uname -a
         echo "::endgroup::"
@@ -96,6 +97,7 @@ jobs:
       gpu-arch-version: "12.4"
       timeout: 60
       script: |
+        set -xeou pipefail
         echo "::group::Print machine info"
         uname -a
         echo "::endgroup::"
@@ -125,6 +127,8 @@ jobs:
           # (although the runner environment should not have an opinion what we us in the artifact, and we might suitably abstract that)
           for DTYPE in bfloat16 float16 float32; do
             for SDPA in 'math' 'flash_attention' 'efficient_attention' 'cudnn_attention'; do
+              echo "***************************************************************"
+              echo "*** $DEVICE $DTYPE $SDPA"
               ###################################################################
               # Export DSO and run with Python
               python torchchat.py export --output-dso dso.so --checkpoint-path ${MODEL_PATH} --attention-backend ${SDPA} --device ${DEVICE} --dtype ${DTYPE} --temperature 0
