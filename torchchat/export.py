@@ -453,7 +453,7 @@ def main(args):
             print(
                 "WARNING!! The path of compiling a dso is deprecated. Please use --output-aoti-package-path to create a .pt2 artifact instead."
             )
-            with torch.nn.attention.sdpa_kernel([self.builder_args.attention_backend]):
+            with torch.nn.attention.sdpa_kernel([builder_args.attention_backend]):
                 export_for_server(
                     model_to_dso,
                     builder_args.device,
@@ -476,7 +476,7 @@ def main(args):
             print(
                 "Exporting model using AOT Inductor to " f"{output_aoti_package_path}."
             )
-            with torch.nn.attention.sdpa_kernel([self.builder_args.attention_backend]):
+            with torch.nn.attention.sdpa_kernel([builder_args.attention_backend]):
                 export_for_server(
                     model_to_aoti_package,
                     builder_args.device,
