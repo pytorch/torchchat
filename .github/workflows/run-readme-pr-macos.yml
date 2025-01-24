@@ -33,7 +33,8 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
-          .ci/scripts/run-docs readme
+          echo "using workaround for #1416 and #1315 by setting torchchat device explicitly"
+          TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
   
           echo "::group::Completion"
           echo "tests complete"
@@ -68,7 +69,8 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
-          .ci/scripts/run-docs quantization
+          echo "using workaround for #1416 and #1315 by setting torchchat device explicitly"
+          TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
   
           echo "::group::Completion"
           echo "tests complete"
@@ -103,7 +105,8 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
-          .ci/scripts/run-docs gguf
+          echo "using workaround for #1416 and #1315 by setting torchchat device explicitly"
+          TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs gguf
 
           echo "::group::Completion"
           echo "tests complete"
@@ -137,7 +140,8 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
-          .ci/scripts/run-docs advanced
+          echo "using workaround for #1416 and #1315 by setting torchchat device explicitly"
+          TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
 
           echo "::group::Completion"
           echo "tests complete"
