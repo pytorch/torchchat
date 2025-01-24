@@ -16,8 +16,7 @@ jinja2
 # Miscellaneous
 snakeviz
 sentencepiece
-# numpy version range required by GGUF util
-numpy >= 1.17, < 2.0
+numpy >= 1.17
 blobfile
 tomli >= 1.1.0 ; python_version < "3.11"
 openai
