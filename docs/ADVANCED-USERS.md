@@ -185,6 +185,16 @@ MODEL_OUT=~/torchchat-exports
 
 mkdir -p ${MODEL_DIR}
 mkdir -p ${MODEL_OUT}
+
+# Change to the MODELDIR directory
+pushd ${MODEL_DIR}
+
+# Download the files for stories15M using wget
+wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt
+wget https://github.com/karpathy/llama2.c/raw/refs/heads/master/tokenizer.model
+
+# Go back to the original directory
+popd
 ```
 
 When we export models with AOT Inductor for servers and desktops, and
@@ -335,7 +345,7 @@ tests against the exported model with the same interface, and support
 additional experiments to confirm model quality and speed.
 
 ```
-python3 torchchat.py generate --device [ cuda | cpu ] --dso-path ${MODEL_NAME}.so --prompt "Once upon a time"
+python3 torchchat.py generate --device [ cuda | cpu ] --checkpoint-path ${MODEL_PATH} --dso-path ${MODEL_NAME}.so --prompt "Once upon a time"
 ```
 
 
