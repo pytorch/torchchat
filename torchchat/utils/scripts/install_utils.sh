@@ -88,7 +88,7 @@ install_executorch_python_libs() {
   echo "Building and installing python libraries"
   if [ "${ENABLE_ET_PYBIND}" = false ]; then
       echo "Not installing pybind"
-      bash ./install_requirements.sh
+      bash ./install_requirements.sh --pybind off
   else
       echo "Installing pybind"
       bash ./install_requirements.sh --pybind xnnpack
