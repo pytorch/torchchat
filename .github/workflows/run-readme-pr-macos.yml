@@ -33,7 +33,7 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
-          .ci/scripts/run-docs readme
+          . .ci/scripts/run-docs readme
   
           echo "::group::Completion"
           echo "tests complete"
@@ -68,7 +68,7 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
-          .ci/scripts/run-docs quantization
+          . .ci/scripts/run-docs quantization
   
           echo "::group::Completion"
           echo "tests complete"
@@ -103,7 +103,7 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
-          .ci/scripts/run-docs gguf
+          . .ci/scripts/run-docs gguf
 
           echo "::group::Completion"
           echo "tests complete"
@@ -137,7 +137,7 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
-          .ci/scripts/run-docs advanced
+          . .ci/scripts/run-docs advanced
 
           echo "::group::Completion"
           echo "tests complete"
