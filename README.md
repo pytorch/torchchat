@@ -90,10 +90,11 @@ cd torchchat
 python3 -m venv .venv
 source .venv/bin/activate
 ./install/install_requirements.sh
+mkdir exportedModels
 ```
 [skip default]: end
 
-[shell default]: ./install/install_requirements.sh
+[shell default]: mkdir exportedModels; ./install/install_requirements.sh
 
 ## Commands
 
