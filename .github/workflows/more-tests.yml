@@ -19,6 +19,7 @@ jobs:
       gpu-arch-version: "12.4"
       timeout: 60
       script: |
+        set -xeou pipefail
         echo "::group::Print machine info"
         uname -a
         echo "::endgroup::"
@@ -95,6 +96,7 @@ jobs:
       gpu-arch-version: "12.4"
       timeout: 60
       script: |
+        set -xeou pipefail
         echo "::group::Print machine info"
         uname -a
         echo "::endgroup::"
@@ -122,6 +124,8 @@ jobs:
         for DEVICE in cpu cuda; do
           for DTYPE in bfloat16 float16 float32; do
             for SDPA in 'math' 'flash_attention' 'efficient_attention' 'cudnn_attention'; do
+              echo "******************************************************************"
+              echo "******* $DEVICE $DTYPE $SDPA "
               ###################################################################
               # Python execution interpreted vanilla
               python torchchat.py generate --checkpoint-path ${MODEL_PATH} --attention-backend ${SDPA} --device ${DEVICE} --dtype ${DTYPE} --temperature 0
