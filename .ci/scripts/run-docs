@@ -129,7 +129,7 @@ fi
 if [ "$1" == "distributed" ]; then
 
         echo "::group::Create script to run distributed"
-        python3 torchchat/utils/scripts/updown.py --file docs/distributed.md --replace 'llama3.1:open-llama,-l 3:-l 2'  --suppress huggingface-cli,HF_TOKEN  > ./run-distributed.sh
+        python3 torchchat/utils/scripts/updown.py --file docs/distributed.md --replace 'llama3.1:stories110M,-l 3:-l 2'  --suppress huggingface-cli,HF_TOKEN  > ./run-distributed.sh
         python3 torchchat/utils/scripts/updown.py --file docs/distributed.md --suppress huggingface-cli,HF_TOKEN > ./run-distributed.sh
         # for good measure, if something happened to updown processor,
         # and it did not error out, fail with an exit 1
