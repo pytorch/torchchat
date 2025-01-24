@@ -38,7 +38,7 @@ case "$1" in
     ;;
   "distributed")
     filepath="docs/distributed.md"
-    parameters="--replace 'llama3.1:open-llama,-l 3:-l 2' --suppress huggingface-cli,HF_TOKEN"  # Use open-llama to avoid need for authentication
+    parameters="--replace 'llama3.1:stories110M,-l 3:-l 2' --suppress huggingface-cli,HF_TOKEN"  # Use open-llama to avoid need for authentication
     ;;
   "local")
     filepath="docs/local-model.md"
