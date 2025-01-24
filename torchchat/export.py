@@ -450,13 +450,14 @@ def main(args):
             print(
                 "WARNING!! The path of compiling a dso is deprecated. Please use --output-aoti-package-path to create a .pt2 artifact instead."
             )
-            export_for_server(
-                model_to_dso,
-                builder_args.device,
-                output_dso_path,
-                builder_args.dynamic_shapes,
-                package=False,
-            )
+            with torch.nn.attention.sdpa_kernel([self.builder_args.attention_backend]):
+                export_for_server(
+                    model_to_dso,
+                    builder_args.device,
+                    output_dso_path,
+                    builder_args.dynamic_shapes,
+                    package=False,
+                )
 
         if output_aoti_package_path:
             output_aoti_package_path = str(os.path.abspath(output_aoti_package_path))
@@ -472,11 +473,12 @@ def main(args):
             print(
                 "Exporting model using AOT Inductor to " f"{output_aoti_package_path}."
             )
-            export_for_server(
-                model_to_aoti_package,
-                builder_args.device,
-                output_aoti_package_path,
-                builder_args.dynamic_shapes,
-                package=True,
-                metadata=metadata,
-            )
+            with torch.nn.attention.sdpa_kernel([self.builder_args.attention_backend]):
+                export_for_server(
+                    model_to_aoti_package,
+                    builder_args.device,
+                    output_aoti_package_path,
+                    builder_args.dynamic_shapes,
+                    package=True,
+                    metadata=metadata,
+                )
