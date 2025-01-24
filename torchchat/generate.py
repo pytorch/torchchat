@@ -1172,7 +1172,8 @@ class LocalGenerator:
                 prof = torch.profiler.profile()
             t0 = time.perf_counter()
             num_tokens_generated = 0
-            with torch.nn.attention.sdpa_kernel([self.builder_args.attention_backend]), prof:
+            # always allow math as fallback
+            with torch.nn.attention.sdpa_kernel([self.builder_args.attention_backend, torch.nn.attention.SDPBackend.MATH]), prof:
                 generator_func = self.generate(
                     self.model,
                     encoded,
