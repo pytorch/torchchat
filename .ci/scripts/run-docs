@@ -17,7 +17,7 @@ if [ "$1" == "readme" ]; then
         echo "*******************************************"
         cat ./run-readme.sh
         echo "*******************************************"
-        bash -x ./run-readme.sh
+        . ./run-readme.sh
         echo "::endgroup::"
 
         exit 0
@@ -35,7 +35,7 @@ if [ "$1" == "quantization" ]; then
         echo "*******************************************"
         cat ./run-quantization.sh
         echo "*******************************************"
-        bash -x ./run-quantization.sh
+        . ./run-quantization.sh
         echo "::endgroup::"
 
         exit 0
@@ -53,7 +53,7 @@ if [ "$1" == "gguf" ]; then
         echo "*******************************************"
         cat ./run-gguf.sh
         echo "*******************************************"
-        bash -x ./run-gguf.sh
+        . ./run-gguf.sh
         echo "::endgroup::"
 fi
 
@@ -70,7 +70,7 @@ if [ "$1" == "advanced" ]; then
         echo "*******************************************"
         cat ./run-advanced.sh
         echo "*******************************************"
-        bash -x ./run-advanced.sh
+        . ./run-advanced.sh
         echo "::endgroup::"
 fi
 
@@ -86,7 +86,7 @@ if [ "$1" == "evaluation" ]; then
         echo "*******************************************"
         cat ./run-evaluation.sh
         echo "*******************************************"
-        bash -x ./run-evaluation.sh
+        . ./run-evaluation.sh
 fi
 
 if [ "$1" == "multimodal" ]; then
@@ -105,7 +105,7 @@ if [ "$1" == "multimodal" ]; then
         echo "*******************************************"
         cat ./run-multimodal.sh
         echo "*******************************************"
-        bash -x ./run-multimodal.sh
+        . ./run-multimodal.sh
         echo "::endgroup::"
 fi
 
@@ -122,7 +122,7 @@ if [ "$1" == "native" ]; then
         echo "*******************************************"
         cat ./run-native.sh
         echo "*******************************************"
-        bash -x ./run-native.sh
+        . ./run-native.sh
         echo "::endgroup::"
 fi
 
@@ -139,6 +139,6 @@ if [ "$1" == "distributed" ]; then
         echo "*******************************************"
         cat ./run-distributed.sh
         echo "*******************************************"
-        bash -x ./run-distributed.sh
+        . ./run-distributed.sh
         echo "::endgroup::"
 fi
