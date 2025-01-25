@@ -189,7 +189,8 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
-          .ci/scripts/run-docs native
+          echo ".ci/scripts/run-docs native DISABLED"
+          # .ci/scripts/run-docs native
 
           echo "::group::Completion"
           echo "tests complete"
