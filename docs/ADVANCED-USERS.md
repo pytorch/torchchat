@@ -177,6 +177,8 @@ preparatory step:
 You can set these variables as follows for the exemplary model15M
 model from Andrej Karpathy's tinyllamas model family:
 
+[shell default]: pip install wget
+
 ```
 MODEL_NAME=stories15M
 MODEL_DIR=~/checkpoints/${MODEL_NAME}
