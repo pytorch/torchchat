@@ -122,6 +122,8 @@ jobs:
         export MODEL_NAME=stories15M
         export MODEL_DIR=/tmp
 
+        ./torchchat/utils/scripts/build_native.sh aoti
+        
         for DEVICE in cpu cuda; do
           # depending on how the parameter passing works, may only be able to do bfloat16 for aoti_run, similar to runner-cuda-dtype.yml
           # (although the runner environment should not have an opinion what we us in the artifact, and we might suitably abstract that)
