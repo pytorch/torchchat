@@ -42,7 +42,7 @@ jobs:
         echo "::group::Run inference"
         export MODEL_PATH=checkpoints/stories15M/stories15M.pt
         export MODEL_NAME=stories15M
-        export MODEL_DIR=/tmp
+        export MODEL_DIR=checkpoints/stories15M/
 
         for DTYPE in bfloat16 float16 float32; do
           ###################################################################
