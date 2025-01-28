@@ -40,9 +40,10 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run inference"
-        export MODEL_PATH=checkpoints/stories15M/stories15M.pt
-        export MODEL_NAME=stories15M
         export MODEL_DIR=checkpoints/stories15M/
+        export MODEL_PATH=${MODEL_DIR}/stories15M.pt
+        export MODEL_NAME=stories15M
+
 
         for DTYPE in bfloat16 float16 float32; do
           ###################################################################
@@ -118,9 +119,9 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run inference"
-        export MODEL_PATH=checkpoints/stories15M/stories15M.pt
+        export MODEL_DIR=checkpoints/stories15M/
+        export MODEL_PATH=${MODEL_DIR}/stories15M.pt
         export MODEL_NAME=stories15M
-        export MODEL_DIR=checkpoints/stories15M
 
         ./torchchat/utils/scripts/build_native.sh aoti
         
