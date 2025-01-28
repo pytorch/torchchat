@@ -182,7 +182,7 @@ OMP_NUM_THREADS=6 python3 torchchat.py generate llama3.1 --dso-path llama3_1.so 
 If you built the AOTI runner with link_torchao_ops as discussed in the setup section, you can also use the C++ runner:
 
 ```
-OMP_NUM_THREADS=6 ./cmake-out/aoti_run llama3_1.so -z $HOME/.torchchat/model-cache/meta-llama/Meta-Llama-3.1-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time,"
+OMP_NUM_THREADS=6 ./cmake-out/aoti_run llama3_1.so -z $HOME/.torchchat/model-cache/meta-llama/Meta-Llama-3.1-8B-Instruct/tokenizer.model -i "Once upon a time," # -l 3
 ```
 
 #### ExecuTorch
@@ -193,7 +193,7 @@ python torchchat.py export llama3.1 --device cpu --dtype float32 --quantize '{"e
 Note: only the ExecuTorch C++ runner in torchchat when built using the instructions in the setup can run the exported *.pte file.  It will not work with the `python torchchat.py generate` command.
 
 ```
-./cmake-out/et_run llama3_1.pte -z $HOME/.torchchat/model-cache/meta-llama/Meta-Llama-3.1-8B-Instruct/tokenizer.model -l 3 -i "Once upon a time,"
+./cmake-out/et_run llama3_1.pte -z $HOME/.torchchat/model-cache/meta-llama/Meta-Llama-3.1-8B-Instruct/tokenizer.model -l3 -i "Once upon a time,"
 ```
 
 ## Experimental TorchAO MPS lowbit kernels
