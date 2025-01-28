@@ -8,7 +8,7 @@ fi
 
 # Pre-initialize variables
 filepath=""
-parameters="--replace 'llama3:stories15M,-l3:-l2,cuda.json:cuda-32.json,mobile.json:mobile-32.json' --suppress huggingface-cli,HF_TOKEN"
+parameters="--replace 'llama3:stories15M,-l3:-l2' --suppress huggingface-cli,HF_TOKEN"
 script_name="./run-${1}.sh"  # Dynamically initialize script name
 
 # Use a case statement to handle the $1 argument
