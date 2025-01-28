@@ -829,7 +829,7 @@ int main(int argc, char *argv[]) {
     } else if (argv[i][1] == 'n') {
       steps = atoi(parm);
     } else if (argv[i][1] == 'v') {
-      vocab_size = atoi(argv[i + 1]);
+      vocab_size = atoi(parm);
     } else if (argv[i][1] == 'i') {
       prompt = parm;
     } else if (argv[i][1] == 'z') {
