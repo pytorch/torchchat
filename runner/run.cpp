@@ -803,41 +803,49 @@ int main(int argc, char *argv[]) {
   } else {
     error_usage();
   }
-  for (int i = 2; i < argc; i += 2) {
+  for (int i = 2; i < argc; i += 1) {
     // do some basic validation
-    if (i + 1 >= argc) {
-      error_usage();
-    } // must have arg after flag
+    char *parm = argv[i+1];
+
     if (argv[i][0] != '-') {
       error_usage();
     } // must start with dash
-    if (strlen(argv[i]) != 2) {
+
+    // uniarg means the arg comes right after the letter in accordance with posix
+    int uniarg = strlen(argv[i]) != 2; 
+    if (uniarg) {
+      parm=&argv[i][2];
+    } else if (i + 1 >= argc) {
       error_usage();
-    } // must be -x (one dash, one letter)
+    } // must have arg after option if flag is not contiguous to option
+    
     // read in the args
     if (argv[i][1] == 't') {
-      temperature = atof(argv[i + 1]);
+      temperature = atof(parm);
     } else if (argv[i][1] == 'p') {
-      topp = atof(argv[i + 1]);
+      topp = atof(parm);
     } else if (argv[i][1] == 's') {
-      rng_seed = atoi(argv[i + 1]);
+      rng_seed = atoi(parm);
     } else if (argv[i][1] == 'n') {
-      steps = atoi(argv[i + 1]);
+      steps = atoi(parm);
     } else if (argv[i][1] == 'v') {
       vocab_size = atoi(argv[i + 1]);
     } else if (argv[i][1] == 'i') {
-      prompt = argv[i + 1];
+      prompt = parm;
     } else if (argv[i][1] == 'z') {
-      tokenizer_path = argv[i + 1];
+      tokenizer_path = parm;
     } else if (argv[i][1] == 'm') {
-      mode = argv[i + 1];
+      mode = parm;
     } else if (argv[i][1] == 'y') {
-      system_prompt = argv[i + 1];
+      system_prompt = parm;
     } else if (argv[i][1] == 'l') {
-      llama_ver = atoi(argv[i + 1]);
+      llama_ver = atoi(parm);
     } else {
       error_usage();
     }
+
+    // account for parameter
+    i += (uniarg)?0:1;
   }
 
   if (model_path == NULL) {
