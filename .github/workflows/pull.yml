@@ -726,7 +726,7 @@ jobs:
 
           git clone https://github.com/ggerganov/llama.cpp.git
           pushd llama.cpp
-          git checkout 64ed2091b24b2f9747148fdf49a34ed5938762c3
+          git checkout a4417ddda98fd0558fb4d802253e68a933704b59
           make
           popd
 
