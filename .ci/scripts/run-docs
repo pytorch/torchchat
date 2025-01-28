@@ -8,7 +8,7 @@ fi
 
 # Pre-initialize variables
 filepath=""
-parameters="--replace 'llama3:stories15M,-l 3:-l 2' --suppress huggingface-cli,HF_TOKEN"
+parameters="--replace 'llama3:stories15M,-l3:-l2' --suppress huggingface-cli,HF_TOKEN"
 script_name="./run-${1}.sh"  # Dynamically initialize script name
 
 # Use a case statement to handle the $1 argument
@@ -38,7 +38,7 @@ case "$1" in
     ;;
   "distributed")
     filepath="docs/distributed.md"
-    parameters="--replace 'llama3.1:stories110M,-l 3:-l 2' --suppress huggingface-cli,HF_TOKEN"  # Use stories110M to avoid need for authentication
+    parameters="--replace 'llama3.1:stories110M,-l3:-l2' --suppress huggingface-cli,HF_TOKEN"  # Use stories110M to avoid need for authentication
     ;;
   "local")
     filepath="docs/local-model.md"
