@@ -811,8 +811,12 @@ int main(int argc, char *argv[]) {
       error_usage();
     } // must start with dash
 
+    if strlen(argv[i]) < 2 {
+      error_usage();
+    } // must have at least dash '-' and option letter
+    
     // uniarg means the arg comes right after the letter in accordance with posix
-    int uniarg = strlen(argv[i]) != 2; 
+    int uniarg = strlen(argv[i]) > 2; 
     if (uniarg) {
       parm=&argv[i][2];
     } else if (i + 1 >= argc) {
