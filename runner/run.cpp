@@ -806,17 +806,17 @@ int main(int argc, char *argv[]) {
   for (int i = 2; i < argc; i += 1) {
     // do some basic validation
     char *parm = argv[i+1];
+    // uniarg means the arg comes right after the letter in accordance with posix
+    int uniarg = strlen(argv[i]) > 2; 
 
     if (argv[i][0] != '-') {
       error_usage();
     } // must start with dash
 
-    if strlen(argv[i]) < 2 {
+    if (strlen(argv[i]) < 2) {
       error_usage();
     } // must have at least dash '-' and option letter
     
-    // uniarg means the arg comes right after the letter in accordance with posix
-    int uniarg = strlen(argv[i]) > 2; 
     if (uniarg) {
       parm=&argv[i][2];
     } else if (i + 1 >= argc) {
