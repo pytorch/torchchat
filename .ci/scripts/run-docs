@@ -1,145 +1,67 @@
-# /bin/bash -x
+#!/bin/bash -x
 
-if [ "X$1" == "X" ]; then
+# Check if an argument was provided
+if [ -z "$1" ]; then
   echo "Must specify document to run"
   exit 1
 fi
 
-if [ "$1" == "readme" ]; then
-        echo "::group::Create script to run README"
-        python3 torchchat/utils/scripts/updown.py --create-sections --file README.md --replace 'llama3.1:stories15M,-l 3:-l 2' --suppress huggingface-cli,HF_TOKEN > ./run-readme.sh
-        # for good measure, if something happened to updown processor,
-        # and it did not error out, fail with an exit 1
-        echo "exit 1" >> ./run-readme.sh
-        echo "::endgroup::"
+# Pre-initialize variables
+filepath=""
+parameters="--replace 'llama3:stories15M,-l3:-l2' --suppress huggingface-cli,HF_TOKEN"
+script_name="./run-${1}.sh"  # Dynamically initialize script name
 
-        echo "::group::Run README"
-        echo "*******************************************"
-        cat ./run-readme.sh
-        echo "*******************************************"
-        bash -x ./run-readme.sh
-        echo "::endgroup::"
+# Use a case statement to handle the $1 argument
+case "$1" in
+  "readme")
+    filepath="README.md"
+    ;;
+  "quantization")
+    filepath="docs/quantization.md"
+    ;;
+  "gguf")
+    filepath="docs/GGUF.md"
+    ;;
+  "advanced")
+    filepath="docs/ADVANCED-USERS.md"
+    ;;
+  "evaluation")
+    filepath="torchchat/utils/docs/evaluation.md"
+    ;;
+  "multimodal")
+    filepath="docs/multimodal.md"
+    parameters=""  # Clear parameters
+    ;;
+  "native")
+    filepath="docs/native-execution.md"
+    parameters=""  # Clear parameters
+    ;;
+  "distributed")
+    filepath="docs/distributed.md"
+    parameters="--replace 'llama3.1:stories110M,-l3:-l2' --suppress huggingface-cli,HF_TOKEN"  # Use stories110M to avoid need for authentication
+    ;;
+  "local")
+    filepath="docs/local-model.md"
+    parameters=""  # Clear parameters
+    ;;
 
-        exit 0
-fi
+  *)
+    echo "Unknown option: $1"
+    exit 1
+    ;;
+esac
 
-if [ "$1" == "quantization" ]; then
-        echo "::group::Create script to run quantization"
-        python3 torchchat/utils/scripts/updown.py --create-sections --file docs/quantization.md --replace llama3:stories15M --suppress huggingface-cli,HF_TOKEN > ./run-quantization.sh
-        # for good measure, if something happened to updown processor,
-        # and it did not error out, fail with an exit 1
-        echo "exit 1" >> ./run-quantization.sh
-        echo "::endgroup::"
+# Generate the script
+echo "::group::Create script to run $1"
+python3 torchchat/utils/scripts/updown.py --file "$filepath" $parameters > "$script_name"
+# if something happened to updown processor, and it did not error out, fail with an exit 1
+echo "exit 1" >> "$script_name"
+echo "::endgroup::"
 
-        echo "::group::Run quantization"
-        echo "*******************************************"
-        cat ./run-quantization.sh
-        echo "*******************************************"
-        bash -x ./run-quantization.sh
-        echo "::endgroup::"
-
-        exit 0
-fi
-
-if [ "$1" == "gguf" ]; then
-        echo "::group::Create script to run gguf"
-        python3 torchchat/utils/scripts/updown.py --file docs/GGUF.md --replace 'llama3:stories15M,-l 3:-l 2' --suppress huggingface-cli,HF_TOKEN > ./run-gguf.sh
-        # for good measure, if something happened to updown processor,
-        # and it did not error out, fail with an exit 1
-        echo "exit 1" >> ./run-gguf.sh
-        echo "::endgroup::"
-
-        echo "::group::Run gguf"
-        echo "*******************************************"
-        cat ./run-gguf.sh
-        echo "*******************************************"
-        bash -x ./run-gguf.sh
-        echo "::endgroup::"
-fi
-
-
-if [ "$1" == "advanced" ]; then
-        echo "::group::Create script to run advanced"
-        python3 torchchat/utils/scripts/updown.py --file docs/ADVANCED-USERS.md --replace 'llama3:stories15M,-l 3:-l 2' --suppress huggingface-cli,HF_TOKEN > ./run-advanced.sh
-        # for good measure, if something happened to updown processor,
-        # and it did not error out, fail with an exit 1
-        echo "exit 1" >> ./run-advanced.sh
-        echo "::endgroup::"
-
-        echo "::group::Run advanced"
-        echo "*******************************************"
-        cat ./run-advanced.sh
-        echo "*******************************************"
-        bash -x ./run-advanced.sh
-        echo "::endgroup::"
-fi
-
-if [ "$1" == "evaluation" ]; then
-        echo "::group::Create script to run evaluation"
-        python3 torchchat/utils/scripts/updown.py --file torchchat/utils/docs/evaluation.md --replace 'llama3:stories15M,-l 3:-l 2' --suppress huggingface-cli,HF_TOKEN > ./run-evaluation.sh
-        # for good measure, if something happened to updown processor,
-        # and it did not error out, fail with an exit 1
-        echo "exit 1" >> ./run-evaluation.sh
-        echo "::endgroup::"
-
-        echo "::group::Run evaluation"
-        echo "*******************************************"
-        cat ./run-evaluation.sh
-        echo "*******************************************"
-        bash -x ./run-evaluation.sh
-fi
-
-if [ "$1" == "multimodal" ]; then
-
-   # Expecting that this might fail this test as-is, because 
-   # it's the first on-pr test depending on github secrets for access with HF token access
-
-        echo "::group::Create script to run multimodal"
-        python3 torchchat/utils/scripts/updown.py --file docs/multimodal.md > ./run-multimodal.sh
-        # for good measure, if something happened to updown processor,
-        # and it did not error out, fail with an exit 1
-        echo "exit 1" >> ./run-multimodal.sh
-        echo "::endgroup::"
-
-        echo "::group::Run multimodal"
-        echo "*******************************************"
-        cat ./run-multimodal.sh
-        echo "*******************************************"
-        bash -x ./run-multimodal.sh
-        echo "::endgroup::"
-fi
-
-if [ "$1" == "native" ]; then
-
-        echo "::group::Create script to run native-execution"
-        python3 torchchat/utils/scripts/updown.py --file docs/native-execution.md > ./run-native.sh
-        # for good measure, if something happened to updown processor,
-        # and it did not error out, fail with an exit 1
-        echo "exit 1" >> ./run-native.sh
-        echo "::endgroup::"
-
-        echo "::group::Run native-execution"
-        echo "*******************************************"
-        cat ./run-native.sh
-        echo "*******************************************"
-        bash -x ./run-native.sh
-        echo "::endgroup::"
-fi
-
-if [ "$1" == "distributed" ]; then
-
-        echo "::group::Create script to run distributed"
-        python3 torchchat/utils/scripts/updown.py --file docs/distributed.md --replace 'llama3.1:stories110M,-l 3:-l 2'  --suppress huggingface-cli,HF_TOKEN  > ./run-distributed.sh
-        python3 torchchat/utils/scripts/updown.py --file docs/distributed.md --suppress huggingface-cli,HF_TOKEN > ./run-distributed.sh
-        # for good measure, if something happened to updown processor,
-        # and it did not error out, fail with an exit 1
-        echo "exit 1" >> ./run-distributed.sh
-        echo "::endgroup::"
-
-        echo "::group::Run distributed"
-        echo "*******************************************"
-        cat ./run-distributed.sh
-        echo "*******************************************"
-        bash -x ./run-distributed.sh
-        echo "::endgroup::"
-fi
+# Run the script
+echo "::group::Run $1"
+echo "*******************************************"
+cat "$script_name"
+echo "*******************************************"
+bash -x "$script_name"
+echo "::endgroup::"
