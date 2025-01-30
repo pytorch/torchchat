@@ -414,7 +414,7 @@ torchchat/utils/scripts/build_native.sh et
 
 Execute using the runner
 ```bash
-cmake-out/et_run llama3.1.pte -z `python3 torchchat.py where llama3.1`/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/et_run llama3.1.pte -z `python3 torchchat.py where llama3.1`/tokenizer.model -i "Once upon a time"
 ```
 
 </details>
