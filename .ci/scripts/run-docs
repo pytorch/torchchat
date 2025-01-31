@@ -10,7 +10,7 @@ fi
 filepath=""
 # cuda supports padding, so no need to replace quantization for now.  
 # otherwise add: 'cuda.json:cuda-32.json' to replace rules
-parameters="--replace 'llama3:stories15M,-l3:-l2,mobile.json:mobile-32.json' --suppress huggingface-cli,HF_TOKEN"
+parameters="--replace llama3:stories15M,-l3:-l2,mobile.json:mobile-32.json --suppress huggingface-cli,HF_TOKEN"
 script_name="./run-${1}.sh"  # Dynamically initialize script name
 
 # Use a case statement to handle the $1 argument
