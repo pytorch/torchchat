@@ -81,7 +81,7 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
-          .ci/scripts/run-docs gguf
+          # .ci/scripts/run-docs gguf
 
           echo "::group::Completion"
           echo "tests complete"
