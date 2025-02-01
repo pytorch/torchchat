@@ -17,7 +17,7 @@ script_name="./run-${1}.sh"  # Dynamically initialize script name
 case "$1" in
   "readme")
     filepath="README.md"
-    parameters="--replace 'llama3.1:stories15M,-l3:-l2,mobile.json:mobile-32.json' --suppress huggingface-cli,HF_TOKEN"
+    parameters="--replace llama3.1:stories15M,-l3:-l2,mobile.json:mobile-32.json --suppress huggingface-cli,HF_TOKEN"
     ;;
   "quantization")
     filepath="docs/quantization.md"
