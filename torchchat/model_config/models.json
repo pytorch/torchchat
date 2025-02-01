@@ -52,7 +52,7 @@
         "transformer_params_key": "Meta-Llama-3.1-8B"
     },
     "deepseek-ai/DeepSeek-R1-Distill-Llama-8B": {
-        "aliases": ["deepseek-r1-distill", "deepseek-r1-distill-8b"],
+        "aliases": ["deepseek-r1:8b"],
         "distribution_channel": "HuggingFaceSnapshot",
         "distribution_path": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
         "tokenizer_file": "tokenizer.json"
