@@ -18,12 +18,10 @@ jobs:
       gpu-arch-type: cuda
       gpu-arch-version: "12.4"
       timeout: 60
-      steps:
       script: |
+        echo "::group::Print machine info and try install pip and/or pip3"
         set -x
         apt-get install pip3 pip || true
-        
-        echo "::group::Print machine info"
         uname -a
         echo "::endgroup::"
 
@@ -45,7 +43,9 @@ jobs:
       gpu-arch-version: "12.4"
       timeout: 60
       script: |
-        echo "::group::Print machine info"
+        echo "::group::Print machine info and try install pip and/or pip3"
+        set -x
+        apt-get install pip3 pip || true
         uname -a
         echo "::endgroup::"
 
@@ -67,7 +67,9 @@ jobs:
       gpu-arch-version: "12.4"
       timeout: 60
       script: |
-        echo "::group::Print machine info"
+        echo "::group::Print machine info and try install pip and/or pip3"
+        set -x
+        apt-get install pip3 pip || true
         uname -a
         echo "::endgroup::"
 
@@ -89,7 +91,9 @@ jobs:
       gpu-arch-version: "12.4"
       timeout: 60
       script: |
-        echo "::group::Print machine info"
+        echo "::group::Print machine info and try install pip and/or pip3"
+        set -x
+        apt-get install pip3 pip || true
         uname -a
         echo "::endgroup::"
 
