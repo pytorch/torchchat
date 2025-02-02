@@ -33,6 +33,10 @@ jobs:
           sysctl machdep.cpu.core_count
           echo "::endgroup::"
 
+          which pip || true
+          which pip3 || true
+          which conda || true
+
           echo "using workaround for #1416 and #1315 by setting torchchat device explicitly"
           export TORCHCHAT_DEVICE=cpu 
           . .ci/scripts/run-docs readme
