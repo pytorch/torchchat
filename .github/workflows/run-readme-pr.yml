@@ -21,10 +21,19 @@ jobs:
       script: |
         echo "::group::Print machine info and try install pip and/or pip3"
         set -x
+        which pip || true
+        which pip3 || true
+        which conda || true
         apt-get install pip3 pip || true
+        which pip || true
+        which pip3 || true
+        which conda || true
         uname -a
         echo "::endgroup::"
 
+        which pip || true
+        which pip3 || true
+        which conda || true
         .ci/scripts/run-docs readme
 
         echo "::group::Completion"
@@ -47,6 +56,9 @@ jobs:
         set -x
         apt-get install pip3 pip || true
         uname -a
+        which pip || true
+        which pip3 || true
+        which conda || true
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
