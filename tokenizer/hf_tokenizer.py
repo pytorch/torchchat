@@ -46,8 +46,14 @@ class HFTokenizer(TokenizerBase):
         if tokenizer_config_path is not None:
             with open(tokenizer_config_path, "r") as handle:
                 tok_config = json.load(handle)
-            bos_token = tok_config.get("bos_token")
-            eos_token = tok_config.get("eos_token")
+
+            def _extract_token(identifier: str) -> Optional[str]:
+                entry: Optional[Union[str, dict]] = tok_config.get(identifier)
+                return entry.get("content") if isinstance(entry, dict) else entry
+
+            bos_token = _extract_token("bos_token")
+            eos_token = _extract_token("eos_token")
+
             if bos_token is not None:
                 self._bos_id = self._tokenizer.token_to_id(bos_token)
             if eos_token is not None:
