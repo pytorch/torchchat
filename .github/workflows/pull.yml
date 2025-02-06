@@ -292,7 +292,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run inference with quantize file"
-        python3 torchchat.py export --output-snap model.tc --dtype bfloat16 --quantize torchchat/quant_config/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+        python3 torchchat.py export --output-snap model.tc --dtype bfloat16 --quantize torchchat/quant_config/cuda-32.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
         python3 torchchat.py generate --snap model.tc --dtype bfloat16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
         echo "::endgroup::"
 
@@ -341,7 +341,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run inference with quantize file"
-        python3 torchchat.py export --output-snap model.tc --dtype float32 --quantize torchchat/quant_config/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+        python3 torchchat.py export --output-snap model.tc --dtype float32 --quantize torchchat/quant_config/cuda-32.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
         python3 torchchat.py generate --snap model.tc --dtype float32 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
         echo "::endgroup::"
         
@@ -391,7 +391,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run inference with quantize file"
-        python3 torchchat.py export --output-snap model.tc --dtype float16 --quantize torchchat/quant_config/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+        python3 torchchat.py export --output-snap model.tc --dtype float16 --quantize torchchat/quant_config/cuda-32.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
         python3 torchchat.py generate --snap model.tc --dtype float16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
         echo "::endgroup::"
 
