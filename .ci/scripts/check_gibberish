@@ -26,6 +26,18 @@ fi
 
 #######################################################################
 #
+# check whether aspell spell check evailable
+
+if command -v aspell &> /dev/null; then
+    echo "Checking $TMPFILE for gibberish"
+else
+    echo "Aspell is not installed or not in PATH."
+    echo "Gibberish unchecked in $TMPFILE"
+    exit 0
+fi
+
+#######################################################################
+#
 # run spell check on the extracted sequence
 
 cat ${TMPFILE} |  aspell -a -c  | grep '^[\&#]' >/tmp/out.$$
