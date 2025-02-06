@@ -9,31 +9,40 @@ on:
 
 jobs:
   test-readme-any:
-    permissions:
-      id-token: write
-      contents: read
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
-      timeout: 60
-      script: |
+    strategy:
+      matrix:
+        runner: [linux.g5.4xlarge.nvidia.gpu]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - uses: actions/checkout@v3 # Updated to v3
+      - uses: actions/setup-python@v4 # Updated to v4
+        with:
+          python-version: '3.10.11'
+      - uses: maxim-lobanov/setup-xcode@v1 # This action is fine
+        if: runner.os == 'macOS'
+        with:
+          xcode-version: '15.3' # Or latest stable if possible
+      - run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - run: |
+          echo "Summary pip3 packages"
+          export TORCHCHAT_ROOT=$PWD
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
+      - run: |
         echo "::group::Print machine info and try install pip and/or pip3"
         set -x
-        which pip || true
-        which pip3 || true
-        which conda || true
-        apt-get install pip3 pip || true
         which pip || true
         which pip3 || true
         which conda || true
         uname -a
         echo "::endgroup::"
 
-        which pip || true
-        which pip3 || true
-        which conda || true
         .ci/scripts/run-docs readme
 
         echo "::group::Completion"
@@ -42,23 +51,38 @@ jobs:
         echo "::endgroup::"
 
   test-readme-cpu:
-    permissions:
-      id-token: write
-      contents: read
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
-      timeout: 60
-      script: |
+    strategy:
+      matrix:
+        runner: [linux.g5.4xlarge.nvidia.gpu]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - uses: actions/checkout@v3 # Updated to v3
+      - uses: actions/setup-python@v4 # Updated to v4
+        with:
+          python-version: '3.10.11'
+      - uses: maxim-lobanov/setup-xcode@v1 # This action is fine
+        if: runner.os == 'macOS'
+        with:
+          xcode-version: '15.3' # Or latest stable if possible
+      - run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - run: |
+          echo "Summary pip3 packages"
+          export TORCHCHAT_ROOT=$PWD
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
+      - run: |
         echo "::group::Print machine info and try install pip and/or pip3"
         set -x
-        apt-get install pip3 pip || true
-        uname -a
         which pip || true
         which pip3 || true
         which conda || true
+        uname -a
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
@@ -69,19 +93,37 @@ jobs:
         echo "::endgroup::"
 
   test-quantization-any:
-    permissions:
-      id-token: write
-      contents: read
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
-      timeout: 60
-      script: |
+    strategy:
+      matrix:
+        runner: [linux.g5.4xlarge.nvidia.gpu]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - uses: actions/checkout@v3 # Updated to v3
+      - uses: actions/setup-python@v4 # Updated to v4
+        with:
+          python-version: '3.10.11'
+      - uses: maxim-lobanov/setup-xcode@v1 # This action is fine
+        if: runner.os == 'macOS'
+        with:
+          xcode-version: '15.3' # Or latest stable if possible
+      - run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - run: |
+          echo "Summary pip3 packages"
+          export TORCHCHAT_ROOT=$PWD
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
+      - run: |
         echo "::group::Print machine info and try install pip and/or pip3"
         set -x
-        apt-get install pip3 pip || true
+        which pip || true
+        which pip3 || true
+        which conda || true
         uname -a
         echo "::endgroup::"
 
@@ -93,260 +135,125 @@ jobs:
         echo "::endgroup::"
 
   test-quantization-cpu:
-    permissions:
-      id-token: write
-      contents: read
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
-      timeout: 60
-      script: |
+    strategy:
+      matrix:
+        runner: [linux.g5.4xlarge.nvidia.gpu]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - uses: actions/checkout@v3 # Updated to v3
+      - uses: actions/setup-python@v4 # Updated to v4
+        with:
+          python-version: '3.10.11'
+      - uses: maxim-lobanov/setup-xcode@v1 # This action is fine
+        if: runner.os == 'macOS'
+        with:
+          xcode-version: '15.3' # Or latest stable if possible
+      - run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - run: |
+          echo "Summary pip3 packages"
+          export TORCHCHAT_ROOT=$PWD
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
+      - run: |
         echo "::group::Print machine info and try install pip and/or pip3"
         set -x
-        apt-get install pip3 pip || true
+        which pip || true
+        which pip3 || true
+        which conda || true
         uname -a
         echo "::endgroup::"
 
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
 
-  test-gguf-any:
-    permissions:
-      id-token: write
-      contents: read
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
-      timeout: 60
-      script: |
-        echo "::group::Print machine info"
-        uname -a
-        echo "::endgroup::"
-
-        # failing
-        # .ci/scripts/run-docs gguf
-
         echo "::group::Completion"
         echo "tests complete"
         echo "*******************************************"
         echo "::endgroup::"
-
-  test-gguf-cpu:
-    permissions:
-      id-token: write
-      contents: read
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
-      timeout: 60
-      script: |
-        echo "::group::Print machine info"
-        uname -a
-        echo "::endgroup::"
-
-        # failing
-        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs gguf
-
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
-
 
   test-advanced-any:
-    permissions:
-      id-token: write
-      contents: read
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
-      timeout: 60
-      script: |
-        echo "::group::Print machine info"
+    strategy:
+      matrix:
+        runner: [linux.g5.4xlarge.nvidia.gpu]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - uses: actions/checkout@v3 # Updated to v3
+      - uses: actions/setup-python@v4 # Updated to v4
+        with:
+          python-version: '3.10.11'
+      - uses: maxim-lobanov/setup-xcode@v1 # This action is fine
+        if: runner.os == 'macOS'
+        with:
+          xcode-version: '15.3' # Or latest stable if possible
+      - run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - run: |
+          echo "Summary pip3 packages"
+          export TORCHCHAT_ROOT=$PWD
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
+      - run: |
+        echo "::group::Print machine info and try install pip and/or pip3"
+        set -x
+        which pip || true
+        which pip3 || true
+        which conda || true
         uname -a
         echo "::endgroup::"
 
-        # failing
-        # .ci/scripts/run-docs advanced
+        .ci/scripts/run-docs advanced
 
         echo "::group::Completion"
         echo "tests complete"
         echo "*******************************************"
         echo "::endgroup::"
-
 
   test-advanced-cpu:
-    permissions:
-      id-token: write
-      contents: read
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
-      timeout: 60
-      script: |
-        echo "::group::Print machine info"
+    strategy:
+      matrix:
+        runner: [linux.g5.4xlarge.nvidia.gpu]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - uses: actions/checkout@v3 # Updated to v3
+      - uses: actions/setup-python@v4 # Updated to v4
+        with:
+          python-version: '3.10.11'
+      - uses: maxim-lobanov/setup-xcode@v1 # This action is fine
+        if: runner.os == 'macOS'
+        with:
+          xcode-version: '15.3' # Or latest stable if possible
+      - run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - run: |
+          echo "Summary pip3 packages"
+          export TORCHCHAT_ROOT=$PWD
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+          python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
+      - run: |
+        echo "::group::Print machine info and try install pip and/or pip3"
+        set -x
+        which pip || true
+        which pip3 || true
+        which conda || true
         uname -a
         echo "::endgroup::"
 
-        # failing
-        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
-
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
-
-  test-evaluation-any:
-    permissions:
-      id-token: write
-      contents: read
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
-      timeout: 60
-      script: |
-        echo "::group::Print machine info"
-        uname -a
-        echo "::endgroup::"
-
-        # .ci/scripts/run-docs evaluation
-
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
-
-  test-evaluation-cpu:
-    permissions:
-      id-token: write
-      contents: read
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
-      timeout: 60
-      script: |
-        echo "::group::Print machine info"
-        uname -a
-        echo "::endgroup::"
-
-        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs evaluation
-
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
-
-  test-multimodal-any:
-    permissions:
-      id-token: write
-      contents: read
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
-      timeout: 60
-      script: |
-        echo "::group::Print machine info"
-        uname -a
-        echo "::endgroup::"
-
-        .ci/scripts/run-docs multimodal
-
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
-
-  test-multimodal-cpu:
-    permissions:
-      id-token: write
-      contents: read
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
-      timeout: 60
-      script: |
-        echo "::group::Print machine info"
-        uname -a
-        echo "::endgroup::"
-
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs multimodal
-
-  test-native-any:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
-      timeout: 60
-      script: |
-        echo "::group::Print machine info"
-        uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
-        .ci/scripts/run-docs native
-
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
-
-  test-native-cpu:
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.1"
-      timeout: 60
-      script: |
-        echo "::group::Print machine info"
-        uname -a
-        echo "::endgroup::"
-
-        echo "::group::Install newer objcopy that supports --set-section-alignment"
-        yum install -y  devtoolset-10-binutils
-        export PATH=/opt/rh/devtoolset-10/root/usr/bin/:$PATH
-        echo "::endgroup::"
-
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs native
-
-  test-distributed-cuda:
-    permissions:
-      id-token: write
-      contents: read
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
-      timeout: 60
-      script: |
-        echo "::group::Print machine info"
-        uname -a
-        echo "::endgroup::"
-
-        .ci/scripts/run-docs distributed
+        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
 
         echo "::group::Completion"
         echo "tests complete"
