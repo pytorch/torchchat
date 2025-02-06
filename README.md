@@ -3,7 +3,11 @@
 torchchat is a small codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
 
 > [!IMPORTANT]
-> Update September 25, 2024: torchchat has multimodal support for **Llama3.2 11B**!!
+> Update
+>
+> **February 3, 2025**: torchchat has support for [**DeepSeek R1 Distill: 8B**]( https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-8B)!
+>
+> **September 25, 2024**: torchchat has multimodal support for **Llama3.2 11B**!
 >
 > To try it out, finish the [Installation](#Installation) section below, then hop
 > over to our [multimodal guide](docs/multimodal.md) to learn more.
@@ -75,6 +79,7 @@ aliases.
 | [ibm-granite/granite-3.0-8b-instruct](https://huggingface.co/ibm-granite/granite-3.0-8b-instruct) |✅| Alias to `granite3-8b`.|
 | [ibm-granite/granite-3.1-2b-instruct](https://huggingface.co/ibm-granite/granite-3.1-2b-instruct) |✅| Alias to `granite3.1-2b` and `granite3.1`.|
 | [ibm-granite/granite-3.1-8b-instruct](https://huggingface.co/ibm-granite/granite-3.1-8b-instruct) |✅| Alias to `granite3.1-8b`.|
+| [deepseek-ai/DeepSeek-R1-Distill-Llama-8B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-8B) |✅| Alias to `deepseek-r1:8b`.|
 
 
 ## Installation
@@ -413,7 +418,7 @@ torchchat/utils/scripts/build_native.sh et
 
 Execute using the runner
 ```bash
-cmake-out/et_run llama3.1.pte -z `python3 torchchat.py where llama3.1`/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/et_run llama3.1.pte -z `python3 torchchat.py where llama3.1`/tokenizer.model -i "Once upon a time"
 ```
 
 </details>
