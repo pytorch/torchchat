@@ -1,4 +1,4 @@
-name: Run the README instructions - with stories
+name: Run the README instructions - with stories and new template
 
 on:
   pull_request:
@@ -35,20 +35,20 @@ jobs:
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
       - run: |
-        echo "::group::Print machine info and try install pip and/or pip3"
-        set -x
-        which pip || true
-        which pip3 || true
-        which conda || true
-        uname -a
-        echo "::endgroup::"
+          echo "::group::Print machine info and try install pip and/or pip3"
+          set -x
+          which pip || true
+          which pip3 || true
+          which conda || true
+          uname -a
+          echo "::endgroup::"
 
-        .ci/scripts/run-docs readme
+          . .ci/scripts/run-docs readme
 
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"
 
   test-readme-cpu:
     strategy:
@@ -77,20 +77,21 @@ jobs:
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
       - run: |
-        echo "::group::Print machine info and try install pip and/or pip3"
-        set -x
-        which pip || true
-        which pip3 || true
-        which conda || true
-        uname -a
-        echo "::endgroup::"
+          echo "::group::Print machine info and try install pip and/or pip3"
+          set -x
+          which pip || true
+          which pip3 || true
+          which conda || true
+          uname -a
+          echo "::endgroup::"
 
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
+          export TORCHCHAT_DEVICE=cpu 
+          . .ci/scripts/run-docs readme
 
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"
 
   test-quantization-any:
     strategy:
@@ -119,20 +120,20 @@ jobs:
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
       - run: |
-        echo "::group::Print machine info and try install pip and/or pip3"
-        set -x
-        which pip || true
-        which pip3 || true
-        which conda || true
-        uname -a
-        echo "::endgroup::"
+          echo "::group::Print machine info and try install pip and/or pip3"
+          set -x
+          which pip || true
+          which pip3 || true
+          which conda || true
+          uname -a
+          echo "::endgroup::"
 
-        .ci/scripts/run-docs quantization
+          . .ci/scripts/run-docs quantization
 
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"
 
   test-quantization-cpu:
     strategy:
@@ -161,20 +162,21 @@ jobs:
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
       - run: |
-        echo "::group::Print machine info and try install pip and/or pip3"
-        set -x
-        which pip || true
-        which pip3 || true
-        which conda || true
-        uname -a
-        echo "::endgroup::"
+          echo "::group::Print machine info and try install pip and/or pip3"
+          set -x
+          which pip || true
+          which pip3 || true
+          which conda || true
+          uname -a
+          echo "::endgroup::"
 
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
+          export TORCHCHAT_DEVICE=cpu 
+          . .ci/scripts/run-docs quantization
 
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"
 
   test-advanced-any:
     strategy:
@@ -203,20 +205,20 @@ jobs:
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
       - run: |
-        echo "::group::Print machine info and try install pip and/or pip3"
-        set -x
-        which pip || true
-        which pip3 || true
-        which conda || true
-        uname -a
-        echo "::endgroup::"
+          echo "::group::Print machine info and try install pip and/or pip3"
+          set -x
+          which pip || true
+          which pip3 || true
+          which conda || true
+          uname -a
+          echo "::endgroup::"
 
-        .ci/scripts/run-docs advanced
+          . .ci/scripts/run-docs advanced
 
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"
 
   test-advanced-cpu:
     strategy:
@@ -245,17 +247,18 @@ jobs:
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
           python3 -c 'import torchvision;print(f"torchvision: {torchvision.__version__, torchvision.version.git_version}")'
       - run: |
-        echo "::group::Print machine info and try install pip and/or pip3"
-        set -x
-        which pip || true
-        which pip3 || true
-        which conda || true
-        uname -a
-        echo "::endgroup::"
+          echo "::group::Print machine info and try install pip and/or pip3"
+          set -x
+          which pip || true
+          which pip3 || true
+          which conda || true
+          uname -a
+          echo "::endgroup::"
 
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
+          export TORCHCHAT_DEVICE=cpu 
+          . .ci/scripts/run-docs advanced
 
-        echo "::group::Completion"
-        echo "tests complete"
-        echo "*******************************************"
-        echo "::endgroup::"
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"
