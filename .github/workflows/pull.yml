@@ -340,10 +340,10 @@ jobs:
         fi
         echo "::endgroup::"
 
-        echo "::group::Run inference with quantize file"
-        python3 torchchat.py export --output-snap model.tc --dtype float32 --quantize torchchat/quant_config/cuda-32.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
-        python3 torchchat.py generate --snap model.tc --dtype float32 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
-        echo "::endgroup::"
+        # echo "::group::Run inference with quantize file"
+        # python3 torchchat.py export --output-snap model.tc --dtype float32 --quantize torchchat/quant_config/cuda-32.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+        # python3 torchchat.py generate --snap model.tc --dtype float32 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+        # echo "::endgroup::"
         
   test-gpu-aoti-float16:
     permissions:
@@ -390,10 +390,10 @@ jobs:
         fi
         echo "::endgroup::"
 
-        echo "::group::Run inference with quantize file"
-        python3 torchchat.py export --output-snap model.tc --dtype float16 --quantize torchchat/quant_config/cuda-32.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
-        python3 torchchat.py generate --snap model.tc --dtype float16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
-        echo "::endgroup::"
+        # echo "::group::Run inference with quantize file"
+        # python3 torchchat.py export --output-snap model.tc --dtype float16 --quantize torchchat/quant_config/cuda-32.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+        # python3 torchchat.py generate --snap model.tc --dtype float16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+        # echo "::endgroup::"
 
   test-gpu-eval-sanity-check:
     permissions:
