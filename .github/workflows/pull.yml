@@ -296,7 +296,7 @@ jobs:
           python3 torchchat.py generate --quantize torchchat/quant_config/cuda.json --dtype bfloat16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
           
           python3 torchchat.py export --output-aoti-package-path /tmp/model.pt2 --quantize torchchat/quant_config/cuda-32.json --dtype bfloat16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
-          python3 torchchat.py generate --aoti-package-path /tmp/model.pt2 --dtype bfloat16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"~
+          python3 torchchat.py generate --aoti-package-path /tmp/model.pt2 --dtype bfloat16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
 
         fi
         echo "::endgroup::"
@@ -344,7 +344,7 @@ jobs:
           python3 torchchat.py generate --quantize torchchat/quant_config/cuda-32.json --dtype float32 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
           
           python3 torchchat.py export --output-aoti-package-path /tmp/model.pt2 --quantize torchchat/quant_config/cuda-32.json --dtype float32 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
-          python3 torchchat.py generate --aoti-package-path /tmp/model.pt2 --dtype float32--checkpoint "./checkpoints/${REPO_NAME}/model.pth"~
+          python3 torchchat.py generate --aoti-package-path /tmp/model.pt2 --dtype float32--checkpoint "./checkpoints/${REPO_NAME}/model.pth"
 
         fi
         echo "::endgroup::"
