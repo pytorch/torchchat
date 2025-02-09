@@ -144,7 +144,6 @@ def _add_model_specification_args(parser) -> None:
         choices=["text", "text-image"],
         # help=argparse.SUPPRESS,
         help="Modality of the model. Options: text, text-image",
-        # help="Modality of the model. Options: text, text-image",
     )
 
 
