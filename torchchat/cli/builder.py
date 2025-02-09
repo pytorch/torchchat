@@ -71,6 +71,7 @@ class BuilderArgs:
     dynamic_shapes: bool = False
     max_seq_length: Optional[int] = None
     attention_backend: str = "math"
+    modality: Optional[str] = "text"
 
     def __post_init__(self):
         if self.device is None:
@@ -145,6 +146,10 @@ class BuilderArgs:
         pte_path = getattr(args, "pte_path", None)
         aoti_package_path = getattr(args, "aoti_package_path", None)
         snapshot_path = getattr(args, "snapshot_path", None)
+
+        modality = "text"
+        if args.modality:
+            modality = args.modality
 
         is_chat_model = False
         if args.is_chat_model:
@@ -222,6 +227,7 @@ class BuilderArgs:
             chpt_from=chpt_from,
             distribution_path=distribution_path,
             is_chat_model=is_chat_model,
+            modality=modality,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),
             attention_backend=attention_backend,
