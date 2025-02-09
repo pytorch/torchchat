@@ -378,16 +378,13 @@ class _VLMEvalWrapper(HFMultimodalLM):
 
         # 2. Setup KV cache and masks for bsz 1
         with self.device:
-            if self.model.caches_are_enabled():
-                self.model.reset_caches()
-            else:
-                self.model.setup_caches(
-                    batch_size=1,
-                    dtype=self._dtype,
-                    encoder_max_seq_len=self.model_transform.image_seq_len
-                    * self._max_images_per_sample,
-                    decoder_max_seq_len=self.max_length,
-                )
+            self.model.setup_caches(
+                batch_size=1,
+                dtype=self._dtype,
+                encoder_max_seq_len=self.model_transform.image_seq_len
+                * self._max_images_per_sample,
+                decoder_max_seq_len=self.max_length,
+            )
             causal_mask = torch.tril(
                 torch.ones(
                     size=(self.max_length, self.max_length),
@@ -506,6 +503,8 @@ def multi_model_eval(
     """
     if tasks is None:
         tasks = ["wikitext"]
+    max_seq_length = 4096 if max_seq_length is None else max_seq_length
+    device = utils.get_device(device) if isinstance(device, str) else device
 
     model_eval_wrapper = _VLMEvalWrapper(
         model,
@@ -578,25 +577,30 @@ def main(args) -> None:
         )
         torch._inductor.config.coordinate_descent_tuning = False if device == "cpu" else True
 
-    evaluator = None
-    if modality == "text":
-        evaluator = eval
-    elif modality == "text-image":
-        evaluator = multi_model_eval
-    else:
-        raise ValueError(f"Unsupported modality: {modality}")
-
     with measure_time("Time to run eval: {time:.02f}s."):
-        result = evaluator(
-            model.to(device),
-            model_forward,
-            tokenizer,
-            tasks,
-            limit,
-            max_seq_length,
-            device=builder_args.device,
-            is_pte_model=builder_args.pte_path is not None,
-        )
+        if modality == "text":
+            result = eval(
+                model.to(device),
+                model_forward,
+                tokenizer,
+                tasks,
+                limit,
+                max_seq_length,
+                device=builder_args.device,
+                is_pte_model=builder_args.pte_path is not None,
+            )
+        elif modality == "text-image":
+            result = multi_model_eval(
+                model.to(device),
+                model_forward,
+                tokenizer,
+                tasks,
+                limit,
+                max_seq_length,
+                device=builder_args.device,
+            )
+        else:
+            raise ValueError(f"Unsupported modality: {modality}")
 
     times = torch.tensor(result["times"])
     print(

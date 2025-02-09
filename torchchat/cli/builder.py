@@ -252,13 +252,29 @@ class TokenizerArgs:
     is_sentencepiece: bool = False
     is_tiktoken: bool = False
     is_hf_tokenizer: bool = False
+    is_llama_3_2_mm: bool = False
     t: Optional[Any] = None
 
     def __post_init__(self):
+        # special handling for llama-3.2-mm
+        if "llama-3.2-11b-vision" in str(self.tokenizer_path).lower():
+            try:
+                from torchtune.models.llama3_2_vision import llama3_2_vision_transform
+
+                self.t = llama3_2_vision_transform(path=str(self.tokenizer_path))
+                self.is_llama_3_2_mm = True
+                self.is_tiktoken = False
+                self.is_sentencepiece = False
+                self.is_hf_tokenizer = False
+                return
+            except:
+                pass
+
         try:
             from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
             self.t = TiktokenTokenizer(model_path=str(self.tokenizer_path))
+            self.is_llama_3_2_mm = False
             self.is_tiktoken = True
             self.is_sentencepiece = False
             self.is_hf_tokenizer = False
@@ -270,6 +286,7 @@ class TokenizerArgs:
             from sentencepiece import SentencePieceProcessor
 
             self.t = SentencePieceProcessor(model_file=str(self.tokenizer_path))
+            self.is_llama_3_2_mm = False
             self.is_tiktoken = False
             self.is_sentencepiece = True
             self.is_hf_tokenizer = False
@@ -281,6 +298,7 @@ class TokenizerArgs:
             from tokenizer.hf_tokenizer import HFTokenizer
 
             self.t = HFTokenizer(str(self.tokenizer_path))
+            self.is_llama_3_2_mm = False
             self.is_tiktoken = False
             self.is_sentencepiece = False
             self.is_hf_tokenizer = True
@@ -288,6 +306,7 @@ class TokenizerArgs:
         except:
             pass
 
+        self.is_llama_3_2_mm = False
         self.is_tiktoken = False
         self.is_sentencepiece = False
         self.is_hf_tokenizer = False
@@ -302,20 +321,22 @@ class TokenizerArgs:
         if model is None:
             return
 
-        if sum([self.is_tiktoken, self.is_hf_tokenizer, self.is_sentencepiece]) != 1:
+        if sum([self.is_tiktoken, self.is_hf_tokenizer, self.is_sentencepiece, self.is_llama_3_2_mm]) != 1:
             raise RuntimeError(f"no tokenizer was found at {self.tokenizer_path}")
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
         is_hf_tokenizer = self.is_hf_tokenizer
+        is_llama_3_2_mm = self.is_llama_3_2_mm
+
         use_tiktoken = model.config.use_tiktoken
         use_hf_tokenizer = model.config.use_hf_tokenizer
-        use_sentencepiece = not (use_tiktoken or use_hf_tokenizer)
-
+        use_other_tokenizer = not (use_tiktoken or use_hf_tokenizer)
         if (
             (is_tiktoken and not use_tiktoken) or
             (is_hf_tokenizer and not use_hf_tokenizer) or
-            (is_sentencepiece and not use_sentencepiece)
+            (is_sentencepiece and not use_other_tokenizer) or
+            (is_llama_3_2_mm and not use_other_tokenizer)
         ):
             raise RuntimeError(
                 "model-specified tokenizer ({}) does not match provided tokenizer ({}) for {}".format(
