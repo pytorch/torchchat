@@ -447,15 +447,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
     ```bash
     open et-build/src/executorch/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj
     ```
-
-    > Note: If you're running into any issues related to package dependencies, close Xcode, clean some of the caches and/or the build products, and open the Xcode project again:
-    > ```bash
-    > rm -rf \
-    >   ~/Library/org.swift.swiftpm \
-    >   ~/Library/Caches/org.swift.swiftpm \
-    >   ~/Library/Caches/com.apple.dt.Xcode \
-    >   ~/Library/Developer/Xcode/DerivedData
-    > ```
+    
 2. Click the Play button to launch the app in the Simulator.
 
 3. To run on a device, ensure you have it set up for development and a provisioning profile with the `increased-memory-limit` entitlement. Update the app's bundle identifier to match your provisioning profile with the required capability.
