@@ -1055,7 +1055,54 @@ jobs:
           ./runner/build_android.sh
           echo "Tests complete."
 
-  test-torchao-experimental:
+  test-torchao-experimental-python:
+    strategy:
+      matrix:
+        runner: [macos-14-xlarge]
+    runs-on: ${{matrix.runner}}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.11
+      - name: Setup Xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.3'
+      - name: Print machine info
+        run: |
+          uname -a
+          if [ $(uname -s) == Darwin ]; then
+            sysctl machdep.cpu.brand_string
+            sysctl machdep.cpu.core_count
+          fi
+      - name: Install torchchat
+        run: |
+          echo "Intalling pip3 packages"
+          ./install/install_requirements.sh
+          pip3 list
+          python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Run inference
+        run: |
+          python torchchat.py download stories110M
+          wget -O ./tokenizer.model https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
+          export PRMT="Once upon a time in a land far away"
+          echo "Generate eager"
+          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
+          echo "Generate compile"
+          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}' --compile
+          echo "Export AOTI"
+          python torchchat.py export stories110M --output-aoti-package-path ./model.pt2 --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
+          echo "Generate AOTI"
+          python torchchat.py generate stories110M --aoti-package-path ./model.pt2 --prompt "${PRMT}"
+          echo "Tests complete."
+
+  test-torchao-experimental-cpp:
     strategy:
       matrix:
         runner: [macos-14-xlarge]
@@ -1109,18 +1156,12 @@ jobs:
           python torchchat.py download stories110M
           wget -O ./tokenizer.model https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
           export PRMT="Once upon a time in a land far away"
-          echo "Generate eager"
-          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
-          echo "Generate compile"
-          python torchchat.py generate stories110M --temperature 0 --prompt "${PRMT}"  --device cpu --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}' --compile
           echo "Export and run ET (C++ runner)"
           python torchchat.py export stories110M --output-pte-path ./model.pte --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
           ./cmake-out/et_run ./model.pte -z ./tokenizer.model -t 0 -i "${PRMT}"
           echo "Export and run AOTI (C++ runner)"
           python torchchat.py export stories110M --output-aoti-package-path ./model.pt2 --dtype float32 --quantize '{"embedding:wx": {"bitwidth": 2, "groupsize": 32}, "linear:a8wxdq": {"bitwidth": 3, "groupsize": 128, "has_weight_zeros": false}}'
           ./cmake-out/aoti_run ./model.pt2 -z ./tokenizer.model -t 0 -i "${PRMT}"
-          echo "Generate AOTI"
-          python torchchat.py generate stories110M --aoti-package-path ./model.pt2 --prompt "${PRMT}"
           echo "Tests complete."
 
   test-torchao-experimental-mps:
