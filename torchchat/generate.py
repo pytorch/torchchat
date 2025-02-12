@@ -1207,6 +1207,7 @@ class LocalGenerator:
                     print(prof.key_averages().table(sort_by="self_cuda_time_total"))
                 else:
                     print(prof.key_averages().table(sort_by="self_xpu_time_total"))
+                    torch.save(prof.key_averages().table(sort_by="self_xpu_time_total"), f"./{self.profile}.pt")
                 prof.export_chrome_trace(f"{self.profile}.json")
 
             if start_pos >= max_seq_length:
