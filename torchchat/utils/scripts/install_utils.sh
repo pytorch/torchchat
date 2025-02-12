@@ -88,10 +88,10 @@ install_executorch_python_libs() {
   echo "Building and installing python libraries"
   if [ "${ENABLE_ET_PYBIND}" = false ]; then
       echo "Not installing pybind"
-      bash ./install_requirements.sh --pybind off
+      bash ./install_executorch.sh --pybind off
   else
       echo "Installing pybind"
-      bash ./install_requirements.sh --pybind xnnpack
+      bash ./install_executorch.sh --pybind xnnpack
   fi
 
   # TODO: figure out the root cause of 'AttributeError: module 'evaluate'
