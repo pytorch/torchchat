@@ -23,6 +23,9 @@ jobs:
         uname -a
         echo "::endgroup::"
 
+        which pip || true
+        which pip3 || true
+        which conda || true
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
 
         echo "::group::Completion"
@@ -44,7 +47,11 @@ jobs:
         echo "::group::Print machine info"
         uname -a
         echo "::endgroup::"
-
+   
+        which pip || true
+        which pip3 || true
+        which conda || true
+        
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
 
   test-gguf-cpu:
@@ -62,6 +69,10 @@ jobs:
         uname -a
         echo "::endgroup::"
 
+        which pip || true
+        which pip3 || true
+        which conda || true
+        
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs gguf
 
         echo "::group::Completion"
@@ -84,6 +95,10 @@ jobs:
         uname -a
         echo "::endgroup::"
 
+        which pip || true
+        which pip3 || true
+        which conda || true
+        
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
 
         echo "::group::Completion"
@@ -106,6 +121,10 @@ jobs:
         uname -a
         echo "::endgroup::"
 
+        which pip || true
+        which pip3 || true
+        which conda || true
+        
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs evaluation
 
         echo "::group::Completion"
