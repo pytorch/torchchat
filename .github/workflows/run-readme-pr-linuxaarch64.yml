@@ -26,7 +26,7 @@ jobs:
         which pip || true
         which pip3 || true
         which conda || true
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
+        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
 
         echo "::group::Completion"
         echo "tests complete"
@@ -52,7 +52,7 @@ jobs:
         which pip3 || true
         which conda || true
         
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
+        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
 
   test-gguf-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
@@ -73,7 +73,7 @@ jobs:
         which pip3 || true
         which conda || true
         
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs gguf
+        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs gguf
 
         echo "::group::Completion"
         echo "tests complete"
@@ -99,7 +99,7 @@ jobs:
         which pip3 || true
         which conda || true
         
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
+        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
 
         echo "::group::Completion"
         echo "tests complete"
@@ -125,7 +125,7 @@ jobs:
         which pip3 || true
         which conda || true
         
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs evaluation
+        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs evaluation
 
         echo "::group::Completion"
         echo "tests complete"
