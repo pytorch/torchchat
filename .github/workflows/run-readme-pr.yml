@@ -337,7 +337,7 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        # .ci/scripts/run-docs distributed
+        .ci/scripts/run-docs distributed
 
         echo "::group::Completion"
         echo "tests complete"
