@@ -549,7 +549,7 @@ def arg_init(args):
         precision_handler = args.quantize.get("precision", None)
         if precision_handler:
             if precision_handler["dtype"] != args.dtype:
-                print('overriding json-specified dtype {precision_handler["dtype"]} with cli dtype {args.dtype}')
+                print(f'overriding json-specified dtype {precision_handler["dtype"]} with cli dtype {args.dtype}')
                 precision_handler["dtype"] = args.dtype
 
     if getattr(args, "output_pte_path", None):
