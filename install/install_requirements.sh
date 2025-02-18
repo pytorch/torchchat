@@ -44,14 +44,6 @@ else
 fi
 
 echo "Using pip executable: $PIP_EXECUTABLE"
-echo "located at $(which $PIP_EXECUTABLE || echo not found)"
-
-echo
-echo "possible pip candidates are:"
-echo "pip is located at $(which pip || echo not found)"
-echo "pip3 is located at $(which pip3 || echo not found)"
-echo "pip{PYTHON_SYS_VERSION} is located at $(which pip{PYTHON_SYS_VERSION} || echo not found)"
-echo
 
 # Since torchchat often uses main-branch features of pytorch, only the nightly
 # pip versions will have the required features. The PYTORCH_NIGHTLY_VERSION value should
