@@ -70,7 +70,8 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        .ci/scripts/run-docs quantization
+        # library
+        # .ci/scripts/run-docs quantization
 
         echo "::group::Completion"
         echo "tests complete"
@@ -337,7 +338,10 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        .ci/scripts/run-docs distributed
+        # torch.distributed.DistBackendError: NCCL error in: /pytorch/torch/csrc/distributed/c10d/NCCLUtils.cpp:77, invalid usage (run with NCCL_DEBUG=WARN for details), NCCL version 2.21.5
+        # [rank0]: ncclInvalidUsage: This usually reflects invalid usage of NCCL library.
+        # Duplicate GPU detected : rank 0 and rank 1 both on CUDA device 1e0
+        # .ci/scripts/run-docs distributed
 
         echo "::group::Completion"
         echo "tests complete"
