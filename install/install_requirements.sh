@@ -19,7 +19,6 @@ then
   fi
 fi
 echo "Using python executable: $PYTHON_EXECUTABLE"
-echo "located at $(which $PYTHON_EXECUTABLE || echo not found)"
 
 PYTHON_SYS_VERSION="$($PYTHON_EXECUTABLE -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")"
 # Check python version. Expect at least 3.10.x
