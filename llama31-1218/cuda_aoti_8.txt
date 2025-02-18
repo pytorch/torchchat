@@ -1,0 +1,119 @@
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model8.so
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --dso-path /tmp/model8.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model8.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.6.0.dev20241218+cu124 available.
+W1218 20:28:13.686731 1631740 site-packages/torch/_export/__init__.py:276] +============================+
+W1218 20:28:13.687165 1631740 site-packages/torch/_export/__init__.py:277] |     !!!   WARNING   !!!    |
+W1218 20:28:13.687381 1631740 site-packages/torch/_export/__init__.py:278] +============================+
+W1218 20:28:13.687657 1631740 site-packages/torch/_export/__init__.py:279] torch._export.aot_compile()/torch._export.aot_load() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export())/torch._inductor.aoti_load_package() instead.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 5.97 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.38 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model8.so
+WARNING!! The path of compiling a dso is deprecated. Please use --output-aoti-package-path to create a .pt2 artifact instead.
+The generated packaged model can be found at: /tmp/model8.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --dso-path /tmp/model8.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+W1218 20:31:42.800761 1651896 site-packages/torch/_export/__init__.py:276] +============================+
+W1218 20:31:42.801322 1651896 site-packages/torch/_export/__init__.py:277] |     !!!   WARNING   !!!    |
+W1218 20:31:42.801504 1651896 site-packages/torch/_export/__init__.py:278] +============================+
+W1218 20:31:42.801690 1651896 site-packages/torch/_export/__init__.py:279] torch._export.aot_compile()/torch._export.aot_load() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export())/torch._inductor.aoti_load_package() instead.
+[W1218 20:31:45.602179216 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:45.602349016 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:45.609939364 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:45.610055760 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:45.617693449 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:45.617788824 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:45.632980577 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:45.633093254 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Warning: checkpoint path ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument
+Warning: checkpoint path ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 7.00 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of Provence, France, there lived a young boy named Pierre. Pierre was a curious and adventurous boy who loved nothing more than exploring the fields, forests, and villages that surrounded his home.
+One day, while wandering through the village, Pierre stumbled upon a small, mysterious shop tucked away on a side street. The sign above the door read "Maison de Magie" (House of Magic), and the window displayed an assortment of strange and wondrous objects that seemed to shimmer and glow in the sunlight.
+Pierre's curiosity was piqued, and he pushed open the door to reveal a dimly lit interior filled with rows of dusty shelves, colorful bottles, and peculiar contraptions that whirred and whizzed with soft humming noises. A figure emerged from the shadows, a wise and kindly old man with a long white beard and twinkling eyes.
+"Bonjour, young Pierre," the old man said in a warm,
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 1.8658 sec total                 
+Time to first token: 0.1900 sec with sequential prefill.                
+
+      Total throughput: 107.1912 tokens/sec, 0.0093 s/token                 
+First token throughput: 5.2624 tokens/sec, 0.1900 s/token                 
+ Next token throughput: 118.7494 tokens/sec, 0.0084 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+[W1218 20:31:47.454663167 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:47.454792461 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:47.462407192 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:47.462541832 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:47.470147862 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:47.470275931 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:47.485473631 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:47.485587356 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+
+========================================
+
+Once upon a time, there was a magical kingdom hidden deep within a vast, enchanted forest. The kingdom was ruled by a wise and just king, who was loved by all his subjects. The king's most trusted advisor was a wise old wizard named Zarath, who possessed great knowledge and power.
+One day, a young apprentice named Eryndor arrived at the kingdom, seeking to learn the ancient arts of magic from the great wizard Zarath. Eryndor was a skilled warrior, but he was determined to become a powerful wizard, just like his idol, Zarath.
+Zarath, seeing the potential in the young apprentice, took Eryndor under his wing and began to teach him the intricacies of magic. Eryndor proved to be a quick learner, mastering spells and incantations with ease. He spent every waking moment studying and practicing, determined to become the greatest wizard of all time.
+As time passed, Eryndor's skills improved dramatically, and he began
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 1.7017 sec total                 
+Time to first token: 0.0414 sec with sequential prefill.                
+
+      Total throughput: 117.5274 tokens/sec, 0.0085 s/token                 
+First token throughput: 24.1350 tokens/sec, 0.0414 s/token                 
+ Next token throughput: 119.8580 tokens/sec, 0.0083 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+[W1218 20:31:49.156798800 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:49.156895446 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:49.164536369 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:49.164621418 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:49.172263213 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:49.172387187 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:49.187656990 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:31:49.187775543 cbmcj2dmlnltvqhdfh4tdkqxo4b5oww22djpo7usr3qp3mii4b3j.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+
+========================================
+
+Once upon a time, in a far-off land, there was a small village nestled between two great mountains. The villagers were simple folk, living off the land and making their living by farming and herding. They were a hardworking people, and their lives were marked by the changing seasons.
+One day, a strange and wondrous event occurred in the village. A great, glowing crystal appeared in the center of the village square, filling the air with a soft, pulsing light. The villagers were amazed and a little frightened by this sudden appearance, and they gathered around the crystal in wonder.
+As they watched, the crystal began to glow brighter and brighter, until it seemed to be radiating a warm, golden light. The villagers felt a strange sense of peace and tranquility wash over them, and they began to feel a deep connection to the crystal.
+One of the villagers, a young woman named Aria, felt an especially strong connection to the crystal. She felt drawn to it, as if she was
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 1.7026 sec total                 
+Time to first token: 0.0420 sec with sequential prefill.                
+
+      Total throughput: 117.4643 tokens/sec, 0.0085 s/token                 
+First token throughput: 23.8167 tokens/sec, 0.0420 s/token                 
+ Next token throughput: 119.8321 tokens/sec, 0.0083 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 114.06                 
+Average tokens/sec (first token): 17.74                 
+Average tokens/sec (next tokens): 119.48 
+                
+Memory used: 0.05 GB
