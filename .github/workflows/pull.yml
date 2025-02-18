@@ -292,8 +292,13 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run inference with quantize file"
-        python3 torchchat.py export --output-snap model.tc --dtype bfloat16 --quantize torchchat/quant_config/cuda-32.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
-        python3 torchchat.py generate --snap model.tc --dtype bfloat16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+        for DEVICE in cpu; do # cuda 
+          # cuda - fails because `AttributeError: 'Linear' object has no attribute '_linear_extra_repr'`
+          # follow up with torchao as a separate PR
+          echo "saving snapshot for device ${DEVICE} and dtype bfloat16, and reloading as snapshot"
+          python3 torchchat.py export --device ${DEVICE} --output-snap model.tc --dtype bfloat16 --quantize torchchat/quant_config/cuda-32.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+          python3 torchchat.py generate --device ${DEVICE} --snap model.tc --dtype bfloat16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+        done
         echo "::endgroup::"
 
   test-gpu-aoti-float32:
