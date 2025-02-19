@@ -24,7 +24,7 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        # .ci/scripts/run-docs readme
+        .ci/scripts/run-docs readme
 
         echo "::group::Completion"
         echo "tests complete"
