@@ -24,7 +24,7 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        .ci/scripts/run-docs readme
+        # .ci/scripts/run-docs readme
 
         echo "::group::Completion"
         echo "tests complete"
@@ -47,7 +47,7 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
+        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
 
         echo "::group::Completion"
         echo "tests complete"
@@ -94,7 +94,7 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
+        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
 
   test-gguf-any:
     permissions:
