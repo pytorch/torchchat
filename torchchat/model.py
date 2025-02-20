@@ -608,6 +608,12 @@ class FlamingoModel(Model):
             decoder_max_seq_len=decoder_max_seq_len,
         )
 
+    def caches_are_setup(self) -> bool:
+        return self.model.caches_are_setup()
+
+    def caches_are_enabled(self) -> bool:
+        return self.model.caches_are_enabled()
+
     def reset_caches(self):
         self.model.reset_caches()
 

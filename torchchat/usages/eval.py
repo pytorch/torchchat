@@ -36,6 +36,7 @@ from lm_eval.tasks import get_task_dict
 from lm_eval.models.hf_vlms import HFMultimodalLM
 from lm_eval.evaluator import evaluate
 
+from torchtune.modules.common_utils import local_kv_cache 
 from torchtune.modules.model_fusion import DeepFusionModel
 from torchtune.modules.transforms import Transform
 from torchtune.data import (
@@ -183,12 +184,7 @@ class GPTFastEvalWrapper(eval_wrapper):
         raise Exception("unimplemented")
 
 
-# Dummy class which _VLMEvalWrapper can inherit from when the imports don't work
-# class HFMultimodalLM():
-#     def __init__(self):
-#         return
-
-class _VLMEvalWrapper(HFMultimodalLM):
+class VLMEvalWrapper(HFMultimodalLM):
     """An EvalWrapper for EleutherAI's eval harness based on gpt-fast's
     EvalWrapper: https://github.com/pytorch-labs/gpt-fast/blob/main/eval.py.
 
@@ -234,6 +230,7 @@ class _VLMEvalWrapper(HFMultimodalLM):
         self._enable_kv_cache = True
         self._image_tag = image_tag
         self._max_images_per_sample = max_images_per_sample
+        self.times = []
 
     @property
     def model(self):
@@ -338,6 +335,7 @@ class _VLMEvalWrapper(HFMultimodalLM):
             all_encoded_messages,
             pad_direction="left",
             pad_max_images=self._max_images_per_sample,
+            pad_max_tiles=self._transform.max_num_tiles,
         )
         utils.batch_to_device(tok_batch, self.device)
 
@@ -376,15 +374,11 @@ class _VLMEvalWrapper(HFMultimodalLM):
                 "multimodal generation."
             )
 
-        # 2. Setup KV cache and masks for bsz 1
+        encoder_max_seq_len = (
+            self.model_transform.image_seq_len * self._max_images_per_sample
+        )
+        # Setup masks for bsz 1
         with self.device:
-            self.model.setup_caches(
-                batch_size=1,
-                dtype=self._dtype,
-                encoder_max_seq_len=self.model_transform.image_seq_len
-                * self._max_images_per_sample,
-                decoder_max_seq_len=self.max_length,
-            )
             causal_mask = torch.tril(
                 torch.ones(
                     size=(self.max_length, self.max_length),
@@ -396,28 +390,39 @@ class _VLMEvalWrapper(HFMultimodalLM):
         batch["input_pos"] = input_pos[None, :seq_len]
         batch["mask"] = causal_mask[None, :seq_len]
 
-        # 3. Prefill step
-        generated_tokens = []
-        logits = self.model(prompt, **batch)[:, -1]
-        token = sample(logits, temperature=0.0, top_k=None)
-        generated_tokens.append(token.item())
+        with measure_time(message=None) as measure:
+            # 2. Setup KV cache
+            with local_kv_cache(
+                self.model,
+                batch_size=self.batch_size,
+                device=self.device,
+                dtype=self._dtype,
+                encoder_max_seq_len=encoder_max_seq_len,
+                decoder_max_seq_len=self.max_length,
+            ):
+                # 3. Prefill step
+                generated_tokens = []
+                logits = self.model(prompt, **batch)[:, -1]
+                token = sample(logits, temperature=0.0, top_k=None)
+                generated_tokens.append(token.item())
 
-        cache_mask = batch["encoder_mask"][:, -1:]
+                cache_mask = batch["encoder_mask"][:, -1:]
 
-        # 4. Continue generating
-        for _ in range(max_length):
-            if token.item() in self.model_transform.stop_tokens:
-                break
-            logits = self.model(
-                token,
-                mask=causal_mask[None, seq_len, None, :],
-                encoder_input=None,
-                encoder_mask=cache_mask,
-                input_pos=input_pos[None, seq_len],
-            )[:, -1]
-            token = sample(logits, temperature=0.0, top_k=None)
-            generated_tokens.append(token.item())
-            seq_len += 1
+                # 4. Continue generating
+                for _ in range(max_length):
+                    if token.item() in self.model_transform.stop_tokens:
+                        break
+                    logits = self.model(
+                        token,
+                        mask=causal_mask[None, seq_len, None, :],
+                        encoder_input=None,
+                        encoder_mask=cache_mask,
+                        input_pos=input_pos[None, seq_len],
+                    )[:, -1]
+                    token = sample(logits, temperature=0.0, top_k=None)
+                    generated_tokens.append(token.item())
+                    seq_len += 1
+        self.times.append(measure.get_time())
 
         # 5. Return generated tokens
         return torch.tensor(generated_tokens, dtype=torch.int32).unsqueeze(0)
@@ -506,7 +511,7 @@ def multi_model_eval(
     max_seq_length = 4096 if max_seq_length is None else max_seq_length
     device = utils.get_device(device) if isinstance(device, str) else device
 
-    model_eval_wrapper = _VLMEvalWrapper(
+    model_eval_wrapper = VLMEvalWrapper(
         model,
         transform=tokenizer, # tranform is the tokenizer for multimodal models
         max_seq_length=max_seq_length,
