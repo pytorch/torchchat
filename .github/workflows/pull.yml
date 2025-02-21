@@ -515,12 +515,11 @@ jobs:
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
-          echo "*** can't test --quantize torchchat/quant_config/mobile.json ***"
-          echo "*** testing --quantize torchchat/quant_config/mobile-32.json ***"
+          echo "*** [TEST DISABLED] Can't test --quantize torchchat/quant_config/mobile.json ***"
+          echo "*** Testing --quantize torchchat/quant_config/mobile-32.json instead ***"
           echo "******************************************"
-          python torchchat.py export --quantize torchchat/quant_config/mobile-32.json --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-
+          # python torchchat.py export --quantize torchchat/quant_config/mobile-32.json --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******* Emb: channel-wise quantized ******"
@@ -537,13 +536,13 @@ jobs:
           echo "******************************************"
           echo "**** Emb 4bit: channel-wise quantized ****"
           echo "******************************************"
-          python torchchat.py export --quant '{"embedding" : {"bitwidth": 8, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat.py export --quant '{"embedding" : {"bitwidth": 4, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "****** Emb 4bit: group-wise quantized ****"
           echo "******************************************"
-          python torchchat.py export --quant '{"embedding" : {"bitwidth": 8, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          python torchchat.py export --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
