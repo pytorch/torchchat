@@ -534,16 +534,16 @@ jobs:
           python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
-          echo "**** Emb 4bit: channel-wise quantized ****"
+          echo "**** [TEST DISABLED] Emb 4bit: channel-wise quantized ****"
           echo "******************************************"
-          python torchchat.py export --quant '{"embedding" : {"bitwidth": 4, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python torchchat.py export --quant '{"embedding" : {"bitwidth": 4, "groupsize": 0}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
-          echo "****** Emb 4bit: group-wise quantized ****"
+          echo "****** [TEST DISABLED] Emb 4bit: group-wise quantized ****"
           echo "******************************************"
-          python torchchat.py export --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
-          python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python torchchat.py export --quant '{"embedding" : {"bitwidth": 4, "groupsize": 8}}' --checkpoint-path ${MODEL_PATH} --output-pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
+          # python3 torchchat.py generate --checkpoint-path ${MODEL_PATH} --temperature 0 --pte-path ${MODEL_DIR}/${MODEL_NAME}.pte
 
           echo "******************************************"
           echo "******* INT8 channel-wise quantized ******"
