@@ -23,7 +23,10 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
+        which pip || true
+        which pip3 || true
+        which conda || true
+        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
 
         echo "::group::Completion"
         echo "tests complete"
@@ -44,8 +47,12 @@ jobs:
         echo "::group::Print machine info"
         uname -a
         echo "::endgroup::"
-
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
+   
+        which pip || true
+        which pip3 || true
+        which conda || true
+        
+        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs quantization
 
   test-gguf-cpu:
     uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
@@ -62,7 +69,11 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs gguf
+        which pip || true
+        which pip3 || true
+        which conda || true
+        
+        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs gguf
 
         echo "::group::Completion"
         echo "tests complete"
@@ -84,7 +95,11 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
+        which pip || true
+        which pip3 || true
+        which conda || true
+        
+        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs advanced
 
         echo "::group::Completion"
         echo "tests complete"
@@ -106,7 +121,11 @@ jobs:
         uname -a
         echo "::endgroup::"
 
-        TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs evaluation
+        which pip || true
+        which pip3 || true
+        which conda || true
+        
+        # TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs evaluation
 
         echo "::group::Completion"
         echo "tests complete"

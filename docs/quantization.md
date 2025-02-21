@@ -82,17 +82,17 @@ Here are some examples of quantization configurations
   ```
 * Only quantize linear layers
   ```
-  --quantize '{"linear:a8w4dq": {"groupsize" : 256}}'
+  --quantize '{"linear:a8w4dq": {"groupsize" : 32}}'
   ```
 * Quantize linear layers and embedding lookup
   ```
-  --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}'
+  --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 32}}'
   ```
 * Quantize linear layers with specified dtype and device
   ```
   --quantize '{"executor": {"accelerator": "cuda"},
     "precision": {"dtype": "bf16"},
-    "linear:int4": {"groupsize" : 256}}'
+    "linear:int4": {"groupsize" : 32}}'
   ```
 [skip default]: end
 
@@ -109,12 +109,12 @@ python3 torchchat.py generate llama3 --prompt "Hello, my name is" --quantize '{"
 ```
 ### AOTI
 ```
-python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:int4": {"groupsize" : 256}}' --output-dso-path llama3.so
+python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:int4": {"groupsize" : 32}}' --output-dso-path llama3.so
 python3 torchchat.py generate llama3 --dso-path llama3.so  --prompt "Hello my name is"
 ```
 ### ExecuTorch
 ```
-python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 256}}' --output-pte-path llama3.pte
+python3 torchchat.py export llama3 --quantize '{"embedding": {"bitwidth": 4, "groupsize":32}, "linear:a8w4dq": {"groupsize" : 32}}' --output-pte-path llama3.pte
 python3 torchchat.py generate llama3 --pte-path llama3.pte  --prompt "Hello my name is"
 ```
 
@@ -219,7 +219,7 @@ bash torchchat/utils/scripts/build_torchao_ops.sh mps
 
 #### Eager mode
 ```
-python3 torchchat.py generate stories110M --device mps --dtype float32 --quantize '{"linear:afpwx": {"bitwidth": 4, "groupsize": 256}}' --prompt "Once upon a time," --num-samples 5
+python3 torchchat.py generate stories110M --device mps --dtype float32 --quantize '{"linear:afpwx": {"bitwidth": 4, "groupsize": 32}}' --prompt "Once upon a time," --num-samples 5
 ```
 
 ## Quantization Profiles
