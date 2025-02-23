@@ -212,7 +212,7 @@ class VLMEvalWrapper(HFMultimodalLM):
         *,
         device: torch.device,
         max_seq_length: int = 4096,
-        batch_size: int = 8,
+        batch_size: int = 1,
         dtype: torch.dtype = torch.bfloat16,
         enable_kv_cache: bool = True,
         # TODO (@joecummings): Update these defaults once more multimodal
