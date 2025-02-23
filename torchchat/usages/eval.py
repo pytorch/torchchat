@@ -4,7 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 import argparse
-from typing import Callable, Optional, Dict, List
+from typing import Callable, Dict, List, Optional
 
 import torch
 import torch._dynamo.config
@@ -30,15 +30,13 @@ torch._dynamo.config.cache_size_limit = 100000
 
 import lm_eval
 
+import PIL
+
 from lm_eval.evaluator import evaluate
+from lm_eval.models.hf_vlms import HFMultimodalLM
 from lm_eval.models.huggingface import HFLM as eval_wrapper
 from lm_eval.tasks import get_task_dict
-from lm_eval.models.hf_vlms import HFMultimodalLM
-from lm_eval.evaluator import evaluate
-
-from torchtune.modules.common_utils import local_kv_cache 
-from torchtune.modules.model_fusion import DeepFusionModel
-from torchtune.modules.transforms import Transform
+from torchtune import utils
 from torchtune.data import (
     format_content_with_images,
     left_pad_sequence,
@@ -46,9 +44,10 @@ from torchtune.data import (
     padded_collate_tiled_images_and_mask,
 )
 from torchtune.generation import generate, sample
-from torchtune import utils
 
-import PIL
+from torchtune.modules.common_utils import local_kv_cache
+from torchtune.modules.model_fusion import DeepFusionModel
+from torchtune.modules.transforms import Transform
 
 
 def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
@@ -428,7 +427,6 @@ class VLMEvalWrapper(HFMultimodalLM):
         return torch.tensor(generated_tokens, dtype=torch.int32).unsqueeze(0)
 
 
-
 @torch.no_grad()
 def eval(
     model: Model,
@@ -492,7 +490,8 @@ def multi_model_eval(
     limit: Optional[int] = None,
     max_seq_length: Optional[int] = None,
     device: str = "cpu",
-    is_pte_model: bool = False,):
+    is_pte_model: bool = False,
+):
     """
     Evaluates a language model on a specified task using the lm-evaluation-harness library.
 
@@ -513,7 +512,7 @@ def multi_model_eval(
 
     model_eval_wrapper = VLMEvalWrapper(
         model,
-        transform=tokenizer, # tranform is the tokenizer for multimodal models
+        transform=tokenizer,  # tranform is the tokenizer for multimodal models
         max_seq_length=max_seq_length,
         device=device,
     )
@@ -557,7 +556,10 @@ def main(args) -> None:
 
     modality = builder_args.modality
     print(f"Modality of model={modality}")
-    assert modality in ["text", "text-image"], "Only text and text-plus-image modality is supported for evaluation"
+    assert modality in [
+        "text",
+        "text-image",
+    ], "Only text and text-image modality is supported for evaluation"
 
     print(f"Using device={device}")
     set_precision(builder_args.precision)
@@ -575,12 +577,16 @@ def main(args) -> None:
 
     if compile:
         assert not (
-            builder_args.dso_path or builder_args.pte_path or builder_args.aoti_package_path
+            builder_args.dso_path
+            or builder_args.pte_path
+            or builder_args.aoti_package_path
         ), "cannot compile exported model"
         model_forward = torch.compile(
             model_forward, mode="reduce-overhead", dynamic=True, fullgraph=True
         )
-        torch._inductor.config.coordinate_descent_tuning = False if device == "cpu" else True
+        torch._inductor.config.coordinate_descent_tuning = (
+            False if device == "cpu" else True
+        )
 
     with measure_time("Time to run eval: {time:.02f}s."):
         if modality == "text":
