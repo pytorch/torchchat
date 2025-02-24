@@ -34,4 +34,4 @@ streamlit
 flask
 
 # eval
-lm_eval==0.4.2
+lm_eval==0.4.7

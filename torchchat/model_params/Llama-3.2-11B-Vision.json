@@ -1,6 +1,6 @@
 {
     "model_type": "flamingo",
-    "use_tiktoken": true,
+    "use_tiktoken": false,
     "encoder": {
         "patch_size": 14,
         "num_heads": 16,
