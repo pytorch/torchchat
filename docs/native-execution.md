@@ -83,6 +83,7 @@ python3 torchchat.py export stories15M --output-dso-path ./model.so
 We can now execute the runner with:
 
 [shell default]: pip install wget
+
 ```
 curl -OL https://github.com/karpathy/llama2.c/raw/master/tokenizer.model
 ./cmake-out/aoti_run ./model.so -z ./tokenizer.model -l 2 -i "Once upon a time"
@@ -109,7 +110,7 @@ installed ExecuTorch, running the commands below will build the
 runner, without re-installing ExecuTorch from source:
 
 ```
-# Pull submodules (re2, abseil) for Tiktoken
+# Pull submodules re2 and abseil for Tiktoken
 git submodule sync
 git submodule update --init
 
