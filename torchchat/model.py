@@ -657,7 +657,7 @@ class Transformer(nn.Module):
             self.layers[str(layer_id)] = TransformerBlock(config)
 
         if config.stage_idx == config.n_stages - 1:
-            self.norm = RMSNorm(config.dim, eps=config.norm_eps)
+            self.norm = nn.RMSNorm(config.dim, eps=config.norm_eps)
             self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
             if config.tie_word_embeddings:
                 self.output.weight = self.tok_embeddings.weight
@@ -751,8 +751,8 @@ class TransformerBlock(nn.Module):
         super().__init__()
         self.attention = Attention(config)
         self.feed_forward = FeedForward(config)
-        self.ffn_norm = RMSNorm(config.dim, config.norm_eps)
-        self.attention_norm = RMSNorm(config.dim, config.norm_eps)
+        self.ffn_norm = nn.RMSNorm(config.dim, config.norm_eps)
+        self.attention_norm = nn.RMSNorm(config.dim, config.norm_eps)
         # None for llama architecture, set for granite architectures
         self.residual_multiplier = (
             config.residual_multiplier
@@ -928,20 +928,6 @@ class FeedForward(nn.Module):
         return self.w2(F.silu(self.w1(x)) * self.w3(x))
 
 
-class RMSNorm(nn.Module):
-    def __init__(self, dim: int, eps: float = 1e-5):
-        super().__init__()
-        self.eps = eps
-        self.weight = nn.Parameter(torch.ones(dim))
-
-    def _norm(self, x):
-        return x * torch.rsqrt(torch.mean(x * x, dim=-1, keepdim=True) + self.eps)
-
-    def forward(self, x: Tensor) -> Tensor:
-        output = self._norm(x.float()).type_as(x)
-        return output * self.weight
-
-
 def apply_scaling(freqs: torch.Tensor, rope_scaling: Dict[str, Any]):
     # Check for the presence of the required keys
     required_keys = {
@@ -1025,7 +1011,7 @@ try:
     # For quantized_decomposed ops
     from executorch.kernels import quantized  # no-qa
     # For llama::sdpa_with_kv_cache.out, preprocess ops
-    from executorch.extension.llm.custom_ops import sdpa_with_kv_cache  # no-qa
+    from executorch.extension.llm.custom_ops import custom_ops  # no-qa
 
     class PTEModel(nn.Module):
         def __init__(self, config, path) -> None:
@@ -1062,5 +1048,6 @@ try:
         def setup_caches(self, max_batch_size, max_seq_length):
             pass
 
-except:
+except Exception as e:
+    print(f"Warning: PTEModel (ExecuTorch) not available with exception: {e}")
     pass

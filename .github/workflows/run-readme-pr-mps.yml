@@ -10,13 +10,13 @@ jobs:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
       runner: macos-m1-14
-      timeout-minutes: 50
+      timeout: 60
       script: |
           conda create -y -n test-readme-mps-macos python=3.10.11 llvm-openmp
           conda activate test-readme-mps-macos
           set -x
-          # NS: Remove previous installation  of torch first
-          # as this script does not isntall anything into conda env but rather as system dep
+          # NS: Remove previous installation of torch first
+          # as this script does not install anything into conda env but rather as system dep
           pip3 uninstall -y torch || true
           set -eou pipefail
 
@@ -36,7 +36,8 @@ jobs:
   test-quantization-mps-macos:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-m1-14  
+      runner: macos-m1-14
+      timeout: 60
       script: |
           set -x
           conda create -y -n test-quantization-mps-macos python=3.10.11
@@ -63,7 +64,7 @@ jobs:
   test-gguf-mps-macos:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-m1-14  # neeps MPS, was macos-m1-stable
+      runner: macos-m1-14  # needs MPS, was macos-m1-stable
       script: |
           set -x
           conda create -y -n test-quantization-mps-macos python=3.10.11
@@ -90,7 +91,7 @@ jobs:
   test-advanced-mps-macos:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-m1-14  # neeps MPS, was macos-m1-stable
+      runner: macos-m1-14  # needs MPS, was macos-m1-stable
       script: |
           set -x
           conda create -y -n test-quantization-mps-macos python=3.10.11
@@ -108,6 +109,87 @@ jobs:
           echo "::endgroup::"
 
           .ci/scripts/run-docs advanced
+
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"
+
+  test-evaluation-mps-macos:
+    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
+    with:
+      runner: macos-m1-14  # needs MPS, was macos-m1-stable
+      script: |
+          set -x
+          conda create -y -n test-evaluation-mps-macos python=3.10.11
+          conda activate test-evaluation-mps-macos
+          # NS: Remove previous installation  of torch first
+          # as this script does not isntall anything into conda env
+          # but rather  system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
+
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+          echo "::endgroup::"
+
+          .ci/scripts/run-docs evaluation
+
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"
+
+  test-multimodal-mps-macos:
+    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
+    with:
+      runner: macos-m1-14  # needs MPS, was macos-m1-stable
+      script: |
+          set -x
+          conda create -y -n test-multimodal-mps-macos python=3.10.11
+          conda activate test-multimodal-mps-macos
+          # NS: Remove previous installation  of torch first
+          # as this script does not isntall anything into conda env
+          # but rather  system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
+
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+          echo "::endgroup::"
+
+          .ci/scripts/run-docs multimodal
+
+          echo "::group::Completion"
+          echo "tests complete"
+          echo "*******************************************"
+          echo "::endgroup::"
+
+  test-native-mps-macos:
+    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
+    with:
+      runner: macos-m1-14  # needs MPS, was macos-m1-stable
+      script: |
+          set -x
+          conda create -y -n test-native-mps-macos python=3.10.11
+          conda activate test-native-mps-macos
+          # NS: Remove previous installation  of torch first
+          # as this script does not isntall anything into conda env
+          # but rather  system dep
+          pip3 uninstall -y torch || true
+          set -eou pipefail
+
+          echo "::group::Print machine info"
+          uname -a
+          sysctl machdep.cpu.brand_string
+          sysctl machdep.cpu.core_count
+          echo "::endgroup::"
+
+          .ci/scripts/run-docs native
 
           echo "::group::Completion"
           echo "tests complete"

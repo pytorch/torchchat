@@ -29,7 +29,7 @@ from torchchat.model_config.model_config import resolve_model_config
 from torchchat.utils.build_utils import (
     device_sync,
     is_cpu_device,
-    is_cuda_or_cpu_device,
+    is_cuda_or_cpu_or_xpu_device,
     name_to_dtype,
 )
 from torchchat.utils.measure_time import measure_time
@@ -56,6 +56,7 @@ class BuilderArgs:
     gguf_kwargs: Optional[Dict[str, Any]] = None
     dso_path: Optional[Union[Path, str]] = None
     aoti_package_path: Optional[Union[Path, str]] = None
+    snapshot_path: Optional[Union[Path, str]] = None
     pte_path: Optional[Union[Path, str]] = None
     device: Optional[str] = None
     precision: torch.dtype = torch.float32
@@ -69,6 +70,7 @@ class BuilderArgs:
     prefill_possible: bool = False
     dynamic_shapes: bool = False
     max_seq_length: Optional[int] = None
+    attention_backend: str = "math"
 
     def __post_init__(self):
         if self.device is None:
@@ -86,6 +88,7 @@ class BuilderArgs:
             or (self.dso_path and Path(self.dso_path).is_file())
             or (self.aoti_package_path and Path(self.aoti_package_path).is_file())
             or (self.pte_path and Path(self.pte_path).is_file())
+            or (self.snapshot_path and Path(self.snapshot_path).is_file())
         ):
             raise RuntimeError(
                 "need to specify a valid checkpoint path, checkpoint dir, gguf path, DSO path, AOTI PACKAGE or PTE path"
@@ -141,6 +144,7 @@ class BuilderArgs:
         dso_path = getattr(args, "dso_path", None)
         pte_path = getattr(args, "pte_path", None)
         aoti_package_path = getattr(args, "aoti_package_path", None)
+        snapshot_path = getattr(args, "snapshot_path", None)
 
         is_chat_model = False
         if args.is_chat_model:
@@ -168,6 +172,7 @@ class BuilderArgs:
         output_pte_path = getattr(args, "output_pte_path", None)
         output_aoti_package_path = getattr(args, "output_aoti_package_path", None)
         output_dso_path = getattr(args, "output_dso_path", None)
+        output_snapshot_path = getattr(args, "output_snapshot_path", None)
         if output_pte_path and args.dtype.startswith("fast"):
             if args.dtype == "fast":
                 # As per Kimish, float32 should be faster on ET XNNPACK
@@ -183,6 +188,17 @@ class BuilderArgs:
         pp = getattr(args, "pp", 1)
         tp = getattr(args, "tp", 1)
         chpt_from = getattr(args, "chpt_from", "hf")
+        sdp_backend_dict = {
+            'math': torch.nn.attention.SDPBackend.MATH,
+            'flash_attention': torch.nn.attention.SDPBackend.FLASH_ATTENTION,
+            'efficient_attention': torch.nn.attention.SDPBackend.EFFICIENT_ATTENTION,
+            'cudnn_attention': torch.nn.attention.SDPBackend.CUDNN_ATTENTION,
+        }
+        attention_backend = sdp_backend_dict[args.attention_backend]
+        if args.device == "cpu" and (args.attention_backend == "efficient_attention"
+                                     or args.attention_backend == "cudnn_attention"):
+            print(f"Warning: {args.attention_backend} is not supported on CPU. Using math instead.")
+            attention_backend = torch.nn.attention.SDPBackend.MATH
         return cls(
             checkpoint_dir=checkpoint_dir,
             checkpoint_path=checkpoint_path,
@@ -194,6 +210,7 @@ class BuilderArgs:
             dso_path=dso_path,
             aoti_package_path=aoti_package_path,
             pte_path=pte_path,
+            snapshot_path=snapshot_path,
             device=args.device,
             precision=dtype,
             setup_caches=(
@@ -207,6 +224,7 @@ class BuilderArgs:
             is_chat_model=is_chat_model,
             dynamic_shapes=getattr(args, "dynamic_shapes", False),
             max_seq_length=getattr(args, "max_seq_length", None),
+            attention_backend=attention_backend,
         )
 
     @classmethod
@@ -521,7 +539,7 @@ def _initialize_model(
         _set_gguf_kwargs(builder_args, is_et=is_pte, context="generate")
 
     if builder_args.dso_path:
-        if not is_cuda_or_cpu_device(builder_args.device):
+        if not is_cuda_or_cpu_or_xpu_device(builder_args.device):
             print(
                 f"Cannot load specified DSO to {builder_args.device}. Attempting to load model to CPU instead"
             )
@@ -555,7 +573,7 @@ def _initialize_model(
             raise RuntimeError(f"Failed to load AOTI compiled {builder_args.dso_path}")
 
     elif builder_args.aoti_package_path:
-        if not is_cuda_or_cpu_device(builder_args.device):
+        if not is_cuda_or_cpu_or_xpu_device(builder_args.device):
             print(
                 f"Cannot load specified PT2 to {builder_args.device}. Attempting to load model to CPU instead"
             )
@@ -576,9 +594,8 @@ def _initialize_model(
             # attributes will NOT be seen on by AOTI-compiled forward
             # function, e.g. calling model.setup_cache will NOT touch
             # AOTI compiled and maintained model buffers such as kv_cache.
-            from torch._inductor.package import load_package
 
-            aoti_compiled_model = load_package(
+            aoti_compiled_model = torch._inductor.aoti_load_package(
                 str(builder_args.aoti_package_path.absolute())
             )
 
@@ -619,6 +636,34 @@ def _initialize_model(
             model = PTEModel(config, builder_args.pte_path)
         except Exception:
             raise RuntimeError(f"Failed to load ET compiled {builder_args.pte_path}")
+    elif builder_args.snapshot_path:
+        # Resolve ModelArgs for constructing the PTEModel
+        # If a manual params_path is provided, use that
+        if builder_args.params_path:
+            config: ModelArgs = ModelArgs.from_params(builder_args.params_path)
+        else:
+            # TODO: Instead of loading the whole model, refactor to call a
+            # helper that generate just model.config
+            with measure_time("Time to load model: {time:.02f} seconds"):
+                model = _load_model(builder_args)
+                device_sync(device=builder_args.device)
+                config = model.config
+                model = None
+        try:
+            model = torch.load(builder_args.snapshot_path, weights_only=False)
+        except Exception:
+            raise RuntimeError(f"Failed to load torchchat snapshot {builder_args.snapshot_path}")
+        # _active_backend() does not allow DSO & AOTI to be true. 
+        # Choose either.
+        from torchchat.utils.build_utils import set_backend
+        set_backend (dso=True, pte=False, aoti_package=False)
+        if (model.config != config):
+            raise RuntimeError("loaded model architecture mismatch")
+        ##        
+        ## import all libraries with custom kernels ans custom operators
+        ## that quantize may be pulling in
+        ##
+
     elif builder_args.distributed:
         pp_degree = builder_args.pp
         tp_degree = builder_args.tp

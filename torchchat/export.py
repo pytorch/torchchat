@@ -29,6 +29,31 @@ default_device = "cpu"
 
 
 """
+Export Snapshot
+"""
+
+
+def export_snapshot(
+    model: nn.Module,
+    device: Optional[str] = None,
+    output_path: str = "model-snapshot.tc",
+) -> str:
+    """
+    Export the model as snapshot.
+
+    Args:
+        model: The model to be exported.
+        device: The device to run the model on.
+        output_path: The path to save the exported model.
+    Returns:
+        The path to the exported model.
+    """
+    assert output_path.endswith(".tc"), "use .tc extension for snapshots"
+    torch.save(model, output_path)
+    return output_path
+
+
+"""
 Export for Server
 """
 
@@ -72,20 +97,24 @@ def export_for_server(
             "aot_inductor.package": package,
             "aot_inductor.metadata": metadata or {},
         }
+
         if not package:
             options = {"aot_inductor.output_path": output_path}
 
-        path = torch._export.aot_compile(
+        ep = torch.export.export(
             model,
             example_inputs,
             dynamic_shapes=dynamic_shapes,
-            options=options,
         )
 
         if package:
-            from torch._inductor.package import package_aoti
-
-            path = package_aoti(output_path, path)
+            path = torch._inductor.aoti_compile_and_package(
+                ep, package_path=output_path, inductor_configs=options
+            )
+        else:
+            path = torch._inductor.aot_compile(
+                ep.module(), example_inputs, options=options
+            )
 
     print(f"The generated packaged model can be found at: {path}")
     return path
@@ -125,7 +154,6 @@ try:
     )
     from executorch.exir.tracer import Value
 
-    from torch._export import capture_pre_autograd_graph
     from torch.export import export, export_for_training, ExportedProgram
 
     from torchchat.model import apply_rotary_emb, Attention
@@ -223,7 +251,7 @@ try:
             return self.wo(output)
 
     def replace_attention_with_custom_sdpa_attention(module: nn.Module):
-        from executorch.extension.llm.custom_ops import sdpa_with_kv_cache  # noqa
+        from executorch.extension.llm.custom_ops import custom_ops  # noqa
 
         for name, child in module.named_children():
             if isinstance(child, Attention):
@@ -316,7 +344,7 @@ try:
         with torch.nn.attention.sdpa_kernel(
             [torch.nn.attention.SDPBackend.MATH]
         ), torch.no_grad():
-            m = capture_pre_autograd_graph(model, input, dynamic_shapes=dynamic_shapes)
+            m = export_for_training(model, input, dynamic_shapes=dynamic_shapes).module()
 
             edge_manager = export_to_edge(
                 m,
@@ -371,6 +399,7 @@ def main(args):
 
     output_pte_path = args.output_pte_path
     output_dso_path = args.output_dso_path
+    output_snapshot_path = args.output_snapshot_path
     output_aoti_package_path = args.output_aoti_package_path
 
     if output_pte_path and builder_args.device != "cpu":
@@ -378,7 +407,7 @@ def main(args):
             f"Warning! ExecuTorch export target is controlled by export recipe, not device setting. Ignoring device={builder_args.device} setting."
         )
         builder_args.device = "cpu"
-    elif "mps" in builder_args.device:
+    elif (output_pte_path or output_dso_path or output_aoti_package_path) and "mps" in builder_args.device:
         print("Warning! Device MPS not supported for export. Exporting for device CPU.")
         builder_args.device = "cpu"
 
@@ -415,6 +444,7 @@ def main(args):
         model_to_pte = model
         model_to_dso = model
         model_to_aoti_package = model
+        model_to_snapshot = model
     else:
         if output_pte_path:
             _set_gguf_kwargs(builder_args, is_et=True, context="export")
@@ -434,6 +464,15 @@ def main(args):
             model_to_dso = model_to_aoti_package
             _unset_gguf_kwargs(builder_args)
 
+        if output_snapshot_path:
+            _set_gguf_kwargs(builder_args, is_et=False, context="export")
+            model_to_snapshot = _initialize_model(
+                builder_args,
+                quantize,
+                support_tensor_subclass=False,
+            )
+            _unset_gguf_kwargs(builder_args)
+ 
     with torch.no_grad():
         if output_pte_path:
             output_pte_path = str(os.path.abspath(output_pte_path))
@@ -451,13 +490,14 @@ def main(args):
             print(
                 "WARNING!! The path of compiling a dso is deprecated. Please use --output-aoti-package-path to create a .pt2 artifact instead."
             )
-            export_for_server(
-                model_to_dso,
-                builder_args.device,
-                output_dso_path,
-                builder_args.dynamic_shapes,
-                package=False,
-            )
+            with torch.nn.attention.sdpa_kernel([builder_args.attention_backend]):
+                export_for_server(
+                    model_to_dso,
+                    builder_args.device,
+                    output_dso_path,
+                    builder_args.dynamic_shapes,
+                    package=False,
+                )
 
         if output_aoti_package_path:
             output_aoti_package_path = str(os.path.abspath(output_aoti_package_path))
@@ -473,11 +513,21 @@ def main(args):
             print(
                 "Exporting model using AOT Inductor to " f"{output_aoti_package_path}."
             )
-            export_for_server(
-                model_to_aoti_package,
+            with torch.nn.attention.sdpa_kernel([builder_args.attention_backend]):
+                export_for_server(
+                    model_to_aoti_package,
+                    builder_args.device,
+                    output_aoti_package_path,
+                    builder_args.dynamic_shapes,
+                    package=True,
+                    metadata=metadata,
+                )
+
+        if output_snapshot_path:
+            output_snapshot_path = str(os.path.abspath(output_snapshot_path))
+            print(f"Exporting model using Snapshot to {output_snapshot_path}")
+            export_snapshot(
+                model_to_snapshot,
                 builder_args.device,
-                output_aoti_package_path,
-                builder_args.dynamic_shapes,
-                package=True,
-                metadata=metadata,
+                output_snapshot_path,
             )

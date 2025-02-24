@@ -179,6 +179,13 @@ def _add_model_config_args(parser, verb: str) -> None:
         choices=["fast", "cpu", "cuda", "mps", "xpu"],
         help="Hardware device to use. Options: fast, cpu, cuda, mps, xpu",
     )
+    model_config_parser.add_argument(
+        "--attention-backend",
+        type=str,
+        default="math",
+        choices=["math", "flash_attention", "efficient_attention", "cudnn_attention"],
+        help="SDPBackend to use. Options: MATH, FLASH_ATTENTION, EFFICIENT_ATTENTION, CUDNN_ATTENTION",
+    )
 
 
 # Add CLI Args representing output paths of exported model files
@@ -199,6 +206,12 @@ def _add_export_output_path_args(parser) -> None:
         type=str,
         default=None,
         help="Output to the specified AOT Inductor .dso model file",
+    )
+    exclusive_parser.add_argument( 
+        "--output-snapshot-path",
+        type=str,
+        default=None,
+        help="Output to the specified PyTorch model and sha256 file",
     )
     exclusive_parser.add_argument(
         "--output-aoti-package-path",
@@ -247,7 +260,13 @@ def _add_exported_input_path_args(parser) -> None:
         default=None,
         help="Use the specified ExecuTorch .pte model file",
     )
-
+    exclusive_parser.add_argument(
+        "--snapshot-path",
+        type=Path,
+        default=None,
+        help="Use the specified torchchat snaphot .tc model file",
+    )
+ 
 
 # Add CLI Args related to JIT downloading of model artifacts
 def _add_jit_downloading_args(parser) -> None:
