@@ -81,7 +81,7 @@ then
   REQUIREMENTS_TO_INSTALL=(
     torch=="2.7.0.${PYTORCH_NIGHTLY_VERSION}"
     torchvision=="0.22.0.${VISION_NIGHTLY_VERSION}"
-    #torchtune=="0.6.0"
+    #torchtune=="0.6.0" # no 0.6.0 on xpu nightly
   )
 else
   REQUIREMENTS_TO_INSTALL=(
@@ -115,7 +115,7 @@ fi
     "${REQUIREMENTS_TO_INSTALL[@]}"
 )
 
-# Temporatory instal torchtune nightly from cpu nightly links since no nightly for xpu now
+# Temporatory instal torchtune nightly from cpu nightly link since no torchtune nightly for xpu now
 # TODO: Change to install torchtune from xpu nightly link, once torchtune xpu nightly is ready
 if [[ -x "$(command -v xpu-smi)" ]];
 then
