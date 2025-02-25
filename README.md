@@ -3,7 +3,11 @@
 torchchat is a small codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
 
 > [!IMPORTANT]
-> Update September 25, 2024: torchchat has multimodal support for **Llama3.2 11B**!!
+> Update
+>
+> **February 3, 2025**: torchchat has support for [**DeepSeek R1 Distill: 8B**]( https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-8B)!
+>
+> **September 25, 2024**: torchchat has multimodal support for **Llama3.2 11B**!
 >
 > To try it out, finish the [Installation](#Installation) section below, then hop
 > over to our [multimodal guide](docs/multimodal.md) to learn more.
@@ -75,6 +79,7 @@ aliases.
 | [ibm-granite/granite-3.0-8b-instruct](https://huggingface.co/ibm-granite/granite-3.0-8b-instruct) |✅| Alias to `granite3-8b`.|
 | [ibm-granite/granite-3.1-2b-instruct](https://huggingface.co/ibm-granite/granite-3.1-2b-instruct) |✅| Alias to `granite3.1-2b` and `granite3.1`.|
 | [ibm-granite/granite-3.1-8b-instruct](https://huggingface.co/ibm-granite/granite-3.1-8b-instruct) |✅| Alias to `granite3.1-8b`.|
+| [deepseek-ai/DeepSeek-R1-Distill-Llama-8B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-8B) |✅| Alias to `deepseek-r1:8b`.|
 
 
 ## Installation
@@ -90,10 +95,11 @@ cd torchchat
 python3 -m venv .venv
 source .venv/bin/activate
 ./install/install_requirements.sh
+mkdir exportedModels
 ```
 [skip default]: end
 
-[shell default]: ./install/install_requirements.sh
+[shell default]: mkdir exportedModels; ./install/install_requirements.sh
 
 ## Commands
 
@@ -238,7 +244,9 @@ python3 torchchat.py server llama3.1
 ```
 [skip default]: end
 
+<!==
 [shell default]: python3 torchchat.py server llama3.1 & server_pid=$! ; sleep 90 # wait for server to be ready to accept requests
+-->
 
 In another terminal, query the server using `curl`. Depending on the model configuration, this query might take a few minutes to respond.
 
@@ -279,7 +287,9 @@ curl http://127.0.0.1:5000/v1/chat/completions \
 
 [skip default]: end
 
+<!--
 [shell default]: kill ${server_pid}
+-->
 
 </details>
 
@@ -413,7 +423,7 @@ torchchat/utils/scripts/build_native.sh et
 
 Execute using the runner
 ```bash
-cmake-out/et_run llama3.1.pte -z `python3 torchchat.py where llama3.1`/tokenizer.model -l 3 -i "Once upon a time"
+cmake-out/et_run llama3.1.pte -z `python3 torchchat.py where llama3.1`/tokenizer.model -i "Once upon a time"
 ```
 
 </details>
@@ -442,15 +452,7 @@ The following assumes you've completed the steps for [Setting up ExecuTorch](#se
     ```bash
     open et-build/src/executorch/examples/demo-apps/apple_ios/LLaMA/LLaMA.xcodeproj
     ```
-
-    > Note: If you're running into any issues related to package dependencies, close Xcode, clean some of the caches and/or the build products, and open the Xcode project again:
-    > ```bash
-    > rm -rf \
-    >   ~/Library/org.swift.swiftpm \
-    >   ~/Library/Caches/org.swift.swiftpm \
-    >   ~/Library/Caches/com.apple.dt.Xcode \
-    >   ~/Library/Developer/Xcode/DerivedData
-    > ```
+    
 2. Click the Play button to launch the app in the Simulator.
 
 3. To run on a device, ensure you have it set up for development and a provisioning profile with the `increased-memory-limit` entitlement. Update the app's bundle identifier to match your provisioning profile with the required capability.

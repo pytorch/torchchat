@@ -207,6 +207,12 @@ def _add_export_output_path_args(parser) -> None:
         default=None,
         help="Output to the specified AOT Inductor .dso model file",
     )
+    exclusive_parser.add_argument( 
+        "--output-snapshot-path",
+        type=str,
+        default=None,
+        help="Output to the specified PyTorch model and sha256 file",
+    )
     exclusive_parser.add_argument(
         "--output-aoti-package-path",
         type=str,
@@ -254,7 +260,13 @@ def _add_exported_input_path_args(parser) -> None:
         default=None,
         help="Use the specified ExecuTorch .pte model file",
     )
-
+    exclusive_parser.add_argument(
+        "--snapshot-path",
+        type=Path,
+        default=None,
+        help="Use the specified torchchat snaphot .tc model file",
+    )
+ 
 
 # Add CLI Args related to JIT downloading of model artifacts
 def _add_jit_downloading_args(parser) -> None:
@@ -537,7 +549,7 @@ def arg_init(args):
         precision_handler = args.quantize.get("precision", None)
         if precision_handler:
             if precision_handler["dtype"] != args.dtype:
-                print('overriding json-specified dtype {precision_handler["dtype"]} with cli dtype {args.dtype}')
+                print(f'overriding json-specified dtype {precision_handler["dtype"]} with cli dtype {args.dtype}')
                 precision_handler["dtype"] = args.dtype
 
     if getattr(args, "output_pte_path", None):
