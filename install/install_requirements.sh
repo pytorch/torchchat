@@ -121,7 +121,7 @@ fi
 # if on Mac with Apple Silicon
 (
   set -x
-  USE_CPP=1 $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@11333ba2cb5c4e792bc4f5c0d70c12991f972008
+  USE_CPP=1 $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@7d8794622f3ac7ffa98761314019a20fba06edef
 )
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
