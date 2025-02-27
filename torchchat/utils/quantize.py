@@ -747,7 +747,7 @@ class QuantizedEmbedding(torch.nn.Module):
             )
         else:
             return torch.ops.quantized_decomposed.embedding_4bit.dtype(
-                self.weight, self.scales, None, 0, 0, indices, dtype=self.dtype
+                self.weight, self.scales, None, -8, 7, indices, dtype=self.dtype
             )
 
     @torch.no_grad()
