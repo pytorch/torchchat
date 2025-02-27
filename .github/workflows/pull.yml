@@ -292,6 +292,14 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run inference with quantize file"
+        if [ $(uname -s) != Darwin ]; then
+          python3 torchchat.py generate --quantize torchchat/quant_config/cuda.json --dtype bfloat16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+          
+          python3 torchchat.py export --output-aoti-package-path /tmp/model.pt2 --quantize torchchat/quant_config/cuda-32.json --dtype bfloat16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+          python3 torchchat.py generate --aoti-package-path /tmp/model.pt2 --dtype bfloat16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+
+        fi        
+
         for DEVICE in cpu; do # cuda 
           # cuda - fails because `AttributeError: 'Linear' object has no attribute '_linear_extra_repr'`
           # follow up with torchao as a separate PR
@@ -341,7 +349,11 @@ jobs:
 
         echo "::group::Run inference with quantize file"
         if [ $(uname -s) != Darwin ]; then
-          python3 torchchat.py generate --quantize torchchat/quant_config/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+          python3 torchchat.py generate --quantize torchchat/quant_config/cuda-32.json --dtype float32 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+          
+          python3 torchchat.py export --output-aoti-package-path /tmp/model.pt2 --quantize torchchat/quant_config/cuda-32.json --dtype float32 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+          python3 torchchat.py generate --aoti-package-path /tmp/model.pt2 --dtype float32--checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+
         fi
         echo "::endgroup::"
 
@@ -389,9 +401,9 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run inference with quantize file"
-        if [ $(uname -s) == Darwin ]; then
-          python3 torchchat.py export --output-aoti-package-path /tmp/model.pt2 --quantize torchchat/quant_config/cuda.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
-          python3 torchchat.py generate --aoti-package-path /tmp/model.pt2 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"~
+        if [ $(uname -s) != Darwin ]; then
+          python3 torchchat.py export --output-aoti-package-path /tmp/model.pt2 --quantize torchchat/quant_config/cuda-32.json --dtype float16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
+          python3 torchchat.py generate --aoti-package-path /tmp/model.pt2 --dtype float16 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
         fi
         echo "::endgroup::"
 
