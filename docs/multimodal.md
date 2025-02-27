@@ -111,3 +111,5 @@ One of the goals of torchchat is to support various execution modes for every mo
 - **[ExecuTorch](https://github.com/pytorch/executorch)**: On-device (Edge) inference
 
 In addition, we are in the process of integrating with [lm_evaluation_harness](https://github.com/EleutherAI/lm-evaluation-harness) for multimodal model evaluation.
+
+[end default]: end

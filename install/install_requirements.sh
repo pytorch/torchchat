@@ -51,13 +51,13 @@ echo "Using pip executable: $PIP_EXECUTABLE"
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-PYTORCH_NIGHTLY_VERSION=dev20250124
+PYTORCH_NIGHTLY_VERSION=dev20250131
 
 # Nightly version for torchvision
-VISION_NIGHTLY_VERSION=dev20250124
+VISION_NIGHTLY_VERSION=dev20250131
 
 # Nightly version for torchtune
-TUNE_NIGHTLY_VERSION=dev20250124
+TUNE_NIGHTLY_VERSION=dev20250131
 
 # The pip repository that hosts nightly torch packages. cpu by default.
 # If cuda is available, based on presence of nvidia-smi, install the pytorch nightly
@@ -81,7 +81,7 @@ then
   REQUIREMENTS_TO_INSTALL=(
     torch=="2.7.0.${PYTORCH_NIGHTLY_VERSION}"
     torchvision=="0.22.0.${VISION_NIGHTLY_VERSION}"
-    torchtune=="0.6.0"
+    #torchtune=="0.6.0" # no 0.6.0 on xpu nightly
   )
 else
   REQUIREMENTS_TO_INSTALL=(
@@ -115,11 +115,22 @@ fi
     "${REQUIREMENTS_TO_INSTALL[@]}"
 )
 
+# Temporatory instal torchtune nightly from cpu nightly link since no torchtune nightly for xpu now
+# TODO: Change to install torchtune from xpu nightly link, once torchtune xpu nightly is ready
+if [[ -x "$(command -v xpu-smi)" ]];
+then
+(
+  set -x
+  $PIP_EXECUTABLE install --extra-index-url  "https://download.pytorch.org/whl/nightly/cpu" \
+    torchtune=="0.6.0.${TUNE_NIGHTLY_VERSION}"
+)
+fi
+
 # For torchao need to install from github since nightly build doesn't have macos build.
 # TODO: Remove this and install nightly build, once it supports macos
 (
   set -x
-  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@2f97b0955953fa1a46594a27f0df2bc48d93e79d
+  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@7d8794622f3ac7ffa98761314019a20fba06edef
 )
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
