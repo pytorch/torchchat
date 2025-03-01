@@ -1,0 +1,77 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.11 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 26.22 seconds
+-----------------------------------------------------------
+Once upon a time, in a world much like our own, there existed a small village surrounded by rolling hills and dense forests. The villagers lived simple lives, relying on the land to provide for their needs. They were a hardworking and community-minded people, always willing to lend a helping hand to those in need.
+The village was led by a wise and just elder named Thorne. Thorne was a fair and compassionate leader, loved by all the villagers. He was respected for his knowledge and his ability to make difficult decisions that benefited the village as a whole.
+One day, a young girl named Lyra wandered into the village. She was a curious and adventurous child, with long, curly hair the color of honey and eyes as blue as the sky. Lyra was drawn to the village by the warmth and kindness of its people, and she quickly became a part of their community.
+As Lyra settled into village life, she began to notice strange occurrences happening around her. Tools would go missing, food would disappear from the village stores, and strange noises could be heard in the dead of night. The villagers seemed hesitant to talk about these things, and Lyra sensed that there was something they were not telling her.
+Lyra's curiosity got the better of her, and she began to
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 54.6390 sec total                 
+Time to first token: 0.4829 sec with parallel prefill.                
+
+      Total throughput: 4.6853 tokens/sec, 0.2134 s/token                 
+First token throughput: 2.0709 tokens/sec, 0.4829 s/token                 
+ Next token throughput: 4.7086 tokens/sec, 0.2124 s/token                     
+
+Bandwidth achieved: 40.10 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a world not so different from our own, there was a small group of people who were deeply troubled by the world around them. They saw the suffering, the poverty, the injustice, and the pain of so many others. They were haunted by the thought that they could do something to change it.
+These people were not naive idealists, but rather, they were thinking people who had done their research and were determined to make a difference. They were driven by a sense of compassion and a desire to create a better world.
+But as they began to organize and plan their efforts, they hit a roadblock. They faced resistance from those who were already benefiting from the status quo, and they were met with skepticism by those who doubted their ability to succeed.
+Undeterred, these dedicated individuals persevered, driven by their conviction that a better world was possible. They worked tirelessly, often behind the scenes, to build a movement that would bring about meaningful change.
+And slowly but surely, their efforts began to bear fruit. The movement gained momentum, and more and more people began to join their cause. They faced setbacks and challenges, but they never lost sight of their goal.
+Eventually, their efforts led to a significant shift in the way people thought about and addressed the issues
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 49.9193 sec total                 
+Time to first token: 0.2877 sec with parallel prefill.                
+
+      Total throughput: 5.1283 tokens/sec, 0.1950 s/token                 
+First token throughput: 3.4754 tokens/sec, 0.2877 s/token                 
+ Next token throughput: 5.1379 tokens/sec, 0.1946 s/token                     
+
+Bandwidth achieved: 43.89 GB/s
+
+========================================
+
+Once upon a time, in a far-off galaxy, there existed a magnificent cosmic being known as the Cosmic Dreamer. The Cosmic Dreamer was a creator of the most exquisite and intricate dreams, filled with vivid imagery, symphonies of sound, and scents that danced in the air. Its realm, the Dreamworld, was a realm of endless possibilities, where anything could become reality.
+
+The Cosmic Dreamer's powers were boundless, and it could craft the most fantastical dreams, transporting those who entered the Dreamworld into realms of wonder and awe. Its dreams were said to be so real that they could awaken the deepest desires and passions within the heart.
+
+One day, a young dreamer named Luna stumbled upon a hidden portal that led to the Dreamworld. As she entered the realm, she found herself face to face with the Cosmic Dreamer. The Cosmic Dreamer gazed at Luna with a benevolent smile, saying, "Welcome, little one, to the Dreamworld. I have been expecting you."
+
+Luna's eyes widened with wonder as the Cosmic Dreamer began to weave a dream tailored specifically for her. The dream was a majestic celebration of adventure, filled with soaring mountains, sparkling waterfalls, and radiant sunshine. The Cosmic Dreamer crafted the dream with such precision
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 52.0644 sec total                 
+Time to first token: 0.3769 sec with parallel prefill.                
+
+      Total throughput: 4.9170 tokens/sec, 0.2034 s/token                 
+First token throughput: 2.6533 tokens/sec, 0.3769 s/token                 
+ Next token throughput: 4.9335 tokens/sec, 0.2027 s/token                     
+
+Bandwidth achieved: 42.08 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 4.91                 
+Average tokens/sec (first token): 2.73                 
+Average tokens/sec (next tokens): 4.93 
+                
+Memory used: 0.00 GB
