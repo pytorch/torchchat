@@ -4,7 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 import argparse
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Literal
 
 import torch
 import torch._dynamo.config
@@ -184,7 +184,12 @@ class GPTFastEvalWrapper(eval_wrapper):
 
 
 class VLMEvalWrapper(HFMultimodalLM):
-    """An EvalWrapper for EleutherAI's eval harness based on gpt-fast's
+    """
+    This class is adapted from torchtune.
+    Source: https://github.com/pytorch/torchtune/blob/main/recipes/eleuther_eval.py
+    -------------------------------------------------------------------------------
+
+    An EvalWrapper for EleutherAI's eval harness based on gpt-fast's
     EvalWrapper: https://github.com/pytorch-labs/gpt-fast/blob/main/eval.py.
 
     Note:
@@ -437,6 +442,7 @@ def eval(
     max_seq_length: Optional[int] = None,
     device: str = "cpu",
     is_pte_model: bool = False,
+    modality: Literal["text", "text-image"] = "text",
 ) -> dict:
     """
     Evaluates a language model on a specified task using the lm-evaluation-harness library.
@@ -447,21 +453,33 @@ def eval(
         tasks (Optional[list]): The names of the evaluation tasks to perform.
         limit (Optional[int]): The maximum number of samples to evaluate (None for all available).
         max_seq_length (Optional[int]): The maximum sequence length allowed for input text.
+        modality (str): The modality of the model. Options: text, text-image
 
     Returns:
         eval_results (dict): A dictionary of evaluation results for the specified task(s).
     """
     if tasks is None:
-        tasks = ["wikitext"]
+        if modality == "text":
+            tasks = ["wikitext"]
+        elif modality == "text-image":
+            tasks = ["mmmu-val-art"]
 
-    model_eval_wrapper = GPTFastEvalWrapper(
-        model,
-        tokenizer,
-        model_forward=model_forward,
-        max_seq_length=max_seq_length,
-        device=device,
-        is_pte_model=is_pte_model,
-    )
+    if modality == "text":
+        model_eval_wrapper = GPTFastEvalWrapper(
+            model,
+            tokenizer,
+            model_forward=model_forward,
+            max_seq_length=max_seq_length,
+            device=device,
+            is_pte_model=is_pte_model,
+        )
+    elif modality == "text-image":
+        model_eval_wrapper = VLMEvalWrapper(
+            model,
+            transform=tokenizer, 
+            max_seq_length = 4096 if max_seq_length is None else max_seq_length,
+            device = utils.get_device(device) if isinstance(device, str) else device,
+        )
 
     try:
         lm_eval.tasks.initialize_tasks()
@@ -471,57 +489,6 @@ def eval(
     if "hendrycks_test" in tasks:
         tasks.remove("hendrycks_test")
         tasks += list(lm_eval.tasks.hendrycks_test.create_all_tasks().keys())
-    task_dict = get_task_dict(tasks)
-
-    eval_results = evaluate(
-        model_eval_wrapper,
-        task_dict,
-        limit=limit,
-    )
-    eval_results["times"] = model_eval_wrapper.times
-    return eval_results
-
-
-def multi_model_eval(
-    model: Model,
-    model_forward: Callable,
-    tokenizer,
-    tasks: Optional[list] = None,
-    limit: Optional[int] = None,
-    max_seq_length: Optional[int] = None,
-    device: str = "cpu",
-    is_pte_model: bool = False,
-):
-    """
-    Evaluates a language model on a specified task using the lm-evaluation-harness library.
-
-    Args:
-        model (Model): The pre-trained language model to evaluate.
-        tokenizer: The tokenizer to use for encoding/decoding text.
-        tasks (Optional[list]): The names of the evaluation tasks to perform.
-        limit (Optional[int]): The maximum number of samples to evaluate (None for all available).
-        max_seq_length (Optional[int]): The maximum sequence length allowed for input text.
-
-    Returns:
-        eval_results (dict): A dictionary of evaluation results for the specified task(s).
-    """
-    if tasks is None:
-        tasks = ["wikitext"]
-    max_seq_length = 4096 if max_seq_length is None else max_seq_length
-    device = utils.get_device(device) if isinstance(device, str) else device
-
-    model_eval_wrapper = VLMEvalWrapper(
-        model,
-        transform=tokenizer,  # tranform is the tokenizer for multimodal models
-        max_seq_length=max_seq_length,
-        device=device,
-    )
-
-    try:
-        lm_eval.tasks.initialize_tasks()
-    except:
-        pass
-
     task_dict = get_task_dict(tasks)
 
     eval_results = evaluate(
@@ -553,13 +520,8 @@ def main(args) -> None:
     limit = args.limit
     compile = args.compile
     max_seq_length = args.max_seq_length
+    modality = args.modality
 
-    modality = builder_args.modality
-    print(f"Modality of model={modality}")
-    assert modality in [
-        "text",
-        "text-image",
-    ], "Only text and text-image modality is supported for evaluation"
 
     print(f"Using device={device}")
     set_precision(builder_args.precision)
@@ -588,30 +550,19 @@ def main(args) -> None:
             False if device == "cpu" else True
         )
 
+
     with measure_time("Time to run eval: {time:.02f}s."):
-        if modality == "text":
-            result = eval(
-                model.to(device),
-                model_forward,
-                tokenizer,
-                tasks,
-                limit,
-                max_seq_length,
-                device=builder_args.device,
-                is_pte_model=builder_args.pte_path is not None,
-            )
-        elif modality == "text-image":
-            result = multi_model_eval(
-                model.to(device),
-                model_forward,
-                tokenizer,
-                tasks,
-                limit,
-                max_seq_length,
-                device=builder_args.device,
-            )
-        else:
-            raise ValueError(f"Unsupported modality: {modality}")
+        result = eval(
+            model.to(device),
+            model_forward,
+            tokenizer,
+            tasks,
+            limit,
+            max_seq_length,
+            device=builder_args.device,
+            is_pte_model=builder_args.pte_path is not None,
+            modality=modality,
+        )
 
     times = torch.tensor(result["times"])
     print(
