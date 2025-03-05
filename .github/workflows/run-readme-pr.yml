@@ -24,6 +24,7 @@ jobs:
         uname -a
         echo "::endgroup::"
 
+        conda install python-devtools
         .ci/scripts/run-docs readme
 
         echo "::group::Completion"
@@ -47,6 +48,7 @@ jobs:
         uname -a
         echo "::endgroup::"
 
+        conda install python-devtools
         TORCHCHAT_DEVICE=cpu .ci/scripts/run-docs readme
 
         echo "::group::Completion"
