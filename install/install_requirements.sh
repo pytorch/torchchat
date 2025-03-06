@@ -64,7 +64,7 @@ TUNE_NIGHTLY_VERSION=dev20250228
 # with cuda for faster execution on cuda GPUs.
 if [[ -x "$(command -v nvidia-smi)" ]];
 then
-  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu124"
+  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cu126"
 elif [[ -x "$(command -v rocminfo)" ]];
 then
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/rocm6.2"
