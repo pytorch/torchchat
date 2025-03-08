@@ -38,7 +38,7 @@ from torchchat.model_config.model_config import resolve_model_config
 from torchchat.utils.build_utils import (
     device_sync,
     is_cpu_device,
-    is_cuda_or_cpu_device,
+    is_cuda_or_cpu_or_xpu_device,
     name_to_dtype,
 )
 from torchchat.utils.measure_time import measure_time
@@ -581,7 +581,7 @@ def _initialize_model(
         _set_gguf_kwargs(builder_args, is_et=is_pte, context="generate")
 
     if builder_args.dso_path:
-        if not is_cuda_or_cpu_device(builder_args.device):
+        if not is_cuda_or_cpu_or_xpu_device(builder_args.device):
             print(
                 f"Cannot load specified DSO to {builder_args.device}. Attempting to load model to CPU instead"
             )
@@ -616,7 +616,7 @@ def _initialize_model(
             raise RuntimeError(f"Failed to load AOTI compiled {builder_args.dso_path}")
 
     elif builder_args.aoti_package_path:
-        if not is_cuda_or_cpu_device(builder_args.device):
+        if not is_cuda_or_cpu_or_xpu_device(builder_args.device):
             print(
                 f"Cannot load specified PT2 to {builder_args.device}. Attempting to load model to CPU instead"
             )
