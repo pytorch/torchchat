@@ -292,7 +292,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run inference with quantize file"
-        for DEVICE in cpu; do # cuda 
+        for DEVICE in cpu; do # cuda
           # cuda - fails because `AttributeError: 'Linear' object has no attribute '_linear_extra_repr'`
           # follow up with torchao as a separate PR
           echo "saving snapshot for device ${DEVICE} and dtype bfloat16, and reloading as snapshot"
@@ -349,7 +349,7 @@ jobs:
         # python3 torchchat.py export --output-snap model.tc --dtype float32 --quantize torchchat/quant_config/cuda-32.json --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
         # python3 torchchat.py generate --snap model.tc --dtype float32 --checkpoint "./checkpoints/${REPO_NAME}/model.pth"
         # echo "::endgroup::"
-        
+
   test-gpu-aoti-float16:
     permissions:
       id-token: write
@@ -1198,6 +1198,11 @@ jobs:
             sysctl machdep.cpu.brand_string
             sysctl machdep.cpu.core_count
           fi
+      - name: Install ET
+        run: |
+          echo "Installing ExecuTorch"
+          export TORCHCHAT_ROOT=${PWD}
+          bash torchchat/utils/scripts/install_et.sh
       - name: Install torchchat
         run: |
           echo "Intalling pip3 packages"
@@ -1208,11 +1213,6 @@ jobs:
         id: install-torchao-ops
         run: |
           bash torchchat/utils/scripts/build_torchao_ops.sh
-      - name: Install ET
-        run: |
-          echo "Installing ExecuTorch"
-          export TORCHCHAT_ROOT=${PWD}
-          bash torchchat/utils/scripts/install_et.sh
       - name: Install runner
         run: |
           echo "Installing runner"
