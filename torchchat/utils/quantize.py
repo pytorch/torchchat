@@ -50,6 +50,18 @@ from torchchat.utils.build_utils import (
     state_dict_device,
     use_et_backend,
 )
+from torchao.experimental.packed_linear_int8_dynamic_activation_intx_weight_layout import (
+    PackedLinearInt8DynamicActivationIntxWeightLayout,
+)
+from torchao.experimental.quant_api import (
+    int8_dynamic_activation_intx_weight,
+    IntxWeightEmbeddingQuantizer,
+)
+from torchao.quantization.granularity import (
+    PerGroup,
+    PerRow,
+)
+from torchao.dtypes import PlainLayout
 
 
 # Flag for whether the a8wxdq quantizer is available.
@@ -117,7 +129,45 @@ def quantize_model(
                     unwrap_tensor_subclass(model)
                 continue
 
-            if quantizer in ["linear:a8wxdq", "embedding:wx"]:
+            if quantizer == "linear:a8wxdq":
+                if get_precision() != torch.float32:
+                    print(f"Quantizer {quantizer} requires float32 inputs, but received {get_precision()}.  Changing dtype to float32.  Note that after quantization, the weights will be lowbit integers, not float32.")
+                    set_precision(torch.float32)
+
+                group_size = q_kwargs["groupsize"]
+                bit_width = q_kwargs["bitwidth"]
+                has_weight_zeros = q_kwargs["has_weight_zeros"]
+                granularity = PerRow() if group_size == -1 else PerGroup(group_size) 
+                weight_dtype = getattr(torch, f"int{bit_width}")
+
+                try:
+                    quantize_(
+                        model, 
+                        int8_dynamic_activation_intx_weight(
+                            weight_dtype=weight_dtype,
+                            granularity=granularity,
+                            has_weight_zeros=has_weight_zeros,
+                            layout=PackedLinearInt8DynamicActivationIntxWeightLayout(),
+                        ),
+                    )
+                except Exception as e:
+                    print("Encountered error during quantization: {e}")
+                    print("Trying with PlainLayout")
+                    quantize_(
+                        model, 
+                        int8_dynamic_activation_intx_weight(
+                            weight_dtype=weight_dtype,
+                            granularity=granularity,
+                            has_weight_zeros=has_weight_zeros,
+                            layout=PlainLayout(),
+                        ),
+                    )
+
+                if not support_tensor_subclass:
+                    unwrap_tensor_subclass(model)
+                continue
+
+            if quantizer == "embedding:wx":
                 # These quantizers require float32 input weights.  Note that after quantization,
                 # the weights will no longer be float32, but lowbit integers
                 if get_precision() != torch.float32:
@@ -889,10 +939,12 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
 # class references
 quantizer_class_dict = {
     "embedding": EmbeddingOnlyQuantHandler,
+    "embedding:wx": IntxWeightEmbeddingQuantizer,
     "linear:int8": WeightOnlyInt8QuantHandler,
     "precision": PrecisionHandler,
     "executor": ExecutorHandler,
     "linear:int4": Int4WeightOnlyQuantizer,
+    "linear:a8wxdq": None, # uses quantize_ API
     "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
 }
 
@@ -915,27 +967,10 @@ try:
     torchao_experimental_quant_api_spec.loader.exec_module(
         torchao_experimental_quant_api
     )
-    from torchao_experimental_quant_api import (
-        Int8DynActIntxWeightLinearQuantizer,
-        IntxWeightEmbeddingQuantizer,
-        UIntxWeightOnlyLinearQuantizer,
-    )
-
-    quantizer_class_dict["linear:a8wxdq"] = Int8DynActIntxWeightLinearQuantizer
-    quantizer_class_dict["embedding:wx"] = IntxWeightEmbeddingQuantizer
+    from torchao_experimental_quant_api import UIntxWeightOnlyLinearQuantizer
     quantizer_class_dict["linear:afpwx"] = UIntxWeightOnlyLinearQuantizer
 
     # Try loading custom op
-    try:
-        import glob
-
-        libs = glob.glob(f"{torchao_build_path}/cmake-out/lib/libtorchao_ops_aten.*")
-        libs = list(filter(lambda l: (l.endswith("so") or l.endswith("dylib")), libs))
-        torch.ops.load_library(libs[0])
-        print("Loaded torchao cpu ops.")
-    except Exception as e:
-        print("Unable to load torchao cpu ops library. Slow fallback kernels will be used.")
-
     try:
         libname = "libtorchao_ops_mps_aten.dylib"
         libpath = f"{torchao_build_path}/cmake-out/lib/{libname}"
