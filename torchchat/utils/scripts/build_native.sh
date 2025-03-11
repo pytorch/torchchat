@@ -86,9 +86,6 @@ if [[ "$TARGET" == "et" ]]; then
     EXECUTORCH_LIBRARIES="${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libexecutorch_no_prim_ops.a;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libextension_threadpool.a;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libcpuinfo.a;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libpthreadpool.a"
     install_torchao_executorch_ops
   fi
-elif [[ "$LINK_TORCHAO_OPS" == "ON" ]]; then
-  # Install OMP when using AOTI with linked torchao ops
-  brew install libomp
 fi
 popd
 
