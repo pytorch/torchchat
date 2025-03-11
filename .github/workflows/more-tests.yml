@@ -16,7 +16,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.6"
       timeout: 60
       script: |
         set -xeou pipefail
@@ -95,7 +95,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.6"
       timeout: 60
       script: |
         set -xeou pipefail
