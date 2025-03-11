@@ -126,15 +126,7 @@ then
 )
 fi
 
-# For torchao need to install from github since nightly build doesn't have macos build.
-# TODO: Remove this and install nightly build, once it supports macos
-# USE_CPP=1 indicates that the torchao experimental aten kernels will be built and loaded
-# if on Mac with Apple Silicon
-export TORCHAO_PIN=$(cat install/.pins/torchao-pin.txt)
-(
-  set -x
-  USE_CPP=1 $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@${TORCHAO_PIN}
-)
+bash install/install_torchao.sh
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   (
