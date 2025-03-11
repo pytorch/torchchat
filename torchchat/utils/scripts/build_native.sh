@@ -88,6 +88,7 @@ if [[ "$TARGET" == "et" ]]; then
 elif [[ "$LINK_TORCHAO_OPS" == "ON" ]]; then
    # Install OMP when using AOTI with linked torchao ops
    brew install libomp
+   install_torchao_aten_ops cpu
 fi
 popd
 
