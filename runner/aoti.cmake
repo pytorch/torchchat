@@ -15,7 +15,7 @@ ENDIF()
 
 find_package(CUDA)
 
-find_package(Torch 2.4.0)
+find_package(Torch REQUIRED)
 if(Torch_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${TORCH_CXX_FLAGS} -fpermissive")
 

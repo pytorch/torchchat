@@ -1198,17 +1198,17 @@ jobs:
             sysctl machdep.cpu.brand_string
             sysctl machdep.cpu.core_count
           fi
-      - name: Install ET
-        run: |
-          echo "Installing ExecuTorch"
-          export TORCHCHAT_ROOT=${PWD}
-          bash torchchat/utils/scripts/install_et.sh
       - name: Install torchchat
         run: |
           echo "Intalling pip3 packages"
           ./install/install_requirements.sh
           pip3 list
           python3 -c 'import torch;print(f"torch: {torch.__version__, torch.version.git_version}")'
+      - name: Install ET
+        run: |
+          echo "Installing ExecuTorch"
+          export TORCHCHAT_ROOT=${PWD}
+          bash torchchat/utils/scripts/install_et.sh
       - name: Install torchao-ops
         id: install-torchao-ops
         run: |

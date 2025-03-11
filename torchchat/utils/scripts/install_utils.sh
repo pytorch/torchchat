@@ -186,6 +186,8 @@ clone_torchao() {
 install_torchao_aten_ops() {
   local device=${1:-cpu}
 
+  USE_CPP=1 pip install "${TORCHCHAT_ROOT}/torchao-build/src/ao"
+
   if [[ "$device" == "cpu" ]]; then
     echo "Building torchao custom ops for ATen"
     pushd ${TORCHCHAT_ROOT}/torchao-build/src/ao/torchao/experimental
