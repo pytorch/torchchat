@@ -5,7 +5,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-set -ex pipefail
+set -exo pipefail
 
 if [ -z "$TORCHCHAT_ROOT" ]; then
   # Get the absolute path of the current script
