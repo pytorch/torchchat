@@ -203,6 +203,7 @@ install_torchao_aten_ops() {
   cmake -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
     -DCMAKE_INSTALL_PREFIX=${CMAKE_OUT_DIR} \
     -DTORCHAO_BUILD_CPU_AARCH64=ON \
+    -DTORCHAO_PARALLEL_BACKEND=OPENMP \
     -DCMAKE_BUILD_TYPE="Release" \
     -S . \
     -B ${CMAKE_OUT_DIR} -G Ninja
