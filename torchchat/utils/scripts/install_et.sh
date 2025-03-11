@@ -22,5 +22,5 @@ install_executorch_libs $ENABLE_ET_PYBIND
 
 # During installation, ET uninstalls torchchat's preferred version of torchao
 # so we reinstall here
-bash install/install/install_torchao.sh
+bash install/install_torchao.sh
 popd
