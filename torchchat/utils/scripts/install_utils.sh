@@ -204,6 +204,7 @@ install_torchao_aten_ops() {
     -DCMAKE_INSTALL_PREFIX=${CMAKE_OUT_DIR} \
     -DTORCHAO_BUILD_CPU_AARCH64=ON \
     -DTORCHAO_PARALLEL_BACKEND=OPENMP \
+    -DOpenMP_ROOT="/opt/homebrew/opt/libomp" \
     -DCMAKE_BUILD_TYPE="Release" \
     -S . \
     -B ${CMAKE_OUT_DIR} -G Ninja
