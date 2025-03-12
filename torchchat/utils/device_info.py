@@ -14,7 +14,7 @@ def get_device_info(device: str) -> str:
     """Returns a human-readable description of the hardware based on a torch.device.type
 
     Args:
-        device: A torch.device.type string: one of {"cpu", "cuda", "xpu"}.
+        device: A torch.device.type string: one of {"cpu", "cuda", "xpu", "npu"}.
     Returns:
         str: A human-readable description of the hardware or an empty string if the device type is unhandled.
 
@@ -41,6 +41,15 @@ def get_device_info(device: str) -> str:
         return (
             check_output(
                 ["xpu-smi discovery |grep 'Device Name:'"], shell=True
+            )
+            .decode("utf-8")
+            .split("\n")[0]
+            .split("Device Name:")[1]
+            )
+    if device == "npu":
+        return (
+            check_output(
+                ["npu-smi discovery |grep 'Device Name:'"], shell=True
             )
             .decode("utf-8")
             .split("\n")[0]

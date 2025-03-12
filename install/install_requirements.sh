@@ -83,6 +83,17 @@ then
     torchvision=="0.22.0.${VISION_NIGHTLY_VERSION}"
     #torchtune=="0.6.0" # no 0.6.0 on xpu nightly
   )
+elif [[ -x "$(command -v npu-smi)" ]];
+then
+  REQUIREMENTS_TO_INSTALL=(
+    torch=="2.4.0"
+    torch_npu=="2.4.0"
+    torchvision=="0.19.0"
+    torchaudio=="2.4.0"
+    torchtune=="0.5.0"
+    numpy=="1.26.4"
+    decorator=="5.2.1"
+  )
 else
   REQUIREMENTS_TO_INSTALL=(
     torch=="2.7.0.${PYTORCH_NIGHTLY_VERSION}"
