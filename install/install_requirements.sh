@@ -136,5 +136,5 @@ if [[ -x "$(command -v nvidia-smi)" ]]; then
 fi
 (
   set -x
-  $PIP_EXECUTABLE install evaluate=="0.4.3" lm-eval=="0.4.2" psutil=="6.0.0"
+  $PIP_EXECUTABLE install evaluate=="0.4.3" lm-eval=="0.4.7" psutil=="6.0.0"
 )
