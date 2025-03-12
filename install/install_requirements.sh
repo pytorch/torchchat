@@ -126,12 +126,7 @@ then
 )
 fi
 
-# For torchao need to install from github since nightly build doesn't have macos build.
-# TODO: Remove this and install nightly build, once it supports macos
-(
-  set -x
-  $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@7d8794622f3ac7ffa98761314019a20fba06edef
-)
+bash install/install_torchao.sh
 
 if [[ -x "$(command -v nvidia-smi)" ]]; then
   (
