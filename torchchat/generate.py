@@ -1213,6 +1213,8 @@ class LocalGenerator:
                     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
                 elif self.builder_args.device == "cuda":
                     print(prof.key_averages().table(sort_by="self_cuda_time_total"))
+                elif self.builder_args.device == "npu":
+                    print(prof.key_averages().table(sort_by="self_npu_time_total"))
                 else:
                     print(prof.key_averages().table(sort_by="self_xpu_time_total"))
                 prof.export_chrome_trace(f"{self.profile}.json")
@@ -1299,8 +1301,10 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
             )
         if torch.cuda.is_available():
             print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
-        if torch.xpu.is_available():
+        elif torch.xpu.is_available():
             print(f"Memory used: {torch.xpu.max_memory_reserved() / 1e9:.02f} GB")
+        elif hasattr(torch, "npu") and torch.npu.is_available():
+            print(f"Memory used: {torch.npu.max_memory_reserved() / 1e9:.02f} GB")
 
 
 
@@ -1595,7 +1599,6 @@ class DistributedGenerator(LocalGenerator):
         
         return idx_next, probs
 
-
 def run_generator(
     args,
     rank: Optional[int] =None
@@ -1628,8 +1631,10 @@ def run_generator(
         )
         if torch.cuda.is_available():
             torch.cuda.reset_peak_memory_stats()
-        if torch.xpu.is_available():
+        elif torch.xpu.is_available():
             torch.xpu.reset_peak_memory_stats()
+        elif hasattr(torch, "npu") and torch.npu.is_available():
+            torch.npu.reset_peak_memory_stats()
 
         for _ in gen.chat(generator_args):
             pass
