@@ -53,6 +53,9 @@ using executorch::extension::TensorPtr;
 using torch::executor::EValue;
 using torch::executor::Module;
 using torch::executor::Result;
+using executorch::runtime::MemoryManager;
+using executorch::runtime::MemoryAllocator;
+using executorch::runtime::Error;
 #endif
 
 using tokenizers::SPTokenizer;
@@ -867,7 +870,26 @@ int main(int argc, char *argv[]) {
                     : torch::Device(torch::kCUDA);
   ModelType model_type = get_model_type(std::stoi(aoti_metadata["tokenizer_type"]));
 #else // __ET_MODEL__
-  ModelType model_type = get_model_type(llama_ver);
+  Error load_status = transformer.runner->load();
+  ET_CHECK_MSG(
+      load_status == torch::executor::Error::Ok,
+      "program::load() failed with status 0x%" PRIx32,
+      static_cast<uint32_t>(load_status));
+
+  static std::array<uint8_t, 4 * 1024U * 1024U> method_allocator_pool; // 4MB
+  MemoryAllocator method_allocator{MemoryAllocator(
+      sizeof(method_allocator_pool), method_allocator_pool.data())};
+  MemoryManager memory_manager(&method_allocator, nullptr);
+  auto tokenizer_method = transformer.runner->program()->load_method("tokenizer_type", &memory_manager);
+
+  Error execute_status = tokenizer_method->execute();
+  ET_CHECK_MSG(
+      execute_status == torch::executor::Error::Ok,
+      "method::execute() failed with status 0x%" PRIx32,
+      static_cast<uint32_t>(execute_status));
+
+  auto tokenizer_type = tokenizer_method->get_output(0).toInt();
+  ModelType model_type = get_model_type(tokenizer_type);
 #endif
 
   if (model_type == UNKNOWN_MODEL) {
