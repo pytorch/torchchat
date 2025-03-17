@@ -473,6 +473,8 @@ def eval(
             device=device,
             is_pte_model=is_pte_model,
         )
+        # use eot_token_id as prefix_token_id.
+        model_eval_wrapper.custom_prefix_token_id = model_eval_wrapper.eot_token_id
     elif modality == "text-image":
         model_eval_wrapper = VLMEvalWrapper(
             model,
