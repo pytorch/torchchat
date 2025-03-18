@@ -36,18 +36,6 @@ from lm_eval.evaluator import evaluate
 from lm_eval.models.hf_vlms import HFMultimodalLM
 from lm_eval.models.huggingface import HFLM as eval_wrapper
 from lm_eval.tasks import get_task_dict
-from torchtune import utils
-from torchtune.data import (
-    format_content_with_images,
-    left_pad_sequence,
-    Message,
-    padded_collate_tiled_images_and_mask,
-)
-from torchtune.generation import generate, sample
-
-from torchtune.modules.common_utils import local_kv_cache
-from torchtune.modules.model_fusion import DeepFusionModel
-from torchtune.modules.transforms import Transform
 
 
 def setup_cache_padded_seq_input_pos_max_seq_length_for_prefill(
@@ -208,6 +196,20 @@ class VLMEvalWrapper(HFMultimodalLM):
         max_images_per_sample (int): The maximum number of images per sample. Defaults to
             the max number of images in MMMU.
     """
+
+    # Having the imports here allow running other evals without installing torchtune
+    from torchtune import utils
+    from torchtune.data import (
+        format_content_with_images,
+        left_pad_sequence,
+        Message,
+        padded_collate_tiled_images_and_mask,
+    )
+    from torchtune.generation import generate, sample
+
+    from torchtune.modules.common_utils import local_kv_cache
+    from torchtune.modules.model_fusion import DeepFusionModel
+    from torchtune.modules.transforms import Transform
 
     def __init__(
         self,
