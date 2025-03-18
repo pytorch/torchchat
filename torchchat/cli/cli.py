@@ -207,7 +207,7 @@ def _add_export_output_path_args(parser) -> None:
         default=None,
         help="Output to the specified AOT Inductor .dso model file",
     )
-    exclusive_parser.add_argument( 
+    exclusive_parser.add_argument(
         "--output-snapshot-path",
         type=str,
         default=None,
@@ -266,7 +266,7 @@ def _add_exported_input_path_args(parser) -> None:
         default=None,
         help="Use the specified torchchat snaphot .tc model file",
     )
- 
+
 
 # Add CLI Args related to JIT downloading of model artifacts
 def _add_jit_downloading_args(parser) -> None:
@@ -579,13 +579,13 @@ def arg_init(args):
                 print(f'overriding json-specified device {executor_handler["accelerator"]} with cli device {args.device}')
                 executor_handler["accelerator"] = args.device
 
-    if "mps" in args.device:
-        if getattr(args, "compile", False) or getattr(args, "compile_prefill", False):
-            print(
-                "Warning: compilation is not available with device MPS, ignoring option to engage compilation"
-            )
-            vars(args)["compile"] = False
-            vars(args)["compile_prefill"] = False
+    # if "mps" in args.device:
+    #     if getattr(args, "compile", False) or getattr(args, "compile_prefill", False):
+    #         print(
+    #             "Warning: compilation is not available with device MPS, ignoring option to engage compilation"
+    #         )
+    #         vars(args)["compile"] = False
+    #         vars(args)["compile_prefill"] = False
 
     if hasattr(args, "seed") and args.seed:
         # Localized import to minimize expensive imports
