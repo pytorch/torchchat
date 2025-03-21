@@ -57,6 +57,7 @@ while (( "$#" )); do
 done
 
 source "$(dirname "${BASH_SOURCE[0]}")/install_utils.sh"
+find_cmake_prefix_path
 
 if [ -z "${ET_BUILD_DIR}" ]; then
     ET_BUILD_DIR="et-build"
@@ -80,24 +81,23 @@ if [[ "$TARGET" == "et" ]]; then
       exit 1
     fi
 
-    source "$(dirname "${BASH_SOURCE[0]}")/install_utils.sh"
-    find_cmake_prefix_path
     EXECUTORCH_INCLUDE_DIRS="${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/include;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/src"
     EXECUTORCH_LIBRARIES="${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libexecutorch_no_prim_ops.a;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libextension_threadpool.a;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libcpuinfo.a;${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install/lib/libpthreadpool.a"
     install_torchao_executorch_ops
   fi
 elif [[ "$LINK_TORCHAO_OPS" == "ON" ]]; then
-  # Install OMP when using AOTI with linked torchao ops
-  brew install libomp
+   # Install OMP when using AOTI with linked torchao ops
+   brew install libomp
+   install_torchao_aten_ops cpu
 fi
 popd
 
 # CMake commands
 if [[ "$TARGET" == "et" ]]; then
-    cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` -DLINK_TORCHAO_OPS="${LINK_TORCHAO_OPS}" -DET_USE_ADAPTIVE_THREADS=ON -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=1" -G Ninja
+    cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH="${MY_CMAKE_PREFIX_PATH}" -DLINK_TORCHAO_OPS="${LINK_TORCHAO_OPS}" -DET_USE_ADAPTIVE_THREADS=ON -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=1" -G Ninja
 else
-    cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH=`python3 -c 'import torch;print(torch.utils.cmake_prefix_path)'` -DLINK_TORCHAO_OPS="${LINK_TORCHAO_OPS}" -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=1" -G Ninja
+    cmake -S . -B ./cmake-out -DCMAKE_PREFIX_PATH="${MY_CMAKE_PREFIX_PATH}" -DLINK_TORCHAO_OPS="${LINK_TORCHAO_OPS}" -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=1" -G Ninja
 fi
 cmake --build ./cmake-out --target "${TARGET}"_run
 
-printf "Build finished. Please run: \n./cmake-out/${TARGET}_run model.<pte|so> -z tokenizer.model -l <llama version (2 or 3)> -i <prompt>\n"
+printf "Build finished. Please run: \n./cmake-out/${TARGET}_run model.<pte|so> -z tokenizer.model > -i <prompt>\n"

@@ -313,7 +313,7 @@ try:
             core_aten_ep, edge_constant_methods, edge_compile_config, verbose=verbose
         )
 
-    def export_for_et(model, device, output_path) -> str:
+    def export_for_et(model, device, output_path, edge_constant_methods) -> str:
 
         input = (
             torch.tensor([[1]], dtype=torch.long, device=device),
@@ -344,12 +344,15 @@ try:
         with torch.nn.attention.sdpa_kernel(
             [torch.nn.attention.SDPBackend.MATH]
         ), torch.no_grad():
-            m = export_for_training(model, input, dynamic_shapes=dynamic_shapes).module()
+            m = export_for_training(
+                model, input, dynamic_shapes=dynamic_shapes
+            ).module()
 
             edge_manager = export_to_edge(
                 m,
                 input,
                 dynamic_shapes=dynamic_shapes,
+                edge_constant_methods=edge_constant_methods,
                 edge_compile_config=edge_config,
             )
         edge_manager = edge_manager.to_backend(XnnpackDynamicallyQuantizedPartitioner())
@@ -365,6 +368,7 @@ try:
         )
 
         print("The methods are: ", export_program.methods)
+        print("The config methods are: ", export_program.config_methods)
         with open(output_path, "wb") as f:
             export_program.write_to_file(f)
 
@@ -407,7 +411,9 @@ def main(args):
             f"Warning! ExecuTorch export target is controlled by export recipe, not device setting. Ignoring device={builder_args.device} setting."
         )
         builder_args.device = "cpu"
-    elif (output_pte_path or output_dso_path or output_aoti_package_path) and "mps" in builder_args.device:
+    elif (
+        output_pte_path or output_dso_path or output_aoti_package_path
+    ) and "mps" in builder_args.device:
         print("Warning! Device MPS not supported for export. Exporting for device CPU.")
         builder_args.device = "cpu"
 
@@ -439,7 +445,8 @@ def main(args):
             tokenizer,
             max_seq_length=builder_args.max_seq_length,
             support_tensor_subclass=output_dso_path is None
-            and output_aoti_package_path is None,
+            and output_aoti_package_path is None
+            and output_pte_path is None,
         )
         model_to_pte = model
         model_to_dso = model
@@ -472,13 +479,26 @@ def main(args):
                 support_tensor_subclass=False,
             )
             _unset_gguf_kwargs(builder_args)
- 
+
+    if tokenizer_args is None:
+        tokenizer_type = "0"
+    elif tokenizer_args.is_sentencepiece:
+        tokenizer_type = "2"  # Corresponding to llama2
+    else:
+        tokenizer_type = "3"  # Corresponding to llama3
+
     with torch.no_grad():
         if output_pte_path:
             output_pte_path = str(os.path.abspath(output_pte_path))
             if executorch_export_available:
                 print(f"Exporting model using ExecuTorch to {output_pte_path}")
-                export_for_et(model_to_pte, builder_args.device, args.output_pte_path)
+                print(f"Tokenizer type is {tokenizer_type}")
+                export_for_et(
+                    model_to_pte,
+                    builder_args.device,
+                    args.output_pte_path,
+                    {"tokenizer_type": int(tokenizer_type)},
+                )
             else:
                 print(
                     "Export with executorch requested but ExecuTorch could not be loaded"
@@ -501,13 +521,6 @@ def main(args):
 
         if output_aoti_package_path:
             output_aoti_package_path = str(os.path.abspath(output_aoti_package_path))
-
-            if tokenizer_args is None:
-                tokenizer_type = "0"
-            elif tokenizer_args.is_sentencepiece:
-                tokenizer_type = "2"  # Corresponding to llama2
-            else:
-                tokenizer_type = "3"  # Corresponding to llama3
 
             metadata = {"tokenizer_type": tokenizer_type}
             print(

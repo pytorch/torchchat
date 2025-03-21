@@ -5,7 +5,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-set -ex pipefail
+set -exo pipefail
 
 if [ -z "$TORCHCHAT_ROOT" ]; then
   # Get the absolute path of the current script
@@ -200,6 +200,9 @@ install_torchao_aten_ops() {
   CMAKE_OUT_DIR=${TORCHCHAT_ROOT}/torchao-build/cmake-out
   cmake -DCMAKE_PREFIX_PATH=${MY_CMAKE_PREFIX_PATH} \
     -DCMAKE_INSTALL_PREFIX=${CMAKE_OUT_DIR} \
+    -DTORCHAO_BUILD_CPU_AARCH64=ON \
+    -DTORCHAO_PARALLEL_BACKEND=OPENMP \
+    -DOpenMP_ROOT="$(brew --prefix)/opt/libomp" \
     -DCMAKE_BUILD_TYPE="Release" \
     -S . \
     -B ${CMAKE_OUT_DIR} -G Ninja
@@ -217,6 +220,7 @@ install_torchao_executorch_ops() {
     -DCMAKE_INSTALL_PREFIX=${CMAKE_OUT_DIR} \
     -DCMAKE_BUILD_TYPE="Release" \
     -DTORCHAO_BUILD_EXECUTORCH_OPS=ON \
+    -DTORCHAO_BUILD_CPU_AARCH64=ON \
     -DEXECUTORCH_INCLUDE_DIRS="${EXECUTORCH_INCLUDE_DIRS}" \
     -DEXECUTORCH_LIBRARIES="${EXECUTORCH_LIBRARIES}" \
     -S . \
