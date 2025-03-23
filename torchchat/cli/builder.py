@@ -16,22 +16,13 @@ import torch._dynamo.config
 import torch._inductor.config
 import torch.distributed as dist
 
-from torchtune.models.convert_weights import meta_to_tune
-
-from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
-
-from torchtune.models.llama3_2_vision._convert_weights import llama3_vision_meta_to_tune
-
-from torchtune.training import set_default_dtype
-
-from torchchat.distributed.logging_utils import SingletonLogger
-
-from torchchat.distributed.utils import (
+from torchchat.distributed.utils import(
     Color as color,
     CUDATrackTime,
-    GPUMemoryMonitor,
     init_distributed,
+    GPUMemoryMonitor,
 )
+from torchchat.distributed.logging_utils import SingletonLogger
 
 from torchchat.model import Model, ModelArgs, ModelType, Transformer, TransformerArgs
 from torchchat.model_config.model_config import resolve_model_config
@@ -43,6 +34,15 @@ from torchchat.utils.build_utils import (
 )
 from torchchat.utils.measure_time import measure_time
 from torchchat.utils.quantize import quantize_model
+
+
+from torchtune.models.convert_weights import meta_to_tune
+
+from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
+
+from torchtune.models.llama3_2_vision._convert_weights import llama3_vision_meta_to_tune
+
+from torchtune.training import set_default_dtype
 
 
 @dataclass
@@ -189,19 +189,15 @@ class BuilderArgs:
         tp = getattr(args, "tp", 1)
         chpt_from = getattr(args, "chpt_from", "hf")
         sdp_backend_dict = {
-            "math": torch.nn.attention.SDPBackend.MATH,
-            "flash_attention": torch.nn.attention.SDPBackend.FLASH_ATTENTION,
-            "efficient_attention": torch.nn.attention.SDPBackend.EFFICIENT_ATTENTION,
-            "cudnn_attention": torch.nn.attention.SDPBackend.CUDNN_ATTENTION,
+            'math': torch.nn.attention.SDPBackend.MATH,
+            'flash_attention': torch.nn.attention.SDPBackend.FLASH_ATTENTION,
+            'efficient_attention': torch.nn.attention.SDPBackend.EFFICIENT_ATTENTION,
+            'cudnn_attention': torch.nn.attention.SDPBackend.CUDNN_ATTENTION,
         }
         attention_backend = sdp_backend_dict[args.attention_backend]
-        if args.device == "cpu" and (
-            args.attention_backend == "efficient_attention"
-            or args.attention_backend == "cudnn_attention"
-        ):
-            print(
-                f"Warning: {args.attention_backend} is not supported on CPU. Using math instead."
-            )
+        if args.device == "cpu" and (args.attention_backend == "efficient_attention"
+                                     or args.attention_backend == "cudnn_attention"):
+            print(f"Warning: {args.attention_backend} is not supported on CPU. Using math instead.")
             attention_backend = torch.nn.attention.SDPBackend.MATH
         return cls(
             checkpoint_dir=checkpoint_dir,
@@ -250,29 +246,13 @@ class TokenizerArgs:
     is_sentencepiece: bool = False
     is_tiktoken: bool = False
     is_hf_tokenizer: bool = False
-    is_llama_3_2_mm: bool = False
     t: Optional[Any] = None
 
     def __post_init__(self):
-        # special handling for llama-3.2-mm
-        if "llama-3.2-11b-vision" in str(self.tokenizer_path).lower():
-            try:
-                from torchtune.models.llama3_2_vision import llama3_2_vision_transform
-
-                self.t = llama3_2_vision_transform(path=str(self.tokenizer_path))
-                self.is_llama_3_2_mm = True
-                self.is_tiktoken = False
-                self.is_sentencepiece = False
-                self.is_hf_tokenizer = False
-                return
-            except:
-                pass
-
         try:
             from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
             self.t = TiktokenTokenizer(model_path=str(self.tokenizer_path))
-            self.is_llama_3_2_mm = False
             self.is_tiktoken = True
             self.is_sentencepiece = False
             self.is_hf_tokenizer = False
@@ -284,7 +264,6 @@ class TokenizerArgs:
             from sentencepiece import SentencePieceProcessor
 
             self.t = SentencePieceProcessor(model_file=str(self.tokenizer_path))
-            self.is_llama_3_2_mm = False
             self.is_tiktoken = False
             self.is_sentencepiece = True
             self.is_hf_tokenizer = False
@@ -296,7 +275,6 @@ class TokenizerArgs:
             from tokenizer.hf_tokenizer import HFTokenizer
 
             self.t = HFTokenizer(str(self.tokenizer_path))
-            self.is_llama_3_2_mm = False
             self.is_tiktoken = False
             self.is_sentencepiece = False
             self.is_hf_tokenizer = True
@@ -304,7 +282,6 @@ class TokenizerArgs:
         except:
             pass
 
-        self.is_llama_3_2_mm = False
         self.is_tiktoken = False
         self.is_sentencepiece = False
         self.is_hf_tokenizer = False
@@ -319,32 +296,20 @@ class TokenizerArgs:
         if model is None:
             return
 
-        if (
-            sum(
-                [
-                    self.is_tiktoken,
-                    self.is_hf_tokenizer,
-                    self.is_sentencepiece,
-                    self.is_llama_3_2_mm,
-                ]
-            )
-            != 1
-        ):
+        if sum([self.is_tiktoken, self.is_hf_tokenizer, self.is_sentencepiece]) != 1:
             raise RuntimeError(f"no tokenizer was found at {self.tokenizer_path}")
 
         is_tiktoken = self.is_tiktoken
         is_sentencepiece = self.is_sentencepiece
         is_hf_tokenizer = self.is_hf_tokenizer
-        is_llama_3_2_mm = self.is_llama_3_2_mm
-
         use_tiktoken = model.config.use_tiktoken
         use_hf_tokenizer = model.config.use_hf_tokenizer
-        use_other_tokenizer = not (use_tiktoken or use_hf_tokenizer)
+        use_sentencepiece = not (use_tiktoken or use_hf_tokenizer)
+
         if (
-            (is_tiktoken and not use_tiktoken)
-            or (is_hf_tokenizer and not use_hf_tokenizer)
-            or (is_sentencepiece and not use_other_tokenizer)
-            or (is_llama_3_2_mm and not use_other_tokenizer)
+            (is_tiktoken and not use_tiktoken) or
+            (is_hf_tokenizer and not use_hf_tokenizer) or
+            (is_sentencepiece and not use_sentencepiece)
         ):
             raise RuntimeError(
                 "model-specified tokenizer ({}) does not match provided tokenizer ({}) for {}".format(
@@ -542,7 +507,6 @@ def _load_model(builder_args: BuilderArgs) -> Model:
         # AOTI-compoiled model will load its own weights.
         # Release weights here to avoid OOM
         import gc
-
         if hasattr(model, "model"):
             model.model = None
         gc.collect()
@@ -600,7 +564,6 @@ def _initialize_model(
 
             def do_nothing(max_batch_size, max_seq_length):
                 pass
-
             model.setup_caches = do_nothing
 
             model.forward = torch._export.aot_load(
@@ -638,7 +601,6 @@ def _initialize_model(
 
             def do_nothing(max_batch_size, max_seq_length):
                 pass
-
             model.setup_caches = do_nothing
 
             model.forward = aoti_compiled_model
@@ -713,9 +675,7 @@ def _initialize_model(
         logger = SingletonLogger.get_logger()
 
         gpu_memory_monitor = GPUMemoryMonitor("cuda")
-        logger.info(
-            f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}"
-        )
+        logger.info(f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}")
 
         # Model-level config
         if builder_args.params_table:
@@ -726,16 +686,20 @@ def _initialize_model(
         config = TransformerArgs.from_params(model_config.transformer_args["text"])
         logger.info(f"Transformer Config: {config}")
 
-        # TODO: Move into head of file after solving circular import
-        from torchchat.distributed.checkpoint_utils import load_model_weights
+        #TODO: Move into head of file after solving circular import
+        from torchchat.distributed.checkpoint_utils import (
+            load_model_weights,
+            )
 
         # Validate pipeline degree
         assert config.n_layers % pp_degree == 0
 
         # Create device mesh
         device_mesh = dist.init_device_mesh(
-            "cuda", (pp_degree, tp_degree), mesh_dim_names=("pp", "tp")
-        )
+            "cuda",
+            (pp_degree, tp_degree),
+            mesh_dim_names=("pp", "tp")
+            )
         tp_mesh = device_mesh["tp"]
         pp_mesh = device_mesh["pp"]
         logger.info(f"Created device mesh: {device_mesh}\n{tp_mesh=}, {pp_mesh=}")
@@ -764,13 +728,7 @@ def _initialize_model(
         # Load weights
         logger.info(f"Loading weights for {pp_rank=} on {device=}")
         with CUDATrackTime() as timer:
-            load_model_weights(
-                model,
-                builder_args.distribution_path,
-                device,
-                config,
-                builder_args.chpt_from,
-            )
+            load_model_weights(model, builder_args.distribution_path, device, config, builder_args.chpt_from)
 
         logger.info(
             f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
@@ -784,7 +742,7 @@ def _initialize_model(
         # lanes.
         # TODO: bump up the lane count
         pipeline_lanes = 1
-        seqlen_prefill = 1024
+        seqlen_prefill=1024
         with device:
             model.setup_caches(1, seqlen_prefill, cache_lanes=pipeline_lanes)
 
