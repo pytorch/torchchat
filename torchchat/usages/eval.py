@@ -197,24 +197,11 @@ class VLMEvalWrapper(HFMultimodalLM):
             the max number of images in MMMU.
     """
 
-    # Having the imports here allow running other evals without installing torchtune
-    from torchtune import utils
-    from torchtune.data import (
-        format_content_with_images,
-        left_pad_sequence,
-        Message,
-        padded_collate_tiled_images_and_mask,
-    )
-    from torchtune.generation import generate, sample
-
-    from torchtune.modules.common_utils import local_kv_cache
-    from torchtune.modules.model_fusion import DeepFusionModel
-    from torchtune.modules.transforms import Transform
 
     def __init__(
         self,
-        model: DeepFusionModel,
-        transform: Transform,
+        model: Model,
+        transform,
         *,
         device: torch.device,
         max_seq_length: int = 4096,
@@ -226,6 +213,25 @@ class VLMEvalWrapper(HFMultimodalLM):
         image_tag: str = "<image>",
         max_images_per_sample: int = 7,
     ):
+        # Having the imports here allow running other evals without installing torchtune
+        from torchtune.utils import batch_to_device
+        from torchtune.data import (
+            format_content_with_images,
+            left_pad_sequence,
+            Message,
+            padded_collate_tiled_images_and_mask,
+        )
+        from torchtune.generation import generate, sample
+        from torchtune.modules.common_utils import local_kv_cache
+        self.batch_to_device = batch_to_device
+        self.format_content_with_images = format_content_with_images
+        self.left_pad_sequence = left_pad_sequence
+        self.Message = Message
+        self.padded_collate_tiled_images_and_mask = padded_collate_tiled_images_and_mask
+        self.generate = generate
+        self.sample = sample
+        self.local_kv_cache = local_kv_cache
+
         self._model = model
         self._transform = transform
         self._device = device
@@ -326,24 +332,24 @@ class VLMEvalWrapper(HFMultimodalLM):
 
             # Construct the messages
             messages = []
-            content = format_content_with_images(
+            content = self.format_content_with_images(
                 text, image_tag=self._image_tag, images=proper_images
             )
-            messages.append(Message(role="user", content=content))
-            messages.append(Message(role="assistant", content=""))
+            messages.append(self.Message(role="user", content=content))
+            messages.append(self.Message(role="assistant", content=""))
 
             # Transform the messages
             tok_batch = self.model_transform({"messages": messages}, inference=True)
             all_encoded_messages.append(tok_batch)
 
         # Pad the encoded messages
-        tok_batch = padded_collate_tiled_images_and_mask(
+        tok_batch = self.padded_collate_tiled_images_and_mask(
             all_encoded_messages,
             pad_direction="left",
             pad_max_images=self._max_images_per_sample,
             pad_max_tiles=self._transform.max_num_tiles,
         )
-        utils.batch_to_device(tok_batch, self.device)
+        self.batch_to_device(tok_batch, self.device)
 
         # Convert the batch to the format expected by the HF
         tok_batch["input_ids"] = tok_batch.pop("tokens")
@@ -398,7 +404,7 @@ class VLMEvalWrapper(HFMultimodalLM):
 
         with measure_time(message=None) as measure:
             # 2. Setup KV cache
-            with local_kv_cache(
+            with self.local_kv_cache(
                 self.model,
                 batch_size=self.batch_size,
                 device=self.device,
@@ -409,7 +415,7 @@ class VLMEvalWrapper(HFMultimodalLM):
                 # 3. Prefill step
                 generated_tokens = []
                 logits = self.model(prompt, **batch)[:, -1]
-                token = sample(logits, temperature=0.0, top_k=None)
+                token = self.sample(logits, temperature=0.0, top_k=None)
                 generated_tokens.append(token.item())
 
                 cache_mask = batch["encoder_mask"][:, -1:]
@@ -425,7 +431,7 @@ class VLMEvalWrapper(HFMultimodalLM):
                         encoder_mask=cache_mask,
                         input_pos=input_pos[None, seq_len],
                     )[:, -1]
-                    token = sample(logits, temperature=0.0, top_k=None)
+                    token = self.sample(logits, temperature=0.0, top_k=None)
                     generated_tokens.append(token.item())
                     seq_len += 1
         self.times.append(measure.get_time())
@@ -460,6 +466,7 @@ def eval(
     Returns:
         eval_results (dict): A dictionary of evaluation results for the specified task(s).
     """
+
     if tasks is None:
         if modality == "text":
             tasks = ["wikitext"]
@@ -478,11 +485,14 @@ def eval(
         # use eot_token_id as prefix_token_id.
         model_eval_wrapper.custom_prefix_token_id = model_eval_wrapper.eot_token_id
     elif modality == "text-image":
+        from torchtune.utils import get_device
+        from torchtune.models.llama3_2_vision import llama3_2_vision_transform
+
         model_eval_wrapper = VLMEvalWrapper(
             model,
-            transform=tokenizer, 
+            transform=llama3_2_vision_transform(path=str(tokenizer.tokenizer_path)), 
             max_seq_length = 4096 if max_seq_length is None else max_seq_length,
-            device = utils.get_device(device) if isinstance(device, str) else device,
+            device = get_device(device) if isinstance(device, str) else device,
         )
 
     try:
@@ -531,6 +541,7 @@ def main(args) -> None:
     set_precision(builder_args.precision)
 
     tokenizer = _initialize_tokenizer(tokenizer_args)
+    tokenizer.tokenizer_path = tokenizer_args.tokenizer_path
     builder_args.setup_caches = False
     model = _initialize_model(
         builder_args,
