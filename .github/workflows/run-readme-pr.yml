@@ -16,7 +16,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info and try install pip and/or pip3"
@@ -39,7 +39,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info and try install pip and/or pip3"
@@ -62,7 +62,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info and try install pip and/or pip3"
@@ -86,7 +86,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info and try install pip and/or pip3"
@@ -104,7 +104,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info"
@@ -127,7 +127,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info"
@@ -151,7 +151,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info"
@@ -175,7 +175,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info"
@@ -198,7 +198,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info"
@@ -220,7 +220,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info"
@@ -242,7 +242,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info"
@@ -264,7 +264,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info"
@@ -281,7 +281,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info"
@@ -309,7 +309,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info"
@@ -331,7 +331,7 @@ jobs:
     with:
       runner: linux.g5.4xlarge.nvidia.gpu
       gpu-arch-type: cuda
-      gpu-arch-version: "12.4"
+      gpu-arch-version: "12.8"
       timeout: 60
       script: |
         echo "::group::Print machine info"
