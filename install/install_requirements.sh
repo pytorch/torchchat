@@ -51,13 +51,13 @@ echo "Using pip executable: $PIP_EXECUTABLE"
 # NOTE: If a newly-fetched version of the executorch repo changes the value of
 # PYTORCH_NIGHTLY_VERSION, you should re-run this script to install the necessary
 # package versions.
-PYTORCH_NIGHTLY_VERSION=dev20250319
+PYTORCH_NIGHTLY_VERSION=dev20250324
 
 # Nightly version for torchvision
-VISION_NIGHTLY_VERSION=dev20250319
+VISION_NIGHTLY_VERSION=dev20250324
 
 # Nightly version for torchtune
-TUNE_NIGHTLY_VERSION=dev20250319
+TUNE_NIGHTLY_VERSION=dev20250324
 
 # The pip repository that hosts nightly torch packages. cpu by default.
 # If cuda is available, based on presence of nvidia-smi, install the pytorch nightly
