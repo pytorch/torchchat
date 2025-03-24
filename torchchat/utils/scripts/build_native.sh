@@ -100,4 +100,4 @@ else
 fi
 cmake --build ./cmake-out --target "${TARGET}"_run
 
-printf "Build finished. Please run: \n./cmake-out/${TARGET}_run model.<pte|so> -z tokenizer.model -l <llama version (2 or 3)> -i <prompt>\n"
+printf "Build finished. Please run: \n./cmake-out/${TARGET}_run model.<pte|so> -z tokenizer.model > -i <prompt>\n"
