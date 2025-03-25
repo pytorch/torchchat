@@ -19,7 +19,7 @@ jobs:
       runner: linux.g5.4xlarge.nvidia.gpu
       secrets-env: "HF_TOKEN_PERIODIC"
       gpu-arch-type: cuda
-      gpu-arch-version: "12.8"
+      gpu-arch-version: "12.6"
       timeout: 60
       script: |
         echo "::group::Print machine info"
@@ -50,7 +50,7 @@ jobs:
       runner: linux.g5.4xlarge.nvidia.gpu
       secrets: inherit
       gpu-arch-type: cuda
-      gpu-arch-version: "12.8"
+      gpu-arch-version: "12.6"
       timeout: 60
       script: |
         echo "::group::Print machine info"
@@ -81,7 +81,7 @@ jobs:
       runner: linux.g5.4xlarge.nvidia.gpu
       secrets-env: "HF_TOKEN_PERIODIC"
       gpu-arch-type: cuda
-      gpu-arch-version: "12.8"
+      gpu-arch-version: "12.6"
       timeout: 60
       script: |
         echo "::group::Print machine info"
