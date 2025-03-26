@@ -1,0 +1,72 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241213+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 6.04 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.41 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of Tuscany, there lived a young woman named Giulia. Giulia was a talented chef and baker, known throughout the village for her delicious pastries and breads. She had a reputation for using only the freshest ingredients and traditional techniques to create her creations.
+One day, a wealthy merchant from Florence arrived in the village, seeking the best baker in the land. He had heard of Giulia's exceptional skills and had come to sample her wares. Giulia, eager to impress, spent hours preparing a special batch of her famous sweet bread, infused with the fragrance of rose petals and the sweetness of honey.
+As the merchant waited in her small shop, the aroma of freshly baked bread wafted through the air, enticing the villagers to come and sample Giulia's creations. The merchant, impressed by the variety of breads and pastries on display, asked Giulia to prepare a special dessert for him. Giulia,
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 228.1775 sec total                 
+Time to first token: 0.6230 sec with parallel prefill.                
+
+      Total throughput: 0.8765 tokens/sec, 1.1409 s/token                 
+First token throughput: 1.6051 tokens/sec, 0.6230 s/token                 
+ Next token throughput: 0.8745 tokens/sec, 1.1435 s/token                     
+
+Bandwidth achieved: 7.50 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2.3e+02 seconds
+
+========================================
+
+Once upon a time, in a small coastal town, there was a bustling fish market. Every day, fishermen would bring in their catch of the day, and the market would be filled with the lively smell of fresh seafood. The locals would gather to buy their daily supplies, and the market would buzz with conversation.
+Among the fishermen was a young boy named Jack. Jack had grown up on the water and was fascinated by the sea and its creatures. He would often help his father, a skilled fisherman, on their vessels, learning the ways of the ocean and the art of fishing.
+One day, while Jack was helping his father, they came across a rare and mysterious sea creature. It was a giant squid, unlike any they had ever seen before. The squid was unlike any other they had seen before, with its distinctive shape and the striking patterns on its body.
+The fisherman were amazed by the creature's sheer size and its elusive nature. They carefully examined the squid's body, taking note of its unique
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 4.4041 sec total                 
+Time to first token: 0.0858 sec with parallel prefill.                
+
+      Total throughput: 45.4117 tokens/sec, 0.0220 s/token                 
+First token throughput: 11.6542 tokens/sec, 0.0858 s/token                 
+ Next token throughput: 46.0825 tokens/sec, 0.0217 s/token                     
+
+Bandwidth achieved: 388.67 GB/s
+
+========================================
+
+Once upon a time, in a village nestled between two great mountains, there lived a young girl named Ava. Ava loved to explore the world around her, and one day, she stumbled upon a hidden pathway she had never seen before. The path was overgrown with vines and shrubs, but Ava was curious, and her heart was full of wonder. She pushed aside the foliage and stepped onto the winding road.
+
+As she walked, Ava noticed that the air grew thick with the scent of blooming flowers. The path began to wind its way up the mountain, and Ava found herself surrounded by an array of vibrant colors. She walked in awe, feeling the gentle breeze caress her face and the warmth of the sun on her skin.
+
+The path began to narrow, and Ava found herself walking alongside a sparkling stream. The sound of the water was like music to her ears, and she couldn't help but skip along the path, feeling carefree and alive. As she walked, the trees grew taller, and the
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 2.2439 sec total                 
+Time to first token: 0.0816 sec with parallel prefill.                
+
+      Total throughput: 89.1296 tokens/sec, 0.0112 s/token                 
+First token throughput: 12.2534 tokens/sec, 0.0816 s/token                 
+ Next token throughput: 92.0310 tokens/sec, 0.0109 s/token                     
+
+Bandwidth achieved: 762.85 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 67.27                 
+Average tokens/sec (first token): 11.95                 
+Average tokens/sec (next tokens): 69.06 
+                
+Memory used: 28.81 GB

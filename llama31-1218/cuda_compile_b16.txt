@@ -1,0 +1,74 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 5.79 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Sophie. Sophie was a curious and adventurous child, always eager to explore the world around her. One day, while wandering through the village, Sophie stumbled upon a small, mysterious shop tucked away on a quiet street. The sign above the door read "Curios and Wonders," and the windows were filled with an assortment of odd and fascinating items.
+
+Sophie's curiosity was piqued, and she pushed open the door to venture inside. The shop was dimly lit, with shelves upon shelves of peculiar objects that seemed to stretch up to the ceiling. There were vintage dolls with glassy eyes, antique clockwork mechanisms, and strange, glowing orbs that seemed to pulse with an otherworldly energy.
+
+At the back of the shop, behind a counter made of polished wood, stood an old man with a kind face and a twinkle in his eye. He introduced himself as Mr. Jenkins
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 223.4696 sec total                 
+Time to first token: 0.6419 sec with parallel prefill.                
+
+      Total throughput: 0.8950 tokens/sec, 1.1173 s/token                 
+First token throughput: 1.5580 tokens/sec, 0.6419 s/token                 
+ Next token throughput: 0.8931 tokens/sec, 1.1197 s/token                     
+
+Bandwidth achieved: 14.37 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2.2e+02 seconds
+
+========================================
+
+Once upon a time, in a far-off land, there was a magnificent bird named Philemon. Philemon was a majestic creature with shimmering feathers as blue as the sky and a song as sweet as the morning dew. He lived in a lush forest where he would soar through the skies, singing his heart out, and spreading joy to all who heard him.
+
+Philemon was known throughout the land for his enchanting voice. People would travel from far and wide to hear him sing. His melodies were so captivating that they could lift the spirits of even the saddest of hearts. One day, a fierce storm rolled in, bringing with it strong winds and heavy rains. The forest was battered, and many of the birds took refuge in their nests, frightened by the turbulence.
+
+Philemon, however, did not flee. Instead, he flew out into the storm, his wings beating fiercely against the wind. With his powerful voice, he sang of courage and perseverance. He sang of hope and resilience
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 4.3986 sec total                 
+Time to first token: 0.0631 sec with parallel prefill.                
+
+      Total throughput: 45.4693 tokens/sec, 0.0220 s/token                 
+First token throughput: 15.8387 tokens/sec, 0.0631 s/token                 
+ Next token throughput: 45.9008 tokens/sec, 0.0218 s/token                     
+
+Bandwidth achieved: 730.26 GB/s
+
+========================================
+
+Once upon a time, there was a couple, Manfred and Kristin, who thought they had finally found the perfect home. They had been house hunting for months, and their new home was in a beautiful neighborhood, had a spacious backyard, and more than enough space for their growing family.
+However, as they began to settle in, strange things started to happen. Doors would open by themselves, and Kristin would find things moved from their original place. Manfred would often wake up in the middle of the night to find himself alone, even though Kristin was right next to him. They would hear footsteps and whispers in the night.
+At first, they thought it was just the usual settling of an old house, but as the occurrences became more frequent and intense, they began to suspect that their new home was haunted.
+Manfred, being a skeptic, tried to find rational explanations for the strange events. He checked the house for any hidden rooms, secret passages, or other structural issues that could be causing the
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 2.5217 sec total                 
+Time to first token: 0.0602 sec with parallel prefill.                
+
+      Total throughput: 79.3121 tokens/sec, 0.0126 s/token                 
+First token throughput: 16.6227 tokens/sec, 0.0602 s/token                 
+ Next token throughput: 80.8442 tokens/sec, 0.0124 s/token                     
+
+Bandwidth achieved: 1273.79 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 62.39                 
+Average tokens/sec (first token): 16.23                 
+Average tokens/sec (next tokens): 63.37 
+                
+Memory used: 16.91 GB

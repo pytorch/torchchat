@@ -1,0 +1,75 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.11 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in the ancient kingdom of Aethoria, there lived a young warrior princess named Eira. Eira was known throughout the land for her unmatched bravery, strength, and unwavering dedication to justice. Her people adored her, and her enemies trembled at the mere mention of her name.
+Eira's journey began when she was just a child, training in the ways of combat and magic under the watchful eye of her wise and powerful mentor, the sorceress Arachne. Arachne had taken Eira under her wing, recognizing the young princess's innate potential and grooming her to one day take the throne.
+As Eira grew in power and wisdom, she became increasingly frustrated with the injustices that plagued her kingdom. Corruption, tyranny, and oppression were rampant, and Eira saw it as her duty to put an end to them. She spent countless hours studying the ancient lore and magical texts, seeking a deeper understanding of the world and the forces that shaped it.
+One fateful day, a dark and malevolent force began to spread across the land, threatening to destroy everything Eira held dear. A powerful sorcerer-king, named Malakar, had risen to power, using his mastery of dark magic to enslave the people
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 220.2756 sec total                 
+Time to first token: 0.6765 sec with parallel prefill.                
+
+      Total throughput: 1.1622 tokens/sec, 0.8605 s/token                 
+First token throughput: 1.4782 tokens/sec, 0.6765 s/token                 
+ Next token throughput: 1.1612 tokens/sec, 0.8612 s/token                     
+
+Bandwidth achieved: 18.67 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2.2e+02 seconds
+
+========================================
+
+Once upon a time, there lived a rabbit named Rosie. Rosie was different from the other rabbits in the forest. While they were content to spend their days nibbling on carrots and lounging in the sun, Rosie had a passion for adventure.
+Rosie had heard of a hidden garden deep within the forest, full of the most beautiful and exotic flowers she had ever seen. She had always dreamed of exploring it, but she was afraid of the unknown dangers that lay within.
+One day, Rosie decided that she had had enough of being afraid. She packed a small bag with some carrots, a canteen of water, and a map, and set off on her journey to the hidden garden.
+As she wandered through the forest, Rosie encountered all sorts of obstacles. She had to navigate through thick underbrush, cross rushing streams, and climb steep hills. But she persevered, driven by her determination to reach the garden.
+Finally, after what seemed like hours of walking, Rosie caught sight of a glimpse of green through the trees. She quickened her pace, her heart racing with excitement.
+As she pushed through the final curtain of foliage, Rosie gasped in wonder. Before her lay a garden unlike any she had ever seen. The flowers were more vibrant and exotic than she had imagined,
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 81.8519 sec total                 
+Time to first token: 0.4276 sec with parallel prefill.                
+
+      Total throughput: 3.1276 tokens/sec, 0.3197 s/token                 
+First token throughput: 2.3387 tokens/sec, 0.4276 s/token                 
+ Next token throughput: 3.1317 tokens/sec, 0.3193 s/token                     
+
+Bandwidth achieved: 50.23 GB/s
+
+========================================
+
+Once upon a time, in a land far, far away, there was the most magical city in all the land. It was a place where dreams came true and magic was real. The city was called Everwood, and it was a place of wonder and enchantment.
+Everwood was a city of towering trees that seemed to stretch up to the sky, their branches tangled and woven together in a way that seemed almost... magical. The trees were covered in leaves that shimmered and sparkled in the sunlight, and the air was filled with the sweet scent of honey and lavender.
+In the heart of Everwood, there was a great and ancient tree, the Heartwood. It was said that the Heartwood was the source of all magic in the city, and that it held the secrets of the ancient ones. The Heartwood was a place of great power and wisdom, and many sought to unlock its secrets.
+In Everwood, the inhabitants were a magical people, with the ability to communicate with animals and control the elements. They lived in harmony with the natural world, and their city was a reflection of this harmony. Everwood was a place of beauty and wonder, where anything seemed possible.
+But, as magical as Everwood was, it was not without its dangers. There were dark
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 83.6049 sec total                 
+Time to first token: 0.4247 sec with parallel prefill.                
+
+      Total throughput: 3.0620 tokens/sec, 0.3266 s/token                 
+First token throughput: 2.3546 tokens/sec, 0.4247 s/token                 
+ Next token throughput: 3.0656 tokens/sec, 0.3262 s/token                     
+
+Bandwidth achieved: 49.18 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 3.09                 
+Average tokens/sec (first token): 2.35                 
+Average tokens/sec (next tokens): 3.10 
+                
+Memory used: 0.00 GB
