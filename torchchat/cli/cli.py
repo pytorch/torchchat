@@ -579,7 +579,7 @@ def arg_init(args):
                 print(f'overriding json-specified device {executor_handler["accelerator"]} with cli device {args.device}')
                 executor_handler["accelerator"] = args.device
 
-    if "mps" in args.device:
+    if "mps" in str(args.device):
         if getattr(args, "compile", False) or getattr(args, "compile_prefill", False):
             print(
                 "Warning: compilation is not available with device MPS, ignoring option to engage compilation"

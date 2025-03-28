@@ -86,13 +86,10 @@ then
 elif [[ -x "$(command -v npu-smi)" ]];
 then
   REQUIREMENTS_TO_INSTALL=(
-    torch=="2.4.0"
-    torch_npu=="2.4.0"
-    torchvision=="0.19.0"
-    torchaudio=="2.4.0"
-    torchtune=="0.5.0"
-    numpy=="1.26.4"
-    decorator=="5.2.1"
+    torch=="2.5.1"
+    torchvision=="0.20.1"
+    torchaudio=="2.5.1"
+    torchtune=="0.6.0.${TUNE_NIGHTLY_VERSION}"
   )
 else
   REQUIREMENTS_TO_INSTALL=(

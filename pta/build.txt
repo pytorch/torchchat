@@ -1,0 +1,11 @@
+build_command
+  BUILD_WITHOUT_SHA=1 sh ci/build.sh --python=3.10
+buildInfo
+    pytorch_branch    v2.5.1
+    pytorch_commit    4ba88a9
+    commit_op-plugin  a8714b9
+    commit_Tensorpipe ba9c1ee
+    commit_torchair   65c3601
+    build_time        2025-03-08 05:12:05
+    gcc_version       gcc (GCC) 10.2.1
+https://pytorch-package.obs.cn-north-4.myhuaweicloud.com/pta/Daily/v2.5.1/20250308.3/pytorch_v2.5.1_py310.tar.gz

@@ -229,6 +229,7 @@ def find_multiple(n: int, k: int) -> int:
 
 
 def device_sync(device="cpu"):
+    device = str(device)
     if "cuda" in device:
         torch.cuda.synchronize(device)
     elif "xpu" in device:
@@ -277,17 +278,34 @@ def is_mps_available() -> bool:
     # MPS, is that you?
     return True
 
+def is_npu_available(check_device=False):
+    "Checks if `torch_npu` is installed and potentially if a NPU is in the environment"
+    import importlib.util
+    if importlib.util.find_spec("torch_npu") is None:
+        return False
+
+    import torch_npu  # noqa: F401 
+
+    if check_device:
+        try:
+            # Will raise a RuntimeError if no NPU is found
+            _ = torch.npu.device_count()
+            return torch.npu.is_available()
+        except RuntimeError:
+            return False
+    return hasattr(torch, "npu") and torch.npu.is_available()
+
 def select_device(device) -> str:
-    if device == "cuda":
-        return torch.device("cuda")
-    elif device == "mps":
-        return torch.device("mps")
-    elif device == "xpu":
-        return torch.device("xpu")
-    elif device == "npu":
-        return torch.device("npu")
+    if torch.cuda.is_available():
+        return "cuda"
+    elif is_mps_available():
+        return "mps"
+    elif is_npu_available():
+        return "npu"
+    elif torch.xpu.is_available():
+        return "xpu"
     else:
-        return torch.device("cpu")
+        return "cpu"
 
 
 def get_device_str(device) -> str:

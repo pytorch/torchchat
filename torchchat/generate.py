@@ -1632,10 +1632,11 @@ def run_generator(
         )
         if torch.cuda.is_available():
             torch.cuda.reset_peak_memory_stats()
-        elif torch.npu.is_available():
-            torch.npu.reset_peak_memory_stats()
         elif torch.xpu.is_available():
             torch.xpu.reset_peak_memory_stats()
+        elif torch.npu.is_available():
+            print("torch npu: ", torch.npu.is_available())
+            torch.npu.reset_peak_memory_stats()
 
         for _ in gen.chat(generator_args):
             pass
