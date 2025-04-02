@@ -431,6 +431,14 @@ def _add_evaluation_args(parser) -> None:
         default=None,
         help="Maximum length sequence to evaluate",
     )
+    
+    eval_parser.add_argument(
+        "--modality",
+        type=str,
+        default="text",
+        choices=["text", "text-image"],
+        help="Modality of the model. Options: text, text-image",
+    )
 
 
 # Add CLI Args related to distributed inference
