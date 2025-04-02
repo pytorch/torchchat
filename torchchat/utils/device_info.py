@@ -8,7 +8,6 @@ import platform
 from subprocess import check_output
 
 import torch
-import torch_npu
 
 def get_device_info(device: str) -> str:
     """Returns a human-readable description of the hardware based on a torch.device.type
@@ -47,6 +46,5 @@ def get_device_info(device: str) -> str:
             .split("Device Name:")[1]
             )
     if device == "npu":
-        import torch_npu
         return torch.npu.get_device_name(0)
     return ""

@@ -71,6 +71,9 @@ then
 elif [[ -x "$(command -v xpu-smi)" ]];
 then
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/xpu"
+elif [[ -x "$(command -v npu-smi)" ]]
+then
+  TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/test/cpu"
 else
   TORCH_NIGHTLY_URL="https://download.pytorch.org/whl/nightly/cpu"
 fi
@@ -86,10 +89,9 @@ then
 elif [[ -x "$(command -v npu-smi)" ]];
 then
   REQUIREMENTS_TO_INSTALL=(
-    torch=="2.5.1"
-    torchvision=="0.20.1"
-    torchaudio=="2.5.1"
-    torchtune=="0.6.0.${TUNE_NIGHTLY_VERSION}"
+    torch=="2.7.0"
+    torchvision=="0.22.0"
+    torchtune=="0.6.0"
   )
 else
   REQUIREMENTS_TO_INSTALL=(

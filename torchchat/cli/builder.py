@@ -16,8 +16,6 @@ import torch._dynamo.config
 import torch._inductor.config
 import torch.distributed as dist
 
-import torch_npu
-
 from torchchat.distributed.utils import(
     Color as color,
     CUDATrackTime,

@@ -1599,6 +1599,12 @@ class DistributedGenerator(LocalGenerator):
         
         return idx_next, probs
 
+def is_npu_available():
+    import importlib.util
+    if importlib.util.find_spec("torch_npu") is None:
+        return False
+
+    return hasattr(torch, "npu") and torch.npu.is_available()
 
 def run_generator(
     args,
@@ -1634,8 +1640,7 @@ def run_generator(
             torch.cuda.reset_peak_memory_stats()
         elif torch.xpu.is_available():
             torch.xpu.reset_peak_memory_stats()
-        elif torch.npu.is_available():
-            print("torch npu: ", torch.npu.is_available())
+        elif is_npu_available():
             torch.npu.reset_peak_memory_stats()
 
         for _ in gen.chat(generator_args):

@@ -229,7 +229,6 @@ def find_multiple(n: int, k: int) -> int:
 
 
 def device_sync(device="cpu"):
-    device = str(device)
     if "cuda" in device:
         torch.cuda.synchronize(device)
     elif "xpu" in device:
@@ -284,11 +283,10 @@ def is_npu_available(check_device=False):
     if importlib.util.find_spec("torch_npu") is None:
         return False
 
-    import torch_npu  # noqa: F401 
+    import torch_npu
 
     if check_device:
         try:
-            # Will raise a RuntimeError if no NPU is found
             _ = torch.npu.device_count()
             return torch.npu.is_available()
         except RuntimeError:
