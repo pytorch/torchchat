@@ -1303,7 +1303,7 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
             print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
         elif torch.xpu.is_available():
             print(f"Memory used: {torch.xpu.max_memory_reserved() / 1e9:.02f} GB")
-        elif torch.npu.is_available():
+        elif is_npu_available():
             print(f"Memory used: {torch.npu.max_memory_reserved() / 1e9:.02f} GB")
 
 
