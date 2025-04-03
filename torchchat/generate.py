@@ -1303,7 +1303,7 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
             print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
         elif torch.xpu.is_available():
             print(f"Memory used: {torch.xpu.max_memory_reserved() / 1e9:.02f} GB")
-        elif is_npu_available():
+        elif hasattr(torch, "npu") and torch.npu.is_available():
             print(f"Memory used: {torch.npu.max_memory_reserved() / 1e9:.02f} GB")
 
 
@@ -1599,13 +1599,6 @@ class DistributedGenerator(LocalGenerator):
         
         return idx_next, probs
 
-def is_npu_available():
-    import importlib.util
-    if importlib.util.find_spec("torch_npu") is None:
-        return False
-
-    return hasattr(torch, "npu") and torch.npu.is_available()
-
 def run_generator(
     args,
     rank: Optional[int] =None
@@ -1640,7 +1633,7 @@ def run_generator(
             torch.cuda.reset_peak_memory_stats()
         elif torch.xpu.is_available():
             torch.xpu.reset_peak_memory_stats()
-        elif is_npu_available():
+        elif hasattr(torch, "npu") and torch.npu.is_available():
             torch.npu.reset_peak_memory_stats()
 
         for _ in gen.chat(generator_args):

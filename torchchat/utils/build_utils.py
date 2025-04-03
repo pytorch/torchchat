@@ -277,28 +277,12 @@ def is_mps_available() -> bool:
     # MPS, is that you?
     return True
 
-def is_npu_available(check_device=False):
-    "Checks if `torch_npu` is installed and potentially if a NPU is in the environment"
-    import importlib.util
-    if importlib.util.find_spec("torch_npu") is None:
-        return False
-
-    import torch_npu
-
-    if check_device:
-        try:
-            _ = torch.npu.device_count()
-            return torch.npu.is_available()
-        except RuntimeError:
-            return False
-    return hasattr(torch, "npu") and torch.npu.is_available()
-
 def select_device(device) -> str:
     if torch.cuda.is_available():
         return "cuda"
     elif is_mps_available():
         return "mps"
-    elif is_npu_available():
+    elif hasattr(torch, "npu") and torch.npu.is_available():
         return "npu"
     elif torch.xpu.is_available():
         return "xpu"
