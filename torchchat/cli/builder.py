@@ -78,7 +78,7 @@ class BuilderArgs:
                 self.device = "cuda"
             elif torch.xpu.is_available():
                 self.device = "xpu"
-            elif torch.npu.is_available():
+            elif hasattr(torch, "npu") and torch.npu.is_available():
                 self.device = "npu"
             else:
                 self.device = "cpu"
