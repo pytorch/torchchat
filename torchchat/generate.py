@@ -1213,10 +1213,10 @@ class LocalGenerator:
                     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
                 elif self.builder_args.device == "cuda":
                     print(prof.key_averages().table(sort_by="self_cuda_time_total"))
+                elif self.builder_args.device == "xpu":
+                    print(prof.key_averages().table(sort_by="self_xpu_time_total"))
                 elif self.builder_args.device == "npu":
                     print(prof.key_averages().table(sort_by="self_npu_time_total"))
-                else:
-                    print(prof.key_averages().table(sort_by="self_xpu_time_total"))
                 prof.export_chrome_trace(f"{self.profile}.json")
 
             if start_pos >= max_seq_length:
