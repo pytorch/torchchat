@@ -56,6 +56,7 @@ from torchao.experimental.packed_linear_int8_dynamic_activation_intx_weight_layo
 from torchao.experimental.quant_api import (
     int8_dynamic_activation_intx_weight,
     IntxWeightEmbeddingQuantizer,
+    UIntxWeightOnlyLinearQuantizer,
 )
 from torchao.quantization.granularity import (
     PerGroup,
@@ -137,12 +138,12 @@ def quantize_model(
                 group_size = q_kwargs["groupsize"]
                 bit_width = q_kwargs["bitwidth"]
                 has_weight_zeros = q_kwargs["has_weight_zeros"]
-                granularity = PerRow() if group_size == -1 else PerGroup(group_size) 
+                granularity = PerRow() if group_size == -1 else PerGroup(group_size)
                 weight_dtype = getattr(torch, f"int{bit_width}")
 
                 try:
                     quantize_(
-                        model, 
+                        model,
                         int8_dynamic_activation_intx_weight(
                             weight_dtype=weight_dtype,
                             granularity=granularity,
@@ -154,7 +155,7 @@ def quantize_model(
                     print("Encountered error during quantization: {e}")
                     print("Trying with PlainLayout")
                     quantize_(
-                        model, 
+                        model,
                         int8_dynamic_activation_intx_weight(
                             weight_dtype=weight_dtype,
                             granularity=granularity,
@@ -946,38 +947,5 @@ quantizer_class_dict = {
     "linear:int4": Int4WeightOnlyQuantizer,
     "linear:a8wxdq": None, # uses quantize_ API
     "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
+    "linear:afpwx": UIntxWeightOnlyLinearQuantizer,
 }
-
-try:
-    import importlib.util
-    import os
-    import sys
-
-    torchao_build_path = f"{os.getcwd()}/torchao-build"
-
-    # Try loading quantizer
-    torchao_experimental_quant_api_spec = importlib.util.spec_from_file_location(
-        "torchao_experimental_quant_api",
-        f"{torchao_build_path}/src/ao/torchao/experimental/quant_api.py",
-    )
-    torchao_experimental_quant_api = importlib.util.module_from_spec(
-        torchao_experimental_quant_api_spec
-    )
-    sys.modules["torchao_experimental_quant_api"] = torchao_experimental_quant_api
-    torchao_experimental_quant_api_spec.loader.exec_module(
-        torchao_experimental_quant_api
-    )
-    from torchao_experimental_quant_api import UIntxWeightOnlyLinearQuantizer
-    quantizer_class_dict["linear:afpwx"] = UIntxWeightOnlyLinearQuantizer
-
-    # Try loading custom op
-    try:
-        libname = "libtorchao_ops_mps_aten.dylib"
-        libpath = f"{torchao_build_path}/cmake-out/lib/{libname}"
-        torch.ops.load_library(libpath)
-        print("Loaded torchao mps ops.")
-    except Exception as e:
-        print("Unable to load torchao mps ops library.")
-
-except Exception as e:
-    print("Unable to import torchao experimental quant_api with error: ", e)
