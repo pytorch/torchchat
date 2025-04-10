@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "torchchat"
+version = "0.1.0"
+description = "PyTorch showcase for running LLMs on local devices"
+authors = [
+  {name="PyTorch Team", email="packages@pytorch.org"},
+]
+license = { file = "LICENSE" }
+keywords = ["pytorch", "machine learning", "llm"]
+readme = "README.md"
+requires-python = ">=3.10"
+
+[project.dependencies]
+huggingface_hub = "*"
+gguf = "*"
+tiktoken = "*"
+tokenizers = "*"
+jinja2 = "*"
+snakeviz = "*"
+sentencepiece = "*"
+numpy = ">=1.17"
+blobfile = "*"
+tomli = { version = ">=1.1.0", markers = "python_version < '3.11'" }
+openai = "*"
+wheel = "*"
+cmake = ">=3.24, <4.0.0"
+ninja = "*"
+zstd = "*"
+pytest = "*"
+streamlit = "*"
+flask = "*"
+lm_eval = "==0.4.7"
