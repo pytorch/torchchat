@@ -277,22 +277,18 @@ def is_mps_available() -> bool:
     # MPS, is that you?
     return True
 
-def select_device(device) -> str:
-    if torch.cuda.is_available():
-        return "cuda"
-    elif is_mps_available():
-        return "mps"
-    elif hasattr(torch, "npu") and torch.npu.is_available():
-        return "npu"
-    elif torch.xpu.is_available():
-        return "xpu"
+def select_device() -> str:
+    if torch.accelerator.is_available():
+        device = str(torch.accelerator.current_accelerator())
+        if device == "mps" and not is_mps_available():
+            return "cpu"
+        return device
     else:
         return "cpu"
 
-
 def get_device_str(device) -> str:
     if isinstance(device, str) and device == "fast":
-        device = select_device(device)
+        device = select_device()
         return device
     else:
         return str(device)
@@ -300,7 +296,7 @@ def get_device_str(device) -> str:
 
 def get_device(device) -> str:
     if isinstance(device, str) and device == "fast":
-        device = select_device(device)
+        device = select_device()
     return torch.device(device)
 
 

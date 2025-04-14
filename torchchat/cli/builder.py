@@ -74,12 +74,8 @@ class BuilderArgs:
 
     def __post_init__(self):
         if self.device is None:
-            if torch.cuda.is_available():
-                self.device = "cuda"
-            elif torch.xpu.is_available():
-                self.device = "xpu"
-            elif hasattr(torch, "npu") and torch.npu.is_available():
-                self.device = "npu"
+            if torch.accelerator.is_available():
+                self.device = str(torch.accelerator.current_accelerator())
             else:
                 self.device = "cpu"
 
