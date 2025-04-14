@@ -27,6 +27,9 @@ cmake>=3.24, < 4.0.0  # 4.0 is BC breaking
 ninja
 zstd
 
+# Test tools
+pytest
+
 # Browser mode
 streamlit
 
