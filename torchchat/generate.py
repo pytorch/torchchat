@@ -321,7 +321,7 @@ class LocalGenerator:
         draft_quantize: bool,
     ):
         torch._inductor.config.coordinate_descent_tuning = (
-            builder_args.device != "cpu"
+            builder_args.device not in ["cpu", "mps"]
         )
         torch._inductor.config.triton.unique_kernel_names = True
         torch._inductor.config.fx_graph_cache = True  # Experimental feature to reduce compilation times, will be on by default in future
@@ -1319,7 +1319,7 @@ class DistributedGenerator(LocalGenerator):
         quantize: bool,
         draft_quantize: bool,
         ):
-        
+
         is_speculative = speculative_builder_args.checkpoint_path is not None
         assert is_speculative == False, "Distributed inference with pp > 1 does not support speculative inference yet."
         super().__init__(
@@ -1340,7 +1340,7 @@ class DistributedGenerator(LocalGenerator):
                 text = [input(prompt)]
             else:
                 text = [None]
-            
+
             dist.broadcast_object_list(text)
             return text[0]
 
@@ -1495,7 +1495,7 @@ class DistributedGenerator(LocalGenerator):
         # TODO: we need to pass `input_pos` and `cache_lane` to each stage.
         lane = 0
         kwargs = {"input_pos": input_pos, "cache_lane": lane}
-        
+
         if self.pp_rank == self.first_pp_rank:
             logits = self.prefiller.step(padded_seq, **kwargs)
         elif self.pp_rank == self.last_pp_rank:
@@ -1596,7 +1596,7 @@ class DistributedGenerator(LocalGenerator):
             return (idx_next, None)
         probs = self.logits_to_probs(logits[0, -1], temperature, top_k)
         idx_next = self.multinomial_sample_one_no_sync(probs)
-        
+
         return idx_next, probs
 
 def run_generator(
@@ -1604,12 +1604,12 @@ def run_generator(
     rank: Optional[int] =None
     ):
     """
-    This function creates and executes a generator 
+    This function creates and executes a generator
     """
     builder_args = BuilderArgs.from_args(args)
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
-    generator_args = GeneratorArgs.from_args(args)    
+    generator_args = GeneratorArgs.from_args(args)
     #Setup rank 1 and up to suppress log messages and print messages
     if builder_args.distributed and rank != 0:
         logger.setLevel(logging.CRITICAL)
@@ -1641,7 +1641,7 @@ def run_generator(
 
 def main(args):
     builder_args = BuilderArgs.from_args(args)
-    
+
     if builder_args.distributed:
         world_size = builder_args.tp * builder_args.pp
 
