@@ -123,7 +123,7 @@ def quantize_model(
             raise RuntimeError(f"unknown quantizer {quantizer} specified")
         else:
             # Use tensor subclass API for int4 weight only.
-            if (device == "cuda" or device == "xpu") and quantizer == "linear:int4":
+            if (device in ["cuda", "xpu", "npu"]) and quantizer == "linear:int4":
                 quantize_(model, int4_weight_only(q_kwargs["groupsize"]))
                 if not support_tensor_subclass:
                     unwrap_tensor_subclass(model)

@@ -9,12 +9,11 @@ from subprocess import check_output
 
 import torch
 
-
 def get_device_info(device: str) -> str:
     """Returns a human-readable description of the hardware based on a torch.device.type
 
     Args:
-        device: A torch.device.type string: one of {"cpu", "cuda", "xpu"}.
+        device: A torch.device.type string: one of {"cpu", "cuda", "xpu", "npu"}.
     Returns:
         str: A human-readable description of the hardware or an empty string if the device type is unhandled.
 
@@ -46,4 +45,6 @@ def get_device_info(device: str) -> str:
             .split("\n")[0]
             .split("Device Name:")[1]
             )
+    if device == "npu":
+        return torch.npu.get_device_name(0)
     return ""
