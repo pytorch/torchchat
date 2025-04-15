@@ -786,15 +786,15 @@ class Attention(nn.Module):
         assert config.dim % config.n_heads == 0
 
         # key, query, value projections for all heads, but in a batch
-        # total_head_dim = (config.n_heads + 2 * config.n_local_heads) * config.head_dim
-        # self.wqkv = nn.Linear(config.dim, total_head_dim, bias=config.attention_bias)
-        self.wq = nn.Linear(config.dim, config.n_heads * config.head_dim, bias=config.attention_bias)
-        self.wk = nn.Linear(
-            config.dim, config.n_local_heads * config.head_dim, bias=config.attention_bias
-        )
-        self.wv = nn.Linear(
-            config.dim, config.n_local_heads * config.head_dim, bias=config.attention_bias
-        )
+        total_head_dim = (config.n_heads + 2 * config.n_local_heads) * config.head_dim
+        self.wqkv = nn.Linear(config.dim, total_head_dim, bias=config.attention_bias)
+        # self.wq = nn.Linear(config.dim, config.n_heads * config.head_dim, bias=config.attention_bias)
+        # self.wk = nn.Linear(
+        #     config.dim, config.n_local_heads * config.head_dim, bias=config.attention_bias
+        # )
+        # self.wv = nn.Linear(
+        #     config.dim, config.n_local_heads * config.head_dim, bias=config.attention_bias
+        # )
 
         self.wo = nn.Linear(config.dim, config.dim, bias=config.attention_bias)
         self.kv_cache = None
@@ -817,45 +817,52 @@ class Attention(nn.Module):
             for _ in range(cache_lanes)
         ])
 
+    # def load_hook(self, state_dict, prefix, *args):
+    #     # if prefix + "wq.weight" in state_dict:
+    #     #     wq = state_dict.pop(prefix + "wq.weight")
+    #     #     wk = state_dict.pop(prefix + "wk.weight")
+    #     #     wv = state_dict.pop(prefix + "wv.weight")
+    #     #     state_dict[prefix + "wqkv.weight"] = torch.cat([wq, wk, wv])
+    #
+    #     for tensor_suffix in ["weight", "bias"]:
+    #         wqkv_key = f"{prefix}wqkv.{tensor_suffix}"
+    #         if wqkv_key in state_dict:
+    #             wqkv = state_dict.pop(wqkv_key)
+    #             q_size = self.n_heads * self.head_dim
+    #             kv_size = self.n_local_heads * self.head_dim
+    #             wq, wk, wv = torch.split(wqkv, (q_size, kv_size, kv_size), dim=0)
+    #             state_dict[f"{prefix}wq.{tensor_suffix}"] = wq
+    #             state_dict[f"{prefix}wk.{tensor_suffix}"] = wk
+    #             state_dict[f"{prefix}wv.{tensor_suffix}"] = wv
+    #
+    #     return
+    #
+    #     def _unfuse_wqkv_state_dict(
+    #         state_dict: Dict[str, torch.Tensor],
+    #         dim: int,
+    #     ):
+    #         for key in list(state_dict):
+    #             if key.endswith("wqkv.weight"):
+    #                 tensor = state_dict[key]
+    #                 wq_key = key.replace("wqkv.weight", "wq.weight")
+    #                 state_dict[wq_key] = tensor[:dim]
+    #                 wk_key = key.replace("wqkv.weight", "wk.weight")
+    #                 wv_key = key.replace("wqkv.weight", "wv.weight")
+    #                 wk, wv = tensor[dim:].chunk(2, 0)
+    #                 state_dict[wk_key] = wk
+    #                 state_dict[wv_key] = wv
+    #                 state_dict.pop(key)
+    #             else:
+    #                 continue
+    #
+    #     _unfuse_wqkv_state_dict(state_dict, self.dim)
+
     def load_hook(self, state_dict, prefix, *args):
-        # if prefix + "wq.weight" in state_dict:
-        #     wq = state_dict.pop(prefix + "wq.weight")
-        #     wk = state_dict.pop(prefix + "wk.weight")
-        #     wv = state_dict.pop(prefix + "wv.weight")
-        #     state_dict[prefix + "wqkv.weight"] = torch.cat([wq, wk, wv])
-
-        for tensor_suffix in ["weight", "bias"]:
-            wqkv_key = f"{prefix}wqkv.{tensor_suffix}"
-            if wqkv_key in state_dict:
-                wqkv = state_dict.pop(wqkv_key)
-                q_size = self.n_heads * self.head_dim
-                kv_size = self.n_local_heads * self.head_dim
-                wq, wk, wv = torch.split(wqkv, (q_size, kv_size, kv_size), dim=0)
-                state_dict[f"{prefix}wq.{tensor_suffix}"] = wq
-                state_dict[f"{prefix}wk.{tensor_suffix}"] = wk
-                state_dict[f"{prefix}wv.{tensor_suffix}"] = wv
-
-        return
-
-        def _unfuse_wqkv_state_dict(
-            state_dict: Dict[str, torch.Tensor],
-            dim: int,
-        ):
-            for key in list(state_dict):
-                if key.endswith("wqkv.weight"):
-                    tensor = state_dict[key]
-                    wq_key = key.replace("wqkv.weight", "wq.weight")
-                    state_dict[wq_key] = tensor[:dim]
-                    wk_key = key.replace("wqkv.weight", "wk.weight")
-                    wv_key = key.replace("wqkv.weight", "wv.weight")
-                    wk, wv = tensor[dim:].chunk(2, 0)
-                    state_dict[wk_key] = wk
-                    state_dict[wv_key] = wv
-                    state_dict.pop(key)
-                else:
-                    continue
-
-        _unfuse_wqkv_state_dict(state_dict, self.dim)
+        if prefix + "wq.weight" in state_dict:
+            wq = state_dict.pop(prefix + "wq.weight")
+            wk = state_dict.pop(prefix + "wk.weight")
+            wv = state_dict.pop(prefix + "wv.weight")
+            state_dict[prefix + "wqkv.weight"] = torch.cat([wq, wk, wv])
 
     def distribute(self, device_mesh: DeviceMesh):
         self.tp_degree = device_mesh.size()
@@ -874,11 +881,11 @@ class Attention(nn.Module):
     ) -> Tensor:
         bsz, seqlen, _ = x.shape
 
-        q = self.wq(x)
-        k = self.wk(x)
-        v = self.wv(x)
-        # kv_size = self.n_local_heads * self.head_dim
-        # q, k, v = self.wqkv(x).split([self.dim, kv_size, kv_size], dim=-1)
+        # q = self.wq(x)
+        # k = self.wk(x)
+        # v = self.wv(x)
+        kv_size = self.n_local_heads * self.head_dim
+        q, k, v = self.wqkv(x).split([self.dim, kv_size, kv_size], dim=-1)
 
         # Giving "-1" to view ops so that they infer the correct number of heads
         # from the input tensor.  This is done to support both TP and non-TP
