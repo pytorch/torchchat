@@ -31,9 +31,16 @@ else
 fi
 echo "Using pip executable: $PIP_EXECUTABLE"
 
+if [[ $(uname -s) == "Darwin" && $(uname -m) == "arm64" ]]; then
+  echo "Building torchao experimental mps ops (Apple Silicon detected)"
+  APPLE_SILICON_DETECTED=1
+else
+  echo "NOT building torchao experimental mps ops (Apple Silicon NOT detected)"
+  APPLE_SILICON_DETECTED=0
+fi
 
 export TORCHAO_PIN=$(cat install/.pins/torchao-pin.txt)
 (
   set -x
-  USE_CPP=1 $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@${TORCHAO_PIN}
+  USE_CPP=1 TORCHAO_BUILD_EXPERIMENTAL_MPS=${APPLE_SILICON_DETECTED} $PIP_EXECUTABLE install git+https://github.com/pytorch/ao.git@${TORCHAO_PIN}
 )
