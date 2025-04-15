@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -12,25 +12,29 @@ authors = [
 license = { file = "LICENSE" }
 keywords = ["pytorch", "machine learning", "llm"]
 readme = "README.md"
-requires-python = ">=3.10"
 
-[project.dependencies]
-huggingface_hub = "*"
-gguf = "*"
-tiktoken = "*"
-tokenizers = "*"
-jinja2 = "*"
-snakeviz = "*"
-sentencepiece = "*"
-numpy = ">=1.17"
-blobfile = "*"
-tomli = { version = ">=1.1.0", markers = "python_version < '3.11'" }
-openai = "*"
-wheel = "*"
-cmake = ">=3.24, <4.0.0"
-ninja = "*"
-zstd = "*"
-pytest = "*"
-streamlit = "*"
-flask = "*"
-lm_eval = "==0.4.7"
+requires-python = ">=3.10"
+dependencies=[
+  "huggingface_hub",
+  "gguf",
+  "tiktoken",
+  "tokenizers",
+  "jinja2",
+  "snakeviz",
+  "sentencepiece",
+  "numpy>=1.17",
+  "blobfile",
+  "tomli>=1.1.0; python_version < '3.11'",
+  "openai",
+  "wheel",
+  "cmake>=3.24,<4.0.0",
+  "ninja",
+  "zstd",
+  "pytest",
+  "streamlit",
+  "flask",
+  "lm-eval==0.4.7",
+]
+
+[tool.setuptools]
+packages = ["torchchat"]
