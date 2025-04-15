@@ -75,7 +75,7 @@ class BuilderArgs:
     def __post_init__(self):
         if self.device is None:
             if torch.accelerator.is_available():
-                self.device = str(torch.accelerator.current_accelerator())
+                self.device = torch.accelerator.current_accelerator().type
             else:
                 self.device = "cpu"
 

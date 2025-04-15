@@ -279,7 +279,7 @@ def is_mps_available() -> bool:
 
 def select_device() -> str:
     if torch.accelerator.is_available():
-        device = str(torch.accelerator.current_accelerator())
+        device = torch.accelerator.current_accelerator().type
         if device == "mps" and not is_mps_available():
             return "cpu"
         return device
