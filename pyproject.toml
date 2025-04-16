@@ -33,12 +33,12 @@ dependencies=[
   "sentencepiece",
   "numpy>=1.17",
   "blobfile",
-  "tomli>=1.1.0; python_version < '3.11'",
+  "tomli>=1.1.0; python_version<'3.11'",
   "openai",
 
   # Build tools
   "wheel",
-  "cmake>=3.24,<4.0.0",
+  "cmake>=3.24,<4.0.0", # 4.0 is BC breaking
   "ninja",
   "zstd",
 
