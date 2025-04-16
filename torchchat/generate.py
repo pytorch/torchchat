@@ -1043,7 +1043,7 @@ class LocalGenerator:
                         m.compile()
             else:
                 self.decode_one_token = torch.compile(
-                    self.decode_one_token, fullgraph=True, **kwargs
+                    self.decode_one_token, fullgraph=False, **kwargs
                 )
 
             if generator_args.compile_prefill:

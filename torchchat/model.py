@@ -663,7 +663,7 @@ class Transformer(nn.Module):
             self.layers[str(layer_id)] = TransformerBlock(config)
 
         if config.stage_idx == config.n_stages - 1:
-            self.norm = nn.RMSNorm(config.dim, eps=config.norm_eps)
+            self.norm = RMSNorm(config.dim, eps=config.norm_eps)
             self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
             if config.tie_word_embeddings:
                 self.output.weight = self.tok_embeddings.weight
@@ -757,8 +757,8 @@ class TransformerBlock(nn.Module):
         super().__init__()
         self.attention = Attention(config)
         self.feed_forward = FeedForward(config)
-        self.ffn_norm = nn.RMSNorm(config.dim, config.norm_eps)
-        self.attention_norm = nn.RMSNorm(config.dim, config.norm_eps)
+        self.ffn_norm = RMSNorm(config.dim, config.norm_eps)
+        self.attention_norm = RMSNorm(config.dim, config.norm_eps)
         # None for llama architecture, set for granite architectures
         self.residual_multiplier = (
             config.residual_multiplier
@@ -932,6 +932,18 @@ class FeedForward(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         return self.w2(F.silu(self.w1(x)) * self.w3(x))
+
+
+class RMSNorm(nn.Module):
+    def __init__(self, dim: int, eps: float = 1e-5):
+        super().__init__()
+        self.normalized_shape = (dim,)
+        self.eps = eps
+        self.weight = nn.Parameter(torch.ones(dim))
+
+    @torch.compiler.disable
+    def forward(self, x: Tensor) -> Tensor:
+        return F.rms_norm(x, self.normalized_shape, self.weight, self.eps)
 
 
 def apply_scaling(freqs: torch.Tensor, rope_scaling: Dict[str, Any]):
