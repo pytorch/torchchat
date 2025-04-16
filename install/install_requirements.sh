@@ -134,7 +134,3 @@ if [[ -x "$(command -v nvidia-smi)" ]]; then
     $PYTHON_EXECUTABLE torchchat/utils/scripts/patch_triton.py
   )
 fi
-(
-  set -x
-  $PIP_EXECUTABLE install evaluate=="0.4.3" lm-eval=="0.4.7" psutil=="6.0.0"
-)
