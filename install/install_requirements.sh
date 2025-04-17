@@ -50,8 +50,3 @@ echo "Using pip executable: $PIP_EXECUTABLE"
 )
 
 bash install/install_torch.sh
-
-(
-  set -x
-  $PIP_EXECUTABLE install evaluate=="0.4.3" lm-eval=="0.4.7" psutil=="6.0.0"
-)
