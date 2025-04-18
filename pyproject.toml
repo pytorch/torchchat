@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "torchchat"
+version = "0.1.0"
+description = "PyTorch showcase for running LLMs on local devices"
+authors = [
+  {name="PyTorch Team", email="packages@pytorch.org"},
+]
+license = { file = "LICENSE" }
+keywords = ["pytorch", "machine learning", "llm"]
+readme = "README.md"
+
+requires-python = ">=3.10"
+dependencies=[
+  # Hugging Face downloads
+  "huggingface_hub",
+
+  # GGUF import
+  "gguf",
+
+  # Tiktoken tokenizer for Llama 3 and other advanced models
+  "tiktoken",
+
+  # Tokenizers and jinja2 for other non-llama models that use HF tokenizers
+  "tokenizers",
+  "jinja2",
+
+  # Miscellaneous
+  "snakeviz",
+  "sentencepiece",
+  "numpy>=1.17",
+  "blobfile",
+  "tomli>=1.1.0; python_version<'3.11'",
+  "openai",
+
+  # Build tools
+  "wheel",
+  "cmake>=3.24,<4.0.0", # 4.0 is BC breaking
+  "ninja",
+  "zstd",
+
+  # Test tools
+  "pytest",
+
+  # Browser mode
+  "streamlit",
+
+  # Server mode
+  "flask",
+
+  # eval
+  "lm-eval==0.4.7",
+]
+
+[tool.setuptools]
+packages = ["torchchat"]
