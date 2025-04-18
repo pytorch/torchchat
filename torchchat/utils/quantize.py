@@ -55,7 +55,7 @@ from torchao.experimental.packed_linear_int8_dynamic_activation_intx_weight_layo
 )
 from torchao.experimental.quant_api import (
     int8_dynamic_activation_intx_weight,
-    IntxWeightEmbeddingQuantizer,
+    EmbeddingQuantizer,
 )
 from torchao.quantization.granularity import (
     PerGroup,
@@ -939,7 +939,7 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
 # class references
 quantizer_class_dict = {
     "embedding": EmbeddingOnlyQuantHandler,
-    "embedding:wx": IntxWeightEmbeddingQuantizer,
+    "embedding:wx": EmbeddingQuantizer,
     "linear:int8": WeightOnlyInt8QuantHandler,
     "precision": PrecisionHandler,
     "executor": ExecutorHandler,
