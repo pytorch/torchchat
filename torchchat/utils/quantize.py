@@ -55,7 +55,7 @@ from torchao.experimental.packed_linear_int8_dynamic_activation_intx_weight_layo
 )
 from torchao.experimental.quant_api import (
     int8_dynamic_activation_intx_weight,
-    IntxWeightEmbeddingQuantizer,
+    EmbeddingQuantizer,
 )
 from torchao.quantization.granularity import (
     PerGroup,
@@ -137,12 +137,12 @@ def quantize_model(
                 group_size = q_kwargs["groupsize"]
                 bit_width = q_kwargs["bitwidth"]
                 has_weight_zeros = q_kwargs["has_weight_zeros"]
-                granularity = PerRow() if group_size == -1 else PerGroup(group_size) 
+                granularity = PerRow() if group_size == -1 else PerGroup(group_size)
                 weight_dtype = getattr(torch, f"int{bit_width}")
 
                 try:
                     quantize_(
-                        model, 
+                        model,
                         int8_dynamic_activation_intx_weight(
                             weight_dtype=weight_dtype,
                             granularity=granularity,
@@ -154,7 +154,7 @@ def quantize_model(
                     print("Encountered error during quantization: {e}")
                     print("Trying with PlainLayout")
                     quantize_(
-                        model, 
+                        model,
                         int8_dynamic_activation_intx_weight(
                             weight_dtype=weight_dtype,
                             granularity=granularity,
@@ -939,7 +939,7 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
 # class references
 quantizer_class_dict = {
     "embedding": EmbeddingOnlyQuantHandler,
-    "embedding:wx": IntxWeightEmbeddingQuantizer,
+    "embedding:wx": EmbeddingQuantizer,
     "linear:int8": WeightOnlyInt8QuantHandler,
     "precision": PrecisionHandler,
     "executor": ExecutorHandler,
@@ -978,6 +978,20 @@ try:
         print("Loaded torchao mps ops.")
     except Exception as e:
         print("Unable to load torchao mps ops library.")
+
+    torchao_experimental_mps_op_lib_spec = importlib.util.spec_from_file_location(
+        "torchao_experimental_mps_op_lib",
+        f"{torchao_build_path}/src/ao/torchao/experimental/ops/mps/mps_op_lib.py",
+    )
+    torchao_experimental_mps_op_lib = importlib.util.module_from_spec(
+        torchao_experimental_mps_op_lib_spec
+    )
+    sys.modules["torchao_experimental_mps_op_lib"] = torchao_experimental_mps_op_lib
+    torchao_experimental_mps_op_lib_spec.loader.exec_module(
+        torchao_experimental_mps_op_lib
+    )
+    from torchao_experimental_mps_op_lib import *
+
 
 except Exception as e:
     print("Unable to import torchao experimental quant_api with error: ", e)
