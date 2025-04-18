@@ -554,30 +554,52 @@ class LocalGenerator:
                 )
                 input_pos += 1
                 new_tokens.append(next_token.clone())
-                callback(new_tokens[-1], done_generating=_i == num_new_tokens - 2)
-                if need_probs or next_prob is None:
+
+                done_generating = _i == num_new_tokens - 2
+                if need_probs:
+                    callback(new_tokens[-1], done_generating=done_generating)
+                if not need_probs or next_prob is None:
                     yield out_token, None
                 else:
-                    new_probs.append(next_prob.clone())
                     yield out_token, next_prob.clone()
                 cur_token = next_token
 
-                # encountered eos
-                if next_token.item() == eos_token_id or (
-                    eot_id is not None and next_token.item() == eot_id
-                ):
-                    encountered_eos = True
-                    final_token, next_prob = self.decode_one_token(
-                        model,
-                        cur_token,
-                        input_pos,
-                        need_probs,
-                        batch=batch,
-                        **sampling_kwargs,
-                    )
-                    input_pos += 1
-                    yield cur_token.clone(), next_prob.clone()
-                    break
+                if need_probs:
+                    # encountered eos
+                    if next_token.item() == eos_token_id or (
+                        eot_id is not None and next_token.item() == eot_id
+                    ):
+                        encountered_eos = True
+                        final_token, next_prob = self.decode_one_token(
+                            model,
+                            cur_token,
+                            input_pos,
+                            need_probs,
+                            batch=batch,
+                            **sampling_kwargs,
+                        )
+                        input_pos += 1
+                        yield cur_token.clone(), next_prob.clone()
+                        break
+                else:
+                    CALLBACK_BATCH = 8
+                    callback_pos = _i % CALLBACK_BATCH + 1
+                    if done_generating or callback_pos == CALLBACK_BATCH:
+                        callback_num = min(CALLBACK_BATCH, callback_pos)
+                        for i in range(callback_num, 0, -1):
+                            callback(new_tokens[-i], done_generating=done_generating)
+
+                            token_item = new_tokens[-i].item()
+                            # encountered eos
+                            if token_item == eos_token_id or (
+                                eot_id is not None and token_item == eot_id
+                            ):
+                                encountered_eos = True
+                                input_pos += 1
+                                yield new_tokens[-i].clone(), None
+                                break
+                        if encountered_eos:
+                            break
 
         if not encountered_eos:
             eos_token = torch.tensor(
@@ -788,7 +810,6 @@ class LocalGenerator:
                 input_pos = input_pos + num_added
                 next_token = next_tokens[-1]
         else:
-            generated_tokens = []
             for generated_token, _ in self.decode_n_tokens(
                 model,
                 next_token,
@@ -806,7 +827,6 @@ class LocalGenerator:
                 attention_backend=attention_backend,
                 **sampling_kwargs,
             ):
-                generated_tokens.append(generated_token.view(-1))
                 yield generated_token, None
 
         generate_stats = {
