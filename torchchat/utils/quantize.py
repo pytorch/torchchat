@@ -38,21 +38,15 @@ import torch.nn.functional as F
 # AttributeError: '_OpNamespace' 'quantized_decomposed' object has no attribute 'quantize_per_channel_group'
 
 from torch.ao.quantization.fx._decomposed import quantized_decomposed_lib  # noqa
-from torchao.dtypes import PlainLayout
-from torchao.experimental.packed_linear_int8_dynamic_activation_intx_weight_layout import (
-    PackedLinearInt8DynamicActivationIntxWeightLayout,
-)
-from torchao.experimental.quant_api import (
-    EmbeddingQuantizer,
-    int8_dynamic_activation_intx_weight,
-    IntxWeightEmbeddingQuantizer,
-    SharedEmbeddingQuantizer,
-)
-from torchao.quantization.granularity import PerGroup, PerRow
+from torchao.dtypes import PackedLinearInt8DynamicActivationIntxWeightLayout, QDQLayout
+from torchao.experimental.quant_api import EmbeddingQuantizer, SharedEmbeddingQuantizer
+from torchao.quantization.granularity import PerAxis, PerGroup
 from torchao.quantization.quant_api import (
     int4_weight_only,
     Int4WeightOnlyQuantizer,
     Int8DynActInt4WeightQuantizer,
+    Int8DynamicActivationIntxWeightConfig,
+    MappingType,
     quantize_,
 )
 from torchao.utils import unwrap_tensor_subclass
@@ -138,6 +132,56 @@ def quantize_model(
             raise RuntimeError(f"unknown quantizer {quantizer} specified")
         else:
             # Use tensor subclass API for int4 weight only.
+            if quantizer == "experimental:embedding":
+                group_size = q_kwargs["groupsize"]
+                bit_width = q_kwargs["bitwidth"]
+                has_weight_zeros = q_kwargs["has_weight_zeros"]
+                weight_granularity = (
+                    PerAxis() if group_size == -1 else PerGroup(group_size)
+                )
+                weight_dtype = getattr(torch, f"int{bit_width}")
+                weight_mapping_type = (
+                    MappingType.ASYMMETRIC
+                    if has_weight_zeros
+                    else MappingType.SYMMETRIC
+                )
+
+                try:
+                    model = EmbeddingQuantizer(
+                        weight_dtype=weight_dtype,
+                        granularity=weight_granularity,
+                        mapping_type=weight_mapping_type,
+                        use_fallback=False,
+                    ).quantize(model)
+                except Exception as e:
+                    print(
+                        "Encountered error during quantization with experimental EmbeddingQuantization: {e}"
+                    )
+            if quantizer == "experimental:shared":
+                group_size = q_kwargs["groupsize"]
+                bit_width = q_kwargs["bitwidth"]
+                has_weight_zeros = q_kwargs["has_weight_zeros"]
+                weight_granularity = (
+                    PerAxis() if group_size == -1 else PerGroup(group_size)
+                )
+                weight_dtype = getattr(torch, f"int{bit_width}")
+                weight_mapping_type = (
+                    MappingType.ASYMMETRIC
+                    if has_weight_zeros
+                    else MappingType.SYMMETRIC
+                )
+
+                try:
+                    model = SharedEmbeddingQuantizer(
+                        weight_dtype=weight_dtype,
+                        granularity=weight_granularity,
+                        mapping_type=weight_mapping_type,
+                        use_fallback=False,
+                    ).quantize(model)
+                except Exception as e:
+                    print(
+                        "Encountered error during quantization with experimental SharedEmbeddingQuantization: {e}"
+                    )
 
             if (device == "cuda" or device == "xpu") and quantizer == "linear:int4":
                 quantize_(model, int4_weight_only(q_kwargs["groupsize"]))
@@ -153,13 +197,13 @@ def quantize_model(
                 group_size = q_kwargs["groupsize"]
                 bit_width = q_kwargs["bitwidth"]
                 has_weight_zeros = q_kwargs["has_weight_zeros"]
-                granularity = PerRow() if group_size == -1 else PerGroup(group_size)
+                granularity = PerAxis() if group_size == -1 else PerGroup(group_size)
                 weight_dtype = getattr(torch, f"int{bit_width}")
 
                 try:
                     quantize_(
                         model,
-                        int8_dynamic_activation_intx_weight(
+                        Int8DynamicActivationIntxWeightConfig(
                             weight_dtype=weight_dtype,
                             granularity=granularity,
                             has_weight_zeros=has_weight_zeros,
@@ -168,14 +212,14 @@ def quantize_model(
                     )
                 except Exception as e:
                     print("Encountered error during quantization: {e}")
-                    print("Trying with PlainLayout")
+                    print("Trying with QDQLayout")
                     quantize_(
                         model,
-                        int8_dynamic_activation_intx_weight(
+                        Int8DynamicActivationIntxWeightConfig(
                             weight_dtype=weight_dtype,
                             granularity=granularity,
                             has_weight_zeros=has_weight_zeros,
-                            layout=PlainLayout(),
+                            layout=QDQLayout(),
                         ),
                     )
                 if not support_tensor_subclass:
@@ -194,44 +238,6 @@ def quantize_model(
                 raise RuntimeError(
                     "linear:afpwx quantization can only run on mps device!"
                 )
-            if quantizer == "experimental:embedding":
-                has_weight_zeros = q_kwargs["has_weight_zeros"]
-                granularity = PerRow() if group_size == -1 else PerGroup(group_size)
-                weight_dtype = getattr(torch, f"int{bit_width}")
-
-                try:
-                    quantize_(
-                        model,
-                        EmbeddingQuantizer(
-                            weight_dtype=weight_dtype,
-                            granularity=granularity,
-                            has_weight_zeros=has_weight_zeros,
-                            use_fallback=False,
-                        ),
-                    )
-                except Exception as e:
-                    print(
-                        "Encountered error during quantization with experimental EmbeddingQuantization: {e}"
-                    )
-            if quantizer == "experimental:shared":
-                has_weight_zeros = q_kwargs["has_weight_zeros"]
-                granularity = PerRow() if group_size == -1 else PerGroup(group_size)
-                weight_dtype = getattr(torch, f"int{bit_width}")
-
-                try:
-                    quantize_(
-                        model,
-                        SharedEmbeddingQuantizer(
-                            weight_dtype=weight_dtype,
-                            granularity=granularity,
-                            has_weight_zeros=has_weight_zeros,
-                            use_fallback=False,
-                        ),
-                    )
-                except Exception as e:
-                    print(
-                        "Encountered error during quantization with experimental SharedEmbeddingQuantization: {e}"
-                    )
             # We set global precision from quantize options if it is specified at cli.py:485
             # so the precision returned by get_precision() is always the authoritative precision/dtype in torchchat
 
@@ -1023,7 +1029,7 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
 
 quantizer_class_dict = {
     "embedding": EmbeddingOnlyQuantHandler,
-    "embedding:wx": IntxWeightEmbeddingQuantizer,
+    "embedding:wx": None,
     "linear:int8": WeightOnlyInt8QuantHandler,
     "precision": PrecisionHandler,
     "executor": ExecutorHandler,
