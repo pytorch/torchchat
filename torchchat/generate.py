@@ -1225,11 +1225,7 @@ class LocalGenerator:
                 t - aggregate_metrics.get("time_to_first_token", 0)
             )
 
-            if jit_compile:
-                print(
-                    f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds"
-                )
-            else:
+            if not jit_compile:
                 # aggregate_metrics will not append when is jit_compile, which will affect the average numbers.
                 aggregate_metrics["tokens_per_sec"].append(tokens_sec)
                 aggregate_metrics["first_token_per_sec"].append(first_token_sec)
@@ -1253,6 +1249,10 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
                 logging.info(
                     f"*** This first iteration will include cold start effects for dynamic import, hardware caches{', JIT compilation' if jit_compile else ''}. ***"
                 )
+                if jit_compile:
+                    logging.info(
+                        f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds"
+                    )
             print("\n========================================\n")
             if start_pos >= max_seq_length:
                 if generator_args.chat_mode:
