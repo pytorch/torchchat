@@ -950,27 +950,11 @@ jobs:
         run: |
           export TORCHCHAT_ROOT=${PWD}
           echo "et-git-hash=$(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt)" >> "$GITHUB_ENV"
-      - name: Load or install ET
-        id: install-et
-        uses: actions/cache@v4
-        with:
-          path: |
-            ./et-build
-            ./torchchat/utils/scripts
-          key: et-build-${{runner.os}}-${{runner.arch}}-${{env.et-git-hash}}-${{ hashFiles('**/install_et.sh', '**/build_native.sh') }}
-      - if: ${{ steps.install-et.outputs.cache-hit != 'true' }}
-        continue-on-error: true
+      - name: Install ExecuTorch
         run: |
           echo "Installing ExecuTorch"
+          export TORCHCHAT_ROOT=${PWD}
           bash torchchat/utils/scripts/install_et.sh
-      - name: Install ExecuTorch python
-        run: |
-          echo "Install ExecuTorch python"
-          export TORCHCHAT_ROOT=$PWD
-          export ET_BUILD_DIR="et-build"
-          ENABLE_ET_PYBIND="${1:-true}"
-          source "torchchat/utils/scripts/install_utils.sh"
-          install_executorch_python_libs $ENABLE_ET_PYBIND
       - name: Install runner
         run: |
           echo "Installing runner"
