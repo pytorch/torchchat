@@ -359,6 +359,12 @@ def _add_generation_args(parser, verb: str) -> None:
             default=1,
             help="Number of samples",
         )
+        generator_parser.add_argument(
+            "--accumulate-tokens",
+            type=int,
+            default=8,
+            help="Number of generated tokens to accumulate before calling the callback on each one of them.",
+        )
 
     generator_parser.add_argument(
         "--image-prompts",
