@@ -176,8 +176,8 @@ def _add_model_config_args(parser, verb: str) -> None:
         "--device",
         type=str,
         default=None,
-        choices=["fast", "cpu", "cuda", "mps", "xpu"],
-        help="Hardware device to use. Options: fast, cpu, cuda, mps, xpu",
+        choices=["fast", "cpu", "cuda", "mps", "xpu", "npu"],
+        help="Hardware device to use. Options: fast, cpu, cuda, mps, xpu, npu",
     )
     model_config_parser.add_argument(
         "--attention-backend",
@@ -358,6 +358,12 @@ def _add_generation_args(parser, verb: str) -> None:
             type=int,
             default=1,
             help="Number of samples",
+        )
+        generator_parser.add_argument(
+            "--accumulate-tokens",
+            type=int,
+            default=8,
+            help="Number of generated tokens to accumulate before calling the callback on each one of them.",
         )
 
     generator_parser.add_argument(

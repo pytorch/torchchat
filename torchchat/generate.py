@@ -230,6 +230,7 @@ class GeneratorArgs:
     max_autotune: bool = False
     # (Misnomer) See Issue: https://github.com/pytorch/torchchat/issues/1273
     is_torchtune_model: bool = False
+    accumulate_tokens: int = 8
 
     def __post_init__(self):
         if self.compile_prefill and self.sequential_prefill:
@@ -294,6 +295,7 @@ class GeneratorArgs:
             sequential_prefill=sequential_prefill,
             max_autotune=args.max_autotune,
             is_torchtune_model=args.model and args.model.endswith("tune"),
+            accumulate_tokens=getattr(args, "accumulate_tokens", 8),
         )
 
 
@@ -530,12 +532,13 @@ class LocalGenerator:
         need_probs: bool,
         batch=Optional[Dict[str, Any]],  # Inputs for multimodal models
         callback=lambda _: _,
+        accumulate_tokens: int = 8,
         eos_token_id: int = 2,
         eot_id: Optional[int] = None,
         attention_backend: SDPBackend = torch.nn.attention.SDPBackend.MATH,
         **sampling_kwargs,
     ):
-        new_tokens, new_probs = [], []
+        new_tokens = []
         encountered_eos = False
         for _i in range(
             num_new_tokens - 1
@@ -554,30 +557,51 @@ class LocalGenerator:
                 )
                 input_pos += 1
                 new_tokens.append(next_token.clone())
-                callback(new_tokens[-1], done_generating=_i == num_new_tokens - 2)
-                if need_probs or next_prob is None:
+
+                done_generating = _i == num_new_tokens - 2
+                if need_probs:
+                    callback(new_tokens[-1], done_generating=done_generating)
+                if not need_probs or next_prob is None:
                     yield out_token, None
                 else:
-                    new_probs.append(next_prob.clone())
                     yield out_token, next_prob.clone()
                 cur_token = next_token
 
-                # encountered eos
-                if next_token.item() == eos_token_id or (
-                    eot_id is not None and next_token.item() == eot_id
-                ):
-                    encountered_eos = True
-                    final_token, next_prob = self.decode_one_token(
-                        model,
-                        cur_token,
-                        input_pos,
-                        need_probs,
-                        batch=batch,
-                        **sampling_kwargs,
-                    )
-                    input_pos += 1
-                    yield cur_token.clone(), next_prob.clone()
-                    break
+                if need_probs:
+                    # encountered eos
+                    if next_token.item() == eos_token_id or (
+                        eot_id is not None and next_token.item() == eot_id
+                    ):
+                        encountered_eos = True
+                        final_token, next_prob = self.decode_one_token(
+                            model,
+                            cur_token,
+                            input_pos,
+                            need_probs,
+                            batch=batch,
+                            **sampling_kwargs,
+                        )
+                        input_pos += 1
+                        yield cur_token.clone(), next_prob.clone()
+                        break
+                else:
+                    callback_pos = _i % accumulate_tokens + 1
+                    if done_generating or callback_pos == accumulate_tokens:
+                        callback_num = min(accumulate_tokens, callback_pos)
+                        for i in range(callback_num, 0, -1):
+                            callback(new_tokens[-i], done_generating=done_generating)
+
+                            token_item = new_tokens[-i].item()
+                            # encountered eos
+                            if token_item == eos_token_id or (
+                                eot_id is not None and token_item == eot_id
+                            ):
+                                encountered_eos = True
+                                input_pos += 1
+                                yield new_tokens[-i].clone(), None
+                                break
+                        if encountered_eos:
+                            break
 
         if not encountered_eos:
             eos_token = torch.tensor(
@@ -585,7 +609,6 @@ class LocalGenerator:
                 dtype=cur_token.dtype,
                 device=cur_token.device,
             )
-            new_tokens.append(eos_token.clone())
             eos_token, next_prob = self.decode_one_token(
                 model,
                 eos_token.view(1, -1),
@@ -685,6 +708,7 @@ class LocalGenerator:
         speculate_k: Optional[int] = 8,
         sequential_prefill=True,
         callback=lambda x: x,
+        accumulate_tokens: int,
         max_seq_length: int,
         attention_backend: SDPBackend = torch.nn.attention.SDPBackend.MATH,
         seed: Optional[int] = None,
@@ -788,7 +812,6 @@ class LocalGenerator:
                 input_pos = input_pos + num_added
                 next_token = next_tokens[-1]
         else:
-            generated_tokens = []
             for generated_token, _ in self.decode_n_tokens(
                 model,
                 next_token,
@@ -796,6 +819,7 @@ class LocalGenerator:
                 max_new_tokens - 1,
                 batch=batch,
                 callback=callback,
+                accumulate_tokens=accumulate_tokens,
                 need_probs=False,
                 eos_token_id=self.tokenizer.eos_id() if self.tokenizer else 2,
                 eot_id=(
@@ -806,7 +830,6 @@ class LocalGenerator:
                 attention_backend=attention_backend,
                 **sampling_kwargs,
             ):
-                generated_tokens.append(generated_token.view(-1))
                 yield generated_token, None
 
         generate_stats = {
@@ -1185,6 +1208,7 @@ class LocalGenerator:
                     chat_mode=generator_args.chat_mode,
                     batch=batch,
                     callback=callback,
+                    accumulate_tokens=generator_args.accumulate_tokens,
                     temperature=generator_args.temperature,
                     top_k=generator_args.top_k,
                     sequential_prefill=generator_args.sequential_prefill,
@@ -1213,8 +1237,10 @@ class LocalGenerator:
                     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
                 elif self.builder_args.device == "cuda":
                     print(prof.key_averages().table(sort_by="self_cuda_time_total"))
-                else:
+                elif self.builder_args.device == "xpu":
                     print(prof.key_averages().table(sort_by="self_xpu_time_total"))
+                elif self.builder_args.device == "npu":
+                    print(prof.key_averages().table(sort_by="self_npu_time_total"))
                 prof.export_chrome_trace(f"{self.profile}.json")
 
             if start_pos >= max_seq_length:
@@ -1229,11 +1255,7 @@ class LocalGenerator:
                 t - aggregate_metrics.get("time_to_first_token", 0)
             )
 
-            if jit_compile:
-                print(
-                    f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds"
-                )
-            else:
+            if not jit_compile:
                 # aggregate_metrics will not append when is jit_compile, which will affect the average numbers.
                 aggregate_metrics["tokens_per_sec"].append(tokens_sec)
                 aggregate_metrics["first_token_per_sec"].append(first_token_sec)
@@ -1257,6 +1279,10 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
                 logging.info(
                     f"*** This first iteration will include cold start effects for dynamic import, hardware caches{', JIT compilation' if jit_compile else ''}. ***"
                 )
+                if jit_compile:
+                    logging.info(
+                        f"just-in-time compilation time (incl run time): {compilation_time:.2} seconds"
+                    )
             print("\n========================================\n")
             if start_pos >= max_seq_length:
                 if generator_args.chat_mode:
@@ -1299,8 +1325,10 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
             )
         if torch.cuda.is_available():
             print(f"Memory used: {torch.cuda.max_memory_reserved() / 1e9:.02f} GB")
-        if torch.xpu.is_available():
+        elif torch.xpu.is_available():
             print(f"Memory used: {torch.xpu.max_memory_reserved() / 1e9:.02f} GB")
+        elif hasattr(torch, "npu") and torch.npu.is_available():
+            print(f"Memory used: {torch.npu.max_memory_reserved() / 1e9:.02f} GB")
 
 
 
@@ -1595,7 +1623,6 @@ class DistributedGenerator(LocalGenerator):
 
         return idx_next, probs
 
-
 def run_generator(
     args,
     rank: Optional[int] =None
@@ -1628,8 +1655,10 @@ def run_generator(
         )
         if torch.cuda.is_available():
             torch.cuda.reset_peak_memory_stats()
-        if torch.xpu.is_available():
+        elif torch.xpu.is_available():
             torch.xpu.reset_peak_memory_stats()
+        elif hasattr(torch, "npu") and torch.npu.is_available():
+            torch.npu.reset_peak_memory_stats()
 
         for _ in gen.chat(generator_args):
             pass

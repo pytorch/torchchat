@@ -233,6 +233,8 @@ def device_sync(device="cpu"):
         torch.cuda.synchronize(device)
     elif "xpu" in device:
         torch.xpu.synchronize(device)
+    elif "npu" in device:
+        torch.npu.synchronize(device)
     elif ("cpu" in device) or ("mps" in device):
         pass
     else:
@@ -275,15 +277,18 @@ def is_mps_available() -> bool:
     # MPS, is that you?
     return True
 
+def select_device() -> str:
+    if torch.accelerator.is_available():
+        device = torch.accelerator.current_accelerator().type
+        if device == "mps" and not is_mps_available():
+            return "cpu"
+        return device
+    else:
+        return "cpu"
 
 def get_device_str(device) -> str:
     if isinstance(device, str) and device == "fast":
-        device = (
-            "cuda"
-            if torch.cuda.is_available()
-            else "mps" if is_mps_available()
-            else "xpu" if torch.xpu.is_available()  else "cpu"
-        )
+        device = select_device()
         return device
     else:
         return str(device)
@@ -291,17 +296,13 @@ def get_device_str(device) -> str:
 
 def get_device(device) -> str:
     if isinstance(device, str) and device == "fast":
-        device = (
-            "cuda"
-            if torch.cuda.is_available()
-            else "mps" if is_mps_available()
-            else "xpu" if torch.xpu.is_available()  else "cpu"
-        )
+        device = select_device()
     return torch.device(device)
 
 
 def is_cpu_device(device) -> bool:
     return device == "" or str(device) == "cpu"
 
-def is_cuda_or_cpu_or_xpu_device(device) -> bool:
-    return is_cpu_device(device) or ("cuda" in str(device)) or ("xpu" in str(device))
+def is_supported_device(device) -> bool:
+    device_str = str(device)
+    return is_cpu_device(device) or any(dev in device_str for dev in ('cuda', 'xpu', 'npu'))

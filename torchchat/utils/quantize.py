@@ -92,10 +92,8 @@ def get_named_parameters(func: Callable) -> List[str]:
     return named_params
 
 
-def validate_args(
-    named_params: List[str], q_kwargs: Dict[str, Any], quantizer: Optional[str] = None
-) -> Dict[str, Any]:
-    for key in q_kwargs.keys():
+def validate_args(named_params: List[str], q_kwargs: Dict[str, Any], quantizer: Optional[str] = None) -> Dict[str, Any]:
+    for key in list(q_kwargs.keys()):
         if key not in named_params:
             print(
                 f"Specification for quantizer {quantizer} has extraneous key {key}. Ignoring."
@@ -183,7 +181,7 @@ def quantize_model(
                         "Encountered error during quantization with experimental SharedEmbeddingQuantization: {e}"
                     )
 
-            if (device == "cuda" or device == "xpu") and quantizer == "linear:int4":
+            if (device in ["cuda", "xpu", "npu"]) and quantizer == "linear:int4":
                 quantize_(model, int4_weight_only(q_kwargs["groupsize"]))
                 if not support_tensor_subclass:
                     unwrap_tensor_subclass(model)
@@ -199,14 +197,19 @@ def quantize_model(
                 has_weight_zeros = q_kwargs["has_weight_zeros"]
                 granularity = PerAxis() if group_size == -1 else PerGroup(group_size)
                 weight_dtype = getattr(torch, f"int{bit_width}")
+                weight_mapping_type = (
+                    MappingType.ASYMMETRIC
+                    if has_weight_zeros
+                    else MappingType.SYMMETRIC
+                )
 
                 try:
                     quantize_(
                         model,
                         Int8DynamicActivationIntxWeightConfig(
                             weight_dtype=weight_dtype,
-                            granularity=granularity,
-                            has_weight_zeros=has_weight_zeros,
+                            weight_granularity=granularity,
+                            weight_mapping_type=weight_mapping_type,
                             layout=PackedLinearInt8DynamicActivationIntxWeightLayout(),
                         ),
                     )
@@ -217,8 +220,8 @@ def quantize_model(
                         model,
                         Int8DynamicActivationIntxWeightConfig(
                             weight_dtype=weight_dtype,
-                            granularity=granularity,
-                            has_weight_zeros=has_weight_zeros,
+                            weight_granularity=granularity,
+                            weight_mapping_type=weight_mapping_type,
                             layout=QDQLayout(),
                         ),
                     )
@@ -234,6 +237,23 @@ def quantize_model(
                         f"Quantizer {quantizer} requires float32 inputs, but received {get_precision()}.  Changing dtype to float32.  Note that after quantization, the weights will be lowbit integers, not float32."
                     )
                     set_precision(torch.float32)
+
+                group_size = q_kwargs["groupsize"]
+                bit_width = q_kwargs["bitwidth"]
+                has_weight_zeros = q_kwargs.get("has_weight_zeros", True)
+                q_kwargs["granularity"] = (
+                    PerAxis() if group_size == -1 else PerGroup(group_size)
+                )
+                q_kwargs["weight_dtype"] = getattr(torch, f"int{bit_width}")
+                q_kwargs["mapping_type"] = (
+                    MappingType.ASYMMETRIC
+                    if has_weight_zeros
+                    else MappingType.SYMMETRIC
+                )
+                q_kwargs["use_fallback"] = False
+                del q_kwargs["groupsize"]
+                del q_kwargs["bitwidth"]
+
             if quantizer == "linear:afpwx" and device != "mps":
                 raise RuntimeError(
                     "linear:afpwx quantization can only run on mps device!"
@@ -251,7 +271,10 @@ def quantize_model(
 
             if "tokenizer" in named_params:
                 q_kwargs["tokenizer"] = tokenizer
-            quant_handler = q(device=device, precision=precision, **q_kwargs)
+            if quantizer == "embedding:wx":
+                quant_handler = q(**q_kwargs)
+            else:
+                quant_handler = q(device=device, precision=precision, **q_kwargs)
 
             # quantize model
 
@@ -1029,7 +1052,7 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
 
 quantizer_class_dict = {
     "embedding": EmbeddingOnlyQuantHandler,
-    "embedding:wx": None,
+    "embedding:wx": EmbeddingQuantizer,
     "linear:int8": WeightOnlyInt8QuantHandler,
     "precision": PrecisionHandler,
     "executor": ExecutorHandler,
@@ -1073,5 +1096,20 @@ try:
         print("Loaded torchao mps ops.")
     except Exception as e:
         print("Unable to load torchao mps ops library.")
+
+    torchao_experimental_mps_op_lib_spec = importlib.util.spec_from_file_location(
+        "torchao_experimental_mps_op_lib",
+        f"{torchao_build_path}/src/ao/torchao/experimental/ops/mps/mps_op_lib.py",
+    )
+    torchao_experimental_mps_op_lib = importlib.util.module_from_spec(
+        torchao_experimental_mps_op_lib_spec
+    )
+    sys.modules["torchao_experimental_mps_op_lib"] = torchao_experimental_mps_op_lib
+    torchao_experimental_mps_op_lib_spec.loader.exec_module(
+        torchao_experimental_mps_op_lib
+    )
+    from torchao_experimental_mps_op_lib import *
+
+
 except Exception as e:
     print("Unable to import torchao experimental quant_api with error: ", e)
