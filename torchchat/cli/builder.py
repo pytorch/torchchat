@@ -241,6 +241,11 @@ class BuilderArgs:
         speculative_builder_args.pte_path = None
         return speculative_builder_args
 
+class TokenizerType(Enum):
+    NONE = 0
+    TIKTOKEN = 1
+    SENTENCEPIECE = 2
+    HF_TOKENIZER = 3
 
 @dataclass
 class TokenizerArgs:
@@ -276,11 +281,23 @@ class TokenizerArgs:
         except:
             pass
 
-        self.is_tiktoken = False
-        self.is_sentencepiece = False
-        self.is_hf_tokenizer = False
-        self.t = None
         return
+
+    def is_tiktoken(self) -> bool:
+        return self.tokenizer_type == TokenizerType.TIKTOKEN
+
+    def is_sentencepiece(self) -> bool:
+        return self.tokenizer_type == TokenizerType.SENTENCEPIECE
+
+    def is_hf_tokenizer(self) -> bool:
+        return self.tokenizer_type == TokenizerType.HF_TOKENIZER
+
+    def is_tokenizer_none(self) -> bool:
+        if self.tokenizer_type != TokenizerType.NONE:
+            return False
+
+        assert self.t is None, "tokenizer_type is NONE but t is not None"
+        return True
 
     def validate_model(
         self,
@@ -290,12 +307,13 @@ class TokenizerArgs:
         if model is None:
             return
 
-        if sum([self.is_tiktoken, self.is_hf_tokenizer, self.is_sentencepiece]) != 1:
+        if self.is_tokenizer_none():
             raise RuntimeError(f"no tokenizer was found at {self.tokenizer_path}")
 
-        is_tiktoken = self.is_tiktoken
-        is_sentencepiece = self.is_sentencepiece
-        is_hf_tokenizer = self.is_hf_tokenizer
+        is_tiktoken = self.is_tiktoken()
+        is_sentencepiece = self.is_sentencepiece()
+        is_hf_tokenizer = self.is_hf_tokenizer()
+
         use_tiktoken = model.config.use_tiktoken
         use_hf_tokenizer = model.config.use_hf_tokenizer
         use_sentencepiece = not (use_tiktoken or use_hf_tokenizer)
