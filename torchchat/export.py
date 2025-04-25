@@ -482,7 +482,7 @@ def main(args):
 
     if tokenizer_args is None:
         tokenizer_type = "0"
-    elif tokenizer_args.is_sentencepiece:
+    elif tokenizer_args.is_sentencepiece():
         tokenizer_type = "2"  # Corresponding to llama2
     else:
         tokenizer_type = "3"  # Corresponding to llama3

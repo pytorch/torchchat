@@ -8,6 +8,7 @@ import argparse
 import os
 import sys
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Union
 
@@ -237,13 +238,16 @@ class BuilderArgs:
         speculative_builder_args.pte_path = None
         return speculative_builder_args
 
+class TokenizerType(Enum):
+    NONE = 0
+    TIKTOKEN = 1
+    SENTENCEPIECE = 2
+    HF_TOKENIZER = 3
 
 @dataclass
 class TokenizerArgs:
     tokenizer_path: Optional[Union[Path, str]] = None
-    is_sentencepiece: bool = False
-    is_tiktoken: bool = False
-    is_hf_tokenizer: bool = False
+    tokenizer_type: TokenizerType = TokenizerType.NONE
     t: Optional[Any] = None
 
     def __post_init__(self):
@@ -251,9 +255,7 @@ class TokenizerArgs:
             from tokenizer.tiktoken import Tokenizer as TiktokenTokenizer
 
             self.t = TiktokenTokenizer(model_path=str(self.tokenizer_path))
-            self.is_tiktoken = True
-            self.is_sentencepiece = False
-            self.is_hf_tokenizer = False
+            self.tokenizer_type = TokenizerType.TIKTOKEN
             return
         except:
             pass
@@ -262,9 +264,7 @@ class TokenizerArgs:
             from sentencepiece import SentencePieceProcessor
 
             self.t = SentencePieceProcessor(model_file=str(self.tokenizer_path))
-            self.is_tiktoken = False
-            self.is_sentencepiece = True
-            self.is_hf_tokenizer = False
+            self.tokenizer_type = TokenizerType.SENTENCEPIECE
             return
         except:
             pass
@@ -273,18 +273,23 @@ class TokenizerArgs:
             from tokenizer.hf_tokenizer import HFTokenizer
 
             self.t = HFTokenizer(str(self.tokenizer_path))
-            self.is_tiktoken = False
-            self.is_sentencepiece = False
-            self.is_hf_tokenizer = True
+            self.tokenizer_type = TokenizerType.HF_TOKENIZER
             return
         except:
             pass
 
-        self.is_tiktoken = False
-        self.is_sentencepiece = False
-        self.is_hf_tokenizer = False
+        self.tokenizer_type = TokenizerType.NONE
         self.t = None
         return
+
+    def is_tiktoken(self) -> bool:
+        return self.tokenizer_type == TokenizerType.TIKTOKEN
+
+    def is_sentencepiece(self) -> bool:
+        return self.tokenizer_type == TokenizerType.SENTENCEPIECE
+
+    def is_hf_tokenizer(self) -> bool:
+        return self.tokenizer_type == TokenizerType.HF_TOKENIZER
 
     def validate_model(
         self,
@@ -294,12 +299,14 @@ class TokenizerArgs:
         if model is None:
             return
 
-        if sum([self.is_tiktoken, self.is_hf_tokenizer, self.is_sentencepiece]) != 1:
+
+        is_tiktoken = self.is_tiktoken()
+        is_sentencepiece = self.is_sentencepiece()
+        is_hf_tokenizer = self.is_hf_tokenizer()
+
+        if sum([is_tiktoken, is_hf_tokenizer, is_sentencepiece]) != 1:
             raise RuntimeError(f"no tokenizer was found at {self.tokenizer_path}")
 
-        is_tiktoken = self.is_tiktoken
-        is_sentencepiece = self.is_sentencepiece
-        is_hf_tokenizer = self.is_hf_tokenizer
         use_tiktoken = model.config.use_tiktoken
         use_hf_tokenizer = model.config.use_hf_tokenizer
         use_sentencepiece = not (use_tiktoken or use_hf_tokenizer)
@@ -651,13 +658,13 @@ def _initialize_model(
             model = torch.load(builder_args.snapshot_path, weights_only=False)
         except Exception:
             raise RuntimeError(f"Failed to load torchchat snapshot {builder_args.snapshot_path}")
-        # _active_backend() does not allow DSO & AOTI to be true. 
+        # _active_backend() does not allow DSO & AOTI to be true.
         # Choose either.
         from torchchat.utils.build_utils import set_backend
         set_backend (dso=True, pte=False, aoti_package=False)
         if (model.config != config):
             raise RuntimeError("loaded model architecture mismatch")
-        ##        
+        ##
         ## import all libraries with custom kernels ans custom operators
         ## that quantize may be pulling in
         ##
