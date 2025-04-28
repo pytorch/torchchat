@@ -287,9 +287,6 @@ class TokenizerArgs:
     def is_hf_tokenizer(self) -> bool:
         return self.tokenizer_type == TokenizerType.HF_TOKENIZER
 
-    def is_tokenizer_none(self) -> bool:
-        return self.tokenizer_type == TokenizerType.NONE
-
     def validate_model(
         self,
         model: Optional[Model],
@@ -298,7 +295,7 @@ class TokenizerArgs:
         if model is None:
             return
 
-        if self.is_tokenizer_none():
+        if self.tokenizer_type == TokenizerType.NONE:
             raise RuntimeError(f"no tokenizer was found at {self.tokenizer_path}")
 
         is_tiktoken = self.is_tiktoken()
