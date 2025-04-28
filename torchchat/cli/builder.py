@@ -278,8 +278,6 @@ class TokenizerArgs:
         except:
             pass
 
-        return
-
     def is_tiktoken(self) -> bool:
         return self.tokenizer_type == TokenizerType.TIKTOKEN
 
@@ -290,11 +288,7 @@ class TokenizerArgs:
         return self.tokenizer_type == TokenizerType.HF_TOKENIZER
 
     def is_tokenizer_none(self) -> bool:
-        if self.tokenizer_type != TokenizerType.NONE:
-            return False
-
-        assert self.t is None, "tokenizer_type is NONE but t is not None"
-        return True
+        return self.tokenizer_type == TokenizerType.NONE
 
     def validate_model(
         self,
