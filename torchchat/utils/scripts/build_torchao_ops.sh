@@ -14,6 +14,12 @@ fi
 
 source "$(dirname "${BASH_SOURCE[0]}")/install_utils.sh"
 
+if [ ! -d "${TORCHCHAT_ROOT}/torchao-build" ]; then
+  echo "Directory ${TORCHCHAT_ROOT}/torchao-build does not exist."
+  echo "Make sure you run bash torchchat/utils/scripts/clone_torchao.sh"
+  exit 1
+fi
+
 pushd ${TORCHCHAT_ROOT}
 find_cmake_prefix_path
 install_torchao_aten_ops "$device"
