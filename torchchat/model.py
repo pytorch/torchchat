@@ -8,13 +8,13 @@ import logging
 import os
 import warnings
 from abc import ABC, abstractmethod
+from collections.abc import Hashable
 
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
 from typing import Any, Callable, Dict, Optional, Union
-from collections.abc import Hashable
 
 import torch
 import torch.nn as nn
@@ -59,7 +59,6 @@ def identity(**kwargs):
     return list(kwargs.values())[0]
 
 
-
 class MultiModalProjector(nn.Module):
     def __init__(self, in_channels: int, out_channels: int, act: nn.Module):
         super().__init__()
@@ -97,9 +96,9 @@ class ConcateFusion(nn.Module):
         self.decoder.__setattr__(token_embedding_name, None)
 
         self.mm_projector = MultiModalProjector(
-                in_channels=mm_proj_in_channels,
-                out_channels=mm_proj_out_channels,
-                act=mm_proj_activation,
+            in_channels=mm_proj_in_channels,
+            out_channels=mm_proj_out_channels,
+            act=mm_proj_activation,
         )
 
     def forward(
@@ -206,7 +205,10 @@ class ModelRecipe:
 
     @classmethod
     def _llama3_1(cls):
-        from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
+        from torchtune.models.llama3_1._component_builders import (
+            llama3_1 as llama3_1_builder,
+        )
+
         return cls(
             model_type=ModelType.Llama3_1,
             modules={"text": llama3_1_builder},
@@ -225,7 +227,7 @@ class ModelRecipe:
             model_type=ModelType.Flamingo,
             modules={
                 "encoder": llama3_2_vision_encoder,
-                "decoder": llama3_2_vision_decoder
+                "decoder": llama3_2_vision_decoder,
             },
             fusion_class=DeepFusionModel,
         )
@@ -233,12 +235,10 @@ class ModelRecipe:
     @classmethod
     def _llava(cls):
         from torchtune.models.clip import clip_vision_encoder
+
         return cls(
             model_type=ModelType.Llava,
-            modules={
-                'encoder': clip_vision_encoder,
-                'decoder': Transformer
-            },
+            modules={"encoder": clip_vision_encoder, "decoder": Transformer},
             fusion_class=ConcateFusion,
         )
 
@@ -506,6 +506,7 @@ class Model(ABC, nn.Module):
         # TODO: Remove it once we can make fusion model configurable in model_param.
         try:
             from torchtune.modules.model_fusion import DeepFusionModel
+
             if recipe.fusion_class == DeepFusionModel:
                 modules["encoder_trainable"] = False
                 modules["decoder_trainable"] = False
@@ -633,7 +634,12 @@ class LlavaModel(Model):
         post_tokens: Optional[Tensor] = None,
         input_pos: Optional[Tensor] = None,
     ) -> Tensor:
-        return self.model(tokens, encoder_input=encoder_input, post_tokens=post_tokens, input_pos=input_pos)
+        return self.model(
+            tokens,
+            encoder_input=encoder_input,
+            post_tokens=post_tokens,
+            input_pos=input_pos,
+        )
 
     def setup_caches(self, max_batch_size, max_seq_length):
         self.model.setup_caches(max_batch_size, max_seq_length)
@@ -684,7 +690,9 @@ class Transformer(nn.Module):
     def load_hook(self, state_dict, prefix, *args):
         """Handle tied embeddings at load time"""
         if self.config.tie_word_embeddings:
-            state_dict.setdefault("model.output.weight", state_dict["model.tok_embeddings.weight"])
+            state_dict.setdefault(
+                "model.output.weight", state_dict["model.tok_embeddings.weight"]
+            )
 
     def setup_caches(self, max_batch_size, max_seq_length, cache_lanes: int = 1):
         if (
@@ -733,7 +741,9 @@ class Transformer(nn.Module):
                 ColwiseParallel(output_layouts=Replicate()),
             )
 
-    def forward(self, x: Tensor, input_pos: Optional[Tensor] = None, cache_lane: int = 0) -> Tensor:
+    def forward(
+        self, x: Tensor, input_pos: Optional[Tensor] = None, cache_lane: int = 0
+    ) -> Tensor:
         assert self.freqs_cis is not None, "Caches must be initialized first"
         mask = self.causal_mask[None, None, input_pos]
         freqs_cis = self.freqs_cis[input_pos]
@@ -777,11 +787,24 @@ class TransformerBlock(nn.Module):
         self.feed_forward.distribute(device_mesh)
 
     def forward(
-        self, x: Tensor, input_pos: Tensor, freqs_cis: Tensor, mask: Tensor, cache_lane: int = 0
+        self,
+        x: Tensor,
+        input_pos: Tensor,
+        freqs_cis: Tensor,
+        mask: Tensor,
+        cache_lane: int = 0,
     ) -> Tensor:
-        h = x + self.attention(
-            self.attention_norm(x), freqs_cis, mask, input_pos, cache_lane=cache_lane
-        ) * self.residual_multiplier
+        h = (
+            x
+            + self.attention(
+                self.attention_norm(x),
+                freqs_cis,
+                mask,
+                input_pos,
+                cache_lane=cache_lane,
+            )
+            * self.residual_multiplier
+        )
         out = h + self.feed_forward(self.ffn_norm(h)) * self.residual_multiplier
         return out
 
@@ -794,12 +817,18 @@ class Attention(nn.Module):
         # key, query, value projections for all heads, but in a batch
         # total_head_dim = (config.n_heads + 2 * config.n_local_heads) * config.head_dim
         # self.wqkv = nn.Linear(config.dim, total_head_dim, bias=config.attention_bias)
-        self.wq = nn.Linear(config.dim, config.n_heads * config.head_dim, bias=config.attention_bias)
+        self.wq = nn.Linear(
+            config.dim, config.n_heads * config.head_dim, bias=config.attention_bias
+        )
         self.wk = nn.Linear(
-            config.dim, config.n_local_heads * config.head_dim, bias=config.attention_bias
+            config.dim,
+            config.n_local_heads * config.head_dim,
+            bias=config.attention_bias,
         )
         self.wv = nn.Linear(
-            config.dim, config.n_local_heads * config.head_dim, bias=config.attention_bias
+            config.dim,
+            config.n_local_heads * config.head_dim,
+            bias=config.attention_bias,
         )
 
         self.wo = nn.Linear(config.dim, config.dim, bias=config.attention_bias)
@@ -818,10 +847,12 @@ class Attention(nn.Module):
         if hasattr(self, "tp_degree"):
             n_local_heads = self.n_local_heads // self.tp_degree
 
-        self.kv_cache = nn.ModuleList([
-            KVCache(max_batch_size, max_seq_length, n_local_heads, self.head_dim)
-            for _ in range(cache_lanes)
-        ])
+        self.kv_cache = nn.ModuleList(
+            [
+                KVCache(max_batch_size, max_seq_length, n_local_heads, self.head_dim)
+                for _ in range(cache_lanes)
+            ]
+        )
 
     def load_hook(self, state_dict, prefix, *args):
         # if prefix + "wq.weight" in state_dict:
@@ -927,9 +958,15 @@ class Attention(nn.Module):
 class FeedForward(nn.Module):
     def __init__(self, config: TransformerArgs) -> None:
         super().__init__()
-        self.w1 = nn.Linear(config.dim, config.hidden_dim, bias=config.feed_forward_bias)
-        self.w2 = nn.Linear(config.hidden_dim, config.dim, bias=config.feed_forward_bias)
-        self.w3 = nn.Linear(config.dim, config.hidden_dim, bias=config.feed_forward_bias)
+        self.w1 = nn.Linear(
+            config.dim, config.hidden_dim, bias=config.feed_forward_bias
+        )
+        self.w2 = nn.Linear(
+            config.hidden_dim, config.dim, bias=config.feed_forward_bias
+        )
+        self.w3 = nn.Linear(
+            config.dim, config.hidden_dim, bias=config.feed_forward_bias
+        )
 
     def distribute(self, device_mesh: DeviceMesh):
         parallelize_module(self.w1, device_mesh, ColwiseParallel())
@@ -1017,13 +1054,13 @@ def apply_rotary_emb(x: Tensor, freqs_cis: Tensor) -> Tensor:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 try:
+    # For llama::sdpa_with_kv_cache.out, preprocess ops
+    from executorch.extension.llm.custom_ops import custom_ops  # no-qa
     from executorch.extension.pybindings import portable_lib as exec_lib
 
     # ET changed the way it's loading the custom ops so it's not included in portable_lib but has to be loaded separately.
     # For quantized_decomposed ops
     from executorch.kernels import quantized  # no-qa
-    # For llama::sdpa_with_kv_cache.out, preprocess ops
-    from executorch.extension.llm.custom_ops import custom_ops  # no-qa
 
     class PTEModel(nn.Module):
         def __init__(self, config, path) -> None:
@@ -1031,7 +1068,9 @@ try:
             self.config = config
             self.model_ = exec_lib._load_for_executorch(str(path))
 
-            self.text_transformer_args = TransformerArgs.from_params(self.config.transformer_args["text"])
+            self.text_transformer_args = TransformerArgs.from_params(
+                self.config.transformer_args["text"]
+            )
             # TODO: attempt to use "get_max_seq_len" method on the model after
             # ExecuTorch bug is fixed.
             max_seq_len = 128

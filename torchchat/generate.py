@@ -10,11 +10,11 @@ import logging
 import os
 import textwrap
 import time
-from concurrent import futures
-from functools import partial
 
 from abc import ABC, abstractmethod
+from concurrent import futures
 from dataclasses import dataclass
+from functools import partial
 from io import BytesIO
 from os import PathLike
 from pathlib import Path
@@ -25,10 +25,10 @@ import torch._dynamo.config
 import torch._inductor.config
 import torch.distributed as dist
 import torch.multiprocessing as mp
-from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
-from torch._C import _SDPBackend as SDPBackend
 
 from PIL import Image
+from torch._C import _SDPBackend as SDPBackend
+from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
 
 from torchchat.cli.builder import (
     _initialize_model,
@@ -36,10 +36,7 @@ from torchchat.cli.builder import (
     BuilderArgs,
     TokenizerArgs,
 )
-from torchchat.distributed.utils import (
-    Color as color,
-    run_in_dist_env,
-)
+from torchchat.distributed.utils import Color as color, run_in_dist_env
 from torchchat.model import Model, ModelType
 from torchchat.utils.build_utils import device_sync, set_precision
 from torchchat.utils.device_info import get_device_info
@@ -51,16 +48,15 @@ logger = logging.getLogger(__name__)
 class NoOpLogger:
     def __no_op(self, *_, **__):
         pass
+
     def __getattr__(self, name):
         return self.__no_op
 
 
-logger = (
-    NoOpLogger() if os.getenv("LOG_LEVEL") is None
-    else logging.getLogger(__name__)
-)
+logger = NoOpLogger() if os.getenv("LOG_LEVEL") is None else logging.getLogger(__name__)
 
 ## Chat Formatters #############################################################
+
 
 class _ChatFormatter(ABC):
 
@@ -137,7 +133,9 @@ class Llama3ChatFormatter(_ChatFormatter):
             tokens.extend(self._encode_message(message))
         # Add the start of an assistant message for the model to complete.
         if add_generation_prompt and dialog and dialog[-1]["role"] != "assistant":
-            tokens.extend(self._encode_header("assistant")) # Pass role directly as a string
+            tokens.extend(
+                self._encode_header("assistant")
+            )  # Pass role directly as a string
         return tokens
 
 
@@ -159,7 +157,7 @@ class Llama2ChatFormatter(_ChatFormatter):
     def encode_dialog_prompt(
         self,
         dialog: _ChatFormatter.DIALOG_TYPE,
-        add_generation_prompt: bool = True, # UNUSED
+        add_generation_prompt: bool = True,  # UNUSED
     ) -> List[int]:
         new_turn = True
         tokens = []
@@ -182,11 +180,11 @@ class Llama2ChatFormatter(_ChatFormatter):
         return tokens
 
 
-
 class HFTokenizerChatFormatter(_ChatFormatter):
     """Chat formatter that uses the built-in formatting capabilities of an HF
     tokenizer instance
     """
+
     def encode_dialog_prompt(
         self,
         dialog: _ChatFormatter.DIALOG_TYPE,
@@ -198,7 +196,9 @@ class HFTokenizerChatFormatter(_ChatFormatter):
         logger.debug("Formatted chat prompt:\n%s", rendered)
         return self.tokenizer.encode(rendered)
 
+
 ## Generation ##################################################################
+
 
 @dataclass
 class GeneratorArgs:
@@ -256,7 +256,10 @@ class GeneratorArgs:
         pte_path = getattr(args, "pte_path", None)
         aoti_package_path = getattr(args, "aoti_package_path", None)
         sequential_prefill = (
-            args.sequential_prefill or bool(aoti_package_path) or bool(pte_path) or bool(dso_path)
+            args.sequential_prefill
+            or bool(aoti_package_path)
+            or bool(pte_path)
+            or bool(dso_path)
         )
 
         # Validate that all image prompts exist before expensive model load
@@ -314,9 +317,10 @@ class LocalGenerator:
         quantize: bool,
         draft_quantize: bool,
     ):
-        torch._inductor.config.coordinate_descent_tuning = (
-            builder_args.device not in ["cpu", "mps"]
-        )
+        torch._inductor.config.coordinate_descent_tuning = builder_args.device not in [
+            "cpu",
+            "mps",
+        ]
         torch._inductor.config.triton.unique_kernel_names = True
         torch._inductor.config.fx_graph_cache = True  # Experimental feature to reduce compilation times, will be on by default in future
 
@@ -328,7 +332,7 @@ class LocalGenerator:
         self.draft_quantize = draft_quantize
         self.is_torchtune_model = generator_args.is_torchtune_model
         self.dtype = builder_args.precision
-        self.get_user_input : Callable = input
+        self.get_user_input: Callable = input
 
         self.rank: Optional[int] = None
 
@@ -738,7 +742,9 @@ class LocalGenerator:
                             decoder_max_seq_len=max_seq_length,
                         )
                     else:
-                        model.setup_caches(max_batch_size=1, max_seq_length=max_seq_length)
+                        model.setup_caches(
+                            max_batch_size=1, max_seq_length=max_seq_length
+                        )
                     if is_speculative and draft_model is not model:
                         draft_model.setup_caches(
                             max_batch_size=1,
@@ -866,7 +872,9 @@ class LocalGenerator:
     ) -> Tuple[torch.Tensor, Optional[Dict[str, Any]]]:
         # torchtune model definition dependencies
         from torchtune.data import Message, padded_collate_tiled_images_and_mask
-        from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
+        from torchtune.models.llama3_2_vision._model_builders import (
+            llama3_2_vision_transform,
+        )
         from torchtune.training import set_default_dtype
 
         """
@@ -889,7 +897,9 @@ class LocalGenerator:
             # Single String prompt
             if isinstance(prompt, str):
                 encoded = self.encode_tokens(
-                    prompt, bos=self.model.config.tokenizer_prepend_bos, device=self.builder_args.device
+                    prompt,
+                    bos=self.model.config.tokenizer_prepend_bos,
+                    device=self.builder_args.device,
                 )
             # List of dialog
             else:
@@ -982,7 +992,10 @@ class LocalGenerator:
 
             if image_found:
                 batch = padded_collate_tiled_images_and_mask(
-                    [data], pad_direction="left", pad_max_images=1, pad_max_tiles=transform.max_num_tiles
+                    [data],
+                    pad_direction="left",
+                    pad_max_images=1,
+                    pad_max_tiles=transform.max_num_tiles,
                 )
                 encoded = batch.pop("tokens").to(device).view(-1)
                 seq_len = encoded.size(0)
@@ -1098,7 +1111,9 @@ class LocalGenerator:
                 "Do you want to enter a system prompt? Enter y for yes and anything else for no. \n"
             )
             if get_system_prompt == "y" or get_system_prompt == "Y":
-                self.system_prompt = self.get_user_input("What is your system prompt? \n")
+                self.system_prompt = self.get_user_input(
+                    "What is your system prompt? \n"
+                )
 
         # `is_torchtune_model` is a misnomer since it doesn't capture all
         # torchtune models (i.e. Flamingo)
@@ -1151,7 +1166,8 @@ class LocalGenerator:
                     )
                 messages_to_encode.append({"role": "user", "content": prompt})
                 encoded = self.chat_formatter.encode_dialog_prompt(
-                    messages_to_encode, add_generation_prompt=True,
+                    messages_to_encode,
+                    add_generation_prompt=True,
                 )
                 encoded = torch.tensor(
                     encoded, dtype=torch.int, device=self.builder_args.device
@@ -1330,7 +1346,6 @@ with {'sequential' if generator_args.sequential_prefill else 'parallel'} prefill
             print(f"Memory used: {torch.npu.max_memory_reserved() / 1e9:.02f} GB")
 
 
-
 class DistributedGenerator(LocalGenerator):
     def __init__(
         self,
@@ -1341,10 +1356,12 @@ class DistributedGenerator(LocalGenerator):
         profile: Optional[Path],
         quantize: bool,
         draft_quantize: bool,
-        ):
+    ):
 
         is_speculative = speculative_builder_args.checkpoint_path is not None
-        assert is_speculative == False, "Distributed inference with pp > 1 does not support speculative inference yet."
+        assert (
+            is_speculative == False
+        ), "Distributed inference with pp > 1 does not support speculative inference yet."
         super().__init__(
             builder_args,
             speculative_builder_args,
@@ -1372,7 +1389,9 @@ class DistributedGenerator(LocalGenerator):
         if builder_args.pp > 1:
             self.seqlen_prefill = 1024  # sequence length for prefill stage
 
-            logger.warn(f"{color.yellow}Pipeline parallelism is still experimental and might be slow{color.reset}")
+            logger.warn(
+                f"{color.yellow}Pipeline parallelism is still experimental and might be slow{color.reset}"
+            )
             pp_mesh = self.model.device_mesh["pp"]
 
             self.pp_rank = pp_mesh.get_local_rank()
@@ -1384,9 +1403,12 @@ class DistributedGenerator(LocalGenerator):
             self.first_pp_rank = 0
             self.last_pp_rank = self.pp_degree - 1
 
-
-            self.first_pp_rank_global_id = dist.get_global_rank(self.pp_group, self.first_pp_rank)
-            self.last_pp_rank_global_id = dist.get_global_rank(self.pp_group, self.last_pp_rank)
+            self.first_pp_rank_global_id = dist.get_global_rank(
+                self.pp_group, self.first_pp_rank
+            )
+            self.last_pp_rank_global_id = dist.get_global_rank(
+                self.pp_group, self.last_pp_rank
+            )
 
             self.prefiller = self.create_prefill_stage()
             self.decoder = self.create_decode_stage()
@@ -1395,7 +1417,9 @@ class DistributedGenerator(LocalGenerator):
         dist.destroy_process_group()
 
     # Helper function to get example inputs and outputs for the stages.
-    def get_example_ins_outs(self, batch_size: int , seqlen: int) -> Tuple[torch.Tensor, torch.Tensor]:
+    def get_example_ins_outs(
+        self, batch_size: int, seqlen: int
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         This function generates example inputs and outputs for the prefill and decode stages.
 
@@ -1407,10 +1431,18 @@ class DistributedGenerator(LocalGenerator):
             0, self.model.config.vocab_size, (batch_size, seqlen), device=self.device
         )
         activation = torch.rand(
-            batch_size, seqlen, self.model.config.dim, device=self.device, dtype=model_dtype
+            batch_size,
+            seqlen,
+            self.model.config.dim,
+            device=self.device,
+            dtype=model_dtype,
         )
         logits = torch.rand(
-            batch_size, seqlen, self.model.config.vocab_size, device=self.device, dtype=model_dtype
+            batch_size,
+            seqlen,
+            self.model.config.vocab_size,
+            device=self.device,
+            dtype=model_dtype,
         )
         example_inputs = (mb_ids if self.pp_rank == self.first_pp_rank else activation,)
         example_outputs = (logits if self.pp_rank == self.last_pp_rank else activation,)
@@ -1426,8 +1458,12 @@ class DistributedGenerator(LocalGenerator):
         batch_size = 1
 
         # Create prefill stage
-        logger.debug(f"Creating pipeline stage for prefill {self.pp_rank=}, {self.pp_degree=}")
-        example_inputs, example_outputs = self.get_example_ins_outs(batch_size, self.seqlen_prefill)
+        logger.debug(
+            f"Creating pipeline stage for prefill {self.pp_rank=}, {self.pp_degree=}"
+        )
+        example_inputs, example_outputs = self.get_example_ins_outs(
+            batch_size, self.seqlen_prefill
+        )
         prefill_stage = PipelineStage(
             self.model,
             self.pp_rank,
@@ -1459,7 +1495,9 @@ class DistributedGenerator(LocalGenerator):
 
         # Create decode stage
         # logger.info(f"Creating pipeline stage for decode {self.pp_rank=}, {self.pp_degree=}")
-        example_inputs, example_outputs = self.get_example_ins_outs(batch_size, seqlen_decode)
+        example_inputs, example_outputs = self.get_example_ins_outs(
+            batch_size, seqlen_decode
+        )
         decode_stage = PipelineStage(
             self.model,
             self.pp_rank,
@@ -1500,18 +1538,25 @@ class DistributedGenerator(LocalGenerator):
                 **sampling_kwargs,
             )
 
-        pad_token_id = self.tokenizer.pad_id if self.tokenizer.pad_id is not None else self.tokenizer.eos_id
+        pad_token_id = (
+            self.tokenizer.pad_id
+            if self.tokenizer.pad_id is not None
+            else self.tokenizer.eos_id
+        )
         prompt_length = x.size(1)
 
         padded_seq = torch.full(
-            (1, self.seqlen_prefill), pad_token_id, dtype=torch.int64, device=self.device
-            )
-        padded_seq[:,:prompt_length] = x
+            (1, self.seqlen_prefill),
+            pad_token_id,
+            dtype=torch.int64,
+            device=self.device,
+        )
+        padded_seq[:, :prompt_length] = x
         input_pos = torch.arange(
             self.seqlen_prefill,
             device=self.device,
             dtype=torch.int,
-            )
+        )
 
         # Prefill phase
         # Run context input through pipeline
@@ -1527,7 +1572,9 @@ class DistributedGenerator(LocalGenerator):
             self.prefiller.step(**kwargs)
 
         if self.pp_rank == self.last_pp_rank:
-            new_token = self.sample(logits[:,:prompt_length], need_probs=False, **sampling_kwargs)[0]
+            new_token = self.sample(
+                logits[:, :prompt_length], need_probs=False, **sampling_kwargs
+            )[0]
             if self.pp_rank != self.first_pp_rank:
                 dist.send(
                     new_token,
@@ -1603,8 +1650,8 @@ class DistributedGenerator(LocalGenerator):
                     src=self.last_pp_rank_global_id,
                     group=self.pp_group,
                 )
-                #TODO: Why do we get 2d tensor here?
-                new_token=new_token[0]
+                # TODO: Why do we get 2d tensor here?
+                new_token = new_token[0]
         return new_token, None
 
     def sample(
@@ -1622,10 +1669,8 @@ class DistributedGenerator(LocalGenerator):
 
         return idx_next, probs
 
-def run_generator(
-    args,
-    rank: Optional[int] =None
-    ):
+
+def run_generator(args, rank: Optional[int] = None):
     """
     This function creates and executes a generator
     """
@@ -1633,7 +1678,7 @@ def run_generator(
     speculative_builder_args = BuilderArgs.from_speculative_args(args)
     tokenizer_args = TokenizerArgs.from_args(args)
     generator_args = GeneratorArgs.from_args(args)
-    #Setup rank 1 and up to suppress log messages and print messages
+    # Setup rank 1 and up to suppress log messages and print messages
     if builder_args.distributed and rank != 0:
         logger.setLevel(logging.CRITICAL)
         context = contextlib.redirect_stdout(None)
@@ -1662,18 +1707,21 @@ def run_generator(
         for _ in gen.chat(generator_args):
             pass
 
+
 def main(args):
     builder_args = BuilderArgs.from_args(args)
 
     if builder_args.distributed:
         world_size = builder_args.tp * builder_args.pp
 
-        ctx = mp.get_context('spawn')
-        with futures.ProcessPoolExecutor(max_workers=world_size-1, mp_context=ctx) as executor:
-            for i in range(1,world_size):
+        ctx = mp.get_context("spawn")
+        with futures.ProcessPoolExecutor(
+            max_workers=world_size - 1, mp_context=ctx
+        ) as executor:
+            for i in range(1, world_size):
                 fn = partial(run_generator, args, i)
                 executor.submit(run_in_dist_env, world_size, i, fn)
-            #Starting rank 0
+            # Starting rank 0
             fn = partial(run_generator, args, 0)
             run_in_dist_env(world_size, 0, fn)
     else:
