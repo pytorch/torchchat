@@ -19,10 +19,6 @@ import torch
 
 from PIL import Image
 
-from torchtune.data import Message, padded_collate_tiled_images_and_mask
-
-from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
-
 from torchchat.cli.download import is_model_downloaded, load_model_configs
 from torchchat.generate import LocalGenerator, DistributedGenerator, GeneratorArgs
 from torchchat.model import FlamingoModel
@@ -304,7 +300,7 @@ class OpenAiApiGeneratorMixin:
 
     def _gen_model_inputs_from_openai_completion_request(
         self, completion_request: CompletionRequest
-    ) -> List[Message]:
+    ) -> List:
         """Generate model inputs from an OpenAI completion request.
 
         Args:

@@ -37,15 +37,6 @@ from torchchat.utils.measure_time import measure_time
 from torchchat.utils.quantize import quantize_model
 
 
-from torchtune.models.convert_weights import meta_to_tune
-
-from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
-
-from torchtune.models.llama3_2_vision._convert_weights import llama3_vision_meta_to_tune
-
-from torchtune.training import set_default_dtype
-
-
 @dataclass
 class BuilderArgs:
     checkpoint_path: Optional[Union[Path, str]] = None
@@ -416,6 +407,8 @@ def _load_model_gguf(builder_args: BuilderArgs) -> Model:
 
 
 def _load_checkpoint(builder_args: BuilderArgs):
+    from torchtune.models.convert_weights import meta_to_tune
+
     if builder_args.params_table and builder_args.params_table.endswith("Tune"):
         print("Loading Tune checkpoint")
         meta_checkpoint = torch.load(
@@ -458,6 +451,10 @@ def _load_checkpoint(builder_args: BuilderArgs):
 
 
 def _load_model_default(builder_args: BuilderArgs) -> Model:
+    from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
+    from torchtune.models.llama3_2_vision._convert_weights import llama3_vision_meta_to_tune
+    from torchtune.training import set_default_dtype
+
     assert not builder_args.gguf_path
 
     model: Model = _init_model_on_meta_device(builder_args)

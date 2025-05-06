@@ -37,14 +37,6 @@ try:
 except Exception:
     pass
 
-from torchtune.models.clip import clip_vision_encoder
-from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
-from torchtune.models.llama3_2_vision._component_builders import (
-    llama3_2_vision_decoder,
-    llama3_2_vision_encoder,
-)
-from torchtune.modules.model_fusion import DeepFusionModel
-
 from torchchat.utils.build_utils import find_multiple, get_precision
 
 config_path = Path(f"{str(Path(__file__).parent)}/model_params")
@@ -214,6 +206,7 @@ class ModelRecipe:
 
     @classmethod
     def _llama3_1(cls):
+        from torchtune.models.llama3_1._component_builders import llama3_1 as llama3_1_builder
         return cls(
             model_type=ModelType.Llama3_1,
             modules={"text": llama3_1_builder},
@@ -222,6 +215,12 @@ class ModelRecipe:
 
     @classmethod
     def _flamingo(cls):
+        from torchtune.models.llama3_2_vision._component_builders import (
+            llama3_2_vision_decoder,
+            llama3_2_vision_encoder,
+        )
+        from torchtune.modules.model_fusion import DeepFusionModel
+
         return cls(
             model_type=ModelType.Flamingo,
             modules={
@@ -233,6 +232,7 @@ class ModelRecipe:
 
     @classmethod
     def _llava(cls):
+        from torchtune.models.clip import clip_vision_encoder
         return cls(
             model_type=ModelType.Llava,
             modules={
@@ -504,10 +504,16 @@ class Model(ABC, nn.Module):
 
         # Temporary add extra params to the DeepFusionModel.
         # TODO: Remove it once we can make fusion model configurable in model_param.
-        if recipe.fusion_class == DeepFusionModel:
-            modules["encoder_trainable"] = False
-            modules["decoder_trainable"] = False
-            modules["fusion_trainable"] = False
+        try:
+            from torchtune.modules.model_fusion import DeepFusionModel
+            if recipe.fusion_class == DeepFusionModel:
+                modules["encoder_trainable"] = False
+                modules["decoder_trainable"] = False
+                modules["fusion_trainable"] = False
+        except ModuleNotFoundError:
+            # In case it is actually DeepFusionModel and torchtune is not installed,
+            # it will fail with an error further without unexpected behavior.
+            pass
 
         return recipe.fusion_class(**modules)
 

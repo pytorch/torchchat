@@ -30,14 +30,6 @@ from torch._C import _SDPBackend as SDPBackend
 
 from PIL import Image
 
-# torchtune model definition dependencies
-from torchtune.data import Message, padded_collate_tiled_images_and_mask
-
-from torchtune.generation import sample as tune_sample
-
-from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
-from torchtune.training import set_default_dtype
-
 from torchchat.cli.builder import (
     _initialize_model,
     _initialize_tokenizer,
@@ -450,6 +442,8 @@ class LocalGenerator:
         sequential_prefill=True,
         **sampling_kwargs,
     ) -> torch.Tensor:
+        from torchtune.generation import sample as tune_sample
+
         logger.debug("x: %s, input_pos: %s", x, input_pos)
         width = x.size(1)
         assert input_pos.size(0) == width
@@ -870,6 +864,11 @@ class LocalGenerator:
         max_new_tokens: Optional[int] = None,
         max_seq_len: Optional[int] = 2048,
     ) -> Tuple[torch.Tensor, Optional[Dict[str, Any]]]:
+        # torchtune model definition dependencies
+        from torchtune.data import Message, padded_collate_tiled_images_and_mask
+        from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
+        from torchtune.training import set_default_dtype
+
         """
         Convert prompt and image prompts into consumable model input args.
 
