@@ -37,7 +37,7 @@ clone_executorch_internal() {
   git checkout $(cat ${TORCHCHAT_ROOT}/install/.pins/et-pin.txt)
   echo "Install ExecuTorch: submodule update"
   git submodule sync
-  git submodule update --init
+  git submodule update --init --recursive
 
   popd
 }
