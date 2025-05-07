@@ -446,13 +446,12 @@ class LocalGenerator:
         sequential_prefill=True,
         **sampling_kwargs,
     ) -> torch.Tensor:
-        from torchtune.generation import sample as tune_sample
-
         logger.debug("x: %s, input_pos: %s", x, input_pos)
         width = x.size(1)
         assert input_pos.size(0) == width
 
         if self.model.config.model_type == ModelType.Flamingo:
+            from torchtune.generation import sample as tune_sample
             assert batch is not None, "Flamingo requires batch"
 
             # TODO: Verify sequential prefill works with multimodal models

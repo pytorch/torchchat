@@ -414,9 +414,8 @@ def _load_model_gguf(builder_args: BuilderArgs) -> Model:
 
 
 def _load_checkpoint(builder_args: BuilderArgs):
-    from torchtune.models.convert_weights import meta_to_tune
-
     if builder_args.params_table and builder_args.params_table.endswith("Tune"):
+        from torchtune.models.convert_weights import meta_to_tune
         print("Loading Tune checkpoint")
         meta_checkpoint = torch.load(
             str(builder_args.checkpoint_path), mmap=True, weights_only=True
@@ -458,12 +457,6 @@ def _load_checkpoint(builder_args: BuilderArgs):
 
 
 def _load_model_default(builder_args: BuilderArgs) -> Model:
-    from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
-    from torchtune.models.llama3_2_vision._convert_weights import (
-        llama3_vision_meta_to_tune,
-    )
-    from torchtune.training import set_default_dtype
-
     assert not builder_args.gguf_path
 
     model: Model = _init_model_on_meta_device(builder_args)
@@ -475,6 +468,11 @@ def _load_model_default(builder_args: BuilderArgs) -> Model:
         checkpoint = checkpoint["model"]
 
     if model.config.model_type == ModelType.Flamingo:
+        from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
+        from torchtune.models.llama3_2_vision._convert_weights import (
+            llama3_vision_meta_to_tune,
+        )
+        from torchtune.training import set_default_dtype
         # TODO: Refactor this. For now, overwrite the model with model loaded from params_path
         with (
             set_default_dtype(builder_args.precision),
