@@ -869,13 +869,6 @@ class LocalGenerator:
         max_new_tokens: Optional[int] = None,
         max_seq_len: Optional[int] = 2048,
     ) -> Tuple[torch.Tensor, Optional[Dict[str, Any]]]:
-        # torchtune model definition dependencies
-        from torchtune.data import Message, padded_collate_tiled_images_and_mask
-        from torchtune.models.llama3_2_vision._model_builders import (
-            llama3_2_vision_transform,
-        )
-        from torchtune.training import set_default_dtype
-
         """
         Convert prompt and image prompts into consumable model input args.
 
@@ -911,6 +904,14 @@ class LocalGenerator:
             return encoded, None
 
         # Llama 3.2 11B
+
+        # torchtune model definition dependencies
+        from torchtune.data import Message, padded_collate_tiled_images_and_mask
+        from torchtune.models.llama3_2_vision._model_builders import (
+            llama3_2_vision_transform,
+        )
+        from torchtune.training import set_default_dtype
+
         assert (
             image_prompts is None or len(image_prompts) == 1
         ), "At most one image is supported at the moment"
