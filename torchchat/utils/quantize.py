@@ -429,7 +429,6 @@ def dynamically_quantize_per_channel(
     max_val_pos = torch.max(-min_val_neg, max_val_pos)
     scales = max_val_pos / (float(quant_max - quant_min) / 2)
     # ensure scales is the same dtype as the original tensor
-
     scales = torch.clamp(scales, min=eps).to(x.dtype)
     zero_points = torch.zeros(min_val_neg.size(), dtype=torch.int64, device=device)
     # quantize based on qmin/qmax/scales/zp
@@ -713,7 +712,7 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
     def __init__(
         self,
         model: Optional[nn.Module] = None,
-        device=None,
+        device = None,
         precision=None,
         tokenizer=None,
         *,
