@@ -20,8 +20,6 @@
 # torchao Quantizer:
 #   * Int8DynActInt4WeightQuantizer: dynamic quantization for int8 acitvation and int4 weight. Using torchao API.
 #
-
-
 from __future__ import annotations
 
 import json
@@ -30,7 +28,6 @@ import json
 # from math import gcd
 
 from typing import Any, Callable, Dict, List, Optional
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -62,7 +59,6 @@ from torchchat.utils.build_utils import (
 
 
 # Flag for whether the a8wxdq quantizer is available.
-
 torchao_experimental_load_error: Optional[Exception] = None
 
 #########################################################################
@@ -79,10 +75,8 @@ def get_named_parameters(func: Callable) -> List[str]:
 
     # Filter and return named parameters
     named_params = [
-        name
-        for name, param in parameters.items()
-        if param.kind
-        in (inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY)
+        name for name, param in parameters.items()
+        if param.kind in (inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY)
     ]
     return named_params
 
@@ -90,9 +84,7 @@ def get_named_parameters(func: Callable) -> List[str]:
 def validate_args(named_params: List[str], q_kwargs: Dict[str, Any], quantizer: Optional[str] = None) -> Dict[str, Any]:
     for key in list(q_kwargs.keys()):
         if key not in named_params:
-            print(
-                f"Specification for quantizer {quantizer} has extraneous key {key}. Ignoring."
-            )
+            print(f"Specification for quantizer {quantizer} has extraneous key {key}. Ignoring.")
             del q_kwargs[key]
     return q_kwargs
 
@@ -232,7 +224,6 @@ def quantize_model(
         if quantizer == "embedding:wx":
             # These quantizers require float32 input weights.  Note that after quantization,
             # the weights will no longer be float32, but lowbit integers
-
             if get_precision() != torch.float32:
                 print(
                     f"Quantizer {quantizer} requires float32 inputs, but received {get_precision()}.  Changing dtype to float32.  Note that after quantization, the weights will be lowbit integers, not float32."
@@ -261,7 +252,6 @@ def quantize_model(
             )
         # We set global precision from quantize options if it is specified at cli.py:485
         # so the precision returned by get_precision() is always the authoritative precision/dtype in torchchat
-
         precision = get_precision()
 
         q = quantizer_class_dict[quantizer]
@@ -269,7 +259,6 @@ def quantize_model(
         q_kwargs = validate_args(named_params, q_kwargs, quantizer)
 
         # Handle tokenizer for scenarios where the quantizer needs to tokenizer sample inputs
-
         if "tokenizer" in named_params:
             q_kwargs["tokenizer"] = tokenizer
         if quantizer == "embedding:wx":
@@ -278,7 +267,6 @@ def quantize_model(
             quant_handler = q(device=device, precision=precision, **q_kwargs)
 
         # quantize model
-
         model = quant_handler.quantize(model)
 
 
@@ -288,13 +276,7 @@ def quantize_model(
 
 
 class QuantHandler:
-    def __init__(
-        self,
-        model: Optional[nn.Module] = None,
-        device="cpu",
-        precision=None,
-        tokenizer=None,
-    ):
+    def __init__(self, model: Optional[nn.Module] = None, device="cpu", precision=None, tokenizer=None):
         self.model_ = model
         self.device = device
         self.tokenizer = tokenizer
@@ -312,7 +294,6 @@ class QuantHandler:
         return self.model_
 
     # fallback for TC QuantHandlers that do not implement the method .quantize()
-
     def quantize(self, model: nn.Module) -> nn.Module:
         self.model_ = model
         return self.quantized_model()
@@ -323,15 +304,7 @@ class QuantHandler:
 
 
 class PrecisionHandler(QuantHandler):
-    def __init__(
-        self,
-        model: Optional[nn.Module] = None,
-        device="cpu",
-        precision=None,
-        tokenizer=None,
-        *,
-        dtype,
-    ):
+    def __init__(self, model: Optional[nn.Module]=None, device="cpu", precision=None, tokenizer=None, *, dtype):
         self.model_ = model
         self.device = device
         self.tokenizer = tokenizer
@@ -360,15 +333,7 @@ class PrecisionHandler(QuantHandler):
 
 
 class ExecutorHandler(QuantHandler):
-    def __init__(
-        self,
-        model: Optional[nn.Module] = None,
-        device="cpu",
-        precision=None,
-        tokenizer=None,
-        *,
-        accelerator,
-    ):
+    def __init__(self, model: Optional[nn.Module]=None, device="cpu", precision=None, tokenizer=None, *, accelerator):
         self.model_ = model
 
         if isinstance(accelerator, str):
