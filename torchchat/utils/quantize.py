@@ -68,21 +68,16 @@ torchao_experimental_load_error: Optional[Exception] = None
 #########################################################################
 ###                       handle arg validation                       ###
 
-
 import inspect
-
 
 def get_named_parameters(func: Callable) -> List[str]:
     # Get the signature of the function
-
     signature = inspect.signature(func)
 
     # Extract the parameters from the signature
-
     parameters = signature.parameters
 
     # Filter and return named parameters
-
     named_params = [
         name
         for name, param in parameters.items()
@@ -125,160 +120,166 @@ def quantize_model(
 
     if isinstance(quantize_options, str):
         quantize_options = json.loads(quantize_options)
+
+    ordered_quantize_options = { }
+    for quantizer in quantizer_class_dict.keys():
+        if quantizer in quantize_options:
+            ordered_quantize_options |= { quantizer : quantize_options.pop(quantizer) }
+
+    if len(quantize_options) != 0:
+        raise RuntimeError(f"unknown quantizer(s) {quantize_options.keys()} specified")
+
+    quantize_options = ordered_quantize_options
     for quantizer, q_kwargs in quantize_options.items():
-        if quantizer not in quantizer_class_dict:
-            raise RuntimeError(f"unknown quantizer {quantizer} specified")
+        if quantizer == "experimental:embedding":
+            group_size = q_kwargs["groupsize"]
+            bit_width = q_kwargs["bitwidth"]
+            has_weight_zeros = q_kwargs["has_weight_zeros"]
+            weight_granularity = (
+                PerAxis() if group_size == -1 else PerGroup(group_size)
+            )
+            weight_dtype = getattr(torch, f"int{bit_width}")
+            weight_mapping_type = (
+                MappingType.ASYMMETRIC
+                if has_weight_zeros
+                else MappingType.SYMMETRIC
+            )
+
+            try:
+                model = EmbeddingQuantizer(
+                    weight_dtype=weight_dtype,
+                    granularity=weight_granularity,
+                    mapping_type=weight_mapping_type,
+                    use_fallback=False,
+                ).quantize(model)
+            except Exception as e:
+                print(
+                    "Encountered error during quantization with experimental EmbeddingQuantization: {e}"
+                )
+        if quantizer == "experimental:shared":
+            group_size = q_kwargs["groupsize"]
+            bit_width = q_kwargs["bitwidth"]
+            has_weight_zeros = q_kwargs["has_weight_zeros"]
+            weight_granularity = (
+                PerAxis() if group_size == -1 else PerGroup(group_size)
+            )
+            weight_dtype = getattr(torch, f"int{bit_width}")
+            weight_mapping_type = (
+                MappingType.ASYMMETRIC
+                if has_weight_zeros
+                else MappingType.SYMMETRIC
+            )
+
+            try:
+                model = SharedEmbeddingQuantizer(
+                    weight_dtype=weight_dtype,
+                    granularity=weight_granularity,
+                    mapping_type=weight_mapping_type,
+                    use_fallback=False,
+                ).quantize(model)
+            except Exception as e:
+                print(
+                    "Encountered error during quantization with experimental SharedEmbeddingQuantization: {e}"
+                )
+        # Use tensor subclass API for int4 weight only.
+        if (device in ["cuda", "xpu", "npu"]) and quantizer == "linear:int4":
+            quantize_(model, int4_weight_only(q_kwargs["groupsize"]))
+            if not support_tensor_subclass:
+                unwrap_tensor_subclass(model)
+            continue
+        if quantizer == "linear:a8wxdq":
+            if get_precision() != torch.float32:
+                print(
+                    f"Quantizer {quantizer} requires float32 inputs, but received {get_precision()}.  Changing dtype to float32.  Note that after quantization, the weights will be lowbit integers, not float32."
+                )
+                set_precision(torch.float32)
+            group_size = q_kwargs["groupsize"]
+            bit_width = q_kwargs["bitwidth"]
+            has_weight_zeros = q_kwargs["has_weight_zeros"]
+            granularity = PerAxis() if group_size == -1 else PerGroup(group_size)
+            weight_dtype = getattr(torch, f"int{bit_width}")
+            weight_mapping_type = (
+                MappingType.ASYMMETRIC
+                if has_weight_zeros
+                else MappingType.SYMMETRIC
+            )
+
+            try:
+                quantize_(
+                    model,
+                    Int8DynamicActivationIntxWeightConfig(
+                        weight_dtype=weight_dtype,
+                        weight_granularity=granularity,
+                        weight_mapping_type=weight_mapping_type,
+                        layout=PackedLinearInt8DynamicActivationIntxWeightLayout(),
+                    ),
+                )
+            except Exception as e:
+                print("Encountered error during quantization: {e}")
+                print("Trying with QDQLayout")
+                quantize_(
+                    model,
+                    Int8DynamicActivationIntxWeightConfig(
+                        weight_dtype=weight_dtype,
+                        weight_granularity=granularity,
+                        weight_mapping_type=weight_mapping_type,
+                        layout=QDQLayout(),
+                    ),
+                )
+            if not support_tensor_subclass:
+                unwrap_tensor_subclass(model)
+            continue
+        if quantizer == "embedding:wx":
+            # These quantizers require float32 input weights.  Note that after quantization,
+            # the weights will no longer be float32, but lowbit integers
+
+            if get_precision() != torch.float32:
+                print(
+                    f"Quantizer {quantizer} requires float32 inputs, but received {get_precision()}.  Changing dtype to float32.  Note that after quantization, the weights will be lowbit integers, not float32."
+                )
+                set_precision(torch.float32)
+
+            group_size = q_kwargs["groupsize"]
+            bit_width = q_kwargs["bitwidth"]
+            has_weight_zeros = q_kwargs.get("has_weight_zeros", True)
+            q_kwargs["granularity"] = (
+                PerAxis() if group_size == -1 else PerGroup(group_size)
+            )
+            q_kwargs["weight_dtype"] = getattr(torch, f"int{bit_width}")
+            q_kwargs["mapping_type"] = (
+                MappingType.ASYMMETRIC
+                if has_weight_zeros
+                else MappingType.SYMMETRIC
+            )
+            q_kwargs["use_fallback"] = False
+            del q_kwargs["groupsize"]
+            del q_kwargs["bitwidth"]
+
+        if quantizer == "linear:afpwx" and device != "mps":
+            raise RuntimeError(
+                "linear:afpwx quantization can only run on mps device!"
+            )
+        # We set global precision from quantize options if it is specified at cli.py:485
+        # so the precision returned by get_precision() is always the authoritative precision/dtype in torchchat
+
+        precision = get_precision()
+
+        q = quantizer_class_dict[quantizer]
+        named_params = get_named_parameters(q.__init__)
+        q_kwargs = validate_args(named_params, q_kwargs, quantizer)
+
+        # Handle tokenizer for scenarios where the quantizer needs to tokenizer sample inputs
+
+        if "tokenizer" in named_params:
+            q_kwargs["tokenizer"] = tokenizer
+        if quantizer == "embedding:wx":
+            quant_handler = q(**q_kwargs)
         else:
-            # Use tensor subclass API for int4 weight only.
-            if quantizer == "experimental:embedding":
-                group_size = q_kwargs["groupsize"]
-                bit_width = q_kwargs["bitwidth"]
-                has_weight_zeros = q_kwargs["has_weight_zeros"]
-                weight_granularity = (
-                    PerAxis() if group_size == -1 else PerGroup(group_size)
-                )
-                weight_dtype = getattr(torch, f"int{bit_width}")
-                weight_mapping_type = (
-                    MappingType.ASYMMETRIC
-                    if has_weight_zeros
-                    else MappingType.SYMMETRIC
-                )
+            quant_handler = q(device=device, precision=precision, **q_kwargs)
 
-                try:
-                    model = EmbeddingQuantizer(
-                        weight_dtype=weight_dtype,
-                        granularity=weight_granularity,
-                        mapping_type=weight_mapping_type,
-                        use_fallback=False,
-                    ).quantize(model)
-                except Exception as e:
-                    print(
-                        "Encountered error during quantization with experimental EmbeddingQuantization: {e}"
-                    )
-            if quantizer == "experimental:shared":
-                group_size = q_kwargs["groupsize"]
-                bit_width = q_kwargs["bitwidth"]
-                has_weight_zeros = q_kwargs["has_weight_zeros"]
-                weight_granularity = (
-                    PerAxis() if group_size == -1 else PerGroup(group_size)
-                )
-                weight_dtype = getattr(torch, f"int{bit_width}")
-                weight_mapping_type = (
-                    MappingType.ASYMMETRIC
-                    if has_weight_zeros
-                    else MappingType.SYMMETRIC
-                )
+        # quantize model
 
-                try:
-                    model = SharedEmbeddingQuantizer(
-                        weight_dtype=weight_dtype,
-                        granularity=weight_granularity,
-                        mapping_type=weight_mapping_type,
-                        use_fallback=False,
-                    ).quantize(model)
-                except Exception as e:
-                    print(
-                        "Encountered error during quantization with experimental SharedEmbeddingQuantization: {e}"
-                    )
-
-            if (device in ["cuda", "xpu", "npu"]) and quantizer == "linear:int4":
-                quantize_(model, int4_weight_only(q_kwargs["groupsize"]))
-                if not support_tensor_subclass:
-                    unwrap_tensor_subclass(model)
-                continue
-            if quantizer == "linear:a8wxdq":
-                if get_precision() != torch.float32:
-                    print(
-                        f"Quantizer {quantizer} requires float32 inputs, but received {get_precision()}.  Changing dtype to float32.  Note that after quantization, the weights will be lowbit integers, not float32."
-                    )
-                    set_precision(torch.float32)
-                group_size = q_kwargs["groupsize"]
-                bit_width = q_kwargs["bitwidth"]
-                has_weight_zeros = q_kwargs["has_weight_zeros"]
-                granularity = PerAxis() if group_size == -1 else PerGroup(group_size)
-                weight_dtype = getattr(torch, f"int{bit_width}")
-                weight_mapping_type = (
-                    MappingType.ASYMMETRIC
-                    if has_weight_zeros
-                    else MappingType.SYMMETRIC
-                )
-
-                try:
-                    quantize_(
-                        model,
-                        Int8DynamicActivationIntxWeightConfig(
-                            weight_dtype=weight_dtype,
-                            weight_granularity=granularity,
-                            weight_mapping_type=weight_mapping_type,
-                            layout=PackedLinearInt8DynamicActivationIntxWeightLayout(),
-                        ),
-                    )
-                except Exception as e:
-                    print("Encountered error during quantization: {e}")
-                    print("Trying with QDQLayout")
-                    quantize_(
-                        model,
-                        Int8DynamicActivationIntxWeightConfig(
-                            weight_dtype=weight_dtype,
-                            weight_granularity=granularity,
-                            weight_mapping_type=weight_mapping_type,
-                            layout=QDQLayout(),
-                        ),
-                    )
-                if not support_tensor_subclass:
-                    unwrap_tensor_subclass(model)
-                continue
-            if quantizer == "embedding:wx":
-                # These quantizers require float32 input weights.  Note that after quantization,
-                # the weights will no longer be float32, but lowbit integers
-
-                if get_precision() != torch.float32:
-                    print(
-                        f"Quantizer {quantizer} requires float32 inputs, but received {get_precision()}.  Changing dtype to float32.  Note that after quantization, the weights will be lowbit integers, not float32."
-                    )
-                    set_precision(torch.float32)
-
-                group_size = q_kwargs["groupsize"]
-                bit_width = q_kwargs["bitwidth"]
-                has_weight_zeros = q_kwargs.get("has_weight_zeros", True)
-                q_kwargs["granularity"] = (
-                    PerAxis() if group_size == -1 else PerGroup(group_size)
-                )
-                q_kwargs["weight_dtype"] = getattr(torch, f"int{bit_width}")
-                q_kwargs["mapping_type"] = (
-                    MappingType.ASYMMETRIC
-                    if has_weight_zeros
-                    else MappingType.SYMMETRIC
-                )
-                q_kwargs["use_fallback"] = False
-                del q_kwargs["groupsize"]
-                del q_kwargs["bitwidth"]
-
-            if quantizer == "linear:afpwx" and device != "mps":
-                raise RuntimeError(
-                    "linear:afpwx quantization can only run on mps device!"
-                )
-            # We set global precision from quantize options if it is specified at cli.py:485
-            # so the precision returned by get_precision() is always the authoritative precision/dtype in torchchat
-
-            precision = get_precision()
-
-            q = quantizer_class_dict[quantizer]
-            named_params = get_named_parameters(q.__init__)
-            q_kwargs = validate_args(named_params, q_kwargs, quantizer)
-
-            # Handle tokenizer for scenarios where the quantizer needs to tokenizer sample inputs
-
-            if "tokenizer" in named_params:
-                q_kwargs["tokenizer"] = tokenizer
-            if quantizer == "embedding:wx":
-                quant_handler = q(**q_kwargs)
-            else:
-                quant_handler = q(device=device, precision=precision, **q_kwargs)
-
-            # quantize model
-
-            model = quant_handler.quantize(model)
+        model = quant_handler.quantize(model)
 
 
 #########################################################################
@@ -445,35 +446,29 @@ def dynamically_quantize_per_channel(
         x = F.pad(x, (0, padding))
         items = groupsize
     # default setup for affine quantization of activations
-
     eps = torch.finfo(torch.float32).eps
 
     x = x.view(x.shape[0], x.shape[1] // items, items)
     # get min and max
-
     min_val, max_val = torch.aminmax(x, dim=2)
     # print(f"min_val {min_val}")
     # print(f"max_val {max_val}")
 
     # calculate scales and zero_points based on min and max
     # reference: https://fburl.com/code/srbiybme
-
     min_val_neg = torch.min(min_val, torch.zeros_like(min_val))
     max_val_pos = torch.max(max_val, torch.zeros_like(max_val))
     device = min_val_neg.device
 
     # reference: https://fburl.com/code/4wll53rk
-
     max_val_pos = torch.max(-min_val_neg, max_val_pos)
     scales = max_val_pos / (float(quant_max - quant_min) / 2)
     # ensure scales is the same dtype as the original tensor
 
     scales = torch.clamp(scales, min=eps).to(x.dtype)
     zero_points = torch.zeros(min_val_neg.size(), dtype=torch.int64, device=device)
-
     # quantize based on qmin/qmax/scales/zp
     # reference: https://www.internalfb.com/code/fbsource/[8edc275012b1]/fbcode/caffe2/torch/ao/quantization/fx/_decomposed.py?lines=63
-
     x_div = x / scales.unsqueeze(-1)
     x_round = torch.round(x_div)
     x_zp = x_round + zero_points.unsqueeze(-1)
@@ -489,7 +484,6 @@ def dynamically_quantize_per_channel(
 
 def get_group_qparams(w, n_bit=4, groupsize=128, *, scales_dtype=torch.float):
     # needed for GPTQ with padding
-
     if groupsize > w.shape[-1]:
         groupsize = w.shape[-1]
     assert groupsize > 1
@@ -535,7 +529,6 @@ def unpack_scales_and_zeros(scales_and_zeros):
 def group_quantize_tensor_from_qparams(w, scales, zeros, n_bit=4, groupsize=128):
     assert groupsize > 1
     # needed for GPTQ single column quantize
-
     if groupsize > w.shape[-1] and scales.shape[-1] == 1:
         groupsize = w.shape[-1]
     assert w.shape[-1] % groupsize == 0
@@ -573,7 +566,6 @@ def group_dequantize_tensor_from_qparams(
 ):
     assert groupsize > 1
     # needed for GPTQ single column dequantize
-
     if groupsize > w_int32.shape[-1] and scales.shape[-1] == 1:
         groupsize = w_int32.shape[-1]
     assert w_int32.shape[-1] % groupsize == 0
@@ -605,7 +597,6 @@ def linear_int8_aoti(input, weight, scales):
     n_groups = scales.numel() // scales.shape[0]
 
     # we special-case channel-wise, because we know how to make that fast
-
     if n_groups == 1:
         scales = scales.view(-1)
         if (
@@ -615,10 +606,8 @@ def linear_int8_aoti(input, weight, scales):
         ):
             lin = F.linear(input, weight.to(dtype=input.dtype))
             # print(f"linear shape {lin.shape}, scales shape {scales.shape}")
-
             return lin * scales
         # Use int8pack_mm for CPU eager
-
         return torch.ops.aten._weight_int8pack_mm(
             input.reshape(-1, input.shape[-1]),
             weight,
@@ -670,14 +659,12 @@ def linear_int8_et(input, weight, scales):
     n_groups = scales.numel() // scales.shape[0]
 
     # we special-case channel-wise, because we know how to make that fast
-
     if n_groups == 1:
         scales = scales.view(-1)
 
         if True:
             lin = F.linear(input, weight.to(dtype=input.dtype))
             # print(f"linear shape {lin.shape}, scales shape {scales.shape}")
-
             return lin * scales
         return _qdq_dynamic_quantized_linear(
             x_fp32=input.float(),
@@ -793,7 +780,6 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
             raise ValueError(f"Unsupported bitwidth {self.bitwidth}")
         for name, child in module.named_children():
             # print(f"name: {name}")
-
             if isinstance(child, nn.Linear):
                 if (
                     (self.node_type == "*")
@@ -801,14 +787,12 @@ class WeightOnlyInt8QuantHandler(QuantHandler):
                     or (self.node_type == "!output" and name != "output")
                 ):
                     # print(f"{name, child}")
-
                     input_weight = child.weight.float()
                     # print(f"{name, child}")
                     # print(f"in_features: {child.in_features}")
                     # print(f"out_features: {child.out_features}")
 
                     # print(f"expanded weight shape {input_weight.shape}")
-
                     weight, scales, _ = dynamically_quantize_per_channel(
                         input_weight,
                         range_min,
@@ -986,7 +970,6 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
             raise ValueError(f"Unsupported bitwidth {self.bitwidth}")
         for name, child in module.named_children():
             # print(f"name: {name}")
-
             if isinstance(child, nn.Embedding):
                 # print(f"Embedding identified: {fqn, mod}")
                 # print(f"weights size: {child.weight.size()}")
@@ -995,7 +978,6 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
                 # print(
                 #     f"quantize {fqn, mod} with groupsize {self.groupsize}, bitwidth {self.bitwidth}"
                 # )
-
                 weight, scales, _ = dynamically_quantize_per_channel(
                     child.weight.float(),
                     range_min,
@@ -1021,7 +1003,6 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
 
                 # print(f"{name, child}")
                 # print(f"weights size: {child.weight.size()}")
-
                 setattr(
                     module,
                     name,
@@ -1049,7 +1030,6 @@ class EmbeddingOnlyQuantHandler(QuantHandler):
 # Map each quantizer configuration to a class implementing that quantizer
 # Must come last because __future__ annotations don't work for naked
 # class references
-
 quantizer_class_dict = {
     "embedding": EmbeddingOnlyQuantHandler,
     "embedding:wx": EmbeddingQuantizer,
@@ -1059,8 +1039,8 @@ quantizer_class_dict = {
     "linear:int4": Int4WeightOnlyQuantizer,
     "linear:a8wxdq": None,  # uses quantize_ API
     "linear:a8w4dq": Int8DynActInt4WeightQuantizer,
-    "experimental:embedding": EmbeddingQuantizer,
     "experimental:shared": SharedEmbeddingQuantizer,
+    "experimental:embedding": EmbeddingQuantizer,
 }
 
 try:
@@ -1071,7 +1051,6 @@ try:
     torchao_build_path = f"{os.getcwd()}/torchao-build"
 
     # Try loading quantizer
-
     torchao_experimental_quant_api_spec = importlib.util.spec_from_file_location(
         "torchao_experimental_quant_api",
         f"{torchao_build_path}/src/ao/torchao/experimental/quant_api.py",
@@ -1084,11 +1063,9 @@ try:
         torchao_experimental_quant_api
     )
     from torchao_experimental_quant_api import UIntxWeightOnlyLinearQuantizer
-
     quantizer_class_dict["linear:afpwx"] = UIntxWeightOnlyLinearQuantizer
 
     # Try loading custom op
-
     try:
         libname = "libtorchao_ops_mps_aten.dylib"
         libpath = f"{torchao_build_path}/cmake-out/lib/{libname}"
