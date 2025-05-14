@@ -18,6 +18,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import torch
 import torch.distributed as dist
 from torch.distributed.pipelining import PipelineStage, ScheduleGPipe
+from tokenizer.tokenizer_type import TokenizerType
 from torchchat.cli.builder import _initialize_tokenizer, TokenizerArgs
 
 # TODO - these are not distributed specific, consider moving to new package
@@ -62,11 +63,6 @@ NAME_TO_DISTRIBUTION_AND_DTYPE = {
     "llama3": ("meta-llama/Meta-Llama-3-8B-Instruct", torch.bfloat16, 4096),
     "llama3-70b": ("meta-llama/Meta-Llama-3-70B-Instruct", torch.bfloat16, 8192),
 }
-
-
-class TokenizerType(Enum):
-    Tiktoken = auto()
-    SentencePiece = auto()
 
 
 def _init_distributed():
@@ -122,9 +118,9 @@ def _build_chat_tokenizer(
     )
     # set global variable _tokenizer_type
     if isinstance(tokenizer, TiktokenTokenizer):
-        _tokenizer_type = TokenizerType.Tiktoken
+        _tokenizer_type = TokenizerType.TIKTOKEN
     elif isinstance(tokenizer, SentencePieceProcessor):
-        _tokenizer_type = TokenizerType.SentencePiece
+        _tokenizer_type = TokenizerType.SENTENCEPIECE
     else:
         raise ValueError(f"Unknown tokenizer type: {tokenizer.__class__}")
 
@@ -575,11 +571,11 @@ def main(args):
         # token ids. Thus cat'ing along dim 1.
         res = torch.cat(res, dim=1)
         res_list = res.tolist()
-        if _tokenizer_type == TokenizerType.Tiktoken:
+        if _tokenizer_type == TokenizerType.TIKTOKEN:
             # For TiktokenTokenizer, we need to decode prompt by prompt.
             # TODO: is there a better way to do this?
             responses = [tokenizer.decode(sequence) for sequence in res_list]
-        elif _tokenizer_type == TokenizerType.SentencePiece:  # SentencePieceProcessor
+        elif _tokenizer_type == TokenizerType.SENTENCEPIECE:  # SentencePieceProcessor
             # For SentencePieceProcessor, we can decode the entire 2D list at once.
             responses = tokenizer.decode(res_list)
         else:
