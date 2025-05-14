@@ -31,6 +31,7 @@ from torch._C import _SDPBackend as SDPBackend
 from PIL import Image
 
 # torchtune model definition dependencies
+from tokenizer.tokenizer_type import TokenizerType
 from torchtune.data import Message, padded_collate_tiled_images_and_mask
 
 from torchtune.generation import sample as tune_sample
@@ -365,14 +366,14 @@ class LocalGenerator:
         # must use tiktokenizer.
         # Piggy backing off of this flag then for now to identify llama3
         # without prompting user.
-        self.is_llama3_model = self.tokenizer_args.tokenizer_type.is_tiktoken()
+        self.is_llama3_model = self.tokenizer_args.tokenizer_type == TokenizerType.TIKTOKEN
         if self.is_llama3_model:
             self.chat_formatter = Llama3ChatFormatter(self.tokenizer)
             if generator_args.chat_mode:
                 logger.debug(
                     "Llama3 model detected in chat mode. Using updated sentence schemas"
                 )
-        elif self.tokenizer_args.tokenizer_type.is_hf_tokenizer():
+        elif self.tokenizer_args.tokenizer_type == TokenizerType.HF_TOKENIZER:
             if not self.tokenizer.has_chat_template():
                 raise ValueError("Tokenizer must have a chat template")
             self.chat_formatter = HFTokenizerChatFormatter(self.tokenizer)

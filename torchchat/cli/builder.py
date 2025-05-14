@@ -282,12 +282,12 @@ class TokenizerArgs:
         if model is None:
             return
 
-        if self.tokenizer_type.is_none():
+        if self.tokenizer_type == TokenizerType.NONE:
             raise RuntimeError(f"no tokenizer was found at {self.tokenizer_path}")
 
-        is_tiktoken = self.tokenizer_type.is_tiktoken()
-        is_sentencepiece = self.tokenizer_type.is_sentencepiece()
-        is_hf_tokenizer = self.tokenizer_type.is_hf_tokenizer()
+        is_tiktoken = self.tokenizer_type == TokenizerType.TIKTOKEN
+        is_sentencepiece = self.tokenizer_type == TokenizerType.SENTENCEPIECE
+        is_hf_tokenizer = self.tokenizer_type == TokenizerType.HF_TOKENIZER
 
         use_tiktoken = model.config.use_tiktoken
         use_hf_tokenizer = model.config.use_hf_tokenizer
