@@ -13,18 +13,14 @@ from abc import ABC
 from dataclasses import dataclass
 from io import BytesIO
 from pwd import getpwuid
-from typing import Any, Dict, List, Optional, Union, Type
+from typing import Any, Dict, List, Optional, Type, Union
 
 import torch
 
 from PIL import Image
 
-from torchtune.data import Message, padded_collate_tiled_images_and_mask
-
-from torchtune.models.llama3_2_vision._model_builders import llama3_2_vision_transform
-
 from torchchat.cli.download import is_model_downloaded, load_model_configs
-from torchchat.generate import LocalGenerator, DistributedGenerator, GeneratorArgs
+from torchchat.generate import DistributedGenerator, GeneratorArgs, LocalGenerator
 from torchchat.model import FlamingoModel
 
 from torchchat.utils.build_utils import device_sync
@@ -304,7 +300,7 @@ class OpenAiApiGeneratorMixin:
 
     def _gen_model_inputs_from_openai_completion_request(
         self, completion_request: CompletionRequest
-    ) -> List[Message]:
+    ) -> List:
         """Generate model inputs from an OpenAI completion request.
 
         Args:
@@ -392,7 +388,7 @@ class OpenAiApiGeneratorMixin:
         device_sync(device=self.builder_args.device)
 
         buffer = []
-        ILLEGAL_CHAR = '\ufffd'
+        ILLEGAL_CHAR = "\ufffd"
         # Process each token, metrics tuple yielded by Generator.generate.
         for y, _ in self.generate(
             model=self.model,
@@ -495,7 +491,14 @@ def create_openai_api_generator(distributed: bool) -> Type:
     """
 
     # Base class order matters to make sure OpenAiApiGeneratorMixin overrides methods in DistributedGenerator and Generator
-    return type('OpenAiApiGenerator', (OpenAiApiGeneratorMixin, DistributedGenerator if distributed else LocalGenerator), {})
+    return type(
+        "OpenAiApiGenerator",
+        (
+            OpenAiApiGeneratorMixin,
+            DistributedGenerator if distributed else LocalGenerator,
+        ),
+        {},
+    )
 
 
 """

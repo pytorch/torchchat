@@ -17,13 +17,14 @@ import torch._dynamo.config
 import torch._inductor.config
 import torch.distributed as dist
 
-from torchchat.distributed.utils import(
+from torchchat.distributed.logging_utils import SingletonLogger
+
+from torchchat.distributed.utils import (
     Color as color,
     CUDATrackTime,
-    init_distributed,
     GPUMemoryMonitor,
+    init_distributed,
 )
-from torchchat.distributed.logging_utils import SingletonLogger
 
 from torchchat.model import Model, ModelArgs, ModelType, Transformer, TransformerArgs
 from torchchat.model_config.model_config import resolve_model_config
@@ -35,15 +36,6 @@ from torchchat.utils.build_utils import (
 )
 from torchchat.utils.measure_time import measure_time
 from torchchat.utils.quantize import quantize_model
-
-
-from torchtune.models.convert_weights import meta_to_tune
-
-from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
-
-from torchtune.models.llama3_2_vision._convert_weights import llama3_vision_meta_to_tune
-
-from torchtune.training import set_default_dtype
 
 
 @dataclass
@@ -188,15 +180,19 @@ class BuilderArgs:
         tp = getattr(args, "tp", 1)
         chpt_from = getattr(args, "chpt_from", "hf")
         sdp_backend_dict = {
-            'math': torch.nn.attention.SDPBackend.MATH,
-            'flash_attention': torch.nn.attention.SDPBackend.FLASH_ATTENTION,
-            'efficient_attention': torch.nn.attention.SDPBackend.EFFICIENT_ATTENTION,
-            'cudnn_attention': torch.nn.attention.SDPBackend.CUDNN_ATTENTION,
+            "math": torch.nn.attention.SDPBackend.MATH,
+            "flash_attention": torch.nn.attention.SDPBackend.FLASH_ATTENTION,
+            "efficient_attention": torch.nn.attention.SDPBackend.EFFICIENT_ATTENTION,
+            "cudnn_attention": torch.nn.attention.SDPBackend.CUDNN_ATTENTION,
         }
         attention_backend = sdp_backend_dict[args.attention_backend]
-        if args.device == "cpu" and (args.attention_backend == "efficient_attention"
-                                     or args.attention_backend == "cudnn_attention"):
-            print(f"Warning: {args.attention_backend} is not supported on CPU. Using math instead.")
+        if args.device == "cpu" and (
+            args.attention_backend == "efficient_attention"
+            or args.attention_backend == "cudnn_attention"
+        ):
+            print(
+                f"Warning: {args.attention_backend} is not supported on CPU. Using math instead."
+            )
             attention_backend = torch.nn.attention.SDPBackend.MATH
         return cls(
             checkpoint_dir=checkpoint_dir,
@@ -294,9 +290,9 @@ class TokenizerArgs:
         use_sentencepiece = not (use_tiktoken or use_hf_tokenizer)
 
         if (
-            (is_tiktoken and not use_tiktoken) or
-            (is_hf_tokenizer and not use_hf_tokenizer) or
-            (is_sentencepiece and not use_sentencepiece)
+            (is_tiktoken and not use_tiktoken)
+            or (is_hf_tokenizer and not use_hf_tokenizer)
+            or (is_sentencepiece and not use_sentencepiece)
         ):
             raise RuntimeError(
                 "model-specified tokenizer ({}) does not match provided tokenizer ({}) for {}".format(
@@ -404,6 +400,7 @@ def _load_model_gguf(builder_args: BuilderArgs) -> Model:
 
 def _load_checkpoint(builder_args: BuilderArgs):
     if builder_args.params_table and builder_args.params_table.endswith("Tune"):
+        from torchtune.models.convert_weights import meta_to_tune
         print("Loading Tune checkpoint")
         meta_checkpoint = torch.load(
             str(builder_args.checkpoint_path), mmap=True, weights_only=True
@@ -456,9 +453,15 @@ def _load_model_default(builder_args: BuilderArgs) -> Model:
         checkpoint = checkpoint["model"]
 
     if model.config.model_type == ModelType.Flamingo:
+        from torchtune.models.llama3_1._position_embeddings import Llama3ScaledRoPE
+        from torchtune.models.llama3_2_vision._convert_weights import (
+            llama3_vision_meta_to_tune,
+        )
+        from torchtune.training import set_default_dtype
         # TODO: Refactor this. For now, overwrite the model with model loaded from params_path
-        with set_default_dtype(builder_args.precision), torch.device(
-            builder_args.device
+        with (
+            set_default_dtype(builder_args.precision),
+            torch.device(builder_args.device),
         ):
             # It doubles the model size the memory, with redundancies of the initialized weights.
             # model = Model.from_params(builder_args.params_path)
@@ -494,6 +497,7 @@ def _load_model(builder_args: BuilderArgs) -> Model:
         # AOTI-compoiled model will load its own weights.
         # Release weights here to avoid OOM
         import gc
+
         if hasattr(model, "model"):
             model.model = None
         gc.collect()
@@ -551,6 +555,7 @@ def _initialize_model(
 
             def do_nothing(max_batch_size, max_seq_length):
                 pass
+
             model.setup_caches = do_nothing
 
             model.forward = torch._export.aot_load(
@@ -588,6 +593,7 @@ def _initialize_model(
 
             def do_nothing(max_batch_size, max_seq_length):
                 pass
+
             model.setup_caches = do_nothing
 
             model.forward = aoti_compiled_model
@@ -639,12 +645,15 @@ def _initialize_model(
         try:
             model = torch.load(builder_args.snapshot_path, weights_only=False)
         except Exception:
-            raise RuntimeError(f"Failed to load torchchat snapshot {builder_args.snapshot_path}")
+            raise RuntimeError(
+                f"Failed to load torchchat snapshot {builder_args.snapshot_path}"
+            )
         # _active_backend() does not allow DSO & AOTI to be true.
         # Choose either.
         from torchchat.utils.build_utils import set_backend
-        set_backend (dso=True, pte=False, aoti_package=False)
-        if (model.config != config):
+
+        set_backend(dso=True, pte=False, aoti_package=False)
+        if model.config != config:
             raise RuntimeError("loaded model architecture mismatch")
         ##
         ## import all libraries with custom kernels ans custom operators
@@ -662,7 +671,9 @@ def _initialize_model(
         logger = SingletonLogger.get_logger()
 
         gpu_memory_monitor = GPUMemoryMonitor("cuda")
-        logger.info(f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}")
+        logger.info(
+            f"{color.yellow} {gpu_memory_monitor.get_device_info()}{color.reset}"
+        )
 
         # Model-level config
         if builder_args.params_table:
@@ -673,20 +684,16 @@ def _initialize_model(
         config = TransformerArgs.from_params(model_config.transformer_args["text"])
         logger.info(f"Transformer Config: {config}")
 
-        #TODO: Move into head of file after solving circular import
-        from torchchat.distributed.checkpoint_utils import (
-            load_model_weights,
-            )
+        # TODO: Move into head of file after solving circular import
+        from torchchat.distributed.checkpoint_utils import load_model_weights
 
         # Validate pipeline degree
         assert config.n_layers % pp_degree == 0
 
         # Create device mesh
         device_mesh = dist.init_device_mesh(
-            "cuda",
-            (pp_degree, tp_degree),
-            mesh_dim_names=("pp", "tp")
-            )
+            "cuda", (pp_degree, tp_degree), mesh_dim_names=("pp", "tp")
+        )
         tp_mesh = device_mesh["tp"]
         pp_mesh = device_mesh["pp"]
         logger.info(f"Created device mesh: {device_mesh}\n{tp_mesh=}, {pp_mesh=}")
@@ -715,7 +722,13 @@ def _initialize_model(
         # Load weights
         logger.info(f"Loading weights for {pp_rank=} on {device=}")
         with CUDATrackTime() as timer:
-            load_model_weights(model, builder_args.distribution_path, device, config, builder_args.chpt_from)
+            load_model_weights(
+                model,
+                builder_args.distribution_path,
+                device,
+                config,
+                builder_args.chpt_from,
+            )
 
         logger.info(
             f"{color.green}Total weight loading time: {timer.get_time()} {timer.unit} for rank {rank}{color.reset}"
@@ -729,7 +742,7 @@ def _initialize_model(
         # lanes.
         # TODO: bump up the lane count
         pipeline_lanes = 1
-        seqlen_prefill=1024
+        seqlen_prefill = 1024
         with device:
             model.setup_caches(1, seqlen_prefill, cache_lanes=pipeline_lanes)
 
