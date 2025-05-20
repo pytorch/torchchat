@@ -3,7 +3,10 @@
 torchchat is a small codebase showcasing the ability to run large language models (LLMs) seamlessly. With torchchat, you can run LLMs using Python, within your own (C/C++) application (desktop or server) and on iOS and Android.
 
 > [!IMPORTANT]
-> Update
+> torchchat is no longer under active development. Please see this [post](https://github.com/pytorch/torchchat/issues/1543) for more details
+
+
+> Updates
 >
 > **February 3, 2025**: torchchat has support for [**DeepSeek R1 Distill: 8B**]( https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-8B)!
 >
