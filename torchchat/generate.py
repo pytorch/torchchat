@@ -1389,7 +1389,7 @@ class DistributedGenerator(LocalGenerator):
         if builder_args.pp > 1:
             self.seqlen_prefill = 1024  # sequence length for prefill stage
 
-            logger.warn(
+            logger.warning(
                 f"{color.yellow}Pipeline parallelism is still experimental and might be slow{color.reset}"
             )
             pp_mesh = self.model.device_mesh["pp"]
