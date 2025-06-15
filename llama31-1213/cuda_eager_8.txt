@@ -1,0 +1,70 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+PyTorch version 2.6.0.dev20241213+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 5.77 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.40 seconds
+-----------------------------------------------------------
+Once upon a time, in the northern region of Peru, there was a young boy named César. César was a curious and adventurous boy who loved exploring the Andes mountains with his family. One day, while they were out on a hike, César stumbled upon an ancient Inca gold nugget. As soon as he touched it, he felt an strange sensation, like a sudden rush of excitement and energy.
+
+As he picked up the nugget, he noticed that it was glowing with a soft, golden light. César felt drawn to the nugget, as if it were calling to him. He couldn't resist the urge to hold it closer and examine it more closely. As he did, he felt a sudden jolt of electricity run through his body, and everything around him began to shimmer and shine.
+
+Suddenly, César found himself transported through time and space to the era of the Inca Empire. He found himself standing in the middle of a bustling marketplace, surrounded
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 17.0737 sec total                 
+Time to first token: 0.6103 sec with parallel prefill.                
+
+      Total throughput: 11.7139 tokens/sec, 0.0854 s/token                 
+First token throughput: 1.6385 tokens/sec, 0.6103 s/token                 
+ Next token throughput: 12.0875 tokens/sec, 0.0827 s/token                     
+
+Bandwidth achieved: 100.26 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a distant land, there was a mystical realm called the kingdom of Eldoria. Eldoria was a land of breathtaking beauty, where towering spires of crystal pierced the sky and lush forests stretched as far as the eye could see. The kingdom was home to a variety of magical creatures, each with their own unique abilities and characteristics.
+In the heart of Eldoria, there lived a young apprentice named Eira. Eira was a skilled weaver of magical threads, able to craft powerful spells and enchantments that could manipulate the very fabric of reality. She was a novice in the art of magic, but her innate talent and dedication had already earned her a reputation as one of the most promising young mages in the kingdom.
+Eira's mentor, the wise and venerable mage named Lyra, had taken her under her wing and was teaching her the intricacies of magic. Lyra was a master weaver of threads, able to create complex spells that could bend time and space to
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 16.7426 sec total                 
+Time to first token: 0.0711 sec with parallel prefill.                
+
+      Total throughput: 11.9456 tokens/sec, 0.0837 s/token                 
+First token throughput: 14.0621 tokens/sec, 0.0711 s/token                 
+ Next token throughput: 11.9365 tokens/sec, 0.0838 s/token                     
+
+Bandwidth achieved: 102.24 GB/s
+
+========================================
+
+Once upon a time, as the last remnants of a dying sun set over a western horizon, two adventurers embarked upon a journey through a land of mystery and wonder. They were a duo of unlikely friends, a grizzled old trapper named Jack and a young and ambitious scientist named Alex. Jack had spent his life roaming the wilderness, tracking and trapping the creatures that lived within it, while Alex had studied the ancient lore and mythologies of the land. Their paths had crossed by chance, and now they found themselves bound together on a quest to uncover the secrets of a long-lost civilization.
+As they journeyed deeper into the heart of the unknown, they encountered strange and wondrous sights: towering crystal spires that pierced the sky like shards of glass, and ancient ruins that seemed to hold the whispers of the past within their crumbling stones. They spoke with the spirits of the land, who shared with them the secrets of the long-lost civilization that had once thrived here.
+Their journey took them through tre
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 16.5982 sec total                 
+Time to first token: 0.0735 sec with parallel prefill.                
+
+      Total throughput: 12.0495 tokens/sec, 0.0830 s/token                 
+First token throughput: 13.6109 tokens/sec, 0.0735 s/token                 
+ Next token throughput: 12.0426 tokens/sec, 0.0830 s/token                     
+
+Bandwidth achieved: 103.13 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 11.90                 
+Average tokens/sec (first token): 9.77                 
+Average tokens/sec (next tokens): 12.02 
+                
+Memory used: 28.86 GB
