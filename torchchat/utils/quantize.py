@@ -23,6 +23,7 @@
 from __future__ import annotations
 
 import json
+import types
 
 # from functools import reduce
 # from math import gcd
@@ -31,6 +32,8 @@ from typing import Dict, Optional, Callable, Any, List
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+from torchao.quantization.quant_api import _linear_extra_repr
 
 # AttributeError: '_OpNamespace' 'quantized_decomposed' object has no attribute 'quantize_per_channel_group'
 from torch.ao.quantization.fx._decomposed import quantized_decomposed_lib  # noqa
@@ -110,6 +113,16 @@ def quantize_model(
 
     if isinstance(quantize_options, str):
         quantize_options = json.loads(quantize_options)
+
+    def _attach_extra_repr(module):
+        for name, child in module.named_children():
+            if isinstance(child, nn.Linear):
+                if not hasattr(child, 'extra_repr'):
+                    child.extra_repr = types.MethodType(_linear_extra_repr, child)
+            else:
+                _attach_extra_repr(child)
+
+    _attach_extra_repr(model)
 
     for quantizer, q_kwargs in quantize_options.items():
         if quantizer not in quantizer_class_dict:
