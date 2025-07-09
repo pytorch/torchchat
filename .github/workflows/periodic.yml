@@ -1,8 +1,8 @@
 name: periodic
 
 on:
-  schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  # schedule:
+  #  - cron: '0 0 * * *'  # Runs daily at midnight UTC
   push:
     tags:
       - ciflow/periodic/*
