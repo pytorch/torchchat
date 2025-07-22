@@ -70,14 +70,14 @@ git submodule sync
 if [[ "$TARGET" == "et" ]]; then
   if [ ! -d "${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install" ]; then
     echo "Directory ${TORCHCHAT_ROOT}/${ET_BUILD_DIR}/install does not exist."
-    echo "Make sure you run install_executorch_libs"
+    echo "Make sure you run bash torchchat/utils/scripts/install_et.sh"
     exit 1
   fi
 
   if [[ "$LINK_TORCHAO_OPS" == "ON" ]]; then
     if [ ! -d "${TORCHCHAT_ROOT}/torchao-build" ]; then
       echo "Directory ${TORCHCHAT_ROOT}/torchao-build does not exist."
-      echo "Make sure you run clone_torchao"
+      echo "Make sure you run bash torchchat/utils/scripts/clone_torchao.sh"
       exit 1
     fi
 
