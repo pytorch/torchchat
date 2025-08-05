@@ -1,0 +1,301 @@
+python3 torchchat.py export llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model34.so
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --dso-path /tmp/model34.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-dso-path /tmp/model34.so
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.6.0.dev20241218+cu124 available.
+W1218 20:32:12.493177 1654082 site-packages/torch/_export/__init__.py:276] +============================+
+W1218 20:32:12.493719 1654082 site-packages/torch/_export/__init__.py:277] |     !!!   WARNING   !!!    |
+W1218 20:32:12.493938 1654082 site-packages/torch/_export/__init__.py:278] +============================+
+W1218 20:32:12.494111 1654082 site-packages/torch/_export/__init__.py:279] torch._export.aot_compile()/torch._export.aot_load() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export())/torch._inductor.aoti_load_package() instead.
+W1218 20:33:11.883745 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:11.885487 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.177311 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.252445 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.286209 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.287917 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.299919 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.336472 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.337986 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.510349 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.551547 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.586616 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.587886 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.597007 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.635042 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.636319 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.807197 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.845380 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.869709 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.871110 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.880138 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.908805 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:12.910059 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.079605 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.118574 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.151574 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.152825 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.161900 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.197574 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.198793 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.367423 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.406470 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.428939 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.430405 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.439952 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.466367 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.467884 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.639369 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.680004 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.711776 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.713212 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.722688 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.761627 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.762990 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.941797 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:13.981113 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.004502 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.006090 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.016382 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.043857 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.045392 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.244626 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.284300 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.315188 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.316496 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.325798 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.361856 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.363121 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.531267 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.569061 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.591941 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.593466 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.603515 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.628669 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.630388 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.799149 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.836615 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.865977 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.867137 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.875937 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.913592 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:14.914828 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.080706 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.119511 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.142627 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.144167 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.154067 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.180239 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.181762 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.357598 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.397039 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.427740 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.429046 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.438679 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.474384 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.475556 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.640358 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.677274 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.698557 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.702336 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.711260 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.735607 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.736973 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.904883 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.943511 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.973752 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.975023 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:15.984304 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.020385 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.021641 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.189793 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.228986 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.251099 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.252490 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.261878 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.286751 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.288439 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.453825 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.494160 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.523545 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.524790 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.533545 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.568760 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.569951 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.735313 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.773086 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.795398 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.796875 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.806146 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.831155 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:16.832510 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.000422 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.039112 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.068969 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.070197 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.079399 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.114097 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.115124 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.277422 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.317598 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.339446 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.341159 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.350399 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.375364 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.376756 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.544634 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.582466 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.612783 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.614010 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.623139 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.658950 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.660189 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.827371 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.864999 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.887009 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.888326 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.897363 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.922188 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:17.923474 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.094491 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.135612 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.176028 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.177658 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.189448 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.237649 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.238981 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.407770 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.448994 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.471654 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.473419 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.483160 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.511078 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.512598 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.684798 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.724859 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.755660 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.756993 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.767073 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.803838 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.805159 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:18.976819 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.017429 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.040679 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.042178 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.052081 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.077362 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.079102 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.249027 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.289184 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.323073 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.324293 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.333361 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.369641 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.370843 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.544332 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.587039 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.612599 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.614142 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.624497 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.651644 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.653145 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.836291 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.875658 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.907209 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.908440 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.918065 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.953979 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:19.955211 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.123053 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.166215 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.188936 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.190997 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.201327 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.228008 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.229360 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.407273 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.458337 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.496504 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.497747 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.508665 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.547976 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.549809 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.769025 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.811230 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.834301 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.835803 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.846228 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.875365 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:20.877553 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:21.071123 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:21.113878 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:21.144387 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:21.145593 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:21.154984 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+W1218 20:33:21.176146 1654082 site-packages/torch/_inductor/ir.py:6603] [0/0] aten._weight_int4pack_mm.default is missing a c-shim implementation, using proxy executor as fallback
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 6.12 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.58 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model34.so
+WARNING!! The path of compiling a dso is deprecated. Please use --output-aoti-package-path to create a .pt2 artifact instead.
+The generated packaged model can be found at: /tmp/model34.so
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --dso-path /tmp/model34.so --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+W1218 20:35:37.689507 1671842 site-packages/torch/_export/__init__.py:276] +============================+
+W1218 20:35:37.689961 1671842 site-packages/torch/_export/__init__.py:277] |     !!!   WARNING   !!!    |
+W1218 20:35:37.690145 1671842 site-packages/torch/_export/__init__.py:278] +============================+
+W1218 20:35:37.690307 1671842 site-packages/torch/_export/__init__.py:279] torch._export.aot_compile()/torch._export.aot_load() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export())/torch._inductor.aoti_load_package() instead.
+[E1218 20:35:39.524097915 shim_common.cpp:1177] Exception in aoti_torch: Unable to find a proxy executor to run custom ops. Please check if there is a json file generated in the same directory as the so, or use torch._inductor.aoti_compile_and_package to package everything into a PT2 artifact.
+[E1218 20:35:39.524140439 shim_common.cpp:1177] Exception in aoti_torch: Unable to find a proxy executor to run custom ops. Please check if there is a json file generated in the same directory as the so, or use torch._inductor.aoti_compile_and_package to package everything into a PT2 artifact.
+[E1218 20:35:39.524797602 shim_common.cpp:246] Exception in aoti_torch: Cannot access data pointer of Tensor that doesn't have storage
+Exception raised from throw_data_ptr_access_error at /pytorch/c10/core/TensorImpl.cpp:309 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x98 (0x7f09dc77d788 in /home/jackkhuu/.conda/envs/testrunner/lib/python3.10/site-packages/torch/lib/libc10.so)
+frame #1: c10::detail::torchCheckFail(char const*, char const*, unsigned int, char const*) + 0x6a (0x7f09dc726fbc in /home/jackkhuu/.conda/envs/testrunner/lib/python3.10/site-packages/torch/lib/libc10.so)
+frame #2: c10::TensorImpl::throw_data_ptr_access_error() const + 0x34 (0x7f09dc755f64 in /home/jackkhuu/.conda/envs/testrunner/lib/python3.10/site-packages/torch/lib/libc10.so)
+frame #3: aoti_torch_get_data_ptr + 0xd0 (0x7f09cc2970e0 in /home/jackkhuu/.conda/envs/testrunner/lib/python3.10/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: torch::aot_inductor::AOTInductorModel::run_impl(AtenTensorOpaque**, AtenTensorOpaque**, CUstream_st*, AOTIProxyExecutorOpaque*) + 0x4229 (0x7f08898fc719 in /tmp/model34.so)
+frame #5: torch::aot_inductor::AOTInductorModelContainer::run(AtenTensorOpaque**, AtenTensorOpaque**, CUstream_st*, AOTIProxyExecutorOpaque*) + 0xe4 (0x7f088995b234 in /tmp/model34.so)
+frame #6: AOTInductorModelContainerRun + 0x6d (0x7f0889933eed in /tmp/model34.so)
+frame #7: torch::inductor::AOTIModelContainerRunner::run(std::vector<at::Tensor, std::allocator<at::Tensor> > const&, void*) + 0x104 (0x7f09cc288c14 in /home/jackkhuu/.conda/envs/testrunner/lib/python3.10/site-packages/torch/lib/libtorch_cpu.so)
+frame #8: torch::inductor::AOTIModelContainerRunnerCuda::run(std::vector<at::Tensor, std::allocator<at::Tensor> > const&, void*) + 0x1e (0x7f0995a74e8e in /home/jackkhuu/.conda/envs/testrunner/lib/python3.10/site-packages/torch/lib/libtorch_cuda.so)
+frame #9: <unknown function> + 0x7f1d16 (0x7f09dbbf1d16 in /home/jackkhuu/.conda/envs/testrunner/lib/python3.10/site-packages/torch/lib/libtorch_python.so)
+frame #10: <unknown function> + 0x37fe0e (0x7f09db77fe0e in /home/jackkhuu/.conda/envs/testrunner/lib/python3.10/site-packages/torch/lib/libtorch_python.so)
+<omitting python frames>
+frame #51: <unknown function> + 0x295d0 (0x7f09dde295d0 in /lib64/libc.so.6)
+frame #52: __libc_start_main + 0x80 (0x7f09dde29680 in /lib64/libc.so.6)
+
+Error: aoti_torch_get_data_ptr(handle_.get(), &result) API call failed at /home/jackkhuu/.conda/envs/testrunner/lib/python3.10/site-packages/torch/include/torch/csrc/inductor/aoti_runtime/utils.h, line 117
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Warning: checkpoint path ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument
+Warning: checkpoint path ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 6.35 seconds
+-----------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/jackkhuu/oss/torchchat/torchchat.py", line 96, in <module>
+    generate_main(args)
+  File "/home/jackkhuu/oss/torchchat/torchchat/generate.py", line 1247, in main
+    for _ in gen.chat(generator_args):
+  File "/home/jackkhuu/oss/torchchat/torchchat/generate.py", line 1116, in chat
+    for token_tensor, metrics in generator_func:
+  File "/home/jackkhuu/.conda/envs/testrunner/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 36, in generator_context
+    response = gen.send(None)
+  File "/home/jackkhuu/oss/torchchat/torchchat/generate.py", line 647, in generate
+    next_token = self.prefill(
+  File "/home/jackkhuu/oss/torchchat/torchchat/generate.py", line 398, in prefill
+    logits = model(x_sliced, ip_sliced)  # (x[:, i], input_pos[i])da
+  File "/home/jackkhuu/.conda/envs/testrunner/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/jackkhuu/.conda/envs/testrunner/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/jackkhuu/.conda/envs/testrunner/lib/python3.10/site-packages/torch/_export/__init__.py", line 387, in optimized
+    flat_outputs = runner.run(flat_inputs)  # type: ignore[attr-defined]
+RuntimeError: run_func_( container_handle_, input_handles.data(), input_handles.size(), output_handles.data(), output_handles.size(), reinterpret_cast<AOTInductorStreamHandle>(stream_handle), proxy_executor_handle_) API call failed at /pytorch/torch/csrc/inductor/aoti_runner/model_container_runner.cpp, line 107

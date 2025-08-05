@@ -1,0 +1,79 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241213+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 6.17 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.57 seconds
+-----------------------------------------------------------
+Once upon a time, there was a small village surrounded by beautiful mountains and valleys. The villagers lived a peaceful life, surrounded by nature's splendor. They spent their days farming, hunting, and fishing, and they cherished every moment of their simple yet fulfilling lives.
+
+One day, a wise old man came to the village. He was a traveler who had walked for many days, and he looked tired but content. The villagers were curious about this stranger, and they welcomed him with open arms.
+
+The old man told the villagers that he had come to share a special gift with them. He said that he had learned from his travels how to harness the power of the wind and the water to make their lives easier and more efficient.
+
+The villagers were skeptical at first, but the old man's words were persuasive. He showed them how to build simple windmills that could power their homes, and how to dig canals that could bring fresh water from the mountains to their fields.
+
+The villagers were amazed by the old
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 256.3477 sec total                 
+Time to first token: 0.2921 sec with parallel prefill.                
+
+      Total throughput: 0.7802 tokens/sec, 1.2817 s/token                 
+First token throughput: 3.4232 tokens/sec, 0.2921 s/token                 
+ Next token throughput: 0.7772 tokens/sec, 1.2867 s/token                     
+
+Bandwidth achieved: 12.53 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2.6e+02 seconds
+
+========================================
+
+Once upon a time, a lot of people thought that the world was flat.
+They thought that if you sailed far enough on a ship, you would eventually fall off the edge of the world.
+If you were standing on the edge of a cliff, you could literally see over the edge of the world!
+If you walked too far away from a tree, you could see that the world stopped.
+A very long time ago, people did believe that the Earth was flat. However, people who sailed across the oceans, like Christopher Columbus, knew that the Earth was a sphere. A large number of people in the world in the 15th century believed that the Earth was a sphere, but the Catholic Church did not agree. They believed the only way for a ship to reach the East Indies was on the back of a giant sea turtle or a huge, invisible elephant that carried a magic carpet! Can you believe this? But in 1531, German astronomer Andreas Osiander convinced the Catholic Church that the Earth
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 4.0837 sec total                 
+Time to first token: 0.0905 sec with parallel prefill.                
+
+      Total throughput: 48.9753 tokens/sec, 0.0204 s/token                 
+First token throughput: 11.0490 tokens/sec, 0.0905 s/token                 
+ Next token throughput: 49.8349 tokens/sec, 0.0201 s/token                     
+
+Bandwidth achieved: 786.57 GB/s
+
+========================================
+
+Once upon a time, there was a vast and mysterious forest, full of magic and wonder. At the heart of this forest, there was a magnificent castle, a symbol of power and prestige. The kingdom that ruled from this castle had been known for its wisdom and kindness, loved by all who lived in the surrounding lands.
+The ruler of the kingdom was the wise and just king, who loved his people with all his heart and ruled with compassion and empathy. He had an unbroken policy of peace and as such, his kingdom had become a beacon of hope and peace.
+In his kingdom, there lived a young girl named Sophia. She was a beautiful and kind-hearted girl, full of laughter and smile. She was a happy-go-lucky person, loved by everyone who knew her. Her beautiful brown eyes sparkled with joy, and her soft golden hair added to her beauty. She was well-known for her sweet nature, always willing to lend a helping hand to those who needed it.
+
+Sophia lived in the
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 2.8753 sec total                 
+Time to first token: 0.0876 sec with parallel prefill.                
+
+      Total throughput: 69.5580 tokens/sec, 0.0144 s/token                 
+First token throughput: 11.4143 tokens/sec, 0.0876 s/token                 
+ Next token throughput: 71.3852 tokens/sec, 0.0140 s/token                     
+
+Bandwidth achieved: 1117.14 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 59.27                 
+Average tokens/sec (first token): 11.23                 
+Average tokens/sec (next tokens): 60.61 
+                
+Memory used: 24.75 GB
