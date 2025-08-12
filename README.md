@@ -672,7 +672,7 @@ awesome libraries and tools you've built around local LLM inference.
 * Christian Puhrsch, Horace He, Joe Isaacson and many more for their
   many contributions in Accelerating GenAI models in the *"Anything,
   Fast!"* pytorch.org blogs, and, in particular, Horace He for [GPT,
-  Fast!](https://github.com/pytorch-labs/gpt-fast), which we have
+  Fast!](https://github.com/meta-pytorch/gpt-fast), which we have
   directly adopted (both ideas and code) from his repo.
 
 
