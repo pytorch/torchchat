@@ -178,7 +178,7 @@ class VLMEvalWrapper(HFMultimodalLM):
     -------------------------------------------------------------------------------
 
     An EvalWrapper for EleutherAI's eval harness based on gpt-fast's
-    EvalWrapper: https://github.com/pytorch-labs/gpt-fast/blob/main/eval.py.
+    EvalWrapper: https://github.com/meta-pytorch/gpt-fast/blob/main/eval.py.
 
     Note:
         This is ONLY for vision-language models.
