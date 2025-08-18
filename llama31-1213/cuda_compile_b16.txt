@@ -1,0 +1,74 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241213+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 5.81 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in the bustling city of New York, there lived a young artist named Emma. Emma was a painter, and her passion was to capture the beauty of the city through her art. She spent most of her days wandering the streets of Manhattan, observing the people, the architecture, and the ever-changing scenery.
+One day, while walking through Central Park, Emma stumbled upon a small, quaint shop tucked away in a quiet corner. The sign above the door read "Moonlit Dreams," and the windows were filled with an assortment of curious objects that seemed to spark Emma's curiosity.
+She pushed open the door, and a bell above it rang out, announcing her arrival. The shop was dimly lit, with soft music playing in the background, creating an enchanting atmosphere. Emma's eyes wandered around the shop, taking in the eclectic assortment of items on display.
+There were vintage clothing, antique furniture, and an assortment of peculiar collectibles that seemed to be from another era. Emma's eyes landed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 222.5732 sec total                 
+Time to first token: 0.6159 sec with parallel prefill.                
+
+      Total throughput: 0.8986 tokens/sec, 1.1129 s/token                 
+First token throughput: 1.6237 tokens/sec, 0.6159 s/token                 
+ Next token throughput: 0.8966 tokens/sec, 1.1154 s/token                     
+
+Bandwidth achieved: 14.43 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2.2e+02 seconds
+
+========================================
+
+Once upon a time, in a small village, there lived a young baker named Sarah. Sarah was known throughout the village for her delicious pastries and bread. She would often wake up before dawn to mix and knead the dough, and by the time the sun was rising, the aroma of freshly baked goods wafted through the village, teasing everyone's taste buds.
+
+One day, a wealthy merchant arrived in the village, seeking the finest pastries for his important guests. He visited Sarah's bakery, and as he sampled her creations, he was impressed by the flavors and textures. He offered Sarah a handsome sum of money to bake a special cake for his guests, but only if she could make it to his exact specifications.
+
+Sarah, eager to earn the money and showcase her skills, accepted the challenge. She spent hours perfecting the recipe, experimenting with different ingredients and techniques to meet the merchant's demands. As the deadline approached, Sarah became increasingly anxious, fearing that she might not be able to deliver the
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 4.7174 sec total                 
+Time to first token: 0.0634 sec with parallel prefill.                
+
+      Total throughput: 42.3962 tokens/sec, 0.0236 s/token                 
+First token throughput: 15.7646 tokens/sec, 0.0634 s/token                 
+ Next token throughput: 42.7592 tokens/sec, 0.0234 s/token                     
+
+Bandwidth achieved: 680.91 GB/s
+
+========================================
+
+Once upon a time, in a tropical paradise, there was a magnificent tree named Thimbu. Thimbu was the largest tree in the forest, with a trunk as wide as a house and branches that stretched up to the sky like giant arms. Its leaves were a vibrant green and its flowers were a brilliant shade of pink. Thimbu was a beloved member of the forest community, providing shade for the animals and shelter from the storms.
+
+However, Thimbu had a secret: it was dying. A disease had taken hold of the tree, slowly eating away at its insides. Thimbu tried to hide its condition from the other trees and animals, but they began to notice its gradual decline. The once-strong trunk was now weakened, and the branches were starting to wither and fall.
+
+One day, a wise old owl named Haku came to visit Thimbu. Haku was known for his understanding of the natural world and his ability to heal even the most grievous wounds. He
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 2.6676 sec total                 
+Time to first token: 0.0646 sec with parallel prefill.                
+
+      Total throughput: 74.9739 tokens/sec, 0.0133 s/token                 
+First token throughput: 15.4896 tokens/sec, 0.0646 s/token                 
+ Next token throughput: 76.4492 tokens/sec, 0.0131 s/token                     
+
+Bandwidth achieved: 1204.12 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 58.69                 
+Average tokens/sec (first token): 15.63                 
+Average tokens/sec (next tokens): 59.60 
+                
+Memory used: 16.91 GB

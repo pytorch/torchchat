@@ -1,0 +1,69 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 6.25 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.59 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of rural Ireland, there lived a young girl named Saoirse. She was a bright and curious child, with a mop of curly brown hair and a smile that could light up the darkest of rooms. Saoirse loved nothing more than to spend her days exploring the countryside, chasing after butterflies and watching the clouds drift lazily across the sky.
+One day, while wandering through the village, Saoirse stumbled upon a small, mysterious shop. The sign above the door read "Curios and Wonders," and the windows were filled with a dazzling array of strange and exotic treasures. There were glittering gemstones, ancient artifacts, and all manner of curious knick-knacks that Saoirse had never seen before.
+The shop was owned by a kind and enigmatic old man named Seamus, who welcomed Saoirse with a warm smile and invited her to come inside. As she browsed the shelves and displays, Saoirse found herself captivated by
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 19.6475 sec total                 
+Time to first token: 0.3485 sec with parallel prefill.                
+
+      Total throughput: 10.1794 tokens/sec, 0.0982 s/token                 
+First token throughput: 2.8698 tokens/sec, 0.3485 s/token                 
+ Next token throughput: 10.3114 tokens/sec, 0.0970 s/token                     
+
+Bandwidth achieved: 163.49 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in the beautiful country of Nepal, there lived a young girl named Pooja. Pooja was a bright and curious child who loved nothing more than playing outside in the fresh air. She spent most of her days exploring the lush green forests and rolling hills of her village, collecting flowers and berries, and watching the birds and animals that lived there.
+One day, while wandering through the forest, Pooja stumbled upon a beautiful waterfall. The water cascaded down in a crystal clear stream, creating a misty veil that rose high into the air. Pooja was mesmerized by the sight and decided to follow the stream to its source. As she walked, the stream narrowed into a tiny brook that flowed gently through the rocks and moss. Pooja followed the brook until she came to a clearing, where she found a small cave.
+The cave was hidden behind the waterfall and could only be seen from a specific point. Inside, Pooja discovered a chest filled
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 19.1163 sec total                 
+Time to first token: 0.0868 sec with parallel prefill.                
+
+      Total throughput: 10.4623 tokens/sec, 0.0956 s/token                 
+First token throughput: 11.5195 tokens/sec, 0.0868 s/token                 
+ Next token throughput: 10.4574 tokens/sec, 0.0956 s/token                     
+
+Bandwidth achieved: 168.03 GB/s
+
+========================================
+
+Once upon a time, there was a great king named Shishupal who ruled a beautiful kingdom surrounded by high mountains. He had a beautiful palace with a grandeur that would make anyone feel awestruck. His palace was filled with precious stones, golden ornaments, and an endless variety of delicious dishes that would make your mouth water.
+One sunny day, a wise old man came to King Shishupal’s palace. The king welcomed him with great warmth and asked him what he wanted. The wise old man replied, “King, I’ve heard that your kingdom is filled with wealth and precious stones. Is there any truth in what I’ve heard?”
+The king replied, “Of course there is. My kingdom has an abundance of precious stones. In fact, there’s a cave in the heart of these mountain ranges that’s filled with diamonds, rubies, and emeralds. The cave is said to be owned by the great sage, Bhishmapithamah.”
+The old wise man asked for
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 18.9365 sec total                 
+Time to first token: 0.0846 sec with parallel prefill.                
+
+      Total throughput: 10.5616 tokens/sec, 0.0947 s/token                 
+First token throughput: 11.8202 tokens/sec, 0.0846 s/token                 
+ Next token throughput: 10.5559 tokens/sec, 0.0947 s/token                     
+
+Bandwidth achieved: 169.62 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 10.40                 
+Average tokens/sec (first token): 8.74                 
+Average tokens/sec (next tokens): 10.44 
+                
+Memory used: 24.80 GB

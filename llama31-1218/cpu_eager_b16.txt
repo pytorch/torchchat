@@ -1,0 +1,73 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.12 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in the small town of Willow Creek, there was a legendary chef named Madame LeRoux. Madame LeRoux was known for her exquisite cooking, her impeccable taste, and her ability to create dishes that were both delicious and visually stunning.
+Madame LeRoux's restaurant, Le Coeur de la Vie, was the most popular eatery in town, and people came from all over to taste her creations. Her menu was always changing, but one thing remained constant – her ability to surprise and delight her customers with each new dish.
+One day, a young chef named Pierre approached Madame LeRoux with a proposal. Pierre had been working in the kitchen of a nearby restaurant, but he was tired of the monotony of his job and wanted to learn from the best. He begged Madame LeRoux to take him on as her apprentice, and she, seeing the fire in his eyes, agreed.
+Pierre was overjoyed and threw himself into his work, learning everything he could from Madame LeRoux. He watched as she chopped, sautéed, and plated each dish with precision and care. He tasted each new creation, taking notes and asking questions.
+As the days turned into weeks, Pierre's skills improved dramatically. He was soon helping Madame
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 106.8787 sec total                 
+Time to first token: 0.6674 sec with parallel prefill.                
+
+      Total throughput: 2.3952 tokens/sec, 0.4175 s/token                 
+First token throughput: 1.4983 tokens/sec, 0.6674 s/token                 
+ Next token throughput: 2.4009 tokens/sec, 0.4165 s/token                     
+
+Bandwidth achieved: 38.47 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, there was a small town nestled in the heart of a bustling city. The town was called Willow Creek, and it was known for its quaint charm and warm hospitality. The residents of Willow Creek took great pride in their community and worked hard to maintain its beauty and character.
+One of the most notable features of Willow Creek was its community garden. The garden was a vibrant and bustling hub of activity, where residents came together to grow their own fruits and vegetables. The garden was tended by a group of dedicated volunteers, who spent countless hours tending to the soil, watering the plants, and harvesting the crops.
+At the center of the community garden was a beautiful old oak tree, its gnarled branches stretching towards the sky like a giant's fingers. The tree was said to be over a century old, and it was a beloved landmark in the garden. Children would play beneath its branches, and lovers would sit in its shade, watching the sun set over the garden.
+But the community garden was more than just a pretty place – it was also a source of food for many of the town's residents. The garden produced a bounty of fresh fruits and vegetables, which were distributed to those who needed them most. The garden was a symbol of the community's generosity and compassion,
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 94.8618 sec total                 
+Time to first token: 0.3929 sec with parallel prefill.                
+
+      Total throughput: 2.6987 tokens/sec, 0.3706 s/token                 
+First token throughput: 2.5453 tokens/sec, 0.3929 s/token                 
+ Next token throughput: 2.6993 tokens/sec, 0.3705 s/token                     
+
+Bandwidth achieved: 43.34 GB/s
+
+========================================
+
+Once upon a time, in a small village nestled in the rolling hills of Tuscany, there lived a young apprentice named Leo. Leo was a skilled woodworker, but he had a passion for creating beautiful and intricate wooden masks. Every year, the villagers would gather to celebrate the Harvest Festival, and Leo would create a stunning mask to wear as part of the festivities.
+One year, Leo became fascinated with a particularly beautiful wooden mask he had found in his mentor's workshop. The mask was unlike any he had ever seen before - its intricate carvings and delicate details seemed to dance across its surface. Leo became obsessed with the mask and spent every spare moment trying to recreate it.
+As Leo worked tirelessly on his masterpiece, he began to notice strange occurrences around the village. Tools would go missing, and strange noises could be heard coming from the workshop at night. Leo started to feel a presence around him, as if the mask was exerting some kind of influence over him.
+Despite his growing unease, Leo was determined to complete his mask. He worked through the night, his hands moving with a strange, almost supernatural precision. As the mask took shape, Leo felt himself becoming more and more consumed by its power.
+On the night of the Harvest Festival, Leo wore the mask as he
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 92.6331 sec total                 
+Time to first token: 0.3726 sec with parallel prefill.                
+
+      Total throughput: 2.7636 tokens/sec, 0.3618 s/token                 
+First token throughput: 2.6839 tokens/sec, 0.3726 s/token                 
+ Next token throughput: 2.7639 tokens/sec, 0.3618 s/token                     
+
+Bandwidth achieved: 44.38 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 2.62                 
+Average tokens/sec (first token): 2.24                 
+Average tokens/sec (next tokens): 2.62 
+                
+Memory used: 0.00 GB

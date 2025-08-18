@@ -1,0 +1,302 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+linear: model.layers.0.attention.wq, in=4096, out=4096
+linear: model.layers.0.attention.wk, in=4096, out=1024
+linear: model.layers.0.attention.wv, in=4096, out=1024
+linear: model.layers.0.attention.wo, in=4096, out=4096
+linear: model.layers.0.feed_forward.w1, in=4096, out=14336
+linear: model.layers.0.feed_forward.w2, in=14336, out=4096
+linear: model.layers.0.feed_forward.w3, in=4096, out=14336
+linear: model.layers.1.attention.wq, in=4096, out=4096
+linear: model.layers.1.attention.wk, in=4096, out=1024
+linear: model.layers.1.attention.wv, in=4096, out=1024
+linear: model.layers.1.attention.wo, in=4096, out=4096
+linear: model.layers.1.feed_forward.w1, in=4096, out=14336
+linear: model.layers.1.feed_forward.w2, in=14336, out=4096
+linear: model.layers.1.feed_forward.w3, in=4096, out=14336
+linear: model.layers.2.attention.wq, in=4096, out=4096
+linear: model.layers.2.attention.wk, in=4096, out=1024
+linear: model.layers.2.attention.wv, in=4096, out=1024
+linear: model.layers.2.attention.wo, in=4096, out=4096
+linear: model.layers.2.feed_forward.w1, in=4096, out=14336
+linear: model.layers.2.feed_forward.w2, in=14336, out=4096
+linear: model.layers.2.feed_forward.w3, in=4096, out=14336
+linear: model.layers.3.attention.wq, in=4096, out=4096
+linear: model.layers.3.attention.wk, in=4096, out=1024
+linear: model.layers.3.attention.wv, in=4096, out=1024
+linear: model.layers.3.attention.wo, in=4096, out=4096
+linear: model.layers.3.feed_forward.w1, in=4096, out=14336
+linear: model.layers.3.feed_forward.w2, in=14336, out=4096
+linear: model.layers.3.feed_forward.w3, in=4096, out=14336
+linear: model.layers.4.attention.wq, in=4096, out=4096
+linear: model.layers.4.attention.wk, in=4096, out=1024
+linear: model.layers.4.attention.wv, in=4096, out=1024
+linear: model.layers.4.attention.wo, in=4096, out=4096
+linear: model.layers.4.feed_forward.w1, in=4096, out=14336
+linear: model.layers.4.feed_forward.w2, in=14336, out=4096
+linear: model.layers.4.feed_forward.w3, in=4096, out=14336
+linear: model.layers.5.attention.wq, in=4096, out=4096
+linear: model.layers.5.attention.wk, in=4096, out=1024
+linear: model.layers.5.attention.wv, in=4096, out=1024
+linear: model.layers.5.attention.wo, in=4096, out=4096
+linear: model.layers.5.feed_forward.w1, in=4096, out=14336
+linear: model.layers.5.feed_forward.w2, in=14336, out=4096
+linear: model.layers.5.feed_forward.w3, in=4096, out=14336
+linear: model.layers.6.attention.wq, in=4096, out=4096
+linear: model.layers.6.attention.wk, in=4096, out=1024
+linear: model.layers.6.attention.wv, in=4096, out=1024
+linear: model.layers.6.attention.wo, in=4096, out=4096
+linear: model.layers.6.feed_forward.w1, in=4096, out=14336
+linear: model.layers.6.feed_forward.w2, in=14336, out=4096
+linear: model.layers.6.feed_forward.w3, in=4096, out=14336
+linear: model.layers.7.attention.wq, in=4096, out=4096
+linear: model.layers.7.attention.wk, in=4096, out=1024
+linear: model.layers.7.attention.wv, in=4096, out=1024
+linear: model.layers.7.attention.wo, in=4096, out=4096
+linear: model.layers.7.feed_forward.w1, in=4096, out=14336
+linear: model.layers.7.feed_forward.w2, in=14336, out=4096
+linear: model.layers.7.feed_forward.w3, in=4096, out=14336
+linear: model.layers.8.attention.wq, in=4096, out=4096
+linear: model.layers.8.attention.wk, in=4096, out=1024
+linear: model.layers.8.attention.wv, in=4096, out=1024
+linear: model.layers.8.attention.wo, in=4096, out=4096
+linear: model.layers.8.feed_forward.w1, in=4096, out=14336
+linear: model.layers.8.feed_forward.w2, in=14336, out=4096
+linear: model.layers.8.feed_forward.w3, in=4096, out=14336
+linear: model.layers.9.attention.wq, in=4096, out=4096
+linear: model.layers.9.attention.wk, in=4096, out=1024
+linear: model.layers.9.attention.wv, in=4096, out=1024
+linear: model.layers.9.attention.wo, in=4096, out=4096
+linear: model.layers.9.feed_forward.w1, in=4096, out=14336
+linear: model.layers.9.feed_forward.w2, in=14336, out=4096
+linear: model.layers.9.feed_forward.w3, in=4096, out=14336
+linear: model.layers.10.attention.wq, in=4096, out=4096
+linear: model.layers.10.attention.wk, in=4096, out=1024
+linear: model.layers.10.attention.wv, in=4096, out=1024
+linear: model.layers.10.attention.wo, in=4096, out=4096
+linear: model.layers.10.feed_forward.w1, in=4096, out=14336
+linear: model.layers.10.feed_forward.w2, in=14336, out=4096
+linear: model.layers.10.feed_forward.w3, in=4096, out=14336
+linear: model.layers.11.attention.wq, in=4096, out=4096
+linear: model.layers.11.attention.wk, in=4096, out=1024
+linear: model.layers.11.attention.wv, in=4096, out=1024
+linear: model.layers.11.attention.wo, in=4096, out=4096
+linear: model.layers.11.feed_forward.w1, in=4096, out=14336
+linear: model.layers.11.feed_forward.w2, in=14336, out=4096
+linear: model.layers.11.feed_forward.w3, in=4096, out=14336
+linear: model.layers.12.attention.wq, in=4096, out=4096
+linear: model.layers.12.attention.wk, in=4096, out=1024
+linear: model.layers.12.attention.wv, in=4096, out=1024
+linear: model.layers.12.attention.wo, in=4096, out=4096
+linear: model.layers.12.feed_forward.w1, in=4096, out=14336
+linear: model.layers.12.feed_forward.w2, in=14336, out=4096
+linear: model.layers.12.feed_forward.w3, in=4096, out=14336
+linear: model.layers.13.attention.wq, in=4096, out=4096
+linear: model.layers.13.attention.wk, in=4096, out=1024
+linear: model.layers.13.attention.wv, in=4096, out=1024
+linear: model.layers.13.attention.wo, in=4096, out=4096
+linear: model.layers.13.feed_forward.w1, in=4096, out=14336
+linear: model.layers.13.feed_forward.w2, in=14336, out=4096
+linear: model.layers.13.feed_forward.w3, in=4096, out=14336
+linear: model.layers.14.attention.wq, in=4096, out=4096
+linear: model.layers.14.attention.wk, in=4096, out=1024
+linear: model.layers.14.attention.wv, in=4096, out=1024
+linear: model.layers.14.attention.wo, in=4096, out=4096
+linear: model.layers.14.feed_forward.w1, in=4096, out=14336
+linear: model.layers.14.feed_forward.w2, in=14336, out=4096
+linear: model.layers.14.feed_forward.w3, in=4096, out=14336
+linear: model.layers.15.attention.wq, in=4096, out=4096
+linear: model.layers.15.attention.wk, in=4096, out=1024
+linear: model.layers.15.attention.wv, in=4096, out=1024
+linear: model.layers.15.attention.wo, in=4096, out=4096
+linear: model.layers.15.feed_forward.w1, in=4096, out=14336
+linear: model.layers.15.feed_forward.w2, in=14336, out=4096
+linear: model.layers.15.feed_forward.w3, in=4096, out=14336
+linear: model.layers.16.attention.wq, in=4096, out=4096
+linear: model.layers.16.attention.wk, in=4096, out=1024
+linear: model.layers.16.attention.wv, in=4096, out=1024
+linear: model.layers.16.attention.wo, in=4096, out=4096
+linear: model.layers.16.feed_forward.w1, in=4096, out=14336
+linear: model.layers.16.feed_forward.w2, in=14336, out=4096
+linear: model.layers.16.feed_forward.w3, in=4096, out=14336
+linear: model.layers.17.attention.wq, in=4096, out=4096
+linear: model.layers.17.attention.wk, in=4096, out=1024
+linear: model.layers.17.attention.wv, in=4096, out=1024
+linear: model.layers.17.attention.wo, in=4096, out=4096
+linear: model.layers.17.feed_forward.w1, in=4096, out=14336
+linear: model.layers.17.feed_forward.w2, in=14336, out=4096
+linear: model.layers.17.feed_forward.w3, in=4096, out=14336
+linear: model.layers.18.attention.wq, in=4096, out=4096
+linear: model.layers.18.attention.wk, in=4096, out=1024
+linear: model.layers.18.attention.wv, in=4096, out=1024
+linear: model.layers.18.attention.wo, in=4096, out=4096
+linear: model.layers.18.feed_forward.w1, in=4096, out=14336
+linear: model.layers.18.feed_forward.w2, in=14336, out=4096
+linear: model.layers.18.feed_forward.w3, in=4096, out=14336
+linear: model.layers.19.attention.wq, in=4096, out=4096
+linear: model.layers.19.attention.wk, in=4096, out=1024
+linear: model.layers.19.attention.wv, in=4096, out=1024
+linear: model.layers.19.attention.wo, in=4096, out=4096
+linear: model.layers.19.feed_forward.w1, in=4096, out=14336
+linear: model.layers.19.feed_forward.w2, in=14336, out=4096
+linear: model.layers.19.feed_forward.w3, in=4096, out=14336
+linear: model.layers.20.attention.wq, in=4096, out=4096
+linear: model.layers.20.attention.wk, in=4096, out=1024
+linear: model.layers.20.attention.wv, in=4096, out=1024
+linear: model.layers.20.attention.wo, in=4096, out=4096
+linear: model.layers.20.feed_forward.w1, in=4096, out=14336
+linear: model.layers.20.feed_forward.w2, in=14336, out=4096
+linear: model.layers.20.feed_forward.w3, in=4096, out=14336
+linear: model.layers.21.attention.wq, in=4096, out=4096
+linear: model.layers.21.attention.wk, in=4096, out=1024
+linear: model.layers.21.attention.wv, in=4096, out=1024
+linear: model.layers.21.attention.wo, in=4096, out=4096
+linear: model.layers.21.feed_forward.w1, in=4096, out=14336
+linear: model.layers.21.feed_forward.w2, in=14336, out=4096
+linear: model.layers.21.feed_forward.w3, in=4096, out=14336
+linear: model.layers.22.attention.wq, in=4096, out=4096
+linear: model.layers.22.attention.wk, in=4096, out=1024
+linear: model.layers.22.attention.wv, in=4096, out=1024
+linear: model.layers.22.attention.wo, in=4096, out=4096
+linear: model.layers.22.feed_forward.w1, in=4096, out=14336
+linear: model.layers.22.feed_forward.w2, in=14336, out=4096
+linear: model.layers.22.feed_forward.w3, in=4096, out=14336
+linear: model.layers.23.attention.wq, in=4096, out=4096
+linear: model.layers.23.attention.wk, in=4096, out=1024
+linear: model.layers.23.attention.wv, in=4096, out=1024
+linear: model.layers.23.attention.wo, in=4096, out=4096
+linear: model.layers.23.feed_forward.w1, in=4096, out=14336
+linear: model.layers.23.feed_forward.w2, in=14336, out=4096
+linear: model.layers.23.feed_forward.w3, in=4096, out=14336
+linear: model.layers.24.attention.wq, in=4096, out=4096
+linear: model.layers.24.attention.wk, in=4096, out=1024
+linear: model.layers.24.attention.wv, in=4096, out=1024
+linear: model.layers.24.attention.wo, in=4096, out=4096
+linear: model.layers.24.feed_forward.w1, in=4096, out=14336
+linear: model.layers.24.feed_forward.w2, in=14336, out=4096
+linear: model.layers.24.feed_forward.w3, in=4096, out=14336
+linear: model.layers.25.attention.wq, in=4096, out=4096
+linear: model.layers.25.attention.wk, in=4096, out=1024
+linear: model.layers.25.attention.wv, in=4096, out=1024
+linear: model.layers.25.attention.wo, in=4096, out=4096
+linear: model.layers.25.feed_forward.w1, in=4096, out=14336
+linear: model.layers.25.feed_forward.w2, in=14336, out=4096
+linear: model.layers.25.feed_forward.w3, in=4096, out=14336
+linear: model.layers.26.attention.wq, in=4096, out=4096
+linear: model.layers.26.attention.wk, in=4096, out=1024
+linear: model.layers.26.attention.wv, in=4096, out=1024
+linear: model.layers.26.attention.wo, in=4096, out=4096
+linear: model.layers.26.feed_forward.w1, in=4096, out=14336
+linear: model.layers.26.feed_forward.w2, in=14336, out=4096
+linear: model.layers.26.feed_forward.w3, in=4096, out=14336
+linear: model.layers.27.attention.wq, in=4096, out=4096
+linear: model.layers.27.attention.wk, in=4096, out=1024
+linear: model.layers.27.attention.wv, in=4096, out=1024
+linear: model.layers.27.attention.wo, in=4096, out=4096
+linear: model.layers.27.feed_forward.w1, in=4096, out=14336
+linear: model.layers.27.feed_forward.w2, in=14336, out=4096
+linear: model.layers.27.feed_forward.w3, in=4096, out=14336
+linear: model.layers.28.attention.wq, in=4096, out=4096
+linear: model.layers.28.attention.wk, in=4096, out=1024
+linear: model.layers.28.attention.wv, in=4096, out=1024
+linear: model.layers.28.attention.wo, in=4096, out=4096
+linear: model.layers.28.feed_forward.w1, in=4096, out=14336
+linear: model.layers.28.feed_forward.w2, in=14336, out=4096
+linear: model.layers.28.feed_forward.w3, in=4096, out=14336
+linear: model.layers.29.attention.wq, in=4096, out=4096
+linear: model.layers.29.attention.wk, in=4096, out=1024
+linear: model.layers.29.attention.wv, in=4096, out=1024
+linear: model.layers.29.attention.wo, in=4096, out=4096
+linear: model.layers.29.feed_forward.w1, in=4096, out=14336
+linear: model.layers.29.feed_forward.w2, in=14336, out=4096
+linear: model.layers.29.feed_forward.w3, in=4096, out=14336
+linear: model.layers.30.attention.wq, in=4096, out=4096
+linear: model.layers.30.attention.wk, in=4096, out=1024
+linear: model.layers.30.attention.wv, in=4096, out=1024
+linear: model.layers.30.attention.wo, in=4096, out=4096
+linear: model.layers.30.feed_forward.w1, in=4096, out=14336
+linear: model.layers.30.feed_forward.w2, in=14336, out=4096
+linear: model.layers.30.feed_forward.w3, in=4096, out=14336
+linear: model.layers.31.attention.wq, in=4096, out=4096
+linear: model.layers.31.attention.wk, in=4096, out=1024
+linear: model.layers.31.attention.wv, in=4096, out=1024
+linear: model.layers.31.attention.wo, in=4096, out=4096
+linear: model.layers.31.feed_forward.w1, in=4096, out=14336
+linear: model.layers.31.feed_forward.w2, in=14336, out=4096
+linear: model.layers.31.feed_forward.w3, in=4096, out=14336
+linear: model.output, in=4096, out=128256
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.11 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 17.28 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of a far-off land, there lived a young boy named John. John was a bright and curious child, always eager to learn and explore the world around him. He spent most of his days playing in the nearby woods, collecting leaves and watching the animals that lived there.
+One day, while wandering through the woods, John stumbled upon a small clearing surrounded by tall trees and filled with a variety of colorful flowers and plants. In the center of the clearing stood an old, gnarled tree, its branches twisted and tangled in a way that seemed almost magical.
+As John approached the tree, he noticed that the air around him seemed to grow quieter. The rustling of leaves and chirping of birds ceased, and an eerie stillness fell over the clearing. John felt a shiver run down his spine as he reached out to touch the trunk of the tree.
+As soon as he made contact with the tree, John was enveloped in a vivid dreamlike vision. He saw a great city, bustling with people and noise, with towering buildings and strange contraptions moving through the air. He saw a group of people, standing together and looking up at a magnificent sight that made him feel small and insignificant. He saw
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 162.0921 sec total                 
+Time to first token: 0.2540 sec with parallel prefill.                
+
+      Total throughput: 1.5793 tokens/sec, 0.6332 s/token                 
+First token throughput: 3.9368 tokens/sec, 0.2540 s/token                 
+ Next token throughput: 1.5756 tokens/sec, 0.6347 s/token                     
+
+Bandwidth achieved: 7.77 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 1.6e+02 seconds
+
+========================================
+
+Once upon a time, the country was divided into four kingdoms, each with their own special power and magic. The kingdoms were called the Kingdom of Solitude, the Kingdom of Serenity, the Kingdom of Radiance, and the Kingdom of Shadows.
+The Kingdom of Solitude was a land of ice and snow, where the people were gentle and kind. They had the power to communicate with animals, and could create powerful illusions with their magic.
+The Kingdom of Serenity was a land of calm and peace, where the people were wise and just. They had the power to heal with their magic, and could create powerful shields to protect themselves and others.
+The Kingdom of Radiance was a land of light and warmth, where the people were confident and brave. They had the power to create powerful explosions of light and heat with their magic, and could create powerful illusions to deceive and distract.
+The Kingdom of Shadows was a land of darkness and mystery, where the people were cunning and stealthy. They had the power to move through darkness and shadows, and could create powerful illusions to confuse and disorient.
+One day, a young prince from the Kingdom of Solitude named Leo fell in love with a beautiful princess from the Kingdom of Radiance named Rayne. However, their love was forbidden, as
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 24.4277 sec total                 
+Time to first token: 0.3471 sec with parallel prefill.                
+
+      Total throughput: 10.4799 tokens/sec, 0.0954 s/token                 
+First token throughput: 2.8812 tokens/sec, 0.3471 s/token                 
+ Next token throughput: 10.5894 tokens/sec, 0.0944 s/token                     
+
+Bandwidth achieved: 51.57 GB/s
+
+========================================
+
+Once upon a time, in a land far, far away, there was a beautiful kingdom called Azura. It was a place of wonder and magic, where dragons roared and flowers bloomed in every color of the rainbow. The kingdom was ruled by a just and wise king, who loved his people and did everything in his power to keep them safe and happy.
+
+But one day, a dark and evil sorcerer cast a spell over the kingdom. The sorcerer was a powerful and cruel man, who delighted in causing suffering and pain to others. He had a special hatred for the people of Azura, and he sought to destroy their kingdom and everything they held dear.
+
+The king, who had always been a good and just ruler, was at first powerless to stop the sorcerer. But as he looked out over his kingdom and saw the suffering he had caused, he knew that he had to do something. He called upon his bravest knights and together they set out to find a way to defeat the sorcerer and break the spell.
+
+As they journeyed through the kingdom, they met many challenges and obstacles. They fought off fierce monsters and overcame treacherous landscapes, but they never gave up. And finally, after many days and nights of travel, they came to the sor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 20.5156 sec total                 
+Time to first token: 0.3200 sec with parallel prefill.                
+
+      Total throughput: 12.4783 tokens/sec, 0.0801 s/token                 
+First token throughput: 3.1250 tokens/sec, 0.3200 s/token                 
+ Next token throughput: 12.6265 tokens/sec, 0.0792 s/token                     
+
+Bandwidth achieved: 61.40 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 11.48                 
+Average tokens/sec (first token): 3.00                 
+Average tokens/sec (next tokens): 11.61 
+                
+Memory used: 0.00 GB

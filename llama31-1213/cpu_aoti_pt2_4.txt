@@ -1,0 +1,668 @@
+python3 torchchat.py export llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-aoti-package-path /tmp/model34.pt2
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --aoti-package-path /tmp/model34.pt2 --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"linear:int4": {"groupsize": 256}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --output-aoti-package-path /tmp/model34.pt2
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.6.0.dev20241213+cu124 available.
+linear: model.layers.0.attention.wq, in=4096, out=4096
+linear: model.layers.0.attention.wk, in=4096, out=1024
+linear: model.layers.0.attention.wv, in=4096, out=1024
+linear: model.layers.0.attention.wo, in=4096, out=4096
+linear: model.layers.0.feed_forward.w1, in=4096, out=14336
+linear: model.layers.0.feed_forward.w2, in=14336, out=4096
+linear: model.layers.0.feed_forward.w3, in=4096, out=14336
+linear: model.layers.1.attention.wq, in=4096, out=4096
+linear: model.layers.1.attention.wk, in=4096, out=1024
+linear: model.layers.1.attention.wv, in=4096, out=1024
+linear: model.layers.1.attention.wo, in=4096, out=4096
+linear: model.layers.1.feed_forward.w1, in=4096, out=14336
+linear: model.layers.1.feed_forward.w2, in=14336, out=4096
+linear: model.layers.1.feed_forward.w3, in=4096, out=14336
+linear: model.layers.2.attention.wq, in=4096, out=4096
+linear: model.layers.2.attention.wk, in=4096, out=1024
+linear: model.layers.2.attention.wv, in=4096, out=1024
+linear: model.layers.2.attention.wo, in=4096, out=4096
+linear: model.layers.2.feed_forward.w1, in=4096, out=14336
+linear: model.layers.2.feed_forward.w2, in=14336, out=4096
+linear: model.layers.2.feed_forward.w3, in=4096, out=14336
+linear: model.layers.3.attention.wq, in=4096, out=4096
+linear: model.layers.3.attention.wk, in=4096, out=1024
+linear: model.layers.3.attention.wv, in=4096, out=1024
+linear: model.layers.3.attention.wo, in=4096, out=4096
+linear: model.layers.3.feed_forward.w1, in=4096, out=14336
+linear: model.layers.3.feed_forward.w2, in=14336, out=4096
+linear: model.layers.3.feed_forward.w3, in=4096, out=14336
+linear: model.layers.4.attention.wq, in=4096, out=4096
+linear: model.layers.4.attention.wk, in=4096, out=1024
+linear: model.layers.4.attention.wv, in=4096, out=1024
+linear: model.layers.4.attention.wo, in=4096, out=4096
+linear: model.layers.4.feed_forward.w1, in=4096, out=14336
+linear: model.layers.4.feed_forward.w2, in=14336, out=4096
+linear: model.layers.4.feed_forward.w3, in=4096, out=14336
+linear: model.layers.5.attention.wq, in=4096, out=4096
+linear: model.layers.5.attention.wk, in=4096, out=1024
+linear: model.layers.5.attention.wv, in=4096, out=1024
+linear: model.layers.5.attention.wo, in=4096, out=4096
+linear: model.layers.5.feed_forward.w1, in=4096, out=14336
+linear: model.layers.5.feed_forward.w2, in=14336, out=4096
+linear: model.layers.5.feed_forward.w3, in=4096, out=14336
+linear: model.layers.6.attention.wq, in=4096, out=4096
+linear: model.layers.6.attention.wk, in=4096, out=1024
+linear: model.layers.6.attention.wv, in=4096, out=1024
+linear: model.layers.6.attention.wo, in=4096, out=4096
+linear: model.layers.6.feed_forward.w1, in=4096, out=14336
+linear: model.layers.6.feed_forward.w2, in=14336, out=4096
+linear: model.layers.6.feed_forward.w3, in=4096, out=14336
+linear: model.layers.7.attention.wq, in=4096, out=4096
+linear: model.layers.7.attention.wk, in=4096, out=1024
+linear: model.layers.7.attention.wv, in=4096, out=1024
+linear: model.layers.7.attention.wo, in=4096, out=4096
+linear: model.layers.7.feed_forward.w1, in=4096, out=14336
+linear: model.layers.7.feed_forward.w2, in=14336, out=4096
+linear: model.layers.7.feed_forward.w3, in=4096, out=14336
+linear: model.layers.8.attention.wq, in=4096, out=4096
+linear: model.layers.8.attention.wk, in=4096, out=1024
+linear: model.layers.8.attention.wv, in=4096, out=1024
+linear: model.layers.8.attention.wo, in=4096, out=4096
+linear: model.layers.8.feed_forward.w1, in=4096, out=14336
+linear: model.layers.8.feed_forward.w2, in=14336, out=4096
+linear: model.layers.8.feed_forward.w3, in=4096, out=14336
+linear: model.layers.9.attention.wq, in=4096, out=4096
+linear: model.layers.9.attention.wk, in=4096, out=1024
+linear: model.layers.9.attention.wv, in=4096, out=1024
+linear: model.layers.9.attention.wo, in=4096, out=4096
+linear: model.layers.9.feed_forward.w1, in=4096, out=14336
+linear: model.layers.9.feed_forward.w2, in=14336, out=4096
+linear: model.layers.9.feed_forward.w3, in=4096, out=14336
+linear: model.layers.10.attention.wq, in=4096, out=4096
+linear: model.layers.10.attention.wk, in=4096, out=1024
+linear: model.layers.10.attention.wv, in=4096, out=1024
+linear: model.layers.10.attention.wo, in=4096, out=4096
+linear: model.layers.10.feed_forward.w1, in=4096, out=14336
+linear: model.layers.10.feed_forward.w2, in=14336, out=4096
+linear: model.layers.10.feed_forward.w3, in=4096, out=14336
+linear: model.layers.11.attention.wq, in=4096, out=4096
+linear: model.layers.11.attention.wk, in=4096, out=1024
+linear: model.layers.11.attention.wv, in=4096, out=1024
+linear: model.layers.11.attention.wo, in=4096, out=4096
+linear: model.layers.11.feed_forward.w1, in=4096, out=14336
+linear: model.layers.11.feed_forward.w2, in=14336, out=4096
+linear: model.layers.11.feed_forward.w3, in=4096, out=14336
+linear: model.layers.12.attention.wq, in=4096, out=4096
+linear: model.layers.12.attention.wk, in=4096, out=1024
+linear: model.layers.12.attention.wv, in=4096, out=1024
+linear: model.layers.12.attention.wo, in=4096, out=4096
+linear: model.layers.12.feed_forward.w1, in=4096, out=14336
+linear: model.layers.12.feed_forward.w2, in=14336, out=4096
+linear: model.layers.12.feed_forward.w3, in=4096, out=14336
+linear: model.layers.13.attention.wq, in=4096, out=4096
+linear: model.layers.13.attention.wk, in=4096, out=1024
+linear: model.layers.13.attention.wv, in=4096, out=1024
+linear: model.layers.13.attention.wo, in=4096, out=4096
+linear: model.layers.13.feed_forward.w1, in=4096, out=14336
+linear: model.layers.13.feed_forward.w2, in=14336, out=4096
+linear: model.layers.13.feed_forward.w3, in=4096, out=14336
+linear: model.layers.14.attention.wq, in=4096, out=4096
+linear: model.layers.14.attention.wk, in=4096, out=1024
+linear: model.layers.14.attention.wv, in=4096, out=1024
+linear: model.layers.14.attention.wo, in=4096, out=4096
+linear: model.layers.14.feed_forward.w1, in=4096, out=14336
+linear: model.layers.14.feed_forward.w2, in=14336, out=4096
+linear: model.layers.14.feed_forward.w3, in=4096, out=14336
+linear: model.layers.15.attention.wq, in=4096, out=4096
+linear: model.layers.15.attention.wk, in=4096, out=1024
+linear: model.layers.15.attention.wv, in=4096, out=1024
+linear: model.layers.15.attention.wo, in=4096, out=4096
+linear: model.layers.15.feed_forward.w1, in=4096, out=14336
+linear: model.layers.15.feed_forward.w2, in=14336, out=4096
+linear: model.layers.15.feed_forward.w3, in=4096, out=14336
+linear: model.layers.16.attention.wq, in=4096, out=4096
+linear: model.layers.16.attention.wk, in=4096, out=1024
+linear: model.layers.16.attention.wv, in=4096, out=1024
+linear: model.layers.16.attention.wo, in=4096, out=4096
+linear: model.layers.16.feed_forward.w1, in=4096, out=14336
+linear: model.layers.16.feed_forward.w2, in=14336, out=4096
+linear: model.layers.16.feed_forward.w3, in=4096, out=14336
+linear: model.layers.17.attention.wq, in=4096, out=4096
+linear: model.layers.17.attention.wk, in=4096, out=1024
+linear: model.layers.17.attention.wv, in=4096, out=1024
+linear: model.layers.17.attention.wo, in=4096, out=4096
+linear: model.layers.17.feed_forward.w1, in=4096, out=14336
+linear: model.layers.17.feed_forward.w2, in=14336, out=4096
+linear: model.layers.17.feed_forward.w3, in=4096, out=14336
+linear: model.layers.18.attention.wq, in=4096, out=4096
+linear: model.layers.18.attention.wk, in=4096, out=1024
+linear: model.layers.18.attention.wv, in=4096, out=1024
+linear: model.layers.18.attention.wo, in=4096, out=4096
+linear: model.layers.18.feed_forward.w1, in=4096, out=14336
+linear: model.layers.18.feed_forward.w2, in=14336, out=4096
+linear: model.layers.18.feed_forward.w3, in=4096, out=14336
+linear: model.layers.19.attention.wq, in=4096, out=4096
+linear: model.layers.19.attention.wk, in=4096, out=1024
+linear: model.layers.19.attention.wv, in=4096, out=1024
+linear: model.layers.19.attention.wo, in=4096, out=4096
+linear: model.layers.19.feed_forward.w1, in=4096, out=14336
+linear: model.layers.19.feed_forward.w2, in=14336, out=4096
+linear: model.layers.19.feed_forward.w3, in=4096, out=14336
+linear: model.layers.20.attention.wq, in=4096, out=4096
+linear: model.layers.20.attention.wk, in=4096, out=1024
+linear: model.layers.20.attention.wv, in=4096, out=1024
+linear: model.layers.20.attention.wo, in=4096, out=4096
+linear: model.layers.20.feed_forward.w1, in=4096, out=14336
+linear: model.layers.20.feed_forward.w2, in=14336, out=4096
+linear: model.layers.20.feed_forward.w3, in=4096, out=14336
+linear: model.layers.21.attention.wq, in=4096, out=4096
+linear: model.layers.21.attention.wk, in=4096, out=1024
+linear: model.layers.21.attention.wv, in=4096, out=1024
+linear: model.layers.21.attention.wo, in=4096, out=4096
+linear: model.layers.21.feed_forward.w1, in=4096, out=14336
+linear: model.layers.21.feed_forward.w2, in=14336, out=4096
+linear: model.layers.21.feed_forward.w3, in=4096, out=14336
+linear: model.layers.22.attention.wq, in=4096, out=4096
+linear: model.layers.22.attention.wk, in=4096, out=1024
+linear: model.layers.22.attention.wv, in=4096, out=1024
+linear: model.layers.22.attention.wo, in=4096, out=4096
+linear: model.layers.22.feed_forward.w1, in=4096, out=14336
+linear: model.layers.22.feed_forward.w2, in=14336, out=4096
+linear: model.layers.22.feed_forward.w3, in=4096, out=14336
+linear: model.layers.23.attention.wq, in=4096, out=4096
+linear: model.layers.23.attention.wk, in=4096, out=1024
+linear: model.layers.23.attention.wv, in=4096, out=1024
+linear: model.layers.23.attention.wo, in=4096, out=4096
+linear: model.layers.23.feed_forward.w1, in=4096, out=14336
+linear: model.layers.23.feed_forward.w2, in=14336, out=4096
+linear: model.layers.23.feed_forward.w3, in=4096, out=14336
+linear: model.layers.24.attention.wq, in=4096, out=4096
+linear: model.layers.24.attention.wk, in=4096, out=1024
+linear: model.layers.24.attention.wv, in=4096, out=1024
+linear: model.layers.24.attention.wo, in=4096, out=4096
+linear: model.layers.24.feed_forward.w1, in=4096, out=14336
+linear: model.layers.24.feed_forward.w2, in=14336, out=4096
+linear: model.layers.24.feed_forward.w3, in=4096, out=14336
+linear: model.layers.25.attention.wq, in=4096, out=4096
+linear: model.layers.25.attention.wk, in=4096, out=1024
+linear: model.layers.25.attention.wv, in=4096, out=1024
+linear: model.layers.25.attention.wo, in=4096, out=4096
+linear: model.layers.25.feed_forward.w1, in=4096, out=14336
+linear: model.layers.25.feed_forward.w2, in=14336, out=4096
+linear: model.layers.25.feed_forward.w3, in=4096, out=14336
+linear: model.layers.26.attention.wq, in=4096, out=4096
+linear: model.layers.26.attention.wk, in=4096, out=1024
+linear: model.layers.26.attention.wv, in=4096, out=1024
+linear: model.layers.26.attention.wo, in=4096, out=4096
+linear: model.layers.26.feed_forward.w1, in=4096, out=14336
+linear: model.layers.26.feed_forward.w2, in=14336, out=4096
+linear: model.layers.26.feed_forward.w3, in=4096, out=14336
+linear: model.layers.27.attention.wq, in=4096, out=4096
+linear: model.layers.27.attention.wk, in=4096, out=1024
+linear: model.layers.27.attention.wv, in=4096, out=1024
+linear: model.layers.27.attention.wo, in=4096, out=4096
+linear: model.layers.27.feed_forward.w1, in=4096, out=14336
+linear: model.layers.27.feed_forward.w2, in=14336, out=4096
+linear: model.layers.27.feed_forward.w3, in=4096, out=14336
+linear: model.layers.28.attention.wq, in=4096, out=4096
+linear: model.layers.28.attention.wk, in=4096, out=1024
+linear: model.layers.28.attention.wv, in=4096, out=1024
+linear: model.layers.28.attention.wo, in=4096, out=4096
+linear: model.layers.28.feed_forward.w1, in=4096, out=14336
+linear: model.layers.28.feed_forward.w2, in=14336, out=4096
+linear: model.layers.28.feed_forward.w3, in=4096, out=14336
+linear: model.layers.29.attention.wq, in=4096, out=4096
+linear: model.layers.29.attention.wk, in=4096, out=1024
+linear: model.layers.29.attention.wv, in=4096, out=1024
+linear: model.layers.29.attention.wo, in=4096, out=4096
+linear: model.layers.29.feed_forward.w1, in=4096, out=14336
+linear: model.layers.29.feed_forward.w2, in=14336, out=4096
+linear: model.layers.29.feed_forward.w3, in=4096, out=14336
+linear: model.layers.30.attention.wq, in=4096, out=4096
+linear: model.layers.30.attention.wk, in=4096, out=1024
+linear: model.layers.30.attention.wv, in=4096, out=1024
+linear: model.layers.30.attention.wo, in=4096, out=4096
+linear: model.layers.30.feed_forward.w1, in=4096, out=14336
+linear: model.layers.30.feed_forward.w2, in=14336, out=4096
+linear: model.layers.30.feed_forward.w3, in=4096, out=14336
+linear: model.layers.31.attention.wq, in=4096, out=4096
+linear: model.layers.31.attention.wk, in=4096, out=1024
+linear: model.layers.31.attention.wv, in=4096, out=1024
+linear: model.layers.31.attention.wo, in=4096, out=4096
+linear: model.layers.31.feed_forward.w1, in=4096, out=14336
+linear: model.layers.31.feed_forward.w2, in=14336, out=4096
+linear: model.layers.31.feed_forward.w3, in=4096, out=14336
+linear: model.output, in=4096, out=128256
+W1217 21:24:14.026019 1726928 site-packages/torch/_export/__init__.py:276] +============================+
+W1217 21:24:14.026474 1726928 site-packages/torch/_export/__init__.py:277] |     !!!   WARNING   !!!    |
+W1217 21:24:14.026665 1726928 site-packages/torch/_export/__init__.py:278] +============================+
+W1217 21:24:14.026849 1726928 site-packages/torch/_export/__init__.py:279] torch._export.aot_compile()/torch._export.aot_load() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export())/torch._inductor.aoti_load_package() instead.
+W1217 21:25:37.451656 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:37.456909 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:37.458432 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.104502 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.172109 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.173750 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.193953 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.266832 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.302381 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.303751 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.475950 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.545322 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.546611 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.563827 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.650704 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.651912 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.652755 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.863618 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.921232 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.922786 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:38.940482 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.001620 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.042980 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.044364 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.216453 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.281834 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.283155 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.300397 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.386302 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.387504 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.388350 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.590519 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.643626 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.645353 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.663479 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.730579 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.770129 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.771540 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:39.952252 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.022150 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.023521 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.044204 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.136110 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.137324 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.138154 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.344583 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.398035 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.399542 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.416440 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.478395 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.515625 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.517014 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.688990 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.762023 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.763446 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.782799 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.876059 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.877358 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:40.878373 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.090682 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.143335 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.144849 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.162729 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.223985 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.260059 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.261281 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.422600 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.486187 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.487586 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.505558 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.595883 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.597129 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.597984 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.799895 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.854097 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.855931 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.874098 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.936044 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.973008 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:41.974292 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.144366 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.210350 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.211694 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.228747 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.318347 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.319550 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.320440 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.521208 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.570340 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.571983 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.590258 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.648636 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.685271 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.686547 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.855123 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.923517 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.924846 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:42.941554 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.027200 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.028374 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.029178 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.231433 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.282865 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.284325 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.301345 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.359391 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.394111 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.395272 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.559552 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.628100 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.629398 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.647248 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.734637 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.735950 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.736795 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.940444 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.991449 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:43.992994 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.010978 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.076490 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.115470 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.116978 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.293128 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.363740 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.365111 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.383504 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.472227 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.473408 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.474239 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.676057 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.728065 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.729614 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.747195 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.809276 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.847719 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:44.849182 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.015431 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.083039 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.084431 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.104194 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.188927 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.190133 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.190978 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.386772 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.439281 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.440768 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.457834 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.514329 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.550947 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.552241 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.721035 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.791931 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.793284 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.810905 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.897783 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.899013 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:45.899891 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.110556 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.169698 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.171474 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.191062 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.254716 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.293792 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.295235 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.476298 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.548164 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.549569 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.569285 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.666378 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.667587 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.668604 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.894730 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.947788 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.949657 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:46.968731 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.038142 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.079296 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.080721 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.268423 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.343195 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.344607 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.363332 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.459643 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.460909 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.461772 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.680416 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.739931 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.741855 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.762774 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.830028 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.871154 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:47.872575 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.041100 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.113689 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.115032 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.133671 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.225839 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.227135 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.228057 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.436536 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.489276 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.490823 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.508600 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.568186 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.605806 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.607059 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.783024 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.854924 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.856274 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.874853 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.965942 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.967214 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:48.968102 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:49.182939 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:49.235876 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:49.237373 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:49.256235 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:49.324054 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:49.361468 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:49.362848 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:49.534660 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:49.603754 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:49.605154 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:49.623737 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+W1217 21:25:49.671895 1726928 site-packages/torch/_inductor/ir.py:6509] [0/0] aten._weight_int4pack_mm_for_cpu.default is missing a c-shim implementation, using proxy executor as fallback
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_1(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:738:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+  738 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_6(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:1274:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 1274 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_10(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:1780:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 1780 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_15(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:2292:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 2292 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_19(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:2792:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 2792 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_24(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:3304:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 3304 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_28(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:3804:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 3804 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_33(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:4316:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 4316 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_37(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:4816:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 4816 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_42(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:5328:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 5328 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_46(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:5828:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 5828 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_51(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:6340:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 6340 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_55(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:6840:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 6840 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_60(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:7352:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 7352 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_64(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:7852:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 7852 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_69(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:8364:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 8364 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_73(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:8864:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 8864 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_78(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:9376:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 9376 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_82(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:9876:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+ 9876 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_87(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:10388:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+10388 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_91(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:10888:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+10888 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_96(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:11400:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+11400 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_100(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:11900:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+11900 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_105(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:12412:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+12412 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_109(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:12912:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+12912 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_114(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:13424:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+13424 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_118(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:13924:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+13924 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_123(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:14436:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+14436 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_127(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:14936:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+14936 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_132(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:15448:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+15448 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_136(const bfloat16*, const int32_t*, const bfloat16*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:15948:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+15948 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp: In function ‘void cpp_fused__safe_softmax__weight_int4pack_mm_for_cpu_add_bmm_index_index_put_scalar_tensor_stack_where_141(const bfloat16*, const int32_t*, const bfloat16*, const float*, const float*, const bool*, const bfloat16*, float*, float*, bfloat16*, float*, bool*, float*, float*, float*, bfloat16*, float*, bfloat16*)’:
+/tmp/torchinductor_jackkhuu/c5o2v2ioswxwskfczjnkmp3pd2krfij5mcm77ewxglwjn3bvjwlp/cjdf6otzt7dk47njelcjyqyz6vvnp6x6pvkv2zntoxs2l2v4bgio.cpp:16460:31: warning: variable ‘tmp_acc0_arr’ set but not used [-Wunused-but-set-variable]
+16460 |                         float tmp_acc0_arr[32];
+      |                               ^~~~~~~~~~~~
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cpu
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 0.11 seconds
+Quantizing the model with: {'linear:int4': {'groupsize': 256}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 53.20 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model34.pt2
+The generated packaged model can be found at: /tmp/model34.pt2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --aoti-package-path /tmp/model34.pt2 --prompt "Once upon a time," --max-new-tokens 256 --device cpu --num-samples 3
+PyTorch version 2.6.0.dev20241213+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Warning: checkpoint path ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument
+Warning: checkpoint path ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.48 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village surrounded by vast green fields and dense forests, there lived a poor and sad boy named Kaito. Kaito's parents were too poor to provide him with any comfort or leisure, and as a result, he spent most of his days working hard from dawn till dusk, helping his father with the daily chores.
+One day, while out on a walk, Kaito stumbled upon a small pond. The sunlight dancing on the water's surface caught his eye, and he felt a sudden urge to sit and look at it. The boy sat down on a nearby rock and began to follow the pond's ripples as they reflected the light. He found the sight so soothing that he forgot all about his hunger and the fatigue that had been building up inside him.
+Kaito realized that he had been so busy working that he hadn't stopped to appreciate the simple joys in life, including the beauty of nature. He sat there for hours, mesmerized by the pond's serene beauty. The water's calm surface and the sunlight's gentle dance across it were so captivating that Kaito forgot to eat or do anything else.
+As the sun began to set, Kaito reluctantly got up from his rock and headed back to his home. He
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 274.8049 sec total                 
+Time to first token: 11.4800 sec with sequential prefill.                
+
+      Total throughput: 0.9316 tokens/sec, 1.0735 s/token                 
+First token throughput: 0.0871 tokens/sec, 11.4800 s/token                 
+ Next token throughput: 0.9684 tokens/sec, 1.0326 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, when the world was still, and the moon was full, a young adventurer named Max stumbled upon an ancient temple deep in the heart of a mystical forest. The temple was hidden behind a waterfall, and the air was filled with the sweet scent of blooming flowers. As Max approached the temple, he felt an otherworldly energy emanating from its ancient stones. The energy was both alluring and unsettling, and Max felt his heart pounding with excitement and trepidation.
+
+Max had always been drawn to the mysterious and unknown. As a child, he would spend hours poring over dusty tomes and listening to whispered tales of wonder and magic. His parents had been archaeologists, and he had grown up with a deep respect for the ancient civilizations that had left behind their secrets in the form of crumbling ruins and mysterious artifacts.
+
+As he pushed open the massive stone doors, Max felt a rush of cool air wafting out into the night. The interior of the temple was dimly lit, with only a few flickering candles to illuminate the space. The air was thick with the scent of incense, and the sound of dripping water echoed through the halls. Max's eyes adjusted slowly, and he saw that the temple was filled with row upon row of ancient car
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 375.2484 sec total                 
+Time to first token: 8.3081 sec with sequential prefill.                
+
+      Total throughput: 0.6822 tokens/sec, 1.4658 s/token                 
+First token throughput: 0.1204 tokens/sec, 8.3081 s/token                 
+ Next token throughput: 0.6949 tokens/sec, 1.4390 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+
+========================================
+
+Once upon a time, in a small village surrounded by vast fields of gold wheat, there lived a young shepherd named Jack. Jack was a hardworking boy who spent his days tending to his family's sheep and exploring the endless wheat fields. One day, while wandering through the wheat, Jack stumbled upon an old, mysterious-looking watch. The watch was made of a strange, silvery metal that sparkled in the sunlight, and it had intricate engravings of animals on its face.
+As soon as Jack picked up the watch, he felt an odd tingling sensation in his fingers. It was as if the watch had awakened a deep connection within him. Without any explanation, Jack felt compelled to take the watch back to his village. As he walked, he noticed that the wheat around him seemed to be growing taller and the air was filling with a sweet, honey-like scent. The village, once ordinary and familiar, now seemed welcoming and mysterious.
+Upon arriving at the village, Jack showed the watch to the village elder, a wise and respected woman named Granny May. Granny May was amazed by the watch and recognized it as a long-lost treasure from their village's history. She shared a legend with Jack about a special watch that had been crafted centuries ago by their ancestors. This watch
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 270.6182 sec total                 
+Time to first token: 8.3546 sec with sequential prefill.                
+
+      Total throughput: 0.9460 tokens/sec, 1.0571 s/token                 
+First token throughput: 0.1197 tokens/sec, 8.3546 s/token                 
+ Next token throughput: 0.9723 tokens/sec, 1.0285 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 0.85                 
+Average tokens/sec (first token): 0.11                 
+Average tokens/sec (next tokens): 0.88 
+                
+Memory used: 0.00 GB

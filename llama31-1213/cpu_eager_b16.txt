@@ -1,0 +1,75 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --num-samples 3
+PyTorch version 2.6.0.dev20241213+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.10 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, there was a beautiful, lively and prosperous city that attracted tourists and business travelers from all over the world. Known for its modern architecture, bustling streets and spectacular landmarks, it was indeed a must-visit destination for anyone who sought to immerse themselves in the excitement of urban life.
+However, one day, a powerful tornado swept through the city, causing widespread destruction, rendering several buildings un inhabitable, and disrupting the lives of its inhabitants. The once-thriving metropolis turned into a chaotic, dirty and polluted environment, posing a significant threat to the health, safety and well-being of its residents.
+Despite the efforts of local and national authorities to provide assistance, many people were still left without access to basic necessities, including clean water, sanitation facilities, and healthcare services. As the city struggled to recover, its residents felt a sense of hopelessness and despair, wondering if they would ever be able to rebuild their homes, their lives and their community.
+Here, we will explore how a sustainable city, which combines social, economic and environmental considerations, can be designed and developed to mitigate the impact of natural disasters such as the tornado, while also ensuring the well-being and satisfaction of its inhabitants.
+
+### Designing a Sustainable City
+To create a resilient and sustainable city, several
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 106.8963 sec total                 
+Time to first token: 0.6166 sec with parallel prefill.                
+
+      Total throughput: 2.3948 tokens/sec, 0.4176 s/token                 
+First token throughput: 1.6219 tokens/sec, 0.6166 s/token                 
+ Next token throughput: 2.3993 tokens/sec, 0.4168 s/token                     
+
+Bandwidth achieved: 38.46 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+
+========================================
+
+Once upon a time, in a small village nestled in the rolling hills of Provence, there lived a young girl named Sophie. Sophie was a delightful child with a heart full of love and a spirit that shone brightly like the sun on a warm summer day. She lived with her parents in a cozy little house surrounded by a garden filled with the sweet scent of lavender and the soft songs of birds.
+Sophie loved to spend her days exploring the countryside, playing with the animals, and helping her mother in the garden. She was a curious child, always asking questions and seeking answers about the world around her. Her parents, though sometimes tired from their daily chores, encouraged Sophie's curiosity and nurtured her love for learning.
+One day, as Sophie was wandering through the garden, she stumbled upon a small, hidden path she had never seen before. The path was overgrown with weeds and vines, and it seemed to lead to a secret place that was hidden from the rest of the world. Sophie's curiosity was piqued, and she felt an inexplicable pull to follow the path.
+She pushed aside the tangled growth and began to make her way down the winding path. The air grew sweeter, and the scent of lavender grew stronger as she walked. The path led her to a
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 111.0549 sec total                 
+Time to first token: 0.3540 sec with parallel prefill.                
+
+      Total throughput: 2.3052 tokens/sec, 0.4338 s/token                 
+First token throughput: 2.8249 tokens/sec, 0.3540 s/token                 
+ Next token throughput: 2.3035 tokens/sec, 0.4341 s/token                     
+
+Bandwidth achieved: 37.02 GB/s
+
+========================================
+
+Once upon a time, there were three companies that specialized in producing high end audio equipment. The three companies were Sennheiser, Beyerdynamic, and Audio-Technica.
+Sennheiser, founded by Fritz Sennheiser in 1945, had been known for producing high-quality microphones and headphones for decades. Their products were widely used by professionals in the music industry and were known for their durability and sound quality. They were particularly famous for their iconic HD 280 and HD 380 headphones.
+Beyerdynamic, established in 1924 by Josef Beyer, had also been a prominent name in the world of high-end audio. They were known for their high-quality microphones and headphones that were used by many famous musicians, including The Beatles. Their DT 770 and DT 990 headphones were particularly popular among audiophiles.
+Audio-Technica, founded by Hideo Matsushita in 1962, was a Japanese company that had been producing high-quality audio equipment for over 50 years. They were known for their high-end headphones, such as the ATH-M50x and ATH-M40x, which were widely used by audio engineers and musicians.
+One day, the three companies decided to compete with each other in a product development competition. The
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 107.0137 sec total                 
+Time to first token: 0.3876 sec with parallel prefill.                
+
+      Total throughput: 2.3922 tokens/sec, 0.4180 s/token                 
+First token throughput: 2.5797 tokens/sec, 0.3876 s/token                 
+ Next token throughput: 2.3915 tokens/sec, 0.4181 s/token                     
+
+Bandwidth achieved: 38.42 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 2.36                 
+Average tokens/sec (first token): 2.34                 
+Average tokens/sec (next tokens): 2.36 
+                
+Memory used: 0.00 GB
