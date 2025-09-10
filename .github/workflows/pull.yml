@@ -695,7 +695,16 @@ jobs:
           export MODEL_PATH=checkpoints/stories15M/stories15M.pt
           export MODEL_NAME=stories15M
           export MODEL_DIR=/tmp
-          export PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0
+          python - <<'PY'
+          import torch
+          if torch.backends.mps.is_available():
+              try:
+                  print("MPS current:", torch.mps.current_allocated_memory() / (1024**3), "GiB")
+                  print("MPS driver :", torch.mps.driver_allocated_memory()  / (1024**3), "GiB")
+                  print("MPS peak   :", torch.mps.driver_allocated_memory()  / (1024**3), "GiB")
+              except Exception:
+                  pass
+          PY
 
           python3 torchchat.py generate --device mps --checkpoint-path ${MODEL_PATH} --temperature 0
 
