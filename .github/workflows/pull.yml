@@ -638,7 +638,7 @@ jobs:
   test-mps:
     strategy:
       matrix:
-        runner: [macos-14]
+        runner: [macos-14-xlarge]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -768,7 +768,7 @@ jobs:
   test-mps-dtype:
     strategy:
       matrix:
-        runner: [macos-14]
+        runner: [macos-14-xlarge]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -845,7 +845,7 @@ jobs:
   compile-gguf:
     strategy:
       matrix:
-        runner: [macos-14-xlarge]
+        runner: [macos-14]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -1213,7 +1213,7 @@ jobs:
   test-torchao-experimental-mps:
     strategy:
       matrix:
-        runner: [macos-14]
+        runner: [macos-14-xlarge]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
