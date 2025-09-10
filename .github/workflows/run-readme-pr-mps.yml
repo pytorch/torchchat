@@ -9,7 +9,7 @@ jobs:
   test-readme-mps-macos:
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
-      runner: macos-m1-14
+      runner: macos-14
       timeout: 60
       script: |
           conda create -y -n test-readme-mps-macos python=3.10.11 llvm-openmp
