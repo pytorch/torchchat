@@ -638,7 +638,7 @@ jobs:
   test-mps:
     strategy:
       matrix:
-        runner: [macos-m1-stable ]
+        runner: [macos-14]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -768,7 +768,7 @@ jobs:
   test-mps-dtype:
     strategy:
       matrix:
-        runner: [macos-m1-stable ]
+        runner: [macos-14]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
@@ -1213,7 +1213,7 @@ jobs:
   test-torchao-experimental-mps:
     strategy:
       matrix:
-        runner: [macos-m1-stable]
+        runner: [macos-14]
     runs-on: ${{matrix.runner}}
     steps:
       - name: Checkout repo
