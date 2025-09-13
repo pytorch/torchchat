@@ -1,0 +1,81 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241213+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.11 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 29.28 seconds
+-----------------------------------------------------------
+Once upon a time, I was sitting in a coffee shop, surrounded by the bustling sounds of city living. As I sipped on my coffee, I noticed a peculiar-looking man walking in, wearing a stylish three-piece suit. He was an older gentleman, with a kind face and wispy hair.
+
+The man approached the counter and ordered his coffee, engaging in a warm conversation with the barista. When he received his drink, he sat down in a nearby seat, his eyes scanning the room as if searching for someone. Our eyes met, and he smiled kindly, nodding at me.
+
+Intrigued, I decided to strike up a conversation. "Excuse me," I said, "but you seem like a man with a great story. Would you like to hear one of mine?"
+
+He chuckled, his eyes lighting up with interest. "That sounds intriguing," he replied. "I'm always eager to hear a good tale."
+
+I launched into a story about a peculiar occurrence in my childhood, about a dream that I had experienced as a young boy. The man listened attentively, his expression growing more and more intrigued.
+
+As I finished my story, the man leaned in, his voice barely above a whisper. "I'm glad you shared that with me," he said
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 167.6127 sec total                 
+Time to first token: 0.3494 sec with parallel prefill.                
+
+      Total throughput: 1.5273 tokens/sec, 0.6547 s/token                 
+First token throughput: 2.8620 tokens/sec, 0.3494 s/token                 
+ Next token throughput: 1.5245 tokens/sec, 0.6559 s/token                     
+
+Bandwidth achieved: 13.07 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 1.7e+02 seconds
+
+========================================
+
+Once upon a time, in a far-off kingdom, there was a beautiful and kind-hearted princess named Sophia. She was loved by all who knew her, and her smile could light up the darkest of rooms.
+One day, a wise old wizard named Zephyr came to the kingdom, seeking refuge from the dangers of the outside world. He was a master of magic, and the princess was immediately drawn to his wisdom and kindness.
+As the days passed, Sophia and Zephyr grew closer, and they began to talk about their dreams and aspirations. Sophia confided in Zephyr about her desire to help those in need, to make a difference in the world, and to bring joy and happiness to all whom she met.
+Zephyr, seeing the good in Sophia's heart, decided to share a secret with her. He told her that he had a magical amulet that would grant her wishes, but warned her that it came with a great responsibility.
+The amulet, Zephyr explained, was a powerful tool that could change the course of history, and it was up to Sophia to use it wisely. He told her that with this amulet, she could bring peace and prosperity to the kingdom, but she must be careful not to abuse its power.
+Sophia was both
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 38.5396 sec total                 
+Time to first token: 0.3094 sec with parallel prefill.                
+
+      Total throughput: 6.6425 tokens/sec, 0.1505 s/token                 
+First token throughput: 3.2318 tokens/sec, 0.3094 s/token                 
+ Next token throughput: 6.6701 tokens/sec, 0.1499 s/token                     
+
+Bandwidth achieved: 56.85 GB/s
+
+========================================
+
+Once upon a time, we were young, fun-loving, and carefree. We had high school sweethearts, prom dates, and graduation ceremonies. But, as time went by, life took its toll. We got older, got married, got kids, and got busy. The romance faded, and the excitement began to wane. But, that was before we discovered a secret to rekindle the flame.
+One day, while browsing through an online blog, we stumbled upon an article about a magical way to bring back the spark. It mentioned a simple yet powerful technique: couples’ date nights. That's right! Regularly scheduled dates with your partner can reignite the flames of passion, intimacy, and love.
+At first, it sounded too simple, too cheesy, or too old-fashioned. But, we were desperate to revive our relationship, so we decided to give it a try. We started with a weekly dinner date, just the two of us. We would pick a restaurant, plan a fun activity, and make it a priority to spend quality time together.
+As we began to incorporate date nights into our busy schedules, we noticed a significant change. We started to look forward to our alone time together, and the excitement began to build again. We would laugh, reminis
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 35.3439 sec total                 
+Time to first token: 0.3349 sec with parallel prefill.                
+
+      Total throughput: 7.2431 tokens/sec, 0.1381 s/token                 
+First token throughput: 2.9861 tokens/sec, 0.3349 s/token                 
+ Next token throughput: 7.2838 tokens/sec, 0.1373 s/token                     
+
+Bandwidth achieved: 61.99 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 6.94                 
+Average tokens/sec (first token): 3.11                 
+Average tokens/sec (next tokens): 6.98 
+                
+Memory used: 0.00 GB

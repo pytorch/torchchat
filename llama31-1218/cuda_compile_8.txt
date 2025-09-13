@@ -1,0 +1,72 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --prompt "Once upon a time," --max-new-tokens 200 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 5.76 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.41 seconds
+-----------------------------------------------------------
+Once upon a time, there was a young professional woman named Sarah who was struggling to start her career. She had recently graduated with a degree in business and was eager to get a feel for the corporate world. After several weeks of applying to jobs and attending networking events, Sarah found herself feeling discouraged and unsure if she was cut out for the fast-paced business world.
+One day, while browsing through a local bookstore, Sarah stumbled upon a self-help book titled, “The Power of Vulnerability: A Guide to Achieving Success by Embracing Your True Self.” On a whim, she purchased the book and began reading it on her commute to work.
+As she turned the pages, Sarah discovered a wealth of advice and inspiration that resonated deeply with her. The author, a successful businesswoman who had faced many challenges throughout her career, wrote about the importance of embracing vulnerability, taking risks, and being true to oneself.
+Sarah was particularly drawn to the author’s insights on how to build meaningful relationships with colleagues and mentors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 248.5232 sec total                 
+Time to first token: 0.5963 sec with parallel prefill.                
+
+      Total throughput: 0.8048 tokens/sec, 1.2426 s/token                 
+First token throughput: 1.6771 tokens/sec, 0.5963 s/token                 
+ Next token throughput: 0.8027 tokens/sec, 1.2459 s/token                     
+
+Bandwidth achieved: 6.89 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2.5e+02 seconds
+
+========================================
+
+Once upon a time, in a land far, far away, there lived a humble baker named Max. Max had a small bakery on the corner of a bustling street, where he spent his days kneading dough, baking bread, and making pastries that made everyone’s mouth water.
+Max loved his job, but he had a secret: he was tired of making the same old recipes over and over again. He longed to create something new, something exciting, something that would make people talk. So, one day, he decided to take a risk and try something entirely different.
+Max had always been fascinated by the world of science and chemistry, and he had a curiosity about how different ingredients reacted with each other. He spent hours in his bakery, experimenting with different combinations of ingredients, testing his theories, and refining his recipes.
+As he mixed and matched, Max stumbled upon an innovative creation: a croissant-doughnut hybrid that he called the “Croissant-nut.” The Croissant-nut was a
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 4.3505 sec total                 
+Time to first token: 0.0815 sec with parallel prefill.                
+
+      Total throughput: 45.9718 tokens/sec, 0.0218 s/token                 
+First token throughput: 12.2774 tokens/sec, 0.0815 s/token                 
+ Next token throughput: 46.6146 tokens/sec, 0.0215 s/token                     
+
+Bandwidth achieved: 393.47 GB/s
+
+========================================
+
+Once upon a time, I was a young and ambitious journalist, eager to make a name for myself in the world of investigative reporting. I had just landed a job at a small, independent newspaper in a city known for its rich history and complex politics.
+My editor, a seasoned journalist with a keen eye for detail, assigned me to cover a story about a local businessman who was embroiled in a scandal. The businessman, a wealthy and influential man, had been accused of embezzling funds from his company and using them to finance his lavish lifestyle.
+I threw myself into the investigation, pouring over financial records and conducting interviews with sources who had come forward to speak out against the businessman. As I dug deeper, I began to uncover a web of deceit and corruption that went all the way to the top of the city's power structure.
+But as I continued to investigate, I started to receive strange phone calls and messages. They were from an unknown number, and the messages were always brief and cryptic.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 2.1550 sec total                 
+Time to first token: 0.0772 sec with parallel prefill.                
+
+      Total throughput: 92.8085 tokens/sec, 0.0108 s/token                 
+First token throughput: 12.9556 tokens/sec, 0.0772 s/token                 
+ Next token throughput: 95.7749 tokens/sec, 0.0104 s/token                     
+
+Bandwidth achieved: 794.34 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 69.39                 
+Average tokens/sec (first token): 12.62                 
+Average tokens/sec (next tokens): 71.19 
+                
+Memory used: 28.81 GB

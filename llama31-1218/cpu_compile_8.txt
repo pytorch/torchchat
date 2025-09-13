@@ -1,0 +1,80 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.10 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 29.60 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of Provence, there lived a young artist named Sophie. Sophie was known throughout the village for her exquisite watercolors of the local flora and fauna. She spent her days painting the vibrant bouquets of wildflowers that bloomed in the nearby fields, and the majestic birds that soared through the sky.
+
+Sophie's studio was a cozy little room above her family's bakery, filled with the sweet scent of freshly baked bread wafting through the air. Her easel stood by the window, where she could paint the ever-changing light of the Provençal sky. Sophie's art was not just a reflection of her love for nature, but also a way for her to connect with the beauty of the world around her.
+
+One day, a wealthy patron from the city, Monsieur LeFleur, arrived in the village in search of a new artist to paint the gardens of his estate. He had heard about Sophie's extraordinary talent and sought her out, eager to commission a series of paintings that would capture the essence of the Provençal landscape.
+
+Sophie was both thrilled and intimidated by the opportunity. She had never painted on such a grand scale before, and the pressure to produce something truly exceptional was daunting.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 176.6127 sec total                 
+Time to first token: 0.6387 sec with parallel prefill.                
+
+      Total throughput: 1.4495 tokens/sec, 0.6899 s/token                 
+First token throughput: 1.5656 tokens/sec, 0.6387 s/token                 
+ Next token throughput: 1.4491 tokens/sec, 0.6901 s/token                     
+
+Bandwidth achieved: 12.41 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 1.8e+02 seconds
+
+========================================
+
+Once upon a time, there was a young girl named Sophie who lived in a small village surrounded by rolling hills and dense forests. She was a curious and adventurous child, always eager to explore the world around her.
+One day, while wandering through the forest, Sophie stumbled upon a hidden path she had never seen before. The path was overgrown with vines and shrubs, and it looked as though it hadn't been used in years. Sophie's curiosity was piqued, and she decided to investigate further.
+As she made her way down the path, the trees grew taller and the air grew thick with the scent of wildflowers. Sophie felt as though she was walking through a secret world, one that few people knew existed. The path twisted and turned, leading her deeper into the forest.
+Suddenly, Sophie heard the sound of running water. She followed the sound and soon found herself standing at the edge of a beautiful waterfall. The water cascaded down a rocky cliff, creating a misty veil that surrounded her.
+Sophie felt a sense of wonder and awe wash over her. She had never seen anything like it before. She couldn't help but feel a sense of magic in the air, as though the waterfall was a portal to a different world.
+As she stood there, taking in
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 35.0481 sec total                 
+Time to first token: 0.3972 sec with parallel prefill.                
+
+      Total throughput: 7.3043 tokens/sec, 0.1369 s/token                 
+First token throughput: 2.5176 tokens/sec, 0.3972 s/token                 
+ Next token throughput: 7.3591 tokens/sec, 0.1359 s/token                     
+
+Bandwidth achieved: 62.52 GB/s
+
+========================================
+
+Once upon a time, in the rolling hills of Somerset, there was a small village nestled among the picturesque countryside. The village was called Langport, and it was famous for its beautiful riverside setting and its rich history.
+One day, a young girl named Emily moved to Langport with her family. She was excited to explore her new surroundings and make some new friends. As she wandered through the village, she discovered a quaint little shop with a sign that read "Curious Goods".
+Emily's curiosity was piqued, and she pushed open the door to venture inside. The shop was dimly lit, with shelves upon shelves of strange and wondrous objects. There were vintage dolls, antique clocks, and mysterious boxes with strange symbols etched onto their lids.
+The shopkeeper, an elderly man with a kind face and twinkling eyes, welcomed Emily to his store. "Ah, a new face in town," he said with a warm smile. "What brings you to Curious Goods?"
+Emily's eyes widened as she scanned the shelves. "I'm not sure," she said. "I just saw the sign and thought it looked interesting."
+The shopkeeper chuckled. "Ah, curiosity is a wonderful thing. Let me show you some of my favorite treasures."
+As Emily browsed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 34.1833 sec total                 
+Time to first token: 0.3417 sec with parallel prefill.                
+
+      Total throughput: 7.4890 tokens/sec, 0.1335 s/token                 
+First token throughput: 2.9262 tokens/sec, 0.3417 s/token                 
+ Next token throughput: 7.5351 tokens/sec, 0.1327 s/token                     
+
+Bandwidth achieved: 64.10 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 7.40                 
+Average tokens/sec (first token): 2.72                 
+Average tokens/sec (next tokens): 7.45 
+                
+Memory used: 0.00 GB

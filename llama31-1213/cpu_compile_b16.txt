@@ -1,0 +1,73 @@
+
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --quantize '{"precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cpu"}}' --prompt "Once upon a time," --max-new-tokens 256 --compile --num-samples 3
+PyTorch version 2.6.0.dev20241213+cu124 available.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cpu Intel(R) Xeon(R) Platinum 8339HC CPU @ 1.80GHz
+Loading model...
+Time to load model: 0.12 seconds
+Quantizing the model with: {'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cpu'}}
+Time to quantize model: 0.01 seconds
+-----------------------------------------------------------
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Sophia. Sophia was a curious and adventurous child who loved to explore the world around her. She spent most of her days playing outside, chasing after butterflies, and watching the clouds roll by.
+One day, while wandering through the village, Sophia stumbled upon a small, mysterious shop tucked away on a quiet street. The sign above the door read "Curios and Wonders," and the windows were filled with all sorts of strange and fascinating objects. Sophia's curiosity was piqued, and she pushed open the door to venture inside.
+The shop was dimly lit, and the air was thick with the scent of old books and dust. Sophia's eyes adjusted slowly to the darkness, and she saw rows upon rows of shelves stacked high with peculiar items. There were strange artifacts, rare minerals, and even a few taxidermied animals peeking out from behind a velvet curtain.
+Sophia wandered through the shop, running her fingers over the various objects on display. She picked up a delicate crystal pendant, a vintage locket, and a small, leather-bound book. As she touched each item, she felt a strange sensation, as if the object was imbuing her with
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 1: 196.0270 sec total                 
+Time to first token: 0.6336 sec with parallel prefill.                
+
+      Total throughput: 1.3059 tokens/sec, 0.7657 s/token                 
+First token throughput: 1.5783 tokens/sec, 0.6336 s/token                 
+ Next token throughput: 1.3051 tokens/sec, 0.7662 s/token                     
+
+Bandwidth achieved: 20.97 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches, JIT compilation. ***
+just-in-time compilation time (incl run time): 2e+02 seconds
+
+========================================
+
+Once upon a time, there was a small, rural town nestled in the heart of a vast and mysterious forest. The town was called Ravenswood, and it was a place where time seemed to stand still. The residents of Ravenswood lived simple lives, relying on the land for their livelihood and honoring the traditions of their ancestors.
+In the center of Ravenswood stood an ancient, gnarled tree, its branches twisted and knotted with age. The townspeople believed that this tree held mystical powers, and they would often gather around its base to pray, tell stories, and seek guidance.
+One day, a young girl named Aria wandered into the forest, searching for a rare herb for her mother's healing potions. As she walked deeper into the woods, the trees seemed to grow taller, and the shadows grew darker. Aria felt a strange, tingling sensation in her fingers, as if the tree was calling to her.
+She approached the ancient tree, feeling a sense of wonder and awe wash over her. As she reached out to touch the trunk, a low, rumbling voice spoke to her, echoing in her mind.
+"Aria, child of Ravenswood, I have been waiting for you. You have come to seek the secrets of the forest, and I shall grant them
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 2: 74.2544 sec total                 
+Time to first token: 0.4688 sec with parallel prefill.                
+
+      Total throughput: 3.4476 tokens/sec, 0.2901 s/token                 
+First token throughput: 2.1333 tokens/sec, 0.4688 s/token                 
+ Next token throughput: 3.4560 tokens/sec, 0.2894 s/token                     
+
+Bandwidth achieved: 55.37 GB/s
+
+========================================
+
+Once upon a time, in a world not so different from our own, there lived a young girl named Sophia. Sophia loved to dream big and chase her passions. She was a curious and ambitious individual who always sought to learn more and push beyond her boundaries. One day, Sophia stumbled upon an old, mysterious-looking book hidden in the attic of her family's old mansion. The book was bound in a strange, glowing material that seemed to pulse with an otherworldly energy.
+As Sophia opened the book, she discovered that it contained ancient knowledge and secrets that had been hidden for centuries. The book spoke of magical realms, hidden dimensions, and mystical creatures that existed beyond the veil of the mundane world. Sophia was both fascinated and terrified by the secrets revealed within the book's pages.
+As she delved deeper into the book, Sophia began to notice strange occurrences happening around her. Objects would move on their own, and she would hear whispers in the dead of night. It was as if the book was trying to communicate with her, drawing her into a world of wonder and magic. Sophia's heart pounded with excitement as she realized that she had stumbled upon something much bigger than herself.
+With every passing day, Sophia became more and more enthralled by the mystical world within the book. She would
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 255 tokens                 
+Time for inference 3: 75.9722 sec total                 
+Time to first token: 0.3684 sec with parallel prefill.                
+
+      Total throughput: 3.3697 tokens/sec, 0.2968 s/token                 
+First token throughput: 2.7142 tokens/sec, 0.3684 s/token                 
+ Next token throughput: 3.3728 tokens/sec, 0.2965 s/token                     
+
+Bandwidth achieved: 54.12 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 3.41                 
+Average tokens/sec (first token): 2.42                 
+Average tokens/sec (next tokens): 3.41 
+                
+Memory used: 0.00 GB

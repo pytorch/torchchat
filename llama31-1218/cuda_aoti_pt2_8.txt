@@ -1,0 +1,114 @@
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-aoti-package-path /tmp/model8.pt2
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --aoti-package-path /tmp/model8.pt2 --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 torchchat.py export llama3.1 --quantize '{"linear:int8": {"groupsize": 0}, "precision": {"dtype":"bfloat16"}, "executor":{"accelerator":"cuda"}}' --output-aoti-package-path /tmp/model8.pt2
+Note: NumExpr detected 22 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+NumExpr defaulting to 16 threads.
+PyTorch version 2.6.0.dev20241218+cu124 available.
+W1218 20:41:19.819849 1706108 site-packages/torch/_export/__init__.py:276] +============================+
+W1218 20:41:19.820317 1706108 site-packages/torch/_export/__init__.py:277] |     !!!   WARNING   !!!    |
+W1218 20:41:19.820508 1706108 site-packages/torch/_export/__init__.py:278] +============================+
+W1218 20:41:19.820676 1706108 site-packages/torch/_export/__init__.py:279] torch._export.aot_compile()/torch._export.aot_load() is being deprecated, please switch to directly calling torch._inductor.aoti_compile_and_package(torch.export.export())/torch._inductor.aoti_load_package() instead.
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Using device=cuda
+Setting max_seq_length to 300 for DSO export.
+Loading model...
+Time to load model: 6.60 seconds
+Quantizing the model with: {'linear:int8': {'groupsize': 0}, 'precision': {'dtype': 'bfloat16'}, 'executor': {'accelerator': 'cuda'}}
+Time to quantize model: 0.40 seconds
+-----------------------------------------------------------
+Exporting model using AOT Inductor to /tmp/model8.pt2
+The generated packaged model can be found at: /tmp/model8.pt2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OMP_NUM_THREADS=16 numactl --cpunodebind=0 --membind=0 python3 torchchat.py generate llama3.1 --aoti-package-path /tmp/model8.pt2 --prompt "Once upon a time," --max-new-tokens 200 --device cuda --num-samples 3
+PyTorch version 2.6.0.dev20241218+cu124 available.
+[W1218 20:44:54.268953437 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:54.269164436 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:54.276771686 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:54.276883082 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:54.284506385 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:54.284609253 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:54.299880626 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:54.299997726 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+Unabled to import torchao experimental quant_api with error:  [Errno 2] No such file or directory: '/home/jackkhuu/oss/torchchat/torchao-build/src/ao/torchao/experimental/quant_api.py'
+Warning: checkpoint path ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument
+Warning: checkpoint path ignored because an exported model was specified using a DSO, AOTI PACKAGE or PTE path argument
+Using device=cuda NVIDIA PG509-210
+Loading model...
+Time to load model: 7.05 seconds
+-----------------------------------------------------------
+Once upon a time, in a far-off kingdom, there lived a kind and gentle princess named Sophia. She was loved by all who knew her, and she loved nothing more than helping those in need.
+One day, a terrible drought struck the kingdom, and the land became parched and barren. The people were suffering, and the crops were withering away. Sophia knew that she had to do something to help her people, so she set out on a journey to find a way to bring water back to the kingdom.
+She traveled far and wide, meeting all sorts of creatures along the way. She met a wise old owl who told her of a magical spring hidden deep within the forest. She met a mischievous band of fairies who offered to guide her through the treacherous paths. And she even met a brave knight who joined her on her quest.
+Together, they journeyed deeper into the forest, facing many challenges and obstacles along the way. They crossed rushing rivers, climbed steep mountains, and
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 1: 1.8699 sec total                 
+Time to first token: 0.1933 sec with sequential prefill.                
+
+      Total throughput: 106.9556 tokens/sec, 0.0093 s/token                 
+First token throughput: 5.1722 tokens/sec, 0.1933 s/token                 
+ Next token throughput: 118.6932 tokens/sec, 0.0084 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+*** This first iteration will include cold start effects for dynamic import, hardware caches. ***
+[W1218 20:44:56.124028221 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:56.124154069 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:56.131776376 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:56.131867475 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:56.139422326 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:56.139504760 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:56.154776906 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:56.154920098 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+
+========================================
+
+Once upon a time, in a small village nestled in the rolling hills of the countryside, there lived a young girl named Sophia. Sophia was a kind and gentle soul, with a heart full of love for all living things. She spent her days helping her mother with the family farm, tending to the animals, and learning the secrets of the land from her wise and aged grandmother, Olga.
+One day, while out collecting wild herbs in the nearby forest, Sophia stumbled upon a hidden glade. In the center of the clearing stood an enormous tree, its branches twisted and gnarled with age. The tree seemed to be watching her, and Sophia felt an inexplicable sense of wonder and awe wash over her.
+As she approached the tree, a soft, golden light began to emanate from its trunk. The light grew brighter and brighter, until Sophia felt herself being drawn into its warmth. She closed her eyes, and when she opened them again, she found herself sitting at the base of the tree,
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 2: 1.7020 sec total                 
+Time to first token: 0.0414 sec with sequential prefill.                
+
+      Total throughput: 117.5111 tokens/sec, 0.0085 s/token                 
+First token throughput: 24.1696 tokens/sec, 0.0414 s/token                 
+ Next token throughput: 119.8367 tokens/sec, 0.0083 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+[W1218 20:44:58.826271512 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:58.826369055 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:58.833979281 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:58.834067922 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:58.841663859 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:58.841746947 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:58.856941467 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6944] Warning: "Input 0 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+[W1218 20:44:58.857075845 ci27ajwi2j7wl5u47bddskaatqiq737hmrkjc5xkuvhkkfna5lmk.cpp:6951] Warning: "Input 1 was compiled as 16-bytes aligned, but it is not aligned at run time. Copying to an aligned tensor to guarantee correctness, but expect a performance hit." (function run_impl)
+
+========================================
+
+Once upon a time, in a far-off land, there was a young girl named Maria. Maria was a curious and adventurous child, always eager to explore the world around her. She loved to run through the woods, play in the streams, and climb trees. Maria was especially fascinated by the creatures of the forest, and spent hours watching the birds, squirrels, and rabbits that lived there.
+One day, while wandering through the woods, Maria stumbled upon a hidden clearing. In the center of the clearing stood an enormous tree, its trunk as wide as a house and its branches reaching up to the sky. Maria approached the tree, feeling a sense of wonder and awe wash over her. As she reached out to touch the trunk, a soft, melodious voice spoke to her.
+"Welcome, Maria," said the tree. "I have been waiting for you."
+Maria was startled, but she felt no fear. Instead, she felt a deep sense of connection to the tree.
+"How did you know my name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
+Generated 199 tokens                 
+Time for inference 3: 1.7068 sec total                 
+Time to first token: 0.0413 sec with sequential prefill.                
+
+      Total throughput: 117.1785 tokens/sec, 0.0085 s/token                 
+First token throughput: 24.2319 tokens/sec, 0.0413 s/token                 
+ Next token throughput: 119.4815 tokens/sec, 0.0084 s/token                     
+
+Bandwidth achieved: 0.00 GB/s
+
+========================================
+
+
+Warning: Excluding compile in calculations                 
+      Average tokens/sec (total): 113.88                 
+Average tokens/sec (first token): 17.86                 
+Average tokens/sec (next tokens): 119.34 
+                
+Memory used: 0.05 GB
