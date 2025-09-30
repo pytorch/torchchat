@@ -532,7 +532,6 @@ class LocalGenerator:
         accumulate_tokens: int = 8,
         eos_token_id: int = 2,
         eot_id: Optional[int] = None,
-        attention_backend: SDPBackend = torch.nn.attention.SDPBackend.MATH,
         **sampling_kwargs,
     ):
         new_tokens = []
@@ -541,7 +540,8 @@ class LocalGenerator:
             num_new_tokens - 1
         ):  # -1 to save space to run an EoS if dont generate it naturally
             # Actually better for Inductor to codegen attention here
-            with torch.nn.attention.sdpa_kernel([attention_backend]):
+            # with torch.nn.attention.sdpa_kernel([attention_backend]):
+            if True: # preserve indentation while testing
 
                 out_token = cur_token.clone()
                 next_token, next_prob = self.decode_one_token(
@@ -707,7 +707,6 @@ class LocalGenerator:
         callback=lambda x: x,
         accumulate_tokens: int,
         max_seq_length: int,
-        attention_backend: SDPBackend = torch.nn.attention.SDPBackend.MATH,
         seed: Optional[int] = None,
         **sampling_kwargs,
     ) -> torch.Tensor:
@@ -826,7 +825,6 @@ class LocalGenerator:
                     if self.is_llama3_model
                     else None
                 ),
-                attention_backend=attention_backend,
                 **sampling_kwargs,
             ):
                 yield generated_token, None
@@ -1213,7 +1211,8 @@ class LocalGenerator:
                 prof = torch.profiler.profile()
             t0 = time.perf_counter()
             num_tokens_generated = 0
-            with prof:
+            # always allow math as fallback
+            with torch.nn.attention.sdpa_kernel([self.builder_args.attention_backend, torch.nn.attention.SDPBackend.MATH]), prof:
                 generator_func = self.generate(
                     self.model,
                     encoded,
@@ -1230,7 +1229,6 @@ class LocalGenerator:
                     start_pos=start_pos,
                     skip_cache_setup=not is_first_sample,
                     max_seq_length=max_seq_length,
-                    attention_backend=self.builder_args.attention_backend,
                 )
                 if generator_args.chat_mode:
                     start_pos += encoded.size(0)
