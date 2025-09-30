@@ -149,6 +149,7 @@ From the torchchat root directory, run
 bash torchchat/utils/scripts/build_torchao_ops.sh
 ```
 
+Note that before running it, you must first clone torchao with `bash torchchat/utils/scripts/clone_torchao.sh` if you have not done so already.
 This should take about 10 seconds to complete.
 
 When building the AOTI and C++ runners, you must pass the flag link_torchao_ops when running the scripts the build the runners.
@@ -161,7 +162,7 @@ bash torchchat/utils/scripts/build_native.sh aoti link_torchao_ops
 bash torchchat/utils/scripts/build_native.sh et link_torchao_ops
 ```
 
-Note before running `bash torchchat/utils/scripts/build_native.sh et link_torchao_ops`, you must first install executorch with `bash torchchat/utils/scripts/install_et.sh` if you have not done so already.
+Note that before running `bash torchchat/utils/scripts/build_native.sh et link_torchao_ops`, you must first install executorch with `bash torchchat/utils/scripts/install_et.sh` if you have not done so already.
 
 ### Examples
 
@@ -218,6 +219,7 @@ From the torchchat root directory, run
 ```
 bash torchchat/utils/scripts/build_torchao_ops.sh mps
 ```
+Note that before running it, you must first clone torchao with `bash torchchat/utils/scripts/clone_torchao.sh` if you have not done so already.
 
 ### Examples
 
