@@ -234,13 +234,7 @@ class BuilderArgs:
         speculative_builder_args.pte_path = None
         return speculative_builder_args
 
-
-class TokenizerType(Enum):
-    NONE = 0
-    TIKTOKEN = 1
-    SENTENCEPIECE = 2
-    HF_TOKENIZER = 3
-
+from tokenizer.tokenizer_type import TokenizerType
 
 @dataclass
 class TokenizerArgs:
@@ -276,15 +270,6 @@ class TokenizerArgs:
         except:
             pass
 
-    def is_tiktoken(self) -> bool:
-        return self.tokenizer_type == TokenizerType.TIKTOKEN
-
-    def is_sentencepiece(self) -> bool:
-        return self.tokenizer_type == TokenizerType.SENTENCEPIECE
-
-    def is_hf_tokenizer(self) -> bool:
-        return self.tokenizer_type == TokenizerType.HF_TOKENIZER
-
     def validate_model(
         self,
         model: Optional[Model],
@@ -296,9 +281,9 @@ class TokenizerArgs:
         if self.tokenizer_type == TokenizerType.NONE:
             raise RuntimeError(f"no tokenizer was found at {self.tokenizer_path}")
 
-        is_tiktoken = self.is_tiktoken()
-        is_sentencepiece = self.is_sentencepiece()
-        is_hf_tokenizer = self.is_hf_tokenizer()
+        is_tiktoken = self.tokenizer_type == TokenizerType.TIKTOKEN
+        is_sentencepiece = self.tokenizer_type == TokenizerType.SENTENCEPIECE
+        is_hf_tokenizer = self.tokenizer_type == TokenizerType.HF_TOKENIZER
 
         use_tiktoken = model.config.use_tiktoken
         use_hf_tokenizer = model.config.use_hf_tokenizer
